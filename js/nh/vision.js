@@ -91,6 +91,11 @@ let varg = null;
 /* Macro definitions that I can't find anywhere. */
 /* don't use abs -- it may exist */
 /* expose viz_clear[][] for sanity checking */
+/**
+ * @param {number} x int
+ * @param {number} y int
+ * @returns {number} boolean
+ */
 export function get_viz_clear(x, y) {   // vision.c:105
     if (isok($c.i16(x), $c.i16(y)) && !viz_clear[y][x]) {
         return TRUE;
@@ -129,6 +134,12 @@ export function vision_init() {   // vision.c:121
  * an opaque region (gas cloud rather than CLOUD terrain) blocks sight,
  * or 2 if an opaque region blocks sight.  [At present, the rest of the
  * code makes no distinction between 1 and 2, just between 0 and non-0.]
+ */
+/**
+ * @param {number} x int
+ * @param {number} y int
+ * @param {$T.rm | null} lev struct rm *
+ * @returns {number} int
  */
 export function does_block(x, y, lev) {   // vision.c:153
     let obj = null, mon = null, $t1;
@@ -226,6 +237,11 @@ export function vision_reset() {   // vision.c:211
  * Called from vision_recalc() and at least one light routine.  Get pointers
  * to the unused vision work area.
  */
+/**
+ * @param {*} rows seenV ***
+ * @param {*} rmin coordxy **
+ * @param {*} rmax coordxy **
+ */
 function get_unused_cs(rows, rmin, rmax) {   // vision.c:274
     let row = 0, nrmin = null, nrmax = null, $t1, $t2;
     if ($c.peq(gv.viz_array, new $c.Ptr(cs_rows0, 0))) {
@@ -259,6 +275,12 @@ function get_unused_cs(rows, rmin, rmax) {   // vision.c:274
  *
  * We set the in_sight bit here as well to escape a bug that shows up
  * due to the one-sided lit wall hack.
+ */
+/**
+ * @param {*} next seenV **
+ * @param {*} rmin coordxy *
+ * @param {*} rmax coordxy *
+ * @returns {Promise<void>}
  */
 async function rogue_vision(next, rmin, rmax) {   // vision.c:314
     let rnum = 0, start = 0, stop = 0, in_door = 0, xhi = 0, xlo = 0, yhi = 0, ylo = 0, zx = 0, zy = 0, $t1, $t2;
@@ -409,6 +431,10 @@ async function rogue_vision(next, rmin, rmax) {   // vision.c:314
  *      + After an option has changed that affects vision [parseoptions()]
  *      + Right after the hero is swallowed. [gulpmu()]
  *      + Just before bubbles are moved. [movebubbles()]
+ */
+/**
+ * @param {number} control int
+ * @returns {Promise<void>}
  */
 export async function vision_recalc(control) {   // vision.c:512
     let temp_array = null, next_array = [null], next_row = null, old_row = null, next_rmin = [null], next_rmax = [null], ranges = null, row = 0, start = 0, stop = 0, dx = 0, dy = 0, col = 0, lev = null, flev = null, sv = null, oldseenv = 0, lo_col = 0, has_night_vision = 0, old_row_val = 0, $goto = null, $t1, $t2;
@@ -731,6 +757,10 @@ export async function vision_recalc(control) {   // vision.c:512
  *
  * Make the location opaque to light.
  */
+/**
+ * @param {number} x int
+ * @param {number} y int
+ */
 export function block_point(x, y) {   // vision.c:865
     let $t1;
     /* set DEBUGFILES=seethru in environment to see through clouds & water */
@@ -761,6 +791,10 @@ export function block_point(x, y) {   // vision.c:865
  *
  * Make the location transparent to light.
  */
+/**
+ * @param {number} x int
+ * @param {number} y int
+ */
 export function unblock_point(x, y) {   // vision.c:899
     dig_point(y, x);
     /* recalc light sources here? */
@@ -769,6 +803,10 @@ export function unblock_point(x, y) {   // vision.c:899
     }
 }
 /* recalc if point should be blocked or unblocked */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ */
 export function recalc_block_point(x, y) {   // vision.c:911
     if (does_block(x, y, $c.relem(svl.level.locations[x], y))) {
         block_point(x, y);
@@ -820,6 +858,10 @@ export function recalc_block_point(x, y) {   // vision.c:911
  *   right-most blocked spot to your right that is connected to you.
  *   This means that a right-edge (a blocked spot that has an open
  *   spot on its right) will point to itself.
+ */
+/**
+ * @param {number} row int
+ * @param {number} col int
  */
 function dig_point(row, col) {   // vision.c:967
     let i = 0;
@@ -903,6 +945,10 @@ function dig_point(row, col) {   // vision.c:967
         right_ptrs[row][col] = $c.i16(col + 1 | 0);
     }
 }
+/**
+ * @param {number} row int
+ * @param {number} col int
+ */
 function fill_point(row, col) {   // vision.c:1051
     let i = 0;
     if (!viz_clear[row][col]) {
@@ -1082,6 +1128,13 @@ function fill_point(row, col) {   // vision.c:1051
  *      m_canseeu()
  *      do_light_sources()
  */
+/**
+ * @param {number} col1 int
+ * @param {number} row1 int
+ * @param {number} col2 int
+ * @param {number} row2 int
+ * @returns {number} boolean
+ */
 export function clear_path(col1, row1, col2, row2) {   // vision.c:1613
     let result = 0, dx = 0, dy = 0, k = 0, err = 0, x = 0, y = 0, dxs = 0, dys = 0, dx$2 = 0, dy$2 = 0, k$2 = 0, err$2 = 0, x$2 = 0, y$2 = 0, dxs$2 = 0, dys$2 = 0, dx$3 = 0, dy$3 = 0, k$3 = 0, err$3 = 0, x$3 = 0, y$3 = 0, dxs$3 = 0, dys$3 = 0, dx$4 = 0, dy$4 = 0, k$4 = 0, err$4 = 0, x$4 = 0, y$4 = 0, dxs$4 = 0, dys$4 = 0;
     cleardone$: {
@@ -1259,6 +1312,13 @@ function view_init() {   // vision.c:1651
  *   left        first (left side) visible spot on prev row
  *   right_mark  last (right side) visible spot on prev row
  *   limits      points at range limit for current row, or NULL
+ */
+/**
+ * @param {number} row int
+ * @param {number} left int
+ * @param {number} right_mark int
+ * @param {*} limits const coordxy *
+ * @returns {Promise<void>}
  */
 async function right_side(row, left, right_mark, limits) {   // vision.c:1666
     let right = 0, right_edge = 0, nrow = 0, deeper = 0, result = 0, i = 0, rowp = null, row_min = null, row_max = null, lim_max = 0, dx = 0, dy = 0, k = 0, err = 0, x = 0, y = 0, dxs = 0, dys = 0, dx$2 = 0, dy$2 = 0, k$2 = 0, err$2 = 0, x$2 = 0, y$2 = 0, dxs$2 = 0, dys$2 = 0, dx$3 = 0, dy$3 = 0, k$3 = 0, err$3 = 0, x$3 = 0, y$3 = 0, dxs$3 = 0, dys$3 = 0, dx$4 = 0, dy$4 = 0, k$4 = 0, err$4 = 0, x$4 = 0, y$4 = 0, dxs$4 = 0, dys$4 = 0;
@@ -1633,6 +1693,13 @@ async function right_side(row, left, right_mark, limits) {   // vision.c:1666
  * This routine is the mirror image of right_side().  See right_side() for
  * extensive comments.
  */
+/**
+ * @param {number} row int
+ * @param {number} left_mark int
+ * @param {number} right int
+ * @param {*} limits const coordxy *
+ * @returns {Promise<void>}
+ */
 async function left_side(row, left_mark, right, limits) {   // vision.c:1858
     let left = 0, left_edge = 0, nrow = 0, deeper = 0, result = 0, i = 0, rowp = null, row_min = null, row_max = null, lim_min = 0, dx = 0, dy = 0, k = 0, err = 0, x = 0, y = 0, dxs = 0, dys = 0, dx$2 = 0, dy$2 = 0, k$2 = 0, err$2 = 0, x$2 = 0, y$2 = 0, dxs$2 = 0, dys$2 = 0, dx$3 = 0, dy$3 = 0, k$3 = 0, err$3 = 0, x$3 = 0, y$3 = 0, dxs$3 = 0, dys$3 = 0, dx$4 = 0, dy$4 = 0, k$4 = 0, err$4 = 0, x$4 = 0, y$4 = 0, dxs$4 = 0, dys$4 = 0;
     rowp = null;
@@ -1954,6 +2021,17 @@ async function left_side(row, left_mark, right, limits) {   // vision.c:1858
  *   func           function to call on each spot
  *   arg            argument for func
  */
+/**
+ * @param {number} srow coordxy
+ * @param {number} scol coordxy
+ * @param {*} loc_cs_rows seenV **
+ * @param {*} left_most coordxy *
+ * @param {*} right_most coordxy *
+ * @param {number} range int
+ * @param {Function | null} func void (*)(coordxy, coordxy, genericptr_t)
+ * @param {*} arg genericptr_t
+ * @returns {Promise<void>}
+ */
 async function view_from(srow, scol, loc_cs_rows, left_most, right_most, range, func, arg) {   // vision.c:2002
     let i = 0, rowp = null, nrow = 0, left = 0, right = 0, limits = null;
     /* loop counter */
@@ -2053,6 +2131,14 @@ async function view_from(srow, scol, loc_cs_rows, left_most, right_most, range, 
  * will call "func" when necessary.  If the hero is the center, use the
  * vision matrix and reduce extra work.
  */
+/**
+ * @param {number} scol coordxy
+ * @param {number} srow coordxy
+ * @param {number} range int
+ * @param {Function | null} func void (*)(coordxy, coordxy, genericptr_t)
+ * @param {*} arg genericptr_t
+ * @returns {Promise<void>}
+ */
 export async function do_clear_area(scol, srow, range, func, arg) {   // vision.c:2107
     let x = 0, y = 0, min_x = 0, max_x = 0, max_y = 0, offset = 0, limits = null, override_vision = 0;
     /* If not centered on hero, do the hard work of figuring the area */
@@ -2092,6 +2178,10 @@ export async function do_clear_area(scol, srow, range, func, arg) {   // vision.
     }
 }
 /* bitmask indicating ways mon is seen; extracted from lookat(pager.c) */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {number} unsigned int
+ */
 export function howmonseen(mon) {   // vision.c:2152
     let useemon = 0, xraydist = 0, how_seen = 0;
     useemon = $c.i8(canseemon(mon));

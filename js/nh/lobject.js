@@ -41,6 +41,10 @@ const luaO_ceillog2$log_2 = $h.data(256, 1);   // static in luaO_ceillog2()
 /*
 ** Computes ceil(log2(x))
 */
+/**
+ * @param {number} x unsigned int
+ * @returns {number} int
+ */
 export function luaO_ceillog2(x) {   // lobject.c:35
     let l = 0;
     /* log_2[i] = ceil(log2(i - 1)) */
@@ -52,6 +56,13 @@ export function luaO_ceillog2(x) {   // lobject.c:35
     }
     return l + $h.u8[luaO_ceillog2$log_2 + x] | 0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} op int
+ * @param {number | bigint} v1 lua_Integer
+ * @param {number | bigint} v2 lua_Integer
+ * @returns {Promise<number | bigint>} lua_Integer
+ */
 async function intarith(L, op, v1, v2) {   // lobject.c:53
     switch (op) {
         case 0:
@@ -83,6 +94,13 @@ async function intarith(L, op, v1, v2) {   // lobject.c:53
             return 0;
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} op int
+ * @param {number} v1 lua_Number
+ * @param {number} v2 lua_Number
+ * @returns {number} lua_Number
+ */
 function numarith(L, op, v1, v2) {   // lobject.c:73
     switch (op) {
         case 0:
@@ -106,6 +124,14 @@ function numarith(L, op, v1, v2) {   // lobject.c:73
             return 0;
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} op int
+ * @param {number} p1 const TValue *
+ * @param {number} p2 const TValue *
+ * @param {number} res TValue *
+ * @returns {Promise<number>} int
+ */
 export async function luaO_rawarith(L, op, p1, p2, res) {   // lobject.c:89
     let io = 0, n1 = 0, n2 = 0, io$2 = 0, n1$2 = 0, n2$2 = 0, io$3 = 0, io$4 = 0, $t1, $t2, $t3, $t4;
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
@@ -169,12 +195,24 @@ export async function luaO_rawarith(L, op, p1, p2, res) {   // lobject.c:89
         }
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} op int
+ * @param {number} p1 const TValue *
+ * @param {number} p2 const TValue *
+ * @param {number} res StkId
+ * @returns {Promise<void>}
+ */
 export async function luaO_arith(L, op, p1, p2, res) {   // lobject.c:126
     if (!await luaO_rawarith(L, op, p1, p2, res)) {
         /* could not perform raw operation; try metamethod */
         await luaT_trybinTM(L, p1, p2, res, ((op - 0 | 0) + 6 /* TM_ADD */ | 0) >>> 0);
     }
 }
+/**
+ * @param {number} c int
+ * @returns {number} int
+ */
 export function luaO_hexavalue(c) {   // lobject.c:135
     if ($h.u8[luai_ctype_ + (c + 1 | 0)] & 2) {
         return c - 48 | 0;
@@ -182,6 +220,10 @@ export function luaO_hexavalue(c) {   // lobject.c:135
         return ((c | 32) - 97 | 0) + 10 | 0;
     }
 }
+/**
+ * @param {number} s const char **
+ * @returns {number} int
+ */
 function isneg(s) {   // lobject.c:141
     if ($h.i8[$h.u32[s >>> 2]] === 45) {
         $h.stp(s, $h.u32[s >>> 2] + 1);
@@ -239,6 +281,12 @@ function isneg(s) {   // lobject.c:141
 ** fail or the address of the ending '\0' on success. ('mode' == 'x')
 ** means a hexadecimal numeral.
 */
+/**
+ * @param {number} s const char *
+ * @param {number} result lua_Number *
+ * @param {number} mode int
+ * @returns {number} const char *
+ */
 function l_str2dloc(s, result, mode) {   // lobject.c:228
     let $t1;
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
@@ -267,6 +315,11 @@ function l_str2dloc(s, result, mode) {   // lobject.c:228
 ** - 'x' means a hexadecimal numeral
 ** - '.' just optimizes the search for the common case (no special chars)
 */
+/**
+ * @param {number} s const char *
+ * @param {number} result lua_Number *
+ * @returns {number} const char *
+ */
 function l_str2d(s, result) {   // lobject.c:251
     let endptr = 0, pmode = 0, mode = 0, pdot = 0, $t1;
     const $sp0 = $h.st.sp, $fp = $h.enter(201);
@@ -293,6 +346,11 @@ function l_str2d(s, result) {   // lobject.c:251
         return endptr;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} s$in const char *
+ * @param {number} result lua_Integer *
+ * @returns {number} const char *
+ */
 function l_str2int(s$in, result) {   // lobject.c:276
     let a = 0, empty = 0, neg = 0, d = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
@@ -333,6 +391,11 @@ function l_str2int(s$in, result) {   // lobject.c:276
         }
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} s const char *
+ * @param {number} o TValue *
+ * @returns {number | bigint} size_t
+ */
 export function luaO_str2num(s, o) {   // lobject.c:308
     let e = 0, io = 0, io$2 = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
@@ -357,6 +420,11 @@ export function luaO_str2num(s, o) {   // lobject.c:308
         return $c.u64($c.add64(e - s, 1));   /* success; return string size */
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} buff char *
+ * @param {number | bigint} x unsigned long
+ * @returns {number} int
+ */
 export function luaO_utf8esc(buff, x) {   // lobject.c:323
     let n = 0, mfb = 0, $t1;
     n = 1;   /* number of bytes put in buffer (backwards) */
@@ -387,6 +455,11 @@ export function luaO_utf8esc(buff, x) {   // lobject.c:323
 /*
 ** Convert a number object to a string, adding it to a buffer
 */
+/**
+ * @param {number} obj TValue *
+ * @param {number} buff char *
+ * @returns {number} int
+ */
 function tostringbuff(obj, buff) {   // lobject.c:355
     let len = 0, $t1, $t2, $t3, $t4;
     0;
@@ -405,6 +478,11 @@ function tostringbuff(obj, buff) {   // lobject.c:355
 /*
 ** Convert a number object to a Lua string, replacing the value at 'obj'
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} obj TValue *
+ * @returns {Promise<void>}
+ */
 export async function luaO_tostring(L, obj) {   // lobject.c:374
     let len = 0, io = 0, x_ = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(44);
@@ -428,6 +506,12 @@ export async function luaO_tostring(L, obj) {   // lobject.c:374
 ** long. In that case, 'luaV_concat' frees the extra slot before
 ** raising the error.
 */
+/**
+ * @param {number} buff BuffFS *
+ * @param {number} str const char *
+ * @param {number | bigint} lstr size_t
+ * @returns {Promise<void>}
+ */
 async function pushstr(buff, str, lstr) {   // lobject.c:414
     let L = 0, io = 0, x_ = 0;
     L = $h.u32[buff >>> 2];
@@ -449,6 +533,10 @@ async function pushstr(buff, str, lstr) {   // lobject.c:414
 /*
 ** empty the buffer space into the stack
 */
+/**
+ * @param {number} buff BuffFS *
+ * @returns {Promise<void>}
+ */
 async function clearbuff(buff) {   // lobject.c:428
     await pushstr(buff, buff + 16, $c.u64($h.i32[(buff + 12) >>> 2]));   /* push buffer contents */
     $h.i32[(buff + 12) >>> 2] = 0;   /* space now is empty */
@@ -457,6 +545,11 @@ async function clearbuff(buff) {   // lobject.c:428
 ** Get a space of size 'sz' in the buffer. If buffer has not enough
 ** space, empty it. 'sz' must fit in an empty buffer.
 */
+/**
+ * @param {number} buff BuffFS *
+ * @param {number} sz int
+ * @returns {Promise<number>} char *
+ */
 async function getbuff(buff, sz) {   // lobject.c:438
     0;
     0;
@@ -469,6 +562,12 @@ async function getbuff(buff, sz) {   // lobject.c:438
 ** Add 'str' to the buffer. If string is larger than the buffer space,
 ** push the string directly to the stack.
 */
+/**
+ * @param {number} buff BuffFS *
+ * @param {number} str const char *
+ * @param {number | bigint} slen size_t
+ * @returns {Promise<void>}
+ */
 async function addstr2buff(buff, str, slen) {   // lobject.c:453
     let bf = 0;
     if (slen <= 199) {
@@ -485,6 +584,11 @@ async function addstr2buff(buff, str, slen) {   // lobject.c:453
 /*
 ** Add a numeral to the buffer.
 */
+/**
+ * @param {number} buff BuffFS *
+ * @param {number} num TValue *
+ * @returns {Promise<void>}
+ */
 async function addnum2buff(buff, num) {   // lobject.c:469
     let numbuff = 0, len = 0;
     numbuff = await getbuff(buff, 44);
@@ -495,6 +599,12 @@ async function addnum2buff(buff, num) {   // lobject.c:469
 ** this function handles only '%d', '%c', '%f', '%p', '%s', and '%%'
    conventional formats, plus Lua-specific '%I' and '%U'
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} fmt const char *
+ * @param {number} argp va_list
+ * @returns {Promise<number>} const char *
+ */
 export async function luaO_pushvfstring(L, fmt, argp) {   // lobject.c:480
     let e = 0, s = 0, io = 0, io$2 = 0, io$3 = 0, sz = 0, bf = 0, p = 0, len = 0, len$2 = 0, $t1, $t2, $t3, $t4;
     const $sp0 = $h.st.sp, $fp = $h.enter(280);
@@ -592,6 +702,12 @@ export async function luaO_pushvfstring(L, fmt, argp) {   // lobject.c:480
         return $h.u32[($h.u32[(L + 16) >>> 2] - 16) >>> 2] + 24;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} fmt const char *
+ * @param {...*} $va the C variable arguments (...)
+ * @returns {Promise<number>} const char *
+ */
 export async function luaO_pushfstring(L, fmt, ...$va) {   // lobject.c:549
     let msg = 0, argp = null;
     argp = new $c.VaList($va);
@@ -600,6 +716,11 @@ export async function luaO_pushfstring(L, fmt, ...$va) {   // lobject.c:549
     return msg;
 }
 /* }================================================================== */
+/**
+ * @param {number} out char *
+ * @param {number} source const char *
+ * @param {number | bigint} srclen size_t
+ */
 export function luaO_chunkid(out, source, srclen) {   // lobject.c:567
     let bufflen = 0, nl = 0;
     bufflen = 60;   /* free space in buffer */

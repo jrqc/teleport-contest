@@ -41,6 +41,11 @@ export function settrack() {   // track.c:24
 }
 /* get a track coord on or next to x,y and last tracked by hero,
    returns null if no such track */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {$T.nhcoord | null} coord *
+ */
 export function gettrack(x, y) {   // track.c:42
     let cnt = 0, ndist = 0, tc = null, $t1;
     cnt = utcnt[0];
@@ -59,6 +64,11 @@ export function gettrack(x, y) {   // track.c:42
 }
 /* !SFCTOOL */
 /* return TRUE if x,y has hero tracks on it */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 export function hastrack(x, y) {   // track.c:63
     let i = 0;
     for (i = 0; i < utcnt[0]; i = i + 1 | 0) {
@@ -69,6 +79,10 @@ export function hastrack(x, y) {   // track.c:63
     return FALSE;
 }
 /* save the hero tracking info */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 export async function save_track(nhfp) {   // track.c:76
     let i = 0;
     if (update_file(nhfp)) {
@@ -83,6 +97,10 @@ export async function save_track(nhfp) {   // track.c:76
     }
 }
 /* restore the hero tracking info */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 export async function rest_track(nhfp) {   // track.c:93
     let i = 0;
     await sfi_int(nhfp, new $c.Ptr(utcnt, 0), $c.lit("track-utcnt"));

@@ -154,6 +154,9 @@ export const hands_obj = new $T.obj();
 export function program_state_init() {   // decl.c:1074
     program_state.$copyFrom(init_program_state);
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function decl_globals_init() {   // decl.c:1080
     ga.$copyFrom(g_init_a);
     gb.$copyFrom(g_init_b);
@@ -384,6 +387,9 @@ export async function decl_globals_init() {   // decl.c:1080
    initialization for fields that aren't explicitly initialized (all of
    'context'); having bite() pass &svc.context.victual to this no-op
    eliminates the analyzer's very verbose complaint */
+/**
+ * @param {$T.victual_info | null} context_victual volatile struct victual_info *
+ */
 export function sa_victual(context_victual) {   // decl.c:1199
     return;
 }

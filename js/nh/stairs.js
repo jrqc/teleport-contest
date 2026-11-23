@@ -11,6 +11,14 @@ import { assign_level, depth, dunlev, on_level, single_level_branch, u_on_newpos
 import { FALSE, TRUE } from './global.h.js';
 import { eos, strsubst } from './hacklib.js';
 
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} up boolean
+ * @param {number} isladder boolean
+ * @param {$T.d_level | null} dest d_level *
+ * @returns {Promise<void>}
+ */
 export async function stairway_add(x, y, up, isladder, dest) {   // stairs.c:8
     let tmp = null;
     tmp = $c.asRec(await alloc(24), $T.stairway, 24);
@@ -34,6 +42,11 @@ export function stairway_free_all() {   // stairs.c:27
     }
     gs.stairs = null;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {$T.stairway | null} stairway *
+ */
 export function stairway_at(x, y) {   // stairs.c:40
     let tmp = null;
     tmp = gs.stairs;
@@ -42,6 +55,10 @@ export function stairway_at(x, y) {   // stairs.c:40
     }
     return tmp;
 }
+/**
+ * @param {$T.d_level | null} fromdlev d_level *
+ * @returns {$T.stairway | null} stairway *
+ */
 export function stairway_find(fromdlev) {   // stairs.c:50
     let tmp = null;
     tmp = gs.stairs;
@@ -53,6 +70,11 @@ export function stairway_find(fromdlev) {   // stairs.c:50
     }
     return tmp;
 }
+/**
+ * @param {$T.d_level | null} fromdlev d_level *
+ * @param {number} isladder boolean
+ * @returns {$T.stairway | null} stairway *
+ */
 export function stairway_find_from(fromdlev, isladder) {   // stairs.c:64
     let tmp = null;
     tmp = gs.stairs;
@@ -64,6 +86,10 @@ export function stairway_find_from(fromdlev, isladder) {   // stairs.c:64
     }
     return tmp;
 }
+/**
+ * @param {number} up boolean
+ * @returns {$T.stairway | null} stairway *
+ */
 export function stairway_find_dir(up) {   // stairs.c:79
     let tmp = null;
     tmp = gs.stairs;
@@ -72,6 +98,11 @@ export function stairway_find_dir(up) {   // stairs.c:79
     }
     return tmp;
 }
+/**
+ * @param {number} isladder boolean
+ * @param {number} up boolean
+ * @returns {$T.stairway | null} stairway *
+ */
 export function stairway_find_type_dir(isladder, up) {   // stairs.c:89
     let tmp = null;
     tmp = gs.stairs;
@@ -80,6 +111,10 @@ export function stairway_find_type_dir(isladder, up) {   // stairs.c:89
     }
     return tmp;
 }
+/**
+ * @param {number} up boolean
+ * @returns {$T.stairway | null} stairway *
+ */
 export function stairway_find_special_dir(up) {   // stairs.c:99
     let tmp = null;
     tmp = gs.stairs;
@@ -92,6 +127,10 @@ export function stairway_find_special_dir(up) {   // stairs.c:99
     return tmp;
 }
 /* place you on the special staircase */
+/**
+ * @param {number} upflag int
+ * @returns {Promise<void>}
+ */
 export async function u_on_sstairs(upflag) {   // stairs.c:113
     let stway = null;
     stway = stairway_find_special_dir($c.i8(upflag));
@@ -102,6 +141,9 @@ export async function u_on_sstairs(upflag) {   // stairs.c:113
     }
 }
 /* place you on upstairs (or special equivalent) */
+/**
+ * @returns {Promise<void>}
+ */
 export async function u_on_upstairs() {   // stairs.c:125
     let stway = null;
     stway = stairway_find_dir(TRUE);
@@ -112,6 +154,9 @@ export async function u_on_upstairs() {   // stairs.c:125
     }
 }
 /* place you on dnstairs (or special equivalent) */
+/**
+ * @returns {Promise<void>}
+ */
 export async function u_on_dnstairs() {   // stairs.c:137
     let stway = null;
     stway = stairway_find_dir(FALSE);
@@ -121,19 +166,39 @@ export async function u_on_dnstairs() {   // stairs.c:137
         await u_on_sstairs(1);   /* destination dnstairs implies moving up */
     }
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 export function On_stairs(x, y) {   // stairs.c:148
     return $c.i8(!$c.peq(stairway_at(x, y), $c.asRec(null, $T.stairway, 24)) ? 1 : 0);
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 export function On_ladder(x, y) {   // stairs.c:154
     let stway = null;
     stway = stairway_at(x, y);
     return $c.i8(stway && stway.isladder ? 1 : 0);
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 export function On_stairs_up(x, y) {   // stairs.c:162
     let stway = null;
     stway = stairway_at(x, y);
     return $c.i8(stway && stway.up ? 1 : 0);
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 export function On_stairs_dn(x, y) {   // stairs.c:170
     let stway = null;
     stway = stairway_at(x, y);
@@ -141,10 +206,20 @@ export function On_stairs_dn(x, y) {   // stairs.c:170
 }
 /* return True if 'sway' is a branch staircase and hero has used these stairs
    to visit the branch */
+/**
+ * @param {$T.stairway | null} sway stairway *
+ * @returns {number} boolean
+ */
 export function known_branch_stairs(sway) {   // stairs.c:180
     return $c.i8(sway && sway.tolev.dnum !== u.uz.dnum && sway.u_traversed ? 1 : 0);
 }
 /* describe staircase 'sway' based on whether hero knows the destination */
+/**
+ * @param {$T.stairway | null} sway stairway *
+ * @param {$c.Ptr | null} outbuf char *
+ * @param {number} stcase boolean
+ * @returns {$c.Ptr | null} char *
+ */
 export function stairs_description(sway, outbuf, stcase) {   // stairs.c:187
     let tolev = new $T.d_level(), stairs = null, updown = null, specialdepth = 0, to_dlev = 0;
     /* stairs/ladder to describe */

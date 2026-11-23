@@ -63,12 +63,22 @@ import { u_at } from './you.macros.js';
 import { Deaf, Fumbling, Hallucination, Levitation, Passes_walls, Unaware, Underwater } from './youprop.macros.js';
 
 const E_phrase$wholebuf = new Int8Array(80);   // static in E_phrase()
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 export function is_waterwall(x, y) {   // dbridge.c:38
     if (isok(x, y) && svl.level.locations[x][y].typ === WATER) {
         return TRUE;
     }
     return FALSE;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 export function is_pool(x, y) {   // dbridge.c:46
     let ltyp = 0;
     if (!isok(x, y)) {
@@ -83,6 +93,11 @@ export function is_pool(x, y) {   // dbridge.c:46
     }
     return FALSE;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 export function is_lava(x, y) {   // dbridge.c:62
     let ltyp = 0;
     if (!isok(x, y)) {
@@ -94,6 +109,11 @@ export function is_lava(x, y) {   // dbridge.c:62
     }
     return FALSE;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 export function is_pool_or_lava(x, y) {   // dbridge.c:77
     if (is_pool(x, y) || is_lava(x, y)) {
         return TRUE;
@@ -101,6 +121,11 @@ export function is_pool_or_lava(x, y) {   // dbridge.c:77
         return FALSE;
     }
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 export function is_ice(x, y) {   // dbridge.c:86
     let ltyp = 0;
     if (!isok(x, y)) {
@@ -112,6 +137,11 @@ export function is_ice(x, y) {   // dbridge.c:86
     }
     return FALSE;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 export function is_moat(x, y) {   // dbridge.c:100
     let ltyp = 0;
     if (!isok(x, y)) {
@@ -123,6 +153,10 @@ export function is_moat(x, y) {   // dbridge.c:100
     }
     return FALSE;
 }
+/**
+ * @param {number} mask int
+ * @returns {number} schar
+ */
 export function db_under_typ(mask) {   // dbridge.c:116
     switch (mask & DB.UNDER) {
         case DB.ICE:
@@ -140,6 +174,11 @@ export function db_under_typ(mask) {   // dbridge.c:116
  * of an eventual drawbridge.
  *
  * Return value:  the direction of the drawbridge, or -1 if not valid
+ */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} int
  */
 export function is_drawbridge_wall(x, y) {   // dbridge.c:137
     let lev = null;
@@ -169,12 +208,22 @@ export function is_drawbridge_wall(x, y) {   // dbridge.c:137
  * drawbridge "wall" is UP in the location x, y
  * (instead of UP or DOWN, as with is_drawbridge_wall).
  */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 export function is_db_wall(x, y) {   // dbridge.c:170
     return $c.i8(svl.level.locations[x][y].typ === DBWALL ? 1 : 0);
 }
 /*
  * Return true with x,y pointing to the drawbridge if x,y initially indicate
  * a drawbridge or drawbridge wall.
+ */
+/**
+ * @param {*} x coordxy *
+ * @param {*} y coordxy *
+ * @returns {number} boolean
  */
 export function find_drawbridge(x, y) {   // dbridge.c:180
     let dir = 0;
@@ -204,6 +253,10 @@ export function find_drawbridge(x, y) {   // dbridge.c:180
 /*
  * Find the drawbridge wall associated with a drawbridge.
  */
+/**
+ * @param {*} x coordxy *
+ * @param {*} y coordxy *
+ */
 function get_wall_for_db(x, y) {   // dbridge.c:211
     switch ((svl.level.locations[x.get(0)][y.get(0)].flags | 0) & DB.DIR) {
         case DB.NORTH:
@@ -224,6 +277,13 @@ function get_wall_for_db(x, y) {   // dbridge.c:211
  * Creation of a drawbridge at pos x,y.
  *     dir is the direction.
  *     flag must be put to TRUE if we want the drawbridge to be opened.
+ */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} dir int
+ * @param {number} flag boolean
+ * @returns {Promise<number>} boolean
  */
 export async function create_drawbridge(x, y, dir, flag) {   // dbridge.c:235
     let x2 = 0, y2 = 0, horiz = 0, lava = 0;
@@ -273,6 +333,11 @@ export async function create_drawbridge(x, y, dir, flag) {   // dbridge.c:235
     }
     return TRUE;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<$T.entity | null>} struct entity *
+ */
 async function e_at(x, y) {   // dbridge.c:286
     let entitycnt = 0, save_plnmsg = 0;
     for (entitycnt = 0; entitycnt < ENTITIES; entitycnt = entitycnt + 1 | 0) {
@@ -289,6 +354,12 @@ async function e_at(x, y) {   // dbridge.c:286
     } while (0);
     return entitycnt === ENTITIES ? null : $c.relem(go.occupants, entitycnt);
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$T.entity | null} etmp struct entity *
+ */
 function m_to_e(mtmp, x, y, etmp) {   // dbridge.c:304
     let $t1;
     etmp.emon = mtmp;
@@ -305,12 +376,20 @@ function m_to_e(mtmp, x, y, etmp) {   // dbridge.c:304
         $t1 = etmp.ey = 0, etmp.ex = $t1;
     }
 }
+/**
+ * @param {$T.entity | null} etmp struct entity *
+ */
 function u_to_e(etmp) {   // dbridge.c:321
     etmp.emon = gy.youmonst;
     etmp.ex = u.ux;
     etmp.ey = u.uy;
     etmp.edata = gy.youmonst.data;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$T.entity | null} etmp struct entity *
+ */
 function set_entity(x, y, etmp) {   // dbridge.c:330
     /* location of span or portcullis */
     /* pointer to occupants[0] or occupants[1] */
@@ -326,12 +405,21 @@ function set_entity(x, y, etmp) {   // dbridge.c:330
  * the specialized routines below suffice for all current purposes.
  */
 /* #define e_strg(etmp, func) (is_u(etmp) ? (char *) 0 : func(etmp->emon)) */
+/**
+ * @param {$T.entity | null} etmp struct entity *
+ * @returns {Promise<$c.Ptr | null>} const char *
+ */
 async function e_nam(etmp) {   // dbridge.c:351
     return is_u(etmp) ? $c.lit("you") : await mon_nam(etmp.emon);
 }
 /*
  * Generates capitalized entity name, makes 2nd -> 3rd person conversion on
  * verb, where necessary.
+ */
+/**
+ * @param {$T.entity | null} etmp struct entity *
+ * @param {$c.Ptr | null} verb const char *
+ * @returns {Promise<$c.Ptr | null>} const char *
  */
 async function E_phrase(etmp, verb) {   // dbridge.c:361
     $c.strcpy(new $c.Ptr(E_phrase$wholebuf, 0), $c.peq(etmp.emon, gy.youmonst) ? $c.lit("You") : await Monnam(etmp.emon));
@@ -349,6 +437,12 @@ async function E_phrase(etmp, verb) {   // dbridge.c:361
 /*
  * Simple-minded "can it be here?" routine
  */
+/**
+ * @param {$T.entity | null} etmp struct entity *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 function e_survives_at(etmp, x, y) {   // dbridge.c:380
     if (noncorporeal(etmp.edata)) {
         return TRUE;
@@ -365,6 +459,12 @@ function e_survives_at(etmp, x, y) {   // dbridge.c:380
     }
     return TRUE;
 }
+/**
+ * @param {$T.entity | null} etmp struct entity *
+ * @param {number} xkill_flags int
+ * @param {number} how int
+ * @returns {Promise<void>}
+ */
 async function e_died(etmp, xkill_flags, how) {   // dbridge.c:402
     let xy = new $T.nhcoord(), entitycnt = 0, seeit = 0;
     if (is_u(etmp)) {
@@ -435,11 +535,20 @@ async function e_died(etmp, xkill_flags, how) {   // dbridge.c:402
 /*
  * These are never directly affected by a bridge or portcullis.
  */
+/**
+ * @param {$T.entity | null} etmp struct entity *
+ * @returns {number} boolean
+ */
 function automiss(etmp) {   // dbridge.c:486
     return $c.i8((is_u(etmp) ? Passes_walls() : passes_walls(etmp.edata)) || noncorporeal(etmp.edata) ? 1 : 0);
 }
 /*
  * Does falling drawbridge or portcullis miss etmp?
+ */
+/**
+ * @param {$T.entity | null} etmp struct entity *
+ * @param {number} chunks boolean
+ * @returns {Promise<number>} boolean
  */
 async function e_missed(etmp, chunks) {   // dbridge.c:496
     let misses = 0, save_plnmsg = 0, save_plnmsg$2 = 0;
@@ -479,6 +588,10 @@ async function e_missed(etmp, chunks) {   // dbridge.c:496
 /*
  * Can etmp jump from death?
  */
+/**
+ * @param {$T.entity | null} etmp struct entity *
+ * @returns {Promise<number>} boolean
+ */
 async function e_jumps(etmp) {   // dbridge.c:531
     let tmp = 0, save_plnmsg = 0;
     tmp = 4;   /* out of 10 */
@@ -503,6 +616,10 @@ async function e_jumps(etmp) {   // dbridge.c:531
     } while (0);
     return $c.i8(tmp >= rnd(10) ? TRUE : FALSE);
 }
+/**
+ * @param {$T.entity | null} etmp struct entity *
+ * @returns {Promise<void>}
+ */
 async function do_entity(etmp) {   // dbridge.c:554
     let newx = Int16Array.of(0), newy = Int16Array.of(0), oldx = 0, oldy = 0, at_portcullis = 0, must_jump = 0, relocates = 0, e_inview = 0, crm = null, save_plnmsg = 0, save_plnmsg$2 = 0, save_plnmsg$3 = 0, save_plnmsg$4 = 0, save_plnmsg$5 = 0, save_plnmsg$6 = 0, other = null, save_plnmsg$7 = 0, save_plnmsg$8 = 0, save_plnmsg$9 = 0, save_plnmsg$10 = 0, save_plnmsg$11 = 0, save_plnmsg$12 = 0, save_plnmsg$13 = 0, save_plnmsg$14 = 0, save_plnmsg$15 = 0, save_plnmsg$16 = 0, save_plnmsg$17 = 0, lava = 0;
     must_jump = FALSE;
@@ -793,6 +910,11 @@ function nokiller() {   // dbridge.c:763
 /*
  * Close the drawbridge located at x,y
  */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function close_drawbridge(x, y) {   // dbridge.c:775
     let lev1 = null, lev2 = null, t = null, x2 = Int16Array.of(0), y2 = Int16Array.of(0);
     lev1 = $c.relem(svl.level.locations[x], y);
@@ -850,6 +972,11 @@ export async function close_drawbridge(x, y) {   // dbridge.c:775
 /*
  * Open the drawbridge located at x,y
  */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function open_drawbridge(x, y) {   // dbridge.c:840
     let lev1 = null, lev2 = null, t = null, x2 = Int16Array.of(0), y2 = Int16Array.of(0);
     lev1 = $c.relem(svl.level.locations[x], y);
@@ -894,6 +1021,11 @@ export async function open_drawbridge(x, y) {   // dbridge.c:840
 }
 /*
  * Let's destroy the drawbridge located at x,y
+ */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
  */
 export async function destroy_drawbridge(x, y) {   // dbridge.c:888
     let lev1 = null, lev2 = null, t = null, otmp = null, x2 = Int16Array.of(0), y2 = Int16Array.of(0), i = 0, e_inview = 0, etmp1 = null, etmp2 = null, otmp2 = null, lava = 0, save_plnmsg = 0, save_plnmsg$2 = 0;

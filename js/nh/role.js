@@ -73,9 +73,17 @@ export const genders = $c.recArray($T.Gender, 4);
 export const aligns = $c.recArray($T.Align, 4);
 /* used by str2XXX() */
 const randomstr = new Int8Array(7);
+/**
+ * @param {number} rolenum int
+ * @returns {number} boolean
+ */
 export function validrole(rolenum) {   // role.c:713
     return $c.i8(rolenum >= 0 && rolenum < 13 ? 1 : 0);
 }
+/**
+ * @param {number} for_display boolean
+ * @returns {number} int
+ */
 export function randrole(for_display) {   // role.c:719
     let res = 0;
     res = 13;
@@ -86,6 +94,9 @@ export function randrole(for_display) {   // role.c:719
     }
     return res;
 }
+/**
+ * @returns {number} int
+ */
 function randrole_filtered() {   // role.c:731
     let i = 0, n = 0, set = new Int32Array(14), $t1;
     n = 0;
@@ -98,6 +109,10 @@ function randrole_filtered() {   // role.c:731
     }
     return n ? set[rn2(n)] : randrole(FALSE);
 }
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @returns {Promise<number>} int
+ */
 export async function str2role(str) {   // role.c:747
     let i = 0, len = 0;
     /* Is str valid? */
@@ -126,10 +141,19 @@ export async function str2role(str) {   // role.c:747
     /* Couldn't find anything appropriate */
     return ROLE_NONE;
 }
+/**
+ * @param {number} rolenum int
+ * @param {number} racenum int
+ * @returns {number} boolean
+ */
 export function validrace(rolenum, racenum) {   // role.c:778
     /* Assumes validrole */
     return $c.i8(racenum >= 0 && racenum < 5 && roles[rolenum].allow & races[racenum].allow & ROLE_RACEMASK ? 1 : 0);
 }
+/**
+ * @param {number} rolenum int
+ * @returns {number} int
+ */
 export function randrace(rolenum) {   // role.c:787
     let i = 0, n = 0;
     n = 0;
@@ -156,6 +180,10 @@ export function randrace(rolenum) {   // role.c:787
     /* This role has no permitted races? */
     return rn2(5);
 }
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @returns {Promise<number>} int
+ */
 export async function str2race(str) {   // role.c:813
     let i = 0, len = 0;
     /* Is str valid? */
@@ -184,10 +212,21 @@ export async function str2race(str) {   // role.c:813
     /* Couldn't find anything appropriate */
     return ROLE_NONE;
 }
+/**
+ * @param {number} rolenum int
+ * @param {number} racenum int
+ * @param {number} gendnum int
+ * @returns {number} boolean
+ */
 export function validgend(rolenum, racenum, gendnum) {   // role.c:844
     /* Assumes validrole and validrace */
     return $c.i8(gendnum >= 0 && gendnum < ROLE_GENDERS && roles[rolenum].allow & races[racenum].allow & genders[gendnum].allow & ROLE_GENDMASK ? 1 : 0);
 }
+/**
+ * @param {number} rolenum int
+ * @param {number} racenum int
+ * @returns {number} int
+ */
 export function randgend(rolenum, racenum) {   // role.c:853
     let i = 0, n = 0;
     n = 0;
@@ -213,6 +252,10 @@ export function randgend(rolenum, racenum) {   // role.c:853
     /* This role/race has no permitted genders? */
     return rn2(ROLE_GENDERS);
 }
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @returns {Promise<number>} int
+ */
 export async function str2gend(str) {   // role.c:880
     let i = 0, len = 0;
     /* Is str valid? */
@@ -237,10 +280,21 @@ export async function str2gend(str) {   // role.c:880
     /* Couldn't find anything appropriate */
     return ROLE_NONE;
 }
+/**
+ * @param {number} rolenum int
+ * @param {number} racenum int
+ * @param {number} alignnum int
+ * @returns {number} boolean
+ */
 export function validalign(rolenum, racenum, alignnum) {   // role.c:907
     /* Assumes validrole and validrace */
     return $c.i8(alignnum >= 0 && alignnum < ROLE_ALIGNS && roles[rolenum].allow & races[racenum].allow & aligns[alignnum].allow & AM.MASK ? 1 : 0);
 }
+/**
+ * @param {number} rolenum int
+ * @param {number} racenum int
+ * @returns {number} int
+ */
 export function randalign(rolenum, racenum) {   // role.c:916
     let i = 0, n = 0;
     n = 0;
@@ -266,6 +320,10 @@ export function randalign(rolenum, racenum) {   // role.c:916
     /* This role/race has no permitted alignments? */
     return rn2(ROLE_ALIGNS);
 }
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @returns {Promise<number>} int
+ */
 export async function str2align(str) {   // role.c:943
     let i = 0, len = 0;
     /* Is str valid? */
@@ -291,6 +349,13 @@ export async function str2align(str) {   // role.c:943
     return ROLE_NONE;
 }
 /* is rolenum compatible with any racenum/gendnum/alignnum constraints? */
+/**
+ * @param {number} rolenum int
+ * @param {number} racenum int
+ * @param {number} gendnum int
+ * @param {number} alignnum int
+ * @returns {number} boolean
+ */
 export function ok_role(rolenum, racenum, gendnum, alignnum) {   // role.c:971
     let i = 0, allow = 0;
     if (rolenum >= 0 && rolenum < 13) {
@@ -332,6 +397,13 @@ export function ok_role(rolenum, racenum, gendnum, alignnum) {   // role.c:971
 /* pick a random role subject to any racenum/gendnum/alignnum constraints */
 /* If pickhow == PICK_RIGID a role is returned only if there is  */
 /* a single possibility */
+/**
+ * @param {number} racenum int
+ * @param {number} gendnum int
+ * @param {number} alignnum int
+ * @param {number} pickhow int
+ * @returns {number} int
+ */
 export function pick_role(racenum, gendnum, alignnum, pickhow) {   // role.c:1015
     let i = 0, roles_ok = 0, set = new Int32Array(14), $t1;
     roles_ok = 0;
@@ -346,6 +418,13 @@ export function pick_role(racenum, gendnum, alignnum, pickhow) {   // role.c:101
     return set[rn2(roles_ok)];
 }
 /* is racenum compatible with any rolenum/gendnum/alignnum constraints? */
+/**
+ * @param {number} rolenum int
+ * @param {number} racenum int
+ * @param {number} gendnum int
+ * @param {number} alignnum int
+ * @returns {number} boolean
+ */
 export function ok_race(rolenum, racenum, gendnum, alignnum) {   // role.c:1037
     let i = 0, allow = 0;
     if (racenum >= 0 && racenum < 5) {
@@ -387,6 +466,13 @@ export function ok_race(rolenum, racenum, gendnum, alignnum) {   // role.c:1037
 /* Pick a random race subject to any rolenum/gendnum/alignnum constraints.
    If pickhow == PICK_RIGID a race is returned only if there is
    a single possibility. */
+/**
+ * @param {number} rolenum int
+ * @param {number} gendnum int
+ * @param {number} alignnum int
+ * @param {number} pickhow int
+ * @returns {number} int
+ */
 export function pick_race(rolenum, gendnum, alignnum, pickhow) {   // role.c:1081
     let i = 0, races_ok = 0;
     races_ok = 0;
@@ -412,6 +498,13 @@ export function pick_race(rolenum, gendnum, alignnum, pickhow) {   // role.c:108
 }
 /* is gendnum compatible with any rolenum/racenum/alignnum constraints? */
 /* gender and alignment are not comparable (and also not constrainable) */
+/**
+ * @param {number} rolenum int
+ * @param {number} racenum int
+ * @param {number} gendnum int
+ * @param {number} alignnum int
+ * @returns {number} boolean
+ */
 export function ok_gend(rolenum, racenum, gendnum, alignnum) {   // role.c:1107
     let i = 0, allow = 0;
     if (gendnum >= 0 && gendnum < ROLE_GENDERS) {
@@ -448,6 +541,13 @@ export function ok_gend(rolenum, racenum, gendnum, alignnum) {   // role.c:1107
 /* gender and alignment are not comparable (and also not constrainable) */
 /* If pickhow == PICK_RIGID a gender is returned only if there is  */
 /* a single possibility */
+/**
+ * @param {number} rolenum int
+ * @param {number} racenum int
+ * @param {number} alignnum int
+ * @param {number} pickhow int
+ * @returns {number} int
+ */
 export function pick_gend(rolenum, racenum, alignnum, pickhow) {   // role.c:1146
     let i = 0, gends_ok = 0;
     gends_ok = 0;
@@ -473,6 +573,13 @@ export function pick_gend(rolenum, racenum, alignnum, pickhow) {   // role.c:114
 }
 /* is alignnum compatible with any rolenum/racenum/gendnum constraints? */
 /* alignment and gender are not comparable (and also not constrainable) */
+/**
+ * @param {number} rolenum int
+ * @param {number} racenum int
+ * @param {number} gendnum int
+ * @param {number} alignnum int
+ * @returns {number} boolean
+ */
 export function ok_align(rolenum, racenum, gendnum, alignnum) {   // role.c:1172
     let i = 0, allow = 0;
     if (alignnum >= 0 && alignnum < ROLE_ALIGNS) {
@@ -509,6 +616,13 @@ export function ok_align(rolenum, racenum, gendnum, alignnum) {   // role.c:1172
    alignment and gender are not comparable (and also not constrainable).
    If pickhow == PICK_RIGID an alignment is returned only if there is
    a single possibility. */
+/**
+ * @param {number} rolenum int
+ * @param {number} racenum int
+ * @param {number} gendnum int
+ * @param {number} pickhow int
+ * @returns {number} int
+ */
 export function pick_align(rolenum, racenum, gendnum, pickhow) {   // role.c:1211
     let i = 0, aligns_ok = 0;
     aligns_ok = 0;
@@ -573,6 +687,10 @@ export function rigid_role_checks() {   // role.c:1235
         }
     }
 }
+/**
+ * @param {$c.Ptr | null} bufp const char *
+ * @returns {Promise<number>} boolean
+ */
 export async function setrolefilter(bufp) {   // role.c:1284
     let i = 0, reslt = 0;
     reslt = TRUE;
@@ -589,6 +707,9 @@ export async function setrolefilter(bufp) {   // role.c:1284
     }
     return reslt;
 }
+/**
+ * @returns {number} boolean
+ */
 export function gotrolefilter() {   // role.c:1303
     let i = 0;
     if (gr.rfilter.mask) {
@@ -603,6 +724,11 @@ export function gotrolefilter() {   // role.c:1303
 }
 /* create a string like " !Bar !Kni" or " !chaotic" that can be
    put back into an RC file by #saveoptions */
+/**
+ * @param {$c.Ptr | null} outbuf char *
+ * @param {number} which int
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function rolefilterstring(outbuf, which) {   // role.c:1318
     let i = 0, $t1;
     $t1 = outbuf.set(1, 0), outbuf.set(0, $t1);
@@ -643,6 +769,9 @@ export async function rolefilterstring(outbuf, which) {   // role.c:1318
     /* constructed with a leading space; drop it */
     return outbuf.add(1);
 }
+/**
+ * @param {number} which int
+ */
 export function clearrolefilter(which) {   // role.c:1358
     let i = 0;
     switch (which) {
@@ -665,6 +794,11 @@ export function clearrolefilter(which) {   // role.c:1358
             break;
     }
 }
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @param {number} num_post_attribs int
+ * @returns {$c.Ptr | null} char *
+ */
 function promptsep(buf, num_post_attribs) {   // role.c:1384
     let conjuct = null;
     conjuct = $c.lit("and ");
@@ -678,6 +812,10 @@ function promptsep(buf, num_post_attribs) {   // role.c:1384
     }
     return buf;
 }
+/**
+ * @param {number} rolenum int
+ * @returns {number} int
+ */
 function role_gendercount(rolenum) {   // role.c:1399
     let gendcount = 0;
     gendcount = 0;
@@ -694,6 +832,10 @@ function role_gendercount(rolenum) {   // role.c:1399
     }
     return gendcount;
 }
+/**
+ * @param {number} racenum int
+ * @returns {number} int
+ */
 function race_alignmentcount(racenum) {   // role.c:1415
     let aligncount = 0;
     aligncount = 0;
@@ -710,6 +852,15 @@ function race_alignmentcount(racenum) {   // role.c:1415
     }
     return aligncount;
 }
+/**
+ * @param {$c.Ptr | null} suppliedbuf char *
+ * @param {number} buflen int
+ * @param {number} rolenum int
+ * @param {number} racenum int
+ * @param {number} gendnum int
+ * @param {number} alignnum int
+ * @returns {$c.Ptr | null} char *
+ */
 export function root_plselection_prompt(suppliedbuf, buflen, rolenum, racenum, gendnum, alignnum) {   // role.c:1431
     let k = 0, gendercount = 0, aligncount = 0, buf = new Int8Array(256), donefirst = 0;
     gendercount = 0;
@@ -850,6 +1001,15 @@ export function root_plselection_prompt(suppliedbuf, buflen, rolenum, racenum, g
         return new $c.Ptr(root_plselection_prompt$err_ret, 0);
     }
 }
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @param {number} buflen int
+ * @param {number} rolenum int
+ * @param {number} racenum int
+ * @param {number} gendnum int
+ * @param {number} alignnum int
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function build_plselection_prompt(buf, buflen, rolenum, racenum, gendnum, alignnum) {   // role.c:1583
     let defprompt = null, num_post_attribs = 0, tmpbuf = new Int8Array(256), p = null, $t1, $t2, $t3, $t4;
     defprompt = $c.lit("Shall I pick a character for you? [ynaq] ");
@@ -922,6 +1082,9 @@ export async function build_plselection_prompt(buf, buflen, rolenum, racenum, ge
     $c.strcat(buf, $c.lit(" for you? [ynaq] "));
     return buf;
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function plnamesuffix() {   // role.c:1665
     let sptr = null, eptr = null, i = 0, $t1, $t2;
     /* some generic user names will be ignored in favor of prompting */
@@ -977,6 +1140,11 @@ export async function plnamesuffix() {   // role.c:1665
 }
 /* show current settings for name, role, race, gender, and alignment
    in the specified window */
+/**
+ * @param {number} which int
+ * @param {number} where winid
+ * @returns {Promise<void>}
+ */
 export async function role_selection_prolog(which, where) {   // role.c:1726
     let buf = new Int8Array(256), r = 0, c = 0, gend = 0, a = 0, allowmask = 0;
     r = flags.initrole;
@@ -1045,6 +1213,12 @@ export async function role_selection_prolog(which, where) {   // role.c:1726
     await putstr()(where, 0, new $c.Ptr(buf, 0));
 }
 /* add a "pick alignment first"-type entry to the specified menu */
+/**
+ * @param {number} which int
+ * @param {number} where winid
+ * @param {number} preselect boolean
+ * @returns {Promise<void>}
+ */
 export async function role_menu_extra(which, where, preselect) {   // role.c:1816
     let any = new $T.any(), buf = new Int8Array(256), what = null, constrainer = null, forcedvalue = null, f = 0, r = 0, c = 0, gend = 0, a = 0, i = 0, allowmask = 0, clr = 0, setfiltering = new Int8Array(40);
     what = null;
@@ -1195,6 +1369,9 @@ export async function role_menu_extra(which, where, preselect) {   // role.c:181
  *
  * This code also replaces quest_init().
  */
+/**
+ * @returns {Promise<void>}
+ */
 export async function role_init() {   // role.c:1980
     let alignmnt = 0, pm = null, trycnt = 0, i = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8;
     /* Strip the role letter out of the player name.
@@ -1314,6 +1491,10 @@ export async function role_init() {   // role.c:1980
     /* Success! */
     return;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {$c.Ptr | null} const char *
+ */
 export function Hello(mtmp) {   // role.c:2120
     switch (gu.urole.mnum) {
         case PM.KNIGHT:
@@ -1328,6 +1509,9 @@ export function Hello(mtmp) {   // role.c:2120
             return $c.lit("Hello");
     }
 }
+/**
+ * @returns {$c.Ptr | null} const char *
+ */
 export function Goodbye() {   // role.c:2143
     switch (gu.urole.mnum) {
         case PM.KNIGHT:
@@ -1345,6 +1529,10 @@ export function Goodbye() {   // role.c:2143
 /* if pmindex is any player race (not necessarily the hero's),
    return a pointer to the races[] entry for it; if pmindex is for some
    other type of monster which isn't a player race, return Null */
+/**
+ * @param {number} pmindex short
+ * @returns {$T.Race | null} const struct Race *
+ */
 export function character_race(pmindex) {   // role.c:2163
     let r = null;
     for (r = $c.relem(races, 0); !$c.peq(r.noun, $c.asArr(null, Int8Array)); r = $c.radd(r, 1)) {
@@ -1356,6 +1544,9 @@ export function character_race(pmindex) {   // role.c:2163
 }
 /*--------------------------------------------------------------------------*/
 /* potential interface routine */
+/**
+ * @returns {Promise<void>}
+ */
 export async function genl_player_selection() {   // role.c:2177
     if (await genl_player_setup(0)) {
         return;
@@ -1366,6 +1557,10 @@ export async function genl_player_selection() {   // role.c:2177
 }
 /* try to reduce clutter in the code below... */
 /* guts of tty's player_selection() */
+/**
+ * @param {number} screenheight int
+ * @returns {Promise<number>} int
+ */
 export async function genl_player_setup(screenheight) {   // role.c:2206
     let pbuf = new Int8Array(128), any = new $T.any(), i = 0, k = 0, n = 0, choice = 0, nextpick = 0, getconfirmation = 0, picksomething = 0, win = 0, selected = [null], clr = 0, pick4u = 0, result = 0, prompt = null, excess = 0, saveROLE = 0, saveRACE = 0, saveGEND = 0, saveALGN = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13, $t14, $t15, $t16, $t17, $t18, $t19;
     win = WIN_ERR;
@@ -1886,6 +2081,9 @@ export async function genl_player_setup(screenheight) {   // role.c:2206
     program_state.in_role_selection = program_state.in_role_selection - 1 | 0;
     return result;
 }
+/**
+ * @returns {Promise<number>} boolean
+ */
 async function reset_role_filtering() {   // role.c:2728
     let win = 0, i = 0, n = 0, filterprompt = new Int8Array(128), selected = [null], $t1, $t2, $t3;
     selected[0] = null;
@@ -1924,6 +2122,11 @@ async function reset_role_filtering() {   // role.c:2728
    tty-only to tty+curses+? made the role selection menu require two pages
    on a traditional 24-line tty; that wasn't fair to tty, so squeeze out
    some blank separator lines from the menu if that will make it fit on one */
+/**
+ * @param {number} rows int
+ * @param {number} aspect int
+ * @returns {number} int
+ */
 function maybe_skip_seps(rows, aspect) {   // role.c:2777
     let i = 0, n = 0;
     n = 0;
@@ -1952,6 +2155,11 @@ function maybe_skip_seps(rows, aspect) {   // role.c:2777
     return 0;
 }
 /* start a menu; show role aspects specified so far as a header line */
+/**
+ * @param {number} ttyrows int
+ * @param {number} aspect int
+ * @returns {Promise<number>} winid
+ */
 async function plsel_startmenu(ttyrows, aspect) {   // role.c:2806
     let qbuf = new Int8Array(128), win = 0, rolename = null;
     /* whatever aspect was just chosen might force others (Orc => chaotic,
@@ -1977,6 +2185,14 @@ async function plsel_startmenu(ttyrows, aspect) {   // role.c:2806
     return win;
 }
 /* add entries a-Archeologist, b-Barbarian, &c to menu being built in 'win' */
+/**
+ * @param {number} win winid
+ * @param {number} filtering boolean
+ * @param {number} race int
+ * @param {number} gend int
+ * @param {number} algn int
+ * @returns {Promise<void>}
+ */
 async function setup_rolemenu(win, filtering, race, gend, algn) {   // role.c:2854
     let any = new $T.any(), i = 0, role_ok = 0, thisch = 0, lastch = 0, rolenamebuf = new Int8Array(50), clr = 0;
     /* True => exclude filtered roles;
@@ -2018,6 +2234,14 @@ async function setup_rolemenu(win, filtering, race, gend, algn) {   // role.c:28
         lastch = thisch;
     }
 }
+/**
+ * @param {number} win winid
+ * @param {number} filtering boolean
+ * @param {number} role int
+ * @param {number} gend int
+ * @param {number} algn int
+ * @returns {Promise<void>}
+ */
 async function setup_racemenu(win, filtering, role, gend, algn) {   // role.c:2905
     let any = new $T.any(), race_ok = 0, i = 0, this_ch = 0, clr = 0;
     clr = NO_COLOR;
@@ -2041,6 +2265,14 @@ async function setup_racemenu(win, filtering, role, gend, algn) {   // role.c:29
         await add_menu(win, nul_glyphinfo, any, $c.i8(filtering ? this_ch : highc(this_ch)), $c.i8(filtering ? highc(this_ch) : 0), ATR.NONE, clr, races[i].noun, !filtering && !race_ok ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     }
 }
+/**
+ * @param {number} win winid
+ * @param {number} filtering boolean
+ * @param {number} role int
+ * @param {number} race int
+ * @param {number} algn int
+ * @returns {Promise<void>}
+ */
 async function setup_gendmenu(win, filtering, role, race, algn) {   // role.c:2943
     let any = new $T.any(), gend_ok = 0, i = 0, this_ch = 0, clr = 0;
     clr = NO_COLOR;
@@ -2062,6 +2294,14 @@ async function setup_gendmenu(win, filtering, role, race, algn) {   // role.c:29
         await add_menu(win, nul_glyphinfo, any, $c.i8(filtering ? this_ch : highc(this_ch)), $c.i8(filtering ? highc(this_ch) : 0), ATR.NONE, clr, genders[i].adj, !filtering && !gend_ok ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     }
 }
+/**
+ * @param {number} win winid
+ * @param {number} filtering boolean
+ * @param {number} role int
+ * @param {number} race int
+ * @param {number} gend int
+ * @returns {Promise<void>}
+ */
 async function setup_algnmenu(win, filtering, role, race, gend) {   // role.c:2979
     let any = new $T.any(), algn_ok = 0, i = 0, this_ch = 0, clr = 0;
     clr = NO_COLOR;

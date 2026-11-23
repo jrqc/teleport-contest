@@ -64,6 +64,10 @@ import { luaopen_utf8 } from './lutf8lib.js';
 ** program
 */
 const loadedlibs = $h.data(176, 8);
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<void>}
+ */
 export async function luaL_openlibs(L) {   // linit.c:57
     let lib = 0;
     /* "require" functions from 'loadedlibs' and set results to global table */

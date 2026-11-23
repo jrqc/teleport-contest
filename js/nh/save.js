@@ -77,6 +77,9 @@ import { wish_history_flush } from './zap.js';
 const savetrapchn$zerotrap = new $T.trap();   // static in savetrapchn()
 const savefruitchn$zerofruit = new $T.fruit();   // static in savefruitchn()
 /* the #save command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dosave() {   // save.c:43
     await clear_nhwindow()($G.WIN_MESSAGE);
     if (await yn_function($c.lit("Really save?"), new $c.Ptr(ynchars, 0), 110, TRUE) === 110) {
@@ -105,6 +108,9 @@ export async function dosave() {   // save.c:43
     return ECMD.OK;
 }
 /* returns 1 if save successful */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dosave0() {   // save.c:74
     let fq_save = null, ltmp = Int8Array.of(0), whynot = new Int8Array(256), nhfp = null, onhfp = null, res = 0, $t1, $t2, $t3;
     res = 0;
@@ -258,6 +264,10 @@ export async function dosave0() {   // save.c:74
     program_state.saving = program_state.saving - 1 | 0;
     return res;
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 async function save_gamelog(nhfp) {   // save.c:237
     let tmp = null, tmp2 = null, slen = Int32Array.of(0);
     tmp = gg.gamelog;
@@ -283,6 +293,10 @@ async function save_gamelog(nhfp) {   // save.c:237
         gg.gamelog = null;
     }
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 async function savegamestate(nhfp) {   // save.c:265
     let i = 0, uid = [0], $t1, $t2;
     program_state.saving = program_state.saving + 1 | 0;   /* caller should/did already set this... */
@@ -345,6 +359,11 @@ async function savegamestate(nhfp) {   // save.c:265
     return;
 }
 /* potentially called from goto_level(do.c) as well as savestateinlock() */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @param {$c.Ptr | null} whynot char *
+ * @returns {Promise<number>} boolean
+ */
 export async function tricked_fileremoved(nhfp, whynot) {   // save.c:337
     if (!nhfp) {
         await pline1(whynot);
@@ -355,6 +374,9 @@ export async function tricked_fileremoved(nhfp, whynot) {   // save.c:337
     }
     return FALSE;
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function savestateinlock() {   // save.c:351
     let hpid = Int32Array.of(0), whynot = new Int8Array(256), nhfp = null, currlev = Int32Array.of(0), $goto = null;
     hpid[0] = 0;
@@ -436,6 +458,11 @@ export async function savestateinlock() {   // save.c:351
     gh.havestate = flags.ins_chkpt;
     return;
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @param {number} lev xint8
+ * @returns {Promise<void>}
+ */
 export async function savelev(nhfp, lev) {   // save.c:429
     let set_uz_save = 0, $t1;
     set_uz_save = $c.i8(gu.uz_save.dnum === 0 && gu.uz_save.dlevel === 0 ? 1 : 0);
@@ -455,6 +482,11 @@ export async function savelev(nhfp, lev) {   // save.c:429
         $t1 = gu.uz_save.dlevel = 0, gu.uz_save.dnum = $t1;   /* unset */
     }
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @param {number} lev$in xint8
+ * @returns {Promise<void>}
+ */
 async function savelev_core(nhfp, lev$in) {   // save.c:452
     const lev = Int8Array.of(lev$in);
     let i = 0, c = 0, r = 0, tmpc = null;
@@ -568,6 +600,10 @@ export function save_adjust_levelflags() {   // save.c:570
     /* adjust any timestamps */
     moves_to_relative_time(new $c.FieldRef(svl.level.flags, "stasis_until", "i64"));
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 async function savelevl(nhfp) {   // save.c:577
     let x = 0, y = 0;
     for (x = 0; x < COLNO; x = x + 1 | 0) {
@@ -578,6 +614,11 @@ async function savelevl(nhfp) {   // save.c:577
     return;
 }
 /* save Plane of Water's air bubbles and Plane of Air's clouds */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @param {number} lev xint8
+ * @returns {Promise<void>}
+ */
 async function save_bubbles(nhfp, lev) {   // save.c:591
     let bbubbly = Int8Array.of(0);
     /* air bubbles and clouds used to be saved as part of game state
@@ -598,6 +639,11 @@ async function save_bubbles(nhfp, lev) {   // save.c:591
     }
 }
 /* used when saving a level and also when saving dungeon overview data */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @param {*} cemeteryaddr struct cemetery **
+ * @returns {Promise<void>}
+ */
 export async function savecemetery(nhfp, cemeteryaddr) {   // save.c:617
     let thisbones = null, nextbones = null, flag = Int32Array.of(0);
     flag[0] = cemeteryaddr.get(0) ? 0 : -1;
@@ -618,6 +664,10 @@ export async function savecemetery(nhfp, cemeteryaddr) {   // save.c:617
         cemeteryaddr.set(0, null);
     }
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 async function savedamage(nhfp) {   // save.c:640
     let damageptr = null, tmp_dam = null, xl = Uint32Array.of(0);
     xl[0] = 0;
@@ -642,6 +692,10 @@ async function savedamage(nhfp) {   // save.c:640
         svl.level.damagelist = null;
     }
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 async function save_stairs(nhfp) {   // save.c:665
     let stway = null, buflen = Int32Array.of(0), use_relative = 0;
     stway = gs.stairs;
@@ -669,6 +723,10 @@ async function save_stairs(nhfp) {   // save.c:665
 }
 /* if ball and/or chain are loose, make an object chain for it/them and
    save that separately from other objects */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 async function save_bc(nhfp) {   // save.c:696
     let bc_objs = [null];
     bc_objs[0] = null;
@@ -696,6 +754,11 @@ async function save_bc(nhfp) {   // save.c:696
 }
 /* save one object;
    caveat: this is only for update_file(); caller handles release_data() */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function saveobj(nhfp, otmp) {   // save.c:726
     let buflen = Int32Array.of(0), zerobuf = Int32Array.of(0);
     zerobuf[0] = 0;
@@ -728,6 +791,11 @@ async function saveobj(nhfp, otmp) {   // save.c:726
 }
 /* save an object chain; sets head of list to Null when done;
    handles release_data() for each object in the list */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @param {*} obj_p struct obj **
+ * @returns {Promise<void>}
+ */
 async function saveobjchn(nhfp, obj_p) {   // save.c:762
     let otmp = null, otmp2 = null, is_invent = 0, minusone = Int32Array.of(0);
     otmp = obj_p.get(0);
@@ -791,6 +859,11 @@ async function saveobjchn(nhfp, obj_p) {   // save.c:762
         obj_p.set(0, null);
     }
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 async function savemon(nhfp, mtmp) {   // save.c:826
     let buflen = Int32Array.of(0);
     mtmp.mtemplit = (0) & 1;
@@ -846,6 +919,11 @@ async function savemon(nhfp, mtmp) {   // save.c:826
         await sfo_int(nhfp, new $c.Ptr(buflen, 0), $c.lit("monst-mcorpsenm"));
     }
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 async function savemonchn(nhfp, mtmp) {   // save.c:884
     let mtmp2 = null, minusone = Int32Array.of(0);
     minusone[0] = -1;
@@ -882,6 +960,11 @@ async function savemonchn(nhfp, mtmp) {   // save.c:884
     }
 }
 /* save traps; gf.ftrap is the only trap chain so 2nd arg is superfluous */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @param {$T.trap | null} trap struct trap *
+ * @returns {Promise<void>}
+ */
 async function savetrapchn(nhfp, trap) {   // save.c:920
     let trap2 = null, use_relative = 0;
     while (trap) {
@@ -910,6 +993,10 @@ async function savetrapchn(nhfp, trap) {   // save.c:920
  * we only want to save the fruits which exist on the bones level; the bones
  * level routine marks nonexistent fruits by making the fid negative.
  */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 export async function savefruitchn(nhfp) {   // save.c:951
     let f2 = null, f1 = null;
     f1 = gf.ffruit;
@@ -930,6 +1017,10 @@ export async function savefruitchn(nhfp) {   // save.c:951
         gf.ffruit = null;
     }
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 async function savelevchn(nhfp) {   // save.c:974
     let tmplev = null, tmplev2 = null, cnt = Int32Array.of(0);
     cnt[0] = 0;
@@ -954,6 +1045,10 @@ async function savelevchn(nhfp) {   // save.c:974
 }
 /* write "name-role-race-gend-algn" into save file for menu-based restore;
    the first dash is actually stored as '\0' instead of '-' */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 export async function store_plname_in_file(nhfp) {   // save.c:999
     let hero = new Int8Array(49), plsiztmp = Int32Array.of(0);
     /* [PL_NSIZ + 4*(1+3) + 1] */
@@ -980,6 +1075,10 @@ export async function store_plname_in_file(nhfp) {   // save.c:999
     }
     return;
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 async function save_msghistory(nhfp) {   // save.c:1030
     let msg = null, msgcount = 0, minusone = Int32Array.of(0), msglen = Int32Array.of(0), init = 0, save_plnmsg = 0;
     msgcount = 0;
@@ -1014,6 +1113,9 @@ async function save_msghistory(nhfp) {   // save.c:1030
     /* note: we don't attempt to handle release_data() here */
 }
 /* also called by prscore(); this probably belongs in dungeon.c... */
+/**
+ * @returns {Promise<void>}
+ */
 export async function free_dungeons() {   // save.c:1060
     let tnhfp = null;
     tnhfp = await get_freeing_nhfile();
@@ -1025,6 +1127,9 @@ export async function free_dungeons() {   // save.c:1060
 }
 /* options.c */
 /* free a lot of allocated memory which is ordinarily freed during save */
+/**
+ * @returns {Promise<void>}
+ */
 export async function freedynamicdata() {   // save.c:1077
     let tnhfp = null;
     tnhfp = await get_freeing_nhfile();

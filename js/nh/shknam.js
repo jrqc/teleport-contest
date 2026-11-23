@@ -96,6 +96,11 @@ export const shtypes = $c.recArray($T.shclass, 13);
 /*0*/
 /* decide whether an object or object type is considered vegetarian;
    for types, items which might go either way are assumed to be veggy */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} otyp int
+ * @returns {number} boolean
+ */
 function veggy_item(obj, otyp) {   // shknam.c:380
     let corpsenm = 0, oclass = 0;
     /* used iff obj is null */
@@ -122,6 +127,9 @@ function veggy_item(obj, otyp) {   // shknam.c:380
     }
     return FALSE;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function shkveg() {   // shknam.c:408
     let i = 0, j = 0, maxprob = 0, prob = 0, oclass = 0, ok = new Int32Array(481), $t1;
     oclass = FOOD_CLASS;
@@ -152,6 +160,11 @@ async function shkveg() {   // shknam.c:408
     return i;
 }
 /* make a random item for health food store */
+/**
+ * @param {number} sx int
+ * @param {number} sy int
+ * @returns {Promise<void>}
+ */
 async function mkveggy_at(sx, sy) {   // shknam.c:443
     let obj = null;
     obj = await mksobj_at(await shkveg(), $c.i16(sx), $c.i16(sy), TRUE, TRUE);
@@ -161,6 +174,13 @@ async function mkveggy_at(sx, sy) {   // shknam.c:443
     return;
 }
 /* make an object of the appropriate type for a shop square */
+/**
+ * @param {$T.shclass | null} shp const struct shclass *
+ * @param {number} sx int
+ * @param {number} sy int
+ * @param {number} mkspecl boolean
+ * @returns {Promise<void>}
+ */
 async function mkshobj_at(shp, sx, sy, mkspecl) {   // shknam.c:454
     let mtmp = null, ptr = null, atype = 0, novel = null;
     /* 3.6 tribute */
@@ -185,6 +205,10 @@ async function mkshobj_at(shp, sx, sy, mkspecl) {   // shknam.c:454
     }
 }
 /* extract a shopkeeper name for the given shop type */
+/**
+ * @param {$T.monst | null} shk struct monst *
+ * @param {*} nlp const char *const *
+ */
 function nameshk(shk, nlp) {   // shknam.c:487
     let i = 0, trycnt = 0, names_avail = 0, shname = null, mtmp = null, name_wanted = 0, sptr = null, nseed = 0;
     shname = null;
@@ -251,6 +275,10 @@ function nameshk(shk, nlp) {   // shknam.c:487
     $c.strncpy(new $c.Ptr(shk.mextra.eshk.shknam, 0), shname, PL.NSIZ);
     shk.mextra.eshk.shknam[PL.NSIZ - 1] = 0;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function neweshk(mtmp) {   // shknam.c:557
     let $t1, $t2;
     if (!mtmp.mextra) {
@@ -263,6 +291,9 @@ export async function neweshk(mtmp) {   // shknam.c:557
     mtmp.mextra.eshk.parentmid = mtmp.m_id;
     mtmp.mextra.eshk.bill_p = null;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ */
 export function free_eshk(mtmp) {   // shknam.c:569
     if (mtmp.mextra && ESHK(mtmp)) {
         $c.free(mtmp.mextra.eshk);
@@ -273,6 +304,12 @@ export function free_eshk(mtmp) {   // shknam.c:569
 /* find a door in room sroom which is good for shop entrance.
    returns -1 if no good door found, or the svd.doors index
    and the door coordinates in sx, sy */
+/**
+ * @param {$T.mkroom | null} sroom struct mkroom *
+ * @param {*} sx coordxy *
+ * @param {*} sy coordxy *
+ * @returns {number} int
+ */
 function good_shopdoor(sroom, sx, sy) {   // shknam.c:582
     let i = 0, di = 0, rmno = 0;
     for (i = 0; i < sroom.doorct; i = i + 1 | 0) {
@@ -309,6 +346,11 @@ function good_shopdoor(sroom, sx, sy) {   // shknam.c:582
     return -1;
 }
 /* create a new shopkeeper in the given room */
+/**
+ * @param {$T.shclass | null} shp const struct shclass *
+ * @param {$T.mkroom | null} sroom struct mkroom *
+ * @returns {Promise<number>} int
+ */
 async function shkinit(shp, sroom) {   // shknam.c:628
     let sh = 0, sx = Int16Array.of(0), sy = Int16Array.of(0), shk = null, eshkp = null, j = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8;
     /* place the shopkeeper in the given room */
@@ -363,6 +405,14 @@ async function shkinit(shp, sroom) {   // shknam.c:628
     nameshk(shk, shp.shknms);
     return sh;
 }
+/**
+ * @param {$T.mkroom | null} sroom struct mkroom *
+ * @param {number} rmno int
+ * @param {number} sh int
+ * @param {number} sx int
+ * @param {number} sy int
+ * @returns {number} boolean
+ */
 function stock_room_goodpos(sroom, rmno, sh, sx, sy) {   // shknam.c:695
     if (sroom.irregular) {
         if (svl.level.locations[sx][sy].edge | 0 || (svl.level.locations[sx][sy].roomno | 0) !== rmno || distmin($c.i16(sx), $c.i16(sy), $c.radd(svd.doors, sh).x, $c.radd(svd.doors, sh).y) <= 1) {
@@ -378,6 +428,11 @@ function stock_room_goodpos(sroom, rmno, sh, sx, sy) {   // shknam.c:695
     return TRUE;
 }
 /* stock a newly-created room with objects */
+/**
+ * @param {number} shp_indx int
+ * @param {$T.mkroom | null} sroom struct mkroom *
+ * @returns {Promise<void>}
+ */
 export async function stock_room(shp_indx, sroom) {   // shknam.c:718
     let sx = 0, sy = 0, sh = 0, stockcount = 0, specialspot = 0, buf = new Int8Array(256), rmno = 0, shp = null, m = 0, n = 0, mtmp = null, $t1;
     /*
@@ -462,6 +517,11 @@ export async function stock_room(shp_indx, sroom) {   // shknam.c:718
     svl.level.flags.has_shop = (TRUE) & 1;
 }
 /* does shkp's shop stock this item type? */
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 export function saleable(shkp, obj) {   // shknam.c:805
     let i = 0, shp_indx = 0, shp = null;
     shp_indx = shkp.mextra.eshk.shoptype - SHOPBASE | 0;
@@ -484,6 +544,10 @@ export function saleable(shkp, obj) {   // shknam.c:805
 }
 /* positive value: class; negative value: specific object type.
    can also return non-existing object class (eg. VEGETARIAN_CLASS) */
+/**
+ * @param {number} type int
+ * @returns {number} int
+ */
 export function get_shop_item(type) {   // shknam.c:829
     let shp = null, i = 0, j = 0;
     shp = $c.radd($c.relem(shtypes, 0), type);
@@ -494,6 +558,10 @@ export function get_shop_item(type) {   // shknam.c:829
     return shp.iprobs[i].itype;
 }
 /* version of shkname() for beginning of sentence */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function Shknam(mtmp) {   // shknam.c:843
     let nam = null, $t1;
     nam = await shkname(mtmp);
@@ -504,6 +572,10 @@ export async function Shknam(mtmp) {   // shknam.c:843
 /* shopkeeper's name, without any visibility constraint; if hallucinating,
    will yield some other shopkeeper's name (not necessarily one residing
    in the current game's dungeon, or who keeps same type of shop) */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function shkname(mtmp) {   // shknam.c:856
     let nam = null, save_isshk = 0, shknm = null, nlp = null, num = 0;
     save_isshk = mtmp.isshk;
@@ -544,11 +616,20 @@ export async function shkname(mtmp) {   // shknam.c:856
     }
     return nam;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number} boolean
+ */
 export function shkname_is_pname(mtmp) {   // shknam.c:900
     let shknm = null;
     shknm = new $c.Ptr(mtmp.mextra.eshk.shknam, 0);
     return $c.i8(shknm.get(0) === 45 || shknm.get(0) === 43 || shknm.get(0) === 61 ? 1 : 0);
 }
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {number} override_hallucination boolean
+ * @returns {number} boolean
+ */
 export function is_izchak(shkp, override_hallucination) {   // shknam.c:908
     let shknm = null;
     if (Hallucination() && !override_hallucination) {

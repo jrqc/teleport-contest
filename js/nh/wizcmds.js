@@ -103,6 +103,9 @@ const template = new Int8Array(18);
 const stats_hdr = new Int8Array(42);
 const stats_sep = new Int8Array(43);
 /* #wizwish command - wish for something */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_wish() {   // wizcmds.c:32
     let save_verbose = 0;
     /* Unlimited wishes for debug mode by Paul Polderman */
@@ -118,6 +121,9 @@ export async function wiz_wish() {   // wizcmds.c:32
     return ECMD.OK;
 }
 /* #wizidentify command - reveal and optionally identify hero's inventory */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_identify() {   // wizcmds.c:50
     let $t1;
     if (wizard()) {
@@ -139,6 +145,11 @@ export async function wiz_identify() {   // wizcmds.c:50
 }
 /* used when wiz_makemap() gets rid of monsters for the old incarnation of
    a level before creating a new incarnation of it */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} migratory boolean
+ * @returns {Promise<void>}
+ */
 async function makemap_unmakemon(mtmp, migratory) {   // wizcmds.c:73
     let ndx = 0;
     ndx = mtmp.data.pmidx;
@@ -174,6 +185,9 @@ async function makemap_unmakemon(mtmp, migratory) {   // wizcmds.c:73
 }
 /* get rid of the all the monsters on--or intimately involved with--current
    level; used when #wizmakemap destroys the level before replacing it */
+/**
+ * @returns {Promise<void>}
+ */
 export async function makemap_remove_mons() {   // wizcmds.c:110
     let mtmp = null, mprev = null;
     /* keep steed and other adjacent pets after releasing them
@@ -212,6 +226,9 @@ export async function makemap_remove_mons() {   // wizcmds.c:110
     return;
 }
 /* #wizmakemap - discard current dungeon level and replace with a new one */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_makemap() {   // wizcmds.c:156
     let was_in_W_tower = 0;
     if (wizard()) {
@@ -229,6 +246,9 @@ export async function wiz_makemap() {   // wizcmds.c:156
 }
 /* the #wizmap command - reveal the level map
    and any traps or engravings on it */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_map() {   // wizcmds.c:176
     let t = null, ep = null, save_Hconf = 0, save_Hhallu = 0, $t1;
     if (wizard()) {
@@ -260,6 +280,9 @@ export async function wiz_map() {   // wizcmds.c:176
     return ECMD.OK;
 }
 /* #wizgenesis - generate monster(s); a count prefix will be honored */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_genesis() {   // wizcmds.c:203
     let mongen_saved = 0;
     if (wizard()) {
@@ -273,6 +296,9 @@ export async function wiz_genesis() {   // wizcmds.c:203
     return ECMD.OK;
 }
 /* #wizwhere command - display dungeon layout */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_where() {   // wizcmds.c:218
     if (wizard()) {
         await print_dungeon(FALSE, null, null);
@@ -282,6 +308,9 @@ export async function wiz_where() {   // wizcmds.c:218
     return ECMD.OK;
 }
 /* the #wizdetect command - detect secret doors, traps, hidden monsters */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_detect() {   // wizcmds.c:229
     if (wizard()) {
         await findit();
@@ -292,6 +321,9 @@ export async function wiz_detect() {   // wizcmds.c:229
 }
 /* the #wizkill command - pick targets and reduce them to 0HP;
    by default, the hero is credited/blamed; use 'm' prefix to avoid that */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_kill() {   // wizcmds.c:243
     let mtmp = null, cc = new $T.nhcoord(), ans = 0, c = 0, qbuf = new Int8Array(128), prompt = null, save_verbose = 0, save_autodescribe = 0, uarehere = new $T.d_level(), tame = 0, seen = 0, flgs = 0, articl = 0, adjs = null, Mn = null;
     prompt = $c.lit("Pick first monster to slay");
@@ -388,6 +420,9 @@ export async function wiz_kill() {   // wizcmds.c:243
     return ECMD.OK;   /* no time elapses */
 }
 /* the #wizloadlua command - load an arbitrary lua file */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_load_lua() {   // wizcmds.c:353
     let buf = new Int8Array(256), sbi = new $T.nhl_sandbox_info();
     if (wizard()) {
@@ -413,6 +448,9 @@ export async function wiz_load_lua() {   // wizcmds.c:353
     return ECMD.OK;
 }
 /* the #wizloaddes command - load a special level lua file */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_load_splua() {   // wizcmds.c:376
     let buf = new Int8Array(256);
     if (wizard()) {
@@ -433,6 +471,9 @@ export async function wiz_load_splua() {   // wizcmds.c:376
     return ECMD.OK;
 }
 /* the #wizlevelport command - level teleport */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_level_tele() {   // wizcmds.c:399
     if (wizard()) {
         await level_tele();
@@ -442,6 +483,9 @@ export async function wiz_level_tele() {   // wizcmds.c:399
     return ECMD.OK;
 }
 /* #wizfliplevel - transpose the current level */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_flip_level() {   // wizcmds.c:412
     let c = 0;
     /*
@@ -469,6 +513,9 @@ export async function wiz_flip_level() {   // wizcmds.c:412
     return ECMD.OK;
 }
 /* #levelchange command - adjust hero's experience level */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_level_change() {   // wizcmds.c:446
     let buf = new Int8Array(256), dummy = Int8Array.of(0), newlevel = Int32Array.of(0), ret = 0;
     dummy[0] = 0;
@@ -515,6 +562,9 @@ export async function wiz_level_change() {   // wizcmds.c:446
     return ECMD.OK;
 }
 /* #wiztelekinesis */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_telekinesis() {   // wizcmds.c:494
     let ans = 0, cc = new $T.nhcoord(), mtmp = null;
     ans = 0;
@@ -546,6 +596,9 @@ export async function wiz_telekinesis() {   // wizcmds.c:494
     return ECMD.OK;
 }
 /* #panic command - test program's panic handling */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_panic() {   // wizcmds.c:534
     let $t1, $t2;
     if (iflags.debug_fuzzer) {
@@ -559,6 +612,9 @@ export async function wiz_panic() {   // wizcmds.c:534
     return ECMD.OK;
 }
 /* #debugfuzzer command - fuzztest the program */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_fuzzer() {   // wizcmds.c:549
     if (flags.suppress_alert < 50790400) {
         await pline($c.lit("The fuzz tester will make NetHack execute random keypresses."));
@@ -575,11 +631,17 @@ export async function wiz_fuzzer() {   // wizcmds.c:549
     return ECMD.OK;
 }
 /* #polyself command - change hero's form */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_polyself() {   // wizcmds.c:568
     await polyself(POLY.CONTROLLED);
     return ECMD.OK;
 }
 /* #seenv command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_show_seenv() {   // wizcmds.c:576
     let win = 0, x = 0, y = 0, startx = 0, stopx = 0, curx = 0, v = 0, row = new Int8Array(81), $t1, $t2;
     win = await create_nhwindow()(NHW.TEXT);
@@ -620,6 +682,9 @@ export async function wiz_show_seenv() {   // wizcmds.c:576
     return ECMD.OK;
 }
 /* #vision command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_show_vision() {   // wizcmds.c:621
     let win = 0, x = 0, y = 0, v = 0, row = new Int8Array(81);
     win = await create_nhwindow()(NHW.TEXT);
@@ -649,6 +714,9 @@ export async function wiz_show_vision() {   // wizcmds.c:621
     return ECMD.OK;
 }
 /* #wmode command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_show_wmodes() {   // wizcmds.c:657
     let win = 0, x = 0, y = 0, row = new Int8Array(81), lev = null, istty = 0;
     istty = $c.i8(windowprocs.wp_id === wp_tty ? 1 : 0);
@@ -680,6 +748,9 @@ export async function wiz_show_wmodes() {   // wizcmds.c:657
     return ECMD.OK;
 }
 /* wizard mode variant of #terrain; internal levl[][].typ values in base-36 */
+/**
+ * @returns {Promise<void>}
+ */
 export async function wiz_map_levltyp() {   // wizcmds.c:693
     let win = 0, x = 0, y = 0, terrain = 0, row = new Int8Array(81), istty = 0, dsc = new Int8Array(256), slev = null, brname = null, $t1, $t2;
     istty = $c.i8(!$c.strcmp(windowprocs.name, $c.lit("tty")) ? 1 : 0);
@@ -838,6 +909,9 @@ export async function wiz_map_levltyp() {   // wizcmds.c:693
     return;
 }
 /* explanation of base-36 output from wiz_map_levltyp() */
+/**
+ * @returns {Promise<void>}
+ */
 export async function wiz_levltyp_legend() {   // wizcmds.c:841
     let win = 0, i = 0, j = 0, last = 0, c = 0, dsc = null, fmt = null, buf = new Int8Array(256);
     win = await create_nhwindow()(NHW.TEXT);
@@ -868,6 +942,9 @@ export async function wiz_levltyp_legend() {   // wizcmds.c:841
     return;
 }
 /* #wizsmell command - test usmellmon(). */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_smell() {   // wizcmds.c:885
     let mtmp = null, mptr = null, ans = 0, glyph = 0, cc = new $T.nhcoord(), is_you = 0;
     /* monster being smelled */
@@ -922,6 +999,9 @@ export async function wiz_smell() {   // wizcmds.c:885
     return ECMD.OK;
 }
 /* #wizinstrinsic command to set some intrinsics for testing */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_intrinsic() {   // wizcmds.c:949
     let win = 0, any = new $T.any(), buf = new Int8Array(256), i = 0, j = 0, n = 0, amt = 0, typ = 0, p = Int32Array.of(0), oldtimeout = 0, newtimeout = 0, propname = null, pick_list = [null], clr = 0, $goto = null;
     if (wizard()) {
@@ -1060,10 +1140,17 @@ export async function wiz_intrinsic() {   // wizcmds.c:949
     return ECMD.OK;
 }
 /* #wizrumorcheck command - verify each rumor access */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_rumor_check() {   // wizcmds.c:1102
     await rumor_check();
     return ECMD.OK;
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {number} int
+ */
 function size_obj(otmp) {   // wizcmds.c:1117
     let sz = 0;
     sz = 112;
@@ -1082,6 +1169,13 @@ function size_obj(otmp) {   // wizcmds.c:1117
     }
     return sz;
 }
+/**
+ * @param {$T.obj | null} chain struct obj *
+ * @param {*} total_count long *
+ * @param {*} total_size long *
+ * @param {number} top boolean
+ * @param {number} recurse boolean
+ */
 function count_obj(chain, total_count, total_size, top, recurse) {   // wizcmds.c:1135
     let count = 0, size = 0, obj = null;
     for (count = size = 0, obj = chain; obj; obj = obj.nobj) {
@@ -1097,6 +1191,15 @@ function count_obj(chain, total_count, total_size, top, recurse) {   // wizcmds.
     total_size.set(0, $c.add64(total_size.get(0), size));
 }
 /* RESTORE_WARNING follows wiz_show_stats */
+/**
+ * @param {number} win winid
+ * @param {$c.Ptr | null} src const char *
+ * @param {$T.obj | null} chain struct obj *
+ * @param {number} force boolean
+ * @param {*} total_count long *
+ * @param {*} total_size long *
+ * @returns {Promise<void>}
+ */
 async function obj_chain(win, src, chain, force, total_count, total_size) {   // wizcmds.c:1156
     let buf = new Int8Array(256), count = [0], size = [0];
     count[0] = 0;
@@ -1109,6 +1212,14 @@ async function obj_chain(win, src, chain, force, total_count, total_size) {   //
         await putstr()(win, 0, new $c.Ptr(buf, 0));
     }
 }
+/**
+ * @param {number} win winid
+ * @param {$c.Ptr | null} src const char *
+ * @param {$T.monst | null} chain struct monst *
+ * @param {*} total_count long *
+ * @param {*} total_size long *
+ * @returns {Promise<void>}
+ */
 async function mon_invent_chain(win, src, chain, total_count, total_size) {   // wizcmds.c:1177
     let buf = new Int8Array(256), count = [0], size = [0], mon = null;
     count[0] = 0;
@@ -1123,6 +1234,13 @@ async function mon_invent_chain(win, src, chain, total_count, total_size) {   //
         await putstr()(win, 0, new $c.Ptr(buf, 0));
     }
 }
+/**
+ * @param {number} win winid
+ * @param {$c.Ptr | null} src const char *
+ * @param {*} total_count long *
+ * @param {*} total_size long *
+ * @returns {Promise<void>}
+ */
 async function contained_stats(win, src, total_count, total_size) {   // wizcmds.c:1199
     let buf = new Int8Array(256), count = [0], size = [0], mon = null;
     count[0] = 0;
@@ -1146,6 +1264,11 @@ async function contained_stats(win, src, total_count, total_size) {   // wizcmds
         await putstr()(win, 0, new $c.Ptr(buf, 0));
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} incl_wsegs boolean
+ * @returns {number} int
+ */
 function size_monst(mtmp, incl_wsegs) {   // wizcmds.c:1228
     let sz = 0;
     sz = 192;
@@ -1179,6 +1302,15 @@ function size_monst(mtmp, incl_wsegs) {   // wizcmds.c:1228
     }
     return sz;
 }
+/**
+ * @param {number} win winid
+ * @param {$c.Ptr | null} src const char *
+ * @param {$T.monst | null} chain struct monst *
+ * @param {number} force boolean
+ * @param {*} total_count long *
+ * @param {*} total_size long *
+ * @returns {Promise<void>}
+ */
 async function mon_chain(win, src, chain, force, total_count, total_size) {   // wizcmds.c:1257
     let buf = new Int8Array(256), count = 0, size = 0, mon = null, incl_wsegs = 0;
     /* mon->wormno means something different for migrating_mons and mydogs */
@@ -1195,6 +1327,12 @@ async function mon_chain(win, src, chain, force, total_count, total_size) {   //
         await putstr()(win, 0, new $c.Ptr(buf, 0));
     }
 }
+/**
+ * @param {number} win winid
+ * @param {*} total_count long *
+ * @param {*} total_size long *
+ * @returns {Promise<void>}
+ */
 async function misc_stats(win, total_count, total_size) {   // wizcmds.c:1284
     let buf = new Int8Array(256), hdrbuf = new Int8Array(128), count = [0], size = [0], idx = 0, tt = null, sd = null, k = null, bi = null;
     /* shop damage */
@@ -1294,6 +1432,9 @@ async function misc_stats(win, total_count, total_size) {   // wizcmds.c:1284
         await putstr()(win, 0, new $c.Ptr(buf, 0));
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function you_sanity_check() {   // wizcmds.c:1402
     let mtmp = null;
     if (u.uswallow | 0 && !u.ustuck) {
@@ -1328,6 +1469,9 @@ async function you_sanity_check() {   // wizcmds.c:1402
     await check_wornmask_slots();
     await check_invent_gold($c.lit("invent"));
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function levl_sanity_check() {   // wizcmds.c:1444
     let x = 0, y = 0;
     if (Underwater()) {
@@ -1341,6 +1485,9 @@ async function levl_sanity_check() {   // wizcmds.c:1444
         }
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function sanity_check() {   // wizcmds.c:1460
     if (iflags.sanity_no_check) {
         /* in case a recurring sanity_check warning occurs, we mustn't
@@ -1363,6 +1510,11 @@ export async function sanity_check() {   // wizcmds.c:1460
     program_state.in_sanity_check = program_state.in_sanity_check - 1 | 0;
 }
 /* qsort() comparison routine for use in list_migrating_mons() */
+/**
+ * @param {*} vptr1 const void *
+ * @param {*} vptr2 const void *
+ * @returns {number} int
+ */
 function migrsort_cmp(vptr1, vptr2) {   // wizcmds.c:1485
     let m1 = null, m2 = null, d1 = 0, l1 = 0, d2 = 0, l2 = 0;
     m1 = $c.asArr(vptr1, 'ptr').get(0);
@@ -1385,6 +1537,10 @@ function migrsort_cmp(vptr1, vptr2) {   // wizcmds.c:1485
 }
 /* called by #migratemons; displays count of migrating monsters, optionally
    displays them as well */
+/**
+ * @param {$T.d_level | null} nextlevl d_level *
+ * @returns {Promise<void>}
+ */
 async function list_migrating_mons(nextlevl) {   // wizcmds.c:1506
     let win = 0, showit = 0, n = 0, xyloc = 0, x = 0, y = 0, c = 0, prmpt = new Int8Array(10), xtra = new Int8Array(10), buf = new Int8Array(256), mtmp = null, marray = null, here = 0, nxtlv = 0, other = 0, $t1, $t2;
     /* default destination for wiz_migrate_mons() */
@@ -1484,6 +1640,9 @@ async function list_migrating_mons(nextlevl) {   // wizcmds.c:1506
 /* the #stats command
  * Display memory usage of all monsters and objects on the level.
  */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_show_stats() {   // wizcmds.c:1616
     let buf = new Int8Array(256), win = 0, total_obj_size = [0], total_obj_count = [0], total_mon_size = [0], total_mon_count = [0], total_ovr_size = [0], total_ovr_count = [0], total_misc_size = [0], total_misc_count = [0];
     win = await create_nhwindow()(NHW.TEXT);
@@ -1541,6 +1700,9 @@ export async function wiz_show_stats() {   // wizcmds.c:1616
 }
 /* the #wizdispmacros command
  * Verify that some display macros are returning sane values */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_display_macros() {   // wizcmds.c:1705
     let buf = new Int8Array(256), win = 0, glyph = 0, test = 0, trouble = 0, no_glyph = 0, max_glyph = 0, $t1, $t2, $t3, $t4, $t5;
     trouble = 0;
@@ -1608,11 +1770,17 @@ export async function wiz_display_macros() {   // wizcmds.c:1705
     return ECMD.OK;
 }
 /* the #wizshownhuuid command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_show_nhuuid() {   // wizcmds.c:1782
     await pline($c.lit("The NHUUID for this game is { %s }."), new $c.Ptr(svn.nhuuid, 0));
     return ECMD.OK;
 }
 /* the #wizmondiff command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_mon_diff() {   // wizcmds.c:1790
     let buf = new Int8Array(256), win = 0, mhardcoded = 0, mcalculated = 0, trouble = 0, cnt = 0, mdiff = 0, mlev = 0, ptr = null, $t1;
     mhardcoded = 0;
@@ -1649,6 +1817,9 @@ export async function wiz_mon_diff() {   // wizcmds.c:1790
     return ECMD.OK;
 }
 /* the #wizobjprobs command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_objprobs() {   // wizcmds.c:1832
     let win = 0, buf = new Int8Array(256), probsum = new Int32Array(18), otyp = 0, oclass = 0;
     oclass = objects[FIRST_OBJECT].oc_class;
@@ -1675,6 +1846,9 @@ export async function wiz_objprobs() {   // wizcmds.c:1832
 }
 /* (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG) */
 /* #migratemons command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_migrate_mons() {   // wizcmds.c:1873
     let mcount = 0, inbuf = new Int8Array(256), ptr = null, mtmp = null, use_random_mon = 0, mongen_saved = 0, tolevel = new $T.d_level(), $t1;
     use_random_mon = TRUE;
@@ -1724,6 +1898,9 @@ export async function wiz_migrate_mons() {   // wizcmds.c:1873
     return ECMD.OK;
 }
 /* #wizcustom command to see glyphmap customizations */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_custom() {   // wizcmds.c:1934
     let win = 0, buf = new Int8Array(256), bufa = new Int8Array(256), n = 0, pick_list = [null];
     /* symbols.c */
@@ -1760,6 +1937,12 @@ export async function wiz_custom() {   // wizcmds.c:1934
     }
     return ECMD.OK;
 }
+/**
+ * @param {number} win winid
+ * @param {number} glyphnum int
+ * @param {$c.Ptr | null} id char *
+ * @returns {Promise<void>}
+ */
 export async function wizcustom_callback(win, glyphnum, id) {   // wizcmds.c:1987
     let cgm = null, clr = 0, buf = new Int8Array(256), bufa = new Int8Array(256), bufb = new Int8Array(256), bufc = new Int8Array(256), bufd = new Int8Array(256), bufu = new Int8Array(256), any = new $T.any(), cp = null;
     clr = NO_COLOR;

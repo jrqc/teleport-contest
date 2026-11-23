@@ -67,6 +67,11 @@ import { luaT_adjustvarargs, luaT_callTM, luaT_callTMres, luaT_callorderTM, luaT
 ** are disabled via macro 'cvt2num'), do not modify 'result'
 ** and return 0.
 */
+/**
+ * @param {number} obj const TValue *
+ * @param {number} result TValue *
+ * @returns {number} int
+ */
 function l_strton(obj, result) {   // lvm.c:90
     let st = 0;
     0;
@@ -81,6 +86,11 @@ function l_strton(obj, result) {   // lvm.c:90
 ** Try to convert a value to a float. The float case is already handled
 ** by the macro 'tonumber'.
 */
+/**
+ * @param {number} obj const TValue *
+ * @param {number} n lua_Number *
+ * @returns {number} int
+ */
 export function luaV_tonumber_(obj, n) {   // lvm.c:105
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
     try {
@@ -99,6 +109,12 @@ export function luaV_tonumber_(obj, n) {   // lvm.c:105
 /*
 ** try to convert a float to an integer, rounding according to 'mode'.
 */
+/**
+ * @param {number} n lua_Number
+ * @param {number} p lua_Integer *
+ * @param {number} mode F2Imod
+ * @returns {number} int
+ */
 export function luaV_flttointeger(n, p, mode) {   // lvm.c:123
     let f = 0;
     f = $hl.floor(n);
@@ -117,6 +133,12 @@ export function luaV_flttointeger(n, p, mode) {   // lvm.c:123
 ** without string coercion.
 ** ("Fast track" handled by macro 'tointegerns'.)
 */
+/**
+ * @param {number} obj const TValue *
+ * @param {number} p lua_Integer *
+ * @param {number} mode F2Imod
+ * @returns {number} int
+ */
 export function luaV_tointegerns(obj, p, mode) {   // lvm.c:139
     if ($h.u8[obj + 8] === 19) {
         return luaV_flttointeger($h.f64[obj >>> 3], p, mode);
@@ -130,6 +152,12 @@ export function luaV_tointegerns(obj, p, mode) {   // lvm.c:139
 /*
 ** try to convert a value to an integer.
 */
+/**
+ * @param {number} obj const TValue *
+ * @param {number} p lua_Integer *
+ * @param {number} mode F2Imod
+ * @returns {number} int
+ */
 export function luaV_tointeger(obj, p, mode) {   // lvm.c:154
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
     try {
@@ -155,6 +183,14 @@ export function luaV_tointeger(obj, p, mode) {   // lvm.c:154
 ** correct; even a limit of LUA_MININTEGER would run the loop once for
 ** an initial value equal to LUA_MININTEGER.)
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number | bigint} init lua_Integer
+ * @param {number} lim const TValue *
+ * @param {number} p lua_Integer *
+ * @param {number | bigint} step lua_Integer
+ * @returns {Promise<number>} int
+ */
 async function forlimit(L, init, lim, p, step) {   // lvm.c:178
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
     try {
@@ -191,6 +227,11 @@ async function forlimit(L, init, lim, p, step) {   // lvm.c:178
 **   ra + 2 : step
 **   ra + 3 : control variable
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} ra StkId
+ * @returns {Promise<number>} int
+ */
 async function forprep(L, ra) {   // lvm.c:208
     let pinit = 0, plimit = 0, pstep = 0, init = 0, step = 0, io = 0, count = 0, io$2 = 0, io$3 = 0, io$4 = 0, io$5 = 0, io$6 = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(32);
@@ -282,6 +323,10 @@ async function forprep(L, ra) {   // lvm.c:208
 ** true iff the loop must continue. (The integer case is
 ** written online with opcode OP_FORLOOP, for performance.)
 */
+/**
+ * @param {number} ra StkId
+ * @returns {number} int
+ */
 function floatforloop(ra) {   // lvm.c:268
     let step = 0, limit = 0, idx = 0, io = 0, io$2 = 0;
     step = $h.f64[(ra + 32) >>> 3];
@@ -309,6 +354,14 @@ function floatforloop(ra) {   // lvm.c:268
 ** if 'slot' is NULL, 't' is not a table; otherwise, 'slot' points to
 ** t[k] entry (which must be empty).
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} t const TValue *
+ * @param {number} key TValue *
+ * @param {number} val StkId
+ * @param {number} slot const TValue *
+ * @returns {Promise<void>}
+ */
 export async function luaV_finishget(L, t, key, val, slot) {   // lvm.c:289
     let loop = 0, tm = 0, io1 = 0, io2 = 0;
     /* counter to avoid infinite loops */
@@ -362,6 +415,14 @@ export async function luaV_finishget(L, t, key, val, slot) {   // lvm.c:289
 ** is no such entry.  (The value at 'slot' must be empty, otherwise
 ** 'luaV_fastget' would have done the job.)
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} t const TValue *
+ * @param {number} key TValue *
+ * @param {number} val TValue *
+ * @param {number} slot const TValue *
+ * @returns {Promise<void>}
+ */
 export async function luaV_finishset(L, t, key, val, slot) {   // lvm.c:332
     let loop = 0, tm = 0, h = 0, io = 0, x_ = 0, io1 = 0, io2 = 0;
     /* counter to avoid infinite loops */
@@ -428,6 +489,11 @@ export async function luaV_finishset(L, t, key, val, slot) {   // lvm.c:332
 ** of the strings. Note that segments can compare equal but still
 ** have different lengths.
 */
+/**
+ * @param {number} ts1 const TString *
+ * @param {number} ts2 const TString *
+ * @returns {number} int
+ */
 function l_strcmp(ts1, ts2) {   // lvm.c:381
     let s1 = 0, rl1 = 0, s2 = 0, rl2 = 0, temp = 0, zl1 = 0, zl2 = 0;
     s1 = ts1 + 24;
@@ -469,6 +535,11 @@ function l_strcmp(ts1, ts2) {   // lvm.c:381
 ** from float to int.)
 ** When 'f' is NaN, comparisons must result in false.
 */
+/**
+ * @param {number | bigint} i lua_Integer
+ * @param {number} f lua_Number
+ * @returns {number} int
+ */
 function LTintfloat(i, f) {   // lvm.c:416
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
     try {
@@ -489,6 +560,11 @@ function LTintfloat(i, f) {   // lvm.c:416
 ** Check whether integer 'i' is less than or equal to float 'f'.
 ** See comments on previous function.
 */
+/**
+ * @param {number | bigint} i lua_Integer
+ * @param {number} f lua_Number
+ * @returns {number} int
+ */
 function LEintfloat(i, f) {   // lvm.c:433
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
     try {
@@ -509,6 +585,11 @@ function LEintfloat(i, f) {   // lvm.c:433
 ** Check whether float 'f' is less than integer 'i'.
 ** See comments on previous function.
 */
+/**
+ * @param {number} f lua_Number
+ * @param {number | bigint} i lua_Integer
+ * @returns {number} int
+ */
 function LTfloatint(f, i) {   // lvm.c:450
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
     try {
@@ -529,6 +610,11 @@ function LTfloatint(f, i) {   // lvm.c:450
 ** Check whether float 'f' is less than or equal to integer 'i'.
 ** See comments on previous function.
 */
+/**
+ * @param {number} f lua_Number
+ * @param {number | bigint} i lua_Integer
+ * @returns {number} int
+ */
 function LEfloatint(f, i) {   // lvm.c:467
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
     try {
@@ -548,6 +634,11 @@ function LEfloatint(f, i) {   // lvm.c:467
 /*
 ** Return 'l < r', for numbers.
 */
+/**
+ * @param {number} l const TValue *
+ * @param {number} r const TValue *
+ * @returns {number} int
+ */
 function LTnum(l, r) {   // lvm.c:483
     let li = 0, lf = 0;
     0;
@@ -572,6 +663,11 @@ function LTnum(l, r) {   // lvm.c:483
 /*
 ** Return 'l <= r', for numbers.
 */
+/**
+ * @param {number} l const TValue *
+ * @param {number} r const TValue *
+ * @returns {number} int
+ */
 function LEnum(l, r) {   // lvm.c:505
     let li = 0, lf = 0;
     0;
@@ -596,6 +692,12 @@ function LEnum(l, r) {   // lvm.c:505
 /*
 ** return 'l < r' for non-numbers.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} l const TValue *
+ * @param {number} r const TValue *
+ * @returns {Promise<number>} int
+ */
 async function lessthanothers(L, l, r) {   // lvm.c:527
     0;
     if (($h.u8[l + 8] & 15) === 4 && ($h.u8[r + 8] & 15) === 4) {   /* both are strings? */
@@ -607,6 +709,12 @@ async function lessthanothers(L, l, r) {   // lvm.c:527
 /*
 ** Main operation less than; return 'l < r'.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} l const TValue *
+ * @param {number} r const TValue *
+ * @returns {Promise<number>} int
+ */
 export async function luaV_lessthan(L, l, r) {   // lvm.c:539
     if (($h.u8[l + 8] & 15) === 3 && ($h.u8[r + 8] & 15) === 3) {   /* both operands are numbers? */
         return LTnum(l, r);
@@ -617,6 +725,12 @@ export async function luaV_lessthan(L, l, r) {   // lvm.c:539
 /*
 ** return 'l <= r' for non-numbers.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} l const TValue *
+ * @param {number} r const TValue *
+ * @returns {Promise<number>} int
+ */
 async function lessequalothers(L, l, r) {   // lvm.c:549
     0;
     if (($h.u8[l + 8] & 15) === 4 && ($h.u8[r + 8] & 15) === 4) {   /* both are strings? */
@@ -628,6 +742,12 @@ async function lessequalothers(L, l, r) {   // lvm.c:549
 /*
 ** Main operation less than or equal to; return 'l <= r'.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} l const TValue *
+ * @param {number} r const TValue *
+ * @returns {Promise<number>} int
+ */
 export async function luaV_lessequal(L, l, r) {   // lvm.c:561
     if (($h.u8[l + 8] & 15) === 3 && ($h.u8[r + 8] & 15) === 3) {   /* both operands are numbers? */
         return LEnum(l, r);
@@ -639,6 +759,12 @@ export async function luaV_lessequal(L, l, r) {   // lvm.c:561
 ** Main operation for equality of Lua values; return 't1 == t2'.
 ** L == NULL means raw equality (no metamethods)
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} t1 const TValue *
+ * @param {number} t2 const TValue *
+ * @returns {Promise<number>} int
+ */
 export async function luaV_equalobj(L, t1, t2) {   // lvm.c:572
     let tm = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
@@ -712,6 +838,11 @@ export async function luaV_equalobj(L, t1, t2) {   // lvm.c:572
 }
 /* macro used by 'luaV_concat' to ensure that element at 'o' is a string */
 /* copy strings in stack from top - n up to top - 1 to buffer */
+/**
+ * @param {number} top StkId
+ * @param {number} n int
+ * @param {number} buff char *
+ */
 function copy2buff(top, n, buff) {   // lvm.c:631
     let tl = 0, st = 0, l = 0;
     tl = 0;   /* size already copied */
@@ -726,6 +857,11 @@ function copy2buff(top, n, buff) {   // lvm.c:631
 ** Main operation for concatenation: concat 'total' values in the stack,
 ** from 'L->top.p - total' up to 'L->top.p - 1'.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} total int
+ * @returns {Promise<void>}
+ */
 export async function luaV_concat(L, total) {   // lvm.c:646
     let top = 0, n = 0, io1 = 0, io2 = 0, tl = 0, ts = 0, l = 0, io = 0, x_ = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(40);
@@ -787,6 +923,12 @@ export async function luaV_concat(L, total) {   // lvm.c:646
 /*
 ** Main operation 'ra = #rb'.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} ra StkId
+ * @param {number} rb const TValue *
+ * @returns {Promise<void>}
+ */
 export async function luaV_objlen(L, ra, rb) {   // lvm.c:693
     let tm = 0, h = 0, io = 0, io$2 = 0, io$3 = 0, $t1;
     switch ($h.u8[rb + 8] & 63) {
@@ -840,6 +982,12 @@ export async function luaV_objlen(L, ra, rb) {   // lvm.c:693
 ** 'floor(q) == trunc(q)' when 'q >= 0' or when 'q' is integer,
 ** otherwise 'floor(q) == trunc(q) - 1'.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number | bigint} m lua_Integer
+ * @param {number | bigint} n lua_Integer
+ * @returns {Promise<number | bigint>} lua_Integer
+ */
 export async function luaV_idiv(L, m, n) {   // lvm.c:728
     let q = 0;
     if (($c.addu64($c.u64(n), 1) <= 1 ? 1 : 0) !== 0 ? 1 : 0) {
@@ -861,6 +1009,12 @@ export async function luaV_idiv(L, m, n) {   // lvm.c:728
 ** negative operands follows C99 behavior. See previous comment
 ** about luaV_idiv.)
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number | bigint} m lua_Integer
+ * @param {number | bigint} n lua_Integer
+ * @returns {Promise<number | bigint>} lua_Integer
+ */
 export async function luaV_mod(L, m, n) {   // lvm.c:748
     let r = 0;
     if (($c.addu64($c.u64(n), 1) <= 1 ? 1 : 0) !== 0 ? 1 : 0) {
@@ -880,6 +1034,12 @@ export async function luaV_mod(L, m, n) {   // lvm.c:748
 /*
 ** Float modulus
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} m lua_Number
+ * @param {number} n lua_Number
+ * @returns {number} lua_Number
+ */
 export function luaV_modf(L, m, n) {   // lvm.c:766
     let r = 0;
     {
@@ -895,6 +1055,11 @@ export function luaV_modf(L, m, n) {   // lvm.c:766
 /*
 ** Shift left operation. (Shift right just negates 'y'.)
 */
+/**
+ * @param {number | bigint} x lua_Integer
+ * @param {number | bigint} y lua_Integer
+ * @returns {number | bigint} lua_Integer
+ */
 export function luaV_shiftl(x, y) {   // lvm.c:780
     if (y < 0) {
         /* shift right? */
@@ -916,6 +1081,14 @@ export function luaV_shiftl(x, y) {   // lvm.c:780
 ** create a new Lua closure, push it in the stack, and initialize
 ** its upvalues.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} p Proto *
+ * @param {number} encup UpVal **
+ * @param {number} base StkId
+ * @param {number} ra StkId
+ * @returns {Promise<void>}
+ */
 async function pushclosure(L, p, encup, base, ra) {   // lvm.c:796
     let nup = 0, uv = 0, i = 0, ncl = 0, io = 0, x_ = 0, $t1;
     nup = $h.i32[(p + 16) >>> 2];
@@ -943,6 +1116,10 @@ async function pushclosure(L, p, encup, base, ra) {   // lvm.c:796
 /*
 ** finish execution of an opcode interrupted by a yield
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<void>}
+ */
 export async function luaV_finishOp(L) {   // lvm.c:817
     let ci = 0, base = 0, inst = 0, op = 0, io1 = 0, io2 = 0, io1$2 = 0, io2$2 = 0, res = 0, top = 0, a = 0, total = 0, io1$3 = 0, io2$3 = 0, ra = 0;
     ci = $h.u32[(L + 32) >>> 2];
@@ -1131,6 +1308,11 @@ export async function luaV_finishOp(L) {   // lvm.c:817
 /* stack reallocation or hooks? */
 /* handle hooks */
 /* correct stack */
+/**
+ * @param {number} L lua_State *
+ * @param {number} ci CallInfo *
+ * @returns {Promise<void>}
+ */
 export async function luaV_execute(L, ci) {   // lvm.c:1154
     let cl = 0, k = 0, base = 0, pc = 0, trap = 0, i = 0, ra = 0, io1 = 0, io2 = 0, ra$2 = 0, b = 0, io = 0, ra$3 = 0, b$2 = 0, io$2 = 0, ra$4 = 0, rb = 0, io1$2 = 0, io2$2 = 0, ra$5 = 0, rb$2 = 0, io1$3 = 0, io2$3 = 0, ra$6 = 0, ra$7 = 0, ra$8 = 0, ra$9 = 0, b$3 = 0, ra$10 = 0, b$4 = 0, io1$4 = 0, io2$4 = 0, ra$11 = 0, uv = 0, io1$5 = 0, io2$5 = 0, ra$12 = 0, slot = 0, upval = 0, rc = 0, key = 0, io1$6 = 0, io2$6 = 0, ra$13 = 0, slot$2 = 0, rb$3 = 0, rc$2 = 0, n = 0, io1$7 = 0, io2$7 = 0, ra$14 = 0, slot$3 = 0, rb$4 = 0, c = 0, io1$8 = 0, io2$8 = 0, io$3 = 0, ra$15 = 0, slot$4 = 0, rb$5 = 0, rc$3 = 0, key$3 = 0, io1$9 = 0, io2$9 = 0, slot$5 = 0, upval$2 = 0, rb$6 = 0, rc$4 = 0, key$4 = 0, io1$10 = 0, io2$10 = 0, ra$16 = 0, slot$6 = 0, rb$7 = 0, rc$5 = 0, n$2 = 0, io1$11 = 0, io2$11 = 0, ra$17 = 0, slot$7 = 0, c$2 = 0, rc$6 = 0, io1$12 = 0, io2$12 = 0, io$4 = 0, ra$18 = 0, slot$8 = 0, rb$8 = 0, rc$7 = 0, key$6 = 0, io1$13 = 0, io2$13 = 0, ra$19 = 0, b$5 = 0, c$3 = 0, t = 0, io$5 = 0, x_ = 0, ra$20 = 0, slot$9 = 0, rb$9 = 0, rc$8 = 0, key$7 = 0, io1$14 = 0, io2$14 = 0, io1$15 = 0, io2$15 = 0, ra$21 = 0, v1 = 0, imm = 0, iv1 = 0, io$6 = 0, nb = 0, fimm = 0, io$7 = 0, v1$2 = 0, v2 = 0, ra$22 = 0, i1 = 0, i2 = 0, io$8 = 0, n1 = 0, n2 = 0, io$9 = 0, v1$3 = 0, v2$2 = 0, ra$23 = 0, i1$2 = 0, i2$2 = 0, io$10 = 0, n1$2 = 0, n2$2 = 0, io$11 = 0, v1$4 = 0, v2$3 = 0, ra$24 = 0, i1$3 = 0, i2$3 = 0, io$12 = 0, n1$3 = 0, n2$3 = 0, io$13 = 0, v1$5 = 0, v2$4 = 0, ra$25 = 0, i1$4 = 0, i2$4 = 0, io$14 = 0, n1$4 = 0, n2$4 = 0, io$15 = 0, ra$26 = 0, v1$6 = 0, v2$5 = 0, n1$5 = 0, n2$5 = 0, io$16 = 0, ra$27 = 0, v1$7 = 0, v2$6 = 0, n1$6 = 0, n2$6 = 0, io$17 = 0, v1$8 = 0, v2$7 = 0, ra$28 = 0, i1$5 = 0, i2$5 = 0, io$18 = 0, n1$7 = 0, n2$7 = 0, io$19 = 0, ra$29 = 0, v1$9 = 0, v2$8 = 0, i2$6 = 0, io$20 = 0, ra$30 = 0, v1$10 = 0, v2$9 = 0, i2$7 = 0, io$21 = 0, ra$31 = 0, v1$11 = 0, v2$10 = 0, i2$8 = 0, io$22 = 0, ra$32 = 0, rb$10 = 0, ic = 0, io$23 = 0, ra$33 = 0, rb$11 = 0, ic$2 = 0, io$24 = 0, v1$12 = 0, v2$11 = 0, ra$34 = 0, i1$9 = 0, i2$9 = 0, io$25 = 0, n1$8 = 0, n2$8 = 0, io$26 = 0, v1$13 = 0, v2$12 = 0, ra$35 = 0, i1$10 = 0, i2$10 = 0, io$27 = 0, n1$9 = 0, n2$9 = 0, io$28 = 0, v1$14 = 0, v2$13 = 0, ra$36 = 0, i1$11 = 0, i2$11 = 0, io$29 = 0, n1$10 = 0, n2$10 = 0, io$30 = 0, v1$15 = 0, v2$14 = 0, ra$37 = 0, i1$12 = 0, i2$12 = 0, io$31 = 0, n1$11 = 0, n2$11 = 0, io$32 = 0, ra$38 = 0, v1$16 = 0, v2$15 = 0, n1$12 = 0, n2$12 = 0, io$33 = 0, ra$39 = 0, v1$17 = 0, v2$16 = 0, n1$13 = 0, n2$13 = 0, io$34 = 0, v1$18 = 0, v2$17 = 0, ra$40 = 0, i1$13 = 0, i2$13 = 0, io$35 = 0, n1$14 = 0, n2$14 = 0, io$36 = 0, ra$41 = 0, v1$19 = 0, v2$18 = 0, io$37 = 0, ra$42 = 0, v1$20 = 0, v2$19 = 0, io$38 = 0, ra$43 = 0, v1$21 = 0, v2$20 = 0, io$39 = 0, ra$44 = 0, v1$22 = 0, v2$21 = 0, io$40 = 0, ra$45 = 0, v1$23 = 0, v2$22 = 0, io$41 = 0, ra$46 = 0, pi = 0, rb$12 = 0, tm = 0, result = 0, ra$47 = 0, pi$2 = 0, imm$2 = 0, tm$2 = 0, flip = 0, result$2 = 0, ra$48 = 0, pi$3 = 0, imm$3 = 0, tm$3 = 0, flip$2 = 0, result$3 = 0, ra$49 = 0, rb$13 = 0, nb$2 = 0, ib$3 = 0, io$42 = 0, io$43 = 0, ra$50 = 0, rb$14 = 0, io$44 = 0, ra$51 = 0, rb$15 = 0, ra$52 = 0, ra$53 = 0, n$3 = 0, ra$54 = 0, ra$55 = 0, ra$56 = 0, cond = 0, rb$16 = 0, ni = 0, ra$57 = 0, cond$2 = 0, rb$17 = 0, ia = 0, ib$5 = 0, ni$2 = 0, ra$58 = 0, cond$3 = 0, rb$18 = 0, ia$2 = 0, ib$6 = 0, ni$3 = 0, ra$59 = 0, rb$19 = 0, cond$4 = 0, ni$4 = 0, ra$60 = 0, cond$5 = 0, im = 0, ni$5 = 0, ra$61 = 0, cond$6 = 0, im$2 = 0, fa = 0, fim = 0, isf = 0, ni$6 = 0, ra$62 = 0, cond$7 = 0, im$3 = 0, fa$2 = 0, fim$2 = 0, isf$2 = 0, ni$7 = 0, ra$63 = 0, cond$8 = 0, im$4 = 0, fa$3 = 0, fim$3 = 0, isf$3 = 0, ni$8 = 0, ra$64 = 0, cond$9 = 0, im$5 = 0, fa$4 = 0, fim$4 = 0, isf$4 = 0, ni$9 = 0, ra$65 = 0, cond$10 = 0, ni$10 = 0, ra$66 = 0, rb$20 = 0, io1$16 = 0, io2$16 = 0, ni$11 = 0, ra$67 = 0, newci = 0, b$6 = 0, nresults = 0, ra$68 = 0, b$7 = 0, n$4 = 0, nparams1 = 0, delta = 0, ra$69 = 0, n$5 = 0, nparams1$2 = 0, ra$70 = 0, nres = 0, ra$71 = 0, nres$2 = 0, ra$72 = 0, io1$17 = 0, io2$17 = 0, ra$73 = 0, count = 0, step = 0, idx = 0, io$45 = 0, io$46 = 0, io$47 = 0, ra$74 = 0, ra$75 = 0, ra$76 = 0, ra$77 = 0, io1$18 = 0, io2$18 = 0, ra$78 = 0, n$6 = 0, last = 0, h = 0, val = 0, io1$19 = 0, io2$19 = 0, ra$79 = 0, p = 0, ra$80 = 0, n$7 = 0, $goto = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13, $t14, $t15, $t16, $t17, $t18, $t19, $t20, $t21;
     const $sp0 = $h.st.sp, $fp = $h.enter(160);

@@ -19,6 +19,9 @@ import { historical } from './hack.h.js';
 /* note: DEBUGFILES value here or in sysconf.DEBUGFILES can be overridden
    at runtime by setting up a value for "DEBUGFILES" in the environment */
 export const sysopt = new $T.sysopt_s();
+/**
+ * @returns {Promise<void>}
+ */
 export async function sys_early_init() {   // sys.c:21
     let p = null, $t1, $t2, $t3, $t4;
     /* Don't assume that these are not already set, and that it is
@@ -120,6 +123,9 @@ export function sysopt_release() {   // sys.c:115
     }
     return;
 }
+/**
+ * @param {number} val int
+ */
 export function sysopt_seduce_set(val) {   // sys.c:164
     /*
      * Attack substitution is now done on the fly in getmattk(mhitu.c).

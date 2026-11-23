@@ -89,6 +89,10 @@ const syslib = $h.data(192, 8);
 /* }================================================================== */
 /* Despite claiming to be ISO C, iOS does not implement 'system'. */
 /* default definition */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function os_execute(L) {   // loslib.c:142
     let cmd = 0, stat = 0;
     cmd = await luaL_optlstring(L, 1, 0, 0);
@@ -101,12 +105,20 @@ async function os_execute(L) {   // loslib.c:142
         return 1;
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function os_remove(L) {   // loslib.c:156
     let filename = 0;
     filename = await luaL_checklstring(L, 1, 0);
     $h.i32[($hl.__error()) >>> 2] = 0;
     return await luaL_fileresult(L, $c.missing("remove")(filename) === 0 ? 1 : 0, filename);
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function os_rename(L) {   // loslib.c:163
     let fromname = 0, toname = 0;
     fromname = await luaL_checklstring(L, 1, 0);
@@ -114,6 +126,10 @@ async function os_rename(L) {   // loslib.c:163
     $h.i32[($hl.__error()) >>> 2] = 0;
     return await luaL_fileresult(L, $c.rename($h.P(fromname), $h.P(toname)) === 0 ? 1 : 0, 0);
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function os_tmpname(L) {   // loslib.c:171
     let err = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(32);
@@ -133,10 +149,18 @@ async function os_tmpname(L) {   // loslib.c:171
         return 1;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function os_getenv(L) {   // loslib.c:182
     await lua_pushstring(L, $hl.getenv(await luaL_checklstring(L, 1, 0)));   /* if NULL push nil */
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {number} int
+ */
 function os_clock(L) {   // loslib.c:188
     lua_pushnumber(L, Number($c.missing("clock")()) / Number(1000000));
     return 1;
@@ -157,10 +181,23 @@ function os_clock(L) {   // loslib.c:188
 ** time 0x1.e1853b0d184f6p+55 would cause an overflow when adding 1900
 ** to compute the year.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} key const char *
+ * @param {number} value int
+ * @param {number} delta int
+ * @returns {Promise<void>}
+ */
 async function setfield(L, key, value, delta) {   // loslib.c:211
     lua_pushinteger(L, $c.add64(value, delta));
     await lua_setfield(L, -2, key);
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} key const char *
+ * @param {number} value int
+ * @returns {Promise<void>}
+ */
 async function setboolfield(L, key, value) {   // loslib.c:221
     if (value < 0) {   /* undefined? */
         return;   /* does not set field */
@@ -171,6 +208,11 @@ async function setboolfield(L, key, value) {   // loslib.c:221
 /*
 ** Set all fields from structure 'tm' in the table on top of the stack
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} stm struct tm *
+ * @returns {Promise<void>}
+ */
 async function setallfields(L, stm) {   // loslib.c:232
     await setfield(L, $h.lit("year"), $h.i32[(stm + 20) >>> 2], 1900);
     await setfield(L, $h.lit("month"), $h.i32[(stm + 16) >>> 2], 1);
@@ -182,12 +224,24 @@ async function setallfields(L, stm) {   // loslib.c:232
     await setfield(L, $h.lit("wday"), $h.i32[(stm + 24) >>> 2], 1);
     await setboolfield(L, $h.lit("isdst"), $h.i32[(stm + 32) >>> 2]);
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} key const char *
+ * @returns {Promise<number>} int
+ */
 async function getboolfield(L, key) {   // loslib.c:245
     let res = 0;
     res = await lua_getfield(L, -1, key) === 0 ? -1 : lua_toboolean(L, -1);
     await lua_settop(L, -2);
     return res;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} key const char *
+ * @param {number} d int
+ * @param {number} delta int
+ * @returns {Promise<number>} int
+ */
 async function getfield(L, key, d, delta) {   // loslib.c:253
     let t = 0, res = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(4);
@@ -212,6 +266,13 @@ async function getfield(L, key, d, delta) {   // loslib.c:253
         return $c.i32(res);
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} conv const char *
+ * @param {number | bigint} convlen ptrdiff_t
+ * @param {number} buff char *
+ * @returns {Promise<number>} const char *
+ */
 async function checkoption(L, conv, convlen, buff) {   // loslib.c:274
     let option = 0, oplen = 0;
     option = $h.lit("aAbBcCdDeFgGhHIjmMnprRStTuUVwWxXyYzZ%||EcECExEXEyEYOdOeOHOIOmOMOSOuOUOVOwOWOy");
@@ -229,6 +290,11 @@ async function checkoption(L, conv, convlen, buff) {   // loslib.c:274
     await luaL_argerror(L, 1, await lua_pushfstring(L, $h.lit("invalid conversion specifier '%%%s'"), conv));
     return conv;   /* to avoid warnings */
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} arg int
+ * @returns {Promise<number | bigint>} time_t
+ */
 async function l_checktime(L, arg) {   // loslib.c:293
     let t = 0;
     t = await luaL_checkinteger(L, arg);
@@ -236,6 +302,10 @@ async function l_checktime(L, arg) {   // loslib.c:293
     return t;
 }
 /* maximum size for an individual 'strftime' item */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function os_date(L) {   // loslib.c:304
     let s = 0, se = 0, stm = 0, reslen = 0, buff = 0, $t1, $t2, $t3, $t4;
     const $sp0 = $h.st.sp, $fp = $h.enter(1136);
@@ -276,6 +346,10 @@ async function os_date(L) {   // loslib.c:304
         return 1;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function os_time(L) {   // loslib.c:346
     let t = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
     const $sp0 = $h.st.sp, $fp = $h.enter(56);
@@ -302,6 +376,10 @@ async function os_time(L) {   // loslib.c:346
         return 1;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function os_difftime(L) {   // loslib.c:372
     let t1 = 0, t2 = 0;
     t1 = await l_checktime(L, 1);
@@ -310,6 +388,10 @@ async function os_difftime(L) {   // loslib.c:372
     return 1;
 }
 /* }====================================================== */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function os_setlocale(L) {   // loslib.c:382
     let l = 0, op = 0;
     l = await luaL_optlstring(L, 1, 0, 0);
@@ -317,6 +399,10 @@ async function os_setlocale(L) {   // loslib.c:382
     await lua_pushstring(L, $hl.setlocale($h.i32[(os_setlocale$cat + op * 4) >>> 2], l));
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function os_exit(L) {   // loslib.c:394
     let status = 0;
     if (lua_type(L, 1) === 1) {
@@ -333,6 +419,10 @@ async function os_exit(L) {   // loslib.c:394
     return 0;
 }
 /* }====================================================== */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 export async function luaopen_os(L) {   // loslib.c:426
     await luaL_checkversion_(L, 504, 136), await lua_createtable(L, 0, 11), await luaL_setfuncs(L, syslib, 0);
     return 1;

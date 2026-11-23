@@ -82,6 +82,11 @@ const generate_stairs$gen_stairs_panic = new Int8Array(45);   // static in gener
 /* there should be one of these per trap, in the same order as trap.h */
 const trap_engravings = $c.nulls(26);
 /* Args must be (const genericptr) so that qsort will always be happy. */
+/**
+ * @param {*} vx const void *
+ * @param {*} vy const void *
+ * @returns {number} int
+ */
 function mkroom_cmp(vx, vy) {   // mklev.c:60
     let x = null, y = null;
     x = $c.asRec(vx, $T.mkroom, 224);
@@ -92,6 +97,13 @@ function mkroom_cmp(vx, vy) {   // mklev.c:60
     return x.lx > y.lx ? 1 : 0;
 }
 /* is x,y a good location for a door into room? */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} dir int
+ * @param {$T.mkroom | null} room struct mkroom *
+ * @returns {number} boolean
+ */
 function good_rm_wall_doorpos(x, y, dir, room) {   // mklev.c:73
     let tx = 0, ty = 0, rmno = 0;
     if (!isok(x, y) || !room.needjoining) {
@@ -115,6 +127,13 @@ function good_rm_wall_doorpos(x, y, dir, room) {   // mklev.c:73
     return TRUE;
 }
 /* starting from x,y going towards dir, find a good location for a door */
+/**
+ * @param {*} x coordxy *
+ * @param {*} y coordxy *
+ * @param {number} dir int
+ * @param {$T.mkroom | null} aroom struct mkroom *
+ * @returns {number} boolean
+ */
 function finddpos_shift(x, y, dir, aroom) {   // mklev.c:106
     let dx = 0, dy = 0, rx = 0, ry = 0, fail = 0;
     dir = DIR_180(dir);
@@ -150,6 +169,12 @@ function finddpos_shift(x, y, dir, aroom) {   // mklev.c:106
 /* find a valid door position at room edge.
    dir is the preferred edge of the room.
    if found, returns TRUE and the coordinate in cc */
+/**
+ * @param {$T.nhcoord | null} cc coord *
+ * @param {number} dir int
+ * @param {$T.mkroom | null} aroom struct mkroom *
+ * @returns {Promise<number>} boolean
+ */
 async function finddpos(cc, dir, aroom) {   // mklev.c:147
     let x = Int16Array.of(0), y = Int16Array.of(0), x1 = 0, y1 = 0, x2 = 0, y2 = 0, tryct = 0;
     tryct = 0;
@@ -210,6 +235,9 @@ async function finddpos(cc, dir, aroom) {   // mklev.c:147
 }
 /* Sort rooms on the level so they're ordered from left to right on the map.
    makecorridors() by default links rooms N and N+1 */
+/**
+ * @returns {Promise<void>}
+ */
 export async function sort_rooms() {   // mklev.c:210
     let x = 0, y = 0, i = 0, ri = new Uint32Array(41), n = 0, rno = 0;
     ri.fill(0);
@@ -229,6 +257,18 @@ export async function sort_rooms() {   // mklev.c:210
         }
     }
 }
+/**
+ * @param {$T.mkroom | null} croom struct mkroom *
+ * @param {number} lowx coordxy
+ * @param {number} lowy coordxy
+ * @param {number} hix coordxy
+ * @param {number} hiy coordxy
+ * @param {number} lit boolean
+ * @param {number} rtype schar
+ * @param {number} special boolean
+ * @param {number} is_room boolean
+ * @returns {Promise<void>}
+ */
 async function do_room_or_subroom(croom, lowx, lowy, hix, hiy, lit, rtype, special, is_room) {   // mklev.c:231
     let x = 0, y = 0, lev = null, $t1, $t2;
     /* locations might bump level edges in wall-less rooms */
@@ -302,6 +342,16 @@ async function do_room_or_subroom(croom, lowx, lowy, hix, hiy, lit, rtype, speci
         }
     }
 }
+/**
+ * @param {number} lowx coordxy
+ * @param {number} lowy coordxy
+ * @param {number} hix coordxy
+ * @param {number} hiy coordxy
+ * @param {number} lit boolean
+ * @param {number} rtype schar
+ * @param {number} special boolean
+ * @returns {Promise<void>}
+ */
 export async function add_room(lowx, lowy, hix, hiy, lit, rtype, special) {   // mklev.c:304
     let croom = null;
     if (svn.nroom >= MAXNROFROOMS) {
@@ -314,6 +364,17 @@ export async function add_room(lowx, lowy, hix, hiy, lit, rtype, special) {   //
     croom.hx = -1;
     svn.nroom = svn.nroom + 1 | 0;
 }
+/**
+ * @param {$T.mkroom | null} proom struct mkroom *
+ * @param {number} lowx coordxy
+ * @param {number} lowy coordxy
+ * @param {number} hix coordxy
+ * @param {number} hiy coordxy
+ * @param {number} lit boolean
+ * @param {number} rtype schar
+ * @param {number} special boolean
+ * @returns {Promise<void>}
+ */
 export async function add_subroom(proom, lowx, lowy, hix, hiy, lit, rtype, special) {   // mklev.c:322
     let croom = null, $t1;
     if (gn.nsubroom >= MAXNROFROOMS) {
@@ -330,6 +391,10 @@ export async function add_subroom(proom, lowx, lowy, hix, hiy, lit, rtype, speci
     croom.hx = -1;
     gn.nsubroom = gn.nsubroom + 1 | 0;
 }
+/**
+ * @param {number} theme_group enum lua_theme_group
+ * @returns {Promise<void>}
+ */
 export async function free_luathemes(theme_group) {   // mklev.c:345
     let i = 0;
     /*
@@ -348,6 +413,9 @@ export async function free_luathemes(theme_group) {   // mklev.c:345
         }
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function makerooms() {   // mklev.c:367
     let tried_vault = 0, themeroom_tries = 0, fname = null, sbi = new $T.nhl_sandbox_info(), themes = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
     tried_vault = FALSE;
@@ -419,6 +487,12 @@ async function makerooms() {   // mklev.c:367
         $t7 = gi.in_mk_themerooms = FALSE, iflags.in_lua = $t7;
     }
 }
+/**
+ * @param {number} a int
+ * @param {number} b int
+ * @param {number} nxcor boolean
+ * @returns {Promise<void>}
+ */
 async function join(a, b, nxcor) {   // mklev.c:439
     let cc = new $T.nhcoord(), tt = new $T.nhcoord(), org = new $T.nhcoord(), dest = new $T.nhcoord(), tx = 0, ty = 0, xx = 0, yy = 0, croom = null, troom = null, dx = 0, dy = 0, npoints = Int32Array.of(0), dig_result = 0;
     croom = $c.relem(svr.rooms, a);
@@ -498,6 +572,9 @@ async function join(a, b, nxcor) {   // mklev.c:439
     }
 }
 /* create random corridors between rooms */
+/**
+ * @returns {Promise<void>}
+ */
 export async function makecorridors() {   // mklev.c:522
     let a = 0, b = 0, i = 0, any = 0;
     any = TRUE;
@@ -534,6 +611,9 @@ export async function makecorridors() {   // mklev.c:522
     }
 }
 /* (re)allocate space for svd.doors array */
+/**
+ * @returns {Promise<void>}
+ */
 async function alloc_doors() {   // mklev.c:556
     let c = 0, doortmp = null;
     if (!svd.doors || gd.doorindex >= svd.doors_alloc) {
@@ -548,6 +628,12 @@ async function alloc_doors() {   // mklev.c:556
         svd.doors_alloc = c;
     }
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$T.mkroom | null} aroom struct mkroom *
+ * @returns {Promise<void>}
+ */
 export async function add_door(x, y, aroom) {   // mklev.c:574
     let broom = null, tmp = 0, i = 0;
     await alloc_doors();
@@ -582,6 +668,13 @@ export async function add_door(x, y, aroom) {   // mklev.c:574
     $c.radd(svd.doors, aroom.fdoor).x = x;
     $c.radd(svd.doors, aroom.fdoor).y = y;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$T.mkroom | null} aroom struct mkroom *
+ * @param {number} type int
+ * @returns {Promise<void>}
+ */
 async function dosdoor(x, y, aroom, type) {   // mklev.c:615
     let shdoor = 0, mtmp = null;
     shdoor = $c.i8(in_rooms(x, y, SHOPBASE).get(0) ? TRUE : FALSE);
@@ -636,6 +729,12 @@ async function dosdoor(x, y, aroom, type) {   // mklev.c:615
 }
 /* is x,y location such that NEWS direction from it is inside aroom,
    excluding subrooms */
+/**
+ * @param {$T.mkroom | null} aroom struct mkroom *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 function cardinal_nextto_room(aroom, x, y) {   // mklev.c:681
     let rmno = 0;
     rmno = $c.i32($c.add64($c.rdiff(aroom, $c.relem(svr.rooms, 0)), ROOMOFFSET));
@@ -653,6 +752,13 @@ function cardinal_nextto_room(aroom, x, y) {   // mklev.c:681
     }
     return FALSE;
 }
+/**
+ * @param {$T.mkroom | null} aroom struct mkroom *
+ * @param {*} dy int *
+ * @param {*} xx coordxy *
+ * @param {*} yy coordxy *
+ * @returns {Promise<number>} boolean
+ */
 async function place_niche(aroom, dy, xx, yy) {   // mklev.c:701
     let dd = new $T.nhcoord();
     if (rn2(2)) {
@@ -670,6 +776,10 @@ async function place_niche(aroom, dy, xx, yy) {   // mklev.c:701
     yy.set(0, dd.y);
     return $c.i8(isok(xx.get(0), $c.i16(yy.get(0) + dy.get(0) | 0)) && svl.level.locations[xx.get(0)][yy.get(0) + dy.get(0) | 0].typ === STONE && (isok(xx.get(0), $c.i16(yy.get(0) - dy.get(0) | 0)) && !(svl.level.locations[xx.get(0)][yy.get(0) - dy.get(0) | 0].typ >= POOL && svl.level.locations[xx.get(0)][yy.get(0) - dy.get(0) | 0].typ <= DRAWBRIDGE_UP) && !(svl.level.locations[xx.get(0)][yy.get(0) - dy.get(0) | 0].typ >= STAIRS && svl.level.locations[xx.get(0)][yy.get(0) - dy.get(0) | 0].typ <= ALTAR)) && cardinal_nextto_room(aroom, xx.get(0), yy.get(0)) ? 1 : 0);
 }
+/**
+ * @param {number} trap_type int
+ * @returns {Promise<void>}
+ */
 async function makeniche(trap_type) {   // mklev.c:740
     let aroom = null, rm = null, dy = Int32Array.of(0), vct = 0, xx = Int16Array.of(0), yy = Int16Array.of(0), ttmp = null, $t1;
     vct = 8;
@@ -726,6 +836,9 @@ async function makeniche(trap_type) {   // mklev.c:740
         return;
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function make_niches() {   // mklev.c:802
     let ct = 0, dep = 0, ltptr = 0, vamp = 0, $t1;
     ct = rnd((svn.nroom >> 1) + 1 | 0);
@@ -744,6 +857,9 @@ async function make_niches() {   // mklev.c:802
         }
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function makevtele() {   // mklev.c:821
     await makeniche(TELEP_TRAP);
 }
@@ -766,6 +882,9 @@ export function count_level_features() {   // mklev.c:828
  * some of this is only necessary for some types of levels (maze, normal,
  * special) but it's easier to put it all in one place than make sure
  * each type initializes what it needs to separately.
+ */
+/**
+ * @returns {Promise<void>}
  */
 export async function clear_level_structures() {   // mklev.c:850
     let x = 0, y = 0, lev = null, $t1, $t2, $t3;
@@ -843,6 +962,11 @@ export async function clear_level_structures() {   // mklev.c:850
 
    If bonus_items is TRUE, there may be an additional special item
    generated, depending on depth. */
+/**
+ * @param {$T.mkroom | null} croom struct mkroom *
+ * @param {number} bonus_items boolean
+ * @returns {Promise<void>}
+ */
 async function fill_ordinary_room(croom, bonus_items) {   // mklev.c:939
     let trycnt = 0, pos = new $T.nhcoord(), tmonst = null, x = 0, y = 0, skip_chests = 0, subroom = null, uz_branch = null, otmp = null, otyp = 0, tryct = 0, cursed = 0, supply_chest = null, oclass = 0, pass = 0, maxpass = 0, otmp2 = null, buf = new Int8Array(256), pristinebuf = new Int8Array(256), mesg = null, $t1, $t2, $t3;
     trycnt = 0;
@@ -1026,6 +1150,9 @@ async function fill_ordinary_room(croom, bonus_items) {   // mklev.c:939
         }
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function themerooms_post_level_generate() {   // mklev.c:1174
     let themes = null, $t1, $t2;
     themes = gl.luathemes[u.uz.dnum];
@@ -1047,6 +1174,11 @@ async function themerooms_post_level_generate() {   // mklev.c:1174
     await lua_gc(themes, LUA.GCCOLLECT);
 }
 /* if x,y is door, does it open into solid terrain */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 function chk_okdoor(x, y) {   // mklev.c:1198
     if (svl.level.locations[x][y].typ === DOOR) {
         if (svl.level.locations[x][y].horizontal) {
@@ -1069,6 +1201,9 @@ function chk_okdoor(x, y) {   // mklev.c:1198
     return TRUE;
 }
 /* check mklev created level sanity */
+/**
+ * @returns {Promise<void>}
+ */
 async function mklev_sanity_check() {   // mklev.c:1223
     let x = 0, y = 0, i = 0, rmno = 0;
     rmno = -1;
@@ -1094,6 +1229,9 @@ async function mklev_sanity_check() {   // mklev.c:1223
         }
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function makelevel() {   // mklev.c:1251
     let croom = null, branchp = null, prevstairs = null, room_threshold = 0, slev = null, i = 0, fillname = new Int8Array(9), loc_lev = null, u_depth = 0, w = Int16Array.of(0), h = Int16Array.of(0), save_plnmsg = 0, fillable_room_count = 0, bonus_item_room_countdown = 0, fillable = 0, $goto = null;
     if (svd.dungeon_topology.d_wiz1_level.dlevel === 0) {
@@ -1256,6 +1394,13 @@ async function makelevel() {   // mklev.c:1251
     }
 }
 /* return TRUE if water location at (x,y) should have kelp. */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} kelp_pool int
+ * @param {number} kelp_moat int
+ * @returns {number} boolean
+ */
 function water_has_kelp(x, y, kelp_pool, kelp_moat) {   // mklev.c:1432
     if (kelp_pool && (svl.level.locations[x][y].typ === POOL || svl.level.locations[x][y].typ === WATER && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) && !rn2(kelp_pool) || kelp_moat && svl.level.locations[x][y].typ === MOAT && !rn2(kelp_moat)) {
         return TRUE;
@@ -1267,6 +1412,14 @@ function water_has_kelp(x, y, kelp_pool, kelp_moat) {   // mklev.c:1432
  *      surrounding the rooms on the map.
  *      Also place kelp in water.
  *      mineralize(-1, -1, -1, -1, FALSE); => "default" behavior
+ */
+/**
+ * @param {number} kelp_pool int
+ * @param {number} kelp_moat int
+ * @param {number} goldprob int
+ * @param {number} gemprob int
+ * @param {number} skip_lvl_checks boolean
+ * @returns {Promise<void>}
  */
 export async function mineralize(kelp_pool, kelp_moat, goldprob, gemprob, skip_lvl_checks) {   // mklev.c:1449
     let sp = null, otmp = null, x = 0, y = 0, cnt = 0, $t1, $t2;
@@ -1355,6 +1508,9 @@ export async function mineralize(kelp_pool, kelp_moat, goldprob, gemprob, skip_l
         }
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function level_finalize_topology() {   // mklev.c:1544
     let croom = null, ridx = 0, $t1;
     bound_digging();
@@ -1382,6 +1538,9 @@ export async function level_finalize_topology() {   // mklev.c:1544
         svr.rooms[ridx].orig_rtype = svr.rooms[ridx].rtype;
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function mklev() {   // mklev.c:1577
     await reseed_random(rn2);
     await reseed_random(rn2_on_display_rng);
@@ -1395,6 +1554,9 @@ export async function mklev() {   // mklev.c:1577
     await reseed_random(rn2);
     await reseed_random(rn2_on_display_rng);
 }
+/**
+ * @param {$T.mkroom | null} croom struct mkroom *
+ */
 export function topologize(croom) {   // mklev.c:1599
     let x = 0, y = 0, roomno = 0, lowx = 0, lowy = 0, hix = 0, hiy = 0, subindex = 0, nsubrooms = 0;
     roomno = $c.i32($c.add64($c.rdiff(croom, $c.relem(svr.rooms, 0)), ROOMOFFSET));
@@ -1445,6 +1607,10 @@ export function topologize(croom) {   // mklev.c:1599
     }
 }
 /* Find an unused room for a branch location. */
+/**
+ * @param {$T.nhcoord | null} mp coord *
+ * @returns {Promise<$T.mkroom | null>} struct mkroom *
+ */
 async function find_branch_room(mp) {   // mklev.c:1660
     let croom = null;
     croom = null;
@@ -1460,6 +1626,11 @@ async function find_branch_room(mp) {   // mklev.c:1660
     return croom;
 }
 /* Find the room for (x,y).  Return null if not in a room. */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {$T.mkroom | null} struct mkroom *
+ */
 function pos_to_room(x, y) {   // mklev.c:1677
     let i = 0, curr = null;
     for (curr = $c.relem(svr.rooms, 0), i = 0; i < svn.nroom; curr = $c.radd(curr, 1), i = i + 1 | 0) {
@@ -1470,6 +1641,12 @@ function pos_to_room(x, y) {   // mklev.c:1677
     return null;
 }
 /* If given a branch, randomly place a special stair or portal. */
+/**
+ * @param {$T.branch | null} br branch *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function place_branch(br, x, y) {   // mklev.c:1691
     let m = new $T.nhcoord(), dest = null, make_stairs = 0, goes_up = 0;
     /* branch to place */
@@ -1523,6 +1700,11 @@ export async function place_branch(br, x, y) {   // mklev.c:1691
      */
     gm.made_branch = TRUE;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 function bydoor(x, y) {   // mklev.c:1750
     let typ = 0;
     if (isok($c.i16(x + 1 | 0), y)) {
@@ -1552,23 +1734,47 @@ function bydoor(x, y) {   // mklev.c:1750
     return FALSE;
 }
 /* see whether it is allowable to create a door at [x,y] */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} int
+ */
 export function okdoor(x, y) {   // mklev.c:1779
     let near_door = 0;
     near_door = bydoor(x, y);
     return (svl.level.locations[x][y].typ === HWALL || svl.level.locations[x][y].typ === VWALL) && (isok($c.i16(x - 1 | 0), y) && !(svl.level.locations[x - 1 | 0][y].typ < POOL) || isok($c.i16(x + 1 | 0), y) && !(svl.level.locations[x + 1 | 0][y].typ < POOL) || isok(x, $c.i16(y - 1 | 0)) && !(svl.level.locations[x][y - 1 | 0].typ < POOL) || isok(x, $c.i16(y + 1 | 0)) && !(svl.level.locations[x][y + 1 | 0].typ < POOL)) && !near_door ? 1 : 0;
 }
 /* do we want a secret door/corridor? */
+/**
+ * @param {number} chance int
+ * @returns {number} boolean
+ */
 export function maybe_sdoor(chance) {   // mklev.c:1793
     return $c.i8(depth(u.uz) > 2 && !rn2(2 > chance ? 2 : chance) ? 1 : 0);
 }
 /* create a door at x,y in room aroom */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$T.mkroom | null} aroom struct mkroom *
+ * @returns {Promise<void>}
+ */
 export async function dodoor(x, y, aroom) {   // mklev.c:1800
     await dosdoor(x, y, aroom, maybe_sdoor(8) ? SDOOR : DOOR);
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 export function occupied(x, y) {   // mklev.c:1806
     return $c.i8(t_at(x, y) || svl.level.locations[x][y].typ >= STAIRS && svl.level.locations[x][y].typ <= ALTAR || is_lava(x, y) || is_pool(x, y) || invocation_pos(x, y) ? 1 : 0);
 }
 /* generate a corpse and some items on top of a trap */
+/**
+ * @param {$T.trap | null} ttmp struct trap *
+ * @returns {Promise<void>}
+ */
 async function mktrap_victim(ttmp) {   // mklev.c:1815
     let otmp = null, victim_mnum = 0, lvl = 0, kind = 0, x = 0, y = 0, poss_class = 0, $t1;
     /* Object generated by the trap; initially NULL, stays NULL if
@@ -1693,6 +1899,10 @@ async function mktrap_victim(ttmp) {   // mklev.c:1815
     otmp.age = $c.sub64(otmp.age, TAINT_AGE + 1);   /* died too long ago to safely eat */
 }
 /* pick a random trap type, return NO_TRAP if "too hard" */
+/**
+ * @param {number} mktrapflags unsigned int
+ * @returns {Promise<number>} int
+ */
 async function traptype_rnd(mktrapflags) {   // mklev.c:1938
     let lvl = 0, kind = 0;
     lvl = await level_difficulty() >>> 0;
@@ -1762,6 +1972,9 @@ async function traptype_rnd(mktrapflags) {   // mklev.c:1938
     return kind;
 }
 /* random trap type for the Rogue level */
+/**
+ * @returns {number} int
+ */
 function traptype_roguelvl() {   // mklev.c:2002
     let kind = 0;
     switch (rn2(7)) {
@@ -1792,6 +2005,13 @@ function traptype_roguelvl() {   // mklev.c:2002
 /* mktrap(): select trap type and location, then use maketrap() to create it;
    make it at location 'tm' when that isn't Null, otherwise in 'croom'
    if mktrapflags doesn't have MKTRAP_MAZEFLAG set, else in maze corridor */
+/**
+ * @param {number} num int
+ * @param {number} mktrapflags unsigned int
+ * @param {$T.mkroom | null} croom struct mkroom *
+ * @param {$T.nhcoord | null} tm coord *
+ * @returns {Promise<void>}
+ */
 export async function mktrap(num, mktrapflags, croom, tm) {   // mklev.c:2036
     let t = null, m = new $T.nhcoord(), kind = 0, lvl = 0, errbuf = new Int8Array(256), tryct = 0, avoid_boulder = 0, $t1, $t2;
     /* if non-zero, specific type of trap to make */
@@ -1896,6 +2116,14 @@ export async function mktrap(num, mktrapflags, croom, tm) {   // mklev.c:2036
 }
 /* Create stairs up or down at x,y.
    If force is TRUE, change the terrain to ROOM first */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} up char
+ * @param {$T.mkroom | null} croom struct mkroom *
+ * @param {number} force boolean
+ * @returns {Promise<void>}
+ */
 export async function mkstairs(x, y, up, croom, force) {   // mklev.c:2159
     let ltyp = 0, dest = new $T.d_level(), glyph = 0, sidx = 0;
     /* [why 'char' when usage is boolean?] */
@@ -1927,6 +2155,11 @@ export async function mkstairs(x, y, up, croom, force) {   // mklev.c:2159
     svl.level.locations[x][y].flags = ((up ? LA.UP : LA.DOWN) >>> 0) & 31;
 }
 /* is room a good one to generate up or down stairs in? */
+/**
+ * @param {$T.mkroom | null} croom struct mkroom *
+ * @param {number} phase int
+ * @returns {number} boolean
+ */
 function generate_stairs_room_good(croom, phase) {   // mklev.c:2201
     /*
      * phase values, smaller allows for more relaxed criteria:
@@ -1938,6 +2171,9 @@ function generate_stairs_room_good(croom, phase) {   // mklev.c:2201
     return $c.i8(croom && (croom.needjoining || phase < 0) && (!has_dnstairs(croom) && !has_upstairs(croom) || phase < 1) && (croom.rtype === OROOM || phase < 2 && croom.rtype === THEMEROOM) ? 1 : 0);
 }
 /* find a good room to generate an up or down stairs in */
+/**
+ * @returns {Promise<$T.mkroom | null>} struct mkroom *
+ */
 async function generate_stairs_find_room() {   // mklev.c:2219
     let croom = null, i = 0, phase = 0, ai = 0, rmarr = null, $t1;
     if (!svn.nroom) {
@@ -1963,6 +2199,9 @@ async function generate_stairs_find_room() {   // mklev.c:2219
 }
 /* construct stairs up and down within the same branch,
    up and down in different rooms if possible */
+/**
+ * @returns {Promise<void>}
+ */
 async function generate_stairs() {   // mklev.c:2250
     let croom = null, pos = new $T.nhcoord(), $t1, $t2, $t3, $t4;
     /* generate_stairs_find_room() returns Null if nroom == 0, but that
@@ -1990,6 +2229,10 @@ async function generate_stairs() {   // mklev.c:2250
         await mkstairs(pos.x, pos.y, 1, croom, FALSE);   /* up */
     }
 }
+/**
+ * @param {$T.mkroom | null} croom struct mkroom *
+ * @returns {Promise<void>}
+ */
 async function mkfount(croom) {   // mklev.c:2285
     let m = new $T.nhcoord();
     if (!find_okay_roompos(croom, m)) {
@@ -2005,6 +2248,11 @@ async function mkfount(croom) {   // mklev.c:2285
     }
     svl.level.flags.nfountains = $c.u8(svl.level.flags.nfountains + 1);
 }
+/**
+ * @param {$T.mkroom | null} croom struct mkroom *
+ * @param {$T.nhcoord | null} crd coord *
+ * @returns {number} boolean
+ */
 function find_okay_roompos(croom, crd) {   // mklev.c:2303
     let tryct = 0;
     tryct = 0;
@@ -2018,6 +2266,10 @@ function find_okay_roompos(croom, crd) {   // mklev.c:2303
     } while (occupied(crd.x, crd.y) || bydoor(crd.x, crd.y));
     return TRUE;
 }
+/**
+ * @param {$T.mkroom | null} croom struct mkroom *
+ * @returns {Promise<void>}
+ */
 async function mksink(croom) {   // mklev.c:2317
     let m = new $T.nhcoord();
     if (!find_okay_roompos(croom, m)) {
@@ -2029,6 +2281,10 @@ async function mksink(croom) {   // mklev.c:2317
     }
     svl.level.flags.nsinks = $c.u8(svl.level.flags.nsinks + 1);
 }
+/**
+ * @param {$T.mkroom | null} croom struct mkroom *
+ * @returns {Promise<void>}
+ */
 async function mkaltar(croom) {   // mklev.c:2332
     let m = new $T.nhcoord(), al = 0;
     if (croom.rtype !== OROOM) {
@@ -2045,6 +2301,10 @@ async function mkaltar(croom) {   // mklev.c:2332
     al = $c.i8(rn2(A.LAWFUL + 2) - 1 | 0);
     svl.level.locations[m.x][m.y].flags = (Align2amask(al)) & 31;
 }
+/**
+ * @param {$T.mkroom | null} croom struct mkroom *
+ * @returns {Promise<void>}
+ */
 async function mkgrave(croom) {   // mklev.c:2353
     let m = new $T.nhcoord(), tryct = 0, otmp = null, dobell = 0, gold = null, $t1, $t2;
     tryct = 0;
@@ -2095,6 +2355,9 @@ async function mkgrave(croom) {   // mklev.c:2353
  * to read the Book of the Dead.  [That assumption is not valid; it is
  * possible that "the Book reads the hero" rather than vice versa if
  * attempted while blind (in order to make blind-from-birth conduct viable).]
+ */
+/**
+ * @returns {Promise<void>}
  */
 export async function mkinvokearea() {   // mklev.c:2410
     let dist = 0, wallct = 0, xmin = 0, xmax = 0, ymin = 0, ymax = 0, i = 0;
@@ -2186,6 +2449,12 @@ export async function mkinvokearea() {   // mklev.c:2410
 /* Change level topology.  Boulders in the vicinity are eliminated.
  * Temporarily overrides vision in the name of a nice effect.
  */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} dist int
+ * @returns {Promise<void>}
+ */
 async function mkinvpos(x, y, dist) {   // mklev.c:2503
     let ttmp = null, otmp = null, make_rocks = 0, lev = null, mon = null, errfunc = null;
     lev = $c.relem(svl.level.locations[x], y);
@@ -2276,6 +2545,11 @@ async function mkinvpos(x, y, dist) {   // mklev.c:2503
 }
 /* reduces clutter in mkinvokearea() while avoiding potential static analyzer
    confusion about using isok(x,y) to control access to levl[x][y] */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} int
+ */
 function mkinvk_check_wall(x, y) {   // mklev.c:2603
     let ltyp = 0;
     if (!isok(x, y)) {
@@ -2293,6 +2567,11 @@ function mkinvk_check_wall(x, y) {   // mklev.c:2603
  * of n_dgns (thus, Is_branchlev() will never find it).
  *
  * Ludios will remain isolated until the branch is corrected by this function.
+ */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
  */
 async function mk_knox_portal(x, y) {   // mklev.c:2624
     let source = null, br = null, u_depth = 0, save_plnmsg = 0;

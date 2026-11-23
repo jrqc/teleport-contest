@@ -108,6 +108,9 @@ const ct_debug_safe = $c.recArray($T.e, 2);
 /* possible ct_os_ tables */
 const ct_os_time = $c.recArray($T.e, 5);
 const ct_os_files = $c.recArray($T.e, 8);
+/**
+ * @returns {Promise<void>}
+ */
 export async function l_nhcore_init() {   // nhlua.c:142
     let sbi = new $T.nhl_sandbox_info(), i = 0, $t1;
     sbi.$copyFrom(new $T.nhl_sandbox_info());
@@ -127,6 +130,9 @@ export async function l_nhcore_init() {   // nhlua.c:142
         await impossible($c.lit("l_nhcore_init failed"));
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function l_nhcore_done() {   // nhlua.c:161
     if (gl.luacore) {
         await nhl_done(gl.luacore);
@@ -134,6 +140,10 @@ export async function l_nhcore_done() {   // nhlua.c:161
     }
     await end_luapat();
 }
+/**
+ * @param {number} callidx int
+ * @returns {Promise<void>}
+ */
 export async function l_nhcore_call(callidx) {   // nhlua.c:171
     let ltyp = 0;
     if (callidx < 0 || callidx >= NUM_NHCORE_CALLS || !gl.luacore || !nhcore_call_available[callidx]) {
@@ -156,6 +166,11 @@ export async function l_nhcore_call(callidx) {   // nhlua.c:171
         nhcore_call_available[callidx] = FALSE;
     }
 }
+/**
+ * @param {*} L lua_State *
+ * @param {$c.Ptr | null} msg const char *
+ * @returns {Promise<void>}
+ */
 export async function nhl_error(L, msg) {   // nhlua.c:201
     let ar = new $T.lua_Debug(), buf = new Int8Array(512);
     lua_getstack(L, 1, ar);
@@ -172,6 +187,10 @@ export async function nhl_error(L, msg) {   // nhlua.c:201
 }
 /* Check that parameters are nothing but single table,
    or if no parameters given, put empty table there */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<void>}
+ */
 export async function lcheck_param_table(L) {   // nhlua.c:227
     let argc = 0;
     argc = lua_gettop(L);
@@ -182,6 +201,11 @@ export async function lcheck_param_table(L) {   // nhlua.c:227
     await lua_settop(L, 1);
     await luaL_checktype(L, 1, LUA.TTABLE);
 }
+/**
+ * @param {*} L lua_State *
+ * @param {$c.Ptr | null} name const char *
+ * @returns {Promise<number>} schar
+ */
 export async function get_table_mapchr(L, name) {   // nhlua.c:243
     let ter = null, typ = 0;
     ter = await get_table_str(L, name);
@@ -194,6 +218,12 @@ export async function get_table_mapchr(L, name) {   // nhlua.c:243
     }
     return typ;
 }
+/**
+ * @param {*} L lua_State *
+ * @param {$c.Ptr | null} name const char *
+ * @param {number} defval schar
+ * @returns {Promise<number>} schar
+ */
 export async function get_table_mapchr_opt(L, name, defval) {   // nhlua.c:258
     let ter = null, typ = 0;
     ter = await get_table_str_opt(L, name, new $c.Ptr(emptystr, 0));
@@ -210,6 +240,11 @@ export async function get_table_mapchr_opt(L, name, defval) {   // nhlua.c:258
     }
     return typ;
 }
+/**
+ * @param {*} L lua_State *
+ * @param {number} idx int
+ * @returns {Promise<number>} short
+ */
 export async function nhl_get_timertype(L, idx) {   // nhlua.c:276
     let ret = 0;
     /* these are in the same order as enum timeout_types in timeout.h and
@@ -220,11 +255,23 @@ export async function nhl_get_timertype(L, idx) {   // nhlua.c:276
     }
     return ret;
 }
+/**
+ * @param {*} L lua_State *
+ * @param {$c.Ptr | null} name const char *
+ * @param {number | bigint} value lua_Integer
+ * @returns {Promise<void>}
+ */
 export async function nhl_add_table_entry_int(L, name, value) {   // nhlua.c:295
     await lua_pushstring(L, name);
     lua_pushinteger(L, value);
     await lua_rawset(L, -3);
 }
+/**
+ * @param {*} L lua_State *
+ * @param {$c.Ptr | null} name const char *
+ * @param {number} value char
+ * @returns {Promise<void>}
+ */
 export async function nhl_add_table_entry_char(L, name, value) {   // nhlua.c:303
     let buf = new Int8Array(2);
     $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%c"), value);
@@ -232,16 +279,37 @@ export async function nhl_add_table_entry_char(L, name, value) {   // nhlua.c:30
     await lua_pushstring(L, new $c.Ptr(buf, 0));
     await lua_rawset(L, -3);
 }
+/**
+ * @param {*} L lua_State *
+ * @param {$c.Ptr | null} name const char *
+ * @param {$c.Ptr | null} value const char *
+ * @returns {Promise<void>}
+ */
 export async function nhl_add_table_entry_str(L, name, value) {   // nhlua.c:313
     await lua_pushstring(L, name);
     await lua_pushstring(L, value);
     await lua_rawset(L, -3);
 }
+/**
+ * @param {*} L lua_State *
+ * @param {$c.Ptr | null} name const char *
+ * @param {number} value boolean
+ * @returns {Promise<void>}
+ */
 export async function nhl_add_table_entry_bool(L, name, value) {   // nhlua.c:320
     await lua_pushstring(L, name);
     lua_pushboolean(L, value);
     await lua_rawset(L, -3);
 }
+/**
+ * @param {*} L lua_State *
+ * @param {$c.Ptr | null} name const char *
+ * @param {number} x1 coordxy
+ * @param {number} y1 coordxy
+ * @param {number} x2 coordxy
+ * @param {number} y2 coordxy
+ * @returns {Promise<void>}
+ */
 export async function nhl_add_table_entry_region(L, name, x1, y1, x2, y2) {   // nhlua.c:328
     await lua_pushstring(L, name);
     await lua_newtable(L);
@@ -251,6 +319,10 @@ export async function nhl_add_table_entry_region(L, name, x1, y1, x2, y2) {   //
     await nhl_add_table_entry_int(L, $c.lit("y2"), y2);
     await lua_rawset(L, -3);
 }
+/**
+ * @param {number} c char
+ * @returns {number} schar
+ */
 export function splev_chr2typ(c) {   // nhlua.c:384
     let i = 0;
     for (i = 0; char2typ[i].ch; i = i + 1 | 0) {
@@ -260,12 +332,20 @@ export function splev_chr2typ(c) {   // nhlua.c:384
     }
     return INVALID_TYPE;
 }
+/**
+ * @param {$c.Ptr | null} s const char *
+ * @returns {number} schar
+ */
 export function check_mapchr(s) {   // nhlua.c:395
     if (s && $c.strlen(s) === 1) {
         return splev_chr2typ(s.get(0));
     }
     return INVALID_TYPE;
 }
+/**
+ * @param {number} typ schar
+ * @returns {number} char
+ */
 function splev_typ2chr(typ) {   // nhlua.c:403
     let i = 0;
     for (i = 0; char2typ[i].typ < MAX_TYPE; i = i + 1 | 0) {
@@ -277,6 +357,10 @@ function splev_typ2chr(typ) {   // nhlua.c:403
 }
 /* local t = nh.gettrap(x,y); */
 /* local t = nh.gettrap({ x = 10, y = 10 }); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_gettrap(L) {   // nhlua.c:418
     let lx = [0], ly = [0], x = Int16Array.of(0), y = Int16Array.of(0), ttmp = null;
     if (!await nhl_get_xy_params(L, new $c.Ptr(lx, 0), new $c.Ptr(ly, 0))) {
@@ -323,6 +407,10 @@ async function nhl_gettrap(L) {   // nhlua.c:418
     return 0;
 }
 /* nh.deltrap(x,y); nh.deltrap({ x = 10, y = 15 }); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_deltrap(L) {   // nhlua.c:473
     let lx = [0], ly = [0], x = Int16Array.of(0), y = Int16Array.of(0), ttmp = null;
     if (!await nhl_get_xy_params(L, new $c.Ptr(lx, 0), new $c.Ptr(ly, 0))) {
@@ -350,6 +438,12 @@ async function nhl_deltrap(L) {   // nhlua.c:473
    they want to interpret the values as absolute or as map-relative, and
    adjust accordingly.
  */
+/**
+ * @param {*} L lua_State *
+ * @param {*} x lua_Integer *
+ * @param {*} y lua_Integer *
+ * @returns {Promise<number>} boolean
+ */
 export async function nhl_get_xy_params(L, x, y) {   // nhlua.c:508
     let argc = 0, ret = 0, ax = [0], ay = [0], $t1, $t2;
     argc = lua_gettop(L);
@@ -367,6 +461,10 @@ export async function nhl_get_xy_params(L, x, y) {   // nhlua.c:508
 }
 /* local loc = nh.getmap(x,y); */
 /* local loc = nh.getmap({ x = 10, y = 35 }); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_getmap(L) {   // nhlua.c:532
     let lx = [0], ly = [0], x = Int16Array.of(0), y = Int16Array.of(0), buf = new Int8Array(256);
     if (!await nhl_get_xy_params(L, new $c.Ptr(lx, 0), new $c.Ptr(ly, 0))) {
@@ -428,6 +526,10 @@ async function nhl_getmap(L) {   // nhlua.c:532
     }
 }
 /* impossible("Error!") */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_impossible(L) {   // nhlua.c:622
     let argc = 0;
     argc = lua_gettop(L);
@@ -440,6 +542,10 @@ async function nhl_impossible(L) {   // nhlua.c:622
 }
 /* pline("It hits!") */
 /* pline("It hits!", true) */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_pline(L) {   // nhlua.c:636
     let argc = 0;
     argc = lua_gettop(L);
@@ -454,6 +560,10 @@ async function nhl_pline(L) {   // nhlua.c:636
     return 0;
 }
 /* verbalize("Fool!") */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_verbalize(L) {   // nhlua.c:652
     let argc = 0;
     argc = lua_gettop(L);
@@ -465,6 +575,10 @@ async function nhl_verbalize(L) {   // nhlua.c:652
     return 0;
 }
 /* parse_config("OPTIONS=!color") */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_parse_config(L) {   // nhlua.c:666
     let argc = 0;
     argc = lua_gettop(L);
@@ -476,6 +590,10 @@ async function nhl_parse_config(L) {   // nhlua.c:666
     return 0;
 }
 /* local windowtype = get_config("windowtype"); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_get_config(L) {   // nhlua.c:680
     let argc = 0;
     argc = lua_gettop(L);
@@ -489,6 +607,10 @@ async function nhl_get_config(L) {   // nhlua.c:680
 }
 /*
   str = getlin("What do you want to call this dungeon level?");
+ */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
  */
 async function nhl_getlin(L) {   // nhlua.c:697
     let argc = 0, prompt = null, buf = new Int8Array(256);
@@ -509,6 +631,10 @@ async function nhl_getlin(L) {   // nhlua.c:697
 
  selected = menu("prompt", default, pickX,
                  {{key:"a", text:"option a"},{key:"b", text:"option b"},... })
+ */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
  */
 async function nhl_menu(L) {   // nhlua.c:723
     let argc = 0, prompt = null, defval = null, pick = 0, pick_cnt = 0, tmpwin = 0, any = new $T.any(), picks = [null], clr = 0, str = null, key = null, buf = new Int8Array(2), buf$2 = new Int8Array(2);
@@ -578,6 +704,10 @@ async function nhl_menu(L) {   // nhlua.c:723
     return 1;
 }
 /* text("foo\nbar\nbaz") */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_text(L) {   // nhlua.c:812
     let argc = 0, picks = [null], tmpwin = 0, ostr = null, ptr = null, str = null, lstr = null, nlp = null;
     argc = lua_gettop(L);
@@ -616,6 +746,10 @@ async function nhl_text(L) {   // nhlua.c:812
     return 0;
 }
 /* makeplural("zorkmid") */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_makeplural(L) {   // nhlua.c:857
     let argc = 0;
     argc = lua_gettop(L);
@@ -627,6 +761,10 @@ async function nhl_makeplural(L) {   // nhlua.c:857
     return 1;
 }
 /* makesingular("zorkmids") */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_makesingular(L) {   // nhlua.c:871
     let argc = 0;
     argc = lua_gettop(L);
@@ -638,6 +776,10 @@ async function nhl_makesingular(L) {   // nhlua.c:871
     return 1;
 }
 /* s_suffix("foo") */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_s_suffix(L) {   // nhlua.c:885
     let argc = 0;
     argc = lua_gettop(L);
@@ -649,6 +791,10 @@ async function nhl_s_suffix(L) {   // nhlua.c:885
     return 1;
 }
 /* ing_suffix("foo") */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_ing_suffix(L) {   // nhlua.c:899
     let argc = 0;
     argc = lua_gettop(L);
@@ -660,6 +806,10 @@ async function nhl_ing_suffix(L) {   // nhlua.c:899
     return 1;
 }
 /* an("foo") */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_an(L) {   // nhlua.c:913
     let argc = 0;
     argc = lua_gettop(L);
@@ -671,6 +821,9 @@ async function nhl_an(L) {   // nhlua.c:913
     return 1;
 }
 /* rn2(10) */
+/**
+ * @returns {number} boolean
+ */
 function nhl_lua_rnglog_ctx_enabled() {   // nhlua.c:927
     let env = null, rnglog = null;
     if (nhl_lua_rnglog_ctx_enabled$enabled >= 0) {
@@ -686,6 +839,11 @@ function nhl_lua_rnglog_ctx_enabled() {   // nhlua.c:927
     nhl_lua_rnglog_ctx_enabled$enabled = rnglog && rnglog.get(0) ? 1 : 0;
     return $c.i8(nhl_lua_rnglog_ctx_enabled$enabled ? TRUE : FALSE);
 }
+/**
+ * @param {*} L lua_State *
+ * @param {$c.Ptr | null} fallback const char *
+ * @returns {Promise<void>}
+ */
 async function nhl_rnglog_set_lua_caller(L, fallback) {   // nhlua.c:949
     let ar = new $T.lua_Debug(), ar2 = new $T.lua_Debug(), src = null, line = 0, line1 = 0, line2 = 0, name = null, name1 = null, name2 = null, have1 = 0, have2 = 0, src_start = null, src_len = 0, src_start$2 = null, src_len$2 = 0;
     /* Static buffers are safe here because this helper is used
@@ -775,6 +933,10 @@ async function nhl_rnglog_set_lua_caller(L, fallback) {   // nhlua.c:949
     rng_log_set_caller(src, line, name);
 }
 /* rn2(10) */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_rn2(L) {   // nhlua.c:1071
     let argc = 0, range = 0;
     argc = lua_gettop(L);
@@ -789,6 +951,10 @@ async function nhl_rn2(L) {   // nhlua.c:1071
 }
 /* random(10);  -- is the same as rn2(10); */
 /* random(5,8); -- same as 5 + rn2(8); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_random(L) {   // nhlua.c:1089
     let argc = 0, range = 0, base = 0, range$2 = 0;
     argc = lua_gettop(L);
@@ -807,6 +973,10 @@ async function nhl_random(L) {   // nhlua.c:1089
     return 1;
 }
 /* level_difficulty() */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_level_difficulty(L) {   // nhlua.c:1111
     let argc = 0;
     argc = lua_gettop(L);
@@ -818,6 +988,10 @@ async function nhl_level_difficulty(L) {   // nhlua.c:1111
     return 1;
 }
 /* local x = nh.is_genocided("vampire") */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_is_genocided(L) {   // nhlua.c:1124
     let argc = 0, paramstr = null, mgend = Int32Array.of(0), i = 0;
     argc = lua_gettop(L);
@@ -834,6 +1008,10 @@ async function nhl_is_genocided(L) {   // nhlua.c:1124
  * if isfill is false, returns value of env variable THEMERM
  * if isfill is true,  returns value of env variable THEMERMFILL
  * return nil if not in wizard mode or the variable isn't set */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_get_debug_themerm_name(L) {   // nhlua.c:1147
     let argc = 0, dbg_themerm = null, is_fill = 0;
     argc = lua_gettop(L);
@@ -855,6 +1033,11 @@ async function nhl_get_debug_themerm_name(L) {   // nhlua.c:1147
     return 1;
 }
 /* get mandatory integer value from table */
+/**
+ * @param {*} L lua_State *
+ * @param {$c.Ptr | null} name const char *
+ * @returns {Promise<number>} int
+ */
 export async function get_table_int(L, name) {   // nhlua.c:1171
     let ret = 0;
     await lua_getfield(L, -1, name);
@@ -863,6 +1046,12 @@ export async function get_table_int(L, name) {   // nhlua.c:1171
     return ret;
 }
 /* get optional integer value from table */
+/**
+ * @param {*} L lua_State *
+ * @param {$c.Ptr | null} name const char *
+ * @param {number} defval int
+ * @returns {Promise<number>} int
+ */
 export async function get_table_int_opt(L, name, defval) {   // nhlua.c:1183
     let ret = 0;
     ret = defval;
@@ -873,6 +1062,11 @@ export async function get_table_int_opt(L, name, defval) {   // nhlua.c:1183
     await lua_settop(L, -2);
     return ret;
 }
+/**
+ * @param {*} L lua_State *
+ * @param {$c.Ptr | null} name const char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function get_table_str(L, name) {   // nhlua.c:1196
     let ret = null;
     await lua_getfield(L, -1, name);
@@ -882,6 +1076,12 @@ export async function get_table_str(L, name) {   // nhlua.c:1196
 }
 /* get optional string value from table.
    return value must be freed by caller. */
+/**
+ * @param {*} L lua_State *
+ * @param {$c.Ptr | null} name const char *
+ * @param {$c.Ptr | null} defval char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function get_table_str_opt(L, name, defval) {   // nhlua.c:1209
     let ret = null, ltyp = 0;
     await lua_getfield(L, -1, name);
@@ -901,6 +1101,11 @@ export async function get_table_str_opt(L, name, defval) {   // nhlua.c:1209
     await lua_settop(L, -2);
     return null;
 }
+/**
+ * @param {*} L lua_State *
+ * @param {$c.Ptr | null} name const char *
+ * @returns {Promise<number>} int
+ */
 export async function get_table_boolean(L, name) {   // nhlua.c:1233
     let ltyp = 0, ret = 0;
     /* static const int boolstr2i[] = { TRUE, FALSE, TRUE, FALSE, -1 }; */
@@ -924,6 +1129,12 @@ export async function get_table_boolean(L, name) {   // nhlua.c:1233
     }
     return ret;
 }
+/**
+ * @param {*} L lua_State *
+ * @param {$c.Ptr | null} name const char *
+ * @param {number} defval int
+ * @returns {Promise<number>} int
+ */
 export async function get_table_boolean_opt(L, name, defval) {   // nhlua.c:1261
     let ret = 0;
     ret = defval;
@@ -936,6 +1147,13 @@ export async function get_table_boolean_opt(L, name, defval) {   // nhlua.c:1261
     return ret;
 }
 /* opts[] is a null-terminated list */
+/**
+ * @param {*} L lua_State *
+ * @param {$c.Ptr | null} name const char *
+ * @param {$c.Ptr | null} defval const char *
+ * @param {*} opts const char *const *
+ * @returns {Promise<number>} int
+ */
 export async function get_table_option(L, name, defval, opts) {   // nhlua.c:1276
     let ret = 0;
     await lua_getfield(L, -1, name);
@@ -946,6 +1164,10 @@ export async function get_table_option(L, name, defval, opts) {   // nhlua.c:127
 /* local fname = dump_fmtstr("/tmp/nethack.%n.%d.log"); */
 /* DUMPLOG */
 /* local dungeon_name = dnum_name(u.dnum); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_dnum_name(L) {   // nhlua.c:1307
     let argc = 0, dnum = 0;
     argc = lua_gettop(L);
@@ -964,6 +1186,10 @@ async function nhl_dnum_name(L) {   // nhlua.c:1307
 /* return gender-neutral monster type name by integer value,
    or empty string if outside LOW_PM - HIGH_PM range */
 /* local montypename = int_to_pmname(12); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_int_to_pm_name(L) {   // nhlua.c:1327
     let argc = 0, i = 0;
     argc = lua_gettop(L);
@@ -981,6 +1207,10 @@ async function nhl_int_to_pm_name(L) {   // nhlua.c:1327
 }
 /* convert integer to object type name and class */
 /* local oname,oclass = int_to_objname(25); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_int_to_obj_name(L) {   // nhlua.c:1346
     let argc = 0, buf = new Int8Array(8), i = 0;
     argc = lua_gettop(L);
@@ -1004,6 +1234,10 @@ async function nhl_int_to_obj_name(L) {   // nhlua.c:1346
 /* set or get variables which are saved and restored along with the game.
    nh.variable("test", 10);
    local ten = nh.variable("test"); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_variable(L) {   // nhlua.c:1375
     let argc = 0, typ = 0, key = null;
     argc = lua_gettop(L);
@@ -1074,6 +1308,9 @@ async function nhl_variable(L) {   // nhlua.c:1375
     return 1;
 }
 /* return nh_lua_variable lua table as a string */
+/**
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function get_nh_lua_variables() {   // nhlua.c:1451
     let key = null;
     key = null;
@@ -1094,6 +1331,10 @@ export async function get_nh_lua_variables() {   // nhlua.c:1451
 }
 /* !SFCTOOL */
 /* save nh_lua_variables table to file */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 export async function save_luadata(nhfp) {   // nhlua.c:1482
     let lua_data_len = Uint32Array.of(0), lua_data = null;
     lua_data = await get_nh_lua_variables();   /* note: '\0' terminated */
@@ -1106,6 +1347,10 @@ export async function save_luadata(nhfp) {   // nhlua.c:1482
     $c.free(lua_data);
 }
 /* restore nh_lua_variables table from file */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 export async function restore_luadata(nhfp) {   // nhlua.c:1499
     let lua_data_len = Uint32Array.of(0), lua_data = null;
     lua_data_len[0] = 0;
@@ -1122,6 +1367,10 @@ export async function restore_luadata(nhfp) {   // nhlua.c:1499
     /* !SFCTOOL */
 }
 /* local stairs = stairways(); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_stairways(L) {   // nhlua.c:1523
     let tmp = null, i = 0;
     tmp = gs.stairs;
@@ -1145,6 +1394,10 @@ async function nhl_stairways(L) {   // nhlua.c:1523
 /*
   test( { x = 123, y = 456 } );
 */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_test(L) {   // nhlua.c:1554
     let x = 0, y = 0, name = null, Player = new Int8Array(7);
     Player.fill(0);
@@ -1161,6 +1414,10 @@ async function nhl_test(L) {   // nhlua.c:1554
 }
 /* push a key into command queue */
 /* nh.pushkey("i"); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_pushkey(L) {   // nhlua.c:1578
     let argc = 0, key = null;
     argc = lua_gettop(L);
@@ -1175,6 +1432,10 @@ async function nhl_pushkey(L) {   // nhlua.c:1578
 }
 /* do a turn of moveloop, or until gm.multi is done if param is true. */
 /* nh.doturn(); nh.doturn(true); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_doturn(L) {   // nhlua.c:1597
     let argc = 0, domulti = 0;
     argc = lua_gettop(L);
@@ -1191,6 +1452,10 @@ async function nhl_doturn(L) {   // nhlua.c:1597
 /* nh.debug_flags({ mongen = false,
                     hunger = false,
                     overwrite_stairs = true }); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_debug_flags(L) {   // nhlua.c:1617
     let val = 0, mtmp = null, mtmp2 = null;
     await lcheck_param_table(L);
@@ -1227,6 +1492,10 @@ async function nhl_debug_flags(L) {   // nhlua.c:1617
 }
 /* flip level */
 /* nh.flip_level(n); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_flip_level(L) {   // nhlua.c:1663
     let argc = 0, flp = 0;
     argc = lua_gettop(L);
@@ -1240,6 +1509,10 @@ async function nhl_flip_level(L) {   // nhlua.c:1663
 /* does location at x,y have timer? */
 /* local has_melttimer = nh.has_timer_at(x,y, "melt-ice"); */
 /* local has_melttimer = nh.has_timer_at({x=4,y=7}, "melt-ice"); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_timer_has_at(L) {   // nhlua.c:1682
     let ret = 0, timertype = 0, lx = [0], ly = [0], x = Int16Array.of(0), y = Int16Array.of(0), when = 0;
     ret = FALSE;
@@ -1263,6 +1536,10 @@ async function nhl_timer_has_at(L) {   // nhlua.c:1682
 /* when does location at x,y timer trigger? */
 /* local melttime = nh.peek_timer_at(x,y, "melt-ice"); */
 /* local melttime = nh.peek_timer_at({x=5,y=6}, "melt-ice"); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_timer_peek_at(L) {   // nhlua.c:1713
     let when = 0, timertype = 0, lx = [0], ly = [0], x = Int16Array.of(0), y = Int16Array.of(0);
     when = 0;
@@ -1285,6 +1562,10 @@ async function nhl_timer_peek_at(L) {   // nhlua.c:1713
 /* stop timer at location x,y */
 /* nh.stop_timer_at(x,y, "melt-ice"); */
 /* nh.stop_timer_at({x=6,y=8}, "melt-ice"); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_timer_stop_at(L) {   // nhlua.c:1741
     let timertype = 0, lx = [0], ly = [0], x = Int16Array.of(0), y = Int16Array.of(0);
     timertype = await nhl_get_timertype(L, -1);
@@ -1304,6 +1585,10 @@ async function nhl_timer_stop_at(L) {   // nhlua.c:1741
 }
 /* start timer at location x,y */
 /* nh.start_timer_at(x,y, "melt-ice", 10); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_timer_start_at(L) {   // nhlua.c:1766
     let timertype = 0, when = 0, lx = [0], ly = [0], x = Int16Array.of(0), y = Int16Array.of(0), where = 0;
     timertype = await nhl_get_timertype(L, -2);
@@ -1327,6 +1612,10 @@ async function nhl_timer_start_at(L) {   // nhlua.c:1766
 /* returns the visual interpretation of the key bound to an extended command,
    or the ext cmd name if not bound to any key */
 /* local helpkey = eckey("help"); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_get_cmd_key(L) {   // nhlua.c:1798
     let argc = 0, cmd = null, key = null;
     argc = lua_gettop(L);
@@ -1342,6 +1631,10 @@ async function nhl_get_cmd_key(L) {   // nhlua.c:1798
 /* callback("level_enter", "function_name"); */
 /* callback("level_enter", "function_name", true); */
 /* level_enter, level_leave, cmd_before */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_callback(L) {   // nhlua.c:1818
     let argc = 0, i = 0, rm = 0, fn = null, cb = null;
     argc = lua_gettop(L);
@@ -1396,6 +1689,10 @@ async function nhl_callback(L) {   // nhlua.c:1818
  */
 /* gamestate(); -- save state */
 /* gamestate(true); -- restore state */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_gamestate(L) {   // nhlua.c:1876
     let wornmask = 0, otmp = null, argc = 0, reststate = 0, otyp = 0, save_plnmsg = 0, cur_uz = new $T.d_level(), cur_uz0 = new $T.d_level(), $t1, $t2, $t3;
     argc = lua_gettop(L);
@@ -1475,6 +1772,9 @@ async function nhl_gamestate(L) {   // nhlua.c:1876
 }
 /* free dynamic date allocated when entering tutorial;
    called when exiting tutorial normally or if player quits while in it */
+/**
+ * @returns {Promise<void>}
+ */
 export async function free_tutorial() {   // nhlua.c:1963
     let otmp = null;
     /* for normal tutorial exit, gmst_invent will already be Null */
@@ -1501,6 +1801,10 @@ export async function free_tutorial() {   // nhlua.c:1963
     }
 }
 /* called from gotolevel(do.c) */
+/**
+ * @param {number} entering boolean
+ * @returns {Promise<void>}
+ */
 export async function tutorial(entering) {   // nhlua.c:1991
     let $t1;
     await l_nhcore_call(entering ? NHCORE.ENTER_TUTORIAL : NHCORE.LEAVE_TUTORIAL);
@@ -1510,6 +1814,10 @@ export async function tutorial(entering) {   // nhlua.c:1991
     }
 }
 /* register and init the constants table */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<void>}
+ */
 async function init_nhc_data(L) {   // nhlua.c:2078
     let i = 0;
     await lua_newtable(L);
@@ -1520,6 +1828,12 @@ async function init_nhc_data(L) {   // nhlua.c:2078
     }
     await lua_setglobal(L, $c.lit("nhc"));
 }
+/**
+ * @param {*} L lua_State *
+ * @param {number} anytype int
+ * @param {*} src void *
+ * @returns {number} int
+ */
 function nhl_push_anything(L, anytype, src) {   // nhlua.c:2094
     let any = new $T.any();
     any.$copyFrom(cg.zeroany);
@@ -1539,6 +1853,10 @@ function nhl_push_anything(L, anytype, src) {   // nhlua.c:2094
     }
     return 1;
 }
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_meta_u_index(L) {   // nhlua.c:2118
     let tkey = null, i = 0;
     tkey = await luaL_checklstring(L, 2, null);
@@ -1571,11 +1889,19 @@ async function nhl_meta_u_index(L) {   // nhlua.c:2118
     /*NOTREACHED*/
     return 0;
 }
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_meta_u_newindex(L) {   // nhlua.c:2185
     await nhl_error(L, $c.lit("Cannot set u table values"));
     /*NOTREACHED*/
     return 0;
 }
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_u_clear_inventory(L) {   // nhlua.c:2195
     while (gi.invent) {
         await useupall(gi.invent);
@@ -1584,9 +1910,17 @@ async function nhl_u_clear_inventory(L) {   // nhlua.c:2195
 }
 /* Put object into player's inventory */
 /* u.giveobj(obj.new("rock")); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_u_giveobj(L) {   // nhlua.c:2205
     return await nhl_obj_u_giveobj(L);
 }
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<void>}
+ */
 async function init_u_data(L) {   // nhlua.c:2217
     await lua_newtable(L);
     await luaL_setfuncs(L, $c.relem(nhl_u_functions, 0), 0);
@@ -1598,17 +1932,32 @@ async function init_u_data(L) {   // nhlua.c:2217
     await lua_setmetatable(L, -2);
     await lua_setglobal(L, $c.lit("u"));
 }
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function traceback_handler(L) {   // nhlua.c:2246
     await luaL_traceback(L, L, await lua_tolstring(L, 1, null), 0);
     /* TODO: call impossible() if fuzzing? */
     return 1;
 }
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} uint32_t
+ */
 async function nhl_getmeminuse(L) {   // nhlua.c:2254
     return (Math.imul(await lua_gc(L, LUA.GCCOUNT), 1024) + await lua_gc(L, LUA.GCCOUNTB) | 0) >>> 0;
 }
 /* lua_pcall with our traceback handler and memory and instruction step
  * limiting.
  *  On error, traceback will be on top of stack */
+/**
+ * @param {*} L lua_State *
+ * @param {number} nargs int
+ * @param {number} nresults int
+ * @param {$c.Ptr | null} name const char *
+ * @returns {Promise<number>} int
+ */
 export async function nhl_pcall(L, nargs, nresults, name) {   // nhlua.c:2263
     let nud = [null], rv = 0, ic = 0, $t1;
     try {
@@ -1643,6 +1992,14 @@ export async function nhl_pcall(L, nargs, nresults, name) {   // nhlua.c:2263
         await panic($c.lit("Lua time exceeded %d:%s"), nud[0].sid, nud[0].name ? nud[0].name : $c.lit("(unknown)"));
     }
 }
+/**
+ * @param {*} L lua_State *
+ * @param {number} nargs int
+ * @param {number} nresults int
+ * @param {$c.Ptr | null} name const char *
+ * @param {number} npa NHL_pcall_action
+ * @returns {Promise<number>} int
+ */
 export async function nhl_pcall_handle(L, nargs, nresults, name, npa) {   // nhlua.c:2309
     let rv = 0, nud = [null];
     rv = await nhl_pcall(L, nargs, nresults, name);
@@ -1665,6 +2022,11 @@ export async function nhl_pcall_handle(L, nargs, nresults, name, npa) {   // nhl
 /* XXX impossible() should be swappable with pline/nothing/panic via flag */
 /* read lua code/data from a dlb module or an external file
    into a string buffer and feed that to lua */
+/**
+ * @param {*} L lua_State *
+ * @param {$c.Ptr | null} fname const char *
+ * @returns {Promise<number>} boolean
+ */
 export async function nhl_loadlua(L, fname) {   // nhlua.c:2338
     let ret = 0, fh = null, buf = null, bufin = null, bufout = null, p = null, nl = null, altfname = null, buflen = 0, ct = 0, cnt = 0, llret = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8;
     /* 8K */
@@ -1765,6 +2127,10 @@ export async function nhl_loadlua(L, fname) {   // nhlua.c:2338
     }
     return ret;
 }
+/**
+ * @param {$T.nhl_sandbox_info | null} sbi nhl_sandbox_info *
+ * @returns {Promise<*>} lua_State *
+ */
 export async function nhl_init(sbi) {   // nhlua.c:2449
     let L = null;
     /* It would be nice to import EXPECTED from each build system. XXX */
@@ -1803,6 +2169,10 @@ export async function nhl_init(sbi) {   // nhlua.c:2449
     }
     return L;
 }
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<void>}
+ */
 export async function nhl_done(L) {   // nhlua.c:2522
     let nud = [null], ic = 0;
     if (L) {
@@ -1824,6 +2194,11 @@ export async function nhl_done(L) {   // nhlua.c:2522
     }
     iflags.in_lua = FALSE;
 }
+/**
+ * @param {$c.Ptr | null} name const char *
+ * @param {$T.nhl_sandbox_info | null} sbi nhl_sandbox_info *
+ * @returns {Promise<number>} boolean
+ */
 export async function load_lua(name, sbi) {   // nhlua.c:2546
     let ret = 0, L = null;
     ret = TRUE;
@@ -1841,6 +2216,9 @@ export async function load_lua(name, sbi) {   // nhlua.c:2546
     await nhl_done(L);
     return ret;
 }
+/**
+ * @returns {Promise<$c.Ptr | null>} const char *
+ */
 export async function get_lua_version() {   // nhlua.c:2570
     let sbi = new $T.nhl_sandbox_info(), L = null, len = [0], vs = null;
     sbi.$copyFrom(new $T.nhl_sandbox_info());
@@ -1888,6 +2266,13 @@ export async function get_lua_version() {   // nhlua.c:2570
     }
     return new $c.Ptr(gl.lua_ver, 0);
 }
+/**
+ * @param {*} L lua_State *
+ * @param {number} flag int
+ * @param {number} tndx int
+ * @param {$T.e | null} todo struct e *
+ * @returns {Promise<void>}
+ */
 async function nhl_clearfromtable(L, flag, tndx, todo) {   // nhlua.c:2762
     while (todo.when !== EOT) {
         lua_pushnil(L);
@@ -1935,6 +2320,9 @@ return values from "call it":
  */
 /* XXX set memory and step limits */
 /* load a pattern matching function */
+/**
+ * @returns {Promise<void>}
+ */
 async function end_luapat() {   // nhlua.c:2834
     if (luapat) {
         await lua_close(luapat);
@@ -1958,6 +2346,10 @@ async function end_luapat() {   // nhlua.c:2834
  */
 /* XXX this may have to be in
  * struct g (gi now) TBD */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<void>}
+ */
 export async function nhl_pushhooked_open_table(L) {   // nhlua.c:2887
     let hot = 0;
     hot = await lua_getfield(L, LUA_REGISTRYINDEX, $c.lit("org.nethack.nethack.sb.fs"));
@@ -1982,6 +2374,11 @@ export async function nhl_pushhooked_open_table(L) {   // nhlua.c:2887
  * doesn't have to work, but POSIX says it does.  So it
  * _should_ work everywhere but all we can do without messing
  * around inside Lua is to try to keep the compiler quiet. */
+/**
+ * @param {*} L lua_State *
+ * @param {number} lflags uint32_t
+ * @returns {Promise<void>}
+ */
 async function nhlL_openlibs(L, lflags) {   // nhlua.c:3000
     let baselib = 0, oslib = 0, env_seed = null, seed = 0, dblib = 0;
     /* translate lflags from user-friendly to internal */
@@ -2090,6 +2487,10 @@ async function nhlL_openlibs(L, lflags) {   // nhlua.c:3000
         await lua_settop(L, -2);
     }
 }
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function nhl_panic(L) {   // nhlua.c:3155
     let msg = null;
     msg = await lua_tolstring(L, -1, null);
@@ -2102,6 +2503,11 @@ async function nhl_panic(L) {   // nhlua.c:3155
 }
 /* called when lua issues a warning message; the text of the message
    is passed to us in pieces across multiple function calls */
+/**
+ * @param {*} userdata void *
+ * @param {$c.Ptr | null} msg_fragment const char *
+ * @param {number} to_be_continued int
+ */
 function nhl_warn(userdata, msg_fragment, to_be_continued) {   // nhlua.c:3171
     let fraglen = 0, buflen = 0;
     /* 0: last fragment; 1: more to come */
@@ -2118,6 +2524,10 @@ function nhl_warn(userdata, msg_fragment, to_be_continued) {   // nhlua.c:3171
         gl.lua_warnbuf[0] = 0;
     }
 }
+/**
+ * @param {*} L lua_State *
+ * @param {$T.lua_Debug | null} ar lua_Debug *
+ */
 function nhl_hookfn(L, ar) {   // nhlua.c:3192
     let nud = [null];
     lua_getallocf(L, new $c.Ptr(nud, 0));
@@ -2127,6 +2537,11 @@ function nhl_hookfn(L, ar) {   // nhlua.c:3192
     nud[0].steps = nud[0].steps - NHL_SB.STEPSIZE >>> 0;
     nud[0].statctr = nud[0].statctr + 1 >>> 0;
 }
+/**
+ * @param {$T.nhl_sandbox_info | null} sbi nhl_sandbox_info *
+ * @param {$c.Ptr | null} name const char *
+ * @returns {Promise<*>} lua_State *
+ */
 async function nhlL_newstate(sbi, name) {   // nhlua.c:3207
     let nud = null, L = null, $t1;
     nud = null;

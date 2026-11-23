@@ -47,6 +47,10 @@ import { __collate_equiv_wchar, __collate_range_cmp, __global_locale, _c_locale,
 import { tre_tnfa_run_backtrack } from './tre-match-backtrack.js';
 import { tre_tnfa_run_parallel } from './tre-match-parallel.js';
 
+/**
+ * @param {number} val void *
+ * @returns {number} void *
+ */
 function xlocale_retain(val) {   // xlocale_private.h:96
     let obj = 0;
     obj = val;
@@ -56,6 +60,9 @@ function xlocale_retain(val) {   // xlocale_private.h:96
     $h.i32[obj >>> 2] = $h.i32[obj >>> 2] + 1 | 0;
     return val;
 }
+/**
+ * @param {number} val void *
+ */
 function xlocale_release(val) {   // xlocale_private.h:107
     let obj = 0;
     obj = val;
@@ -68,9 +75,16 @@ function xlocale_release(val) {   // xlocale_private.h:107
         }
     }
 }
+/**
+ * @returns {number} locale_t
+ */
 function __current_locale() {   // xlocale_private.h:122
     return __global_locale;
 }
+/**
+ * @param {number} __loc locale_t
+ * @returns {number} locale_t
+ */
 function __locale_ptr(__loc) {   // xlocale_private.h:128
     if (__loc === 0) {
         __loc = $h.u32[_c_locale >>> 2];
@@ -79,10 +93,21 @@ function __locale_ptr(__loc) {   // xlocale_private.h:128
     }
     return __loc;
 }
+/**
+ * @param {number} tags const tre_tag_t *
+ * @param {number} i int
+ * @returns {number} int
+ */
 function tre_tag_get(tags, i) {   // tre-match-utils.h:282
     tags = tags + i * 16;
     return $h.i32[tags >>> 2] > 0 ? $h.i32[(tags + 8) >>> 2] : -1;
 }
+/**
+ * @param {number} tags tre_tag_t *
+ * @param {number} i int
+ * @param {number} val int
+ * @param {number} touch int
+ */
 function tre_tag_set(tags, i, val, touch) {   // tre-match-utils.h:289
     let $t1;
     tags = tags + i * 16;
@@ -92,12 +117,28 @@ function tre_tag_set(tags, i, val, touch) {   // tre-match-utils.h:289
     $h.i32[(tags + 8) >>> 2] = val;
     $h.i32[(tags + 12) >>> 2] = touch;
 }
+/**
+ * @param {number} tags tre_tag_t *
+ * @param {number} i int
+ */
 function tre_tag_reset(tags, i) {   // tre-match-utils.h:299
     $h.i32[(tags + i * 16) >>> 2] = 0;
 }
+/**
+ * @param {number} tags const tre_tag_t *
+ * @param {number} i int
+ * @returns {number} int
+ */
 function tre_tag_touch_get(tags, i) {   // tre-match-utils.h:305
     return $h.i32[(tags + i * 16 + 12) >>> 2];
 }
+/**
+ * @param {number} start int
+ * @param {number} end int
+ * @param {number} tags1 const tre_tag_t *
+ * @param {number} tags2 const tre_tag_t *
+ * @returns {number} int
+ */
 function tre_minimal_tag_order(start, end, tags1, tags2) {   // tre-match-utils.h:363
     let t1 = 0, t2 = 0;
     t1 = tags1 + start * 16;
@@ -119,6 +160,13 @@ function tre_minimal_tag_order(start, end, tags1, tags2) {   // tre-match-utils.
     }
     return $h.i32[(t2 + 8) >>> 2] - $h.i32[(t1 + 8) >>> 2] | 0;
 }
+/**
+ * @param {number} i int
+ * @param {number} dir tre_tag_direction_t
+ * @param {number} t1 const tre_tag_t *
+ * @param {number} t2 const tre_tag_t *
+ * @returns {number} int
+ */
 function tre_tag_order_1(i, dir, t1, t2) {   // tre-match-utils.h:399
     let diff = 0;
     t1 = t1 + i * 16;
@@ -170,6 +218,13 @@ function tre_tag_order_1(i, dir, t1, t2) {   // tre-match-utils.h:399
     }
     return 0;
 }
+/**
+ * @param {number} num_tags int
+ * @param {number} tag_directions tre_tag_direction_t *
+ * @param {number} t1 const tre_tag_t *
+ * @param {number} t2 const tre_tag_t *
+ * @returns {number} int
+ */
 function tre_tag_order(num_tags, tag_directions, t1, t2) {   // tre-match-utils.h:482
     let i = 0, ret = 0;
     for (i = 0; i < num_tags; i = i + 1 | 0) {
@@ -179,6 +234,12 @@ function tre_tag_order(num_tags, tag_directions, t1, t2) {   // tre-match-utils.
     }
     return 0;
 }
+/**
+ * @param {number} list tre_bracket_match_list_t *restrict
+ * @param {number} wc tre_cint_t
+ * @param {number} tnfa const tre_tnfa_t *restrict
+ * @returns {number} int
+ */
 function tre_bracket_match(list, wc, tnfa) {   // tre-match-utils.h:523
     let match = 0, i = 0, b = 0, uc = 0, lc = 0, icase = 0, start = 0, end = 0;
     match = 0;
@@ -280,6 +341,13 @@ function tre_bracket_match(list, wc, tnfa) {   // tre-match-utils.h:523
    the corresponding tags.  If reset_all is non-zero, reset all tags in all
    branches.  Recurse into the nested last matched structures, clearing tags as
    apprpriate. */
+/**
+ * @param {number} tags tre_tag_t *
+ * @param {number} lm const tre_last_matched_t *
+ * @param {number} n int
+ * @param {number} start_tag int
+ * @param {number} reset_all int
+ */
 function tre_reset_last_matched_branches(tags, lm, n, start_tag, reset_all) {   // regexec.c:63
     let max = 0, i = 0, reset = 0, b = 0, t = 0, t$2 = 0, touch = 0, j = 0, t$3 = 0, $t1;
     do {
@@ -337,6 +405,15 @@ function tre_reset_last_matched_branches(tags, lm, n, start_tag, reset_all) {   
 }
 /* Fills the POSIX.2 regmatch_t array according to the TNFA tag and match
    endpoint values. */
+/**
+ * @param {number | bigint} nmatch size_t
+ * @param {number} pmatch regmatch_t *
+ * @param {number} cflags int
+ * @param {number} tnfa const tre_tnfa_t *
+ * @param {number} intags const tre_tag_t *
+ * @param {number} match_eo int
+ * @returns {number} reg_errcode_t
+ */
 export function tre_fill_pmatch(nmatch, pmatch, cflags, tnfa, intags, match_eo) {   // regexec.c:152
     let i = 0, tags = 0, submatch_data = 0, t = 0, $t1, $t2, $t3;
     if (cflags & 4) {
@@ -397,6 +474,16 @@ export function tre_fill_pmatch(nmatch, pmatch, cflags, tnfa, intags, match_eo) 
 */
 /* TRE_APPROX */
 /* !__LIBC__ */
+/**
+ * @param {number} tnfa const tre_tnfa_t *
+ * @param {number} string const void *
+ * @param {number | bigint} len ssize_t
+ * @param {number} type tre_str_type_t
+ * @param {number | bigint} nmatch size_t
+ * @param {number} pmatch regmatch_t *
+ * @param {number} eflags int
+ * @returns {number} int
+ */
 function tre_match(tnfa, string, len, type, nmatch, pmatch, eflags) {   // regexec.c:246
     let status = 0, tags = 0, offset = 0, count = 0, i = 0, p = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(4);
@@ -467,6 +554,15 @@ function tre_match(tnfa, string, len, type, nmatch, pmatch, eflags) {   // regex
         return status;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} preg const regex_t *
+ * @param {number} str const char *
+ * @param {number | bigint} len size_t
+ * @param {number | bigint} nmatch size_t
+ * @param {number} pmatch regmatch_t *
+ * @param {number} eflags int
+ * @returns {number} int
+ */
 export function regnexec(preg, str, len, nmatch, pmatch, eflags) {   // regexec.c:357
     let tnfa = 0, type = 0;
     tnfa = $h.u32[(preg + 24) >>> 2];
@@ -477,10 +573,27 @@ export function regnexec(preg, str, len, nmatch, pmatch, eflags) {   // regexec.
     /* TRE_USE_SYSTEM_REGEX_H */
     return tre_match(tnfa, str, $c.i64(len), type, nmatch, pmatch, eflags);
 }
+/**
+ * @param {number} preg const regex_t *
+ * @param {number} str const char *
+ * @param {number | bigint} nmatch size_t
+ * @param {number} pmatch regmatch_t *
+ * @param {number} eflags int
+ * @returns {number} int
+ */
 export function regexec(preg, str, nmatch, pmatch, eflags) {   // regexec.c:371
     return regnexec(preg, str, 18446744073709551615n, nmatch, pmatch, eflags);
 }
 /* !__APPLE__ */
+/**
+ * @param {number} preg const regex_t *
+ * @param {number} str const wchar_t *
+ * @param {number | bigint} len size_t
+ * @param {number | bigint} nmatch size_t
+ * @param {number} pmatch regmatch_t *
+ * @param {number} eflags int
+ * @returns {number} int
+ */
 export function regwnexec(preg, str, len, nmatch, pmatch, eflags) {   // regexec.c:401
     let tnfa = 0;
     tnfa = $h.u32[(preg + 24) >>> 2];
@@ -490,6 +603,14 @@ export function regwnexec(preg, str, len, nmatch, pmatch, eflags) {   // regexec
     /* TRE_USE_SYSTEM_REGEX_H */
     return tre_match(tnfa, str, $c.i64(len), 0, nmatch, pmatch, eflags);
 }
+/**
+ * @param {number} preg const regex_t *
+ * @param {number} str const wchar_t *
+ * @param {number | bigint} nmatch size_t
+ * @param {number} pmatch regmatch_t *
+ * @param {number} eflags int
+ * @returns {number} int
+ */
 export function regwexec(preg, str, nmatch, pmatch, eflags) {   // regexec.c:414
     return regwnexec(preg, str, 18446744073709551615n, nmatch, pmatch, eflags);
 }

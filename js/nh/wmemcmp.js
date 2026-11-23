@@ -32,6 +32,12 @@ import * as $hl from '../crt/heaplibc.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
 
+/**
+ * @param {number} s1 const wchar_t *
+ * @param {number} s2 const wchar_t *
+ * @param {number | bigint} n size_t
+ * @returns {number} int
+ */
 export function wmemcmp(s1, s2, n) {   // wmemcmp.c:40
     let i = 0;
     for (i = 0; i < n; i = $c.addu64(i, 1)) {

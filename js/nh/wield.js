@@ -71,6 +71,10 @@ const can_no_longer_twoweap = new Int8Array(40);
  * responsibility to handle that.  It's also the caller's responsibility
  * to print the appropriate messages.
  */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function setuwep(obj) {   // wield.c:100
     let olduwep = null, $t1;
     olduwep = $G.uwep;
@@ -104,6 +108,10 @@ export async function setuwep(obj) {   // wield.c:100
         gu.unweapon = TRUE;   /* for "bare hands" message */
     }
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} boolean
+ */
 async function cant_wield_corpse(obj) {   // wield.c:138
     let kbuf = new Int8Array(256);
     if ($G.uarmg || obj.otyp !== CORPSE || !touch_petrifies($c.relem(mons, obj.corpsenm)) || Stone_resistance()) {
@@ -117,12 +125,19 @@ async function cant_wield_corpse(obj) {   // wield.c:138
 }
 /* description of hands when not wielding anything; also used
    by #seeweapon (')'), #attributes (^X), and #takeoffall ('A') */
+/**
+ * @returns {$c.Ptr | null} const char *
+ */
 export function empty_handed() {   // wield.c:158
     /* gloves imply hands */
     /* hands but no weapon and no gloves */
     /* alternate phrasing for paws or lack of hands */
     return $G.uarmg ? $c.lit("empty handed") : humanoid(gy.youmonst.data) ? $c.lit("bare handed") : $c.lit("not wielding anything");
 }
+/**
+ * @param {$T.obj | null} wep$in struct obj *
+ * @returns {Promise<number>} int
+ */
 async function ready_weapon(wep$in) {   // wield.c:169
     const wep = [wep$in];
     let res = 0, was_twoweap = 0, had_wep = 0, tmp = null, thestr = null, dummy = 0, this_shkp = null;
@@ -211,18 +226,30 @@ async function ready_weapon(wep$in) {   // wield.c:169
     }
     return res;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function setuqwep(obj) {   // wield.c:276
     await setworn(obj, W.QUIVER);
     /* no extra handling needed; this used to include a call to
        update_inventory() but that's already performed by setworn() */
     return;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function setuswapwep(obj) {   // wield.c:285
     await setworn(obj, W.SWAPWEP);
     return;
 }
 /* getobj callback for object to ready for throwing/shooting;
    this filter lets worn items through so that caller can reject them */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 function ready_ok(obj) {   // wield.c:294
     if (!obj) {   /* '-', will empty quiver slot if chosen */
         return $G.uquiver ? GETOBJ.SUGGEST : GETOBJ.DOWNPLAY;
@@ -249,6 +276,10 @@ function ready_ok(obj) {   // wield.c:294
     return GETOBJ.DOWNPLAY;
 }
 /* getobj callback for object to wield */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 function wield_ok(obj) {   // wield.c:331
     if (!obj) {
         return GETOBJ.SUGGEST;
@@ -261,12 +292,19 @@ function wield_ok(obj) {   // wield.c:331
     }
     return GETOBJ.DOWNPLAY;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function finish_splitting(obj) {   // wield.c:346
     /* obj was split off from something; give it its own invlet */
     await freeinv(obj);
     await addinv_nomerge(obj);
 }
 /* the #wield command - wield a weapon */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dowield() {   // wield.c:355
     let qbuf = new Int8Array(128), wep = null, oldwep = null, result = 0, use_plural = 0, $goto = null;
     D1: for (;;) {
@@ -368,6 +406,9 @@ export async function dowield() {   // wield.c:355
     }
 }
 /* the #swap command - swap wielded and secondary weapons */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doswapweapon() {   // wield.c:461
     let oldwep = null, oldswap = null, result = 0;
     result = 0;
@@ -405,10 +446,17 @@ export async function doswapweapon() {   // wield.c:461
     return result;
 }
 /* the #quiver command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dowieldquiver() {   // wield.c:505
     return await doquiver_core($c.lit("ready"));
 }
 /* guts of #quiver command; also used by #fire when refilling empty quiver */
+/**
+ * @param {$c.Ptr | null} verb const char *
+ * @returns {Promise<number>} int
+ */
 export async function doquiver_core(verb) {   // wield.c:512
     let qbuf = new Int8Array(128), newquiver = null, res = 0, was_uwep = 0, was_twoweap = 0, weld_res = 0, use_plural = 0, use_plural$2 = 0, $goto = null;
     D1: for (;;) {
@@ -564,6 +612,11 @@ export async function doquiver_core(verb) {   // wield.c:512
     }
 }
 /* used for #rub and for applying pick-axe, whip, grappling hook or polearm */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$c.Ptr | null} verb const char *
+ * @returns {Promise<number>} boolean
+ */
 export async function wield_tool(obj, verb) {   // wield.c:683
     let what = null, more_than_1 = 0, hand = null, oldwep = null;
     /* "rub",&c */
@@ -637,6 +690,9 @@ export async function wield_tool(obj, verb) {   // wield.c:683
     }
     return TRUE;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 export async function can_twoweapon() {   // wield.c:761
     let otmp = null, hand_s = null;
     if (!could_twoweap(gy.youmonst.data)) {
@@ -677,6 +733,9 @@ export async function can_twoweapon() {   // wield.c:761
 }
 /* uswapwep has become cursed while in two-weapon combat mode or hero is
    attempting to dual-wield when it is already cursed or hands are slippery */
+/**
+ * @returns {Promise<void>}
+ */
 export async function drop_uswapwep() {   // wield.c:809
     let left_hand = new Int8Array(128), obj = null;
     obj = $G.uswapwep;
@@ -696,6 +755,9 @@ export async function drop_uswapwep() {   // wield.c:809
     }
     await dropx(obj);
 }
+/**
+ * @param {number} on_off boolean
+ */
 export function set_twoweap(on_off) {   // wield.c:834
     if (on_off !== u.twoweap) {
         u.twoweap = on_off;
@@ -705,6 +767,9 @@ export function set_twoweap(on_off) {   // wield.c:834
     }
 }
 /* the #twoweapon command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dotwoweapon() {   // wield.c:845
     /* You can always toggle it off */
     if (u.twoweap) {
@@ -729,6 +794,9 @@ export async function dotwoweapon() {   // wield.c:845
  * 1.  The item has been eaten, stolen, burned away, or rotted away.
  * 2.  Making an item disappear for a bones pile.
  */
+/**
+ * @returns {Promise<void>}
+ */
 export async function uwepgone() {   // wield.c:873
     if ($G.uwep) {
         if (artifact_light($G.uwep) && $G.uwep.lamplit | 0) {
@@ -742,18 +810,27 @@ export async function uwepgone() {   // wield.c:873
         await update_inventory();
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function uswapwepgone() {   // wield.c:888
     if ($G.uswapwep) {
         await setworn(null, W.SWAPWEP);
         await update_inventory();
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function uqwepgone() {   // wield.c:897
     if ($G.uquiver) {
         await setworn(null, W.QUIVER);
         await update_inventory();
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function untwoweapon() {   // wield.c:906
     if (u.twoweap) {
         await You($c.lit("%s."), new $c.Ptr(can_no_longer_twoweap, 0));
@@ -763,6 +840,11 @@ export async function untwoweapon() {   // wield.c:906
     return;
 }
 /* enchant wielded weapon */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} amount int
+ * @returns {Promise<number>} int
+ */
 export async function chwepon(otmp, amount) {   // wield.c:918
     let color = null, xtime = null, wepname = null, multiple = 0, otyp = 0, buf = new Int8Array(256), $t1, $t2;
     color = hcolor(amount < 0 ? c_color_names.c_black : c_color_names.c_blue);
@@ -887,6 +969,10 @@ export async function chwepon(otmp, amount) {   // wield.c:918
     }
     return 1;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function welded(obj) {   // wield.c:1051
     if (obj && $c.peq(obj, $G.uwep) && will_weld(obj)) {
         await set_bknown(obj, 1);
@@ -894,6 +980,10 @@ export async function welded(obj) {   // wield.c:1051
     }
     return 0;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function weldmsg(obj) {   // wield.c:1061
     let savewornmask = 0, hand = null;
     hand = await body_part(HAND);
@@ -909,6 +999,10 @@ export async function weldmsg(obj) {   // wield.c:1061
     obj.owornmask = savewornmask;
 }
 /* test whether monster's wielded weapon is stuck to hand/paw/whatever */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 export function mwelded(obj) {   // wield.c:1078
     /* caller is responsible for making sure this is a monster's item */
     if (obj && $c.and64(obj.owornmask, W.WEP) && will_weld(obj)) {

@@ -69,6 +69,11 @@ import { learnwand, zapnodir, zappable } from './zap.js';
 /* Partial rubouts for engraving characters. -3. */
 const rubouts = $c.recArray($T.anon_engrave_66, 48);
 const blind_writing = $c.matrix(Int8Array, [9, 21]);
+/**
+ * @param {$c.Ptr | null} outbuf char *
+ * @param {$c.Ptr | null} pristine_copy char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function random_engraving(outbuf, pristine_copy) {   // engrave.c:51
     let rumor = null;
     /* a random engraving may come from the "rumors" file,
@@ -81,6 +86,11 @@ export async function random_engraving(outbuf, pristine_copy) {   // engrave.c:5
     return outbuf;
 }
 /* degrade some of the characters in a string */
+/**
+ * @param {$c.Ptr | null} engr char *
+ * @param {number} cnt int
+ * @param {number} seed unsigned int
+ */
 export function wipeout_text(engr, cnt, seed) {   // engrave.c:120
     let s = null, i = 0, j = 0, nxt = 0, use_rubout = 0, lth = 0, ln = 0, $t1;
     /* engraving text */
@@ -143,6 +153,10 @@ export function wipeout_text(engr, cnt, seed) {   // engrave.c:120
     }
 }
 /* check whether hero can reach something at ground level */
+/**
+ * @param {number} check_pit boolean
+ * @returns {number} boolean
+ */
 export function can_reach_floor(check_pit) {   // engrave.c:187
     let t = null;
     /* assume that arms are pinned rather than that the hero
@@ -168,9 +182,22 @@ export function can_reach_floor(check_pit) {   // engrave.c:187
     return TRUE;
 }
 /* give a message after caller has determined that hero can't reach */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} up boolean
+ * @param {number} check_pit boolean
+ * @param {number} wand_engraving boolean
+ * @returns {Promise<void>}
+ */
 export async function cant_reach_floor(x, y, up, check_pit, wand_engraving) {   // engrave.c:218
     await pline($c.lit("%s can't reach the %s."), wand_engraving ? $c.lit("The wand does nothing more, and the tip of the wand") : $c.lit("You"), up ? ceiling(x, y) : check_pit && can_reach_floor(FALSE) ? $c.lit("bottom of the pit") : surface(x, y));
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {$T.engr | null} struct engr *
+ */
 export function engr_at(x, y) {   // engrave.c:231
     let ep = null;
     ep = $G.head_engr;
@@ -189,6 +216,13 @@ export function engr_at(x, y) {   // engrave.c:231
  * If strict checking is requested, the word is only considered to be
  * present if it is intact and is the entire content of the engraving.
  */
+/**
+ * @param {$c.Ptr | null} s const char *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} strict boolean
+ * @returns {$T.engr | null} struct engr *
+ */
 export function sengr_at(s, x, y, strict) {   // engrave.c:251
     let ep = null;
     ep = engr_at(x, y);
@@ -199,11 +233,22 @@ export function sengr_at(s, x, y, strict) {   // engrave.c:251
     }
     return $c.asRec(null, $T.engr, 64);
 }
+/**
+ * @param {number} cnt int
+ * @returns {Promise<void>}
+ */
 export async function u_wipe_engr(cnt) {   // engrave.c:264
     if (can_reach_floor(TRUE)) {
         await wipe_engr_at(u.ux, u.uy, $c.i16(cnt), FALSE);
     }
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} cnt xint16
+ * @param {number} magical boolean
+ * @returns {Promise<void>}
+ */
 export async function wipe_engr_at(x, y, cnt, magical) {   // engrave.c:271
     let ep = null, save_plnmsg = 0, save_plnmsg$2 = 0;
     ep = engr_at(x, y);
@@ -241,6 +286,10 @@ export async function wipe_engr_at(x, y, cnt, magical) {   // engrave.c:271
  * Returns:
  *    non-zero if it can be felt
  */
+/**
+ * @param {$T.engr | null} ep struct engr *
+ * @returns {number} boolean
+ */
 export function engr_can_be_felt(ep) {   // engrave.c:297
     let canfeel = 0;
     canfeel = FALSE;
@@ -259,6 +308,11 @@ export function engr_can_be_felt(ep) {   // engrave.c:297
     }
     return canfeel;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function read_engr_at(x, y) {   // engrave.c:318
     let ep = null, eloc = null, sensed = 0, et = null, buf = new Int8Array(256), endpunct = null, maxelen = 0, elen = 0, off = 0;
     ep = engr_at(x, y);
@@ -336,6 +390,15 @@ export async function read_engr_at(x, y) {   // engrave.c:318
         }
     }
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$c.Ptr | null} s const char *
+ * @param {$c.Ptr | null} pristine_s const char *
+ * @param {number | bigint} e_time long
+ * @param {number} e_type int
+ * @returns {Promise<void>}
+ */
 export async function make_engr_at(x, y, s, pristine_s, e_time, e_type) {   // engrave.c:408
     let i = 0, ep = null, smem = 0, havepristine = 0, prmem = 0, $t1;
     smem = await Strlen_(s, $c.lit("make_engr_at"), 417) + 1 >>> 0;
@@ -383,6 +446,11 @@ export async function make_engr_at(x, y, s, pristine_s, e_time, e_type) {   // e
      * the caller will need to if required */
 }
 /* delete any engraving at location <x,y> */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function del_engr_at(x, y) {   // engrave.c:461
     let ep = null;
     ep = engr_at(x, y);
@@ -393,10 +461,17 @@ export async function del_engr_at(x, y) {   // engrave.c:461
 /*
  * freehand - returns true if player has a free hand
  */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function freehand() {   // engrave.c:473
     return !$G.uwep || !await welded($G.uwep) || !bimanual($G.uwep) && (!$G.uarms || !$G.uarms.cursed) ? 1 : 0;
 }
 /* getobj callback for an object to engrave with */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 function stylus_ok(obj) {   // engrave.c:481
     if (!obj) {
         return GETOBJ.SUGGEST;
@@ -414,6 +489,9 @@ function stylus_ok(obj) {   // engrave.c:481
     return GETOBJ.DOWNPLAY;
 }
 /* can hero engrave at all (at their location)? */
+/**
+ * @returns {Promise<number>} boolean
+ */
 async function u_can_engrave() {   // engrave.c:503
     let levtyp = 0;
     levtyp = svl.level.locations[u.ux][u.uy].typ === DRAWBRIDGE_UP ? db_under_typ(svl.level.locations[u.ux][u.uy].flags | 0) : svl.level.locations[u.ux][u.uy].typ;
@@ -452,6 +530,9 @@ async function u_can_engrave() {   // engrave.c:503
     return TRUE;
 }
 /* initialize the doengrave data */
+/**
+ * @param {$T._doengrave_ctx | null} de struct _doengrave_ctx *
+ */
 function doengrave_ctx_init(de) {   // engrave.c:545
     let $t1, $t2;
     de.dengr = FALSE;
@@ -484,6 +565,10 @@ function doengrave_ctx_init(de) {   // engrave.c:545
     $t2 = is_ice(u.ux, u.uy), de.frosted = $t2;
 }
 /* special engraving effects for WAND objects */
+/**
+ * @param {$T._doengrave_ctx | null} de struct _doengrave_ctx *
+ * @returns {Promise<void>}
+ */
 async function doengrave_sfx_item_WAN(de) {   // engrave.c:583
     switch (de.otmp.otyp) {
         default:
@@ -625,6 +710,10 @@ async function doengrave_sfx_item_WAN(de) {   // engrave.c:583
     /* type = ENGR_BLOOD wands */
 }
 /* special engraving effects for all objects */
+/**
+ * @param {$T._doengrave_ctx | null} de struct _doengrave_ctx *
+ * @returns {Promise<number>} boolean
+ */
 async function doengrave_sfx_item(de) {   // engrave.c:742
     switch (de.otmp.oclass) {
         default:
@@ -768,6 +857,9 @@ async function doengrave_sfx_item(de) {   // engrave.c:742
     return TRUE;
 }
 /* which verb phrasing to use for engraving */
+/**
+ * @param {$T._doengrave_ctx | null} de struct _doengrave_ctx *
+ */
 function doengrave_ctx_verb(de) {   // engrave.c:896
     switch (de.type) {
         default:
@@ -821,6 +913,9 @@ function doengrave_ctx_verb(de) {   // engrave.c:896
  * moonstone  -  6      (orthoclase)    * amber      -  2-2.5
  */
 /* the #engrave command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doengrave() {   // engrave.c:956
     let sp = null, de = null, retval = 0, initial_msg_given = 0, tmp_ep = null, c = 0, $t1, $t2, $t3, $t4, $t5, $t6;
     /* Place holder for space count of engr text */
@@ -1091,6 +1186,9 @@ export async function doengrave() {   // engrave.c:956
     return retval;
 }
 /* occupation callback for engraving some text */
+/**
+ * @returns {Promise<number>} int
+ */
 async function engrave() {   // engrave.c:1267
     let oep = null, buf = new Int8Array(256), finishverb = null, stylus = null, firsttime = 0, rate = 0, truncate = 0, neweng = 0, carving = 0, dulling_wep = 0, marker = 0, endc = null, i = 0, space_left = 0, splitstack = 0, dulled = 0, ink_cost = 0, $t1;
     /* holds the post-this-action engr text, including
@@ -1315,6 +1413,9 @@ export function forget_engravings() {   // engrave.c:1509
          * Does it matter? */
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function engraving_sanity_check() {   // engrave.c:1524
     let ep = null, levtyp = 0, x = 0, y = 0;
     if ($G.head_engr && ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) {
@@ -1335,6 +1436,10 @@ export async function engraving_sanity_check() {   // engrave.c:1524
         }
     }
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 export async function save_engravings(nhfp) {   // engrave.c:1551
     let ep = null, ep2 = null, no_more_engr = Uint32Array.of(0), engr_alloc = Uint32Array.of(0), szeach = 0;
     no_more_engr[0] = 0;
@@ -1364,6 +1469,10 @@ export async function save_engravings(nhfp) {   // engrave.c:1551
     }
 }
 /* !SFCTOOL */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 export async function rest_engravings(nhfp) {   // engrave.c:1584
     let ep = null, lth = Uint32Array.of(0), szeach = 0;
     lth[0] = 0;
@@ -1397,6 +1506,12 @@ export async function rest_engravings(nhfp) {   // engrave.c:1584
     }
 }
 /* to support '#stats' wizard-mode command */
+/**
+ * @param {$c.Ptr | null} hdrfmt const char *
+ * @param {$c.Ptr | null} hdrbuf char *
+ * @param {*} count long *
+ * @param {*} size long *
+ */
 export function engr_stats(hdrfmt, hdrbuf, count, size) {   // engrave.c:1626
     let ep = null, $t1;
     $c.sprintf(hdrbuf, hdrfmt, 64);
@@ -1406,6 +1521,10 @@ export function engr_stats(hdrfmt, hdrbuf, count, size) {   // engrave.c:1626
         size.set(0, $c.add64(size.get(0), $c.add64(64, ep.engr_alloc)));
     }
 }
+/**
+ * @param {$T.engr | null} ep struct engr *
+ * @returns {Promise<void>}
+ */
 export async function del_engr(ep) {   // engrave.c:1645
     let ept = null;
     if ($c.peq(ep, $G.head_engr)) {
@@ -1425,6 +1544,10 @@ export async function del_engr(ep) {   // engrave.c:1645
     dealloc_engr(ep);
 }
 /* randomly relocate an engraving */
+/**
+ * @param {$T.engr | null} ep struct engr *
+ * @returns {Promise<void>}
+ */
 export async function rloc_engr(ep) {   // engrave.c:1667
     let tx = 0, ty = 0, tryct = 0;
     tryct = 200;
@@ -1441,6 +1564,12 @@ export async function rloc_engr(ep) {   // engrave.c:1667
 }
 /* Create a headstone at the given location.
  * The caller is responsible for newsym(x, y).
+ */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$c.Ptr | null} str const char *
+ * @returns {Promise<void>}
  */
 export async function make_grave(x, y, str) {   // engrave.c:1687
     let buf = new Int8Array(256);
@@ -1461,6 +1590,11 @@ export async function make_grave(x, y, str) {   // engrave.c:1687
     return;
 }
 /* called when kicking or engraving on a grave's headstone */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function disturb_grave(x, y) {   // engrave.c:1707
     let lev = null;
     lev = $c.relem(svl.level.locations[x], y);
@@ -1475,11 +1609,19 @@ export async function disturb_grave(x, y) {   // engrave.c:1707
         await exercise(A.WIS, FALSE);
     }
 }
+/**
+ * @param {$T.engr | null} ep struct engr *
+ * @returns {Promise<void>}
+ */
 export async function see_engraving(ep) {   // engrave.c:1724
     await newsym(ep.engr_x, ep.engr_y);
 }
 /* like see_engravings() but overrides vision, but only for some types
    of engravings that can be felt  [this isn't actually used anywhere?] */
+/**
+ * @param {$T.engr | null} ep struct engr *
+ * @returns {Promise<void>}
+ */
 export async function feel_engraving(ep) {   // engrave.c:1732
     if (engr_can_be_felt(ep)) {
         ep.eread = (1) & 1;
@@ -1489,6 +1631,9 @@ export async function feel_engraving(ep) {   // engrave.c:1732
         await newsym(ep.engr_x, ep.engr_y);
     }
 }
+/**
+ * @returns {$c.Ptr | null} const char *
+ */
 function blengr() {   // engrave.c:1765
     return new $c.Ptr(blind_writing[rn2(9)], 0);
 }

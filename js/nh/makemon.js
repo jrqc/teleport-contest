@@ -96,6 +96,10 @@ const mongen_order = new Int32Array(383);
 const mclass_maxf = new Int8Array(61);
 let mongen_order_init = 0;
 const syms = new Int8Array(17);
+/**
+ * @param {$T.permonst | null} ptr struct permonst *
+ * @returns {number} boolean
+ */
 export function is_home_elemental(ptr) {   // makemon.c:33
     if (ptr.mlet === S.ELEMENTAL) {
         switch (ptr.pmidx) {
@@ -115,6 +119,10 @@ export function is_home_elemental(ptr) {   // makemon.c:33
 }
 /*
  * Return true if the given monster cannot exist on this elemental level.
+ */
+/**
+ * @param {$T.permonst | null} ptr struct permonst *
+ * @returns {number} boolean
  */
 function wrong_elem_type(ptr) {   // makemon.c:56
     if (ptr.mlet === S.ELEMENTAL) {
@@ -138,6 +146,14 @@ function wrong_elem_type(ptr) {   // makemon.c:56
     return FALSE;
 }
 /* make a group just like mtmp */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} n int
+ * @param {number} mmflags mmflags_nht
+ * @returns {Promise<void>}
+ */
 async function m_initgrp(mtmp, x, y, n, mmflags) {   // makemon.c:79
     let mm = new $T.nhcoord(), cnt = 0, mon = null, $t1;
     cnt = rnd(n);
@@ -182,6 +198,12 @@ async function m_initgrp(mtmp, x, y, n, mmflags) {   // makemon.c:79
         }
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} otyp int
+ * @param {number} oquan int
+ * @returns {Promise<void>}
+ */
 async function m_initthrow(mtmp, otyp, oquan) {   // makemon.c:148
     let otmp = null, $t1, $t2;
     otmp = await mksobj(otyp, TRUE, FALSE);
@@ -192,6 +214,10 @@ async function m_initthrow(mtmp, otyp, oquan) {   // makemon.c:148
     }
     await mpickobj(mtmp, otmp);
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 async function m_initweap(mtmp) {   // makemon.c:161
     let ptr = null, mm = 0, otmp = null, bias = 0, w1 = 0, w2 = 0, typ = 0, nam = null, $t1, $t2;
     ptr = mtmp.data;
@@ -640,6 +666,11 @@ async function m_initweap(mtmp) {   // makemon.c:161
     }
 }
 /* create a new stack of gold in monster's inventory */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number | bigint} amount long
+ * @returns {Promise<void>}
+ */
 export async function mkmonmoney(mtmp, amount) {   // makemon.c:576
     let gold = null, $t1;
     /* mk_mplayer() passes rn2(1000) so the amount might be 0 */
@@ -650,6 +681,10 @@ export async function mkmonmoney(mtmp, amount) {   // makemon.c:576
         await add_to_minv(mtmp, gold);
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 async function m_initinv(mtmp) {   // makemon.c:589
     let cnt = 0, otmp = null, ptr = null, mac = 0, catcorpse = null, $t1, $t2, $t3, $t4, $t5;
     ptr = mtmp.data;
@@ -901,6 +936,12 @@ async function m_initinv(mtmp) {   // makemon.c:589
     }
 }
 /* Note: for long worms, always call cutworm (cutworm calls clone_mon) */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<$T.monst | null>} struct monst *
+ */
 export async function clone_mon(mon, x, y) {   // makemon.c:837
     let mm = new $T.nhcoord(), m2 = null, atyp = 0, $t1, $t2, $t3;
     /* clone's preferred location or 0 (near mon) */
@@ -1009,6 +1050,12 @@ export async function clone_mon(mon, x, y) {   // makemon.c:837
  * Returns FALSE propagation unsuccessful
  *         TRUE  propagation successful
  */
+/**
+ * @param {number} mndx int
+ * @param {number} tally boolean
+ * @param {number} ghostly boolean
+ * @returns {Promise<number>} boolean
+ */
 export async function propagate(mndx, tally, ghostly) {   // makemon.c:958
     let gone = 0, result = 0, lim = 0, save_plnmsg = 0;
     lim = mbirth_limit(mndx);
@@ -1036,6 +1083,10 @@ export async function propagate(mndx, tally, ghostly) {   // makemon.c:958
     return result;
 }
 /* amount of HP to lose from level drain (or gain from Stormbringer) */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {number} int
+ */
 export function monhp_per_lvl(mon) {   // makemon.c:986
     let ptr = null, hp = 0;
     ptr = mon.data;
@@ -1059,6 +1110,11 @@ export function monhp_per_lvl(mon) {   // makemon.c:986
 }
 /* set up a new monster's initial level and hit points;
    used by newcham() as well as by makemon() */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} mndx int
+ * @returns {Promise<void>}
+ */
 export async function newmonhp(mon, mndx) {   // makemon.c:1012
     let ptr = null, basehp = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13;
     ptr = $c.relem(mons, mndx);
@@ -1100,16 +1156,28 @@ export async function newmonhp(mon, mndx) {   // makemon.c:1012
         mon.mhp = mon.mhpmax;
     }
 }
+/**
+ * @param {$T.mextra | null} mex struct mextra *
+ */
 function init_mextra(mex) {   // makemon.c:1059
     mex.$copyFrom(zeromextra);
     mex.mcorpsenm = NON_PM;
 }
+/**
+ * @returns {Promise<$T.mextra | null>} struct mextra *
+ */
 export async function newmextra() {   // makemon.c:1066
     let mextra = null;
     mextra = $c.asRec(await alloc(64), $T.mextra, 64);
     init_mextra(mextra);
     return mextra;
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} gpflags mmflags_nht
+ * @param {$T.nhcoord | null} cc coord *
+ * @returns {number} boolean
+ */
 function makemon_rnd_goodpos(mon, gpflags, cc) {   // makemon.c:1076
     let tryct = 0, nx = 0, ny = 0, good = 0, xofs = 0, yofs = 0, dx = 0, dy = 0, bl = 0, stway = null, $goto = null;
     D1: for (;;) {
@@ -1181,6 +1249,13 @@ function makemon_rnd_goodpos(mon, gpflags, cc) {   // makemon.c:1076
  *      [u.ux,u.uy] means: near player (if !gi.in_mklev)
  *
  *      In case we make a monster group, only return the one at [x,y].
+ */
+/**
+ * @param {$T.permonst | null} ptr struct permonst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} mmflags mmflags_nht
+ * @returns {Promise<$T.monst | null>} struct monst *
  */
 export async function makemon(ptr, x, y, mmflags) {   // makemon.c:1147
     let mtmp = null, fakemon = new $T.monst(), cc = new $T.nhcoord(), mndx = 0, mcham = 0, ct = 0, mitem = 0, femaleok = 0, maleok = 0, anymon = 0, byyou = 0, allow_minvent = 0, countbirth = 0, allowtail = 0, gpflags = 0, save_plnmsg = 0, tryct = 0, save_plnmsg$2 = 0, eminp = null, mbuf = new Int8Array(256), what = null, exclaim = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11;
@@ -1538,6 +1613,11 @@ export async function makemon(ptr, x, y, mmflags) {   // makemon.c:1147
     return mtmp;
 }
 /* caller rejects makemon()'s result; always returns Null */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} mmflags mmflags_nht
+ * @returns {Promise<$T.monst | null>} struct monst *
+ */
 export async function unmakemon(mon, mmflags) {   // makemon.c:1514
     let countbirth = 0, mndx = 0;
     countbirth = $c.i8($c.and64(mmflags, MM.NOCOUNTBIRTH) === 0 ? 1 : 0);
@@ -1560,6 +1640,10 @@ export async function unmakemon(mon, mmflags) {   // makemon.c:1514
     await mongone(mon);
     return null;
 }
+/**
+ * @param {number} mndx int
+ * @returns {number} int
+ */
 export function mbirth_limit(mndx) {   // makemon.c:1542
     /* There is an implicit limit of 4 for "high priest of <deity>",
      * but aligned priests can grow into high priests, thus they aren't
@@ -1570,6 +1654,12 @@ export function mbirth_limit(mndx) {   // makemon.c:1542
 }
 /* used for wand/scroll/spell of create monster */
 /* returns TRUE iff you know monsters have been created */
+/**
+ * @param {number} cnt int
+ * @param {$T.permonst | null} mptr struct permonst *
+ * @param {number} neverask boolean
+ * @returns {Promise<number>} boolean
+ */
 export async function create_critters(cnt, mptr, neverask) {   // makemon.c:1556
     let c = new $T.nhcoord(), x = 0, y = 0, mon = null, known = 0, ask = 0, $t1;
     /* usually null; used for confused reading */
@@ -1599,6 +1689,10 @@ export async function create_critters(cnt, mptr, neverask) {   // makemon.c:1556
     }
     return known;
 }
+/**
+ * @param {number} mndx int
+ * @returns {number} boolean
+ */
 function uncommon(mndx) {   // makemon.c:1593
     if (mons[mndx].geno & (G_NOGEN | G_UNIQ)) {
         return TRUE;
@@ -1616,6 +1710,10 @@ function uncommon(mndx) {   // makemon.c:1593
  *      shift the probability of a monster's generation by
  *      comparing the dungeon alignment and monster alignment.
  *      return an integer in the range of 0-5.
+ */
+/**
+ * @param {$T.permonst | null} ptr struct permonst *
+ * @returns {number} int
  */
 function align_shift(ptr) {   // makemon.c:1611
     let alshift = 0;
@@ -1643,6 +1741,10 @@ function align_shift(ptr) {   // makemon.c:1611
     return alshift;
 }
 /* return larger value if monster prefers the level temperature */
+/**
+ * @param {$T.permonst | null} ptr struct permonst *
+ * @returns {number} int
+ */
 function temperature_shift(ptr) {   // makemon.c:1641
     if (svl.level.flags.temperature && (ptr.mresists & (svl.level.flags.temperature > 0 ? MR.FIRE : MR.COLD)) !== 0) {
         return 3;
@@ -1650,10 +1752,18 @@ function temperature_shift(ptr) {   // makemon.c:1641
     return 0;
 }
 /* select a random monster type */
+/**
+ * @returns {Promise<$T.permonst | null>} struct permonst *
+ */
 export async function rndmonst() {   // makemon.c:1652
     return await rndmonst_adj(0, 0);
 }
 /* select a random monster type, with adjusted difficulty */
+/**
+ * @param {number} minadj int
+ * @param {number} maxadj int
+ * @returns {Promise<$T.permonst | null>} struct permonst *
+ */
 export async function rndmonst_adj(minadj, maxadj) {   // makemon.c:1659
     let ptr = null, mndx = 0, weight = 0, totalweight = 0, selected_mndx = 0, zlevel = 0, minmlev = 0, maxmlev = 0, elemlevel = 0, upper = 0, save_plnmsg = 0;
     if (u.uz.dnum === svd.dungeon_topology.d_quest_dnum && rn2(7) && (ptr = await qt_montype()) !== null) {
@@ -1732,6 +1842,12 @@ export async function rndmonst_adj(minadj, maxadj) {   // makemon.c:1659
     return $c.relem(mons, selected_mndx);
 }
 /* decide whether it's ok to generate a candidate monster by mkclass() */
+/**
+ * @param {number} mndx int
+ * @param {number} mvflagsmask unsigned int
+ * @param {number} genomask unsigned int
+ * @returns {number} boolean
+ */
 function mk_gen_ok(mndx, mvflagsmask, genomask) {   // makemon.c:1736
     let ptr = null;
     ptr = $c.relem(mons, mndx);
@@ -1750,6 +1866,11 @@ function mk_gen_ok(mndx, mvflagsmask, genomask) {   // makemon.c:1736
     }
     return TRUE;
 }
+/**
+ * @param {*} p1 const void *
+ * @param {*} p2 const void *
+ * @returns {number} int
+ */
 function cmp_init_mongen_order(p1, p2) {   // makemon.c:1760
     let i1 = 0, i2 = 0, offset1 = 0, offset2 = 0, difficulty1 = 0, difficulty2 = 0;
     i1 = $c.asArr(p1, Int32Array).get(0);
@@ -1764,6 +1885,9 @@ function cmp_init_mongen_order(p1, p2) {   // makemon.c:1760
 }
 /* check that monsters are in correct difficulty order for mkclass() */
 /* initialize monster order for mkclass */
+/**
+ * @returns {Promise<void>}
+ */
 async function init_mongen_order() {   // makemon.c:1807
     let i = 0, mlet = 0;
     if (mongen_order_init) {
@@ -1780,6 +1904,9 @@ async function init_mongen_order() {   // makemon.c:1807
     $c.nh_deterministic_qsort(new $c.Ptr(mongen_order, 0), SPECIAL_PM, 4, cmp_init_mongen_order);
 }
 /* allmain.c */
+/**
+ * @returns {Promise<void>}
+ */
 export async function dump_mongen() {   // makemon.c:1835
     let mlet = 0, prev_mlet = 0, i = 0, nmwidth = 0, special = 0, nmbuf = new Int8Array(80);
     prev_mlet = 0;
@@ -1805,10 +1932,21 @@ export async function dump_mongen() {   // makemon.c:1835
    The second parameter specifies a special casing bit mask
    to allow the normal genesis masks to be deactivated.
    Returns Null if no monsters in that class can be made. */
+/**
+ * @param {number} class_ char
+ * @param {number} spc int
+ * @returns {Promise<$T.permonst | null>} struct permonst *
+ */
 export async function mkclass(class_, spc) {   // makemon.c:1873
     return await mkclass_aligned(class_, spc, A.NONE);
 }
 /* mkclass() with alignment restrictions; used by ndemon() */
+/**
+ * @param {number} class_ char
+ * @param {number} spc int
+ * @param {number} atyp aligntyp
+ * @returns {Promise<$T.permonst | null>} struct permonst *
+ */
 export async function mkclass_aligned(class_, spc, atyp) {   // makemon.c:1880
     let first = 0, last = 0, num = 0, k = 0, nums = new Int32Array(331), maxmlev = 0, gehennom = 0, mv_mask = 0, gn_mask = 0, zero_freq_for_entire_class = 0, $t1;
     /* special mons[].geno handling */
@@ -1902,6 +2040,10 @@ export async function mkclass_aligned(class_, spc, atyp) {   // makemon.c:1880
    player with polycontrol picks a class instead of a specific type;
    genocided types are avoided but extinct ones are acceptable; we don't
    check polyok() here--caller accepts some choices !polyok() would reject */
+/**
+ * @param {number} class_ int
+ * @returns {number} int
+ */
 export function mkclass_poly(class_) {   // makemon.c:1983
     let first = 0, last = 0, num = 0, gmask = 0;
     num = 0;
@@ -1936,6 +2078,10 @@ export function mkclass_poly(class_) {   // makemon.c:1983
     return first;
 }
 /* adjust strength of monsters based on u.uz and u.ulevel */
+/**
+ * @param {$T.permonst | null} ptr struct permonst *
+ * @returns {Promise<number>} int
+ */
 export async function adj_lev(ptr) {   // makemon.c:2016
     let tmp = 0, tmp2 = 0;
     if ($c.peq(ptr, $c.relem(mons, PM.WIZARD_OF_YENDOR))) {
@@ -1969,6 +2115,11 @@ export async function adj_lev(ptr) {   // makemon.c:2016
 }
 /* monster earned experience and will gain some hit points; it might also
    grow into a bigger monster (baby to adult, soldier to officer, etc) */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.monst | null} victim struct monst *
+ * @returns {Promise<$T.permonst | null>} struct permonst *
+ */
 export async function grow_up(mtmp, victim) {   // makemon.c:2051
     let oldtype = 0, newtype = 0, max_increase = 0, cur_increase = 0, lev_limit = 0, hp_threshold = 0, fem = 0, ptr = null, buf = new Int8Array(256);
     ptr = mtmp.data;
@@ -2083,6 +2234,11 @@ export async function grow_up(mtmp, victim) {   // makemon.c:2051
     }
     return ptr;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} otyp int
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function mongets(mtmp, otyp) {   // makemon.c:2181
     let otmp = null, $t1, $t2, $t3, $t4;
     if (!otyp) {
@@ -2132,6 +2288,10 @@ export async function mongets(mtmp, otyp) {   // makemon.c:2181
     }
     return otmp;
 }
+/**
+ * @param {number} type int
+ * @returns {number} int
+ */
 export function golemhp(type) {   // makemon.c:2233
     switch (type) {
         case PM.STRAW_GOLEM:
@@ -2163,6 +2323,10 @@ export function golemhp(type) {   // makemon.c:2233
 /*
  *      Alignment vs. yours determines monster's attitude to you.
  *      (Some "animal" types are co-aligned, but also hungry.)
+ */
+/**
+ * @param {$T.permonst | null} ptr struct permonst *
+ * @returns {number} boolean
  */
 export function peace_minded(ptr) {   // makemon.c:2268
     let mal = 0, ual = 0;
@@ -2218,6 +2382,9 @@ export function peace_minded(ptr) {   // makemon.c:2268
  *      peaceful monsters;
  *   it's never bad to kill a hostile monster, although it may not be good.
  */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ */
 export function set_malign(mtmp) {   // makemon.c:2321
     let mal = 0, coaligned = 0, absmal = 0, absmal$2 = 0, absmal$3 = 0, $t1;
     mal = mtmp.data.maligntyp;
@@ -2271,6 +2438,10 @@ export function set_malign(mtmp) {   // makemon.c:2321
     }
 }
 /* allocate a new mcorpsenm field for a monster; only need mextra itself */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function newmcorpsenm(mtmp) {   // makemon.c:2370
     let $t1;
     if (!mtmp.mextra) {
@@ -2279,11 +2450,18 @@ export async function newmcorpsenm(mtmp) {   // makemon.c:2370
     mtmp.mextra.mcorpsenm = NON_PM;   /* not initialized yet */
 }
 /* release monster's mcorpsenm field; basically a no-op */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ */
 export function freemcorpsenm(mtmp) {   // makemon.c:2379
     if (has_mcorpsenm(mtmp)) {
         mtmp.mextra.mcorpsenm = NON_PM;
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function set_mimic_sym(mtmp) {   // makemon.c:2393
     let typ = 0, roomno = 0, rt = 0, appear = 0, ap_type = 0, s_sym = 0, otmp = null, mx = 0, my = 0, mndx = 0, nocorpse_ndx = 0, algn = 0, $goto = null, $t1;
     D1: for (;;) {
@@ -2430,6 +2608,12 @@ export async function set_mimic_sym(mtmp) {   // makemon.c:2393
     }
 }
 /* release monster from bag of tricks; return number of monsters created */
+/**
+ * @param {$T.obj | null} bag struct obj *
+ * @param {number} tipping boolean
+ * @param {*} seencount int *
+ * @returns {Promise<number>} int
+ */
 export async function bagotricks(bag, tipping, seencount) {   // makemon.c:2554
     let moncount = 0, mtmp = null, creatcnt = 0, seecount = 0;
     /* caller emptying entirely; affects shop handling */
@@ -2476,6 +2660,10 @@ export async function bagotricks(bag, tipping, seencount) {   // makemon.c:2554
     return moncount;
 }
 /* create some or all remaining erinyes around the player */
+/**
+ * @param {number} limit int
+ * @returns {Promise<void>}
+ */
 export async function summon_furies(limit) {   // makemon.c:2605
     let i = 0;
     /* number to create, or 0 to create until extinct */

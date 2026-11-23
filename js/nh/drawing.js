@@ -42,6 +42,10 @@ export const def_r_oc_syms = new Uint8Array(18);
  * invent.c, o_init.c, objnam.c, options.c, pickup.c, sp_lev.c, and
  * windows.c.
  */
+/**
+ * @param {number} ch char
+ * @returns {number} int
+ */
 export function def_char_to_objclass(ch) {   // drawing.c:91
     let i = 0;
     for (i = 1; i < MAXOCLASSES; i = i + 1 | 0) {
@@ -57,6 +61,10 @@ export function def_char_to_objclass(ch) {   // drawing.c:91
  * Used in detect.c, drawing.c, mondata.c, options.c, pickup.c,
  * sp_lev.c, and windows.c.
  */
+/**
+ * @param {number} ch char
+ * @returns {number} int
+ */
 export function def_char_to_monclass(ch) {   // drawing.c:108
     let i = 0;
     for (i = 1; i < MAXMCLASSES; i = i + 1 | 0) {
@@ -67,6 +75,10 @@ export function def_char_to_monclass(ch) {   // drawing.c:108
     return i;
 }
 /* does 'ch' represent a furniture character?  returns index into defsyms[] */
+/**
+ * @param {number} ch char
+ * @returns {number} int
+ */
 export function def_char_is_furniture(ch) {   // drawing.c:120
     let i = 0, furniture = 0;
     /* note: these refer to defsyms[] order which is much different from

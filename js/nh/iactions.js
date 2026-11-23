@@ -86,6 +86,12 @@ const item_naming_classification$Rename = new Int8Array(18);   // static in item
 const item_naming_classification$Call = new Int8Array(5);   // static in item_naming_classification()
 const item_naming_classification$Recall = new Int8Array(19);   // static in item_naming_classification()
 /* construct text for the menu entries for IA_NAME_OBJ and IA_NAME_OTYP */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$c.Ptr | null} onamebuf char *
+ * @param {$c.Ptr | null} ocallbuf char *
+ * @returns {Promise<number>} boolean
+ */
 async function item_naming_classification(obj, onamebuf, ocallbuf) {   // iactions.c:46
     let callname = null, $t1;
     /* "re-call" seems a bit weird, but "recall" and
@@ -108,6 +114,11 @@ async function item_naming_classification(obj, onamebuf, ocallbuf) {   // iactio
     return $c.i8(onamebuf.get(0) || ocallbuf.get(0) ? TRUE : FALSE);
 }
 /* construct text for the menu entries for IA_READ_OBJ */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$c.Ptr | null} outbuf char *
+ * @returns {Promise<number>} int
+ */
 async function item_reading_classification(obj, outbuf) {   // iactions.c:86
     let otyp = 0, res = 0, magic = null, novel = 0, blank = 0, tome = 0;
     otyp = obj.otyp;
@@ -135,6 +146,13 @@ async function item_reading_classification(obj, outbuf) {   // iactions.c:86
     }
     return res;
 }
+/**
+ * @param {number} win winid
+ * @param {number} act int
+ * @param {number} let_ char
+ * @param {$c.Ptr | null} txt const char *
+ * @returns {Promise<void>}
+ */
 async function ia_addmenu(win, act, let_, txt) {   // iactions.c:127
     let any = new $T.any(), clr = 0;
     clr = NO_COLOR;
@@ -143,6 +161,11 @@ async function ia_addmenu(win, act, let_, txt) {   // iactions.c:127
     await add_menu(win, nul_glyphinfo, any, let_, 0, ATR.NONE, clr, txt, MENU.ITEMFLAGS_NONE);
 }
 /* set up a command to execute on a specific item next */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} act int
+ * @returns {Promise<void>}
+ */
 async function itemactions_pushkeys(otmp, act) {   // iactions.c:140
     switch (act) {
         default:
@@ -275,6 +298,10 @@ async function itemactions_pushkeys(otmp, act) {   // iactions.c:140
     }
 }
 /* Show menu of possible actions hero could do with item otmp */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function itemactions(otmp) {   // iactions.c:278
     let n = 0, act = 0, win = 0, buf = new Int8Array(256), buf2 = new Int8Array(256), selected = [null], mtmp = null, light = null, already_worn = 0, verb = null, action = null, which = null, what = null, multiple = 0, s = null, o = null, shoot = 0, shoot$2 = 0, Wmask = 0, o$2 = null;
     act = IA.NONE;

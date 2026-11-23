@@ -67,6 +67,10 @@ const disco_orders_descr = $c.nulls(5);
  * another routine.
  */
 /* TILES_IN_GLYPHMAP */
+/**
+ * @param {$T.d_level | null} dlev d_level *
+ * @returns {Promise<void>}
+ */
 async function setgemprobs(dlev) {   // o_init.c:54
     let j = 0, first = 0, lev = 0, sum = 0;
     sum = 0;
@@ -122,6 +126,11 @@ function randomize_gem_colors() {   // o_init.c:85
     }
 }
 /* shuffle descriptions on objects o_low to o_high */
+/**
+ * @param {number} o_low int
+ * @param {number} o_high int
+ * @param {number} domaterial boolean
+ */
 function shuffle(o_low, o_high, domaterial) {   // o_init.c:113
     let i = 0, j = 0, num_to_shuffle = 0, sw = 0, color = 0;
     for (num_to_shuffle = 0, j = o_low; j <= o_high; j = j + 1 | 0) {
@@ -156,6 +165,9 @@ function shuffle(o_low, o_high, domaterial) {   // o_init.c:113
         }
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function init_objects() {   // o_init.c:151
     let i = 0, first = 0, last = 0, prevoclass = 0, oclass = 0, nmkn = 0, $t1, $t2, $t3;
     for (i = 0; i <= MAXOCLASSES; i = i + 1 | 0) {
@@ -232,6 +244,9 @@ export async function init_objects() {   // o_init.c:151
 }
 /* Compute the total probability of each object class.
  * Assumes svb.bases[] has already been set. */
+/**
+ * @returns {Promise<void>}
+ */
 export async function init_oclass_probs() {   // o_init.c:240
     let i = 0, sum = 0, oclass = 0;
     for (oclass = 0; oclass < MAXOCLASSES; oclass = oclass + 1 | 0) {
@@ -254,6 +269,11 @@ export async function init_oclass_probs() {   // o_init.c:240
     }
 }
 /* retrieve the range of objects that otyp shares descriptions with */
+/**
+ * @param {number} otyp int
+ * @param {*} lo_p int *
+ * @param {*} hi_p int *
+ */
 export function obj_shuffle_range(otyp, lo_p, hi_p) {   // o_init.c:269
     let i = 0, ocls = 0, $t1, $t2;
     /* input: representative item */
@@ -324,6 +344,11 @@ function shuffle_all() {   // o_init.c:322
 }
 /* Return TRUE if the provided string matches the unidentified description of
  * the provided object. */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$c.Ptr | null} descr const char *
+ * @returns {Promise<number>} boolean
+ */
 export async function objdescr_is(obj, descr) {   // o_init.c:352
     let objdescr = null;
     if (!obj) {
@@ -337,9 +362,16 @@ export async function objdescr_is(obj, descr) {   // o_init.c:352
     return $c.i8(!$c.strcmp(objdescr, descr) ? 1 : 0);
 }
 /* level dependent initialization */
+/**
+ * @returns {Promise<void>}
+ */
 export async function oinit() {   // o_init.c:369
     await setgemprobs(u.uz);
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 export async function savenames(nhfp) {   // o_init.c:375
     let i = 0, len = Uint32Array.of(0);
     if (update_file(nhfp)) {
@@ -371,6 +403,10 @@ export async function savenames(nhfp) {   // o_init.c:375
     }
 }
 /* !SFCTOOL */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 export async function restnames(nhfp) {   // o_init.c:411
     let i = 0, len = Uint32Array.of(0), $t1;
     len[0] = 0;
@@ -392,6 +428,10 @@ export async function restnames(nhfp) {   // o_init.c:411
     }
 }
 /* make the object dknown and mark it as encountered */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function observe_object(obj) {   // o_init.c:442
     let oindx = 0;
     oindx = obj.otyp;
@@ -401,6 +441,13 @@ export async function observe_object(obj) {   // o_init.c:442
         await discover_object(oindx, FALSE, TRUE, FALSE);
     }
 }
+/**
+ * @param {number} oindx int
+ * @param {number} mark_as_known boolean
+ * @param {number} mark_as_encountered boolean
+ * @param {number} credit_hero boolean
+ * @returns {Promise<void>}
+ */
 export async function discover_object(oindx, mark_as_known, mark_as_encountered, credit_hero) {   // o_init.c:454
     let dindx = 0, acls = 0;
     /* type of object */
@@ -441,6 +488,10 @@ export async function discover_object(oindx, mark_as_known, mark_as_encountered,
     }
 }
 /* if a class name has been cleared, we may need to purge it from disco[] */
+/**
+ * @param {number} oindx int
+ * @returns {Promise<void>}
+ */
 export async function undiscover_object(oindx) {   // o_init.c:498
     let dindx = 0, acls = 0, found = 0;
     if (!objects[oindx].oc_name_known && !objects[oindx].oc_encountered) {
@@ -465,6 +516,10 @@ export async function undiscover_object(oindx) {   // o_init.c:498
         }
     }
 }
+/**
+ * @param {number} i int
+ * @returns {number} boolean
+ */
 export function interesting_to_discover(i) {   // o_init.c:526
     /* most players who don't speak Japanese manage to figure out what
        gunyoki, osaku, and so forth mean, but treat them as pre-discovered
@@ -477,6 +532,11 @@ export function interesting_to_discover(i) {   // o_init.c:526
     return $c.i8(objects[i].oc_uname !== null || (objects[i].oc_name_known | 0 || objects[i].oc_encountered | 0) && obj_descr[objects[i].oc_descr_idx].oc_descr !== null ? 1 : 0);
 }
 /* discoveries qsort comparison function */
+/**
+ * @param {*} v1 const void *
+ * @param {*} v2 const void *
+ * @returns {number} int
+ */
 function discovered_cmp(v1, v2) {   // o_init.c:553
     let s1 = null, s2 = null, res = 0;
     s1 = $c.asArr(v1, 'ptr').get(0);
@@ -488,6 +548,11 @@ function discovered_cmp(v1, v2) {   // o_init.c:553
     }
     return res;
 }
+/**
+ * @param {number} otyp int
+ * @param {$c.Ptr | null} outbuf char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 async function sortloot_descr(otyp, outbuf) {   // o_init.c:567
     let sl_cookie = new $T.sortloot_item(), o = new $T.obj();
     o.$copyFrom(cg.zeroobj);
@@ -507,6 +572,10 @@ async function sortloot_descr(otyp, outbuf) {   // o_init.c:567
     $c.sprintf(outbuf, $c.lit("%02d%02d%1d "), sl_cookie.orderclass, sl_cookie.subclass, sl_cookie.disco);
     return outbuf;
 }
+/**
+ * @param {number} mode int
+ * @returns {Promise<number>} int
+ */
 export async function choose_disco_sort(mode) {   // o_init.c:611
     let tmpwin = 0, selected = [null], any = new $T.any(), i = 0, n = 0, choice = 0, clr = 0;
     /* 0 => 'O' cmd, 1 => full discoveries; 2 => class disco */
@@ -542,6 +611,10 @@ export async function choose_disco_sort(mode) {   // o_init.c:611
     return n;
 }
 /* augment obj_typename() with explanation of Japanese item names */
+/**
+ * @param {number} otyp int
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 async function disco_typename(otyp) {   // o_init.c:661
     let result = null, buf = new Int8Array(256), actualn = null;
     result = await obj_typename(otyp);
@@ -567,6 +640,11 @@ async function disco_typename(otyp) {   // o_init.c:661
 }
 /* append typename(dis) to buf[], possibly truncating in the process;
    also append price quote information if it fits */
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @param {number} dis int
+ * @returns {Promise<void>}
+ */
 async function disco_append_typename(buf, dis) {   // o_init.c:694
     let len = 0, p = null, typnm = null, typnm_len = 0, eos = [null];
     len = $c.strlen(buf);
@@ -592,6 +670,10 @@ async function disco_append_typename(buf, dis) {   // o_init.c:694
     append_price_quote(buf, new $c.Ptr(eos, 0), dis);
 }
 /* minor fixup for Book of the Dead needed in more than one place */
+/**
+ * @param {number} uidx int
+ * @param {$c.Ptr | null} outbuf char *
+ */
 function disco_fmt_uniq(uidx, outbuf) {   // o_init.c:725
     $c.sprintf(outbuf, $c.lit("  %s"), objects[uidx].oc_name_known | 0 ? obj_descr[objects[uidx].oc_name_idx].oc_name : obj_descr[objects[uidx].oc_descr_idx].oc_descr);
     /* in the spellbooks section of main discoveries list, encountered
@@ -603,6 +685,13 @@ function disco_fmt_uniq(uidx, outbuf) {   // o_init.c:725
     }
 }
 /* sort and output sorted_lines to window and free the lines */
+/**
+ * @param {number} tmpwin winid
+ * @param {*} sorted_lines char **
+ * @param {number} sorted_ct int
+ * @param {number} lootsort boolean
+ * @returns {Promise<void>}
+ */
 async function disco_output_sorted(tmpwin, sorted_lines, sorted_ct, lootsort) {   // o_init.c:741
     let p = null, j = 0;
     $c.nh_deterministic_qsort(sorted_lines, $c.u64(sorted_ct), 8, discovered_cmp);
@@ -618,6 +707,9 @@ async function disco_output_sorted(tmpwin, sorted_lines, sorted_ct, lootsort) { 
     }
 }
 /* the #known command - show discovered object types */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dodiscovered() {   // o_init.c:764
     let tmpwin = 0, s = null, oclass = 0, prev_class = 0, classes = new Int8Array(18), buf = new Int8Array(256), sorted_lines = $c.nulls(481), p = null, i = 0, dis = 0, ct = 0, uniq_ct = 0, arti_ct = 0, sorted_ct = 0, uidx = 0, sortindx = 0, alphabetized = 0, alphabyclass = 0, lootsort = 0, $t1, $t2, $t3, $t4;
     /* free after Robert Viduya */
@@ -717,6 +809,11 @@ export async function dodiscovered() {   // o_init.c:764
     return ECMD.OK;
 }
 /* lower case let_to_name() output, which differs from def_oc_syms[].name */
+/**
+ * @param {number} oclass char
+ * @param {$c.Ptr | null} buf char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 async function oclass_to_name(oclass, buf) {   // o_init.c:877
     let s = null, $t1;
     $c.strcpy(buf, await let_to_name(oclass, FALSE, FALSE));
@@ -728,6 +825,9 @@ async function oclass_to_name(oclass, buf) {   // o_init.c:877
 /* the #knownclass command - show discovered object types for one class;
    in addition to actual object classes, supports pseudo-class 'a' for
    discovered artifacts and 'u' (or 'r', for "relics") for unique items */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doclassdisco() {   // o_init.c:891
     let tmpwin = 0, pick_list = [null], any = new $T.any(), s = null, c = 0, oclass = 0, menulet = 0, allclasses = new Int8Array(18), discosyms = new Int8Array(22), buf = new Int8Array(256), sorted_lines = $c.nulls(481), p = null, i = 0, ct = 0, dis = 0, xtras = 0, sorted_ct = 0, uidx = 0, traditional = 0, alphabetized = 0, lootsort = 0, clr = 0, allclasses_plustwo = new Int8Array(21), sl = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
     tmpwin = WIN_ERR;
@@ -939,6 +1039,9 @@ export async function doclassdisco() {   // o_init.c:891
     return ECMD.OK;
 }
 /* put up nameable subset of discoveries list as a menu */
+/**
+ * @returns {Promise<void>}
+ */
 export async function rename_disco() {   // o_init.c:1131
     let i = 0, dis = 0, ct = 0, mn = 0, sl = 0, s = null, oclass = 0, prev_class = 0, tmpwin = 0, any = new $T.any(), selected = [null], clr = 0, buf = new Int8Array(256), odummy = new $T.obj();
     ct = 0;
@@ -1005,6 +1108,10 @@ export async function rename_disco() {   // o_init.c:1131
     return;
 }
 /* !SFCTOOL */
+/**
+ * @param {$c.Ptr | null} opts char *
+ * @param {number} cnf boolean
+ */
 export function get_sortdisco(opts, cnf) {   // o_init.c:1210
     let p = null;
     p = $c.strchr(new $c.Ptr(disco_order_let, 0), flags.discosort);

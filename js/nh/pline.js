@@ -31,6 +31,10 @@ import { Blind, Deaf, Unaware, Underwater } from './youprop.macros.js';
 let vpline$in_pline = 0;   // static in vpline()
 let use_pline_handler = 0;
 /* keep the most recent DUMPLOG_MSG_COUNT messages */
+/**
+ * @param {$c.Ptr | null} line const char *
+ * @returns {Promise<void>}
+ */
 export async function dumplogmsg(line) {   // pline.c:22
     let indx = 0, oldest = null, $t1;
     /*
@@ -70,6 +74,10 @@ export function dumplogfreemessages() {   // pline.c:52
     gs.saved_pline_index = 0;
 }
 /* keeps windowprocs usage out of pline() */
+/**
+ * @param {$c.Ptr | null} line const char *
+ * @returns {Promise<void>}
+ */
 async function putmesg(line) {   // pline.c:65
     let attr = 0;
     attr = ATR.NONE;
@@ -85,22 +93,40 @@ async function putmesg(line) {   // pline.c:65
     await putstr()($G.WIN_MESSAGE, attr, line);
 }
 /* set the direction where next message happens */
+/**
+ * @param {number} dir int
+ */
 export function set_msg_dir(dir) {   // pline.c:84
     dirtocoord(a11y.msg_loc, dir);
     a11y.msg_loc.x = $c.i16(a11y.msg_loc.x + u.ux | 0);
     a11y.msg_loc.y = $c.i16(a11y.msg_loc.y + u.uy | 0);
 }
 /* set the coordinate where next message happens */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ */
 export function set_msg_xy(x, y) {   // pline.c:93
     a11y.msg_loc.x = x;
     a11y.msg_loc.y = y;
 }
+/**
+ * @param {$c.Ptr | null} line const char *
+ * @param {...*} $va the C variable arguments (...)
+ * @returns {Promise<void>}
+ */
 export async function pline(line, ...$va) {   // pline.c:104
     let the_args = null;
     the_args = new $c.VaList($va);
     await vpline(line, the_args);
     void 0;
 }
+/**
+ * @param {number} dir int
+ * @param {$c.Ptr | null} line const char *
+ * @param {...*} $va the C variable arguments (...)
+ * @returns {Promise<void>}
+ */
 export async function pline_dir(dir, line, ...$va) {   // pline.c:114
     let the_args = null;
     set_msg_dir(dir);
@@ -108,6 +134,13 @@ export async function pline_dir(dir, line, ...$va) {   // pline.c:114
     await vpline(line, the_args);
     void 0;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$c.Ptr | null} line const char *
+ * @param {...*} $va the C variable arguments (...)
+ * @returns {Promise<void>}
+ */
 export async function pline_xy(x, y, line, ...$va) {   // pline.c:126
     let the_args = null;
     set_msg_xy(x, y);
@@ -115,6 +148,12 @@ export async function pline_xy(x, y, line, ...$va) {   // pline.c:126
     await vpline(line, the_args);
     void 0;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$c.Ptr | null} line const char *
+ * @param {...*} $va the C variable arguments (...)
+ * @returns {Promise<void>}
+ */
 export async function pline_mon(mtmp, line, ...$va) {   // pline.c:138
     let the_args = null;
     if ($c.peq(mtmp, gy.youmonst)) {
@@ -126,6 +165,11 @@ export async function pline_mon(mtmp, line, ...$va) {   // pline.c:138
     await vpline(line, the_args);
     void 0;
 }
+/**
+ * @param {$c.Ptr | null} line const char *
+ * @param {$c.Ptr | null} the_args va_list
+ * @returns {Promise<void>}
+ */
 async function vpline(line, the_args) {   // pline.c:153
     let pbuf = new Int8Array(1280), ln = 0, msgtyp = 0, no_repeat = 0, a11y_mesgxy = new $T.nhcoord(), tmp = null, dirstr = null, dirstrbuf = new Int8Array(128), tmp_in_pline = 0, $t1, $t2, $t3, $t4;
     /* will get chopped down to BUFSZ-1 if longer */
@@ -244,6 +288,12 @@ async function vpline(line, the_args) {   // pline.c:153
 /* pline() variant which can override MSGTYPE handling or suppress
    message history (tty interface uses pline() to issue prompts and
    they shouldn't be blockable via MSGTYPE=hide) */
+/**
+ * @param {number} pflags unsigned int
+ * @param {$c.Ptr | null} line const char *
+ * @param {...*} $va the C variable arguments (...)
+ * @returns {Promise<void>}
+ */
 export async function custompline(pflags, line, ...$va) {   // pline.c:299
     let the_args = null;
     the_args = new $c.VaList($va);
@@ -256,6 +306,11 @@ export async function custompline(pflags, line, ...$va) {   // pline.c:299
    until next input request, tell the interface that it should override that
    and re-enable them; equivalent to custompline(URGENT_MESSAGE, line, ...)
    but slightly simpler to use */
+/**
+ * @param {$c.Ptr | null} line const char *
+ * @param {...*} $va the C variable arguments (...)
+ * @returns {Promise<void>}
+ */
 export async function urgent_pline(line, ...$va) {   // pline.c:315
     let the_args = null;
     the_args = new $c.VaList($va);
@@ -264,6 +319,11 @@ export async function urgent_pline(line, ...$va) {   // pline.c:315
     gp.pline_flags = 0;
     void 0;
 }
+/**
+ * @param {$c.Ptr | null} line const char *
+ * @param {...*} $va the C variable arguments (...)
+ * @returns {Promise<void>}
+ */
 export async function Norep(line, ...$va) {   // pline.c:327
     let the_args = null;
     the_args = new $c.VaList($va);
@@ -272,6 +332,10 @@ export async function Norep(line, ...$va) {   // pline.c:327
     gp.pline_flags = 0;
     void 0;
 }
+/**
+ * @param {number} siz int
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 async function You_buf(siz) {   // pline.c:339
     let $t1;
     if (siz > gy.you_buf_siz) {
@@ -290,18 +354,33 @@ export function free_youbuf() {   // pline.c:351
     gy.you_buf_siz = 0;
 }
 /* `prefix' must be a string literal, not a pointer */
+/**
+ * @param {$c.Ptr | null} line const char *
+ * @param {...*} $va the C variable arguments (...)
+ * @returns {Promise<void>}
+ */
 export async function You(line, ...$va) {   // pline.c:366
     let the_args = null, tmp = null;
     the_args = new $c.VaList($va);
     await vpline($c.strcat(($c.strcpy(tmp = await You_buf($c.i32($c.addu64($c.strlen(line), 5))), $c.lit("You ")), tmp), line), the_args);
     void 0;
 }
+/**
+ * @param {$c.Ptr | null} line const char *
+ * @param {...*} $va the C variable arguments (...)
+ * @returns {Promise<void>}
+ */
 export async function Your(line, ...$va) {   // pline.c:377
     let the_args = null, tmp = null;
     the_args = new $c.VaList($va);
     await vpline($c.strcat(($c.strcpy(tmp = await You_buf($c.i32($c.addu64($c.strlen(line), 6))), $c.lit("Your ")), tmp), line), the_args);
     void 0;
 }
+/**
+ * @param {$c.Ptr | null} line const char *
+ * @param {...*} $va the C variable arguments (...)
+ * @returns {Promise<void>}
+ */
 export async function You_feel(line, ...$va) {   // pline.c:388
     let the_args = null, tmp = null;
     the_args = new $c.VaList($va);
@@ -313,24 +392,44 @@ export async function You_feel(line, ...$va) {   // pline.c:388
     await vpline($c.strcat(tmp, line), the_args);
     void 0;
 }
+/**
+ * @param {$c.Ptr | null} line const char *
+ * @param {...*} $va the C variable arguments (...)
+ * @returns {Promise<void>}
+ */
 export async function You_cant(line, ...$va) {   // pline.c:403
     let the_args = null, tmp = null;
     the_args = new $c.VaList($va);
     await vpline($c.strcat(($c.strcpy(tmp = await You_buf($c.i32($c.addu64($c.strlen(line), 11))), $c.lit("You can't ")), tmp), line), the_args);
     void 0;
 }
+/**
+ * @param {$c.Ptr | null} line const char *
+ * @param {...*} $va the C variable arguments (...)
+ * @returns {Promise<void>}
+ */
 export async function pline_The(line, ...$va) {   // pline.c:414
     let the_args = null, tmp = null;
     the_args = new $c.VaList($va);
     await vpline($c.strcat(($c.strcpy(tmp = await You_buf($c.i32($c.addu64($c.strlen(line), 5))), $c.lit("The ")), tmp), line), the_args);
     void 0;
 }
+/**
+ * @param {$c.Ptr | null} line const char *
+ * @param {...*} $va the C variable arguments (...)
+ * @returns {Promise<void>}
+ */
 export async function There(line, ...$va) {   // pline.c:425
     let the_args = null, tmp = null;
     the_args = new $c.VaList($va);
     await vpline($c.strcat(($c.strcpy(tmp = await You_buf($c.i32($c.addu64($c.strlen(line), 7))), $c.lit("There ")), tmp), line), the_args);
     void 0;
 }
+/**
+ * @param {$c.Ptr | null} line const char *
+ * @param {...*} $va the C variable arguments (...)
+ * @returns {Promise<void>}
+ */
 export async function You_hear(line, ...$va) {   // pline.c:436
     let the_args = null, tmp = null;
     if (Deaf() && !Unaware() || !flags.acoustics) {
@@ -347,6 +446,11 @@ export async function You_hear(line, ...$va) {   // pline.c:436
     await vpline($c.strcat(tmp, line), the_args);
     void 0;
 }
+/**
+ * @param {$c.Ptr | null} line const char *
+ * @param {...*} $va the C variable arguments (...)
+ * @returns {Promise<void>}
+ */
 export async function You_see(line, ...$va) {   // pline.c:455
     let the_args = null, tmp = null;
     the_args = new $c.VaList($va);
@@ -364,6 +468,11 @@ export async function You_see(line, ...$va) {   // pline.c:455
  * The caller is responsible for checking deafness.
  * Gods can speak directly to you in spite of deafness.
  */
+/**
+ * @param {$c.Ptr | null} line const char *
+ * @param {...*} $va the C variable arguments (...)
+ * @returns {Promise<void>}
+ */
 export async function verbalize(line, ...$va) {   // pline.c:476
     let the_args = null, tmp = null;
     the_args = new $c.VaList($va);
@@ -376,6 +485,12 @@ export async function verbalize(line, ...$va) {   // pline.c:476
     gp.pline_flags = (gp.pline_flags & 4294967279) >>> 0;
     void 0;
 }
+/**
+ * @param {number | bigint} glflags long
+ * @param {number | bigint} gltime long
+ * @param {$c.Ptr | null} str const char *
+ * @returns {Promise<void>}
+ */
 export async function gamelog_add(glflags, gltime, str) {   // pline.c:495
     let tmp = null, lst = null, $t1;
     lst = gg.gamelog;
@@ -393,6 +508,12 @@ export async function gamelog_add(glflags, gltime, str) {   // pline.c:495
         lst.next = tmp;
     }
 }
+/**
+ * @param {number | bigint} ll_type long
+ * @param {$c.Ptr | null} line const char *
+ * @param {...*} $va the C variable arguments (...)
+ * @returns {Promise<void>}
+ */
 export async function livelog_printf(ll_type, line, ...$va) {   // pline.c:514
     let gamelogbuf = new Int8Array(512), the_args = null;
     the_args = new $c.VaList($va);
@@ -402,6 +523,11 @@ export async function livelog_printf(ll_type, line, ...$va) {   // pline.c:514
     strNsubst(new $c.Ptr(gamelogbuf, 0), $c.lit("\t"), $c.lit("_"), 0);
     await livelog_add(ll_type, new $c.Ptr(gamelogbuf, 0));
 }
+/**
+ * @param {$c.Ptr | null} line const char *
+ * @param {...*} $va the C variable arguments (...)
+ * @returns {Promise<void>}
+ */
 export async function raw_printf(line, ...$va) {   // pline.c:549
     let the_args = null;
     the_args = new $c.VaList($va);
@@ -411,6 +537,11 @@ export async function raw_printf(line, ...$va) {   // pline.c:549
         ge.early_raw_messages = ge.early_raw_messages + 1 | 0;
     }
 }
+/**
+ * @param {$c.Ptr | null} line const char *
+ * @param {$c.Ptr | null} the_args va_list
+ * @returns {Promise<void>}
+ */
 async function vraw_printf(line, the_args) {   // pline.c:563
     let pbuf = new Int8Array(1280);
     /* will be chopped down to BUFSZ-1 if longer */
@@ -431,6 +562,11 @@ async function vraw_printf(line, the_args) {   // pline.c:563
         ge.early_raw_messages = ge.early_raw_messages + 1 | 0;
     }
 }
+/**
+ * @param {$c.Ptr | null} s const char *
+ * @param {...*} $va the C variable arguments (...)
+ * @returns {Promise<void>}
+ */
 export async function impossible(s, ...$va) {   // pline.c:584
     let the_args = null, pbuf = new Int8Array(1280), pbuf2 = new Int8Array(256), report = 0;
     /* will be chopped down to BUFSZ-1 if longer */
@@ -472,6 +608,10 @@ export async function impossible(s, ...$va) {   // pline.c:584
     }
     program_state.in_impossible = 0;
 }
+/**
+ * @param {$c.Ptr | null} line const char *
+ * @returns {Promise<void>}
+ */
 async function execplinehandler(line) {   // pline.c:641
     let f = 0, args = $c.nulls(3), status = Int32Array.of(0);
     if (!use_pline_handler || !sysopt.msghandler) {
@@ -499,6 +639,12 @@ async function execplinehandler(line) {   // pline.c:641
     /* -Wunused-but-set-variable */
 }
 /* nhassert_failed is called when an nhassert's condition is false */
+/**
+ * @param {$c.Ptr | null} expression const char *
+ * @param {$c.Ptr | null} filepath const char *
+ * @param {number} line int
+ * @returns {Promise<void>}
+ */
 export async function nhassert_failed(expression, filepath, line) {   // pline.c:690
     let filename = null, p = null;
     /* Attempt to get filename from path.

@@ -24,6 +24,9 @@ const SEL_FLOOD_STACK = 1680;
 const selection_floodfill$floodfill_stack_overrun = new Int8Array(24);   // static in selection_floodfill()
 let selection_flood_check_func = null;
 /* selection */
+/**
+ * @returns {Promise<$T.selectionvar | null>} struct selectionvar *
+ */
 export async function selection_new() {   // selvar.c:15
     let tmps = null, $t1, $t2;
     tmps = $c.asRec(await alloc(32), $T.selectionvar, 32);
@@ -38,6 +41,10 @@ export async function selection_new() {   // selvar.c:15
     tmps.map.set(COLNO * ROWNO, 0);
     return tmps;
 }
+/**
+ * @param {$T.selectionvar | null} sel struct selectionvar *
+ * @param {number} freesel boolean
+ */
 export function selection_free(sel, freesel) {   // selvar.c:33
     if (sel) {
         if (sel.map) {
@@ -52,6 +59,10 @@ export function selection_free(sel, freesel) {   // selvar.c:33
     }
 }
 /* clear selection, setting all locations to value val */
+/**
+ * @param {$T.selectionvar | null} sel struct selectionvar *
+ * @param {number} val int
+ */
 export function selection_clear(sel, val) {   // selvar.c:48
     let $t1;
     $c.memset(sel.map, 1 + val | 0, COLNO * ROWNO);
@@ -67,6 +78,10 @@ export function selection_clear(sel, val) {   // selvar.c:48
     }
     sel.bounds_dirty = FALSE;
 }
+/**
+ * @param {$T.selectionvar | null} sel struct selectionvar *
+ * @returns {Promise<$T.selectionvar | null>} struct selectionvar *
+ */
 export async function selection_clone(sel) {   // selvar.c:65
     let tmps = null, $t1;
     tmps = $c.asRec(await alloc(32), $T.selectionvar, 32);
@@ -75,6 +90,10 @@ export async function selection_clone(sel) {   // selvar.c:65
     return tmps;
 }
 /* get boundary rect of selection sel into b */
+/**
+ * @param {$T.selectionvar | null} sel struct selectionvar *
+ * @param {$T.nhrect | null} b NhRect *
+ */
 export function selection_getbounds(sel, b) {   // selvar.c:77
     if (!sel || !b) {
         return;
@@ -93,6 +112,9 @@ export function selection_getbounds(sel, b) {   // selvar.c:77
     }
 }
 /* recalc the boundary of selection, if necessary */
+/**
+ * @param {$T.selectionvar | null} sel struct selectionvar *
+ */
 export function selection_recalc_bounds(sel) {   // selvar.c:99
     let x = 0, y = 0, r = new $T.nhrect(), $t1, $t2, $t3, $t4;
     if (!sel.bounds_dirty) {
@@ -155,6 +177,12 @@ export function selection_recalc_bounds(sel) {   // selvar.c:99
     }
     sel.bounds_dirty = FALSE;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$T.selectionvar | null} sel struct selectionvar *
+ * @returns {number} coordxy
+ */
 export function selection_getpoint(x, y, sel) {   // selvar.c:168
     if (!sel || !sel.map) {
         return 0;
@@ -164,6 +192,12 @@ export function selection_getpoint(x, y, sel) {   // selvar.c:168
     }
     return $c.i16(sel.map.get(Math.imul(sel.wid, y) + x | 0) - 1 | 0);
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$T.selectionvar | null} sel struct selectionvar *
+ * @param {number} c int
+ */
 export function selection_setpoint(x, y, sel, c) {   // selvar.c:181
     if (!sel || !sel.map) {
         return;
@@ -191,6 +225,10 @@ export function selection_setpoint(x, y, sel, c) {   // selvar.c:181
     }
     sel.map.set(Math.imul(sel.wid, y) + x | 0, $c.i8(c + 1 | 0));
 }
+/**
+ * @param {$T.selectionvar | null} s struct selectionvar *
+ * @returns {$T.selectionvar | null} struct selectionvar *
+ */
 export function selection_not(s) {   // selvar.c:211
     let x = 0, y = 0, tmprect = new $T.nhrect();
     tmprect.$copyFrom(cg.zeroNhRect);
@@ -202,6 +240,11 @@ export function selection_not(s) {   // selvar.c:211
     selection_getbounds(s, tmprect);
     return s;
 }
+/**
+ * @param {$T.selectionvar | null} ov struct selectionvar *
+ * @param {number} percent int
+ * @returns {Promise<$T.selectionvar | null>} struct selectionvar *
+ */
 export async function selection_filter_percent(ov, percent) {   // selvar.c:224
     let x = 0, y = 0, ret = null, rect = new $T.nhrect();
     rect.$copyFrom(cg.zeroNhRect);
@@ -219,6 +262,12 @@ export async function selection_filter_percent(ov, percent) {   // selvar.c:224
     }
     return ret;
 }
+/**
+ * @param {$T.selectionvar | null} ov struct selectionvar *
+ * @param {number} typ xint16
+ * @param {number} lit int
+ * @returns {Promise<$T.selectionvar | null>} struct selectionvar *
+ */
 export async function selection_filter_mapchar(ov, typ, lit) {   // selvar.c:248
     let x = 0, y = 0, ret = null, rect = new $T.nhrect();
     rect.$copyFrom(cg.zeroNhRect);
@@ -250,6 +299,13 @@ export async function selection_filter_mapchar(ov, typ, lit) {   // selvar.c:248
     }
     return ret;
 }
+/**
+ * @param {$T.selectionvar | null} ov struct selectionvar *
+ * @param {*} x coordxy *
+ * @param {*} y coordxy *
+ * @param {number} removeit boolean
+ * @returns {number} int
+ */
 export function selection_rndcoord(ov, x, y, removeit) {   // selvar.c:284
     let idx = 0, c = 0, dx = 0, dy = 0, rect = new $T.nhrect(), $t1;
     idx = 0;
@@ -283,6 +339,11 @@ export function selection_rndcoord(ov, x, y, removeit) {   // selvar.c:284
     $t1 = y.set(0, -1), x.set(0, $t1);
     return 0;
 }
+/**
+ * @param {$T.selectionvar | null} ov struct selectionvar *
+ * @param {number} dir int
+ * @returns {Promise<void>}
+ */
 export async function selection_do_grow(ov, dir) {   // selvar.c:321
     let x = 0, y = 0, tmp = null, rect = new $T.nhrect();
     rect.$copyFrom(cg.zeroNhRect);
@@ -315,10 +376,21 @@ export async function selection_do_grow(ov, dir) {   // selvar.c:321
     }
     selection_free(tmp, TRUE);
 }
+/**
+ * @param {Function | null} f int (*)(coordxy, coordxy)
+ */
 export function set_selection_floodfillchk(f) {   // selvar.c:372
     selection_flood_check_func = f;
 }
 /* check whethere <x,y> is already in xs[],ys[] */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {*} xs coordxy *
+ * @param {*} ys coordxy *
+ * @param {number} n int
+ * @returns {number} boolean
+ */
 function sel_flood_havepoint(x, y, xs, ys, n) {   // selvar.c:379
     let xx = 0, yy = 0;
     xx = x;
@@ -331,6 +403,13 @@ function sel_flood_havepoint(x, y, xs, ys, n) {   // selvar.c:379
     }
     return FALSE;
 }
+/**
+ * @param {$T.selectionvar | null} ov struct selectionvar *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} diagonals boolean
+ * @returns {Promise<void>}
+ */
 export async function selection_floodfill(ov, x, y, diagonals) {   // selvar.c:395
     let tmp = null, idx = 0, dx = new Int16Array(1680), dy = new Int16Array(1680);
     tmp = await selection_new();
@@ -466,6 +545,14 @@ export async function selection_floodfill(ov, x, y, diagonals) {   // selvar.c:3
     selection_free(tmp, TRUE);
 }
 /* McIlroy's Ellipse Algorithm */
+/**
+ * @param {$T.selectionvar | null} ov struct selectionvar *
+ * @param {number} xc int
+ * @param {number} yc int
+ * @param {number} a int
+ * @param {number} b int
+ * @param {number} filled int
+ */
 export function selection_do_ellipse(ov, xc, yc, a, b, filled) {   // selvar.c:456
     let x = 0, y = 0, a2 = 0, b2 = 0, crit1 = 0, crit2 = 0, crit3 = 0, t = 0, dxt = 0, dyt = 0, d2xt = 0, d2yt = 0, width = 0, i = 0;
     /* e(x,y) = b^2*x^2 + a^2*y^2 - a^2*b^2 */
@@ -559,6 +646,15 @@ export function selection_do_ellipse(ov, xc, yc, a, b, filled) {   // selvar.c:4
     }
 }
 /* square of distance from line segment (x1,y1, x2,y2) to point (x3,y3) */
+/**
+ * @param {number | bigint} x1 long
+ * @param {number | bigint} y1 long
+ * @param {number | bigint} x2 long
+ * @param {number | bigint} y2 long
+ * @param {number | bigint} x3 long
+ * @param {number | bigint} y3 long
+ * @returns {number | bigint} long
+ */
 function line_dist_coord(x1, y1, x2, y2, x3, y3) {   // selvar.c:542
     let px = 0, py = 0, s = 0, x = 0, y = 0, dx = 0, dy = 0, distsq = 0, lu = 0;
     px = $c.sub64(x2, x1);
@@ -583,6 +679,17 @@ function line_dist_coord(x1, y1, x2, y2, x3, y3) {   // selvar.c:542
     return distsq;
 }
 /* guts of l_selection_gradient */
+/**
+ * @param {$T.selectionvar | null} ov struct selectionvar *
+ * @param {number | bigint} x long
+ * @param {number | bigint} y long
+ * @param {number | bigint} x2 long
+ * @param {number | bigint} y2 long
+ * @param {number | bigint} gtyp long
+ * @param {number | bigint} mind long
+ * @param {number | bigint} maxd long
+ * @returns {Promise<void>}
+ */
 export async function selection_do_gradient(ov, x, y, x2, y2, gtyp, mind, maxd) {   // selvar.c:570
     let dx = 0, dy = 0, dofs = 0, tmp = 0, d0 = 0, d1 = 0, d2 = 0, d3 = 0, d4 = 0, d5 = 0, d0$2 = 0;
     if (mind > maxd) {
@@ -630,6 +737,13 @@ export async function selection_do_gradient(ov, x, y, x2, y2, gtyp, mind, maxd) 
     }   /*switch*/
 }
 /* bresenham line algo */
+/**
+ * @param {number} x1 coordxy
+ * @param {number} y1 coordxy
+ * @param {number} x2 coordxy
+ * @param {number} y2 coordxy
+ * @param {$T.selectionvar | null} ov struct selectionvar *
+ */
 export function selection_do_line(x1, y1, x2, y2, ov) {   // selvar.c:626
     let d0 = 0, dx = 0, dy = 0, ai = 0, bi = 0, xi = 0, yi = 0;
     if (x1 < x2) {
@@ -679,6 +793,15 @@ export function selection_do_line(x1, y1, x2, y2, ov) {   // selvar.c:626
         } while (y1 !== y2);
     }
 }
+/**
+ * @param {number} x1 coordxy
+ * @param {number} y1 coordxy
+ * @param {number} x2 coordxy
+ * @param {number} y2 coordxy
+ * @param {number} rough schar
+ * @param {number} rec schar
+ * @param {$T.selectionvar | null} ov struct selectionvar *
+ */
 export function selection_do_randline(x1, y1, x2, y2, rough, rec, ov) {   // selvar.c:683
     let mx = 0, my = 0, dx = 0, dy = 0;
     if (rec < 1 || x2 === x1 && y2 === y1) {
@@ -707,6 +830,12 @@ export function selection_do_randline(x1, y1, x2, y2, rough, rec, ov) {   // sel
     selection_do_randline($c.i16(mx), $c.i16(my), x2, y2, rough, rec, ov);
     selection_setpoint(x2, y2, ov, 1);
 }
+/**
+ * @param {$T.selectionvar | null} ov struct selectionvar *
+ * @param {Function | null} func select_iter_func
+ * @param {*} arg genericptr_t
+ * @returns {Promise<void>}
+ */
 export async function selection_iterate(ov, func, arg) {   // selvar.c:726
     let x = 0, y = 0, rect = new $T.nhrect();
     rect.$copyFrom(cg.zeroNhRect);
@@ -723,6 +852,10 @@ export async function selection_iterate(ov, func, arg) {   // selvar.c:726
     }
 }
 /* selection is not rectangular, or has holes in it */
+/**
+ * @param {$T.selectionvar | null} sel struct selectionvar *
+ * @returns {number} boolean
+ */
 export function selection_is_irregular(sel) {   // selvar.c:747
     let x = 0, y = 0, rect = new $T.nhrect();
     rect.$copyFrom(cg.zeroNhRect);
@@ -737,6 +870,11 @@ export function selection_is_irregular(sel) {   // selvar.c:747
     return FALSE;
 }
 /* return a description of the selection size */
+/**
+ * @param {$T.selectionvar | null} sel struct selectionvar *
+ * @param {$c.Ptr | null} buf char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function selection_size_description(sel, buf) {   // selvar.c:764
     let rect = new $T.nhrect(), dx = 0, dy = 0;
     rect.$copyFrom(cg.zeroNhRect);
@@ -746,6 +884,10 @@ export function selection_size_description(sel, buf) {   // selvar.c:764
     $c.sprintf(buf, $c.lit("%s %i by %i"), selection_is_irregular(sel) ? $c.lit("irregularly shaped") : dx === dy ? $c.lit("square") : $c.lit("rectangular"), dx, dy);
     return buf;
 }
+/**
+ * @param {$T.mkroom | null} croom struct mkroom *
+ * @returns {Promise<$T.selectionvar | null>} struct selectionvar *
+ */
 export async function selection_from_mkroom(croom) {   // selvar.c:781
     let sel = null, x = 0, y = 0, rmno = 0;
     sel = await selection_new();
@@ -765,6 +907,10 @@ export async function selection_from_mkroom(croom) {   // selvar.c:781
     }
     return sel;
 }
+/**
+ * @param {$T.selectionvar | null} sel struct selectionvar *
+ * @returns {Promise<void>}
+ */
 export async function selection_force_newsyms(sel) {   // selvar.c:802
     let x = 0, y = 0;
     for (x = 1; x < sel.wid; x = $c.i16(x + 1)) {

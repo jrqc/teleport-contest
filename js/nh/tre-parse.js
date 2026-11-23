@@ -73,6 +73,10 @@ const cnames = $h.data(1536, 8);
 /* Characters with special meanings in regexp syntax. */
 /* Some macros for expanding \w, \s, etc. */
 const tre_macros = $h.data(208, 8);
+/**
+ * @param {number} val void *
+ * @returns {number} void *
+ */
 function xlocale_retain(val) {   // xlocale_private.h:96
     let obj = 0;
     obj = val;
@@ -82,6 +86,9 @@ function xlocale_retain(val) {   // xlocale_private.h:96
     $h.i32[obj >>> 2] = $h.i32[obj >>> 2] + 1 | 0;
     return val;
 }
+/**
+ * @param {number} val void *
+ */
 function xlocale_release(val) {   // xlocale_private.h:107
     let obj = 0;
     obj = val;
@@ -94,9 +101,16 @@ function xlocale_release(val) {   // xlocale_private.h:107
         }
     }
 }
+/**
+ * @returns {number} locale_t
+ */
 function __current_locale() {   // xlocale_private.h:122
     return __global_locale;
 }
+/**
+ * @param {number} __loc locale_t
+ * @returns {number} locale_t
+ */
 function __locale_ptr(__loc) {   // xlocale_private.h:128
     if (__loc === 0) {
         __loc = $h.u32[_c_locale >>> 2];
@@ -108,6 +122,12 @@ function __locale_ptr(__loc) {   // xlocale_private.h:128
 /* Expands a macro delimited by `regex' and `regex_end' to `buf', which
    must have at least `len' items.  Sets buf[0] to zero if the there
    is no match in `tre_macros'. */
+/**
+ * @param {number} regex const tre_char_t *
+ * @param {number} regex_end const tre_char_t *
+ * @param {number} buf tre_char_t *
+ * @param {number | bigint} buf_len size_t
+ */
 function tre_expand_macro(regex, regex_end, buf, buf_len) {   // tre-parse.c:85
     let i = 0, j = 0;
     $h.i32[buf >>> 2] = 0;
@@ -126,6 +146,14 @@ function tre_expand_macro(regex, regex_end, buf, buf_len) {   // tre-parse.c:85
         }
     }
 }
+/**
+ * @param {number} mem tre_mem_t
+ * @param {number} type int
+ * @param {number} val int
+ * @param {number} max_i int *
+ * @param {number} items tre_bracket_match_list_t **
+ * @returns {number} reg_errcode_t
+ */
 function tre_new_item(mem, type, val, max_i, items) {   // tre-parse.c:110
     let status = 0, array = 0, i = 0, new_items = 0, $t1;
     status = 0;
@@ -153,6 +181,11 @@ function tre_new_item(mem, type, val, max_i, items) {   // tre-parse.c:110
     $h.i32[array >>> 2] = $h.i32[array >>> 2] + 1 | 0;
     return status;
 }
+/**
+ * @param {number} name const wchar_t *
+ * @param {number | bigint} len size_t
+ * @returns {number} wchar_t
+ */
 function tre_search_cnames(name, len) {   // tre-parse.c:227
     let low = 0, high = 0, cur = 0, cmp = 0;
     low = 0;
@@ -181,6 +214,13 @@ function tre_search_cnames(name, len) {   // tre-parse.c:227
  * without the MCCSs and the MCCSs (e.g., [x[.ch.]] => [x]|ch), and
  * call tre_parse (recursive) to parse that new string (which will
  * call tre_parse_bracket and tre_parse_bracket_items again. */
+/**
+ * @param {number} ctx tre_parse_ctx_t *
+ * @param {number} items tre_bracket_match_list_t **
+ * @param {number} items_size int *
+ * @param {number} result tre_collating_symbol **
+ * @returns {number} reg_errcode_t
+ */
 function tre_parse_bracket_items(ctx, items, items_size, result) {   // tre-parse.c:256
     let re = 0, re_end = 0, col_syms = 0, cp = 0, n_col_syms = 0, status = 0, other = 0, range = 0, min = 0, c = 0, invert = 0, collect_MCCS = 0, start = 0, i = 0, tmp = 0, kind = 0, equiv = 0, class_ = 0, len = 0, $goto = null;
     const $sp0 = $h.st.sp, $fp = $h.enter(464);
@@ -560,6 +600,11 @@ function tre_parse_bracket_items(ctx, items, items_size, result) {   // tre-pars
     } finally { $h.st.sp = $sp0; }
 }
 /* TRE_DEBUG */
+/**
+ * @param {number} ctx tre_parse_ctx_t *
+ * @param {number} result tre_ast_node_t **
+ * @returns {number} reg_errcode_t
+ */
 function tre_parse_bracket(ctx, result) {   // tre-parse.c:723
     let node = 0, status = 0, str = 0, sp = 0, cp = 0, re = 0, i = 0, l = 0, $t1, $t2, $t3, $t4, $t5;
     const $sp0 = $h.st.sp, $fp = $h.enter(160);
@@ -682,6 +727,11 @@ function tre_parse_bracket(ctx, result) {   // tre-parse.c:723
 }
 /* Parses a positive decimal integer capped at INT_MAX.  Returns -1 if the
    string does not contain a valid number. */
+/**
+ * @param {number} regex const tre_char_t **
+ * @param {number} regex_end const tre_char_t *
+ * @returns {number} int
+ */
 function tre_parse_int(regex, regex_end) {   // tre-parse.c:887
     let num = 0, overflow = 0, r = 0;
     num = 0;
@@ -706,6 +756,11 @@ function tre_parse_int(regex, regex_end) {   // tre-parse.c:887
     $h.stp(regex, r);
     return overflow ? 2147483647 : $c.i32(num);
 }
+/**
+ * @param {number} ctx tre_parse_ctx_t *
+ * @param {number} result tre_ast_node_t **
+ * @returns {number} reg_errcode_t
+ */
 function tre_parse_bound(ctx, result) {   // tre-parse.c:917
     let min = 0, max = 0, minimal = 0, $t1;
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
@@ -859,6 +914,10 @@ function tre_parse_bound(ctx, result) {   // tre-parse.c:917
         return 0;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} ctx tre_parse_ctx_t *
+ * @returns {number} reg_errcode_t
+ */
 export function tre_parse(ctx) {   // tre-parse.c:1304
     let symbol = 0, status = 0, stack = 0, bottom = 0, depth = 0, temporary_cflags = 0, bre_branch_begin = 0, c = 0, tree = 0, tmp_node = 0, tmp_node$2 = 0, tree$2 = 0, pipechar = 0, minimal = 0, rep_min = 0, rep_max = 0, tmp_node$3 = 0, raw_assertion = 0, new_cflags = 0, bit = 0, invisible_submatch = 0, val = 0, val$2 = 0, i = 0, val$3 = 0, tmp1 = 0, tmp2 = 0, tmp1$2 = 0, tmp2$2 = 0, submatch_id = 0, n = 0, tmp_node$4 = 0, $goto = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8;
     const $sp0 = $h.st.sp, $fp = $h.enter(412);

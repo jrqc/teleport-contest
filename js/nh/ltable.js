@@ -85,6 +85,11 @@ const absentkey = $h.data(16, 8);
 ** remainder, which is faster. Otherwise, use an unsigned-integer
 ** remainder, which uses all bits and ensures a non-negative result.
 */
+/**
+ * @param {number} t const Table *
+ * @param {number | bigint} i lua_Integer
+ * @returns {number} Node *
+ */
 function hashint(t, i) {   // ltable.c:108
     let ui = 0;
     ui = $c.u64(i);
@@ -107,6 +112,10 @@ function hashint(t, i) {   // ltable.c:108
 ** adding 'i'; the use of '~u' (instead of '-u') avoids problems with
 ** INT_MIN.
 */
+/**
+ * @param {number} n lua_Number
+ * @returns {number} int
+ */
 function l_hashfloat(n) {   // ltable.c:131
     let u = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
@@ -127,6 +136,11 @@ function l_hashfloat(n) {   // ltable.c:131
 ** returns the 'main' position of an element in a table (that is,
 ** the index of its hash value).
 */
+/**
+ * @param {number} t const Table *
+ * @param {number} key const TValue *
+ * @returns {number} Node *
+ */
 function mainpositionTV(t, key) {   // ltable.c:151
     let i = 0, n = 0, ts = 0, ts$2 = 0, p = 0, f = 0, o = 0;
     switch ($h.u8[key + 8] & 63) {
@@ -171,6 +185,11 @@ function mainpositionTV(t, key) {   // ltable.c:151
             }
     }
 }
+/**
+ * @param {number} t const Table *
+ * @param {number} nd Node *
+ * @returns {number} Node *
+ */
 function mainpositionfromnode(t, nd) {   // ltable.c:189
     let io_ = 0, n_ = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
@@ -205,6 +224,12 @@ function mainpositionfromnode(t, nd) {   // ltable.c:189
 ** positive does not break anything.  (In particular, 'next' will return
 ** some other valid item on the table or nil.)
 */
+/**
+ * @param {number} k1 const TValue *
+ * @param {number} n2 const Node *
+ * @param {number} deadok int
+ * @returns {number} int
+ */
 function equalkey(k1, n2, deadok) {   // ltable.c:216
     /* not the same variants? */
     if ($h.u8[k1 + 8] !== $h.u8[n2 + 9] && !(deadok && $h.u8[n2 + 9] === 11 && $h.u8[k1 + 8] & 64)) {
@@ -237,6 +262,10 @@ function equalkey(k1, n2, deadok) {   // ltable.c:216
 /*
 ** Returns the real size of the 'array' array
 */
+/**
+ * @param {number} t const Table *
+ * @returns {number} unsigned int
+ */
 export function luaH_realasize(t) {   // ltable.c:250
     let size = 0;
     if (!($h.u8[t + 10] & 128) || ($h.u32[(t + 12) >>> 2] & $h.u32[(t + 12) >>> 2] - 1 >>> 0) >>> 0 === 0) {
@@ -261,9 +290,17 @@ export function luaH_realasize(t) {   // ltable.c:250
 ** (If it is not, 'alimit' cannot be changed to any other value
 ** without changing the real size.)
 */
+/**
+ * @param {number} t const Table *
+ * @returns {number} int
+ */
 function ispow2realasize(t) {   // ltable.c:278
     return !!($h.u8[t + 10] & 128) || ($h.u32[(t + 12) >>> 2] & $h.u32[(t + 12) >>> 2] - 1 >>> 0) >>> 0 === 0 ? 1 : 0;
 }
+/**
+ * @param {number} t Table *
+ * @returns {number} unsigned int
+ */
 function setlimittosize(t) {   // ltable.c:283
     let $t1;
     $t1 = luaH_realasize(t), $h.u32[(t + 12) >>> 2] = $t1;
@@ -275,6 +312,12 @@ function setlimittosize(t) {   // ltable.c:283
 ** which may be in array part, nor for floats with integral values.)
 ** See explanation about 'deadok' in function 'equalkey'.
 */
+/**
+ * @param {number} t Table *
+ * @param {number} key const TValue *
+ * @param {number} deadok int
+ * @returns {number} const TValue *
+ */
 function getgeneric(t, key, deadok) {   // ltable.c:299
     let n = 0, nx = 0;
     n = mainpositionTV(t, key);
@@ -295,6 +338,10 @@ function getgeneric(t, key, deadok) {   // ltable.c:299
 ** returns the index for 'k' if 'k' is an appropriate key to live in
 ** the array part of a table, 0 otherwise.
 */
+/**
+ * @param {number | bigint} k lua_Integer
+ * @returns {number} unsigned int
+ */
 function arrayindex(k) {   // ltable.c:318
     if ($c.subu64($c.u64(k), 1) < 2147483648) {   /* 'k' in [1, MAXASIZE]? */
         return $c.u32(k);   /* 'key' is an appropriate array index */
@@ -307,6 +354,13 @@ function arrayindex(k) {   // ltable.c:318
 ** elements in the array part, then elements in the hash part. The
 ** beginning of a traversal is signaled by 0.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} t Table *
+ * @param {number} key TValue *
+ * @param {number} asize unsigned int
+ * @returns {Promise<number>} unsigned int
+ */
 async function findindex(L, t, key, asize) {   // ltable.c:331
     let i = 0, n = 0;
     if (($h.u8[key + 8] & 15) === 0) {
@@ -325,6 +379,12 @@ async function findindex(L, t, key, asize) {   // ltable.c:331
         return (i + 1 >>> 0) + asize >>> 0;
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} t Table *
+ * @param {number} key StkId
+ * @returns {Promise<number>} int
+ */
 export async function luaH_next(L, t, key) {   // ltable.c:349
     let asize = 0, i = 0, io = 0, io1 = 0, io2 = 0, n = 0, io_ = 0, n_ = 0, io1$2 = 0, io2$2 = 0;
     asize = luaH_realasize(t);
@@ -374,6 +434,11 @@ export async function luaH_next(L, t, key) {   // ltable.c:349
     }
     return 0;   /* no more elements */
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} t Table *
+ * @returns {Promise<void>}
+ */
 async function freehash(L, t) {   // ltable.c:371
     if (!($h.u32[(t + 32) >>> 2] === 0)) {
         await luaM_free_(L, $h.u32[(t + 24) >>> 2], $c.mulu64($c.u64(1 << $h.u8[t + 11]), 24));
@@ -392,6 +457,11 @@ async function freehash(L, t) {   // ltable.c:371
 ** will go to the array part; return the optimal size.  (The condition
 ** 'twotoi > 0' in the for loop stops the loop if 'twotoi' overflows.)
 */
+/**
+ * @param {number} nums unsigned int *
+ * @param {number} pna unsigned int *
+ * @returns {number} unsigned int
+ */
 function computesizes(nums, pna) {   // ltable.c:391
     let i = 0, twotoi = 0, a = 0, na = 0, optimal = 0;
     /* 2^i (candidate for optimal size) */
@@ -411,6 +481,11 @@ function computesizes(nums, pna) {   // ltable.c:391
     $h.u32[pna >>> 2] = na;
     return optimal;
 }
+/**
+ * @param {number | bigint} key lua_Integer
+ * @param {number} nums unsigned int *
+ * @returns {number} int
+ */
 function countint(key, nums) {   // ltable.c:413
     let k = 0, $t1;
     k = arrayindex(key);
@@ -427,6 +502,11 @@ function countint(key, nums) {   // ltable.c:413
 ** number of keys that will go into corresponding slice and return
 ** total number of non-nil keys.
 */
+/**
+ * @param {number} t const Table *
+ * @param {number} nums unsigned int *
+ * @returns {number} unsigned int
+ */
 function numusearray(t, nums) {   // ltable.c:429
     let lg = 0, ttlg = 0, ause = 0, i = 0, asize = 0, lc = 0, lim = 0;
     /* 2^lg */
@@ -454,6 +534,12 @@ function numusearray(t, nums) {   // ltable.c:429
     }
     return ause;
 }
+/**
+ * @param {number} t const Table *
+ * @param {number} nums unsigned int *
+ * @param {number} pna unsigned int *
+ * @returns {number} int
+ */
 function numusehash(t, nums, pna) {   // ltable.c:456
     let totaluse = 0, ause = 0, i = 0, n = 0, $t1;
     totaluse = 0;   /* total number of elements */
@@ -478,6 +564,12 @@ function numusehash(t, nums, pna) {   // ltable.c:456
 ** comparison ensures that the shift in the second one does not
 ** overflow.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} t Table *
+ * @param {number} size unsigned int
+ * @returns {Promise<void>}
+ */
 async function setnodevector(L, t, size) {   // ltable.c:480
     let i = 0, lsize = 0, n = 0, $t1;
     if (size === 0) {
@@ -505,6 +597,12 @@ async function setnodevector(L, t, size) {   // ltable.c:480
 /*
 ** (Re)insert all elements from the hash part of 'ot' into table 't'.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} ot Table *
+ * @param {number} t Table *
+ * @returns {Promise<void>}
+ */
 async function reinsert(L, ot, t) {   // ltable.c:508
     let j = 0, size = 0, old = 0, io_ = 0, n_ = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
@@ -530,6 +628,10 @@ async function reinsert(L, ot, t) {   // ltable.c:508
 /*
 ** Exchange the hash part of 't1' and 't2'.
 */
+/**
+ * @param {number} t1 Table *
+ * @param {number} t2 Table *
+ */
 function exchangehashpart(t1, t2) {   // ltable.c:527
     let lsizenode = 0, node = 0, lastfree = 0;
     lsizenode = $h.u8[t1 + 11];
@@ -555,6 +657,13 @@ function exchangehashpart(t1, t2) {   // ltable.c:527
 ** nils and reinserts the elements of the old hash back into the new
 ** parts of the table.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} t Table *
+ * @param {number} newasize unsigned int
+ * @param {number} nhsize unsigned int
+ * @returns {Promise<void>}
+ */
 export async function luaH_resize(L, t, newasize, nhsize) {   // ltable.c:553
     let i = 0, oldasize = 0, newarray = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(56);
@@ -595,6 +704,12 @@ export async function luaH_resize(L, t, newasize, nhsize) {   // ltable.c:553
         await freehash(L, $fp);   /* free old hash part */
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} t Table *
+ * @param {number} nasize unsigned int
+ * @returns {Promise<void>}
+ */
 export async function luaH_resizearray(L, t, nasize) {   // ltable.c:590
     let nsize = 0;
     nsize = $h.u32[(t + 32) >>> 2] === 0 ? 0 : 1 << $h.u8[t + 11];
@@ -603,6 +718,12 @@ export async function luaH_resizearray(L, t, nasize) {   // ltable.c:590
 /*
 ** nums[i] = number of keys 'k' where 2^(i - 1) < k <= 2^i
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} t Table *
+ * @param {number} ek const TValue *
+ * @returns {Promise<void>}
+ */
 async function rehash(L, t, ek) {   // ltable.c:598
     let asize = 0, i = 0, totaluse = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(132);
@@ -630,6 +751,10 @@ async function rehash(L, t, ek) {   // ltable.c:598
 /*
 ** }=============================================================
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} Table *
+ */
 export async function luaH_new(L) {   // ltable.c:626
     let o = 0, t = 0;
     o = await luaC_newobj(L, 5, 56);
@@ -641,11 +766,20 @@ export async function luaH_new(L) {   // ltable.c:626
     await setnodevector(L, t, 0);
     return t;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} t Table *
+ * @returns {Promise<void>}
+ */
 export async function luaH_free(L, t) {   // ltable.c:638
     await freehash(L, t);
     await luaM_free_(L, $h.u32[(t + 16) >>> 2], $c.mulu64(luaH_realasize(t), 16));
     await luaM_free_(L, t, 56);
 }
+/**
+ * @param {number} t Table *
+ * @returns {number} Node *
+ */
 function getfreepos(t) {   // ltable.c:645
     if (!($h.u32[(t + 32) >>> 2] === 0)) {
         while ($h.u32[(t + 32) >>> 2] > $h.u32[(t + 24) >>> 2]) {
@@ -664,6 +798,13 @@ function getfreepos(t) {   // ltable.c:645
 ** put new key in its main position; otherwise (colliding node is in its main
 ** position), new key goes to an empty position.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} t Table *
+ * @param {number} key const TValue *
+ * @param {number} value TValue *
+ * @returns {Promise<void>}
+ */
 async function luaH_newkey(L, t, key, value) {   // ltable.c:665
     let mp = 0, f = 0, io = 0, othern = 0, f$2 = 0, n_ = 0, io_ = 0, io1 = 0, io2 = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(24);
@@ -766,6 +907,11 @@ async function luaH_newkey(L, t, key, value) {   // ltable.c:665
 ** If key is 0 or negative, 'res' will have its higher bit on, so that
 ** if cannot be smaller than alimit.
 */
+/**
+ * @param {number} t Table *
+ * @param {number | bigint} key lua_Integer
+ * @returns {number} const TValue *
+ */
 export function luaH_getint(t, key) {   // ltable.c:745
     let alimit = 0, n = 0, nx = 0;
     alimit = $h.u32[(t + 12) >>> 2];
@@ -796,6 +942,11 @@ export function luaH_getint(t, key) {   // ltable.c:745
 /*
 ** search function for short strings
 */
+/**
+ * @param {number} t Table *
+ * @param {number} key TString *
+ * @returns {number} const TValue *
+ */
 export function luaH_getshortstr(t, key) {   // ltable.c:773
     let n = 0, nx = 0;
     n = $h.u32[(t + 24) >>> 2] + (($h.u32[(key + 12) >>> 2] & ((1 << $h.u8[t + 11]) - 1 | 0) >>> 0) >>> 0 | 0) * 24;
@@ -813,6 +964,11 @@ export function luaH_getshortstr(t, key) {   // ltable.c:773
         }
     }
 }
+/**
+ * @param {number} t Table *
+ * @param {number} key TString *
+ * @returns {number} const TValue *
+ */
 export function luaH_getstr(t, key) {   // ltable.c:789
     let io = 0, x_ = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
@@ -835,6 +991,11 @@ export function luaH_getstr(t, key) {   // ltable.c:789
 /*
 ** main search function
 */
+/**
+ * @param {number} t Table *
+ * @param {number} key const TValue *
+ * @returns {number} const TValue *
+ */
 export function luaH_get(t, key) {   // ltable.c:803
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
     try {
@@ -863,6 +1024,14 @@ export function luaH_get(t, key) {   // ltable.c:803
 ** Beware: when using this function you probably need to check a GC
 ** barrier and invalidate the TM cache.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} t Table *
+ * @param {number} key const TValue *
+ * @param {number} slot const TValue *
+ * @param {number} value TValue *
+ * @returns {Promise<void>}
+ */
 export async function luaH_finishset(L, t, key, slot, value) {   // ltable.c:826
     let io1 = 0, io2 = 0;
     if ($h.u8[slot + 8] === 32) {
@@ -880,11 +1049,25 @@ export async function luaH_finishset(L, t, key, slot, value) {   // ltable.c:826
 ** beware: when using this function you probably need to check a GC
 ** barrier and invalidate the TM cache.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} t Table *
+ * @param {number} key const TValue *
+ * @param {number} value TValue *
+ * @returns {Promise<void>}
+ */
 export async function luaH_set(L, t, key, value) {   // ltable.c:839
     let slot = 0;
     slot = luaH_get(t, key);
     await luaH_finishset(L, t, key, slot, value);
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} t Table *
+ * @param {number | bigint} key lua_Integer
+ * @param {number} value TValue *
+ * @returns {Promise<void>}
+ */
 export async function luaH_setint(L, t, key, value) {   // ltable.c:845
     let p = 0, io = 0, io1 = 0, io2 = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
@@ -920,6 +1103,11 @@ export async function luaH_setint(L, t, key, value) {   // ltable.c:845
 ** boundary. ('j + 1' cannot be a present integer key because it is
 ** not a valid integer in Lua.)
 */
+/**
+ * @param {number} t Table *
+ * @param {number | bigint} j lua_Unsigned
+ * @returns {number | bigint} lua_Unsigned
+ */
 function hash_search(t, j) {   // ltable.c:870
     let i = 0, m = 0;
     if (j === 0) {
@@ -951,6 +1139,12 @@ function hash_search(t, j) {   // ltable.c:870
     }
     return i;
 }
+/**
+ * @param {number} array const TValue *
+ * @param {number} i unsigned int
+ * @param {number} j unsigned int
+ * @returns {number} unsigned int
+ */
 function binsearch(array, i, j) {   // ltable.c:895
     let m = 0;
     while (j - i >>> 0 > 1) {
@@ -996,6 +1190,10 @@ function binsearch(array, i, j) {   // ltable.c:895
 ** (In those cases, the boundary is not inside the array part, and
 ** therefore cannot be used as a new limit.)
 */
+/**
+ * @param {number} t Table *
+ * @returns {number | bigint} lua_Unsigned
+ */
 export function luaH_getn(t) {   // ltable.c:938
     let limit = 0, boundary = 0, boundary$2 = 0;
     limit = $h.u32[(t + 12) >>> 2];

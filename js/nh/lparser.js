@@ -48,9 +48,20 @@ const forbody$forloop = $h.data(8, 4);   // static in forbody()
 ** Priority table for binary operators.
 */
 const priority = $h.data(42, 1);
+/**
+ * @param {number} ls LexState *
+ * @param {number} token int
+ * @returns {Promise<void>}
+ */
 async function error_expected(ls, token) {   // lparser.c:68
     await luaX_syntaxerror(ls, await luaO_pushfstring($h.u32[(ls + 56) >>> 2], $h.lit("%s expected"), await luaX_token2str(ls, token)));
 }
+/**
+ * @param {number} fs FuncState *
+ * @param {number} limit int
+ * @param {number} what const char *
+ * @returns {Promise<void>}
+ */
 async function errorlimit(fs, limit, what) {   // lparser.c:74
     let L = 0, msg = 0, line = 0, where = 0;
     L = $h.u32[($h.u32[(fs + 16) >>> 2] + 56) >>> 2];
@@ -59,6 +70,13 @@ async function errorlimit(fs, limit, what) {   // lparser.c:74
     msg = await luaO_pushfstring(L, $h.lit("too many %s (limit is %d) in %s"), what, limit, where);
     await luaX_syntaxerror($h.u32[(fs + 16) >>> 2], msg);
 }
+/**
+ * @param {number} fs FuncState *
+ * @param {number} v int
+ * @param {number} l int
+ * @param {number} what const char *
+ * @returns {Promise<void>}
+ */
 async function checklimit(fs, v, l, what) {   // lparser.c:87
     if (v > l) {
         await errorlimit(fs, l, what);
@@ -67,6 +85,11 @@ async function checklimit(fs, v, l, what) {   // lparser.c:87
 /*
 ** Test whether next token is 'c'; if so, skip it.
 */
+/**
+ * @param {number} ls LexState *
+ * @param {number} c int
+ * @returns {Promise<number>} int
+ */
 async function testnext(ls, c) {   // lparser.c:95
     if ($h.i32[(ls + 16) >>> 2] === c) {
         await luaX_next(ls);
@@ -78,6 +101,11 @@ async function testnext(ls, c) {   // lparser.c:95
 /*
 ** Check that next token is 'c'.
 */
+/**
+ * @param {number} ls LexState *
+ * @param {number} c int
+ * @returns {Promise<void>}
+ */
 async function check(ls, c) {   // lparser.c:107
     if ($h.i32[(ls + 16) >>> 2] !== c) {
         await error_expected(ls, c);
@@ -86,6 +114,11 @@ async function check(ls, c) {   // lparser.c:107
 /*
 ** Check that next token is 'c' and skip it.
 */
+/**
+ * @param {number} ls LexState *
+ * @param {number} c int
+ * @returns {Promise<void>}
+ */
 async function checknext(ls, c) {   // lparser.c:116
     await check(ls, c);
     await luaX_next(ls);
@@ -95,6 +128,13 @@ async function checknext(ls, c) {   // lparser.c:116
 ** raise an error that the expected 'what' should match a 'who'
 ** in line 'where' (if that is not the current line).
 */
+/**
+ * @param {number} ls LexState *
+ * @param {number} what int
+ * @param {number} who int
+ * @param {number} where int
+ * @returns {Promise<void>}
+ */
 async function check_match(ls, what, who, where) {   // lparser.c:130
     if ((!await testnext(ls, what) ? 1 : 0) !== 0 ? 1 : 0) {
         if (where === $h.i32[(ls + 4) >>> 2]) {   /* all in the same line? */
@@ -104,6 +144,10 @@ async function check_match(ls, what, who, where) {   // lparser.c:130
         }
     }
 }
+/**
+ * @param {number} ls LexState *
+ * @returns {Promise<number>} TString *
+ */
 async function str_checkname(ls) {   // lparser.c:143
     let ts = 0;
     await check(ls, 291 /* TK_NAME */);
@@ -111,18 +155,32 @@ async function str_checkname(ls) {   // lparser.c:143
     await luaX_next(ls);
     return ts;
 }
+/**
+ * @param {number} e expdesc *
+ * @param {number} k expkind
+ * @param {number} i int
+ */
 function init_exp(e, k, i) {   // lparser.c:152
     let $t1;
     $t1 = $h.i32[(e + 16) >>> 2] = -1, $h.i32[(e + 20) >>> 2] = $t1;
     $h.u32[e >>> 2] = k;
     $h.i32[(e + 8) >>> 2] = i;
 }
+/**
+ * @param {number} e expdesc *
+ * @param {number} s TString *
+ */
 function codestring(e, s) {   // lparser.c:159
     let $t1;
     $t1 = $h.i32[(e + 16) >>> 2] = -1, $h.i32[(e + 20) >>> 2] = $t1;
     $h.u32[e >>> 2] = 7;
     $h.stp(e + 8, s);
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} e expdesc *
+ * @returns {Promise<void>}
+ */
 async function codename(ls, e) {   // lparser.c:166
     codestring(e, await str_checkname(ls));
 }
@@ -130,6 +188,12 @@ async function codename(ls, e) {   // lparser.c:166
 ** Register a new local variable in the active 'Proto' (for debug
 ** information).
 */
+/**
+ * @param {number} ls LexState *
+ * @param {number} fs FuncState *
+ * @param {number} varname TString *
+ * @returns {Promise<number>} int
+ */
 async function registerlocalvar(ls, fs, varname) {   // lparser.c:175
     let f = 0, oldsize = 0, $t1, $t2, $t3;
     f = $h.u32[fs >>> 2];
@@ -147,6 +211,11 @@ async function registerlocalvar(ls, fs, varname) {   // lparser.c:175
 ** Create a new local variable with the given 'name'. Return its index
 ** in the function.
 */
+/**
+ * @param {number} ls LexState *
+ * @param {number} name TString *
+ * @returns {Promise<number>} int
+ */
 async function new_localvar(ls, name) {   // lparser.c:193
     let L = 0, fs = 0, dyd = 0, var_ = 0, $t1, $t2;
     L = $h.u32[(ls + 56) >>> 2];
@@ -164,6 +233,11 @@ async function new_localvar(ls, name) {   // lparser.c:193
 ** (Unless noted otherwise, all variables are referred to by their
 ** compiler indices.)
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} vidx int
+ * @returns {number} Vardesc *
+ */
 function getlocalvardesc(fs, vidx) {   // lparser.c:219
     return $h.u32[($h.u32[($h.u32[(fs + 16) >>> 2] + 88) >>> 2]) >>> 2] + ($h.i32[(fs + 56) >>> 2] + vidx | 0) * 24;
 }
@@ -172,6 +246,11 @@ function getlocalvardesc(fs, vidx) {   // lparser.c:219
 ** register. For that, search for the highest variable below that level
 ** that is in a register and uses its register index ('ridx') plus one.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} nvar int
+ * @returns {number} int
+ */
 function reglevel(fs, nvar) {   // lparser.c:229
     let vd = 0, $t1;
     while (($t1 = nvar, nvar = $t1 - 1 | 0, $t1) > 0) {
@@ -186,12 +265,21 @@ function reglevel(fs, nvar) {   // lparser.c:229
 ** Return the number of variables in the register stack for the given
 ** function.
 */
+/**
+ * @param {number} fs FuncState *
+ * @returns {number} int
+ */
 export function luaY_nvarstack(fs) {   // lparser.c:243
     return reglevel(fs, $h.u8[fs + 66]);
 }
 /*
 ** Get the debug-information entry for current variable 'vidx'.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} vidx int
+ * @returns {number} LocVar *
+ */
 function localdebuginfo(fs, vidx) {   // lparser.c:251
     let vd = 0, idx = 0;
     vd = getlocalvardesc(fs, vidx);
@@ -206,6 +294,11 @@ function localdebuginfo(fs, vidx) {   // lparser.c:251
 /*
 ** Create an expression representing variable 'vidx'
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} e expdesc *
+ * @param {number} vidx int
+ */
 function init_var(fs, e, vidx) {   // lparser.c:266
     let $t1, $t2;
     $t1 = $h.i32[(e + 16) >>> 2] = -1, $h.i32[(e + 20) >>> 2] = $t1;
@@ -216,6 +309,11 @@ function init_var(fs, e, vidx) {   // lparser.c:266
 /*
 ** Raises an error if variable described by 'e' is read only
 */
+/**
+ * @param {number} ls LexState *
+ * @param {number} e expdesc *
+ * @returns {Promise<void>}
+ */
 async function check_readonly(ls, e) {   // lparser.c:277
     let fs = 0, varname = 0, vardesc = 0, up = 0, msg = 0;
     fs = $h.u32[(ls + 48) >>> 2];
@@ -253,6 +351,11 @@ async function check_readonly(ls, e) {   // lparser.c:277
 /*
 ** Start the scope for the last 'nvars' created variables.
 */
+/**
+ * @param {number} ls LexState *
+ * @param {number} nvars int
+ * @returns {Promise<void>}
+ */
 async function adjustlocalvars(ls, nvars) {   // lparser.c:311
     let fs = 0, reglevel = 0, i = 0, vidx = 0, var_ = 0, $t1, $t2, $t3, $t4;
     fs = $h.u32[(ls + 48) >>> 2];
@@ -268,6 +371,10 @@ async function adjustlocalvars(ls, nvars) {   // lparser.c:311
 ** Close the scope for all variables up to level 'tolevel'.
 ** (debug info.)
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} tolevel int
+ */
 function removevars(fs, tolevel) {   // lparser.c:328
     let var_ = 0;
     $h.i32[($h.u32[($h.u32[(fs + 16) >>> 2] + 88) >>> 2] + 8) >>> 2] = $h.i32[($h.u32[($h.u32[(fs + 16) >>> 2] + 88) >>> 2] + 8) >>> 2] - ($h.u8[fs + 66] - tolevel | 0) | 0;
@@ -282,6 +389,11 @@ function removevars(fs, tolevel) {   // lparser.c:328
 ** Search the upvalues of the function 'fs' for one
 ** with the given 'name'.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} name TString *
+ * @returns {number} int
+ */
 function searchupvalue(fs, name) {   // lparser.c:342
     let i = 0, up = 0;
     up = $h.u32[($h.u32[fs >>> 2] + 80) >>> 2];
@@ -292,6 +404,10 @@ function searchupvalue(fs, name) {   // lparser.c:342
     }
     return -1;   /* not found */
 }
+/**
+ * @param {number} fs FuncState *
+ * @returns {Promise<number>} Upvaldesc *
+ */
 async function allocupvalue(fs) {   // lparser.c:352
     let f = 0, oldsize = 0, $t1, $t2, $t3;
     f = $h.u32[fs >>> 2];
@@ -303,6 +419,12 @@ async function allocupvalue(fs) {   // lparser.c:352
     }
     return $h.u32[(f + 80) >>> 2] + ($t3 = $h.u8[fs + 67], $h.u8[fs + 67] = $c.u8($t3 + 1), $t3) * 16;
 }
+/**
+ * @param {number} fs FuncState *
+ * @param {number} name TString *
+ * @param {number} v expdesc *
+ * @returns {Promise<number>} int
+ */
 async function newupvalue(fs, name, v) {   // lparser.c:364
     let up = 0, prev = 0, $t1;
     up = await allocupvalue(fs);
@@ -327,6 +449,12 @@ async function newupvalue(fs, name, v) {   // lparser.c:364
 ** function 'fs'. If found, initialize 'var' with it and return
 ** its expression kind; otherwise return -1.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} n TString *
+ * @param {number} var_ expdesc *
+ * @returns {number} int
+ */
 function searchvar(fs, n, var_) {   // lparser.c:390
     let i = 0, vd = 0;
     for (i = $h.u8[fs + 66] - 1 | 0; i >= 0; i = i - 1 | 0) {
@@ -348,6 +476,10 @@ function searchvar(fs, n, var_) {   // lparser.c:390
 ** Mark block where variable at given level was defined
 ** (to emit close instructions later).
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} level int
+ */
 function markupval(fs, level) {   // lparser.c:410
     let bl = 0;
     bl = $h.u32[(fs + 24) >>> 2];
@@ -360,6 +492,9 @@ function markupval(fs, level) {   // lparser.c:410
 /*
 ** Mark that current block has a to-be-closed variable.
 */
+/**
+ * @param {number} fs FuncState *
+ */
 function marktobeclosed(fs) {   // lparser.c:422
     let bl = 0;
     bl = $h.u32[(fs + 24) >>> 2];
@@ -372,6 +507,13 @@ function marktobeclosed(fs) {   // lparser.c:422
 ** this upvalue into all intermediate functions. If it is a global, set
 ** 'var' as 'void' as a flag.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} n TString *
+ * @param {number} var_ expdesc *
+ * @param {number} base int
+ * @returns {Promise<void>}
+ */
 async function singlevaraux(fs, n, var_, base) {   // lparser.c:435
     let v = 0, idx = 0;
     if (fs === 0) {   /* no more levels? */
@@ -404,6 +546,11 @@ async function singlevaraux(fs, n, var_, base) {   // lparser.c:435
 ** Find a variable with the given name 'n', handling global variables
 ** too.
 */
+/**
+ * @param {number} ls LexState *
+ * @param {number} var_ expdesc *
+ * @returns {Promise<void>}
+ */
 async function singlevar(ls, var_) {   // lparser.c:463
     let varname = 0, fs = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(24);
@@ -425,6 +572,13 @@ async function singlevar(ls, var_) {   // lparser.c:463
 ** Adjust the number of results from an expression list 'e' with 'nexps'
 ** expressions to 'nvars' values.
 */
+/**
+ * @param {number} ls LexState *
+ * @param {number} nvars int
+ * @param {number} nexps int
+ * @param {number} e expdesc *
+ * @returns {Promise<void>}
+ */
 async function adjust_assign(ls, nvars, nexps, e) {   // lparser.c:482
     let fs = 0, needed = 0, extra = 0;
     fs = $h.u32[(ls + 48) >>> 2];
@@ -455,6 +609,11 @@ async function adjust_assign(ls, nvars, nexps, e) {   // lparser.c:482
 ** Generates an error that a goto jumps into the scope of some
 ** local variable.
 */
+/**
+ * @param {number} ls LexState *
+ * @param {number} gt Labeldesc *
+ * @returns {Promise<void>}
+ */
 async function jumpscopeerror(ls, gt) {   // lparser.c:514
     let varname = 0, msg = 0;
     varname = $h.u32[(getlocalvardesc($h.u32[(ls + 48) >>> 2], $h.u8[gt + 16]) + 16) >>> 2] + 24;
@@ -467,6 +626,12 @@ async function jumpscopeerror(ls, gt) {   // lparser.c:514
 ** from the list of pending gotos.
 ** If it jumps into the scope of some variable, raises an error.
 */
+/**
+ * @param {number} ls LexState *
+ * @param {number} g int
+ * @param {number} label Labeldesc *
+ * @returns {Promise<void>}
+ */
 async function solvegoto(ls, g, label) {   // lparser.c:527
     let i = 0, gl = 0, gt = 0;
     gl = $h.u32[(ls + 88) >>> 2] + 16;   /* list of gotos */
@@ -484,6 +649,11 @@ async function solvegoto(ls, g, label) {   // lparser.c:527
 /*
 ** Search for an active label with the given name.
 */
+/**
+ * @param {number} ls LexState *
+ * @param {number} name TString *
+ * @returns {number} Labeldesc *
+ */
 function findlabel(ls, name) {   // lparser.c:544
     let i = 0, dyd = 0, lb = 0;
     dyd = $h.u32[(ls + 88) >>> 2];
@@ -499,6 +669,14 @@ function findlabel(ls, name) {   // lparser.c:544
 /*
 ** Adds a new label/goto in the corresponding list.
 */
+/**
+ * @param {number} ls LexState *
+ * @param {number} l Labellist *
+ * @param {number} name TString *
+ * @param {number} line int
+ * @param {number} pc int
+ * @returns {Promise<number>} int
+ */
 async function newlabelentry(ls, l, name, line, pc) {   // lparser.c:560
     let n = 0, $t1;
     n = $h.i32[(l + 8) >>> 2];
@@ -511,6 +689,13 @@ async function newlabelentry(ls, l, name, line, pc) {   // lparser.c:560
     $h.i32[(l + 8) >>> 2] = n + 1 | 0;
     return n;
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} name TString *
+ * @param {number} line int
+ * @param {number} pc int
+ * @returns {Promise<number>} int
+ */
 async function newgotoentry(ls, name, line, pc) {   // lparser.c:575
     return await newlabelentry(ls, $h.u32[(ls + 88) >>> 2] + 16, name, line, pc);
 }
@@ -519,6 +704,11 @@ async function newgotoentry(ls, name, line, pc) {   // lparser.c:575
 ** pending gotos in current block and solves them. Return true
 ** if any of the gotos need to close upvalues.
 */
+/**
+ * @param {number} ls LexState *
+ * @param {number} lb Labeldesc *
+ * @returns {Promise<number>} int
+ */
 async function solvegotos(ls, lb) {   // lparser.c:585
     let gl = 0, i = 0, needsclose = 0;
     gl = $h.u32[(ls + 88) >>> 2] + 16;
@@ -541,6 +731,13 @@ async function solvegotos(ls, lb) {   // lparser.c:585
 ** a close instruction if necessary.
 ** Returns true iff it added a close instruction.
 */
+/**
+ * @param {number} ls LexState *
+ * @param {number} name TString *
+ * @param {number} line int
+ * @param {number} last int
+ * @returns {Promise<number>} int
+ */
 async function createlabel(ls, name, line, last) {   // lparser.c:608
     let fs = 0, ll = 0, l = 0;
     fs = $h.u32[(ls + 48) >>> 2];
@@ -561,6 +758,10 @@ async function createlabel(ls, name, line, last) {   // lparser.c:608
 /*
 ** Adjust pending gotos to outer level of a block.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} bl BlockCnt *
+ */
 function movegotosout(fs, bl) {   // lparser.c:628
     let i = 0, gl = 0, gt = 0;
     gl = $h.u32[($h.u32[(fs + 16) >>> 2] + 88) >>> 2] + 16;
@@ -575,6 +776,11 @@ function movegotosout(fs, bl) {   // lparser.c:628
         $h.u8[gt + 16] = $h.u8[bl + 16];   /* update goto level */
     }
 }
+/**
+ * @param {number} fs FuncState *
+ * @param {number} bl BlockCnt *
+ * @param {number} isloop lu_byte
+ */
 function enterblock(fs, bl, isloop) {   // lparser.c:642
     $h.u8[bl + 18] = isloop;
     $h.u8[bl + 16] = $h.u8[fs + 66];
@@ -589,6 +795,11 @@ function enterblock(fs, bl, isloop) {   // lparser.c:642
 /*
 ** generates an error for an undefined 'goto'.
 */
+/**
+ * @param {number} ls LexState *
+ * @param {number} gt Labeldesc *
+ * @returns {Promise<void>}
+ */
 async function undefgoto(ls, gt) {   // lparser.c:658
     let msg = 0;
     if ($h.u32[gt >>> 2] === await luaS_newlstr($h.u32[(ls + 56) >>> 2], $h.lit("break"), 5)) {
@@ -600,6 +811,10 @@ async function undefgoto(ls, gt) {   // lparser.c:658
     }
     await luaK_semerror(ls, msg);
 }
+/**
+ * @param {number} fs FuncState *
+ * @returns {Promise<void>}
+ */
 async function leaveblock(fs) {   // lparser.c:672
     let bl = 0, ls = 0, hasclose = 0, stklevel = 0;
     bl = $h.u32[(fs + 24) >>> 2];
@@ -628,6 +843,10 @@ async function leaveblock(fs) {   // lparser.c:672
 /*
 ** adds a new prototype into list of prototypes
 */
+/**
+ * @param {number} ls LexState *
+ * @returns {Promise<number>} Proto *
+ */
 async function addprototype(ls) {   // lparser.c:698
     let clp = 0, L = 0, fs = 0, f = 0, oldsize = 0, $t1, $t2, $t3, $t4, $t5;
     L = $h.u32[(ls + 56) >>> 2];
@@ -651,12 +870,22 @@ async function addprototype(ls) {   // lparser.c:698
 ** are in use at that time.
 
 */
+/**
+ * @param {number} ls LexState *
+ * @param {number} v expdesc *
+ * @returns {Promise<void>}
+ */
 async function codeclosure(ls, v) {   // lparser.c:722
     let fs = 0;
     fs = $h.u32[($h.u32[(ls + 48) >>> 2] + 8) >>> 2];
     init_exp(v, 17, await luaK_codeABx(fs, 79, 0, ($h.i32[(fs + 48) >>> 2] - 1 | 0) >>> 0));
     await luaK_exp2nextreg(fs, v);   /* fix it at the last register */
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} fs FuncState *
+ * @param {number} bl BlockCnt *
+ */
 function open_func(ls, fs, bl) {   // lparser.c:729
     let f = 0;
     f = $h.u32[fs >>> 2];
@@ -683,6 +912,10 @@ function open_func(ls, fs, bl) {   // lparser.c:729
     $h.u8[f + 12] = 2;   /* registers 0/1 are always valid */
     enterblock(fs, bl, 0);
 }
+/**
+ * @param {number} ls LexState *
+ * @returns {Promise<void>}
+ */
 async function close_func(ls) {   // lparser.c:756
     let L = 0, fs = 0, f = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
     L = $h.u32[(ls + 56) >>> 2];
@@ -717,6 +950,11 @@ async function close_func(ls) {   // lparser.c:756
 ** 'until' closes syntactical blocks, but do not close scope,
 ** so it is handled in separate.
 */
+/**
+ * @param {number} ls LexState *
+ * @param {number} withuntil int
+ * @returns {number} int
+ */
 function block_follow(ls, withuntil) {   // lparser.c:788
     switch ($h.i32[(ls + 16) >>> 2]) {
         case 259 /* TK_ELSE */:
@@ -730,6 +968,10 @@ function block_follow(ls, withuntil) {   // lparser.c:788
             return 0;
     }
 }
+/**
+ * @param {number} ls LexState *
+ * @returns {Promise<void>}
+ */
 async function statlist(ls) {   // lparser.c:799
     /* statlist -> { stat [';'] } */
     while (!block_follow(ls, 1)) {
@@ -740,6 +982,11 @@ async function statlist(ls) {   // lparser.c:799
         await statement(ls);
     }
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} v expdesc *
+ * @returns {Promise<void>}
+ */
 async function fieldsel(ls, v) {   // lparser.c:811
     let fs = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(24);
@@ -752,6 +999,11 @@ async function fieldsel(ls, v) {   // lparser.c:811
         await luaK_indexed(fs, v, $fp);
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} v expdesc *
+ * @returns {Promise<void>}
+ */
 async function yindex(ls, v) {   // lparser.c:822
     /* index -> '[' expr ']' */
     await luaX_next(ls);   /* skip the '[' */
@@ -759,6 +1011,11 @@ async function yindex(ls, v) {   // lparser.c:822
     await luaK_exp2val($h.u32[(ls + 48) >>> 2], v);
     await checknext(ls, 93);
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} cc ConsControl *
+ * @returns {Promise<void>}
+ */
 async function recfield(ls, cc) {   // lparser.c:847
     let fs = 0, reg = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(72);
@@ -782,6 +1039,11 @@ async function recfield(ls, cc) {   // lparser.c:847
         $h.u8[fs + 68] = $c.u8(reg);   /* free registers */
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} fs FuncState *
+ * @param {number} cc ConsControl *
+ * @returns {Promise<void>}
+ */
 async function closelistfield(fs, cc) {   // lparser.c:867
     if ($h.u32[cc >>> 2] === 0) {
         return;   /* there is no list item */
@@ -794,6 +1056,11 @@ async function closelistfield(fs, cc) {   // lparser.c:867
         $h.i32[(cc + 40) >>> 2] = 0;   /* no more items pending */
     }
 }
+/**
+ * @param {number} fs FuncState *
+ * @param {number} cc ConsControl *
+ * @returns {Promise<void>}
+ */
 async function lastlistfield(fs, cc) {   // lparser.c:879
     if ($h.i32[(cc + 40) >>> 2] === 0) {
         return;
@@ -810,11 +1077,21 @@ async function lastlistfield(fs, cc) {   // lparser.c:879
     }
     $h.i32[(cc + 36) >>> 2] = $h.i32[(cc + 36) >>> 2] + $h.i32[(cc + 40) >>> 2] | 0;
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} cc ConsControl *
+ * @returns {Promise<void>}
+ */
 async function listfield(ls, cc) {   // lparser.c:895
     /* listfield -> exp */
     await expr(ls, cc);
     $h.i32[(cc + 40) >>> 2] = $h.i32[(cc + 40) >>> 2] + 1 | 0;
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} cc ConsControl *
+ * @returns {Promise<void>}
+ */
 async function field(ls, cc) {   // lparser.c:902
     /* field -> listfield | recfield */
     switch ($h.i32[(ls + 16) >>> 2]) {
@@ -840,6 +1117,11 @@ async function field(ls, cc) {   // lparser.c:902
             }
     }
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} t expdesc *
+ * @returns {Promise<void>}
+ */
 async function constructor(ls, t) {   // lparser.c:924
     let fs = 0, line = 0, pc = 0, $t1, $t2;
     const $sp0 = $h.st.sp, $fp = $h.enter(48);
@@ -870,10 +1152,19 @@ async function constructor(ls, t) {   // lparser.c:924
     } finally { $h.st.sp = $sp0; }
 }
 /* }====================================================================== */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} nparams int
+ * @returns {Promise<void>}
+ */
 async function setvararg(fs, nparams) {   // lparser.c:952
     $h.u8[$h.u32[fs >>> 2] + 11] = 1;
     await luaK_codeABCk(fs, 81, nparams, 0, 0, 0);
 }
+/**
+ * @param {number} ls LexState *
+ * @returns {Promise<void>}
+ */
 async function parlist(ls) {   // lparser.c:958
     let fs = 0, f = 0, nparams = 0, isvararg = 0;
     /* parlist -> [ {NAME ','} (NAME | '...') ] */
@@ -909,6 +1200,13 @@ async function parlist(ls) {   // lparser.c:958
     }
     await luaK_reserveregs(fs, $h.u8[fs + 66]);   /* reserve registers for parameters */
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} e expdesc *
+ * @param {number} ismethod int
+ * @param {number} line int
+ * @returns {Promise<void>}
+ */
 async function body(ls, e, ismethod, line) {   // lparser.c:989
     let $t1;
     const $sp0 = $h.st.sp, $fp = $h.enter(96);
@@ -931,6 +1229,11 @@ async function body(ls, e, ismethod, line) {   // lparser.c:989
         await close_func(ls);
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} v expdesc *
+ * @returns {Promise<number>} int
+ */
 async function explist(ls, v) {   // lparser.c:1011
     let n = 0;
     /* explist -> expr { ',' expr } */
@@ -943,6 +1246,11 @@ async function explist(ls, v) {   // lparser.c:1011
     }
     return n;
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} f expdesc *
+ * @returns {Promise<void>}
+ */
 async function funcargs(ls, f) {   // lparser.c:1024
     let fs = 0, base = 0, nparams = 0, line = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(24);
@@ -1005,6 +1313,11 @@ async function funcargs(ls, f) {   // lparser.c:1024
 ** Expression parsing
 ** =======================================================================
 */
+/**
+ * @param {number} ls LexState *
+ * @param {number} v expdesc *
+ * @returns {Promise<void>}
+ */
 async function primaryexp(ls, v) {   // lparser.c:1080
     let line = 0;
     /* primaryexp -> NAME | '(' expr ')' */
@@ -1029,6 +1342,11 @@ async function primaryexp(ls, v) {   // lparser.c:1080
             }
     }
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} v expdesc *
+ * @returns {Promise<void>}
+ */
 async function suffixedexp(ls, v) {   // lparser.c:1102
     let fs = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(48);
@@ -1077,6 +1395,11 @@ async function suffixedexp(ls, v) {   // lparser.c:1102
         }
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} v expdesc *
+ * @returns {Promise<void>}
+ */
 async function simpleexp(ls, v) {   // lparser.c:1139
     let fs = 0;
     /* simpleexp -> FLT | INT | STRING | NIL | TRUE | FALSE | ... |
@@ -1146,6 +1469,10 @@ async function simpleexp(ls, v) {   // lparser.c:1139
     }
     await luaX_next(ls);
 }
+/**
+ * @param {number} op int
+ * @returns {number} UnOpr
+ */
 function getunopr(op) {   // lparser.c:1194
     switch (op) {
         case 270 /* TK_NOT */:
@@ -1160,6 +1487,10 @@ function getunopr(op) {   // lparser.c:1194
             return 4;
     }
 }
+/**
+ * @param {number} op int
+ * @returns {number} BinOpr
+ */
 function getbinopr(op) {   // lparser.c:1205
     switch (op) {
         case 43:
@@ -1213,6 +1544,12 @@ function getbinopr(op) {   // lparser.c:1205
 ** subexpr -> (simpleexp | unop subexpr) { binop subexpr }
 ** where 'binop' is any binary operator with a priority higher than 'limit'
 */
+/**
+ * @param {number} ls LexState *
+ * @param {number} v expdesc *
+ * @param {number} limit int
+ * @returns {Promise<number>} BinOpr
+ */
 async function subexpr(ls, v, limit) {   // lparser.c:1259
     let op = 0, uop = 0, line = 0, nextop = 0, line$2 = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(24);
@@ -1243,6 +1580,11 @@ async function subexpr(ls, v, limit) {   // lparser.c:1259
         return op;   /* return first untreated operator */
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} v expdesc *
+ * @returns {Promise<void>}
+ */
 async function expr(ls, v) {   // lparser.c:1289
     await subexpr(ls, v, 0);
 }
@@ -1252,6 +1594,10 @@ async function expr(ls, v) {   // lparser.c:1289
 ** Rules for Statements
 ** =======================================================================
 */
+/**
+ * @param {number} ls LexState *
+ * @returns {Promise<void>}
+ */
 async function block(ls) {   // lparser.c:1304
     let fs = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(24);
@@ -1269,6 +1615,12 @@ async function block(ls) {   // lparser.c:1304
 ** table. If so, save original upvalue/local value in a safe place and
 ** use this safe copy in the previous assignment.
 */
+/**
+ * @param {number} ls LexState *
+ * @param {number} lh struct LHS_assign *
+ * @param {number} v expdesc *
+ * @returns {Promise<void>}
+ */
 async function check_conflict(ls, lh, v) {   // lparser.c:1330
     let fs = 0, extra = 0, conflict = 0;
     fs = $h.u32[(ls + 48) >>> 2];
@@ -1316,6 +1668,12 @@ async function check_conflict(ls, lh, v) {   // lparser.c:1330
 ** assignment -> suffixedexp restassign
 ** restassign -> ',' suffixedexp restassign | '=' explist
 */
+/**
+ * @param {number} ls LexState *
+ * @param {number} lh struct LHS_assign *
+ * @param {number} nvars int
+ * @returns {Promise<void>}
+ */
 async function restassign(ls, lh, nvars) {   // lparser.c:1374
     let nexps = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(56);
@@ -1352,6 +1710,10 @@ async function restassign(ls, lh, nvars) {   // lparser.c:1374
         await luaK_storevar($h.u32[(ls + 48) >>> 2], lh + 8, $fp);
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} ls LexState *
+ * @returns {Promise<number>} int
+ */
 async function cond(ls) {   // lparser.c:1405
     const $sp0 = $h.st.sp, $fp = $h.enter(24);
     try {
@@ -1364,6 +1726,10 @@ async function cond(ls) {   // lparser.c:1405
         return $h.i32[($fp + 20) >>> 2];
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} ls LexState *
+ * @returns {Promise<void>}
+ */
 async function gotostat(ls) {   // lparser.c:1415
     let fs = 0, line = 0, name = 0, lb = 0, lblevel = 0;
     fs = $h.u32[(ls + 48) >>> 2];
@@ -1388,6 +1754,10 @@ async function gotostat(ls) {   // lparser.c:1415
 /*
 ** Break statement. Semantically equivalent to "goto break".
 */
+/**
+ * @param {number} ls LexState *
+ * @returns {Promise<void>}
+ */
 async function breakstat(ls) {   // lparser.c:1437
     let line = 0;
     line = $h.i32[(ls + 4) >>> 2];
@@ -1397,6 +1767,11 @@ async function breakstat(ls) {   // lparser.c:1437
 /*
 ** Check whether there is already a label with the given 'name'.
 */
+/**
+ * @param {number} ls LexState *
+ * @param {number} name TString *
+ * @returns {Promise<void>}
+ */
 async function checkrepeated(ls, name) {   // lparser.c:1447
     let lb = 0, msg = 0;
     lb = findlabel(ls, name);
@@ -1407,6 +1782,12 @@ async function checkrepeated(ls, name) {   // lparser.c:1447
         await luaK_semerror(ls, msg);   /* error */
     }
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} name TString *
+ * @param {number} line int
+ * @returns {Promise<void>}
+ */
 async function labelstat(ls, name, line) {   // lparser.c:1457
     /* label -> '::' NAME '::' */
     await checknext(ls, 287 /* TK_DBCOLON */);   /* skip double colon */
@@ -1416,6 +1797,11 @@ async function labelstat(ls, name, line) {   // lparser.c:1457
     await checkrepeated(ls, name);   /* check for repeated labels */
     await createlabel(ls, name, line, block_follow(ls, 0));
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} line int
+ * @returns {Promise<void>}
+ */
 async function whilestat(ls, line) {   // lparser.c:1467
     let fs = 0, whileinit = 0, condexit = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(24);
@@ -1434,6 +1820,11 @@ async function whilestat(ls, line) {   // lparser.c:1467
         await luaK_patchtohere(fs, condexit);   /* false conditions finish the loop */
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} line int
+ * @returns {Promise<void>}
+ */
 async function repeatstat(ls, line) {   // lparser.c:1486
     let condexit = 0, fs = 0, repeat_init = 0, exit = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(48);
@@ -1465,6 +1856,10 @@ async function repeatstat(ls, line) {   // lparser.c:1486
 ** stack slot.
 **
 */
+/**
+ * @param {number} ls LexState *
+ * @returns {Promise<void>}
+ */
 async function exp1(ls) {   // lparser.c:1516
     const $sp0 = $h.st.sp, $fp = $h.enter(24);
     try {
@@ -1478,6 +1873,13 @@ async function exp1(ls) {   // lparser.c:1516
 ** (Jump addresses are relative in Lua). 'back' true means
 ** a back jump.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} pc int
+ * @param {number} dest int
+ * @param {number} back int
+ * @returns {Promise<void>}
+ */
 async function fixforjump(fs, pc, dest, back) {   // lparser.c:1529
     let jmp = 0, offset = 0;
     jmp = $h.u32[($h.u32[fs >>> 2] + 64) >>> 2] + pc * 4;
@@ -1493,6 +1895,14 @@ async function fixforjump(fs, pc, dest, back) {   // lparser.c:1529
 /*
 ** Generate code for a 'for' loop.
 */
+/**
+ * @param {number} ls LexState *
+ * @param {number} base int
+ * @param {number} line int
+ * @param {number} nvars int
+ * @param {number} isgen int
+ * @returns {Promise<void>}
+ */
 async function forbody(ls, base, line, nvars, isgen) {   // lparser.c:1543
     let fs = 0, prep = 0, endfor = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(24);
@@ -1517,6 +1927,12 @@ async function forbody(ls, base, line, nvars, isgen) {   // lparser.c:1543
         await luaK_fixline(fs, line);
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} varname TString *
+ * @param {number} line int
+ * @returns {Promise<void>}
+ */
 async function fornum(ls, varname, line) {   // lparser.c:1568
     let fs = 0, base = 0;
     /* fornum -> NAME = exp,exp[,exp] forbody */
@@ -1540,6 +1956,11 @@ async function fornum(ls, varname, line) {   // lparser.c:1568
     await adjustlocalvars(ls, 3);   /* control variables */
     await forbody(ls, base, line, 1, 0);
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} indexname TString *
+ * @returns {Promise<void>}
+ */
 async function forlist(ls, indexname) {   // lparser.c:1591
     let fs = 0, nvars = 0, line = 0, base = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(24);
@@ -1568,6 +1989,11 @@ async function forlist(ls, indexname) {   // lparser.c:1591
         await forbody(ls, base, line, nvars - 4 | 0, 1);
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} line int
+ * @returns {Promise<void>}
+ */
 async function forstat(ls, line) {   // lparser.c:1619
     let fs = 0, varname = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(24);
@@ -1592,6 +2018,11 @@ async function forstat(ls, line) {   // lparser.c:1619
         await leaveblock(fs);   /* loop scope ('break' jumps to this point) */
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} escapelist int *
+ * @returns {Promise<void>}
+ */
 async function test_then_block(ls, escapelist) {   // lparser.c:1637
     let fs = 0, jf = 0, line = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(48);
@@ -1633,6 +2064,11 @@ async function test_then_block(ls, escapelist) {   // lparser.c:1637
         await luaK_patchtohere(fs, jf);
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} line int
+ * @returns {Promise<void>}
+ */
 async function ifstat(ls, line) {   // lparser.c:1674
     let fs = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(4);
@@ -1651,6 +2087,10 @@ async function ifstat(ls, line) {   // lparser.c:1674
         await luaK_patchtohere(fs, $h.i32[$fp >>> 2]);   /* patch escape list to 'if' end */
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} ls LexState *
+ * @returns {Promise<void>}
+ */
 async function localfunc(ls) {   // lparser.c:1688
     let fs = 0, fvar = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(24);
@@ -1664,6 +2104,10 @@ async function localfunc(ls) {   // lparser.c:1688
         $h.i32[(localdebuginfo(fs, fvar) + 8) >>> 2] = $h.i32[(fs + 32) >>> 2];
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} ls LexState *
+ * @returns {Promise<number>} int
+ */
 async function getlocalattribute(ls) {   // lparser.c:1700
     let attr = 0;
     /* ATTRIB -> ['<' Name '>'] */
@@ -1680,6 +2124,11 @@ async function getlocalattribute(ls) {   // lparser.c:1700
     }
     return 0;   /* regular variable */
 }
+/**
+ * @param {number} fs FuncState *
+ * @param {number} level int
+ * @returns {Promise<void>}
+ */
 async function checktoclose(fs, level) {   // lparser.c:1717
     if (level !== -1) {
         /* is there a to-be-closed variable? */
@@ -1687,6 +2136,10 @@ async function checktoclose(fs, level) {   // lparser.c:1717
         await luaK_codeABCk(fs, 55, reglevel(fs, level), 0, 0, 0);
     }
 }
+/**
+ * @param {number} ls LexState *
+ * @returns {Promise<void>}
+ */
 async function localstat(ls) {   // lparser.c:1725
     let fs = 0, toclose = 0, var_ = 0, vidx = 0, kind = 0, nvars = 0, nexps = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(24);
@@ -1731,6 +2184,11 @@ async function localstat(ls) {   // lparser.c:1725
         await checktoclose(fs, toclose);
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} v expdesc *
+ * @returns {Promise<number>} int
+ */
 async function funcname(ls, v) {   // lparser.c:1767
     let ismethod = 0;
     /* funcname -> NAME {fieldsel} [':' NAME] */
@@ -1745,6 +2203,11 @@ async function funcname(ls, v) {   // lparser.c:1767
     }
     return ismethod;
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} line int
+ * @returns {Promise<void>}
+ */
 async function funcstat(ls, line) {   // lparser.c:1781
     let ismethod = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(48);
@@ -1758,6 +2221,10 @@ async function funcstat(ls, line) {   // lparser.c:1781
         await luaK_fixline($h.u32[(ls + 48) >>> 2], line);   /* definition "happens" in the first line */
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} ls LexState *
+ * @returns {Promise<void>}
+ */
 async function exprstat(ls) {   // lparser.c:1794
     let fs = 0, inst = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(32);
@@ -1781,6 +2248,10 @@ async function exprstat(ls) {   // lparser.c:1794
         }
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} ls LexState *
+ * @returns {Promise<void>}
+ */
 async function retstat(ls) {   // lparser.c:1812
     let fs = 0, nret = 0, first = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(24);
@@ -1815,6 +2286,10 @@ async function retstat(ls) {   // lparser.c:1812
         await testnext(ls, 59);   /* skip optional semicolon */
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} ls LexState *
+ * @returns {Promise<void>}
+ */
 async function statement(ls) {   // lparser.c:1844
     let line = 0, $t1;
     line = $h.i32[(ls + 4) >>> 2];   /* may be needed for error messages */
@@ -1918,6 +2393,11 @@ async function statement(ls) {   // lparser.c:1844
 ** compiles the main function, which is a regular vararg function with an
 ** upvalue named LUA_ENV
 */
+/**
+ * @param {number} ls LexState *
+ * @param {number} fs FuncState *
+ * @returns {Promise<void>}
+ */
 async function mainfunc(ls, fs) {   // lparser.c:1923
     let env = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(24);
@@ -1936,6 +2416,15 @@ async function mainfunc(ls, fs) {   // lparser.c:1923
         await close_func(ls);
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} z ZIO *
+ * @param {number} buff Mbuffer *
+ * @param {number} dyd Dyndata *
+ * @param {number} name const char *
+ * @param {number} firstchar int
+ * @returns {Promise<number>} LClosure *
+ */
 export async function luaY_parser(L, z, buff, dyd, name, firstchar) {   // lparser.c:1941
     let cl = 0, io = 0, x_ = 0, io$2 = 0, x_$2 = 0, $t1, $t2, $t3, $t4, $t5, $t6;
     const $sp0 = $h.st.sp, $fp = $h.enter(184);

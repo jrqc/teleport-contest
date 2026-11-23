@@ -42,6 +42,10 @@ import { luaV_tointegerns } from './lvm.js';
 
 const strlocal = $h.data(6, 1);
 const strupval = $h.data(8, 1);
+/**
+ * @param {number} ci CallInfo *
+ * @returns {number} int
+ */
 function currentpc(ci) {   // ldebug.c:44
     0;
     return $c.i32(($h.u32[(ci + 32) >>> 2] - $h.u32[($h.u32[($h.u32[($h.u32[ci >>> 2]) >>> 2] + 24) >>> 2] + 64) >>> 2]) / 4) - 1 | 0;
@@ -59,6 +63,12 @@ function currentpc(ci) {   // ldebug.c:44
 ** value for MAXIWTHABS or smaller. (Previous releases use a little
 ** smaller value.)
 */
+/**
+ * @param {number} f const Proto *
+ * @param {number} pc int
+ * @param {number} basepc int *
+ * @returns {number} int
+ */
 function getbaseline(f, pc, basepc) {   // ldebug.c:63
     let i = 0;
     if ($h.i32[(f + 40) >>> 2] === 0 || pc < $h.i32[($h.u32[(f + 96) >>> 2]) >>> 2]) {
@@ -80,6 +90,11 @@ function getbaseline(f, pc, basepc) {   // ldebug.c:63
 ** first gets a base line and from there does the increments until
 ** the desired instruction.
 */
+/**
+ * @param {number} f const Proto *
+ * @param {number} pc int
+ * @returns {number} int
+ */
 export function luaG_getfuncline(f, pc) {   // ldebug.c:86
     let baseline = 0, $t1;
     const $sp0 = $h.st.sp, $fp = $h.enter(4);
@@ -97,6 +112,10 @@ export function luaG_getfuncline(f, pc) {   // ldebug.c:86
         }
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} ci CallInfo *
+ * @returns {number} int
+ */
 function getcurrentline(ci) {   // ldebug.c:101
     return luaG_getfuncline($h.u32[($h.u32[($h.u32[ci >>> 2]) >>> 2] + 24) >>> 2], currentpc(ci));
 }
@@ -111,6 +130,9 @@ function getcurrentline(ci) {   // ldebug.c:101
 ** temporarily broken while inserting a new element. We simply assume it
 ** has no good reasons to do that.)
 */
+/**
+ * @param {number} ci CallInfo *
+ */
 function settraps(ci) {   // ldebug.c:117
     for (; ci !== 0; ci = $h.u32[(ci + 16) >>> 2]) {
         if (!($h.u16[(ci + 62) >>> 1] & 2)) {
@@ -128,6 +150,12 @@ function settraps(ci) {   // ldebug.c:117
 ** for all platforms where it runs). Moreover, 'hook' is always checked
 ** before being called (see 'luaD_hook').
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} func lua_Hook
+ * @param {number} mask int
+ * @param {number} count int
+ */
 export function lua_sethook(L, func, mask, count) {   // ldebug.c:134
     if (func === 0 || mask === 0) {
         /* turn off hooks? */
@@ -142,15 +170,33 @@ export function lua_sethook(L, func, mask, count) {   // ldebug.c:134
         settraps($h.u32[(L + 32) >>> 2]);   /* to trace inside 'luaV_execute' */
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {number} lua_Hook
+ */
 export function lua_gethook(L) {   // ldebug.c:148
     return $h.u32[(L + 160) >>> 2];
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {number} int
+ */
 export function lua_gethookmask(L) {   // ldebug.c:153
     return $h.i32[(L + 192) >>> 2];
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {number} int
+ */
 export function lua_gethookcount(L) {   // ldebug.c:158
     return $h.i32[(L + 184) >>> 2];
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} level int
+ * @param {number} ar lua_Debug *
+ * @returns {number} int
+ */
 export function lua_getstack(L, level, ar) {   // ldebug.c:163
     let status = 0, ci = 0;
     if (level < 0) {
@@ -170,6 +216,11 @@ export function lua_getstack(L, level, ar) {   // ldebug.c:163
     0;
     return status;
 }
+/**
+ * @param {number} p const Proto *
+ * @param {number} uv int
+ * @returns {number} const char *
+ */
 function upvalname(p, uv) {   // ldebug.c:180
     let s = 0;
     s = $h.u32[($h.u32[(p + 80) >>> 2] + uv * 16) >>> 2];
@@ -179,6 +230,12 @@ function upvalname(p, uv) {   // ldebug.c:180
         return s + 24;
     }
 }
+/**
+ * @param {number} ci CallInfo *
+ * @param {number} n int
+ * @param {number} pos StkId *
+ * @returns {number} const char *
+ */
 function findvararg(ci, n, pos) {   // ldebug.c:187
     let nextra = 0;
     if ($h.u8[$h.u32[($h.u32[($h.u32[ci >>> 2]) >>> 2] + 24) >>> 2] + 11]) {
@@ -191,6 +248,13 @@ function findvararg(ci, n, pos) {   // ldebug.c:187
     }
     return 0;   /* no such vararg */
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} ci CallInfo *
+ * @param {number} n int
+ * @param {number} pos StkId *
+ * @returns {number} const char *
+ */
 export function luaG_findlocal(L, ci, n, pos) {   // ldebug.c:199
     let base = 0, name = 0, limit = 0;
     base = $h.u32[ci >>> 2] + 16;
@@ -218,6 +282,12 @@ export function luaG_findlocal(L, ci, n, pos) {   // ldebug.c:199
     }
     return name;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} ar const lua_Debug *
+ * @param {number} n int
+ * @returns {number} const char *
+ */
 export function lua_getlocal(L, ar, n) {   // ldebug.c:223
     let name = 0, io1 = 0, io2 = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
@@ -254,6 +324,12 @@ export function lua_getlocal(L, ar, n) {   // ldebug.c:223
         return name;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} ar const lua_Debug *
+ * @param {number} n int
+ * @returns {number} const char *
+ */
 export function lua_setlocal(L, ar, n) {   // ldebug.c:245
     let name = 0, io1 = 0, io2 = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
@@ -276,6 +352,10 @@ export function lua_setlocal(L, ar, n) {   // ldebug.c:245
         return name;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} ar lua_Debug *
+ * @param {number} cl Closure *
+ */
 function funcinfo(ar, cl) {   // ldebug.c:259
     let p = 0;
     if (!(cl !== 0 && $h.u8[cl + 8] === 6)) {
@@ -299,6 +379,12 @@ function funcinfo(ar, cl) {   // ldebug.c:259
     }
     luaO_chunkid(ar + 68, $h.u32[(ar + 32) >>> 2], $h.ldu64(ar + 40));
 }
+/**
+ * @param {number} p const Proto *
+ * @param {number} currentline int
+ * @param {number} pc int
+ * @returns {number} int
+ */
 function nextline(p, currentline, pc) {   // ldebug.c:285
     if ($h.i8[$h.u32[(p + 88) >>> 2] + pc] !== -128) {
         return currentline + $h.i8[$h.u32[(p + 88) >>> 2] + pc] | 0;
@@ -306,6 +392,11 @@ function nextline(p, currentline, pc) {   // ldebug.c:285
         return luaG_getfuncline(p, pc);
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} f Closure *
+ * @returns {Promise<void>}
+ */
 async function collectvalidlines(L, f) {   // ldebug.c:293
     let p = 0, currentline = 0, t = 0, io = 0, x_ = 0, i = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
@@ -351,6 +442,12 @@ async function collectvalidlines(L, f) {   // ldebug.c:293
         }
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} ci CallInfo *
+ * @param {number} name const char **
+ * @returns {number} const char *
+ */
 function getfuncname(L, ci, name) {   // ldebug.c:324
     /* calling function is a known function? */
     if (ci !== 0 && !($h.u16[(ci + 62) >>> 1] & 32)) {
@@ -359,6 +456,14 @@ function getfuncname(L, ci, name) {   // ldebug.c:324
         return 0;   /* no way to find a name */
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} what const char *
+ * @param {number} ar lua_Debug *
+ * @param {number} f Closure *
+ * @param {number} ci CallInfo *
+ * @returns {number} int
+ */
 function auxgetinfo(L, what, ar, f, ci) {   // ldebug.c:332
     let status = 0, $t1, $t2, $t3;
     status = 1;
@@ -420,6 +525,12 @@ function auxgetinfo(L, what, ar, f, ci) {   // ldebug.c:332
     }
     return status;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} what const char *
+ * @param {number} ar lua_Debug *
+ * @returns {Promise<number>} int
+ */
 export async function lua_getinfo(L, what, ar) {   // ldebug.c:388
     let status = 0, cl = 0, ci = 0, func = 0, io1 = 0, io2 = 0;
     0;
@@ -461,6 +572,11 @@ export async function lua_getinfo(L, what, ar) {   // ldebug.c:388
 ** Symbolic Execution
 ** =======================================================
 */
+/**
+ * @param {number} pc int
+ * @param {number} jmptarget int
+ * @returns {number} int
+ */
 function filterpc(pc, jmptarget) {   // ldebug.c:426
     if (pc < jmptarget) {   /* is code conditional (inside a jump)? */
         return -1;   /* cannot know who sets that register */
@@ -471,6 +587,12 @@ function filterpc(pc, jmptarget) {   // ldebug.c:426
 /*
 ** Try to find last instruction before 'lastpc' that modified register 'reg'.
 */
+/**
+ * @param {number} p const Proto *
+ * @param {number} lastpc int
+ * @param {number} reg int
+ * @returns {number} int
+ */
 function findsetreg(p, lastpc, reg) {   // ldebug.c:436
     let pc = 0, setreg = 0, jmptarget = 0, i = 0, op = 0, a = 0, change = 0, b = 0, b$2 = 0, dest = 0;
     setreg = -1;   /* keep last instruction that changed 'reg' */
@@ -530,6 +652,12 @@ function findsetreg(p, lastpc, reg) {   // ldebug.c:436
 /*
 ** Find a "name" for the constant 'c'.
 */
+/**
+ * @param {number} p const Proto *
+ * @param {number} index int
+ * @param {number} name const char **
+ * @returns {number} const char *
+ */
 function kname(p, index, name) {   // ldebug.c:485
     let kvalue = 0;
     kvalue = $h.u32[(p + 56) >>> 2] + index * 16;
@@ -541,6 +669,13 @@ function kname(p, index, name) {   // ldebug.c:485
         return 0;
     }
 }
+/**
+ * @param {number} p const Proto *
+ * @param {number} ppc int *
+ * @param {number} reg int
+ * @param {number} name const char **
+ * @returns {number} const char *
+ */
 function basicgetobjname(p, ppc, reg, name) {   // ldebug.c:498
     let pc = 0, i = 0, op = 0, b = 0, $t1, $t2, $t3;
     pc = $h.i32[ppc >>> 2];
@@ -581,6 +716,12 @@ function basicgetobjname(p, ppc, reg, name) {   // ldebug.c:498
 /*
 ** Find a "name" for the register 'c'.
 */
+/**
+ * @param {number} p const Proto *
+ * @param {number} pc$in int
+ * @param {number} c int
+ * @param {number} name const char **
+ */
 function rname(p, pc$in, c, name) {   // ldebug.c:532
     let what = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(4);
@@ -595,6 +736,12 @@ function rname(p, pc$in, c, name) {   // ldebug.c:532
 /*
 ** Find a "name" for a 'C' value in an RK instruction.
 */
+/**
+ * @param {number} p const Proto *
+ * @param {number} pc int
+ * @param {number} i Instruction
+ * @param {number} name const char **
+ */
 function rkname(p, pc, i, name) {   // ldebug.c:542
     let c = 0;
     c = (i >>> 24 & 255) >>> 0 | 0;   /* key index */
@@ -612,6 +759,13 @@ function rkname(p, pc, i, name) {   // ldebug.c:542
 ** that name is the name of a local variable (and not, for instance,
 ** a string). Then check that, if there is a name, it is '_ENV'.
 */
+/**
+ * @param {number} p const Proto *
+ * @param {number} pc$in int
+ * @param {number} i Instruction
+ * @param {number} isup int
+ * @returns {number} const char *
+ */
 function isEnv(p, pc$in, i, isup) {   // ldebug.c:558
     let t = 0, what = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
@@ -634,6 +788,13 @@ function isEnv(p, pc$in, i, isup) {   // ldebug.c:558
 /*
 ** Extend 'basicgetobjname' to handle table accesses
 */
+/**
+ * @param {number} p const Proto *
+ * @param {number} lastpc$in int
+ * @param {number} reg int
+ * @param {number} name const char **
+ * @returns {number} const char *
+ */
 function getobjname(p, lastpc$in, reg, name) {   // ldebug.c:575
     let kind = 0, i = 0, op = 0, k = 0, k$2 = 0, k$3 = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(4);
@@ -688,6 +849,13 @@ function getobjname(p, lastpc$in, reg, name) {   // ldebug.c:575
 ** Returns what the name is (e.g., "for iterator", "method",
 ** "metamethod") and sets '*name' to point to the name.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} p const Proto *
+ * @param {number} pc int
+ * @param {number} name const char **
+ * @returns {number} const char *
+ */
 function funcnamefromcode(L, p, pc, name) {   // ldebug.c:620
     let tm = 0, i = 0;
     tm = 0;   /* (initial value avoids warnings) */
@@ -762,6 +930,12 @@ function funcnamefromcode(L, p, pc, name) {   // ldebug.c:620
 /*
 ** Try to find a name for a function based on how it was called.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} ci CallInfo *
+ * @param {number} name const char **
+ * @returns {number} const char *
+ */
 function funcnamefromcall(L, ci, name) {   // ldebug.c:664
     if ($h.u16[(ci + 62) >>> 1] & 8) {
         /* was it called inside a hook? */
@@ -784,6 +958,11 @@ function funcnamefromcall(L, ci, name) {   // ldebug.c:664
 ** not point to a value in this stack, we cannot compare it with the
 ** region boundaries (undefined behavior in ISO C).
 */
+/**
+ * @param {number} ci CallInfo *
+ * @param {number} o const TValue *
+ * @returns {number} int
+ */
 function instack(ci, o) {   // ldebug.c:690
     let pos = 0, base = 0;
     base = $h.u32[ci >>> 2] + 16;
@@ -799,6 +978,12 @@ function instack(ci, o) {   // ldebug.c:690
 ** with instructions OP_GETTABUP/OP_SETTABUP, which operate directly on
 ** upvalues.)
 */
+/**
+ * @param {number} ci CallInfo *
+ * @param {number} o const TValue *
+ * @param {number} name const char **
+ * @returns {number} const char *
+ */
 function getupvalname(ci, o, name) {   // ldebug.c:706
     let c = 0, i = 0, $t1;
     c = $h.u32[($h.u32[ci >>> 2]) >>> 2];
@@ -810,6 +995,12 @@ function getupvalname(ci, o, name) {   // ldebug.c:706
     }
     return 0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} kind const char *
+ * @param {number} name const char *
+ * @returns {Promise<number>} const char *
+ */
 async function formatvarinfo(L, kind, name) {   // ldebug.c:720
     if (kind === 0) {
         return $h.lit("");   /* no information */
@@ -821,6 +1012,11 @@ async function formatvarinfo(L, kind, name) {   // ldebug.c:720
 ** Build a string with a "description" for the value 'o', such as
 ** "variable 'x'" or "upvalue 'y'".
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} o const TValue *
+ * @returns {Promise<number>} const char *
+ */
 async function varinfo(L, o) {   // ldebug.c:732
     let ci = 0, kind = 0, reg = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
@@ -844,6 +1040,13 @@ async function varinfo(L, o) {   // ldebug.c:732
 /*
 ** Raise a type error
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} o const TValue *
+ * @param {number} op const char *
+ * @param {number} extra const char *
+ * @returns {Promise<void>}
+ */
 async function typeerror(L, o, op, extra) {   // ldebug.c:751
     let t = 0;
     t = await luaT_objtypename(L, o);
@@ -853,6 +1056,12 @@ async function typeerror(L, o, op, extra) {   // ldebug.c:751
 ** Raise a type error with "standard" information about the faulty
 ** object 'o' (using 'varinfo').
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} o const TValue *
+ * @param {number} op const char *
+ * @returns {Promise<void>}
+ */
 export async function luaG_typeerror(L, o, op) {   // ldebug.c:762
     await typeerror(L, o, op, await varinfo(L, o));
 }
@@ -861,6 +1070,11 @@ export async function luaG_typeerror(L, o, op) {   // ldebug.c:762
 ** for the object based on how it was called ('funcnamefromcall'); if it
 ** cannot get a name there, try 'varinfo'.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} o const TValue *
+ * @returns {Promise<void>}
+ */
 export async function luaG_callerror(L, o) {   // ldebug.c:772
     let ci = 0, kind = 0, extra = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
@@ -872,15 +1086,34 @@ export async function luaG_callerror(L, o) {   // ldebug.c:772
         await typeerror(L, o, $h.lit("call"), extra);
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} o const TValue *
+ * @param {number} what const char *
+ * @returns {Promise<void>}
+ */
 export async function luaG_forerror(L, o, what) {   // ldebug.c:781
     await luaG_runerror(L, $h.lit("bad 'for' %s (number expected, got %s)"), what, await luaT_objtypename(L, o));
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} p1 const TValue *
+ * @param {number} p2 const TValue *
+ * @returns {Promise<void>}
+ */
 export async function luaG_concaterror(L, p1, p2) {   // ldebug.c:787
     if (($h.u8[p1 + 8] & 15) === 4 || ($h.u8[p1 + 8] & 15) === 3) {
         p1 = p2;
     }
     await luaG_typeerror(L, p1, $h.lit("concatenate"));
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} p1 const TValue *
+ * @param {number} p2 const TValue *
+ * @param {number} msg const char *
+ * @returns {Promise<void>}
+ */
 export async function luaG_opinterror(L, p1, p2, msg) {   // ldebug.c:793
     if (!(($h.u8[p1 + 8] & 15) === 3)) {   /* first operand is wrong? */
         p2 = p1;   /* now second is wrong */
@@ -890,6 +1123,12 @@ export async function luaG_opinterror(L, p1, p2, msg) {   // ldebug.c:793
 /*
 ** Error when both values are convertible to numbers, but not to integers
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} p1 const TValue *
+ * @param {number} p2 const TValue *
+ * @returns {Promise<void>}
+ */
 export async function luaG_tointerror(L, p1, p2) {   // ldebug.c:804
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
     try {
@@ -899,6 +1138,12 @@ export async function luaG_tointerror(L, p1, p2) {   // ldebug.c:804
         await luaG_runerror(L, $h.lit("number%s has no integer representation"), await varinfo(L, p2));
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} p1 const TValue *
+ * @param {number} p2 const TValue *
+ * @returns {Promise<void>}
+ */
 export async function luaG_ordererror(L, p1, p2) {   // ldebug.c:812
     let t1 = 0, t2 = 0;
     t1 = await luaT_objtypename(L, p1);
@@ -910,6 +1155,13 @@ export async function luaG_ordererror(L, p1, p2) {   // ldebug.c:812
     }
 }
 /* add src:line information to 'msg' */
+/**
+ * @param {number} L lua_State *
+ * @param {number} msg const char *
+ * @param {number} src TString *
+ * @param {number} line int
+ * @returns {Promise<number>} const char *
+ */
 export async function luaG_addinfo(L, msg, src, line) {   // ldebug.c:823
     const $sp0 = $h.st.sp, $fp = $h.enter(60);
     try {
@@ -923,6 +1175,10 @@ export async function luaG_addinfo(L, msg, src, line) {   // ldebug.c:823
         return await luaO_pushfstring(L, $h.lit("%s:%d: %s"), $fp, line, msg);
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<void>}
+ */
 export async function luaG_errormsg(L) {   // ldebug.c:835
     let errfunc = 0, io1 = 0, io2 = 0, io1$2 = 0, io2$2 = 0;
     if ($h.ld64(L + 168) !== 0) {
@@ -950,6 +1206,12 @@ export async function luaG_errormsg(L) {   // ldebug.c:835
     }
     await luaD_throw(L, 2);
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} fmt const char *
+ * @param {...*} $va the C variable arguments (...)
+ * @returns {Promise<void>}
+ */
 export async function luaG_runerror(L, fmt, ...$va) {   // ldebug.c:848
     let ci = 0, msg = 0, argp = null, io1 = 0, io2 = 0;
     ci = $h.u32[(L + 32) >>> 2];
@@ -987,6 +1249,12 @@ export async function luaG_runerror(L, fmt, ...$va) {   // ldebug.c:848
 ** too far apart, there is a good chance of a ABSLINEINFO in the way,
 ** so it goes directly to 'luaG_getfuncline'.
 */
+/**
+ * @param {number} p const Proto *
+ * @param {number} oldpc int
+ * @param {number} newpc int
+ * @returns {number} int
+ */
 function changedline(p, oldpc, newpc) {   // ldebug.c:873
     let delta = 0, pc = 0, lineinfo = 0;
     if ($h.u32[(p + 88) >>> 2] === 0) {   /* no debug information? */
@@ -1019,6 +1287,10 @@ function changedline(p, oldpc, newpc) {   // ldebug.c:873
 ** a line/count hook before the call hook. Functions coming from
 ** an yield already called 'luaD_hookcall' before yielding.)
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 export async function luaG_tracecall(L) {   // ldebug.c:902
     let ci = 0, p = 0;
     ci = $h.u32[(L + 32) >>> 2];
@@ -1046,6 +1318,11 @@ export async function luaG_tracecall(L) {   // ldebug.c:902
 ** This function is not "Protected" when called, so it should correct
 ** 'L->top.p' before calling anything that can run the GC.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} pc const Instruction *
+ * @returns {Promise<number>} int
+ */
 export async function luaG_traceexec(L, pc) {   // ldebug.c:928
     let ci = 0, mask = 0, p = 0, counthook = 0, oldpc = 0, npci = 0, newline = 0;
     ci = $h.u32[(L + 32) >>> 2];

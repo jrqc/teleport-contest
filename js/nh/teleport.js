@@ -95,6 +95,10 @@ const dotelecmd$tports = $c.recArray($T.tporttypes, 4);   // static in dotelecmd
 const level_tele$get_there_from = new Int8Array(19);   // static in level_tele()
 let tele_trap$in_tele_trap = 0;   // static in tele_trap()
 /* does monster block others from teleporting? */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number} boolean
+ */
 function m_blocks_teleporting(mtmp) {   // teleport.c:21
     if (is_dlord(mtmp.data) || is_dprince(mtmp.data)) {
         return TRUE;
@@ -102,6 +106,10 @@ function m_blocks_teleporting(mtmp) {   // teleport.c:21
     return FALSE;
 }
 /* teleporting is prevented on this level for this monster? */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<number>} boolean
+ */
 export async function noteleport_level(mon) {   // teleport.c:30
     /* demon court in Gehennom prevent others from teleporting */
     if (In_hell(u.uz) && !(is_dlord(mon.data) || is_dprince(mon.data))) {
@@ -123,6 +131,12 @@ export async function noteleport_level(mon) {   // teleport.c:30
 /* this is an approximation of onscary() that doesn't use any 'struct monst'
    fields aside from 'monst->data'; used primarily for new monster creation
    and monster teleport destination, not for ordinary monster movement */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$T.permonst | null} mptr struct permonst *
+ * @returns {number} boolean
+ */
 function goodpos_onscary(x, y, mptr) {   // teleport.c:53
     /* onscary() checks Angels and lawful minions; this oversimplifies */
     if (mptr.mlet === S.HUMAN || mptr.mlet === S.ANGEL || is_rider(mptr) || unique_corpstat(mptr)) {
@@ -154,6 +168,13 @@ function goodpos_onscary(x, y, mptr) {   // teleport.c:53
  *
  * This function will only look at mtmp->mdat, so makemon, mplayer, etc can
  * call it to generate new monster positions with fake monster structures.
+ */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} gpflags mmflags_nht
+ * @returns {number} boolean
  */
 export function goodpos(x, y, mtmp, gpflags) {   // teleport.c:86
     let mdat = null, ignorewater = 0, ignorelava = 0, checkscary = 0, allow_u = 0, avoid_monpos = 0, mtmp2 = null;
@@ -252,12 +273,35 @@ export function goodpos(x, y, mtmp, gpflags) {   // teleport.c:86
  * If there is more than one valid position in the ring, choose one randomly.
  * Return TRUE and the position chosen when successful, FALSE otherwise.
  */
+/**
+ * @param {$T.nhcoord | null} cc coord *
+ * @param {number} xx coordxy
+ * @param {number} yy coordxy
+ * @param {$T.permonst | null} mdat struct permonst *
+ * @returns {Promise<number>} boolean
+ */
 export async function enexto(cc, xx, yy, mdat) {   // teleport.c:196
     return $c.i8(await enexto_core(cc, xx, yy, mdat, GP.CHECKSCARY) || await enexto_core(cc, xx, yy, mdat, NO.MM_FLAGS) ? 1 : 0);
 }
+/**
+ * @param {$T.nhcoord | null} cc coord *
+ * @param {number} xx coordxy
+ * @param {number} yy coordxy
+ * @param {$T.permonst | null} mdat struct permonst *
+ * @param {number} entflags mmflags_nht
+ * @returns {Promise<number>} boolean
+ */
 export async function enexto_gpflags(cc, xx, yy, mdat, entflags) {   // teleport.c:206
     return $c.i8(await enexto_core(cc, xx, yy, mdat, $c.u32($c.or64(GP.CHECKSCARY, entflags))) || await enexto_core(cc, xx, yy, mdat, entflags) ? 1 : 0);
 }
+/**
+ * @param {$T.nhcoord | null} cc coord *
+ * @param {number} xx coordxy
+ * @param {number} yy coordxy
+ * @param {$T.permonst | null} mdat struct permonst *
+ * @param {number} entflags mmflags_nht
+ * @returns {Promise<number>} boolean
+ */
 export async function enexto_core(cc, xx, yy, mdat, entflags) {   // teleport.c:219
     let candy = $c.recArray($T.nhcoord, 1659), i = 0, nearcandyct = 0, allcandyct = 0, fakemon = new $T.monst(), allow_xx_yy = 0, save_plnmsg = 0, save_plnmsg$2 = 0;
     /* output; <cc.x,cc.y> as close as feasible to <xx,yy> */
@@ -347,6 +391,13 @@ export async function enexto_core(cc, xx, yy, mdat, entflags) {   // teleport.c:
  * need to be augmented to allow deliberate passage in wizard mode, but
  * only for explicitly chosen destinations.)
  */
+/**
+ * @param {number} x1 coordxy
+ * @param {number} y1 coordxy
+ * @param {number} x2 coordxy
+ * @param {number} y2 coordxy
+ * @returns {number} boolean
+ */
 function tele_jump_ok(x1, y1, x2, y2) {   // teleport.c:386
     if (!isok(x2, y2)) {
         return FALSE;
@@ -372,6 +423,12 @@ function tele_jump_ok(x1, y1, x2, y2) {   // teleport.c:386
     }
     return TRUE;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} trapok boolean
+ * @returns {Promise<number>} boolean
+ */
 async function teleok(x, y, trapok) {   // teleport.c:420
     let trap = null;
     if (!trapok) {
@@ -400,6 +457,12 @@ async function teleok(x, y, trapok) {   // teleport.c:420
     }
     return TRUE;
 }
+/**
+ * @param {number} nux coordxy
+ * @param {number} nuy coordxy
+ * @param {number} teleds_flags int
+ * @returns {Promise<void>}
+ */
 export async function teleds(nux, nuy, teleds_flags) {   // teleport.c:448
     let was_swallowed = 0, ball_active = 0, ball_still_in_range = 0, allow_drag = 0, is_teleport = 0, vault_guard = null, bc_control = Int32Array.of(0), ballx = Int16Array.of(0), bally = Int16Array.of(0), chainx = Int16Array.of(0), chainy = Int16Array.of(0), cause_delay = Int8Array.of(0), save_urooms = new Int8Array(5);
     ball_still_in_range = FALSE;
@@ -527,6 +590,15 @@ export async function teleds(nux, nuy, teleds_flags) {   // teleport.c:448
 }
 /* make a list of coordinates in expanding distance from <cx,cy>;
    return value is number of coordinates inserted into ccc[]  */
+/**
+ * @param {$T.nhcoord | null} ccc coord *
+ * @param {number} cx coordxy
+ * @param {number} cy coordxy
+ * @param {number} maxradius int
+ * @param {number} cc_flags unsigned int
+ * @param {Function | null} filter boolean (*)(coordxy, coordxy)
+ * @returns {Promise<number>} int
+ */
 export async function collect_coords(ccc, cx, cy, maxradius, cc_flags, filter) {   // teleport.c:578
     let x = 0, y = 0, lox = 0, hix = 0, loy = 0, hiy = 0, radius = 0, rowrange = 0, colrange = 0, k = 0, n = 0, cc = new $T.nhcoord(), passcc = null, newpass = 0, passend = 0, include_cxcy = 0, scramble = 0, ring_pairs = 0, skip_mons = 0, skip_inaccessible = 0, result = 0, save_plnmsg = 0, $t1;
     /* pointer to array of at least size ROWNO*(COLNO-1) */
@@ -676,6 +748,10 @@ export async function collect_coords(ccc, cx, cy, maxradius, cc_flags, filter) {
     return result;
 }
 /* [try to] teleport hero to a safe spot */
+/**
+ * @param {number} teleds_flags int
+ * @returns {Promise<number>} boolean
+ */
 export async function safe_teleds(teleds_flags) {   // teleport.c:717
     let nux = 0, nuy = 0, cc_flags = 0, candy = $c.recArray($T.nhcoord, 1659), backupspot = new $T.nhcoord(), tcnt = 0, candycount = 0, $t1;
     /*
@@ -725,6 +801,9 @@ export async function safe_teleds(teleds_flags) {   // teleport.c:717
     }
     return FALSE;
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function vault_tele() {   // teleport.c:773
     let croom = null, c = new $T.nhcoord();
     croom = search_special(VAULT);
@@ -734,6 +813,11 @@ async function vault_tele() {   // teleport.c:773
     }
     await tele();
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} force_it boolean
+ * @returns {Promise<number>} boolean
+ */
 export async function teleport_pet(mtmp, force_it) {   // teleport.c:786
     let otmp = null, $goto = null;
     if ($c.peq(mtmp, u.usteed)) {
@@ -772,6 +856,9 @@ export async function teleport_pet(mtmp, force_it) {   // teleport.c:786
     return TRUE;
 }
 /* teleport to random pet, if valid location next to it */
+/**
+ * @returns {Promise<void>}
+ */
 export async function tele_to_rnd_pet() {   // teleport.c:814
     let mtmp = null, pet = null, cnt = 0, tx = 0, ty = 0;
     pet = null;
@@ -797,10 +884,17 @@ export async function tele_to_rnd_pet() {   // teleport.c:814
     }
 }
 /* teleport the hero via some method other than scroll of teleport */
+/**
+ * @returns {Promise<void>}
+ */
 export async function tele() {   // teleport.c:842
     await scrolltele(null);
 }
 /* teleport the hero; usually discover scroll of teleportation if via scroll */
+/**
+ * @param {$T.obj | null} scroll struct obj *
+ * @returns {Promise<void>}
+ */
 export async function scrolltele(scroll) {   // teleport.c:849
     let cc = new $T.nhcoord(), whobuf = new Int8Array(256), $t1;
     /* Disable teleportation in stronghold && Vlad's Tower */
@@ -868,6 +962,9 @@ export async function scrolltele(scroll) {   // teleport.c:849
     await safe_teleds(TELEDS.TELEPORT);
 }
 /* the #teleport command; 'm ^T' == choose among several teleport modes */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dotelecmd() {   // teleport.c:919
     let save_HTele = 0, save_ETele = 0, res = 0, added = 0, hidden = 0, ignore_restrictions = 0, picks = [null], any = new $T.any(), win = 0, i = 0, tmode = 0, clr = 0, $t1, $t2;
     ignore_restrictions = FALSE;
@@ -952,6 +1049,10 @@ export async function dotelecmd() {   // teleport.c:919
     }
     return res ? ECMD.TIME : ECMD.OK;
 }
+/**
+ * @param {number} break_the_rules boolean
+ * @returns {Promise<number>} int
+ */
 export async function dotele(break_the_rules) {   // teleport.c:1034
     let trap = null, cantdoit = null, trap_once = 0, castit = 0, energy = 0, knownsp = 0, $t1;
     /* True: wizard mode ^T */
@@ -1062,6 +1163,9 @@ export async function dotele(break_the_rules) {   // teleport.c:1034
     }
     return 1;
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function level_tele() {   // teleport.c:1165
     let newlev = 0, newlevel = new $T.d_level(), escape_by_flying = null, buf = new Int8Array(256), force_dest = 0, qbuf = new Int8Array(256), trycnt = 0, destlev = Int8Array.of(0), destdnum = Int16Array.of(0), amu = null, llimit = 0, lsav = new $T.d_level(), qbranch = null, deepest = 0, $goto = null, $t1, $t2, $t3;
     D1: for (;;) {
@@ -1324,6 +1428,10 @@ export async function level_tele() {   // teleport.c:1165
     /* in case player just read a scroll and is about to be asked to
        call it something, we can't defer until the end of the turn */
 }
+/**
+ * @param {$T.trap | null} ttmp struct trap *
+ * @returns {Promise<void>}
+ */
 export async function domagicportal(ttmp) {   // teleport.c:1444
     let target_level = new $T.d_level(), totype = 0, stunmsg = null;
     stunmsg = null;
@@ -1361,6 +1469,10 @@ export async function domagicportal(ttmp) {   // teleport.c:1444
     }
     await schedule_goto(target_level, totype, stunmsg, null);
 }
+/**
+ * @param {$T.trap | null} trap struct trap *
+ * @returns {Promise<void>}
+ */
 export async function tele_trap(trap) {   // teleport.c:1492
     let cc = new $T.nhcoord(), mtmp = null;
     /* a fixed-destination teleport trap could theoretically place hero onto a
@@ -1402,6 +1514,11 @@ export async function tele_trap(trap) {   // teleport.c:1492
     }
     tele_trap$in_tele_trap = FALSE;
 }
+/**
+ * @param {$T.trap | null} trap struct trap *
+ * @param {number} trflags unsigned int
+ * @returns {Promise<void>}
+ */
 export async function level_tele_trap(trap, trflags) {   // teleport.c:1538
     let verbbuf = new Int8Array(256), intentional = 0;
     intentional = FALSE;
@@ -1436,6 +1553,12 @@ export async function level_tele_trap(trap, trflags) {   // teleport.c:1538
     }
 }
 /* check whether monster can arrive at location <x,y> via Tport (or fall) */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number} boolean
+ */
 function rloc_pos_ok(x, y, mtmp) {   // teleport.c:1575
     let xx = 0, yy = 0;
     /* coordinates of candidate location */
@@ -1492,6 +1615,13 @@ function rloc_pos_ok(x, y, mtmp) {   // teleport.c:1575
  * levels.monsters array.  However, if oldx is 0, oldy may still have
  * a value because mtmp is a migrating_mon.  Worm tails are always
  * placed randomly around the head of the worm.
+ */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} rlocflags unsigned int
+ * @returns {Promise<void>}
  */
 async function rloc_to_core(mtmp, x, y, rlocflags) {   // teleport.c:1645
     let oldx = 0, oldy = 0, resident_shk = 0, preventmsg = 0, vanishmsg = 0, appearmsg = 0, domsg = 0, telemsg = 0, du = 0, olddu = 0, next = null, nearu = null, otmp = null, shkp = null, peaceful = 0;
@@ -1600,12 +1730,30 @@ async function rloc_to_core(mtmp, x, y, rlocflags) {   // teleport.c:1645
         await mintrap(mtmp, NO_TRAP_FLAGS);
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function rloc_to(mtmp, x, y) {   // teleport.c:1771
     await rloc_to_core(mtmp, x, y, RLOC.NOMSG);
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} rlocflags unsigned int
+ * @returns {Promise<void>}
+ */
 export async function rloc_to_flag(mtmp, x, y, rlocflags) {   // teleport.c:1777
     await rloc_to_core(mtmp, x, y, rlocflags);
 }
+/**
+ * @param {number} isladder boolean
+ * @param {number} up boolean
+ * @returns {$T.stairway | null} stairway *
+ */
 function stairway_find_forwiz(isladder, up) {   // teleport.c:1786
     let stway = null;
     stway = gs.stairs;
@@ -1616,6 +1764,11 @@ function stairway_find_forwiz(isladder, up) {   // teleport.c:1786
 }
 /* place a monster at a random location, typically due to teleport;
    return TRUE if successful, FALSE if not; rlocflags is RLOC_foo flags */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} rlocflags unsigned int
+ * @returns {Promise<number>} boolean
+ */
 export async function rloc(mtmp, rlocflags) {   // teleport.c:1799
     let cc = new $T.nhcoord(), backupcc = new $T.nhcoord(), candy = $c.recArray($T.nhcoord, 1659), cc_flags = 0, x = 0, y = 0, trycount = 0, i = 0, j = 0, candycount = 0, stway = null, $t1;
     /* mtmp->mx==0 implies migrating monster arrival */
@@ -1708,6 +1861,13 @@ export async function rloc(mtmp, rlocflags) {   // teleport.c:1799
     return TRUE;
 }
 /* let wizard-mode player choose a teleporting monster's destination */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.nhcoord | null} cc_p coord *
+ * @param {number} rlocflags unsigned int
+ * @param {number} via_rloc boolean
+ * @returns {Promise<number>} boolean
+ */
 export async function control_mon_tele(mon, cc_p, rlocflags, via_rloc) {   // teleport.c:1899
     let tcbuf = new Int8Array(256);
     /* input: default spot; output: player selected spot */
@@ -1737,6 +1897,10 @@ export async function control_mon_tele(mon, cc_p, rlocflags, via_rloc) {   // te
     await pline($c.lit("%s destination."), via_rloc ? $c.lit("Picking random") : $c.lit("Using derived"));
     return FALSE;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 async function mvault_tele(mtmp) {   // teleport.c:1937
     let croom = null, c = new $T.nhcoord();
     croom = search_special(VAULT);
@@ -1746,6 +1910,10 @@ async function mvault_tele(mtmp) {   // teleport.c:1937
     }
     await rloc(mtmp, RLOC.NONE);
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<number>} boolean
+ */
 export async function tele_restrict(mon) {   // teleport.c:1950
     if (await noteleport_level(mon)) {
         if (canseemon(mon)) {
@@ -1755,6 +1923,12 @@ export async function tele_restrict(mon) {   // teleport.c:1950
     }
     return FALSE;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.trap | null} trap struct trap *
+ * @param {number} in_sight int
+ * @returns {Promise<void>}
+ */
 export async function mtele_trap(mtmp, trap, in_sight) {   // teleport.c:1962
     let monname = null;
     /* don't print feedback here: a monster stepping on a trap and not
@@ -1793,6 +1967,13 @@ export async function mtele_trap(mtmp, trap, in_sight) {   // teleport.c:1962
     }
 }
 /* return Trap_Effect_Finished if still on level, Trap_Moved_Mon if not */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.trap | null} trap struct trap *
+ * @param {number} force_it boolean
+ * @param {number} in_sight int
+ * @returns {Promise<number>} int
+ */
 export async function mlevel_tele_trap(mtmp, trap, force_it, in_sight) {   // teleport.c:2006
     let tt = 0, tolevel = new $T.d_level(), migrate_typ = 0, nlev = 0;
     tt = trap ? trap.ttyp | 0 : NO_TRAP;
@@ -1870,6 +2051,10 @@ export async function mlevel_tele_trap(mtmp, trap, force_it, in_sight) {   // te
     return Trap.Effect_Finished;
 }
 /* place object randomly, returns False if it's gone (eg broken) */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} boolean
+ */
 export async function rloco(obj) {   // teleport.c:2102
     let tx = 0, ty = 0, otx = 0, oty = 0, restricted_fall = 0, try_limit = 0, shkp = null, objinshop = 0, onboundary = 0, h = 0, oo = 0, hinshop = 0;
     try_limit = 4000;
@@ -1937,6 +2122,9 @@ export async function rloco(obj) {   // teleport.c:2102
     return TRUE;
 }
 /* Returns an absolute depth */
+/**
+ * @returns {number} int
+ */
 export function random_teleport_level() {   // teleport.c:2191
     let nlev = 0, max_depth = 0, min_depth = 0, cur_depth = 0, bottom = 0, qlocate_depth = 0;
     cur_depth = depth(u.uz);
@@ -2007,6 +2195,11 @@ export function random_teleport_level() {   // teleport.c:2191
 }
 /* you teleport a monster (via wand, spell, or poly'd q.mechanic attack);
    return false iff the attempt fails */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} give_feedback boolean
+ * @returns {Promise<number>} boolean
+ */
 export async function u_teleport_mon(mtmp, give_feedback) {   // teleport.c:2263
     let cc = new $T.nhcoord();
     if (svl.level.flags.stasis_until >= svm.moves) {

@@ -56,11 +56,23 @@ const MAX_CLOUD_SIZE = 150;
 
 const callbacks = $c.nulls(2);
 /* Should be inlined. */
+/**
+ * @param {$T.nhrect | null} r NhRect *
+ * @param {number} x int
+ * @param {number} y int
+ * @returns {number} boolean
+ */
 export function inside_rect(r, x, y) {   // region.c:54
     return $c.i8(x >= r.lx && x <= r.hx && y >= r.ly && y <= r.hy ? 1 : 0);
 }
 /*
  * Check if a point is inside a region.
+ */
+/**
+ * @param {$T.NhRegion | null} reg NhRegion *
+ * @param {number} x int
+ * @param {number} y int
+ * @returns {number} boolean
  */
 export function inside_region(reg, x, y) {   // region.c:63
     let i = 0;
@@ -76,6 +88,11 @@ export function inside_region(reg, x, y) {   // region.c:63
 }
 /*
  * Create a region. It does not activate it.
+ */
+/**
+ * @param {$T.nhrect | null} rects NhRect *
+ * @param {number} nrect int
+ * @returns {Promise<$T.NhRegion | null>} NhRegion *
  */
 export async function create_region(rects, nrect) {   // region.c:79
     let i = 0, reg = null, $t1;
@@ -130,6 +147,11 @@ export async function create_region(rects, nrect) {   // region.c:79
 /*
  * Add rectangle to region.
  */
+/**
+ * @param {$T.NhRegion | null} reg NhRegion *
+ * @param {$T.nhrect | null} rect NhRect *
+ * @returns {Promise<void>}
+ */
 export async function add_rect_to_reg(reg, rect) {   // region.c:133
     let tmp_rect = null;
     tmp_rect = $c.asRec(await alloc($c.u32($c.mulu64($c.u64(reg.nrects + 1 | 0), 8))), $T.nhrect, 8);
@@ -157,6 +179,11 @@ export async function add_rect_to_reg(reg, rect) {   // region.c:133
 /*
  * Add a monster to the region
  */
+/**
+ * @param {$T.NhRegion | null} reg NhRegion *
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<void>}
+ */
 export async function add_mon_to_reg(reg, mon) {   // region.c:161
     let i = 0, tmp_m = null, $t1;
     /* if this is a long worm, it might already be present in the region;
@@ -183,6 +210,10 @@ export async function add_mon_to_reg(reg, mon) {   // region.c:161
 /*
  * Remove a monster from the region list (it left or died...)
  */
+/**
+ * @param {$T.NhRegion | null} reg NhRegion *
+ * @param {$T.monst | null} mon struct monst *
+ */
 export function remove_mon_from_reg(reg, mon) {   // region.c:192
     let i = 0;
     for (i = 0; i < reg.n_monst; i = i + 1 | 0) {
@@ -197,6 +228,11 @@ export function remove_mon_from_reg(reg, mon) {   // region.c:192
  * Check if a monster is inside the region.
  * It's probably quicker to check with the region internal list
  * than to check for coordinates.
+ */
+/**
+ * @param {$T.NhRegion | null} reg NhRegion *
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {number} boolean
  */
 export function mon_in_region(reg, mon) {   // region.c:210
     let i = 0;
@@ -218,6 +254,9 @@ export function mon_in_region(reg, mon) {   // region.c:210
 /*
  * Free mem from region.
  */
+/**
+ * @param {$T.NhRegion | null} reg NhRegion *
+ */
 export function free_region(reg) {   // region.c:263
     if (reg) {
         if (reg.rects) {
@@ -238,6 +277,10 @@ export function free_region(reg) {   // region.c:263
 /*
  * Add a region to the list.
  * This actually activates the region.
+ */
+/**
+ * @param {$T.NhRegion | null} reg NhRegion *
+ * @returns {Promise<void>}
  */
 export async function add_region(reg) {   // region.c:284
     let tmp_reg = null, i = 0, j = 0, mtmp = null, is_inside = 0, $t1;
@@ -290,6 +333,10 @@ export async function add_region(reg) {   // region.c:284
 }
 /*
  * Remove a region from the list & free it.
+ */
+/**
+ * @param {$T.NhRegion | null} reg NhRegion *
+ * @returns {Promise<void>}
  */
 export async function remove_region(reg) {   // region.c:344
     let i = 0, x = 0, y = 0, pass = 0, tmp_uinwater = 0;
@@ -358,6 +405,9 @@ export function clear_regions() {   // region.c:394
  * It makes the regions age, if necessary and calls the appropriate
  * callbacks when needed.
  */
+/**
+ * @returns {Promise<void>}
+ */
 export async function run_regions() {   // region.c:414
     let i = 0, j = 0, k = 0, f_indx = 0, mtmp = null;
     /* reset some messaging variables */
@@ -414,6 +464,11 @@ export async function run_regions() {   // region.c:414
 /*
  * check whether player enters/leaves one or more regions.
  */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} boolean
+ */
 export async function in_out_region(x, y) {   // region.c:480
     let i = 0, f_indx = 0;
     f_indx = 0;
@@ -462,6 +517,12 @@ export async function in_out_region(x, y) {   // region.c:480
 }
 /*
  * check whether a monster enters/leaves one or more regions.
+ */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} boolean
  */
 export async function m_in_out_region(mon, x, y) {   // region.c:533
     let i = 0, f_indx = 0;
@@ -519,6 +580,10 @@ export function update_player_regions() {   // region.c:582
 /*
  * Ditto for a specified monster.
  */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<void>}
+ */
 export async function update_monster_region(mon) {   // region.c:598
     let i = 0;
     for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
@@ -544,12 +609,19 @@ export async function update_monster_region(mon) {   // region.c:598
  */
 /*0*/
 /* per-turn damage inflicted by visible region; hides details from caller */
+/**
+ * @param {$T.NhRegion | null} reg NhRegion *
+ * @returns {number} int
+ */
 export function reg_damg(reg) {   // region.c:651
     let damg = 0;
     damg = !reg.visible || reg.ttl === -2 ? 0 : reg.arg.a_int;
     return damg;
 }
 /* check whether current level has any visible regions */
+/**
+ * @returns {number} boolean
+ */
 export function any_visible_region() {   // region.c:660
     let i = 0;
     for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
@@ -561,6 +633,10 @@ export function any_visible_region() {   // region.c:660
     return FALSE;
 }
 /* for the wizard mode #timeout command */
+/**
+ * @param {number} win winid
+ * @returns {Promise<void>}
+ */
 export async function visible_region_summary(win) {   // region.c:674
     let reg = null, buf = new Int8Array(256), typbuf = new Int8Array(128), i = 0, damg = 0, hdr_done = 0, fldsep = null, $t1;
     hdr_done = 0;
@@ -598,6 +674,11 @@ export async function visible_region_summary(win) {   // region.c:674
  * Check if a spot is under a visible region (eg: gas cloud).
  * Returns NULL if not, otherwise returns region.
  */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {$T.NhRegion | null} NhRegion *
+ */
 export function visible_region_at(x, y) {   // region.c:718
     let i = 0;
     for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
@@ -610,11 +691,21 @@ export function visible_region_at(x, y) {   // region.c:718
     }
     return null;
 }
+/**
+ * @param {$T.NhRegion | null} reg NhRegion *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function show_region(reg, x, y) {   // region.c:732
     await show_glyph(x, y, reg.glyph);
 }
 /**
  * save_regions :
+ */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
  */
 export async function save_regions(nhfp) {   // region.c:741
     let r = null, i = 0, j = 0, n = Uint32Array.of(0);
@@ -667,6 +758,10 @@ export async function save_regions(nhfp) {   // region.c:741
     }
 }
 /* !SFCTOOL */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 export async function rest_regions(nhfp) {   // region.c:799
     let r = null, i = 0, j = 0, n = Uint32Array.of(0), tmstamp = [0], msg_buf = null, ghostly = 0, $t1, $t2, $t3, $t4;
     n[0] = 0;
@@ -761,6 +856,12 @@ export async function rest_regions(nhfp) {   // region.c:799
     /* !SFCTOOL */
 }
 /* to support '#stats' wizard-mode command */
+/**
+ * @param {$c.Ptr | null} hdrfmt const char *
+ * @param {$c.Ptr | null} hdrbuf char *
+ * @param {*} count long *
+ * @param {*} size long *
+ */
 export function region_stats(hdrfmt, hdrbuf, count, size) {   // region.c:899
     let rg = null, i = 0, $t1, $t2;
     /* other stats formats take one parameter; this takes two */
@@ -781,6 +882,9 @@ export function region_stats(hdrfmt, hdrbuf, count, size) {   // region.c:899
     /* ? */
 }
 /* update monster IDs for region being loaded from bones; `ghostly' implied */
+/**
+ * @param {$T.NhRegion | null} reg NhRegion *
+ */
 function reset_region_mids(reg) {   // region.c:928
     let i = 0, n = 0, mid_list = null, $t1;
     i = 0;
@@ -824,6 +928,11 @@ function reset_region_mids(reg) {   // region.c:928
  * region life after some mods...
  */
 /*ARGSUSED*/
+/**
+ * @param {*} p1 genericptr_t
+ * @param {*} p2 genericptr_t
+ * @returns {number} boolean
+ */
 export function expire_gas_cloud(p1, p2) {   // region.c:1046
     let reg = null, damage = 0, pass = 0, x = 0, y = 0;
     reg = $c.asRec(p1, $T.NhRegion, 96);
@@ -863,6 +972,11 @@ export function expire_gas_cloud(p1, p2) {   // region.c:1046
     return TRUE;   /* OK, it's gone, you can free it! */
 }
 /* returns True if p2 is killed by region p1, False otherwise */
+/**
+ * @param {*} p1 genericptr_t
+ * @param {*} p2 genericptr_t
+ * @returns {Promise<number>} boolean
+ */
 export async function inside_gas_cloud(p1, p2) {   // region.c:1091
     let reg = null, mtmp = null, umon = null, dam = 0, $t1;
     reg = $c.asRec(p1, $T.NhRegion, 96);
@@ -942,6 +1056,9 @@ export async function inside_gas_cloud(p1, p2) {   // region.c:1091
     }
     return FALSE;   /* Monster is still alive */
 }
+/**
+ * @returns {number} boolean
+ */
 function is_hero_inside_gas_cloud() {   // region.c:1168
     let i = 0;
     for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
@@ -953,6 +1070,12 @@ function is_hero_inside_gas_cloud() {   // region.c:1168
 }
 /* details of gas cloud creation which are common to create_gas_cloud()
    and create_gas_cloud_selection() */
+/**
+ * @param {$T.NhRegion | null} cloud NhRegion *
+ * @param {number} damage int
+ * @param {number} inside_cloud boolean
+ * @returns {Promise<void>}
+ */
 async function make_gas_cloud(cloud, damage, inside_cloud) {   // region.c:1182
     let $t1;
     if (!gi.in_mklev && !svc.context.mon_moving) {
@@ -977,6 +1100,13 @@ async function make_gas_cloud(cloud, damage, inside_cloud) {   // region.c:1182
  * breadth-first search.
  * cloudsize is the number of squares the cloud will attempt to fill.
  * damage is how much it deals to afflicted creatures. */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} cloudsize int
+ * @param {number} damage int
+ * @returns {Promise<$T.NhRegion | null>} NhRegion *
+ */
 export async function create_gas_cloud(x, y, cloudsize, damage) {   // region.c:1213
     let cloud = null, i = 0, j = 0, tmprect = new $T.nhrect(), xcoords = new Int16Array(150), ycoords = new Int16Array(150), curridx = 0, newidx = 0, inside_cloud = 0, xx = 0, yy = 0, dirs = $c.recArray($T.nhcoord, 4), swapidx = 0, tmp = new $T.nhcoord(), nvalid = 0, dx = 0, dy = 0, isunpicked = 0, $t1, $t2, $t3;
     /* store visited coords */
@@ -1069,6 +1199,11 @@ export async function create_gas_cloud(x, y, cloudsize, damage) {   // region.c:
     return cloud;
 }
 /* create a single gas cloud from selection */
+/**
+ * @param {$T.selectionvar | null} sel struct selectionvar *
+ * @param {number} damage int
+ * @returns {Promise<$T.NhRegion | null>} NhRegion *
+ */
 export async function create_gas_cloud_selection(sel, damage) {   // region.c:1313
     let cloud = null, tmprect = new $T.nhrect(), x = 0, y = 0, r = new $T.nhrect(), inside_cloud = 0, $t1, $t2;
     r.$copyFrom(cg.zeroNhRect);
@@ -1088,6 +1223,9 @@ export async function create_gas_cloud_selection(sel, damage) {   // region.c:13
     return cloud;
 }
 /* for checking troubles during prayer; is hero at risk? */
+/**
+ * @returns {number} boolean
+ */
 export function region_danger() {   // region.c:1341
     let i = 0, f_indx = 0, n = 0;
     n = 0;
@@ -1115,6 +1253,9 @@ export function region_danger() {   // region.c:1341
 }
 /* for fixing trouble at end of prayer;
    danger detected at start of prayer might have expired by now */
+/**
+ * @returns {Promise<void>}
+ */
 export async function region_safety() {   // region.c:1368
     let r = null, i = 0, f_indx = 0, n = 0, $t1;
     r = null;

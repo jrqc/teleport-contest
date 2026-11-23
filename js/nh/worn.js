@@ -84,6 +84,11 @@ export function recalc_telepat_range() {   // worn.c:50
     }
 }
 /* Updated to use the extrinsic and blocked fields. */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number | bigint} mask long
+ * @returns {Promise<void>}
+ */
 export async function setworn(obj, mask) {   // worn.c:73
     let wp = null, oobj = null, p = 0;
     if ($c.and64(mask, W.ARM | I_SPECIAL) === (W.ARM | I_SPECIAL)) {
@@ -159,6 +164,10 @@ export async function setworn(obj, mask) {   // worn.c:73
 }
 /* called e.g. when obj is destroyed */
 /* Updated to use the extrinsic and blocked fields. */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function setnotworn(obj) {   // worn.c:150
     let wp = null, p = 0, unworn = 0;
     unworn = 0;
@@ -210,6 +219,10 @@ export function allunworn() {   // worn.c:188
     }
 }
 /* return item worn in slot indicated by wornmask; needed by poly_obj() */
+/**
+ * @param {number | bigint} wornmask long
+ * @returns {$T.obj | null} struct obj *
+ */
 export function wearmask_to_obj(wornmask) {   // worn.c:206
     let wp = null;
     for (wp = $c.relem(worn, 0); wp.w_mask; wp = $c.radd(wp, 1)) {
@@ -220,6 +233,10 @@ export function wearmask_to_obj(wornmask) {   // worn.c:206
     return null;
 }
 /* convert an armor wornmask to corresponding category */
+/**
+ * @param {number | bigint} mask long
+ * @returns {number} int
+ */
 export function wornmask_to_armcat(mask) {   // worn.c:218
     let cat = 0;
     cat = 0;
@@ -249,6 +266,10 @@ export function wornmask_to_armcat(mask) {   // worn.c:218
     return cat;
 }
 /* convert an armor category to corresponding wornmask */
+/**
+ * @param {number} cat int
+ * @returns {number | bigint} long
+ */
 export function armcat_to_wornmask(cat) {   // worn.c:250
     let mask = 0;
     mask = 0;
@@ -278,6 +299,10 @@ export function armcat_to_wornmask(cat) {   // worn.c:250
     return mask;
 }
 /* return a bitmask of the equipment slot(s) a given item might be worn in */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number | bigint} long
+ */
 export function wearslot(obj) {   // worn.c:282
     let otyp = 0, res = 0;
     otyp = obj.otyp;
@@ -351,6 +376,9 @@ export function wearslot(obj) {   // worn.c:282
     return res;
 }
 /* for 'sanity_check' option, called by you_sanity_check() */
+/**
+ * @returns {Promise<void>}
+ */
 export async function check_wornmask_slots() {   // worn.c:355
     let whybuf = new Int8Array(256), wp = null, o = null, otmp = null, m = 0;
     /* we'll skip ball and chain here--they warrant separate sanity check */
@@ -399,6 +427,11 @@ export async function check_wornmask_slots() {   // worn.c:355
     /* EXTRA_SANITY_CHECKS */
     return;
 }   /* check_wornmask_slots() */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} cursed_potion boolean
+ * @returns {Promise<void>}
+ */
 export async function mon_set_minvis(mon, cursed_potion) {   // worn.c:474
     mon.perminvis = ((!cursed_potion ? 1 : 0) >>> 0) & 1;
     if (!mon.invis_blkd) {
@@ -409,6 +442,12 @@ export async function mon_set_minvis(mon, cursed_potion) {   // worn.c:474
         }
     }
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} adjust int
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function mon_adjust_speed(mon, adjust, obj) {   // worn.c:488
     let otmp = null, give_msg = 0, petrify = 0, oldspeed = 0, howmuch = null;
     /* positive => increase speed, negative => decrease */
@@ -496,6 +535,13 @@ export async function mon_adjust_speed(mon, adjust, obj) {   // worn.c:488
    if someone changes it to hallucination resistance, all bets are off
    [TODO: handle alternate properties conferred by dragon scales/mail] */
 /* armor put on or taken off; might be magical variety */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} on boolean
+ * @param {number} silently boolean
+ * @returns {Promise<void>}
+ */
 export async function update_mon_extrinsics(mon, obj, on, silently) {   // worn.c:579
     let unseen = 0, mask = 0, otmp = null, which = 0, altwhich = 0, save_in_mklev = 0, save_in_mklev$2 = 0;
     /* armor being worn or taken off */
@@ -633,6 +679,10 @@ export async function update_mon_extrinsics(mon, obj, on, silently) {   // worn.
         await newsym(mon.mx, mon.my);
     }
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {number} int
+ */
 export function find_mac(mon) {   // worn.c:717
     let obj = null, base = 0, mwflags = 0;
     base = mon.data.ac;
@@ -669,6 +719,11 @@ export function find_mac(mon) {   // worn.c:717
  * and preventing suits under cloaks makes it a little bit too easy for
  * players to influence what gets worn.  Putting on a shirt underneath
  * already worn body armor is too obviously buggy...
+ */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} creation boolean
+ * @returns {Promise<void>}
  */
 export async function m_dowear(mon, creation) {   // worn.c:757
     let can_wear_armor = 0;
@@ -711,6 +766,13 @@ export async function m_dowear(mon, creation) {   // worn.c:757
         await m_dowear_type(mon, W.ARM, creation, TRUE);
     }
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number | bigint} flag long
+ * @param {number} creation boolean
+ * @param {number} racialexception boolean
+ * @returns {Promise<void>}
+ */
 async function m_dowear_type(mon, flag, creation, racialexception) {   // worn.c:799
     let old = null, best = null, obj = null, oldmask = 0, m_delay = 0, sawmon = 0, sawloc = 0, autocurse = 0, nambuf = new Int8Array(256), buf = new Int8Array(256), oldarm = new Int8Array(256), newarm = new Int8Array(265), adesc = null, $t1;
     /* wornmask value */
@@ -919,6 +981,11 @@ async function m_dowear_type(mon, flag, creation, racialexception) {   // worn.c
         }
     }
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number | bigint} flag long
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function which_armor(mon, flag) {   // worn.c:1006
     let obj = null;
     if ($c.peq(mon, gy.youmonst)) {
@@ -951,6 +1018,12 @@ export async function which_armor(mon, flag) {   // worn.c:1006
     }
 }
 /* remove an item of armor and then drop it */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} polyspot boolean
+ * @returns {Promise<void>}
+ */
 async function m_lose_armor(mon, obj, polyspot) {   // worn.c:1040
     await extract_from_minvent(mon, obj, TRUE, FALSE);
     await place_object(obj, mon.mx, mon.my);
@@ -961,6 +1034,9 @@ async function m_lose_armor(mon, obj, polyspot) {   // worn.c:1040
     await newsym(mon.mx, mon.my);
 }
 /* clear bypass bits for an object chain, plus contents if applicable */
+/**
+ * @param {$T.obj | null} objchn struct obj *
+ */
 function clear_bypass(objchn) {   // worn.c:1055
     let o = null;
     for (o = objchn; o; o = o.nobj) {
@@ -1021,11 +1097,18 @@ export function clear_bypasses() {   // worn.c:1070
     }
     svc.context.bypasses = FALSE;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ */
 export function bypass_obj(obj) {   // worn.c:1119
     obj.bypass = (1) & 1;
     svc.context.bypasses = TRUE;
 }
 /* set or clear the bypass bit in a list of objects */
+/**
+ * @param {$T.obj | null} objchain struct obj *
+ * @param {number} on boolean
+ */
 export function bypass_objlist(objchain, on) {   // worn.c:1127
     /* TRUE => set, FALSE => clear */
     if (on && objchain) {
@@ -1038,6 +1121,10 @@ export function bypass_objlist(objchain, on) {   // worn.c:1127
 }
 /* return the first object without its bypass bit set; set that bit
    before returning so that successive calls will find further objects */
+/**
+ * @param {$T.obj | null} objchain struct obj *
+ * @returns {$T.obj | null} struct obj *
+ */
 export function nxt_unbypassed_obj(objchain) {   // worn.c:1142
     while (objchain) {
         if (!objchain.bypass) {
@@ -1052,6 +1139,11 @@ export function nxt_unbypassed_obj(objchain) {   // worn.c:1142
    than an object linked list; the array contains obj==Null terminator;
    there's an added complication that the array may have stale pointers
    for deleted objects (see Multiple-Drop case in askchain(invent.c)) */
+/**
+ * @param {$T.sortloot_item | null} lootarray Loot *
+ * @param {$T.obj | null} listhead struct obj *
+ * @returns {$T.obj | null} struct obj *
+ */
 export function nxt_unbypassed_loot(lootarray, listhead) {   // worn.c:1159
     let o = null, obj = null;
     while ((obj = lootarray.obj) !== null) {
@@ -1068,6 +1160,11 @@ export function nxt_unbypassed_loot(lootarray, listhead) {   // worn.c:1159
     }
     return obj;
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} polyspot boolean
+ * @returns {Promise<void>}
+ */
 export async function mon_break_armor(mon, polyspot) {   // worn.c:1177
     let otmp = null, mdat = null, vis = 0, handless_or_tiny = 0, noride = 0, pronoun = null, ppronoun = null, passes_thru_clothes = 0, buf = new Int8Array(256);
     mdat = mon.data;
@@ -1211,6 +1308,11 @@ export async function mon_break_armor(mon, polyspot) {   // worn.c:1177
     return;
 }
 /* bias a monster's preferences towards armor that has special benefits. */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 function extra_pref(mon, obj) {   // worn.c:1339
     /* currently only does speed boots, but might be expanded if monsters
      * get to use more armor abilities
@@ -1230,6 +1332,11 @@ function extra_pref(mon, obj) {   // worn.c:1339
  *       1 If the race/object combination is acceptable.
  *      -1 If the race/object combination is unacceptable.
  */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 export function racial_exception(mon, obj) {   // worn.c:1360
     let ptr = null;
     ptr = raceptr(mon);
@@ -1244,6 +1351,13 @@ export function racial_exception(mon, obj) {   // worn.c:1360
     return 0;
 }
 /* Remove an object from a monster's inventory. */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} do_extrinsics boolean
+ * @param {number} silently boolean
+ * @returns {Promise<void>}
+ */
 export async function extract_from_minvent(mon, obj, do_extrinsics, silently) {   // worn.c:1377
     let unwornmask = 0;
     /* whether to call update_mon_extrinsics */

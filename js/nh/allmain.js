@@ -97,6 +97,11 @@ import { makewish } from './zap.js';
 let mvl_wtcap = 0;
 let mvl_change = 0;
 /*ARGSUSED*/
+/**
+ * @param {number} argc int
+ * @param {*} argv char **
+ * @returns {Promise<void>}
+ */
 export async function early_init(argc, argv) {   // allmain.c:33
     program_state_init();
     /* Do this as early as possible, but let ports do other things first. */
@@ -107,6 +112,10 @@ export async function early_init(argc, argv) {   // allmain.c:33
     await sys_early_init();
     await runtime_info_init();
 }
+/**
+ * @param {number} resuming boolean
+ * @returns {Promise<void>}
+ */
 async function moveloop_preamble(resuming) {   // allmain.c:48
     let $t1, $t2, $t3, $t4;
     /* if a save file created in normal mode is now being restored in
@@ -169,6 +178,9 @@ async function moveloop_preamble(resuming) {   // allmain.c:48
         await update_inventory();
     }
 }
+/**
+ * @param {number} wtcap int
+ */
 function u_calc_moveamt(wtcap) {   // allmain.c:114
     let moveamt = 0;
     moveamt = 0;
@@ -216,11 +228,17 @@ function u_calc_moveamt(wtcap) {   // allmain.c:114
     }
 }
 /* small chance of generating a new random monster */
+/**
+ * @returns {Promise<void>}
+ */
 async function maybe_generate_rnd_mon() {   // allmain.c:162
     if (!rn2(u.uevent.udemigod | 0 ? 25 : depth(u.uz) > depth(svd.dungeon_topology.d_stronghold_level) ? 50 : 70)) {
         await makemon(null, 0, 0, NO.MM_FLAGS);
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function moveloop_core() {   // allmain.c:177
     let monscanmove = 0, mtmp = null, old_ux = 0, old_uy = 0, $t1, $t2, $t3;
     monscanmove = FALSE;
@@ -562,6 +580,9 @@ export async function moveloop_core() {   // allmain.c:177
         await lua_settop(gl.luacore, 0);
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function maybe_do_tutorial() {   // allmain.c:567
     let sp = null;
     sp = find_level($c.lit("tut-1"));
@@ -578,6 +599,10 @@ async function maybe_do_tutorial() {   // allmain.c:567
         iflags.nofollowers = FALSE;
     }
 }
+/**
+ * @param {number} resuming boolean
+ * @returns {Promise<void>}
+ */
 export async function moveloop(resuming) {   // allmain.c:587
     await moveloop_preamble(resuming);
     if (!resuming) {
@@ -587,6 +612,10 @@ export async function moveloop(resuming) {   // allmain.c:587
         await moveloop_core();
     }
 }
+/**
+ * @param {number} wtcap int
+ * @returns {Promise<void>}
+ */
 async function regen_pw(wtcap) {   // allmain.c:600
     let upper = 0, $t1;
     if (u.uen < u.uenmax && (wtcap < MOD_ENCUMBER && !$c.rem64(svm.moves, $c.div32(Math.imul(MAXULEV + 8 - u.ulevel | 0, gu.urole.mnum === PM.WIZARD ? 3 : 4), 6)) || Energy_regeneration())) {
@@ -605,6 +634,10 @@ async function regen_pw(wtcap) {   // allmain.c:600
     }
 }
 /* maybe recover some lost health (or lose some when an eel out of water) */
+/**
+ * @param {number} wtcap int
+ * @returns {Promise<void>}
+ */
 async function regen_hp(wtcap) {   // allmain.c:625
     let heal = 0, reached_full = 0, encumbrance_ok = 0;
     heal = 0;
@@ -659,6 +692,9 @@ async function regen_hp(wtcap) {   // allmain.c:625
         await interrupt_multi($c.lit("You are in full health."));
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function stop_occupation() {   // allmain.c:684
     if (go.occupation) {
         if (!await maybe_finished_meal(TRUE)) {
@@ -672,6 +708,9 @@ export async function stop_occupation() {   // allmain.c:684
     }
     cmdq_clear(CQ_CANNED);
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function init_sound_disp_gamewindows() {   // allmain.c:699
     let menu_behavior = 0;
     menu_behavior = MENU.BEHAVE_STANDARD;
@@ -709,6 +748,9 @@ export async function init_sound_disp_gamewindows() {   // allmain.c:699
     clear_glyph_buffer();
     await display_nhwindow()($G.WIN_MAP, FALSE);
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function newgame() {   // allmain.c:766
     let i = 0, $t1;
     /* make sure welcome messages are given before noticing monsters */
@@ -789,6 +831,10 @@ export async function newgame() {   // allmain.c:766
     return;
 }
 /* show "welcome [back] to NetHack" message at program startup */
+/**
+ * @param {number} new_game boolean
+ * @returns {Promise<void>}
+ */
 export async function welcome(new_game) {   // allmain.c:854
     let buf = new Int8Array(256), currentgend = 0, adrift = 0;
     /* false => restoring an old game */
@@ -857,6 +903,10 @@ export async function welcome(new_game) {   // allmain.c:854
 /* FIXME: traversing 'stairs' list ignores mimics that pose as stairs */
 /* hero location */
 /* fence post */
+/**
+ * @param {$c.Ptr | null} msg const char *
+ * @returns {Promise<void>}
+ */
 async function interrupt_multi(msg) {   // allmain.c:976
     if (gm.multi > 0 && !svc.context.travel && !svc.context.run) {
         nomul(0);
@@ -866,12 +916,21 @@ async function interrupt_multi(msg) {   // allmain.c:976
     }
 }
 /* convert from time_t to number of seconds */
+/**
+ * @param {number | bigint} ttim time_t
+ * @returns {number | bigint} long
+ */
 export function timet_to_seconds(ttim) {   // allmain.c:987
     /* for Unix-based and Posix-compliant systems, a cast to 'long' would
        suffice but the C Standard doesn't require time_t to be that simple */
     return timet_delta(ttim, 0);
 }
 /* calculate the difference in seconds between two time_t values */
+/**
+ * @param {number | bigint} etim time_t
+ * @param {number | bigint} stim time_t
+ * @returns {number | bigint} long
+ */
 export function timet_delta(etim, stim) {   // allmain.c:996
     /* end and start times */
     /* difftime() is a STDC routine which returns the number of seconds

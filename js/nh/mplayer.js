@@ -45,6 +45,9 @@ const mplayer_talk$other_class_msg = $c.nulls(3);   // static in mplayer_talk()
  */
 const developers = $c.nulls(58);
 /* return a randomly chosen developer name */
+/**
+ * @returns {$c.Ptr | null} const char *
+ */
 function dev_name() {   // mplayer.c:44
     let i = 0, m = 0, n = 0, mtmp = null, match = 0;
     m = 0;
@@ -68,6 +71,10 @@ function dev_name() {   // mplayer.c:44
     }
     return developers[i];
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$c.Ptr | null} nam char *
+ */
 function get_mplname(mtmp, nam) {   // mplayer.c:72
     let fmlkind = 0, devnam = null;
     fmlkind = $c.i8(is_female(mtmp.data));
@@ -87,6 +94,11 @@ function get_mplname(mtmp, nam) {   // mplayer.c:72
     $c.strcat(nam, $c.lit(" the "));
     $c.strcat(nam, rank_of(mtmp.m_lev, $c.i16(mtmp.data.pmidx), $c.i8(mtmp.female)));
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} typ short
+ * @returns {Promise<void>}
+ */
 async function mk_mplayer_armor(mon, typ) {   // mplayer.c:95
     let obj = null, $t1, $t2;
     if (typ === STRANGE_OBJECT) {
@@ -110,6 +122,13 @@ async function mk_mplayer_armor(mon, typ) {   // mplayer.c:95
     $t2 = $c.i8(rn2(10) ? rn2(3) ? rn2(5) : rn2(4) + 4 | 0 : -rnd(3) | 0), obj.spe = $t2;
     await mpickobj(mon, obj);
 }
+/**
+ * @param {$T.permonst | null} ptr struct permonst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} special boolean
+ * @returns {Promise<$T.monst | null>} struct monst *
+ */
 export async function mk_mplayer(ptr, x, y, special) {   // mplayer.c:118
     let mtmp = null, nam = new Int8Array(32), weapon = 0, armor = 0, cloak = 0, helm = 0, shield = 0, quan = 0, otmp = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13;
     if (!is_mplayer(ptr)) {
@@ -331,6 +350,11 @@ export async function mk_mplayer(ptr, x, y, special) {   // mplayer.c:118
  * developers array, otherwise a bunch of Adams and Eves will
  * fill up the overflow.
  */
+/**
+ * @param {number} num int
+ * @param {number} special boolean
+ * @returns {Promise<void>}
+ */
 export async function create_mplayers(num, special) {   // mplayer.c:327
     let pm = 0, x = 0, y = 0, fakemon = new $T.monst(), tryct = 0, $t1;
     fakemon.$copyFrom(cg.zeromonst);
@@ -352,6 +376,10 @@ export async function create_mplayers(num, special) {   // mplayer.c:327
         num = num - 1 | 0;
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function mplayer_talk(mtmp) {   // mplayer.c:356
     if (mtmp.mpeaceful) {
         return;   /* will drop to humanoid talk */

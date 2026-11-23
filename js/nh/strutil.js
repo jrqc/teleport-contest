@@ -12,11 +12,19 @@ import { lowc } from './hacklib.js';
 
 /* for config.h+extern.h */
 /* strbuf_init() initializes strbuf state for use */
+/**
+ * @param {$T.strbuf | null} strbuf strbuf_t *
+ */
 export function strbuf_init(strbuf) {   // strutil.c:9
     strbuf.str = null;
     strbuf.len = 0;
 }
 /* strbuf_append() appends given str to strbuf->str */
+/**
+ * @param {$T.strbuf | null} strbuf strbuf_t *
+ * @param {$c.Ptr | null} str const char *
+ * @returns {Promise<void>}
+ */
 export async function strbuf_append(strbuf, str) {   // strutil.c:17
     let len = 0;
     len = $c.i32($c.strlen(str)) + 1 | 0;
@@ -24,6 +32,11 @@ export async function strbuf_append(strbuf, str) {   // strutil.c:17
     $c.strcat(strbuf.str, str);
 }
 /* strbuf_reserve() ensure strbuf->str has storage for len characters */
+/**
+ * @param {$T.strbuf | null} strbuf strbuf_t *
+ * @param {number} len int
+ * @returns {Promise<void>}
+ */
 export async function strbuf_reserve(strbuf, len) {   // strutil.c:28
     let oldbuf = null, $t1;
     if ($c.peq(strbuf.str, $c.asArr(null, Int8Array))) {
@@ -42,6 +55,9 @@ export async function strbuf_reserve(strbuf, len) {   // strutil.c:28
     }
 }
 /* strbuf_empty() frees allocated memory and set strbuf to initial state */
+/**
+ * @param {$T.strbuf | null} strbuf strbuf_t *
+ */
 export function strbuf_empty(strbuf) {   // strutil.c:49
     if (!$c.peq(strbuf.str, $c.asArr(null, Int8Array)) && !$c.peq(strbuf.str, new $c.Ptr(strbuf.buf, 0))) {
         $c.free(strbuf.str);
@@ -49,6 +65,10 @@ export function strbuf_empty(strbuf) {   // strutil.c:49
     strbuf_init(strbuf);
 }
 /* strbuf_nl_to_crlf() converts all occurrences of \n to \r\n */
+/**
+ * @param {$T.strbuf | null} strbuf strbuf_t *
+ * @returns {Promise<void>}
+ */
 export async function strbuf_nl_to_crlf(strbuf) {   // strutil.c:58
     let len = 0, count = 0, cp = null, $t1;
     if (strbuf.str) {
@@ -73,6 +93,12 @@ export async function strbuf_nl_to_crlf(strbuf) {   // strutil.c:58
 }
 /* strlen() but returns unsigned and panics if string is unreasonably long;
    used by dlb as well as by nethack */
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @param {$c.Ptr | null} file const char *
+ * @param {number} line int
+ * @returns {Promise<number>} unsigned int
+ */
 export async function Strlen_(str, file, line) {   // strutil.c:82
     let p = null, len = 0, $t1;
     /* strnlen(str, LARGEST_INT) w/o requiring posix.1 headers or libraries */
@@ -88,6 +114,13 @@ export async function Strlen_(str, file, line) {   // strutil.c:82
 }
 /* guts of pmatch(), pmatchi(), and pmatchz();
    match a string against a pattern */
+/**
+ * @param {$c.Ptr | null} patrn const char *
+ * @param {$c.Ptr | null} strng const char *
+ * @param {number} ci boolean
+ * @param {$c.Ptr | null} sk const char *
+ * @returns {number} boolean
+ */
 function pmatch_internal(patrn, strng, ci, sk) {   // strutil.c:105
     let s = 0, p = 0, $t1, $t2, $t3, $t4;
     /* True => case-insensitive,
@@ -125,10 +158,20 @@ function pmatch_internal(patrn, strng, ci, sk) {   // strutil.c:105
     }
 }
 /* case-sensitive wildcard match */
+/**
+ * @param {$c.Ptr | null} patrn const char *
+ * @param {$c.Ptr | null} strng const char *
+ * @returns {number} boolean
+ */
 export function pmatch(patrn, strng) {   // strutil.c:145
     return pmatch_internal(patrn, strng, FALSE, null);
 }
 /* case-insensitive wildcard match */
+/**
+ * @param {$c.Ptr | null} patrn const char *
+ * @param {$c.Ptr | null} strng const char *
+ * @returns {number} boolean
+ */
 export function pmatchi(patrn, strng) {   // strutil.c:152
     return pmatch_internal(patrn, strng, TRUE, null);
 }

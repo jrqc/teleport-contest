@@ -88,6 +88,12 @@ const poiseff = $c.recArray($T.poison_effect_message, 6);
    phrased as "You must have been [][0]." or "You haven't been [][1]." */
 const exertext = $c.arrayOf(6, () => $c.nulls(2));
 /* adjust an attribute; return TRUE if change is made, FALSE otherwise */
+/**
+ * @param {number} ndx int
+ * @param {number} incr int
+ * @param {number} msgflg int
+ * @returns {Promise<number>} boolean
+ */
 export async function adjattrib(ndx, incr, msgflg) {   // attrib.c:117
     let old_acurr = 0, old_abase = 0, old_amax = 0, decr = 0, abonflg = 0, attrstr = null, $t1, $t2;
     /* which characteristic */
@@ -170,6 +176,12 @@ export async function adjattrib(ndx, incr, msgflg) {   // attrib.c:117
     return TRUE;
 }
 /* strength gain */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} incr int
+ * @param {number} givemsg boolean
+ * @returns {Promise<void>}
+ */
 export async function gainstr(otmp, incr, givemsg) {   // attrib.c:203
     let num = 0;
     num = incr;
@@ -185,6 +197,12 @@ export async function gainstr(otmp, incr, givemsg) {   // attrib.c:203
     await adjattrib(A.STR, otmp && otmp.cursed | 0 ? -num | 0 : num, givemsg ? -1 : 1);
 }
 /* strength loss, may kill you; cause may be poison or monster like 'a' */
+/**
+ * @param {number} num int
+ * @param {$c.Ptr | null} knam const char *
+ * @param {number} k_format schar
+ * @returns {Promise<void>}
+ */
 export async function losestr(num, knam, k_format) {   // attrib.c:221
     let uhpmin = 0, olduhpmax = 0, ustr = 0, amt = 0, dmg = 0, waspolyd = 0;
     uhpmin = minuhpmax(1);
@@ -231,11 +249,23 @@ export async function losestr(num, knam, k_format) {   // attrib.c:221
     }
 }
 /* combined strength loss and damage from some poisons */
+/**
+ * @param {number} strloss int
+ * @param {number} dmg int
+ * @param {$c.Ptr | null} knam const char *
+ * @param {number} k_format schar
+ * @returns {Promise<void>}
+ */
 export async function poison_strdmg(strloss, dmg, knam, k_format) {   // attrib.c:274
     await losestr(strloss, knam, k_format);
     await losehp(dmg, knam, k_format);
 }
 /* feedback for attribute loss due to poisoning */
+/**
+ * @param {number} typ int
+ * @param {number} exclaim boolean
+ * @returns {Promise<void>}
+ */
 export async function poisontell(typ, exclaim) {   // attrib.c:294
     let func = null, msg_txt = null;
     /* which attribute */
@@ -257,6 +287,14 @@ export async function poisontell(typ, exclaim) {   // attrib.c:294
     await func($c.lit("%s%c"), msg_txt, exclaim ? 33 : 46);
 }
 /* called when an attack or trap has poisoned hero (used to be in mon.c) */
+/**
+ * @param {$c.Ptr | null} reason const char *
+ * @param {number} typ int
+ * @param {$c.Ptr | null} pkiller const char *
+ * @param {number} fatal int
+ * @param {number} thrown_weapon boolean
+ * @returns {Promise<void>}
+ */
 export async function poisoned(reason, typ, pkiller, fatal, thrown_weapon) {   // attrib.c:317
     let i = 0, loss = 0, kprefix = 0, blast = 0, plural = 0, olduhp = 0, newuhpmax = 0, cloud = 0;
     /* controls what messages we display */
@@ -342,6 +380,9 @@ export async function poisoned(reason, typ, pkiller, fatal, thrown_weapon) {   /
     }
     await encumber_msg();
 }
+/**
+ * @param {number} n schar
+ */
 export function change_luck(n) {   // attrib.c:411
     u.uluck = $c.i8(u.uluck + n | 0);
     if (u.uluck < 0 && u.uluck < LUCKMIN) {
@@ -353,6 +394,10 @@ export function change_luck(n) {   // attrib.c:411
 }
 /* decide whether there are more blessed luckstones (plus luck-conferring
    artifacts) than cursed ones; optionally combine uncursed with blessed */
+/**
+ * @param {number} include_uncursed boolean
+ * @returns {number} int
+ */
 export function stone_luck(include_uncursed) {   // attrib.c:423
     let otmp = null, bonchance = 0;
     bonchance = 0;
@@ -380,6 +425,9 @@ export function set_moreluck() {   // attrib.c:441
     }
 }
 /* (not used) */
+/**
+ * @returns {Promise<void>}
+ */
 export async function restore_attrib() {   // attrib.c:455
     let i = 0, equilibrium = 0, $t1;
     /*
@@ -411,6 +459,11 @@ export async function restore_attrib() {   // attrib.c:455
     }
 }
 /* tune value for exercise gains */
+/**
+ * @param {number} i int
+ * @param {number} inc_or_dec boolean
+ * @returns {Promise<void>}
+ */
 export async function exercise(i, inc_or_dec) {   // attrib.c:489
     let save_plnmsg = 0, save_plnmsg$2 = 0, $t1;
     do {
@@ -450,6 +503,9 @@ export async function exercise(i, inc_or_dec) {   // attrib.c:489
         await encumber_msg();
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function exerper() {   // attrib.c:521
     let hs = 0, save_plnmsg = 0, save_plnmsg$2 = 0, save_plnmsg$3 = 0;
     if (!$c.rem64(svm.moves, 10)) {
@@ -531,6 +587,9 @@ async function exerper() {   // attrib.c:521
         }
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function exerchk() {   // attrib.c:598
     let i = 0, ax = 0, mod_val = 0, lolim = 0, hilim = 0, save_plnmsg = 0, save_plnmsg$2 = 0, save_plnmsg$3 = 0, save_plnmsg$4 = 0, save_plnmsg$5 = 0, save_plnmsg$6 = 0, $t1, $t2, $t3;
     /*  Check out the periodic accumulations */
@@ -638,6 +697,9 @@ export async function exerchk() {   // attrib.c:598
 }
 /* return random hero attribute (by role's attr distribution).
    returns A_MAX if failed. */
+/**
+ * @returns {number} int
+ */
 function rnd_attr() {   // attrib.c:682
     let i = 0, x = 0;
     x = rn2(100);
@@ -654,6 +716,11 @@ function rnd_attr() {   // attrib.c:682
    adjusting the base and maximum values of the attributes.
    if subtracting, np must be negative.
    returns the left over points. */
+/**
+ * @param {number} np int
+ * @param {number} addition boolean
+ * @returns {number} int
+ */
 function init_attr_role_redist(np, addition) {   // attrib.c:699
     let tryct = 0, adj = 0, i = 0;
     tryct = 0;
@@ -672,6 +739,9 @@ function init_attr_role_redist(np, addition) {   // attrib.c:699
     return np;
 }
 /* allocate hero's initial characteristics */
+/**
+ * @param {number} np int
+ */
 export function init_attr(np) {   // attrib.c:723
     let i = 0, $t1, $t2;
     for (i = 0; i < A.MAX; i = i + 1 | 0) {
@@ -708,6 +778,9 @@ export function redist_attr() {   // attrib.c:740
     /* encumber_msg(); -- caller needs to do this */
 }
 /* apply minor variation to attributes */
+/**
+ * @returns {Promise<void>}
+ */
 export async function vary_init_attr() {   // attrib.c:764
     let i = 0, xd = 0;
     for (i = 0; i < A.MAX; i = i + 1 | 0) {
@@ -720,6 +793,10 @@ export async function vary_init_attr() {   // attrib.c:764
         }
     }
 }
+/**
+ * @param {*} ability long *
+ * @returns {Promise<void>}
+ */
 async function postadjabil(ability) {   // attrib.c:780
     if (!u.ulevel) {   /* initializing hero; don't attempt screen update yet */
         return;
@@ -728,6 +805,10 @@ async function postadjabil(ability) {   // attrib.c:780
         await see_monsters();
     }
 }
+/**
+ * @param {number} r int
+ * @returns {$T.innate | null} const struct innate *
+ */
 function role_abil(r) {   // attrib.c:789
     let roleabils = $c.recArray($T.anon_attrib_791, 14), i = 0;
     for (let $i4 = 0; $i4 < 14; $i4++) {
@@ -766,6 +847,11 @@ function role_abil(r) {   // attrib.c:789
     }
     return roleabils[i].abil;
 }
+/**
+ * @param {*} ability long *
+ * @param {number | bigint} frommask long
+ * @returns {$T.innate | null} const struct innate *
+ */
 function check_innate_abil(ability, frommask) {   // attrib.c:818
     let abil = null;
     abil = null;
@@ -805,6 +891,10 @@ function check_innate_abil(ability, frommask) {   // attrib.c:818
 /* intrinsically (eating some corpse or prayer reward) */
 /* from experience for some level > 1 */
 /* check whether particular ability has been obtained via innate attribute */
+/**
+ * @param {*} ability long *
+ * @returns {number} int
+ */
 function innately(ability) {   // attrib.c:864
     let iptr = null;
     if ((iptr = check_innate_abil(ability, FROMEXPER)) !== null) {
@@ -821,6 +911,10 @@ function innately(ability) {   // attrib.c:864
     }
     return FROM_NONE;
 }
+/**
+ * @param {number} propidx int
+ * @returns {number} int
+ */
 export function is_innate(propidx) {   // attrib.c:880
     let innateness = 0;
     /* innately() would report FROM_FORM for this; caller wants specificity */
@@ -843,6 +937,10 @@ export function is_innate(propidx) {   // attrib.c:880
     }
     return FROM_NONE;
 }
+/**
+ * @param {number} propidx int
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function from_what(propidx) {   // attrib.c:905
     let p = null, obj = null, innateness = 0;
     /* special cases can have negative values */
@@ -924,6 +1022,11 @@ export async function from_what(propidx) {   // attrib.c:905
     }   /*wizard*/
     return new $c.Ptr(from_what$buf, 0);
 }
+/**
+ * @param {number} oldlevel int
+ * @param {number} newlevel int
+ * @returns {Promise<void>}
+ */
 export async function adjabil(oldlevel, newlevel) {   // attrib.c:1006
     let abil = null, rabil = null, prevabil = 0, mask = 0;
     mask = FROMEXPER;
@@ -997,6 +1100,9 @@ export async function adjabil(oldlevel, newlevel) {   // attrib.c:1006
 /* called when gaining a level (before u.ulevel gets incremented);
    also called with u.ulevel==0 during hero initialization or for
    re-init if hero turns into a "new man/woman/elf/&c" */
+/**
+ * @returns {number} int
+ */
 export function newhp() {   // attrib.c:1080
     let hp = 0, conplus = 0, lim = 0;
     if (u.ulevel === 0) {
@@ -1069,6 +1175,10 @@ export function newhp() {   // attrib.c:1080
 }
 /* minimum value for uhpmax is ulevel but for life-saving it is always at
    least 10 if ulevel is less than that */
+/**
+ * @param {number} altmin int
+ * @returns {number} int
+ */
 export function minuhpmax(altmin) {   // attrib.c:1147
     if (altmin < 1) {
         altmin = 1;
@@ -1077,6 +1187,10 @@ export function minuhpmax(altmin) {   // attrib.c:1147
 }
 /* update u.uhpmax or u.mhmax and values of other things that depend upon
    whichever of them is relevant */
+/**
+ * @param {number} newmax int
+ * @param {number} even_when_polyd boolean
+ */
 export function setuhpmax(newmax, even_when_polyd) {   // attrib.c:1157
     if (!Upolyd() || even_when_polyd) {
         if (newmax !== u.uhpmax) {
@@ -1103,6 +1217,11 @@ export function setuhpmax(newmax, even_when_polyd) {   // attrib.c:1157
 /* called after setuhpmax() when damage is pending;
    if uhpmax (or mhmax) has been reduced, it might have caused uhp (or mh)
    to be reduced too; if so, recalculate pending loss to account for that */
+/**
+ * @param {number} loss int
+ * @param {number} olduhp int
+ * @returns {number} int
+ */
 export function adjuhploss(loss, olduhp) {   // attrib.c:1182
     /* pending hp loss */
     /* does double duty as oldmh when Upolyd */
@@ -1120,6 +1239,10 @@ export function adjuhploss(loss, olduhp) {   // attrib.c:1182
 /* return the current effective value of a specific characteristic
    (the 'a' in 'acurr()' comes from outdated use of "attribute" for the
    six Str/Dex/&c characteristics; likewise for u.abon, u.atemp, u.acurr) */
+/**
+ * @param {number} chridx int
+ * @returns {number} schar
+ */
 export function acurr(chridx) {   // attrib.c:1200
     let tmp = 0, result = 0;
     result = 0;   /* 'result' will always be reset to positive value */
@@ -1163,6 +1286,9 @@ export function acurr(chridx) {   // attrib.c:1200
     return $c.i8(result);
 }
 /* condense clumsy ACURR(A_STR) value into value that fits into formulas */
+/**
+ * @returns {number} schar
+ */
 export function acurrstr() {   // attrib.c:1245
     let str = 0, result = 0;
     /* 3..125 after massaging by acurr() */
@@ -1185,6 +1311,10 @@ export function acurrstr() {   // attrib.c:1245
 /* when wearing (or taking off) an unID'd item, this routine is used
    to distinguish between observable +0 result and no-visible-effect
    due to an attribute not being able to exceed maximum or minimum */
+/**
+ * @param {number} attrindx int
+ * @returns {number} boolean
+ */
 export function extremeattr(attrindx) {   // attrib.c:1268
     let lolimit = 0, hilimit = 0, curval = 0;
     /* does attrindx's value match its max or min? */
@@ -1216,6 +1346,9 @@ export function extremeattr(attrindx) {   // attrib.c:1268
 }
 /* avoid possible problems with alignment overflow, and provide a centralized
    location for any future alignment limits */
+/**
+ * @param {number} n int
+ */
 export function adjalign(n) {   // attrib.c:1298
     let newalign = 0, newabuse = 0;
     newalign = u.ualign.record + n | 0;
@@ -1236,6 +1369,11 @@ export function adjalign(n) {   // attrib.c:1298
     }
 }
 /* change hero's alignment type, possibly losing use of artifacts */
+/**
+ * @param {number} newalign int
+ * @param {number} reason int
+ * @returns {Promise<void>}
+ */
 export async function uchangealign(newalign, reason) {   // attrib.c:1320
     let oldalign = 0;
     /* A_CG_CONVERT, A_CG_HELM_ON, or A_CG_HELM_OFF */

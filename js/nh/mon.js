@@ -135,6 +135,11 @@ let itermonsiz = 0;   /* size in 'monst *' pointers */
 /* potentially of historical interest */
 /* part of the original warning code which was replaced in 3.3.1 */
 /* 0 */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$c.Ptr | null} msgarg const char *
+ * @returns {Promise<void>}
+ */
 async function pet_sanity_check(mtmp, msgarg) {   // mon.c:57
     let edog = null;
     if (has_edog(mtmp)) {
@@ -145,6 +150,12 @@ async function pet_sanity_check(mtmp, msgarg) {   // mon.c:57
         /* TODO: verify some of the other edog fields */
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} chk_geno boolean
+ * @param {$c.Ptr | null} msg const char *
+ * @returns {Promise<void>}
+ */
 async function sanity_check_single_mon(mtmp, chk_geno, msg) {   // mon.c:73
     let mptr = null, mx = 0, my = 0, mndx = 0, ns = null, nt = null, t = null, is_mimic = 0, what = null;
     mptr = mtmp.data;
@@ -280,6 +291,9 @@ async function sanity_check_single_mon(mtmp, chk_geno, msg) {   // mon.c:73
         /*if (!m_next2u(mtmp))*/
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function mon_sanity_check() {   // mon.c:258
     let x = 0, y = 0, mtmp = null, m = null;
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
@@ -336,6 +350,10 @@ export async function mon_sanity_check() {   // mon.c:258
 /* Would monster be OK with poison gas? */
 /* Does not check for actual poison gas at the location. */
 /* Returns one of M_POISONGAS_foo */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} int
+ */
 export async function m_poisongas_ok(mtmp) {   // mon.c:330
     let px = 0, py = 0, is_you = 0;
     is_you = $c.i8($c.peq(mtmp, gy.youmonst) ? 1 : 0);
@@ -366,6 +384,10 @@ export async function m_poisongas_ok(mtmp) {   // mon.c:330
     return M_POISONGAS.BAD;
 }
 /* return True if mon is capable of converting other monsters into zombies */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {number} boolean
+ */
 export function zombie_maker(mon) {   // mon.c:362
     let pm = null;
     pm = mon.data;
@@ -388,6 +410,10 @@ export function zombie_maker(mon) {   // mon.c:362
 /* Return monster index of zombie monster which this monster could
    be turned into, or NON_PM if it doesn't have a direct counterpart.
    Sort of the zombie-specific inverse of undead_to_corpse. */
+/**
+ * @param {$T.permonst | null} pm struct permonst *
+ * @returns {number} int
+ */
 export function zombie_form(pm) {   // mon.c:386
     switch (pm.mlet) {
         case S.ZOMBIE:
@@ -420,6 +446,10 @@ export function zombie_form(pm) {   // mon.c:386
     return NON_PM;
 }
 /* convert the monster index of an undead to its living counterpart */
+/**
+ * @param {number} mndx int
+ * @returns {number} int
+ */
 export function undead_to_corpse(mndx) {   // mon.c:417
     switch (mndx) {
         case PM.KOBOLD_ZOMBIE:
@@ -467,6 +497,11 @@ export function undead_to_corpse(mndx) {   // mon.c:417
  *
  * Return associated character class monster, rather than species
  * if mode is 1.
+ */
+/**
+ * @param {number} mndx int
+ * @param {number} mode int
+ * @returns {number} int
  */
 export function genus(mndx, mode) {   // mon.c:470
     let ptr = null;
@@ -531,6 +566,10 @@ export function genus(mndx, mode) {   // mon.c:470
     return mndx;
 }
 /* return monster index if chameleon, or NON_PM if not */
+/**
+ * @param {number} mndx int
+ * @returns {number} int
+ */
 export function pm_to_cham(mndx) {   // mon.c:535
     let mcham = 0;
     mcham = NON_PM;
@@ -551,6 +590,11 @@ export function pm_to_cham(mndx) {   // mon.c:535
  * leave corpses.  Monsters which leave "special" corpses should have
  * G_NOCORPSE set in order to prevent wishing for one, finding tins of one,
  * etc....
+ */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} corpseflags unsigned int
+ * @returns {Promise<$T.obj | null>} struct obj *
  */
 async function make_corpse(mtmp, corpseflags) {   // mon.c:564
     let mdat = null, num = 0, obj = [null], otmp = [null], x = 0, y = 0, mndx = 0, corpstatflags = 0, burythem = 0, dealloc = Int8Array.of(0), $goto = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9;
@@ -766,6 +810,10 @@ async function make_corpse(mtmp, corpseflags) {   // mon.c:564
     return obj[0];
 }
 /* check mtmp and water/lava for compatibility, 0 (survived), 1 (died) */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} int
+ */
 export async function minliquid(mtmp) {   // mon.c:947
     let res = 0, $t1;
     /* set up flag for mondead() and xkilled() */
@@ -776,6 +824,10 @@ export async function minliquid(mtmp) {   // mon.c:947
     return res;
 }
 /* guts of minliquid() */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} int
+ */
 async function minliquid_core(mtmp) {   // mon.c:961
     let inpool = 0, inlava = 0, infountain = 0, waterwall = 0, dam = 0, dummy = null, how = null;
     waterwall = is_waterwall(mtmp.mx, mtmp.my);
@@ -936,6 +988,11 @@ async function minliquid_core(mtmp) {   // mon.c:961
     return 0;
 }
 /* calculate 'mon's movement for current turn; called from moveloop() */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} m_moving boolean
+ * @returns {number} int
+ */
 export function mcalcmove(mon, m_moving) {   // mon.c:1126
     let mmove = 0, mmove_adj = 0;
     /* True: adjust for moving;
@@ -980,9 +1037,16 @@ export function mcalcmove(mon, m_moving) {   // mon.c:1126
 /* actions that happen once per ``turn'', regardless of each
    individual monster's metabolism; some of these might need to
    be reclassified to occur more in proportion with movement rate */
+/**
+ * @returns {Promise<void>}
+ */
 export async function mcalcdistress() {   // mon.c:1174
     await iter_mons(m_calcdistress);
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 async function m_calcdistress(mtmp) {   // mon.c:1180
     /* must check non-moving monsters once/turn in case they managed
        to end up in water or lava; note: when not in liquid they regen,
@@ -1016,6 +1080,10 @@ async function m_calcdistress(mtmp) {   // mon.c:1180
 }
 /* perform movement for a single monster.
    meant to be used with iter_mons_safe. */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} boolean
+ */
 export async function movemon_singlemon(mtmp) {   // mon.c:1214
     let oldworn = 0;
     /* end monster movement early if hero is flagged to leave the level */
@@ -1117,6 +1185,9 @@ export async function movemon_singlemon(mtmp) {   // mon.c:1214
     return FALSE;
 }
 /* perform movement for all monsters */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function movemon() {   // mon.c:1326
     gs.somebody_can_move = FALSE;
     await iter_mons_safe(movemon_singlemon);
@@ -1140,6 +1211,11 @@ export async function movemon() {   // mon.c:1326
     return gs.somebody_can_move;
 }
 /* dispose of contents of an eaten container; used for pets and other mons */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 export async function meatbox(mon, otmp) {   // mon.c:1354
     let engulf_contents = 0, x = 0, y = 0, cobj = null;
     engulf_contents = $c.i8($c.peq(mon.data, $c.relem(mons, PM.GELATINOUS_CUBE)) ? 1 : 0);
@@ -1171,6 +1247,11 @@ export async function meatbox(mon, otmp) {   // mon.c:1354
 /* Monster mtmp consumes an object.
    Monster may die, polymorph, grow up, heal, etc; meating is not changed.
    Object is extracted from any linked list and freed. */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 export async function m_consume_obj(mtmp, otmp) {   // mon.c:1392
     let ispet = 0, deadmimic = 0, slimer = 0, poly = 0, grow = 0, heal = 0, eyes = 0, mstone = 0, vis = 0, corpsenm = 0, ptr = null;
     ispet = mtmp.mtame;
@@ -1240,6 +1321,10 @@ export async function m_consume_obj(mtmp, otmp) {   // mon.c:1392
  * that can't happen at present because nothing which eats objects
  * has young and old forms).
  */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} int
+ */
 export async function meatmetal(mtmp) {   // mon.c:1463
     let otmp = null, otmpname = null, vis = 0;
     vis = canseemon(mtmp);
@@ -1302,6 +1387,10 @@ export async function meatmetal(mtmp) {   // mon.c:1463
     return 0;
 }
 /* monster eats a pile of objects */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} int
+ */
 export async function meatobj(mtmp) {   // mon.c:1533
     let otmp = null, otmp2 = null, ptr = null, original_ptr = null, count = 0, ecount = 0, buf = new Int8Array(256), otmpname = null, ox = 0, oy = 0, revived_it = 0;
     /* for gelatinous cubes */
@@ -1406,6 +1495,10 @@ export async function meatobj(mtmp) {   // mon.c:1533
 }
 /* Monster eats a corpse off the ground.
    Return value is 0 = nothing eaten, 1 = ate a corpse, 2 = died. */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} int
+ */
 export async function meatcorpse(mtmp) {   // mon.c:1656
     let otmp = null, ptr = null, original_ptr = null, corpsepm = null, x = 0, y = 0, revived_it = 0, otmpname = null;
     /* for purple worms and other voracious monsters */
@@ -1470,6 +1563,11 @@ export async function meatcorpse(mtmp) {   // mon.c:1656
     return 0;
 }
 /* give monster property prop */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} prop int
+ * @returns {Promise<void>}
+ */
 export async function mon_give_prop(mtmp, prop) {   // mon.c:1726
     let msg = null, intrinsic = 0;
     msg = null;
@@ -1516,6 +1614,11 @@ export async function mon_give_prop(mtmp, prop) {   // mon.c:1726
     }
 }
 /* Maybe give an intrinsic to monster from eating corpse that confers it. */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.permonst | null} ptr struct permonst *
+ * @returns {Promise<void>}
+ */
 export async function mon_givit(mtmp, ptr) {   // mon.c:1778
     let prop = 0, vis = 0, mtmpbuf = new Int8Array(256);
     prop = await corpse_intrinsic(ptr);
@@ -1557,6 +1660,10 @@ export async function mon_givit(mtmp, ptr) {   // mon.c:1778
     }
     await mon_give_prop(mtmp, prop);
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function mpickgold(mtmp) {   // mon.c:1827
     let gold = null, mat_idx = 0;
     if ((gold = g_at(mtmp.mx, mtmp.my)) !== null) {
@@ -1572,6 +1679,10 @@ export async function mpickgold(mtmp) {   // mon.c:1827
     }
 }
 /* monster picks up one item stack from the map location they are at */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} boolean
+ */
 export async function mpickstuff(mtmp) {   // mon.c:1847
     let otmp = null, otmp2 = null, otmp3 = null, carryamt = 0, otmpname = null;
     carryamt = 0;
@@ -1631,6 +1742,10 @@ export async function mpickstuff(mtmp) {   // mon.c:1847
     }
     return FALSE;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number} int
+ */
 export function curr_mon_load(mtmp) {   // mon.c:1913
     let curload = 0, obj = null;
     curload = 0;
@@ -1641,6 +1756,10 @@ export function curr_mon_load(mtmp) {   // mon.c:1913
     }
     return curload;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number} int
+ */
 export function max_mon_load(mtmp) {   // mon.c:1927
     let maxload = 0;
     /* Base monster carrying capacity is equal to human maximum
@@ -1667,6 +1786,11 @@ export function max_mon_load(mtmp) {   // mon.c:1927
     return $c.i32(maxload);
 }
 /* can monster touch object safely? */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} boolean
+ */
 export async function can_touch_safely(mtmp, otmp) {   // mon.c:1958
     let otyp = 0, mdat = null;
     otyp = otmp.otyp;
@@ -1697,6 +1821,11 @@ export async function can_touch_safely(mtmp, otmp) {   // mon.c:1958
  *       Change from 'int' to 'long' to accommodate big stacks of gold.
  *       Right now we fake it by reporting a partial quantity, but the
  *       likesgold handling m_move results in picking up the whole stack.
+ */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} int
  */
 export async function can_carry(mtmp, otmp) {   // mon.c:1990
     let iquan = 0, otyp = 0, newload = 0, mdat = null, nattk = 0, glomper = 0;
@@ -1761,10 +1890,20 @@ export async function can_carry(mtmp, otmp) {   // mon.c:1990
     return iquan;
 }
 /* is <nx,ny> in direct line with where 'mon' thinks hero is? */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} nx int
+ * @param {number} ny int
+ * @returns {number} boolean
+ */
 function monlineu(mon, nx, ny) {   // mon.c:2057
     return online2($c.i16(nx), $c.i16(ny), mon.mux, mon.muy);
 }
 /* return flags based on monster data, for mfndpos() */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number | bigint>} long
+ */
 export async function mon_allowflags(mtmp) {   // mon.c:2064
     let allowflags = 0, can_open = 0, can_unlock = 0, doorbuster = 0, can_tunnel = 0;
     allowflags = 0;
@@ -1833,10 +1972,20 @@ export async function mon_allowflags(mtmp) {   // mon.c:2064
     return allowflags;
 }
 /* return TRUE if monster is up in the air/on the ceiling */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number} boolean
+ */
 export function m_in_air(mtmp) {   // mon.c:2130
     return $c.i8(is_flyer(mtmp.data) || is_floater(mtmp.data) || is_clinger(mtmp.data) && has_ceiling(u.uz) && mtmp.mundetected | 0 ? 1 : 0);
 }
 /* return number of acceptable neighbour positions */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.mfndposdata | null} data struct mfndposdata *
+ * @param {number | bigint} flag long
+ * @returns {Promise<number>} int
+ */
 export async function mfndpos(mon, data, flag) {   // mon.c:2140
     let mdat = null, ttmp = null, x = 0, y = 0, nx = 0, ny = 0, cnt = 0, ntyp = 0, nowtyp = 0, wantpool = 0, poolok = 0, lavaok = 0, nodiag = 0, rockok = 0, treeok = 0, thrudoor = 0, maxx = 0, maxy = 0, poisongas_ok = 0, in_poisongas = 0, gas_reg = null, gas_glyph = 0, mw_tmp = null, dispx = 0, dispy = 0, monseeu = 0, checkobj = 0, mtmp2 = null, mmflag = 0;
     mdat = mon.data;
@@ -2050,6 +2199,11 @@ export async function mfndpos(mon, data, flag) {   // mon.c:2140
 /* Part of mm_aggression that represents two-way aggression.  To avoid
    having to code each case twice, this function contains those cases that
    ought to happen twice, and mm_aggression will call it twice. */
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.monst | null} mdef struct monst *
+ * @returns {Promise<number | bigint>} long
+ */
 async function mm_2way_aggression(magr, mdef) {   // mon.c:2388
     if (On_W_tower_level(u.uz)) {
         /* treat inside the Wizard's tower as if it were a separate level
@@ -2085,6 +2239,11 @@ async function mm_2way_aggression(magr, mdef) {   // mon.c:2388
    in the absence of Conflict.  There is no provision for targeting
    other monsters; just hand to hand fighting when they happen to be
    next to each other. */
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.monst | null} mdef struct monst *
+ * @returns {Promise<number | bigint>} long
+ */
 async function mm_aggression(magr, mdef) {   // mon.c:2428
     let mndx = 0;
     /* monster that is currently deciding where to move */
@@ -2105,6 +2264,11 @@ async function mm_aggression(magr, mdef) {   // mon.c:2428
     return $c.or64(await mm_2way_aggression(magr, mdef), await mm_2way_aggression(mdef, magr));
 }
 /* Monster displacing another monster out of the way */
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.monst | null} mdef struct monst *
+ * @returns {number | bigint} long
+ */
 function mm_displacement(magr, mdef) {   // mon.c:2451
     let pa = null, pd = null;
     /* monster that is currently deciding where to move */
@@ -2125,6 +2289,12 @@ function mm_displacement(magr, mdef) {   // mon.c:2451
     return 0;
 }
 /* Is the square close enough for the monster to move or attack into? */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 export function monnear(mon, x, y) {   // mon.c:2476
     let distance = 0;
     distance = dist2(mon.mx, mon.my, x, y);
@@ -2134,6 +2304,9 @@ export function monnear(mon, x, y) {   // mon.c:2476
     return $c.i8(distance < 3 ? 1 : 0);
 }
 /* really free dead monsters */
+/**
+ * @returns {Promise<void>}
+ */
 export async function dmonsfree() {   // mon.c:2487
     let mtmp = null, freetmp = null, count = 0, buf = new Int8Array(128);
     count = 0;
@@ -2156,6 +2329,11 @@ export async function dmonsfree() {   // mon.c:2487
     iflags.purge_monsters = 0;
 }
 /* called when monster is moved to larger structure */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.monst | null} mtmp2 struct monst *
+ * @returns {Promise<void>}
+ */
 export async function replmon(mtmp, mtmp2) {   // mon.c:2515
     let otmp = null;
     /* transfer the monster's inventory */
@@ -2201,6 +2379,11 @@ export async function replmon(mtmp, mtmp2) {   // mon.c:2515
 }
 /* release mon from the display and the map's monster list,
    maybe transfer it to one of the other monster lists */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {*} monst_list struct monst **
+ * @returns {Promise<void>}
+ */
 export async function relmon(mon, monst_list) {   // mon.c:2561
     let mtmp = null;
     /* &gm.migrating_mons or &gm.mydogs or null */
@@ -2232,6 +2415,11 @@ export async function relmon(mon, monst_list) {   // mon.c:2561
         mon.nmon = null;
     }
 }
+/**
+ * @param {$T.monst | null} mtmp2 struct monst *
+ * @param {$T.monst | null} mtmp1 struct monst *
+ * @returns {Promise<void>}
+ */
 export async function copy_mextra(mtmp2, mtmp1) {   // mon.c:2597
     let $t1;
     if (!mtmp2 || !mtmp1 || !mtmp1.mextra) {
@@ -2290,6 +2478,9 @@ export async function copy_mextra(mtmp2, mtmp1) {   // mon.c:2597
         mtmp2.mextra.mcorpsenm = mtmp1.mextra.mcorpsenm;
     }
 }
+/**
+ * @param {$T.monst | null} m struct monst *
+ */
 export function dealloc_mextra(m) {   // mon.c:2649
     let x = null;
     x = m.mextra;
@@ -2320,6 +2511,10 @@ export function dealloc_mextra(m) {   // mon.c:2649
         m.mextra = null;
     }
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<void>}
+ */
 export async function dealloc_monst(mon) {   // mon.c:2676
     let buf = new Int8Array(128);
     buf[0] = 0;
@@ -2337,6 +2532,10 @@ export async function dealloc_monst(mon) {   // mon.c:2676
 }
 /* 'mon' is being removed from level due to migration [relmon from keepdogs
    or migrate_to_level] or due to death [m_detach from mondead or mongone] */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<void>}
+ */
 async function mon_leaving_level(mon) {   // mon.c:2696
     let mx = 0, my = 0, onmap = 0;
     mx = mon.mx;
@@ -2373,6 +2572,12 @@ async function mon_leaving_level(mon) {   // mon.c:2696
     }
 }
 /* 'mtmp' is going away; remove effects of mtmp from other data structures */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.permonst | null} mptr struct permonst *
+ * @param {number} due_to_death boolean
+ * @returns {Promise<void>}
+ */
 async function m_detach(mtmp, mptr, due_to_death) {   // mon.c:2734
     let mx = 0, my = 0;
     /* reflects mtmp->data _prior_ to mtmp's death */
@@ -2446,6 +2651,10 @@ async function m_detach(mtmp, mptr, due_to_death) {   // mon.c:2734
 }
 /* give a life-saved monster a reasonable mhpmax value in case it has
    been the victim of excessive life draining */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} minimum_mhpmax int
+ */
 function set_mon_min_mhpmax(mon, minimum_mhpmax) {   // mon.c:2808
     /* monster life-saving has traditionally used 10 */
     /* can't be less than m_lev+1 (if we just used m_lev itself, level 0
@@ -2463,6 +2672,10 @@ function set_mon_min_mhpmax(mon, minimum_mhpmax) {   // mon.c:2808
     }
 }
 /* find the worn amulet of life saving which will save a monster */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function mlifesaver(mon) {   // mon.c:2827
     let otmp = null;
     if (!nonliving(mon.data) || is_vampshifter(mon)) {
@@ -2473,6 +2686,10 @@ export async function mlifesaver(mon) {   // mon.c:2827
     }
     return null;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 async function lifesaved_monster(mtmp) {   // mon.c:2839
     let surviver = 0, lifesave = null;
     lifesave = await mlifesaver(mtmp);
@@ -2518,6 +2735,10 @@ async function lifesaved_monster(mtmp) {   // mon.c:2839
 /* when a shape-shifted vampire is killed, it reverts to base form instead
    of dying; returns True if mtmp successfully revives, False otherwise;
    "successfully revived" vampire might be killed by a booby trapped door */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} boolean
+ */
 async function vamprises(mtmp) {   // mon.c:2890
     let mndx = 0, action = new Int8Array(256), spec_mon = 0, spec_death = 0, x = 0, y = 0, door = null, trapped = 0, seeit = 0, trap_killed = 0, save_verbose = 0;
     mndx = mtmp.cham;
@@ -2601,6 +2822,11 @@ async function vamprises(mtmp) {   // mon.c:2890
    actually killed even when unseen or hallucinated to be something else */
 /* when a mon has died, maybe record an achievement or issue livelog message;
    moved into separate routine to unclutter mondead() */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} mndx int
+ * @returns {Promise<void>}
+ */
 async function logdeadmon(mtmp, mndx) {   // mon.c:2997
     let howmany = 0, shkdetail = new Int8Array(128), mkilled = null, herodidit = 0, xtra = new Int8Array(40), llevent_type = 0;
     howmany = svm.mvitals[mndx].died;
@@ -2662,6 +2888,10 @@ async function logdeadmon(mtmp, mndx) {   // mon.c:2997
     }
 }
 /* anger all the quest guards on the level */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 async function anger_quest_guardians(mtmp) {   // mon.c:3072
     if ($c.peq(mtmp.data, $c.relem(mons, gu.urole.guardnum))) {
         await setmangry(mtmp, TRUE);
@@ -2669,6 +2899,10 @@ async function anger_quest_guardians(mtmp) {   // mon.c:3072
 }
 /* monster 'mtmp' has died; maybe life-save, otherwise unshapeshift and
    update vanquished stats and update map */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function mondead(mtmp) {   // mon.c:3081
     let mptr = null, be_sad = 0, mndx = 0, stway = null;
     /* potential pet message; always clear global flag */
@@ -2759,6 +2993,12 @@ export async function mondead(mtmp) {   // mon.c:3081
     return;
 }
 /* TRUE if corpse might be dropped, magr may die if mon was swallowed */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.monst | null} magr struct monst *
+ * @param {number} was_swallowed boolean
+ * @returns {Promise<number>} boolean
+ */
 export async function corpse_chance(mon, magr, was_swallowed) {   // mon.c:3181
     let mdat = null, i = 0, tmp = 0;
     /* killer, if swallowed */
@@ -2824,6 +3064,10 @@ export async function corpse_chance(mon, magr, was_swallowed) {   // mon.c:3181
     return $c.i8(!rn2(tmp) ? 1 : 0);
 }
 /* drop (perhaps) a cadaver and remove monster */
+/**
+ * @param {$T.monst | null} mdef struct monst *
+ * @returns {Promise<void>}
+ */
 export async function mondied(mdef) {   // mon.c:3253
     await mondead(mdef);
     if (!DEADMONSTER(mdef)) {
@@ -2835,6 +3079,10 @@ export async function mondied(mdef) {   // mon.c:3253
     }
 }
 /* monster disappears, not dies */
+/**
+ * @param {$T.monst | null} mdef struct monst *
+ * @returns {Promise<void>}
+ */
 export async function mongone(mdef) {   // mon.c:3267
     mdef.mhp = 0;   /* can skip some inventory bookkeeping */
     /* dead vault guard is actually kept at coordinate <0,0> until
@@ -2852,6 +3100,10 @@ export async function mongone(mdef) {   // mon.c:3267
     await m_detach(mdef, mdef.data, FALSE);
 }
 /* drop a statue or rock and remove monster */
+/**
+ * @param {$T.monst | null} mdef struct monst *
+ * @returns {Promise<void>}
+ */
 export async function monstone(mdef) {   // mon.c:3287
     let otmp = null, obj = null, oldminvent = null, x = 0, y = 0, wasinside = 0, corpstatflags = 0, $t1;
     x = mdef.mx;
@@ -2940,6 +3192,12 @@ export async function monstone(mdef) {   // mon.c:3287
     return;
 }
 /* another monster has killed the monster mdef */
+/**
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$c.Ptr | null} fltxt const char *
+ * @param {number} how int
+ * @returns {Promise<void>}
+ */
 export async function monkilled(mdef, fltxt, how) {   // mon.c:3377
     let mptr = null, rxt = null;
     mptr = mdef.data;
@@ -2973,6 +3231,10 @@ export async function monkilled(mdef, fltxt, how) {   // mon.c:3377
     }
     return;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function set_ustuck(mtmp) {   // mon.c:3421
     if (iflags.sanity_check || iflags.debug_fuzzer) {
         if (mtmp && !(dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2)) {
@@ -2986,6 +3248,10 @@ export async function set_ustuck(mtmp) {   // mon.c:3421
         u.uswldtim = 0;
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function unstuck(mtmp) {   // mon.c:3438
     let ptr = null, swallowed = 0, $t1;
     if ($c.peq(u.ustuck, mtmp)) {
@@ -3013,10 +3279,19 @@ export async function unstuck(mtmp) {   // mon.c:3438
         }
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function killed(mtmp) {   // mon.c:3470
     await xkilled(mtmp, XKILL.GIVEMSG);
 }
 /* the player has killed the monster mtmp */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} xkill_flags int
+ * @returns {Promise<void>}
+ */
 export async function xkilled(mtmp, xkill_flags) {   // mon.c:3477
     let tmp = 0, mndx = 0, x = 0, y = 0, museum = new $T.monst(), mdat = null, otmp = null, t = null, be_sad = 0, wasinside = 0, burycorpse = 0, nomsg = 0, nocorpse = 0, noconduct = 0, namedpet = 0, cadaver = null, otyp = 0, mname = 0, $t1, $t2;
     /* 1: suppress mesg, 2: suppress corpse, 4: pacifist */
@@ -3240,6 +3515,10 @@ export async function xkilled(mtmp, xkill_flags) {   // mon.c:3477
 }
 /* changes the monster into a stone monster of the same type
    this should only be called when poly_when_stoned() is true */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function mon_to_stone(mtmp) {   // mon.c:3748
     if (mtmp.data.mlet === S.GOLEM) {
         /* it's a golem, and not a stone golem */
@@ -3259,6 +3538,10 @@ export async function mon_to_stone(mtmp) {   // mon.c:3748
         await impossible($c.lit("Can't polystone %s!"), await a_monnam(mtmp));
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} boolean
+ */
 export async function vamp_stone(mtmp) {   // mon.c:3766
     let mndx = 0, x = 0, y = 0, buf = new Int8Array(256), new_xy = new $T.nhcoord();
     if (is_vampshifter(mtmp)) {
@@ -3312,6 +3595,10 @@ export async function vamp_stone(mtmp) {   // mon.c:3766
     return TRUE;
 }
 /* drop monster into "limbo" - that is, migrate to the current level */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function m_into_limbo(mtmp) {   // mon.c:3834
     let target_lev = 0, xyloc = 0;
     target_lev = ledger_no(u.uz);
@@ -3319,6 +3606,12 @@ export async function m_into_limbo(mtmp) {   // mon.c:3834
     mtmp.mstate = $c.or64(mtmp.mstate, MON.LIMBO);
     await migrate_mon(mtmp, target_lev, xyloc);
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} target_lev xint16
+ * @param {number} xyloc xint16
+ * @returns {Promise<void>}
+ */
 export async function migrate_mon(mtmp, target_lev, xyloc) {   // mon.c:3843
     /* destination level */
     /* MIGR_xxx flag for location within destination */
@@ -3336,6 +3629,10 @@ export async function migrate_mon(mtmp, target_lev, xyloc) {   // mon.c:3843
     }
     await migrate_to_level(mtmp, target_lev, xyloc, null);
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number} boolean
+ */
 function ok_to_obliterate(mtmp) {   // mon.c:3864
     /*
      * Add checks for monsters that should not be obliterated
@@ -3346,6 +3643,10 @@ function ok_to_obliterate(mtmp) {   // mon.c:3864
     }
     return TRUE;
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<void>}
+ */
 export async function elemental_clog(mon) {   // mon.c:3878
     let m_lev = 0, mtmp = null, m1 = null, m2 = null, m3 = null, m4 = null, m5 = null, zm = null, mx = 0, my = 0, dest = new $T.d_level(), target_lev = 0;
     m_lev = 0;
@@ -3421,6 +3722,11 @@ export async function elemental_clog(mon) {   // mon.c:3878
 }
 /* make monster mtmp next to you (if possible);
    might place monst on far side of a wall or boulder */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} rlocflags unsigned int
+ * @returns {Promise<void>}
+ */
 export async function mnexto(mtmp, rlocflags) {   // mon.c:3955
     let mm = new $T.nhcoord(), savemm = new $T.nhcoord();
     if ($c.peq(mtmp, u.usteed)) {
@@ -3446,6 +3752,10 @@ export async function mnexto(mtmp, rlocflags) {   // mon.c:3955
     await rloc_to_flag(mtmp, mm.x, mm.y, rlocflags);
     return;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function deal_with_overcrowding(mtmp) {   // mon.c:3986
     let save_plnmsg = 0, save_plnmsg$2 = 0;
     if (In_endgame(u.uz)) {
@@ -3469,6 +3779,10 @@ export async function deal_with_overcrowding(mtmp) {   // mon.c:3986
     }
 }
 /* like mnexto() but requires destination to be directly accessible */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function maybe_mnexto(mtmp) {   // mon.c:3999
     let mm = new $T.nhcoord(), ptr = null, diagok = 0, tryct = 0;
     ptr = mtmp.data;
@@ -3496,6 +3810,14 @@ export async function maybe_mnexto(mtmp) {   // mon.c:3999
  *
  * Might be called recursively if 'move_other' is True; if so, that argument
  * will be False on the nested call so there won't be any further recursion.
+ */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} move_other boolean
+ * @param {number} rlocflags unsigned int
+ * @returns {Promise<number>} int
  */
 export async function mnearto(mtmp, x, y, move_other, rlocflags) {   // mon.c:4031
     let othermon = null, newx = 0, newy = 0, mm = new $T.nhcoord(), res = 0, $t1;
@@ -3544,6 +3866,10 @@ export async function mnearto(mtmp, x, y, move_other, rlocflags) {   // mon.c:40
     return res;
 }
 /* shrieker special action: shriek, maybe summon monster, aggravate */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 async function m_respond_shrieker(mtmp) {   // mon.c:4089
     if (!Deaf()) {
         await pline($c.lit("%s shrieks."), await Monnam(mtmp));
@@ -3558,6 +3884,10 @@ async function m_respond_shrieker(mtmp) {   // mon.c:4089
     await aggravate();
 }
 /* medusa special action: gaze at hero */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 async function m_respond_medusa(mtmp) {   // mon.c:4109
     let i = 0;
     for (i = 0; i < NATTK; i = i + 1 | 0) {
@@ -3568,6 +3898,10 @@ async function m_respond_medusa(mtmp) {   // mon.c:4109
     }
 }
 /* monster responds to player action; not the same as a passive attack */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function m_respond(mtmp) {   // mon.c:4122
     if (mtmp.data.msound === MS.SHRIEK && !um_dist(mtmp.mx, mtmp.my, 1)) {
         await m_respond_shrieker(mtmp);
@@ -3581,6 +3915,9 @@ export async function m_respond(mtmp) {   // mon.c:4122
     }
 }
 /* how quest guardians respond when you attack the quest leader */
+/**
+ * @returns {Promise<void>}
+ */
 async function qst_guardians_respond() {   // mon.c:4135
     let mon = null, q_guardian = null, got_mad = 0, who = null;
     q_guardian = $c.relem(mons, await quest_info(MS.GUARDIAN));
@@ -3606,6 +3943,10 @@ async function qst_guardians_respond() {   // mon.c:4135
     }
 }
 /* how other peacefuls react when you attack monster */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 async function peacefuls_respond(mtmp) {   // mon.c:4163
     let mon = null, mndx = 0, buf = new Int8Array(256), exclaimed = 0, needpunct = 0, alreadyfleeing = 0, gasp = null;
     mndx = mtmp.data.pmidx;
@@ -3698,6 +4039,11 @@ async function peacefuls_respond(mtmp) {   // mon.c:4163
    attack and any ramifications that might have. Useful also in situations
    where mtmp was already hostile; it checks for situations where the player
    shouldn't be attacking and any ramifications /that/ might have. */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} via_attack boolean
+ * @returns {Promise<void>}
+ */
 export async function setmangry(mtmp, via_attack) {   // mon.c:4265
     /* only hypocritical if monster is vulnerable to Elbereth (or
        peaceful--not vulnerable but attacking it is hypocritical) */
@@ -3755,12 +4101,22 @@ export async function setmangry(mtmp, via_attack) {   // mon.c:4265
     }
 }
 /* Indicate via message that a monster has awoken. */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} interesting boolean
+ * @returns {Promise<void>}
+ */
 export async function wake_msg(mtmp, interesting) {   // mon.c:4322
     if (mtmp.msleeping | 0 && canseemon(mtmp)) {
         await pline_mon(mtmp, $c.lit("%s wakes up%s%s"), await Monnam(mtmp), interesting ? $c.lit("!") : $c.lit("."), $c.peq(mtmp.data, $c.relem(mons, PM.FLESH_GOLEM)) ? $c.lit(" It's alive!") : $c.lit(""));
     }
 }
 /* wake up a monster, possibly making it angry in the process */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} via_attack boolean
+ * @returns {Promise<void>}
+ */
 export async function wakeup(mtmp, via_attack) {   // mon.c:4333
     let was_sleeping = 0, was_peaceful = 0;
     was_sleeping = $c.i8(mtmp.msleeping);
@@ -3794,10 +4150,21 @@ export async function wakeup(mtmp, via_attack) {   // mon.c:4333
     }
 }
 /* Wake up nearby monsters without angering them. */
+/**
+ * @param {number} petcall boolean
+ * @returns {Promise<void>}
+ */
 export async function wake_nearby(petcall) {   // mon.c:4367
     await wake_nearto_core(u.ux, u.uy, Math.imul(u.ulevel, 20), petcall);
 }
 /* Wake up monsters near some particular location. */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} distance int
+ * @param {number} petcall boolean
+ * @returns {Promise<void>}
+ */
 async function wake_nearto_core(x, y, distance, petcall) {   // mon.c:4374
     let mtmp = null;
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
@@ -3826,10 +4193,20 @@ async function wake_nearto_core(x, y, distance, petcall) {   // mon.c:4374
     }
     await disturb_buried_zombies(x, y);
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} distance int
+ * @returns {Promise<void>}
+ */
 export async function wake_nearto(x, y, distance) {   // mon.c:4402
     await wake_nearto_core(x, y, distance, FALSE);
 }
 /* NOTE: we must check for mimicry before calling this routine */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function seemimic(mtmp) {   // mon.c:4409
     let is_blocker_appear = 0;
     is_blocker_appear = $c.i8((mtmp.m_ap_type & M_AP.TYPMASK) === M_AP.OBJECT && mtmp.mappearance === BOULDER || (mtmp.m_ap_type & M_AP.TYPMASK) === M_AP.FURNITURE && (mtmp.mappearance === S.hcdoor || mtmp.mappearance === S.vcdoor || mtmp.mappearance < S.ndoor || mtmp.mappearance === S.tree) ? 1 : 0);
@@ -3847,6 +4224,10 @@ export async function seemimic(mtmp) {   // mon.c:4409
     await newsym(mtmp.mx, mtmp.my);
 }
 /* [taken out of rescham() in order to be shared by restore_cham()] */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<void>}
+ */
 export async function normal_shape(mon) {   // mon.c:4431
     let mcham = 0, mcan = 0;
     mcham = mon.cham;
@@ -3881,6 +4262,10 @@ export async function normal_shape(mon) {   // mon.c:4431
 }
 /* manage itermonarr; it used to be allocated and freed every time the
    monster movement loop ran; now, keep it around most of the time */
+/**
+ * @param {number} count unsigned int
+ * @returns {Promise<void>}
+ */
 export async function alloc_itermonarr(count) {   // mon.c:4471
     /* if count is 0 or bigger than itermonsiz or much smaller than
        itermonsiz, release itermonarr (and reset itermonsiz to 0) */
@@ -3907,6 +4292,10 @@ export async function alloc_itermonarr(count) {   // mon.c:4471
 
    Safe for list deletions and insertions, and guarantees calling bfunc()
    once per monster in fmon unless it returns TRUE (or game ends). */
+/**
+ * @param {Function | null} bfunc boolean (*)(struct monst *)
+ * @returns {Promise<void>}
+ */
 export async function iter_mons_safe(bfunc) {   // mon.c:4500
     let mtmp = null, i = 0, nmons = 0, $t1;
     for (nmons = 0, mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
@@ -3928,6 +4317,10 @@ export async function iter_mons_safe(bfunc) {   // mon.c:4500
     return;
 }
 /* iterate all living monsters on current level, calling vfunc for each. */
+/**
+ * @param {Function | null} vfunc void (*)(struct monst *)
+ * @returns {Promise<void>}
+ */
 export async function iter_mons(vfunc) {   // mon.c:4527
     let mtmp = null, mtmp2 = null;
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp2) {
@@ -3941,6 +4334,10 @@ export async function iter_mons(vfunc) {   // mon.c:4527
 }
 /* iterate all living monsters on current level, calling bfunc for each.
    if bfunc returns TRUE, stop and return that monster. */
+/**
+ * @param {Function | null} bfunc boolean (*)(struct monst *)
+ * @returns {Promise<$T.monst | null>} struct monst *
+ */
 export async function get_iter_mons(bfunc) {   // mon.c:4544
     let mtmp = null, mtmp2 = null;
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp2) {
@@ -3957,6 +4354,12 @@ export async function get_iter_mons(bfunc) {   // mon.c:4544
 /* iterate all living monsters on current level, calling bfunc for each,
    passing x,y to the function.
    if bfunc returns TRUE, stop and return that monster. */
+/**
+ * @param {Function | null} bfunc boolean (*)(struct monst *, coordxy, coordxy)
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<$T.monst | null>} struct monst *
+ */
 export async function get_iter_mons_xy(bfunc, x, y) {   // mon.c:4562
     let mtmp = null, mtmp2 = null;
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp2) {
@@ -3986,6 +4389,12 @@ export async function get_iter_mons_xy(bfunc, x, y) {   // mon.c:4562
 
    amt and overheal must not be negative (0 is allowed, and a very common
    amount for overheal). Returns the number of hitpoints healed. */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} amt int
+ * @param {number} overheal int
+ * @returns {Promise<number>} int
+ */
 export async function healmon(mtmp, amt, overheal) {   // mon.c:4596
     let oldhp = 0, oldhp$2 = 0;
     if ($c.peq(mtmp, gy.youmonst)) {
@@ -4009,9 +4418,16 @@ export async function healmon(mtmp, amt, overheal) {   // mon.c:4596
 /* force all chameleons and mimics to become themselves and werecreatures
    to revert to human form; called when Protection_from_shape_changers gets
    activated via wearing or eating ring or via #wizintrinsic */
+/**
+ * @returns {Promise<void>}
+ */
 export async function rescham() {   // mon.c:4621
     await iter_mons(normal_shape);
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 async function m_restartcham(mtmp) {   // mon.c:4627
     let $t1;
     if (!mtmp.mcan) {
@@ -4024,12 +4440,19 @@ async function m_restartcham(mtmp) {   // mon.c:4627
 }
 /* let chameleons change and mimics hide again; called when taking off
    ring of protection from shape changers */
+/**
+ * @returns {Promise<void>}
+ */
 export async function restartcham() {   // mon.c:4640
     await iter_mons(m_restartcham);
 }
 /* called when restoring a monster from a saved level; protection
    against shape-changing might be different now than it was at the
    time the level was saved. */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<void>}
+ */
 export async function restore_cham(mon) {   // mon.c:4649
     let $t1;
     if (Protection_from_shape_changers() || mon.mcan | 0) {
@@ -4041,6 +4464,10 @@ export async function restore_cham(mon) {   // mon.c:4649
     }
 }
 /* unwatched hiders may hide again; if so, returns True */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} boolean
+ */
 async function restrap(mtmp) {   // mon.c:4662
     let t = null;
     /* can't hide while trapped except in pits */
@@ -4067,6 +4494,11 @@ async function restrap(mtmp) {   // mon.c:4662
 }
 /* reveal a hiding monster at x,y, either under nonexistent object,
    or an eel out of water. */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function maybe_unhide_at(x, y) {   // mon.c:4698
     let mtmp = null, undetected = 0, trapped = 0;
     undetected = FALSE;
@@ -4088,6 +4520,10 @@ export async function maybe_unhide_at(x, y) {   // mon.c:4698
 /* monster/hero tries to hide under something at the current location;
    if used by monster creation, should only happen during level
    creation, otherwise there will be message sequencing issues */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} boolean
+ */
 export async function hideunder(mtmp) {   // mon.c:4726
     let t = null, otmp = null, seenmon = null, seenobj = null, locomo = null, seeit = 0, oldundetctd = 0, undetected = 0, is_u = 0, x = 0, y = 0;
     seenmon = null;
@@ -4162,6 +4598,10 @@ export async function hideunder(mtmp) {   // mon.c:4726
     return undetected;
 }
 /* called when returning to a previously visited level */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<void>}
+ */
 export async function hide_monst(mon) {   // mon.c:4806
     let hider_under = 0, x = 0, y = 0, save_viz = 0;
     hider_under = $c.i8(hides_under(mon.data) || mon.data.mlet === S.EEL ? 1 : 0);
@@ -4184,6 +4624,10 @@ export async function hide_monst(mon) {   // mon.c:4806
         }
     }
 }
+/**
+ * @param {number} construct boolean
+ * @returns {Promise<void>}
+ */
 export async function mon_animal_list(construct) {   // mon.c:4829
     let animal_temp = new Int16Array(330), i = 0, n = 0, $t1, $t2;
     if (construct) {
@@ -4205,6 +4649,9 @@ export async function mon_animal_list(construct) {   // mon.c:4829
         ga.animal_list_count = 0;
     }
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function pick_animal() {   // mon.c:4855
     let res = 0;
     if (!ga.animal_list) {
@@ -4220,6 +4667,10 @@ async function pick_animal() {   // mon.c:4855
     }
     return res;
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<void>}
+ */
 export async function decide_to_shapeshift(mon) {   // mon.c:4872
     let ptr = null, mndx = 0, was_female = 0, dochng = 0, new_xy = new $T.nhcoord(), $t1;
     ptr = null;
@@ -4278,6 +4729,10 @@ export async function decide_to_shapeshift(mon) {   // mon.c:4872
         }
     }
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {number} int
+ */
 function pickvampshape(mon) {   // mon.c:4941
     let mndx = 0, wolfchance = 0, uppercase_only = 0;
     mndx = mon.cham;
@@ -4316,12 +4771,21 @@ function pickvampshape(mon) {   // mon.c:4941
     return mndx;
 }
 /* nonshapechangers who warrant special polymorph handling */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {number} boolean
+ */
 function isspecmon(mon) {   // mon.c:4983
     return $c.i8(mon.isshk | 0 || mon.ispriest | 0 || mon.isgd | 0 || mon.m_id === svq.quest_status.leader_m_id ? 1 : 0);
 }
 /* restrict certain special monsters (shopkeepers, aligned priests,
    vault guards) to forms that allow them to behave sensibly (catching
    gold, speaking?) so that they don't need too much extra code */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} mndx int
+ * @returns {number} boolean
+ */
 function validspecmon(mon, mndx) {   // mon.c:4993
     let ptr = null;
     if (mndx === NON_PM) {
@@ -4342,6 +4806,11 @@ function validspecmon(mon, mndx) {   // mon.c:4993
     return TRUE;   /* potential new form is ok */
 }
 /* used for hero polyself handling */
+/**
+ * @param {number} base int
+ * @param {number} form int
+ * @returns {number} boolean
+ */
 export function valid_vampshiftform(base, form) {   // mon.c:5015
     if (base >= LOW_PM && is_vampire($c.relem(mons, base))) {
         if (form === PM.VAMPIRE_BAT || form === PM.FOG_CLOUD || form === PM.WOLF && base !== PM.VAMPIRE) {
@@ -4352,6 +4821,12 @@ export function valid_vampshiftform(base, form) {   // mon.c:5015
 }
 /* prevent wizard mode user from specifying invalid vampshifter shape
    when using monpolycontrol to assign a new form to a vampshifter */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {*} mndx_p int *
+ * @param {number} monclass int
+ * @returns {number} boolean
+ */
 export function validvamp(mon, mndx_p, monclass) {   // mon.c:5028
     /* simplify caller's usage */
     if (!is_vampshifter(mon)) {
@@ -4399,6 +4874,10 @@ export function validvamp(mon, mndx_p, monclass) {   // mon.c:5028
     }
     return $c.i8(mndx_p.get(0) !== NON_PM ? 1 : 0);
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<number>} int
+ */
 async function wiz_force_cham_form(mon) {   // mon.c:5078
     let pprompt = new Int8Array(256), parttwo = new Int8Array(128), buf = new Int8Array(256), prevbuf = new Int8Array(256), monclass = 0, len = 0, tryct = 0, mndx = Int32Array.of(0), $t1;
     mndx[0] = NON_PM;
@@ -4468,6 +4947,10 @@ async function wiz_force_cham_form(mon) {   // mon.c:5078
     }
     return mndx[0];
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<number>} int
+ */
 export async function select_newcham_form(mon) {   // mon.c:5157
     let mndx = 0, tryct = 0, m_armr = null;
     mndx = NON_PM;
@@ -4543,6 +5026,11 @@ export async function select_newcham_form(mon) {   // mon.c:5157
     return mndx;
 }
 /* this used to be inline within newcham() but monpolycontrol needs it too */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} mndx int
+ * @returns {$T.permonst | null} struct permonst *
+ */
 function accept_newcham_form(mon, mndx) {   // mon.c:5229
     let mdat = null;
     if (mndx === NON_PM) {
@@ -4570,6 +5058,10 @@ function accept_newcham_form(mon, mndx) {   // mon.c:5229
     return polyok(mdat) ? mdat : null;
 }
 /* shapechanger might take on a shape that forces gender change */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.permonst | null} mdat struct permonst *
+ */
 export function mgender_from_permonst(mtmp, mdat) {   // mon.c:5256
     if (is_male(mdat)) {
         mtmp.female = (FALSE) & 1;
@@ -4588,6 +5080,12 @@ export function mgender_from_permonst(mtmp, mdat) {   // mon.c:5256
 /* make a chameleon take on another shape, or a polymorph target
    (possibly self-inflicted) become a different monster;
    returns 1 if it actually changes form */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.permonst | null} mdat struct permonst *
+ * @param {number} ncflags unsigned int
+ * @returns {Promise<number>} int
+ */
 export async function newcham(mtmp, mdat, ncflags) {   // mon.c:5278
     let polyspot = 0, msg = 0, seenorsensed = 0, hpn = 0, hpd = 0, mndx = 0, tryct = 0, olddata = null, p = null, oldname = new Int8Array(256), l_oldname = new Int8Array(256), mx = 0, my = 0, msgtrail = new Int8Array(256), mnm = null, otmp = null, otmp2 = null, $t1, $t2, $t3, $t4;
     /* "The oldmon turns into a newmon!" */
@@ -4835,6 +5333,10 @@ export async function newcham(mtmp, mdat, ncflags) {   // mon.c:5278
  * Return the monster number to use as the egg's corpsenm.  Return
  * NON_PM if the given monster can't be hatched.
  */
+/**
+ * @param {number} mnum int
+ * @returns {number} int
+ */
 export function can_be_hatched(mnum) {   // mon.c:5546
     /* ranger quest nemesis has the oviparous bit set, making it
        be possible to wish for eggs of that unique monster; turn
@@ -4853,6 +5355,11 @@ export function can_be_hatched(mnum) {   // mon.c:5546
     return NON_PM;
 }
 /* type of egg laid by #sit; usually matches parent */
+/**
+ * @param {number} mnum int
+ * @param {number} force_ordinary boolean
+ * @returns {number} int
+ */
 export function egg_type_from_parent(mnum, force_ordinary) {   // mon.c:5569
     /* parent monster; caller must handle lays_eggs() check */
     if (force_ordinary || !!rn2(77)) {
@@ -4866,6 +5373,11 @@ export function egg_type_from_parent(mnum, force_ordinary) {   // mon.c:5569
 }
 /* decide whether an egg of the indicated monster type is viable;
    also used to determine whether an egg or tin can be created... */
+/**
+ * @param {number} m_idx int
+ * @param {number} egg boolean
+ * @returns {number} boolean
+ */
 export function dead_species(m_idx, egg) {   // mon.c:5587
     let alt_idx = 0;
     /* generic eggs are unhatchable and have corpsenm of NON_PM */
@@ -4884,6 +5396,10 @@ export function dead_species(m_idx, egg) {   // mon.c:5587
     return $c.i8((svm.mvitals[m_idx].mvflags & G_GENOD) !== 0 || (svm.mvitals[alt_idx].mvflags & G_GENOD) !== 0 ? 1 : 0);
 }
 /* kill off any eggs of genocided monsters */
+/**
+ * @param {$T.obj | null} obj_list struct obj *
+ * @returns {Promise<void>}
+ */
 async function kill_eggs(obj_list) {   // mon.c:5609
     let otmp = null;
     for (otmp = obj_list; otmp; otmp = otmp.nobj) {
@@ -4906,6 +5422,9 @@ async function kill_eggs(obj_list) {   // mon.c:5609
     }
 }
 /* kill all members of genocided species */
+/**
+ * @returns {Promise<void>}
+ */
 export async function kill_genocided_monsters() {   // mon.c:5639
     let mtmp = null, mtmp2 = null, kill_cham = 0, mndx = 0;
     /*
@@ -4942,6 +5461,12 @@ export async function kill_genocided_monsters() {   // mon.c:5639
     await kill_eggs(gm.migrating_objs);
     await kill_eggs(svl.level.buriedobjlist);
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} damtype int
+ * @param {number} dam int
+ * @returns {Promise<void>}
+ */
 export async function golemeffects(mon, damtype, dam) {   // mon.c:5680
     let heal = 0, slow = 0;
     heal = 0;
@@ -4975,6 +5500,10 @@ export async function golemeffects(mon, damtype, dam) {   // mon.c:5680
     }
 }
 /* anger the Minetown watch */
+/**
+ * @param {number} silent boolean
+ * @returns {Promise<number>} boolean
+ */
 export async function angry_guards(silent) {   // mon.c:5711
     let mtmp = null, ct = 0, nct = 0, sct = 0, slct = 0, buf = new Int8Array(256), $t1;
     ct = 0;
@@ -5026,14 +5555,25 @@ export async function angry_guards(silent) {   // mon.c:5711
     }
     return FALSE;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ */
 function pacify_guard(mtmp) {   // mon.c:5763
     if (is_watch(mtmp.data)) {
         mtmp.mpeaceful = (1) & 1;
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function pacify_guards() {   // mon.c:5770
     await iter_mons(pacify_guard);
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} otyp short
+ * @returns {Promise<void>}
+ */
 export async function mimic_hit_msg(mtmp, otyp) {   // mon.c:5776
     let ap = 0;
     ap = $c.i16(mtmp.mappearance);
@@ -5049,6 +5589,10 @@ export async function mimic_hit_msg(mtmp, otyp) {   // mon.c:5776
             break;
     }
 }
+/**
+ * @param {$T.permonst | null} mdat struct permonst *
+ * @returns {Promise<number>} boolean
+ */
 export async function usmellmon(mdat) {   // mon.c:5796
     let mndx = 0, nonspecific = 0, msg_given = 0;
     nonspecific = FALSE;
@@ -5165,10 +5709,16 @@ export async function usmellmon(mdat) {   // mon.c:5796
 /* setting misc_worn_check's I_SPECIAL bit flags a monster to reassess
    and potentially re-equip gear at the start of its next move;
    this hides the details of that */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ */
 export function check_gear_next_turn(mon) {   // mon.c:5915
     mon.misc_worn_check = $c.or64(mon.misc_worn_check, I_SPECIAL);
 }
 /* make erinyes more dangerous based on your alignment abuse */
+/**
+ * @param {number} abuse unsigned int
+ */
 export function adj_erinys(abuse) {   // mon.c:5922
     let pm = null;
     pm = $c.relem(mons, PM.ERINYS);
@@ -5214,6 +5764,11 @@ export function adj_erinys(abuse) {   // mon.c:5922
 }
 /* mark individual monster type as seen from close-up,
    if we haven't seen it nearby before */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} photo boolean
+ * @returns {Promise<void>}
+ */
 export async function see_monster_closeup(mtmp, photo) {   // mon.c:5971
     let mndx = 0;
     if (Hallucination() || Blind() && !Blind_telepat()) {
@@ -5258,6 +5813,9 @@ export async function see_monster_closeup(mtmp, photo) {   // mon.c:5971
     }
 }
 /* mark a monster type as seen close-up when we see it next to us */
+/**
+ * @returns {Promise<void>}
+ */
 export async function see_nearby_monsters() {   // mon.c:6025
     let mtmp = null, mndx = 0, x = 0, y = 0;
     if (Hallucination() || Blind() && !Blind_telepat()) {
@@ -5290,6 +5848,10 @@ export async function see_nearby_monsters() {   // mon.c:6025
 }
 /* monster resists something.
    make a shield effect at monster's location and give a message */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function shieldeff_mon(mtmp) {   // mon.c:6058
     await shieldeff(mtmp.mx, mtmp.my);
     /* does not depend on seeing the monster; the shield effect is visible */
@@ -5297,6 +5859,10 @@ export async function shieldeff_mon(mtmp) {   // mon.c:6058
         await pline_mon(mtmp, $c.lit("%s resists!"), await Monnam(mtmp));
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function flash_mon(mtmp) {   // mon.c:6067
     let mx = 0, my = 0, count = 0, saveviz = 0;
     mx = mtmp.mx;

@@ -48,6 +48,9 @@ let CapMons = null;
 /* from do_name.c */
 /* makedefs pads short rumors, epitaphs, engravings, and hallucinatory
    monster names with trailing underscores; strip those off */
+/**
+ * @param {$c.Ptr | null} line char *
+ */
 function unpadline(line) {   // rumors.c:67
     let p = null;
     p = eos(line);
@@ -61,6 +64,9 @@ function unpadline(line) {   // rumors.c:67
     }
     p.set(0, 0);
 }
+/**
+ * @param {$T.__sFILE | null} fp FILE *
+ */
 function init_rumors(fp) {   // rumors.c:85
     let true_count = Int32Array.of(0), false_count = Int32Array.of(0), eof_offset = [0], line = new Int8Array(256);
     /* in file but not used here */
@@ -80,6 +86,12 @@ function init_rumors(fp) {   // rumors.c:85
  * context where messages such as "You swallowed the fortune!" that refer to
  * cookies should not appear.  This has no effect for true rumors since none
  * of them contain such references anyway.
+ */
+/**
+ * @param {number} truth int
+ * @param {$c.Ptr | null} rumor_buf char *
+ * @param {number} exclude_cookie boolean
+ * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function getrumor(truth, rumor_buf, exclude_cookie) {   // rumors.c:117
     let rumors = null, beginning = 0, ending = 0, line = new Int8Array(256), marklen = 0, count = 0, adjtruth = 0, src = null, dst = null, $t1;
@@ -150,6 +162,9 @@ export async function getrumor(truth, rumor_buf, exclude_cookie) {   // rumors.c
 }
 /* test that the true/false rumor boundaries are valid and show the first
    two and very last epitaphs, engravings, and bogus monsters */
+/**
+ * @returns {Promise<void>}
+ */
 export async function rumor_check() {   // rumors.c:196
     let rumors = null, tmpwin = Int32Array.of(0), endp = null, line = new Int8Array(256), xbuf = new Int8Array(256), rumor_buf = new Int8Array(256), ftell_rumor_start = 0, $goto = null;
     D1: for (;;) {
@@ -249,6 +264,12 @@ export async function rumor_check() {   // rumors.c:196
     }
 }
 /* 5.0: augments rumors_check(); test 'engrave' or 'epitaph' or 'bogusmon' */
+/**
+ * @param {$c.Ptr | null} ftype const char *
+ * @param {$c.Ptr | null} fname const char *
+ * @param {*} winptr winid *
+ * @returns {Promise<void>}
+ */
 async function others_check(ftype, fname, winptr) {   // rumors.c:308
     let fh = null, line = new Int8Array(256), xbuf = new Int8Array(256), endp = null, tmpwin = 0, entrycount = 0, $t1;
     /* header: "{Engravings|Epitaphs|Bogus monsters}:" */
@@ -355,6 +376,16 @@ async function others_check(ftype, fname, winptr) {   // rumors.c:308
    chosen; however, if padlength is 0, lines following long lines are
    more likely than average to be picked, and lines after short lines
    are less likely */
+/**
+ * @param {$T.__sFILE | null} fh FILE *
+ * @param {$c.Ptr | null} buf char *
+ * @param {number} bufsiz unsigned int
+ * @param {Function | null} rng int (*)(int)
+ * @param {number | bigint} startpos long
+ * @param {number | bigint} endpos long
+ * @param {number} padlength unsigned int
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 async function get_rnd_line(fh, buf, bufsiz, rng, startpos, endpos, padlength) {   // rumors.c:420
     let newl = null, xbufp = null, xbuf = new Int8Array(256), filechunksize = 0, chunkoffset = 0, trylimit = 0;
     /* already opened file */
@@ -430,6 +461,13 @@ async function get_rnd_line(fh, buf, bufsiz, rng, startpos, endpos, padlength) {
 }
 /* Gets a random line of text from file 'fname', and returns it.
    rng is the random number generator to use, and should act like rn2 does. */
+/**
+ * @param {$c.Ptr | null} fname const char *
+ * @param {$c.Ptr | null} buf char *
+ * @param {Function | null} rng int (*)(int)
+ * @param {number} padlength unsigned int
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function get_rnd_text(fname, buf, rng, padlength) {   // rumors.c:499
     let fh = null, starttxt = 0, line = new Int8Array(256);
     fh = $c.fopen(fname, $c.lit("r"));
@@ -449,6 +487,11 @@ export async function get_rnd_text(fname, buf, rng, padlength) {   // rumors.c:4
     }
     return buf;
 }
+/**
+ * @param {number} truth int
+ * @param {number} mechanism int
+ * @returns {Promise<void>}
+ */
 export async function outrumor(truth, mechanism) {   // rumors.c:529
     let line = null, buf = new Int8Array(256), reading = 0;
     /* 1=true, -1=false, 0=either */
@@ -485,6 +528,10 @@ export async function outrumor(truth, mechanism) {   // rumors.c:529
     }
     await pline1(line);
 }
+/**
+ * @param {$T.__sFILE | null} fp FILE *
+ * @returns {Promise<void>}
+ */
 async function init_oracles(fp) {   // rumors.c:577
     let i = 0, line = new Int8Array(256), cnt = Int32Array.of(0), $t1;
     cnt[0] = 0;
@@ -501,6 +548,10 @@ async function init_oracles(fp) {   // rumors.c:577
     }
     return;
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 export async function save_oracles(nhfp) {   // rumors.c:598
     let i = 0;
     if (update_file(nhfp)) {
@@ -522,6 +573,10 @@ export async function save_oracles(nhfp) {   // rumors.c:598
     }
 }
 /* !SFCTOOL */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 export async function restore_oracles(nhfp) {   // rumors.c:623
     let i = 0, $t1;
     await sfi_unsigned(nhfp, new $c.FieldRef(svo, "oracle_cnt", "u32"), $c.lit("oracle-oracle_cnt"));
@@ -533,6 +588,11 @@ export async function restore_oracles(nhfp) {   // rumors.c:623
         go.oracle_flg = 1;   /* no need to call init_oracles() */
     }
 }
+/**
+ * @param {number} special boolean
+ * @param {number} delphi boolean
+ * @returns {Promise<void>}
+ */
 export async function outoracle(special, delphi) {   // rumors.c:640
     let tmpwin = 0, oracles = null, oracle_idx = 0, endp = null, line = new Int8Array(80), xbuf = new Int8Array(256), $t1;
     /* early return if we couldn't open ORACLEFILE on previous attempt,
@@ -583,6 +643,10 @@ export async function outoracle(special, delphi) {   // rumors.c:640
         go.oracle_flg = -1;   /* don't try to open it again */
     }
 }
+/**
+ * @param {$T.monst | null} oracl struct monst *
+ * @returns {Promise<number>} int
+ */
 export async function doconsult(oracl) {   // rumors.c:696
     let umoney = 0, u_pay = 0, minor_cost = 0, major_cost = 0, add_xpts = 0, qbuf = new Int8Array(128), cheapskate = 0;
     minor_cost = 50;
@@ -652,6 +716,10 @@ export async function doconsult(oracl) {   // rumors.c:696
     }
     return ECMD.TIME;
 }
+/**
+ * @param {$c.Ptr | null} filename const char *
+ * @returns {Promise<void>}
+ */
 async function couldnt_open_file(filename) {   // rumors.c:770
     let save_something = 0;
     save_something = program_state.something_worth_saving;
@@ -670,6 +738,10 @@ async function couldnt_open_file(filename) {   // rumors.c:770
    this sets up a list of names rather than scan all of mons[] every time
    the decision is needed (resulting list currently contains 27 monster
    entries and 20 hallucination entries) */
+/**
+ * @param {$c.Ptr | null} word const char *
+ * @returns {Promise<number>} boolean
+ */
 export async function CapitalMon(word) {   // rumors.c:791
     let nam = null, i = 0, wln = 0, nln = 0;
     /* potential monster name; a name might be followed by
@@ -704,6 +776,9 @@ export async function CapitalMon(word) {   // rumors.c:791
    having a capitalized type name like Green-elf or Archon, plus unique
    monsters whose "name" is a title rather than a personal name, plus
    hallucinatory monster names that fall into either of those categories */
+/**
+ * @returns {Promise<void>}
+ */
 async function init_CapMons() {   // rumors.c:829
     let pass = 0, bogonfile = null, mptr = null, nam = null, mndx = 0, mgend = 0, hline = new Int8Array(256), xbuf = new Int8Array(256), endp = null, startp = null, code = 0, buf = new Int8Array(256), i = 0, tmpwin = 0, $t1;
     bogonfile = $c.fopen($c.lit("bogusmon"), $c.lit("r"));

@@ -79,6 +79,16 @@ import { luaC_fullgc } from './lgc.js';
 ** reallocating to size 1, then 2, and then 4. All these arrays
 ** will be reallocated to exact sizes or erased when parsing ends.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} block void *
+ * @param {number} nelems int
+ * @param {number} psize int *
+ * @param {number} size_elems int
+ * @param {number} limit int
+ * @param {number} what const char *
+ * @returns {Promise<number>} void *
+ */
 export async function luaM_growaux_(L, block, nelems, psize, size_elems, limit, what) {   // lmem.c:97
     let newblock = 0, size = 0;
     size = $h.i32[psize >>> 2];
@@ -109,6 +119,14 @@ export async function luaM_growaux_(L, block, nelems, psize, size_elems, limit, 
 ** to its number of elements, the only option is to raise an
 ** error.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} block void *
+ * @param {number} size int *
+ * @param {number} final_n int
+ * @param {number} size_elem int
+ * @returns {Promise<number>} void *
+ */
 export async function luaM_shrinkvector_(L, block, size, final_n, size_elem) {   // lmem.c:128
     let newblock = 0, oldsize = 0, newsize = 0;
     oldsize = $c.u64(Math.imul($h.i32[size >>> 2], size_elem));
@@ -119,12 +137,22 @@ export async function luaM_shrinkvector_(L, block, size, final_n, size_elem) {  
     return newblock;
 }
 /* }================================================================== */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<void>}
+ */
 export async function luaM_toobig(L) {   // lmem.c:142
     await luaG_runerror(L, $h.lit("memory allocation error: block too big"));
 }
 /*
 ** Free memory
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} block void *
+ * @param {number | bigint} osize size_t
+ * @returns {Promise<void>}
+ */
 export async function luaM_free_(L, block, osize) {   // lmem.c:150
     let g = 0;
     g = $h.u32[(L + 24) >>> 2];
@@ -136,6 +164,13 @@ export async function luaM_free_(L, block, osize) {   // lmem.c:150
 ** In case of allocation fail, this function will do an emergency
 ** collection to free some memory and then try the allocation again.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} block void *
+ * @param {number | bigint} osize size_t
+ * @param {number | bigint} nsize size_t
+ * @returns {Promise<number>} void *
+ */
 async function tryagain(L, block, osize, nsize) {   // lmem.c:162
     let g = 0;
     g = $h.u32[(L + 24) >>> 2];
@@ -149,6 +184,13 @@ async function tryagain(L, block, osize, nsize) {   // lmem.c:162
 /*
 ** Generic allocation routine.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} block void *
+ * @param {number | bigint} osize size_t
+ * @param {number | bigint} nsize size_t
+ * @returns {Promise<number>} void *
+ */
 export async function luaM_realloc_(L, block, osize, nsize) {   // lmem.c:176
     let newblock = 0, g = 0;
     g = $h.u32[(L + 24) >>> 2];
@@ -164,6 +206,13 @@ export async function luaM_realloc_(L, block, osize, nsize) {   // lmem.c:176
     $h.st64(g + 24, $c.i64($c.subu64($c.addu64($c.u64($h.ld64(g + 24)), nsize), osize)));
     return newblock;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} block void *
+ * @param {number | bigint} osize size_t
+ * @param {number | bigint} nsize size_t
+ * @returns {Promise<number>} void *
+ */
 export async function luaM_saferealloc_(L, block, osize, nsize) {   // lmem.c:192
     let newblock = 0;
     newblock = await luaM_realloc_(L, block, osize, nsize);
@@ -172,6 +221,12 @@ export async function luaM_saferealloc_(L, block, osize, nsize) {   // lmem.c:19
     }
     return newblock;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number | bigint} size size_t
+ * @param {number} tag int
+ * @returns {Promise<number>} void *
+ */
 export async function luaM_malloc_(L, size, tag) {   // lmem.c:201
     let g = 0, newblock = 0;
     if (size === 0) {

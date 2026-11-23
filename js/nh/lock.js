@@ -69,6 +69,11 @@ const PICKLOCK_DID_SOMETHING = 1;
 
 const lock_action$actions = $c.nulls(4);   // static in lock_action()
 const pick_lock$no_longer = new Int8Array(40);   // static in pick_lock()
+/**
+ * @param {*} x coordxy *
+ * @param {*} y coordxy *
+ * @returns {number} boolean
+ */
 export function picking_lock(x, y) {   // lock.c:17
     let $t1;
     if (go.occupation === picklock) {
@@ -80,10 +85,18 @@ export function picking_lock(x, y) {   // lock.c:17
         return FALSE;
     }
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 export function picking_at(x, y) {   // lock.c:30
     return $c.i8(go.occupation === picklock && $c.peq(gx.xlock.door, $c.relem(svl.level.locations[x], y)) ? 1 : 0);
 }
 /* produce an occupation string appropriate for the current activity */
+/**
+ * @returns {$c.Ptr | null} const char *
+ */
 function lock_action() {   // lock.c:38
     /* "unlocking"+2 == "locking" */
     /* if the target is currently unlocked, we're trying to lock it now */
@@ -105,6 +118,9 @@ function lock_action() {   // lock.c:38
     }
 }
 /* try to open/close a lock */
+/**
+ * @returns {Promise<number>} int
+ */
 async function picklock() {   // lock.c:68
     let what = null, alreadyunlocked = 0, $t1;
     if (gx.xlock.box) {
@@ -192,6 +208,11 @@ async function picklock() {   // lock.c:68
     await exercise(A.DEX, TRUE);
     return gx.xlock.usedtime = 0;
 }
+/**
+ * @param {$T.obj | null} box struct obj *
+ * @param {number} destroyit boolean
+ * @returns {Promise<void>}
+ */
 export async function breakchestlock(box, destroyit) {   // lock.c:162
     let hide_contents = null, otmp = null, shkp = null, costly = 0, peaceful_shk = 0, loss = 0;
     if (!destroyit) {
@@ -243,6 +264,9 @@ export async function breakchestlock(box, destroyit) {   // lock.c:162
     }
 }
 /* try to force a locked chest */
+/**
+ * @returns {Promise<number>} int
+ */
 async function forcelock() {   // lock.c:216
     let $t1;
     if (gx.xlock.box.ox !== u.ux || gx.xlock.box.oy !== u.uy) {
@@ -291,6 +315,9 @@ export function reset_pick() {   // lock.c:259
     gx.xlock.box = null;
 }
 /* level change or object deletion; context may no longer be valid */
+/**
+ * @param {$T.obj | null} container struct obj *
+ */
 export function maybe_reset_pick(container) {   // lock.c:269
     /* passed from obfree() */
     /*
@@ -309,6 +336,10 @@ export function maybe_reset_pick(container) {   // lock.c:269
     }
 }
 /* pick a tool for autounlock */
+/**
+ * @param {number} opening boolean
+ * @returns {$T.obj | null} struct obj *
+ */
 export function autokey(opening) {   // lock.c:289
     let o = null, key = null, pick = null, card = null, akey = null, apick = null, acard = null;
     /* True: key, pick, or card; False: key or pick */
@@ -381,6 +412,13 @@ export function autokey(opening) {   // lock.c:289
 /* time passes */
 /* no time passes */
 /* player is applying a key, lock pick, or credit card */
+/**
+ * @param {$T.obj | null} pick struct obj *
+ * @param {number} rx coordxy
+ * @param {number} ry coordxy
+ * @param {$T.obj | null} container struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function pick_lock(pick, rx, ry, container) {   // lock.c:358
     let dummypick = new $T.obj(), picktyp = 0, c = 0, ch = 0, cc = new $T.nhcoord(), door = null, otmp = null, qbuf = new Int8Array(128), autounlock = 0, what = null, action = null, verb = null, qsfx = new Int8Array(128), it = 0, count = 0, mtmp = null, res = 0, oldglyph = 0, oldlastseentyp = 0, $t1, $t2;
     /* coordinates of door/container, for autounlock:
@@ -637,6 +675,9 @@ export async function pick_lock(pick, rx, ry, container) {   // lock.c:358
     return PICKLOCK_DID_SOMETHING;
 }
 /* is hero wielding a weapon that can #force? */
+/**
+ * @returns {number} boolean
+ */
 export function u_have_forceable_weapon() {   // lock.c:660
     /* proper type test */
     if (!$G.uwep || ($G.uwep.oclass === WEAPON_CLASS || is_weptool($G.uwep) ? objects[$G.uwep.otyp].oc_subtyp < P.DAGGER || objects[$G.uwep.otyp].oc_subtyp === P.FLAIL || objects[$G.uwep.otyp].oc_subtyp > P.LANCE : $G.uwep.oclass !== ROCK_CLASS)) {
@@ -645,6 +686,9 @@ export function u_have_forceable_weapon() {   // lock.c:660
     return TRUE;
 }
 /* the #force command - try to force a chest with your weapon */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doforce() {   // lock.c:676
     let otmp = null, c = 0, picktyp = 0, qbuf = new Int8Array(128), use_plural = 0;
     /*
@@ -713,6 +757,11 @@ export async function doforce() {   // lock.c:676
     }
     return ECMD.TIME;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} boolean
+ */
 export async function stumble_on_door_mimic(x, y) {   // lock.c:759
     let mtmp = null;
     if ((mtmp = svl.level.monsters[x][y]) && is_door_mappear(mtmp) && !Protection_from_shape_changers()) {
@@ -722,10 +771,18 @@ export async function stumble_on_door_mimic(x, y) {   // lock.c:759
     return FALSE;
 }
 /* the #open command - try to open a door */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doopen() {   // lock.c:773
     return await doopen_indir(0, 0);
 }
 /* try to open a door in direction u.dx/u.dy */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} int
+ */
 export async function doopen_indir(x, y) {   // lock.c:780
     let cc = new $T.nhcoord(), door = null, portcullis = 0, dirprompt = null, res = 0, oldglyph = 0, oldlastseentyp = 0, mesg = null, locked = 0, unlocktool = null;
     res = ECMD.OK;
@@ -850,6 +907,12 @@ export async function doopen_indir(x, y) {   // lock.c:780
     }
     return ECMD.TIME;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} quietly boolean
+ * @returns {Promise<number>} boolean
+ */
 async function obstructed(x, y, quietly) {   // lock.c:926
     let mtmp = null, Mn = null, $goto = null;
     D1: for (;;) {
@@ -886,6 +949,9 @@ async function obstructed(x, y, quietly) {   // lock.c:926
     }
 }
 /* the #close command - try to close a door */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doclose() {   // lock.c:957
     let x = 0, y = 0, door = null, portcullis = 0, res = 0, oldglyph = 0, oldlastseentyp = 0, $goto = null;
     D1: for (;;) {
@@ -977,6 +1043,11 @@ export async function doclose() {   // lock.c:957
 }
 /* box obj was hit with spell or wand effect otmp;
    returns true if something happened */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} boolean
+ */
 export async function boxlock(obj, otmp) {   // lock.c:1056
     let res = 0;
     /* obj *is* a box */
@@ -1027,6 +1098,12 @@ export async function boxlock(obj, otmp) {   // lock.c:1056
 }
 /* Door/secret door was hit with spell or wand effect otmp;
    returns true if something happened */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} boolean
+ */
 export async function doorlock(otmp, x, y) {   // lock.c:1103
     let door = null, res = 0, loudness = 0, msg = null, dustcloud = null, quickly_dissipates = null, mysterywand = 0, vis = 0, sawit = 0, seeit = 0, mtmp = null;
     door = $c.relem(svl.level.locations[x], y);
@@ -1191,6 +1268,10 @@ export async function doorlock(otmp, x, y) {   // lock.c:1103
     }
     return res;
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function chest_shatter_msg(otmp) {   // lock.c:1276
     let disposition = null, thing = null, save_HBlinded = 0, save_BBlinded = 0;
     if (otmp.oclass === POTION_CLASS) {

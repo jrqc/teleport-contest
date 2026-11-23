@@ -99,6 +99,9 @@ const wgrowtime = $c.zeros(32);
  *
  *  Implementation is left to the interested hacker.
  */
+/**
+ * @returns {number} int
+ */
 export function get_wormno() {   // worm.c:96
     let new_wormno = 0;
     new_wormno = 1;
@@ -120,6 +123,11 @@ export function get_wormno() {   // worm.c:96
  *
  *  If the worm has no tail (ie get_wormno() fails) then this function
  *  need not be called.
+ */
+/**
+ * @param {$T.monst | null} worm struct monst *
+ * @param {number} wseg_count int
+ * @returns {Promise<void>}
  */
 export async function initworm(worm, wseg_count) {   // worm.c:120
     let seg = null, new_tail = null, wnum = 0, $t1, $t2;
@@ -145,6 +153,11 @@ export async function initworm(worm, wseg_count) {   // worm.c:120
  *  Get rid of all worm segments on and following the given pointer curr.
  *  The display may or may not need to be updated as we free the segments.
  */
+/**
+ * @param {$T.wseg | null} curr struct wseg *
+ * @param {number} display_update boolean
+ * @returns {Promise<void>}
+ */
 async function toss_wsegs(curr, display_update) {   // worm.c:146
     let nxtseg = null;
     while (curr) {
@@ -168,6 +181,10 @@ async function toss_wsegs(curr, display_update) {   // worm.c:146
  *
  *  Remove the tail segment of the worm (the starting segment of the list).
  */
+/**
+ * @param {number} wnum int
+ * @returns {Promise<void>}
+ */
 async function shrink_worm(wnum) {   // worm.c:175
     let seg = null;
     /* worm number */
@@ -185,6 +202,10 @@ async function shrink_worm(wnum) {   // worm.c:175
  *  Check for mon->wormno before calling this function!
  *
  *  Move the worm.  Maybe grow.
+ */
+/**
+ * @param {$T.monst | null} worm struct monst *
+ * @returns {Promise<void>}
  */
 export async function worm_move(worm) {   // worm.c:196
     let seg = null, new_seg = null, wnum = 0, whplimit = 0, whpcap = 0, prev_mhp = 0, wsegs = 0, mmove = 0, incr = 0, $t1, $t2;
@@ -277,6 +298,10 @@ export async function worm_move(worm) {   // worm.c:196
  *
  *  The worm doesn't move, so it should shrink.
  */
+/**
+ * @param {$T.monst | null} worm struct monst *
+ * @returns {Promise<void>}
+ */
 export async function worm_nomove(worm) {   // worm.c:288
     let $t1;
     await shrink_worm(worm.wormno | 0);   /* shrink */
@@ -294,6 +319,10 @@ export async function worm_nomove(worm) {   // worm.c:288
  *  keep track of what its coordinates were if planning to put it back.
  *
  *  Should only be called when mon->wormno is non-zero.
+ */
+/**
+ * @param {$T.monst | null} worm struct monst *
+ * @returns {Promise<void>}
  */
 export async function wormgone(worm) {   // worm.c:308
     let wnum = 0, $t1;
@@ -327,6 +356,10 @@ export async function wormgone(worm) {   // worm.c:308
  *  Returns 1 if the worm dies (poly'd hero with passive counter-attack)
  *  or 0 if it doesn't.
  */
+/**
+ * @param {$T.monst | null} worm struct monst *
+ * @returns {Promise<number>} int
+ */
 export async function wormhitu(worm) {   // worm.c:344
     let wnum = 0, seg = null;
     wnum = worm.wormno | 0;
@@ -354,6 +387,13 @@ export async function wormhitu(worm) {   // worm.c:344
  *  When hitting a worm (worm) at position x, y, with a weapon (weap),
  *  there is a chance that the worm will be cut in half, and a chance
  *  that both halves will survive.
+ */
+/**
+ * @param {$T.monst | null} worm struct monst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} cuttier boolean
+ * @returns {Promise<void>}
  */
 export async function cutworm(worm, x, y, cuttier) {   // worm.c:373
     let curr = null, new_tail = null, new_worm = null, wnum = 0, cut_chance = 0, new_wnum = 0, $t1, $t2, $t3;
@@ -456,6 +496,10 @@ export async function cutworm(worm, x, y, cuttier) {   // worm.c:373
  *  from see_monster() in display.c or when a monster goes minvis.  It
  *  is located here for modularity.
  */
+/**
+ * @param {$T.monst | null} worm struct monst *
+ * @returns {Promise<void>}
+ */
 export async function see_wsegs(worm) {   // worm.c:487
     let curr = null;
     curr = wtails[worm.wormno];
@@ -468,6 +512,11 @@ export async function see_wsegs(worm) {   // worm.c:487
  *  detect_wsegs()
  *
  *  Display all of the segments of the given worm for detection.
+ */
+/**
+ * @param {$T.monst | null} worm struct monst *
+ * @param {number} use_detection_glyph boolean
+ * @returns {Promise<void>}
  */
 export async function detect_wsegs(worm, use_detection_glyph) {   // worm.c:503
     let num = 0, curr = null, what_tail = 0;
@@ -484,6 +533,10 @@ export async function detect_wsegs(worm, use_detection_glyph) {   // worm.c:503
  *
  *  Save the worm information for later use.  The count is the number
  *  of segments, including the dummy.  Called from save.c.
+ */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
  */
 export async function save_worm(nhfp) {   // worm.c:528
     let i = 0, count = Int32Array.of(0), curr = null, temp = null, $t1;
@@ -529,6 +582,10 @@ export async function save_worm(nhfp) {   // worm.c:528
  *
  *  Restore the worm information from the save file.  Called from restore.c
  */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 export async function rest_worm(nhfp) {   // worm.c:577
     let i = 0, j = 0, count = Int32Array.of(0), curr = null, temp = null;
     count[0] = 0;
@@ -561,6 +618,11 @@ export async function rest_worm(nhfp) {   // worm.c:577
  *  If oldworm is not NULL, assumes the oldworm segments are on map
  *  in the same location as worm segments
  */
+/**
+ * @param {$T.monst | null} worm struct monst *
+ * @param {$T.monst | null} oldworm struct monst *
+ * @returns {Promise<void>}
+ */
 export async function place_wsegs(worm, oldworm) {   // worm.c:615
     let curr = null, x = 0, y = 0, mtmp = null;
     curr = wtails[worm.wormno];
@@ -582,6 +644,10 @@ export async function place_wsegs(worm, oldworm) {   // worm.c:615
     curr.wx = worm.mx, curr.wy = worm.my;
 }
 /* called from mon_sanity_check(mon.c) */
+/**
+ * @param {$T.monst | null} worm struct monst *
+ * @returns {Promise<void>}
+ */
 export async function sanity_check_worm(worm) {   // worm.c:639
     let curr = null, wnum = 0, x = 0, y = 0;
     if (!worm) {
@@ -632,6 +698,10 @@ export function wormno_sanity_check() {   // worm.c:682
  *  It does not get rid of (dealloc) the worm tail structures, and it does
  *  not remove the mon from the fmon chain.
  */
+/**
+ * @param {$T.monst | null} worm struct monst *
+ * @returns {Promise<void>}
+ */
 export async function remove_worm(worm) {   // worm.c:714
     let curr = null;
     curr = wtails[worm.wormno];
@@ -652,6 +722,12 @@ export async function remove_worm(worm) {   // worm.c:714
  *  to tail while placing them.
  *  x, and y are most likely the worm->mx, and worm->my, but don't *need* to
  *  be, if somehow the head is disjoint from the tail.
+ */
+/**
+ * @param {$T.monst | null} worm struct monst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
  */
 export async function place_worm_tail_randomly(worm, x, y) {   // worm.c:738
     let wnum = 0, curr = null, new_tail = null, ox = 0, oy = 0, nx = Int16Array.of(0), ny = Int16Array.of(0), $t1, $t2, $t3, $t4;
@@ -723,11 +799,19 @@ export async function place_worm_tail_randomly(worm, x, y) {   // worm.c:738
 /* bottom, use -1 */
 /* top, use +1 */
 /* for size_monst(cmd.c) to support #stats */
+/**
+ * @param {$T.monst | null} worm struct monst *
+ * @returns {number} int
+ */
 export function size_wseg(worm) {   // worm.c:827
     return $c.i32($c.mulu64($c.u64(count_wsegs(worm)), 16));
 }
 /*  count_wsegs()
  *  returns the number of segments that a worm has.
+ */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number} int
  */
 export function count_wsegs(mtmp) {   // worm.c:836
     let i = 0, curr = null;
@@ -741,6 +825,10 @@ export function count_wsegs(mtmp) {   // worm.c:836
 }
 /*  create_worm_tail()
  *  will create a worm tail chain of (num_segs + 1) and return pointer to it.
+ */
+/**
+ * @param {number} num_segs int
+ * @returns {Promise<$T.wseg | null>} struct wseg *
  */
 async function create_worm_tail(num_segs) {   // worm.c:852
     let i = 0, new_tail = null, curr = null, $t1;
@@ -767,6 +855,10 @@ async function create_worm_tail(num_segs) {   // worm.c:852
  *  invisibility and telepathy (which should only show the head anyway).
  *  Mostly used in the canseemon() macro.
  */
+/**
+ * @param {$T.monst | null} worm struct monst *
+ * @returns {number} boolean
+ */
 export function worm_known(worm) {   // worm.c:883
     let curr = null;
     curr = wtails[worm.wormno];
@@ -780,6 +872,13 @@ export function worm_known(worm) {   // worm.c:883
 }
 /* would moving from <x1,y1> to <x2,y2> involve passing between two
    consecutive segments of the same worm? */
+/**
+ * @param {number} x1 int
+ * @param {number} y1 int
+ * @param {number} x2 int
+ * @param {number} y2 int
+ * @returns {Promise<number>} boolean
+ */
 export async function worm_cross(x1, y1, x2, y2) {   // worm.c:898
     let worm = null, curr = null, wnxt = null;
     /*
@@ -824,6 +923,12 @@ export async function worm_cross(x1, y1, x2, y2) {   // worm.c:898
     return FALSE;
 }
 /* construct an index number for a worm tail segment */
+/**
+ * @param {$T.monst | null} worm struct monst *
+ * @param {number} x int
+ * @param {number} y int
+ * @returns {number} int
+ */
 export function wseg_at(worm, x, y) {   // worm.c:946
     let res = 0, curr = null, i = 0, n = 0, wx = 0, wy = 0;
     res = 0;
@@ -843,6 +948,11 @@ export function wseg_at(worm, x, y) {   // worm.c:946
     }
     return res;
 }
+/**
+ * @param {$T.monst | null} worm struct monst *
+ * @param {number} miny int
+ * @param {number} maxy int
+ */
 export function flip_worm_segs_vertical(worm, miny, maxy) {   // worm.c:968
     let curr = null;
     curr = wtails[worm.wormno];
@@ -851,6 +961,11 @@ export function flip_worm_segs_vertical(worm, miny, maxy) {   // worm.c:968
         curr = curr.nseg;
     }
 }
+/**
+ * @param {$T.monst | null} worm struct monst *
+ * @param {number} minx int
+ * @param {number} maxx int
+ */
 export function flip_worm_segs_horizontal(worm, minx, maxx) {   // worm.c:979
     let curr = null;
     curr = wtails[worm.wormno];
@@ -859,6 +974,10 @@ export function flip_worm_segs_horizontal(worm, minx, maxx) {   // worm.c:979
         curr = curr.nseg;
     }
 }
+/**
+ * @param {$T.monst | null} worm struct monst *
+ * @returns {Promise<void>}
+ */
 export async function redraw_worm(worm) {   // worm.c:990
     let curr = null;
     curr = wtails[worm.wormno];

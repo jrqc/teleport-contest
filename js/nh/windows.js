@@ -49,12 +49,21 @@ let dumplog_file = null;
 export const zerowri = new $T.win_request_info_t();
 /* NB: this chain does not contain the terminal real window system pointer */
 /* WINCHAIN */
+/**
+ * @returns {number} boolean
+ */
 export function genl_can_suspend_no() {   // windows.c:193
     return 0;
 }
+/**
+ * @returns {number} boolean
+ */
 export function genl_can_suspend_yes() {   // windows.c:199
     return 1;
 }
+/**
+ * @param {$c.Ptr | null} s const char *
+ */
 function def_raw_print(s) {   // windows.c:206
     $c.puts(s);
     if (s.get(0)) {
@@ -73,6 +82,10 @@ function def_wait_synch() {   // windows.c:215
      */
     return;
 }
+/**
+ * @param {number | bigint} wincap unsigned long
+ * @returns {number} boolean
+ */
 export function check_tty_wincap(wincap) {   // windows.c:231
     let wc = null;
     wc = win_choices_find($c.lit("tty"));
@@ -81,6 +94,10 @@ export function check_tty_wincap(wincap) {   // windows.c:231
     }
     return 0;
 }
+/**
+ * @param {number | bigint} wincap2 unsigned long
+ * @returns {number} boolean
+ */
 export function check_tty_wincap2(wincap2) {   // windows.c:241
     let wc = null;
     wc = win_choices_find($c.lit("tty"));
@@ -89,6 +106,10 @@ export function check_tty_wincap2(wincap2) {   // windows.c:241
     }
     return 0;
 }
+/**
+ * @param {$c.Ptr | null} s const char *
+ * @returns {$T.win_choices | null} struct win_choices *
+ */
 function win_choices_find(s) {   // windows.c:253
     let i = 0;
     for (i = 0; winchoices[i].procs; i = i + 1 | 0) {
@@ -98,6 +119,10 @@ function win_choices_find(s) {   // windows.c:253
     }
     return null;
 }
+/**
+ * @param {$c.Ptr | null} s const char *
+ * @returns {Promise<void>}
+ */
 export async function choose_windows(s) {   // windows.c:267
     let i = 0, tmps = null, buf = new Int8Array(256), first = 0;
     tmps = null;
@@ -180,11 +205,20 @@ export async function choose_windows(s) {   // windows.c:267
  * --More-- prompt; other interfaces generally don't need that.
  */
 /*ARGSUSED*/
+/**
+ * @param {number} let_ char
+ * @param {number} how int
+ * @param {$c.Ptr | null} mesg const char *
+ * @returns {Promise<number>} char
+ */
 export async function genl_message_menu(let_, how, mesg) {   // windows.c:451
     await pline($c.lit("%s"), mesg);
     return 0;
 }
 /*ARGSUSED*/
+/**
+ * @param {$c.Ptr | null} pref const char *
+ */
 export function genl_preference_update(pref) {   // windows.c:461
     /* window ports are expected to provide
        their own preference update routine
@@ -193,6 +227,10 @@ export function genl_preference_update(pref) {   // windows.c:461
        Just return in this genl one. */
     return;
 }
+/**
+ * @param {number} init boolean
+ * @returns {$c.Ptr | null} char *
+ */
 export function genl_getmsghistory(init) {   // windows.c:472
     /* window ports can provide
        their own getmsghistory() routine to
@@ -207,6 +245,11 @@ export function genl_getmsghistory(init) {   // windows.c:472
      */
     return null;
 }
+/**
+ * @param {$c.Ptr | null} msg const char *
+ * @param {number} is_restoring boolean
+ * @returns {Promise<void>}
+ */
 export async function genl_putmsghistory(msg, is_restoring) {   // windows.c:489
     /* window ports can provide
        their own putmsghistory() routine to
@@ -255,6 +298,10 @@ export function nhwindows_hangup() {   // windows.c:615
         windowprocs.win_getmsghistory = previnterface_getmsghistory;
     }
 }
+/**
+ * @param {$c.Ptr | null} lastgasp const char *
+ * @returns {Promise<void>}
+ */
 async function hup_exit_nhwindows(lastgasp) {   // windows.c:643
     /* core has called exit_nhwindows(); call the previous interface's
        shutdown routine now; xxx_exit_nhwindows() needs to call other
@@ -266,10 +313,19 @@ async function hup_exit_nhwindows(lastgasp) {   // windows.c:643
     }
     iflags.window_inited = 0;
 }
+/**
+ * @returns {number} int
+ */
 function hup_nhgetch() {   // windows.c:657
     return 27;   /* ESC */
 }
 /*ARGSUSED*/
+/**
+ * @param {$c.Ptr | null} prompt const char *
+ * @param {$c.Ptr | null} resp const char *
+ * @param {number} deflt char
+ * @returns {number} char
+ */
 function hup_yn_function(prompt, resp, deflt) {   // windows.c:664
     if (!deflt) {
         deflt = 27;
@@ -277,58 +333,131 @@ function hup_yn_function(prompt, resp, deflt) {   // windows.c:664
     return deflt;
 }
 /*ARGSUSED*/
+/**
+ * @param {*} x coordxy *
+ * @param {*} y coordxy *
+ * @param {*} mod int *
+ * @returns {number} int
+ */
 function hup_nh_poskey(x, y, mod) {   // windows.c:676
     return 27;
 }
 /*ARGSUSED*/
+/**
+ * @param {$c.Ptr | null} prompt const char *
+ * @param {$c.Ptr | null} outbuf char *
+ */
 function hup_getlin(prompt, outbuf) {   // windows.c:683
     $c.strcpy(outbuf, $c.lit("\x1b"));
 }
 /*ARGSUSED*/
+/**
+ * @param {*} argc_p int *
+ * @param {*} argv char **
+ */
 function hup_init_nhwindows(argc_p, argv) {   // windows.c:690
     iflags.window_inited = 1;
 }
 /*ARGUSED*/
+/**
+ * @param {number} type int
+ * @returns {number} winid
+ */
 function hup_create_nhwindow(type) {   // windows.c:697
     return WIN_ERR;
 }
 /*ARGSUSED*/
+/**
+ * @param {number} window winid
+ * @param {number} how int
+ * @param {*} menu_list struct mi **
+ * @returns {number} int
+ */
 function hup_select_menu(window, how, menu_list) {   // windows.c:704
     return -1;
 }
 /*ARGSUSED*/
+/**
+ * @param {number} window winid
+ * @param {$T.glyphinfo | null} glyphinfo const glyph_info *
+ * @param {$T.any | null} identifier const anything *
+ * @param {number} sel char
+ * @param {number} grpsel char
+ * @param {number} attr int
+ * @param {number} clr int
+ * @param {$c.Ptr | null} txt const char *
+ * @param {number} itemflags unsigned int
+ */
 function hup_add_menu(window, glyphinfo, identifier, sel, grpsel, attr, clr, txt, itemflags) {   // windows.c:714
     return;
 }
 /*ARGSUSED*/
+/**
+ * @param {number} window winid
+ * @param {$c.Ptr | null} prompt const char *
+ */
 function hup_end_menu(window, prompt) {   // windows.c:730
     return;
 }
 /*ARGSUSED*/
+/**
+ * @param {number} window winid
+ * @param {number} attr int
+ * @param {$c.Ptr | null} text const char *
+ */
 function hup_putstr(window, attr, text) {   // windows.c:737
     return;
 }
 /*ARGSUSED*/
+/**
+ * @param {number} window winid
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$T.glyphinfo | null} glyphinfo const glyph_info *
+ * @param {$T.glyphinfo | null} bkglyphinfo const glyph_info *
+ */
 function hup_print_glyph(window, x, y, glyphinfo, bkglyphinfo) {   // windows.c:744
     return;
 }
 /*ARGSUSED*/
+/**
+ * @param {number} tmpwin winid
+ * @param {number} how int
+ * @param {number | bigint} when time_t
+ */
 function hup_outrip(tmpwin, how, when) {   // windows.c:755
     return;
 }
 /*ARGSUSED*/
+/**
+ * @param {number} window winid
+ * @param {number} x int
+ * @param {number} y int
+ */
 function hup_curs(window, x, y) {   // windows.c:762
     return;
 }
 /*ARGSUSED*/
+/**
+ * @param {number} window winid
+ * @param {number} blocking boolean
+ */
 function hup_display_nhwindow(window, blocking) {   // windows.c:769
     return;
 }
 /*ARGSUSED*/
+/**
+ * @param {$c.Ptr | null} fname const char *
+ * @param {number} complain boolean
+ */
 function hup_display_file(fname, complain) {   // windows.c:776
     return;
 }
 /*ARGSUSED*/
+/**
+ * @param {number} x int
+ * @param {number} y int
+ */
 function hup_cliparound(x, y) {   // windows.c:784
     return;
 }
@@ -337,11 +466,22 @@ function hup_cliparound(x, y) {   // windows.c:784
 /* MACOS9 */
 /* CHANGE_COLOR */
 /*ARGSUSED*/
+/**
+ * @param {number} idx int
+ * @param {*} ptr genericptr_t
+ * @param {number} chg int
+ * @param {number} pc int
+ * @param {number} color int
+ * @param {*} colormasks unsigned long *
+ */
 function hup_status_update(idx, ptr, chg, pc, color, colormasks) {   // windows.c:816
     return;
 }
 /*
  * Non-specific stubs.
+ */
+/**
+ * @returns {number} int
  */
 function hup_int_ndecl() {   // windows.c:829
     return -1;
@@ -350,26 +490,48 @@ function hup_void_ndecl() {   // windows.c:835
     return;
 }
 /*ARGUSED*/
+/**
+ * @param {number} arg int
+ */
 function hup_void_fdecl_int(arg) {   // windows.c:842
     return;
 }
 /*ARGUSED*/
+/**
+ * @param {number} window winid
+ */
 function hup_void_fdecl_winid(window) {   // windows.c:849
     return;
 }
 /*ARGUSED*/
+/**
+ * @param {number} window winid
+ * @param {number | bigint} mbehavior unsigned long
+ */
 function hup_void_fdecl_winid_ulong(window, mbehavior) {   // windows.c:856
     return;
 }
 /*ARGUSED*/
+/**
+ * @param {$c.Ptr | null} string const char *
+ */
 function hup_void_fdecl_constchar_p(string) {   // windows.c:865
     return;
 }
 /*ARGUSED*/
+/**
+ * @param {number} window winid
+ * @param {number} request int
+ * @param {$T.win_request_info_t | null} wri win_request_info *
+ * @returns {$T.win_request_info_t | null} win_request_info *
+ */
 export function hup_ctrl_nhwindow(window, request, wri) {   // windows.c:872
     /* window to use, must be of type NHW_MENU */
     return null;
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function genl_status_init() {   // windows.c:893
     let i = 0, $t1;
     for (i = 0; i < MAXBLSTATS; i = i + 1 | 0) {
@@ -392,12 +554,27 @@ export function genl_status_finish() {   // windows.c:909
         }
     }
 }
+/**
+ * @param {number} fieldidx int
+ * @param {$c.Ptr | null} nm const char *
+ * @param {$c.Ptr | null} fmt const char *
+ * @param {number} enable boolean
+ */
 export function genl_status_enablefield(fieldidx, nm, fmt, enable) {   // windows.c:922
     status_fieldfmt[fieldidx] = fmt;
     status_fieldnm[fieldidx] = nm;
     status_activefields[fieldidx] = enable;
 }
 /* call once for each field, then call with BL_FLUSH to output the result */
+/**
+ * @param {number} idx int
+ * @param {*} ptr genericptr_t
+ * @param {number} chg int
+ * @param {number} percent int
+ * @param {number} color int
+ * @param {*} colormasks unsigned long *
+ * @returns {Promise<void>}
+ */
 export async function genl_status_update(idx, ptr, chg, percent, color, colormasks) {   // windows.c:937
     let newbot1 = new Int8Array(200), newbot2 = new Int8Array(200), cond = 0, condptr = null, i = 0, pass = 0, lndelta = 0, idx1 = 0, idx2 = 0, fieldlist = null, nb = null, text = null, val = null;
     condptr = ptr;
@@ -582,6 +759,9 @@ export async function genl_status_update(idx, ptr, chg, percent, color, colormas
 /* note: replacements are only done on field substitutions,
    not on the template (from sysconf or DUMPLOG_FILE) */
 /* DUMPLOG */
+/**
+ * @param {number | bigint} now time_t
+ */
 export function dump_open_log(now) {   // windows.c:1244
     /*!DUMPLOG*/
     nhUse(now);
@@ -593,6 +773,13 @@ export function dump_close_log() {   // windows.c:1267
         dumplog_file = null;
     }
 }
+/**
+ * @param {number} win winid
+ * @param {number} attr int
+ * @param {$c.Ptr | null} str const char *
+ * @param {number} no_forward int
+ * @returns {Promise<void>}
+ */
 export async function dump_forward_putstr(win, attr, str, no_forward) {   // windows.c:1276
     if (dumplog_file) {
         $c.fprintf(dumplog_file, $c.lit("%s\n"), str);
@@ -602,31 +789,65 @@ export async function dump_forward_putstr(win, attr, str, no_forward) {   // win
     }
 }
 /*ARGSUSED*/
+/**
+ * @param {number} win winid
+ * @param {number} attr int
+ * @param {$c.Ptr | null} str const char *
+ */
 function dump_putstr(win, attr, str) {   // windows.c:1286
     if (dumplog_file) {
         $c.fprintf(dumplog_file, $c.lit("%s\n"), str);
     }
 }
+/**
+ * @param {number} type int
+ * @returns {number} winid
+ */
 function dump_create_nhwindow(type) {   // windows.c:1293
     return WIN_ERR;
 }
 /*ARGUSED*/
+/**
+ * @param {number} win winid
+ */
 function dump_clear_nhwindow(win) {   // windows.c:1300
     return;
 }
 /*ARGSUSED*/
+/**
+ * @param {number} win winid
+ * @param {number} p boolean
+ */
 function dump_display_nhwindow(win, p) {   // windows.c:1307
     return;
 }
 /*ARGUSED*/
+/**
+ * @param {number} win winid
+ */
 function dump_destroy_nhwindow(win) {   // windows.c:1314
     return;
 }
 /*ARGUSED*/
+/**
+ * @param {number} win winid
+ * @param {number | bigint} mbehavior unsigned long
+ */
 function dump_start_menu(win, mbehavior) {   // windows.c:1321
     return;
 }
 /*ARGSUSED*/
+/**
+ * @param {number} win winid
+ * @param {$T.glyphinfo | null} glyphinfo const glyph_info *
+ * @param {$T.any | null} identifier const anything *
+ * @param {number} ch char
+ * @param {number} gch char
+ * @param {number} attr int
+ * @param {number} clr int
+ * @param {$c.Ptr | null} str const char *
+ * @param {number} itemflags unsigned int
+ */
 function dump_add_menu(win, glyphinfo, identifier, ch, gch, attr, clr, str, itemflags) {   // windows.c:1328
     if (dumplog_file) {
         if (glyphinfo.glyph === NO_GLYPH) {
@@ -637,6 +858,10 @@ function dump_add_menu(win, glyphinfo, identifier, ch, gch, attr, clr, str, item
     }
 }
 /*ARGSUSED*/
+/**
+ * @param {number} win winid
+ * @param {$c.Ptr | null} str const char *
+ */
 function dump_end_menu(win, str) {   // windows.c:1348
     if (dumplog_file) {
         if (str) {
@@ -646,10 +871,19 @@ function dump_end_menu(win, str) {   // windows.c:1348
         }
     }
 }
+/**
+ * @param {number} win winid
+ * @param {number} how int
+ * @param {*} item menu_item **
+ * @returns {number} int
+ */
 function dump_select_menu(win, how, item) {   // windows.c:1359
     item.set(0, null);
     return 0;
 }
+/**
+ * @param {number} onoff_flag boolean
+ */
 export function dump_redirect(onoff_flag) {   // windows.c:1366
     if (dumplog_file) {
         if (onoff_flag) {
@@ -670,25 +904,46 @@ export function dump_redirect(onoff_flag) {   // windows.c:1366
         iflags.in_dumplog = 0;
     }
 }
+/**
+ * @param {number} color int
+ * @returns {number} int
+ */
 export function has_color(color) {   // windows.c:1397
     return iflags.wc_color && windowprocs.name && $c.andu64(windowprocs.wincap, WC.COLOR) && windowprocs.has_color[color] ? 1 : 0;
 }
+/**
+ * @param {number} glyph int
+ * @returns {number} int
+ */
 export function glyph2ttychar(glyph) {   // windows.c:1410
     let glyphinfo = new $T.glyphinfo();
     map_glyphinfo(0, 0, glyph, 0, glyphinfo);
     return glyphinfo.ttychar;
 }
+/**
+ * @param {number} glyph int
+ * @returns {number} int
+ */
 export function glyph2symidx(glyph) {   // windows.c:1419
     let glyphinfo = new $T.glyphinfo();
     map_glyphinfo(0, 0, glyph, 0, glyphinfo);
     return glyphinfo.gm.sym.symidx;
 }
+/**
+ * @param {number} glyph int
+ * @returns {$c.Ptr | null} char *
+ */
 export function encglyph(glyph) {   // windows.c:1428
     /* 10+1 would suffice */
     $c.sprintf(new $c.Ptr(encglyph$encbuf, 0), $c.lit("\\G%04X%04X"), svc.context.rndencode, glyph);
     return new $c.Ptr(encglyph$encbuf, 0);
 }
 /* hexdd[] is defined in decl.c */
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @param {*} glyph_ptr int *
+ * @returns {number} int
+ */
 export function decode_glyph(str, glyph_ptr) {   // windows.c:1439
     let rndchk = 0, dcount = 0, retval = 0, dp = null, $t1;
     rndchk = 0;
@@ -716,6 +971,11 @@ export function decode_glyph(str, glyph_ptr) {   // windows.c:1439
     }
     return 0;
 }
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @param {$c.Ptr | null} str const char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function decode_mixed(buf, str) {   // windows.c:1466
     let put = null, glyphinfo = new $T.glyphinfo(), dcount = 0, so = 0, ggv = Int32Array.of(0), save_str = null, $t1, $t2, $t3, $t4, $t5, $t6;
     put = buf;
@@ -771,6 +1031,12 @@ export function decode_mixed(buf, str) {   // windows.c:1466
  * showsyms[] char, then just passes that string onto
  * putstr().
  */
+/**
+ * @param {number} window winid
+ * @param {number} attr int
+ * @param {$c.Ptr | null} str const char *
+ * @returns {Promise<void>}
+ */
 export async function genl_putmixed(window, attr, str) {   // windows.c:1528
     let buf = new Int8Array(256);
     /* now send it to the normal putstr */
@@ -778,6 +1044,10 @@ export async function genl_putmixed(window, attr, str) {   // windows.c:1528
 }
 /* possibly called to show usage info during command line processing when
    an interface hasn't yet been chosen and set up */
+/**
+ * @param {$c.Ptr | null} fname const char *
+ * @param {number} complain boolean
+ */
 export function genl_display_file(fname, complain) {   // windows.c:1539
     let buf = new Int8Array(256), f = null;
     f = $c.fopen(fname, $c.lit("r"));
@@ -798,6 +1068,12 @@ export function genl_display_file(fname, complain) {   // windows.c:1539
 /*
  * Window port helper function for menu invert routines to move the decision
  * logic into one place instead of 7 different window-port routines.
+ */
+/**
+ * @param {number} mode int
+ * @param {number} itemflags unsigned int
+ * @param {number} is_selected boolean
+ * @returns {number} boolean
  */
 export function menuitem_invert_test(mode, itemflags, is_selected) {   // windows.c:1562
     let skipinvert = 0;
@@ -834,6 +1110,11 @@ export function menuitem_invert_test(mode, itemflags, is_selected) {   // window
  * extracting the \GNNNNNNNN information. The glyph details,
  * including the utf8 representation under ENHANCED_SYMBOLS,
  * will be stored in the glyph_info struct pointed to by gip.
+ */
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @param {$T.glyphinfo | null} gip glyph_info *
+ * @returns {$c.Ptr | null} const char *
  */
 export function mixed_to_glyphinfo(str, gip) {   // windows.c:1600
     let dcount = 0, ggv = Int32Array.of(0);
@@ -874,6 +1155,14 @@ export function mixed_to_glyphinfo(str, gip) {   // windows.c:1600
  *           a null terminated string containing the selected characters.
  *
  * Returns number selected.
+ */
+/**
+ * @param {$c.Ptr | null} prompt const char *
+ * @param {number} category int
+ * @param {number} way boolean
+ * @param {$c.Ptr | null} class_list char *
+ * @param {$c.Ptr | null} class_select char *
+ * @returns {Promise<number>} int
  */
 export async function choose_classes_menu(prompt, category, way, class_list, class_select) {   // windows.c:1644
     let pick_list = [null], win = 0, any = new $T.any(), buf = new Int8Array(256), text = null, selected = 0, ret = 0, i = 0, n = 0, next_accelerator = 0, accelerator = 0, clr = 0, idx = 0, $t1;
@@ -979,6 +1268,10 @@ export async function choose_classes_menu(prompt, category, way, class_list, cla
     class_select.set(0, 0);
     return ret;
 }
+/**
+ * @param {number} window winid
+ * @param {$T.color_and_attr | null} style color_attr *
+ */
 export function adjust_menu_promptstyle(window, style) {   // windows.c:1769
     let wri = new $T.win_request_info_t();
     wri.$copyFrom(zerowri);
@@ -992,6 +1285,18 @@ export function adjust_menu_promptstyle(window, style) {   // windows.c:1769
  *   Common code point leading into the interface-specific
  *   add_menu() to allow single-spot adjustments to the parameters,
  *   such as those done by menu_colors.
+ */
+/**
+ * @param {number} window winid
+ * @param {$T.glyphinfo | null} glyphinfo const glyph_info *
+ * @param {$T.any | null} identifier const anything *
+ * @param {number} ch char
+ * @param {number} gch char
+ * @param {number} attr$in int
+ * @param {number} color$in int
+ * @param {$c.Ptr | null} str const char *
+ * @param {number} itemflags unsigned int
+ * @returns {Promise<void>}
  */
 export async function add_menu(window, glyphinfo, identifier, ch, gch, attr$in, color$in, str, itemflags) {   // windows.c:1785
     const attr = Int32Array.of(attr$in);
@@ -1028,6 +1333,11 @@ export async function add_menu(window, glyphinfo, identifier, ch, gch, attr$in, 
     await windowprocs.win_add_menu(window, glyphinfo, identifier, ch, gch, attr[0], color[0], str, itemflags);
 }
 /* insert a non-selectable, possibly highlighted line of text into a menu */
+/**
+ * @param {number} tmpwin winid
+ * @param {$c.Ptr | null} buf const char *
+ * @returns {Promise<void>}
+ */
 export async function add_menu_heading(tmpwin, buf) {   // windows.c:1816
     let any = new $T.any(), attr = 0, color = 0;
     any.$copyFrom(cg.zeroany);
@@ -1040,11 +1350,22 @@ export async function add_menu_heading(tmpwin, buf) {   // windows.c:1816
     await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, attr, color, buf, MENU.ITEMFLAGS_SKIPMENUCOLORS);
 }
 /* insert a non-selectable, unhighlighted line of text into a menu */
+/**
+ * @param {number} tmpwin winid
+ * @param {$c.Ptr | null} buf const char *
+ * @returns {Promise<void>}
+ */
 export async function add_menu_str(tmpwin, buf) {   // windows.c:1832
     let any = new $T.any();
     any.$copyFrom(cg.zeroany);
     await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, NO_COLOR, buf, MENU.ITEMFLAGS_NONE);
 }
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @param {*} color int *
+ * @param {*} attr int *
+ * @returns {number} boolean
+ */
 function get_menu_coloring(str, color, attr) {   // windows.c:1841
     let tmpmc = null;
     if (iflags.use_menu_color) {
@@ -1058,6 +1379,12 @@ function get_menu_coloring(str, color, attr) {   // windows.c:1841
     }
     return 0;
 }
+/**
+ * @param {number} window winid
+ * @param {number} how int
+ * @param {*} menu_list menu_item **
+ * @returns {Promise<number>} int
+ */
 export async function select_menu(window, how, menu_list) {   // windows.c:1856
     let reslt = 0, old_bot_disabled = 0;
     old_bot_disabled = gb.bot_disabled;
@@ -1066,6 +1393,11 @@ export async function select_menu(window, how, menu_list) {   // windows.c:1856
     gb.bot_disabled = old_bot_disabled;
     return reslt;
 }
+/**
+ * @param {$c.Ptr | null} query const char *
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<void>}
+ */
 export async function getlin(query, bufp) {   // windows.c:1868
     let old_bot_disabled = 0, obufp = null, got_cmdq = 0, cmdq = null;
     old_bot_disabled = gb.bot_disabled;

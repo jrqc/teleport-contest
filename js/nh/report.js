@@ -41,6 +41,10 @@ const uend = [null];   // address taken
 let utmp = 0;   // used inside macros
 let mark = null;   // holds previous terminator (generally)
 /* ARGSUSED */
+/**
+ * @param {number} argc int
+ * @param {*} argv char **
+ */
 export function crashreport_init(argc, argv) {   // report.c:113
     let binfile = null, tmp = new Uint8Array(16), ctxp_ = new $T.CC_MD4state_st(), ctxp = null, fd = 0, segsize = 0, segment = new Uint8Array(4096), p = null, in_ = [null], cnt = 0, $t1, $t2, $t3, $t4, $t5, $t6;
     if ($t1 = crashreport_init$once, crashreport_init$once = $t1 + 1 | 0, $t1) {   /* NetHackW.exe calls us twice */
@@ -94,6 +98,9 @@ export function crashreport_init(argc, argv) {   // report.c:113
     nhUse(argc);
     nhUse(argv);
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function crashreport_bidshow() {   // report.c:189
     {
         await raw_print()(new $c.Ptr(bid, 0));
@@ -112,6 +119,13 @@ export async function crashreport_bidshow() {   // report.c:189
 //     want to roll back to the last SWR_ADD, update mark before
 //     calling this macro.
 /* On overflow, truncate to markp (but only if markp != NULL). */
+/**
+ * @param {$c.Ptr | null} in_ const char *
+ * @param {*} out char **
+ * @param {*} remaining int *
+ * @param {$c.Ptr | null} markp char *
+ * @returns {number} boolean
+ */
 export function swr_add_uricoded(in_, out, remaining, markp) {   // report.c:237
     let chr = new Int8Array(40), x = 0;
     while (in_.get(0)) {
@@ -153,6 +167,12 @@ export function swr_add_uricoded(in_, out, remaining, markp) {   // report.c:237
     }
     return FALSE;   /* normal return */
 }
+/**
+ * @param {number} cos int
+ * @param {$c.Ptr | null} msg const char *
+ * @param {$c.Ptr | null} why const char *
+ * @returns {Promise<number>} boolean
+ */
 export async function submit_web_report(cos, msg, why) {   // report.c:290
     let temp = new Int8Array(200), temp2 = new Int8Array(200), countpp = 0, count = 0, bt = $c.nulls(20), x = 0, info = null, k = 0, line = null, xargv = $c.nulls(3), pid = 0, err = new Int8Array(400), status = Int32Array.of(0);
     urem[0] = gc.crash_urlmax < 0 || gc.crash_urlmax > MAX_URL ? MAX_URL : MAX_URL < gc.crash_urlmax ? MAX_URL : gc.crash_urlmax;
@@ -367,6 +387,9 @@ export async function submit_web_report(cos, msg, why) {   // report.c:290
     /* !WIN32 */
     return TRUE;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dobugreport() {   // report.c:461
     if (!await submit_web_report(2, null, $c.lit("#bugreport command"))) {
         await pline($c.lit("Unable to send bug report.  Please visit %s instead."), sysopt.crashreporturl && sysopt.crashreporturl.get(0) ? sysopt.crashreporturl : $c.lit("https://www.nethack.org/"));
@@ -375,6 +398,9 @@ export async function dobugreport() {   // report.c:461
 }
 /* CRASHREPORT */
 /*ARGSUSED*/
+/**
+ * @returns {Promise<number>} boolean
+ */
 export async function NH_panictrace_libc() {   // report.c:485
     let bt = $c.nulls(20), count = 0, x = 0, info = null, buf = new Int8Array(256);
     /* XXX how did this get left here? */
@@ -399,6 +425,9 @@ export async function NH_panictrace_libc() {   // report.c:485
 /* SYSCF */
 /* SYSCF */
 /* PANICTRACE_GDB */
+/**
+ * @returns {Promise<number>} boolean
+ */
 export async function NH_panictrace_gdb() {   // report.c:529
     let gdbpath = null, greppath = null, buf = new Int8Array(256), gdb = null;
     /* A (more) generic method to get a stack trace - invoke
@@ -427,6 +456,10 @@ export async function NH_panictrace_gdb() {   // report.c:529
 }
 /* lineno==0 gives the most recent message (e.g.
    "Do you want to call panic..." if called from #panic) */
+/**
+ * @param {number} lineno int
+ * @returns {$c.Ptr | null} const char *
+ */
 export function get_saved_pline(lineno) {   // report.c:571
     let p = 0, limit = 0, $t1, $t2;
     limit = DUMPLOG_MSG_COUNT;
@@ -449,6 +482,10 @@ export function get_saved_pline(lineno) {   // report.c:571
 }
 /* called as signal() handler, so sent at least one arg */
 /*ARGUSED*/
+/**
+ * @param {number} sig_unused int
+ * @returns {Promise<void>}
+ */
 export async function panictrace_handler(sig_unused) {   // report.c:600
     let f2 = 0;
     /* wincurs.h */
@@ -462,6 +499,10 @@ export async function panictrace_handler(sig_unused) {   // report.c:600
     nhUse(f2);   /* what could we do if write to fd#2 (stderr) fails  */
     await NH_abort(null);   /* ... and we're already in the process of quitting? */
 }
+/**
+ * @param {number} set boolean
+ * @returns {Promise<void>}
+ */
 export async function panictrace_setsignals(set) {   // report.c:625
     $c.signal(4, set ? panictrace_handler : null);
     $c.signal(5, set ? panictrace_handler : null);

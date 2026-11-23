@@ -72,6 +72,10 @@ import { Blind, Deaf, Fire_resistance, Glib, Hallucination, Invisible, Levitatio
 const dipfountain$lady = new Int8Array(17);   // static in dipfountain()
 /* used when trying to dip in or drink from fountain or sink or pool while
    levitating above it, or when trying to move downwards in that state */
+/**
+ * @param {$c.Ptr | null} what const char *
+ * @returns {Promise<void>}
+ */
 export async function floating_above(what) {   // fountain.c:21
     let umsg = null;
     umsg = $c.lit("are floating high above the %s.");
@@ -84,6 +88,9 @@ export async function floating_above(what) {   // fountain.c:21
     await You(umsg, what);
 }
 /* Fountain of snakes! */
+/**
+ * @returns {Promise<void>}
+ */
 async function dowatersnakes() {   // fountain.c:38
     let num = 0, mtmp = null, $t1;
     num = rn2(5) + 2 | 0;
@@ -103,6 +110,9 @@ async function dowatersnakes() {   // fountain.c:38
     }
 }
 /* Water demon */
+/**
+ * @returns {Promise<void>}
+ */
 async function dowaterdemon() {   // fountain.c:64
     let mtmp = [null];
     if (!(svm.mvitals[PM.WATER_DEMON].mvflags & G_GONE)) {
@@ -127,6 +137,9 @@ async function dowaterdemon() {   // fountain.c:64
     }
 }
 /* Water Nymph */
+/**
+ * @returns {Promise<void>}
+ */
 async function dowaternymph() {   // fountain.c:94
     let mtmp = null;
     if (!(svm.mvitals[PM.WATER_NYMPH].mvflags & G_GONE) && (mtmp = await makemon($c.relem(mons, PM.WATER_NYMPH), u.ux, u.uy, MM.NOMSG)) !== null) {
@@ -146,6 +159,10 @@ async function dowaternymph() {   // fountain.c:94
     }
 }
 /* Gushing forth along LOS from (u.ux, u.uy) */
+/**
+ * @param {number} drinking int
+ * @returns {Promise<void>}
+ */
 export async function dogushforth(drinking) {   // fountain.c:120
     let madepool = Int32Array.of(0);
     madepool[0] = 0;
@@ -158,6 +175,12 @@ export async function dogushforth(drinking) {   // fountain.c:120
         }
     }
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {*} poolcnt genericptr_t
+ * @returns {Promise<void>}
+ */
 async function gush(x, y, poolcnt) {   // fountain.c:134
     let mtmp = null, ttmp = null, $t1;
     if ($c.rem32(x + y | 0, 2) || u_at(x, y) || rn2(1 + distmin(u.ux, u.uy, x, y) | 0) || svl.level.locations[x][y].typ !== ROOM || sobj_at(BOULDER, x, y) || nexttodoor(x, y)) {
@@ -182,6 +205,9 @@ async function gush(x, y, poolcnt) {   // fountain.c:134
     }
 }
 /* Find a gem in the sparkling waters. */
+/**
+ * @returns {Promise<void>}
+ */
 async function dofindgem() {   // fountain.c:165
     if (!Blind()) {
         await You($c.lit("spot a gem in the sparkling waters!"));
@@ -193,6 +219,10 @@ async function dofindgem() {   // fountain.c:165
     await newsym(u.ux, u.uy);
     await exercise(A.WIS, TRUE);   /* a discovery! */
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} boolean
+ */
 async function watchman_warn_fountain(mtmp) {   // fountain.c:179
     if (is_watch(mtmp.data) && couldsee(mtmp.mx, mtmp.my) && mtmp.mpeaceful | 0) {
         if (!Deaf()) {
@@ -205,6 +235,12 @@ async function watchman_warn_fountain(mtmp) {   // fountain.c:179
     }
     return FALSE;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} isyou boolean
+ * @returns {Promise<void>}
+ */
 export async function dryup(x, y, isyou) {   // fountain.c:201
     let mtmp = null, glyph = 0;
     if (svl.level.locations[x][y].typ === FOUNTAIN && (!rn2(3) || FOUNTAIN_IS_WARNED(x, y))) {
@@ -245,6 +281,9 @@ export async function dryup(x, y, isyou) {   // fountain.c:201
     }
 }
 /* quaff from a fountain when standing on its location */
+/**
+ * @returns {Promise<void>}
+ */
 export async function drinkfountain() {   // fountain.c:243
     let mgkftn = 0, fate = 0, i = 0, ii = 0, littleluck = 0, obj = null, nextobj = null, buc_changed = 0, mtmp = null, $t1;
     /* What happens when you drink from a fountain? */
@@ -401,6 +440,10 @@ export async function drinkfountain() {   // fountain.c:243
     await dryup(u.ux, u.uy, TRUE);
 }
 /* dip an object into a fountain when standing on its location */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function dipfountain(obj) {   // fountain.c:394
     let er = 0, is_hands = 0, money = 0, otmp = null, nextobj = null, denomination = 0, coin_loss = 0, $t1;
     er = ER.NOTHING;
@@ -557,6 +600,9 @@ export async function dipfountain(obj) {   // fountain.c:394
     await dryup(u.ux, u.uy, TRUE);
 }
 /* dipping '-' in fountain, pool, or sink */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wash_hands() {   // fountain.c:558
     let hands = null, res = 0, was_glib = 0;
     hands = await makeplural(await body_part(HAND));
@@ -578,6 +624,11 @@ export async function wash_hands() {   // fountain.c:558
     return res;
 }
 /* convert a sink into a fountain */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function breaksink(x, y) {   // fountain.c:581
     if (cansee(x, y) || u_at(x, y)) {
         await pline_The($c.lit("pipes break!  Water spurts out!"));
@@ -590,6 +641,9 @@ export async function breaksink(x, y) {   // fountain.c:581
     await newsym(x, y);
 }
 /* quaff from a sink while standing on its location */
+/**
+ * @returns {Promise<void>}
+ */
 export async function drinksink() {   // fountain.c:595
     let otmp = null, mtmp = null, $t1;
     if (Levitation()) {
@@ -702,6 +756,10 @@ export async function drinksink() {   // fountain.c:595
     }
 }
 /* for #dip(potion.c) when standing on a sink */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function dipsink(obj) {   // fountain.c:716
     let try_call = 0, not_looted_yet = 0, is_hands = 0;
     try_call = FALSE;
@@ -789,6 +847,11 @@ export async function dipsink(obj) {   // fountain.c:716
     await useup(obj);
 }
 /* find a ring in a sink */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function sink_backs_up(x, y) {   // fountain.c:805
     let buf = new Int8Array(256);
     if (!Blind()) {

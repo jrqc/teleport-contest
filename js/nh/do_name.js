@@ -92,11 +92,19 @@ const coynames = $c.nulls(22);
    reordered for some reason, make sure that those get renumbered to match */
 const sir_Terry_novels = $c.nulls(41);
 /* manage a pool of BUFSZ buffers, so callers don't have to */
+/**
+ * @returns {$c.Ptr | null} char *
+ */
 function nextmbuf() {   // do_name.c:20
     nextmbuf$bufidx = $c.rem32(nextmbuf$bufidx + 1 | 0, NUMMBUF);
     return new $c.Ptr(nextmbuf$bufs[nextmbuf$bufidx], 0);
 }
 /* allocate space for a monster's name; removes old name if there is one */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} lth int
+ * @returns {Promise<void>}
+ */
 export async function new_mgivenname(mon, lth) {   // do_name.c:31
     let $t1, $t2;
     /* desired length (caller handles adding 1 for terminator) */
@@ -116,6 +124,9 @@ export async function new_mgivenname(mon, lth) {   // do_name.c:31
     }
 }
 /* release a monster's name; retains mextra even if all fields are now null */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ */
 export function free_mgivenname(mon) {   // do_name.c:51
     if (has_mgivenname(mon)) {
         $c.free(mon.mextra.mgivenname);
@@ -123,6 +134,11 @@ export function free_mgivenname(mon) {   // do_name.c:51
     }
 }
 /* allocate space for an object's name; removes old name if there is one */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} lth int
+ * @returns {Promise<void>}
+ */
 export async function new_oname(obj, lth) {   // do_name.c:61
     let $t1, $t2;
     /* desired length (caller handles adding 1 for terminator) */
@@ -142,6 +158,9 @@ export async function new_oname(obj, lth) {   // do_name.c:61
     }
 }
 /* release an object's name; retains oextra even if all fields are now null */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ */
 export function free_oname(obj) {   // do_name.c:81
     if (has_oname(obj)) {
         $c.free(obj.oextra.oname);
@@ -153,6 +172,10 @@ export function free_oname(obj) {   // do_name.c:81
  *  if it has one, or a pointer to an empty string
  *  if it doesn't.
  */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {$c.Ptr | null} const char *
+ */
 export function safe_oname(obj) {   // do_name.c:95
     if (has_oname(obj)) {
         return obj.oextra.oname;
@@ -161,6 +184,12 @@ export function safe_oname(obj) {   // do_name.c:95
 }
 /* get a name for a monster or an object from player;
    truncate if longer than PL_PSIZ, then return it */
+/**
+ * @param {$c.Ptr | null} outbuf char *
+ * @param {$c.Ptr | null} prompt const char *
+ * @param {$c.Ptr | null} defres const char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 async function name_from_player(outbuf, prompt, defres) {   // do_name.c:105
     /* output buffer, assumed to be at least BUFSZ long;
      * anything longer than PL_PSIZ will be truncated */
@@ -182,6 +211,11 @@ async function name_from_player(outbuf, prompt, defres) {   // do_name.c:105
 }
 /* historical note: this returns a monster pointer because it used to
    allocate a new bigger block of memory to hold the monster and its name */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$c.Ptr | null} name const char *
+ * @returns {Promise<$T.monst | null>} struct monst *
+ */
 export async function christen_monst(mtmp, name) {   // do_name.c:133
     let lth = 0, buf = new Int8Array(63);
     /* dogname & catname are PL_PSIZ arrays; object names have same limit */
@@ -204,6 +238,12 @@ export async function christen_monst(mtmp, name) {   // do_name.c:133
 /* check whether user-supplied name matches or nearly matches an unnameable
    monster's name, or is an attempt to delete the monster's name; if so, give
    alternate reject message for do_mgivenname() */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$c.Ptr | null} monnambuf char *
+ * @param {$c.Ptr | null} usrbuf char *
+ * @returns {Promise<number>} boolean
+ */
 async function alreadynamed(mtmp, monnambuf, usrbuf) {   // do_name.c:158
     let pronounbuf = new Int8Array(10), p = null, name_not_title = 0;
     if (!usrbuf.get(0)) {
@@ -229,6 +269,9 @@ async function alreadynamed(mtmp, monnambuf, usrbuf) {   // do_name.c:158
     return FALSE;
 }
 /* allow player to assign a name to some chosen monster */
+/**
+ * @returns {Promise<void>}
+ */
 async function do_mgivenname() {   // do_name.c:199
     let buf = new Int8Array(256), monnambuf = new Int8Array(256), qbuf = new Int8Array(128), cc = new $T.nhcoord(), cx = 0, cy = 0, mtmp = null, do_swallow = 0, glyph = 0;
     mtmp = null;
@@ -300,6 +343,10 @@ async function do_mgivenname() {   // do_name.c:199
  * used with extreme care.  Applying a name to an object no longer
  * allocates a replacement object, so that old risk is gone.
  */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function do_oname(obj) {   // do_name.c:290
     let bufp = null, buf = new Int8Array(256), bufcpy = new Int8Array(256), qbuf = new Int8Array(128), aname = null, objtyp = Int16Array.of(0);
     objtyp[0] = STRANGE_OBJECT;
@@ -369,6 +416,12 @@ async function do_oname(obj) {   // do_name.c:290
     obj = await oname(obj, new $c.Ptr(buf, 0), ONAME_VIA_NAMING | ONAME_KNOW_ARTI);
     nhUse(obj);
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$c.Ptr | null} name const char *
+ * @param {number} oflgs unsigned int
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function oname(obj, name, oflgs) {   // do_name.c:372
     let lth = 0, buf = new Int8Array(63), via_naming = 0, skip_inv_update = 0, $t1;
     /* item to assign name to */
@@ -423,6 +476,10 @@ export async function oname(obj, name, oflgs) {   // do_name.c:372
     }
     return obj;
 }
+/**
+ * @param {number} i int
+ * @returns {number} boolean
+ */
 export function objtyp_is_callable(i) {   // do_name.c:429
     if (objects[i].oc_uname) {
         return TRUE;
@@ -459,6 +516,10 @@ export function objtyp_is_callable(i) {   // do_name.c:429
     return FALSE;
 }
 /* getobj callback for object to name (specific item) - anything but gold */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 export function name_ok(obj) {   // do_name.c:467
     if (!obj || obj.oclass === COIN_CLASS) {
         return GETOBJ.EXCLUDE;
@@ -469,6 +530,10 @@ export function name_ok(obj) {   // do_name.c:467
     return GETOBJ.SUGGEST;
 }
 /* getobj callback for object to call (name its type) */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 export function call_ok(obj) {   // do_name.c:480
     if (!obj || !objtyp_is_callable(obj.otyp)) {
         return GETOBJ.EXCLUDE;
@@ -484,6 +549,9 @@ export function call_ok(obj) {   // do_name.c:480
     return GETOBJ.SUGGEST;
 }
 /* #call / #name command - player can name monster or object or type of obj */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function docallcmd() {   // do_name.c:499
     let obj = null, win = 0, any = new $T.any(), pick_list = [null], cq = new $T._cmd_queue(), cmdq = null, ch = 0, abc = 0, clr = 0;
     pick_list[0] = null;
@@ -576,6 +644,10 @@ export async function docallcmd() {   // do_name.c:499
     return ECMD.OK;
 }
 /* for use by safe_qbuf() */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 async function docall_xname(obj) {   // do_name.c:605
     let otemp = new $T.obj(), $t1;
     otemp.$copyFrom(obj);
@@ -603,6 +675,10 @@ async function docall_xname(obj) {   // do_name.c:605
     }
     return await an(await xname(otemp));
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function docall(obj) {   // do_name.c:636
     let buf = new Int8Array(256), qbuf = new Int8Array(128), uname_p = null, had_name = 0, $t1;
     had_name = FALSE;
@@ -640,6 +716,9 @@ export async function docall(obj) {   // do_name.c:636
         await update_inventory();
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function namefloorobj() {   // do_name.c:679
     let cc = new $T.nhcoord(), glyph = 0, buf = new Int8Array(256), obj = [null], fakeobj = 0, use_plural = 0, unames = $c.nulls(6), tmpbuf = new Int8Array(256), $t1, $t2, $t3;
     obj[0] = null;
@@ -703,6 +782,9 @@ async function namefloorobj() {   // do_name.c:679
     }
 }
 /* ghost names formerly set by x_monnam(), now by makemon() instead */
+/**
+ * @returns {$c.Ptr | null} const char *
+ */
 export function rndghostname() {   // do_name.c:772
     return rn2(7) ? ghostnames[rn2(34)] : new $c.Ptr(svp.plname, 0);
 }
@@ -752,6 +834,14 @@ export function rndghostname() {   // do_name.c:772
  *
  * Bug: if the monster is a priest or shopkeeper, not every one of these
  * options works, since those are special cases.
+ */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} article int
+ * @param {$c.Ptr | null} adjective const char *
+ * @param {number} suppress int
+ * @param {number} called boolean
+ * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function x_monnam(mtmp, article, adjective, suppress, called) {   // do_name.c:827
     let buf = null, mdat = null, pm_name = null, do_hallu = 0, do_invis = 0, do_it = 0, do_saddle = 0, do_mappear = 0, do_exact = 0, do_name = 0, augment_it = 0, name_at_start = 0, has_adjectives = 0, insertbuf2 = 0, mappear_as_mon = 0, bp = null, buf2 = new Int8Array(256), s_one = 0, name = null, save_prop = 0, save_invis = 0, rnamecode = Int8Array.of(0), rname = null, name$2 = null, pbuf = new Int8Array(256), pbuf$2 = new Int8Array(256);
@@ -928,9 +1018,17 @@ export async function x_monnam(mtmp, article, adjective, suppress, called) {   /
     }
     return buf;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function l_monnam(mtmp) {   // do_name.c:1035
     return await x_monnam(mtmp, ARTICLE.NONE, null, mtmp.mextra && mtmp.mextra.mgivenname ? SUPPRESS.SADDLE : 0, TRUE);
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function mon_nam(mtmp) {   // do_name.c:1042
     return await x_monnam(mtmp, ARTICLE.THE, null, mtmp.mextra && mtmp.mextra.mgivenname ? SUPPRESS.SADDLE : 0, FALSE);
 }
@@ -939,26 +1037,46 @@ export async function mon_nam(mtmp) {   // do_name.c:1042
    for monsters aggravating the player with a cursed potion of invisibility;
    also used for pet moving "reluctantly" onto cursed object when that pet
    can be seen either before or after it moves */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function noit_mon_nam(mtmp) {   // do_name.c:1054
     return await x_monnam(mtmp, ARTICLE.YOUR, null, has_mgivenname(mtmp) ? SUPPRESS.SADDLE | SUPPRESS.IT : SUPPRESS.IT, FALSE);
 }
 /* in between noit_mon_nam() and mon_nam(); if the latter would pick "it",
    use "someone" (for humanoids) or "something" (for others) instead */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function some_mon_nam(mtmp) {   // do_name.c:1065
     return await x_monnam(mtmp, ARTICLE.THE, null, has_mgivenname(mtmp) ? SUPPRESS.SADDLE | AUGMENT_IT : AUGMENT_IT, FALSE);
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function Monnam(mtmp) {   // do_name.c:1074
     let bp = null, $t1;
     bp = await mon_nam(mtmp);
     $t1 = highc(bp.get(0)), bp.set(0, $t1);
     return bp;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function noit_Monnam(mtmp) {   // do_name.c:1083
     let bp = null, $t1;
     bp = await noit_mon_nam(mtmp);
     $t1 = highc(bp.get(0)), bp.set(0, $t1);
     return bp;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function Some_Monnam(mtmp) {   // do_name.c:1092
     let bp = null, $t1;
     bp = await some_mon_nam(mtmp);
@@ -966,15 +1084,28 @@ export async function Some_Monnam(mtmp) {   // do_name.c:1092
     return bp;
 }
 /* return "a dog" rather than "Fido", honoring hallucination and visibility */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} article int
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function noname_monnam(mtmp, article) {   // do_name.c:1102
     return await x_monnam(mtmp, article, null, SUPPRESS_NAME, FALSE);
 }
 /* monster's own name -- overrides hallucination and [in]visibility
    so shouldn't be used in ordinary messages (mainly for disclosure) */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function m_monnam(mtmp) {   // do_name.c:1110
     return await x_monnam(mtmp, ARTICLE.NONE, null, EXACT_NAME, FALSE);
 }
 /* pet name: "your little dog" */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function y_monnam(mtmp) {   // do_name.c:1117
     let prefix = 0, suppression_flag = 0;
     prefix = mtmp.mtame ? ARTICLE.YOUR : ARTICLE.THE;
@@ -983,21 +1114,38 @@ export async function y_monnam(mtmp) {   // do_name.c:1117
     return await x_monnam(mtmp, prefix, null, suppression_flag, FALSE);
 }
 /* y_monnam() for start of sentence */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function YMonnam(mtmp) {   // do_name.c:1133
     let bp = null, $t1;
     bp = await y_monnam(mtmp);
     $t1 = highc(bp.get(0)), bp.set(0, $t1);
     return bp;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$c.Ptr | null} adj const char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function Adjmonnam(mtmp, adj) {   // do_name.c:1142
     let bp = null, $t1;
     bp = await x_monnam(mtmp, ARTICLE.THE, adj, has_mgivenname(mtmp) ? SUPPRESS.SADDLE : 0, FALSE);
     $t1 = highc(bp.get(0)), bp.set(0, $t1);
     return bp;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function a_monnam(mtmp) {   // do_name.c:1152
     return await x_monnam(mtmp, ARTICLE.A, null, has_mgivenname(mtmp) ? SUPPRESS.SADDLE : 0, FALSE);
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function Amonnam(mtmp) {   // do_name.c:1159
     let bp = null, $t1;
     bp = await a_monnam(mtmp);
@@ -1006,6 +1154,12 @@ export async function Amonnam(mtmp) {   // do_name.c:1159
 }
 /* used for monster ID by the '/', ';', and 'C' commands to block remote
    identification of the endgame altars via their attending priests */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} article int
+ * @param {$c.Ptr | null} outbuf char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function distant_monnam(mon, article, outbuf) {   // do_name.c:1170
     /* only ARTICLE_NONE and ARTICLE_THE are handled here */
     /* high priest(ess)'s identity is concealed on the Astral Plane,
@@ -1021,6 +1175,11 @@ export async function distant_monnam(mon, article, outbuf) {   // do_name.c:1170
 }
 /* returns mon_nam(mon) relative to other_mon; normal name unless they're
    the same, in which case the reference is to {him|her|it} self */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.monst | null} other_mon struct monst *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function mon_nam_too(mon, other_mon) {   // do_name.c:1191
     let outbuf = null;
     if (!$c.peq(mon, other_mon)) {
@@ -1048,6 +1207,13 @@ export async function mon_nam_too(mon, other_mon) {   // do_name.c:1191
 }
 /* construct "<monnamtext> <verb> <othertext> {him|her|it}self" which might
    be distorted by Hallu; if that's plural, adjust monnamtext and verb */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$c.Ptr | null} monnamtext char *
+ * @param {$c.Ptr | null} verb const char *
+ * @param {$c.Ptr | null} othertext const char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function monverbself(mon, monnamtext, verb, othertext) {   // do_name.c:1221
     let verbs = null, selfbuf = new Int8Array(40), capitaliz = 0, $t1;
     /* modifiable 'mbuf' with adequate room at end */
@@ -1077,6 +1243,11 @@ export async function monverbself(mon, monnamtext, verb, othertext) {   // do_na
 }
 /* for debugging messages, where data might be suspect and we aren't
    taking what the hero does or doesn't know into consideration */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} ckloc boolean
+ * @returns {$c.Ptr | null} char *
+ */
 export function minimal_monnam(mon, ckloc) {   // do_name.c:1254
     let ptr = null, outbuf = null;
     outbuf = nextmbuf();
@@ -1098,6 +1269,10 @@ export function minimal_monnam(mon, ckloc) {   // do_name.c:1254
     }
     return outbuf;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number} int
+ */
 export function Mgender(mtmp) {   // do_name.c:1289
     let mgender = 0;
     mgender = MALE;
@@ -1110,6 +1285,11 @@ export function Mgender(mtmp) {   // do_name.c:1289
     }
     return mgender;
 }
+/**
+ * @param {$T.permonst | null} pm struct permonst *
+ * @param {number} mgender int
+ * @returns {$c.Ptr | null} const char *
+ */
 export function pmname(pm, mgender) {   // do_name.c:1303
     if (mgender < MALE || mgender >= NUM_MGENDERS || !pm.pmnames[mgender]) {
         mgender = NEUTRAL;
@@ -1118,11 +1298,19 @@ export function pmname(pm, mgender) {   // do_name.c:1303
 }
 /* PMNAME_MACROS */
 /* mons[]->pmname for a monster */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {$c.Ptr | null} const char *
+ */
 export function mon_pmname(mon) {   // do_name.c:1313
     /* for neuter, mon->data->pmnames[MALE] will be Null and use [NEUTRAL] */
     return pmname(mon.data, Mgender(mon));
 }
 /* mons[]->pmname for a corpse or statue or figurine */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} const char *
+ */
 export async function obj_pmname(obj) {   // do_name.c:1321
     let cgend = 0, mgend = 0, mndx = 0;
     /* ignore saved montraits even when they're available; they determine
@@ -1152,6 +1340,11 @@ export async function obj_pmname(obj) {   // do_name.c:1321
     return $c.lit("two-legged glorkum-seeker");
 }
 /* fake monsters used to be in a hard-coded array, now in a data file */
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @param {$c.Ptr | null} code char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function bogusmon(buf, code) {   // do_name.c:1369
     let mnam = null;
     mnam = buf;
@@ -1172,6 +1365,10 @@ export async function bogusmon(buf, code) {   // do_name.c:1369
     return mnam;
 }
 /* return a random monster name, for hallucination */
+/**
+ * @param {$c.Ptr | null} code char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function rndmonnam(code) {   // do_name.c:1389
     let mnam = null, name = 0;
     /* arbitrary */
@@ -1189,6 +1386,10 @@ export async function rndmonnam(code) {   // do_name.c:1389
     return mnam;
 }
 /* check bogusmon prefix to decide whether it's a personal name */
+/**
+ * @param {number} code char
+ * @returns {number} boolean
+ */
 export function bogon_is_pname(code) {   // do_name.c:1415
     if (!code) {
         return FALSE;
@@ -1196,6 +1397,9 @@ export function bogon_is_pname(code) {   // do_name.c:1415
     return $c.i8($c.strchr($c.lit("-+="), code) ? TRUE : FALSE);
 }
 /* name of a Rogue player */
+/**
+ * @returns {$c.Ptr | null} const char *
+ */
 export function roguename() {   // do_name.c:1424
     let i = null, opts = null, j = null;
     if ((opts = nh_getenv($c.lit("ROGUEOPTS"))) !== null) {
@@ -1210,16 +1414,27 @@ export function roguename() {   // do_name.c:1424
     }
     return rn2(3) ? rn2(2) ? $c.lit("Michael Toy") : $c.lit("Kenneth Arnold") : $c.lit("Glenn Wichman");
 }
+/**
+ * @param {$c.Ptr | null} colorpref const char *
+ * @returns {$c.Ptr | null} const char *
+ */
 export function hcolor(colorpref) {   // do_name.c:1461
     return Hallucination() || !colorpref ? hcolors[rn2_on_display_rng(74)] : colorpref;
 }
 /* return a random real color unless hallucinating */
+/**
+ * @returns {$c.Ptr | null} const char *
+ */
 export function rndcolor() {   // do_name.c:1470
     let k = 0;
     k = rn2(CLR.MAX);
     return Hallucination() ? hcolor(null) : k === NO_COLOR ? $c.lit("colorless") : c_obj_colors[k];
 }
 /* if hallucinating, return a random liquid instead of 'liquidpref' */
+/**
+ * @param {$c.Ptr | null} liquidpref const char *
+ * @returns {$c.Ptr | null} const char *
+ */
 export function hliquid(liquidpref) {   // do_name.c:1493
     let hallucinate = 0, indx = 0, count = 0;
     /* use as-is when not hallucintg (unless empty) */
@@ -1238,12 +1453,21 @@ export function hliquid(liquidpref) {   // do_name.c:1493
     }
     return liquidpref;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$c.Ptr | null} buf char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function coyotename(mtmp, buf) {   // do_name.c:1526
     if (mtmp && buf) {
         $c.sprintf(buf, $c.lit("%s - %s"), await x_monnam(mtmp, ARTICLE.NONE, null, 0, TRUE), mtmp.mcan | 0 ? coynames[21] : coynames[$c.remu32(mtmp.m_id, 21)]);
     }
     return buf;
 }
+/**
+ * @param {$c.Ptr | null} s char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function rndorcname(s) {   // do_name.c:1538
     let i = 0, iend = 0, vstart = 0;
     iend = rn2(2) + 3 | 0;
@@ -1257,6 +1481,12 @@ export function rndorcname(s) {   // do_name.c:1538
     }
     return s;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$c.Ptr | null} gang const char *
+ * @param {$c.Ptr | null} other const char *
+ * @returns {Promise<$T.monst | null>} struct monst *
+ */
 export async function christen_orc(mtmp, gang, other) {   // do_name.c:1557
     let sz = 0, buf = new Int8Array(256), buf2 = new Int8Array(256), orcname = null, gbuf = new Int8Array(256), nameit = 0;
     sz = 0;
@@ -1283,6 +1513,10 @@ export async function christen_orc(mtmp, gang, other) {   // do_name.c:1557
     }
     return mtmp;
 }
+/**
+ * @param {*} novidx int *
+ * @returns {$c.Ptr | null} const char *
+ */
 export function noveltitle(novidx) {   // do_name.c:1611
     let j = 0, k = 0;
     k = 41;
@@ -1297,6 +1531,11 @@ export function noveltitle(novidx) {   // do_name.c:1611
     return sir_Terry_novels[j];
 }
 /* figure out canonical novel title from player-specified one */
+/**
+ * @param {$c.Ptr | null} lookname const char *
+ * @param {*} idx int *
+ * @returns {Promise<$c.Ptr | null>} const char *
+ */
 export async function lookup_novel(lookname, idx) {   // do_name.c:1627
     let k = 0;
     /*

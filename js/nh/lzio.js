@@ -32,6 +32,10 @@ import * as $hl from '../crt/heaplibc.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
 
+/**
+ * @param {number} z ZIO *
+ * @returns {Promise<number>} int
+ */
 export async function luaZ_fill(z) {   // lzio.c:23
     let L = 0, buff = 0, $t1;
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
@@ -48,6 +52,12 @@ export async function luaZ_fill(z) {   // lzio.c:23
         return $c.u8($h.i8[($t1 = $h.u32[(z + 8) >>> 2], $h.stp(z + 8, $t1 + 1), $t1)]);
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} z ZIO *
+ * @param {number} reader lua_Reader
+ * @param {number} data void *
+ */
 export function luaZ_init(L, z, reader, data) {   // lzio.c:38
     $h.stp(z + 32, L);
     $h.stp(z + 16, reader);
@@ -56,6 +66,12 @@ export function luaZ_init(L, z, reader, data) {   // lzio.c:38
     $h.stp(z + 8, 0);
 }
 /* --------------------------------------------------------------- read --- */
+/**
+ * @param {number} z ZIO *
+ * @param {number} b void *
+ * @param {number | bigint} n size_t
+ * @returns {Promise<number | bigint>} size_t
+ */
 export async function luaZ_read(z, b, n) {   // lzio.c:48
     let m = 0;
     while (n) {

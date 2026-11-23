@@ -113,6 +113,11 @@ const overloadpfx = new Int8Array(28);
 /* BUG: this lets you look at cockatrice corpses while blind without
    touching them */
 /* much simpler version of the look-here code; used by query_classes() */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} here boolean
+ * @returns {Promise<void>}
+ */
 async function simple_look(otmp, here) {   // pickup.c:76
     let tmpwin = 0;
     /* list of objects */
@@ -136,6 +141,14 @@ async function simple_look(otmp, here) {   // pickup.c:76
         await destroy_nhwindow()(tmpwin);
     }
 }
+/**
+ * @param {$c.Ptr | null} ilets char *
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} here boolean
+ * @param {Function | null} filter boolean (*)(struct obj *)
+ * @param {*} itemcount int *
+ * @returns {Promise<number>} int
+ */
 export async function collect_obj_classes(ilets, otmp, here, filter, itemcount) {   // pickup.c:101
     let iletct = 0, c = 0, $t1;
     iletct = 0;
@@ -170,6 +183,16 @@ export async function collect_obj_classes(ilets, otmp, here, filter, itemcount) 
  * ease of typing (using 'a' is much more common than 'A'); for Full,
  * it was changed to enhance menu entry ordering ('A' stands out, but
  * some players complain that it is too easy to choose accidentally).
+ */
+/**
+ * @param {$c.Ptr | null} oclasses char *
+ * @param {$c.Ptr | null} one_at_a_time boolean *
+ * @param {$c.Ptr | null} everything boolean *
+ * @param {$c.Ptr | null} action const char *
+ * @param {$T.obj | null} objs struct obj *
+ * @param {number} here boolean
+ * @param {*} menu_on_demand int *
+ * @returns {Promise<number>} boolean
  */
 async function query_classes(oclasses, one_at_a_time, everything, action, objs, here, menu_on_demand) {   // pickup.c:141
     let ilets = new Int8Array(36), inbuf = new Int8Array(256), iletct = 0, oclassct = 0, not_everything = 0, filtered = 0, qbuf = new Int8Array(128), m_seen = 0, itemcount = Int32Array.of(0), bcnt = Int32Array.of(0), ucnt = Int32Array.of(0), ccnt = Int32Array.of(0), xcnt = Int32Array.of(0), ocnt = Int32Array.of(0), jcnt = Int32Array.of(0), where = null, sym = 0, oc_of_sym = 0, p = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13, $t14, $t15, $t16, $t17;
@@ -301,6 +324,11 @@ async function query_classes(oclasses, one_at_a_time, everything, action, objs, 
  *  st_resists     does hero have stoning resistance?
  *  st_all         st_gloves | st_corpse | st_petrifies | st_resists
  */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} tests int
+ * @returns {number} boolean
+ */
 export function u_safe_from_fatal_corpse(obj, tests) {   // pickup.c:273
     if (tests & st_gloves && $G.uarmg || tests & st_corpse && obj.otyp !== CORPSE || tests & st_petrifies && !touch_petrifies($c.relem(mons, obj.corpsenm)) || tests & st_resists && Stone_resistance()) {
         return TRUE;
@@ -308,6 +336,11 @@ export function u_safe_from_fatal_corpse(obj, tests) {   // pickup.c:273
     return FALSE;
 }
 /* check whether hero is bare-handedly touching a cockatrice corpse */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} remotely boolean
+ * @returns {Promise<number>} boolean
+ */
 async function fatal_corpse_mistake(obj, remotely) {   // pickup.c:285
     if (u_safe_from_fatal_corpse(obj, st_all) || remotely) {
         return FALSE;
@@ -321,6 +354,11 @@ async function fatal_corpse_mistake(obj, remotely) {   // pickup.c:285
     return TRUE;
 }
 /* attempting to manipulate a Rider's corpse triggers its revival */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} remotely boolean
+ * @returns {Promise<number>} boolean
+ */
 export async function rider_corpse_revival(obj, remotely) {   // pickup.c:303
     if (!obj || obj.otyp !== CORPSE || !is_rider($c.relem(mons, obj.corpsenm))) {
         return FALSE;
@@ -331,6 +369,10 @@ export async function rider_corpse_revival(obj, remotely) {   // pickup.c:303
     return TRUE;
 }
 /* wand of probing zapped down; perhaps hero is levitating while blind */
+/**
+ * @param {number} via_probing boolean
+ * @returns {Promise<void>}
+ */
 export async function force_decor(via_probing) {   // pickup.c:317
     let $t1;
     /* we don't want describe_decor() to defer feedback if hero is fumbling
@@ -349,6 +391,10 @@ export async function force_decor(via_probing) {   // pickup.c:317
     $t1 = gd.decor_levitate_override = FALSE, gd.decor_fumble_override = $t1;
     svl.lastseentyp[u.ux][u.uy] = svl.level.locations[u.ux][u.uy].typ;
 }
+/**
+ * @param {number} setup boolean
+ * @returns {Promise<void>}
+ */
 export async function deferred_decor(setup) {   // pickup.c:337
     /* True: deferring, False: catching up */
     if (!flags.mention_decor) {
@@ -362,6 +408,9 @@ export async function deferred_decor(setup) {   // pickup.c:337
 }
 /* handle 'mention_decor' (when walking onto a dungeon feature such as
    stairs or altar, describe it even if it isn't covered up by an object) */
+/**
+ * @returns {Promise<number>} boolean
+ */
 async function describe_decor() {   // pickup.c:353
     let outbuf = new Int8Array(256), fbuf = new Int8Array(128), doorhere = 0, waterhere = 0, res = 0, dfeature = null, ltyp = 0;
     res = TRUE;
@@ -430,6 +479,10 @@ async function describe_decor() {   // pickup.c:353
     return res;
 }
 /* look at the objects at our location, unless there are too many of them */
+/**
+ * @param {number} picked_some boolean
+ * @returns {Promise<void>}
+ */
 async function check_here(picked_some) {   // pickup.c:430
     let obj = null, ct = 0, lhflags = 0;
     ct = 0;
@@ -457,6 +510,10 @@ async function check_here(picked_some) {   // pickup.c:430
     }
 }
 /* query_objlist callback: return TRUE if obj's count is >= reference value */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 function n_or_more(obj) {   // pickup.c:460
     if ($c.peq(obj, $G.uchain)) {
         return FALSE;
@@ -464,9 +521,16 @@ function n_or_more(obj) {   // pickup.c:460
     return $c.i8(obj.quan >= gv.val_for_n_or_more ? 1 : 0);
 }
 /* check valid_menu_classes[] for an entry; also used by askchain() */
+/**
+ * @param {number} c int
+ * @returns {number} boolean
+ */
 export function menu_class_present(c) {   // pickup.c:469
     return $c.i8(c && $c.strchr(new $c.Ptr(gv.valid_menu_classes, 0), c) ? TRUE : FALSE);
 }
+/**
+ * @param {number} c int
+ */
 export function add_valid_menu_class(c) {   // pickup.c:475
     let $t1, $t2, $t3;
     if (c === 0) {
@@ -499,14 +563,26 @@ export function add_valid_menu_class(c) {   // pickup.c:475
     gv.valid_menu_classes[add_valid_menu_class$vmc_count] = 0;
 }
 /* query_objlist callback: return TRUE if not uchain */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 function all_but_uchain(obj) {   // pickup.c:509
     return $c.i8(!$c.peq(obj, $G.uchain) ? 1 : 0);
 }
 /* query_objlist callback: return TRUE */
 /*ARGUSED*/
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 export function allow_all(obj) {   // pickup.c:517
     return TRUE;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} boolean
+ */
 export async function allow_category(obj) {   // pickup.c:523
     let bucx = 0;
     /* If no filters are active, nothing will match unless
@@ -576,10 +652,17 @@ export async function allow_category(obj) {   // pickup.c:523
 /* not used */
 /* query_objlist callback: return TRUE if valid category (class), no uchain */
 /* query_objlist callback: return TRUE if valid class and worn */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} boolean
+ */
 export async function is_worn_by_type(otmp) {   // pickup.c:609
     return $c.i8(is_worn(otmp) && await allow_category(otmp) ? TRUE : FALSE);
 }
 /* reset last-picked-up flags */
+/**
+ * @param {$T.obj | null} olist struct obj *
+ */
 export function reset_justpicked(olist) {   // pickup.c:616
     let otmp = null;
     /*
@@ -596,6 +679,10 @@ export function reset_justpicked(olist) {   // pickup.c:616
         otmp.pickup_prev = (0) & 1;
     }
 }
+/**
+ * @param {$T.obj | null} olist struct obj *
+ * @returns {number} int
+ */
 export function count_justpicked(olist) {   // pickup.c:635
     let otmp = null, cnt = 0;
     cnt = 0;
@@ -606,6 +693,10 @@ export function count_justpicked(olist) {   // pickup.c:635
     }
     return cnt;
 }
+/**
+ * @param {$T.obj | null} olist struct obj *
+ * @returns {$T.obj | null} struct obj *
+ */
 export function find_justpicked(olist) {   // pickup.c:648
     let otmp = null;
     for (otmp = olist; otmp; otmp = otmp.nobj) {
@@ -626,6 +717,10 @@ export function find_justpicked(olist) {   // pickup.c:648
  *
  * Returns 1 if tried to pick something up, whether
  * or not it succeeded.
+ */
+/**
+ * @param {number} what int
+ * @returns {Promise<number>} int
  */
 export async function pickup(what) {   // pickup.c:672
     let i = 0, n = 0, res = 0, count = 0, n_tried = 0, n_picked = 0, pick_list = [null], autopickup = 0, objchain_p = null, traverse_how = 0, t = null, qbuf = new Int8Array(128), ct = 0, lcount = 0, all_of_a_type = Int8Array.of(0), selective = Int8Array.of(0), bycat = 0, oclasses = new Int8Array(28), obj = null, obj2 = null, via_menu = Int32Array.of(0), qbuf$2 = new Int8Array(256), $goto = null;
@@ -854,6 +949,10 @@ export async function pickup(what) {   // pickup.c:672
         break;
     }
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$T.autopickup_exception | null>} struct autopickup_exception *
+ */
 export async function check_autopickup_exceptions(obj) {   // pickup.c:913
     let ape = null, objdesc = null;
     /*
@@ -868,6 +967,11 @@ export async function check_autopickup_exceptions(obj) {   // pickup.c:913
     }
     return ape;
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} calc_costly boolean
+ * @returns {Promise<number>} boolean
+ */
 export async function autopick_testobj(otmp, calc_costly) {   // pickup.c:930
     let ape = null, otypes = null, pickit = 0;
     otypes = new $c.Ptr(flags.pickup_types, 0);
@@ -905,6 +1009,12 @@ export async function autopick_testobj(otmp, calc_costly) {   // pickup.c:930
  * and counts of the items to be picked up.  If the number of items
  * picked is zero, the pickup list is left alone.  The caller of this
  * function must free the pickup list.
+ */
+/**
+ * @param {$T.obj | null} olist struct obj *
+ * @param {number} follow int
+ * @param {*} pick_list menu_item **
+ * @returns {Promise<number>} int
  */
 async function autopick(olist, follow, pick_list) {   // pickup.c:975
     let pi = null, curr = null, n = 0, check_costly = 0, $t1;
@@ -950,6 +1060,15 @@ async function autopick(olist, follow, pick_list) {   // pickup.c:975
  *      SIGNAL_ESCAPE     - Return -1 rather than 0 if player uses ESC to
  *                          pick nothing.
  *      FEEL_COCKATRICE   - touch corpse.
+ */
+/**
+ * @param {$c.Ptr | null} qstr const char *
+ * @param {*} olist_p struct obj **
+ * @param {number} qflags int
+ * @param {*} pick_list menu_item **
+ * @param {number} how int
+ * @param {Function | null} allow boolean (*)(struct obj *)
+ * @returns {Promise<number>} int
  */
 export async function query_objlist(qstr, olist_p, qflags, pick_list, how, allow) {   // pickup.c:1025
     let i = 0, n = 0, tmpglyph = 0, win = 0, curr = null, last = null, fake_hero_object = new $T.obj(), olist = [null], pack = null, packbuf = new Int8Array(19), any = new $T.any(), printed_type_name = 0, first = 0, sorted = 0, engulfer = 0, engulfer_minvent = 0, sortflags = 0, tmpglyphinfo = new $T.glyphinfo(), sortedolist = [null], srtoli = null, clr = 0, with_oc_sym = 0, buf = new Int8Array(256), mi = null, k = 0, $t1, $t2;
@@ -1115,6 +1234,14 @@ export async function query_objlist(qstr, olist_p, qflags, pick_list, how, allow
  * allow menu-based category (class) selection (for Drop,take off etc.)
  *
  * If ParanoidAutoAll, requires confirmation when 'A' has been picked.
+ */
+/**
+ * @param {$c.Ptr | null} qstr const char *
+ * @param {$T.obj | null} olist struct obj *
+ * @param {number} qflags int
+ * @param {*} pick_list menu_item **
+ * @param {number} how int
+ * @returns {Promise<number>} int
  */
 export async function query_category(qstr, olist, qflags, pick_list, how) {   // pickup.c:1226
     let n = 0, win = 0, curr = null, pack = null, packbuf = new Int8Array(19), any = new $T.any(), collected_type_name = 0, invlet = 0, ccount = 0, ofilter = null, show_a = 0, do_unpaid = 0, do_usedup = 0, do_blessed = 0, do_cursed = 0, do_uncursed = 0, do_buc_unknown = 0, do_worn = 0, verify_All = 0, num_buc_types = 0, num_justpicked = 0, clr = 0, save_plnmsg = 0, oclass = 0, tmpbuf = new Int8Array(256), i = 0, j = 0, $t1, $t2, $t3, $t4;
@@ -1369,6 +1496,11 @@ export async function query_category(qstr, olist, qflags, pick_list, how) {   //
     }
     return n;
 }
+/**
+ * @param {$T.obj | null} olist struct obj *
+ * @param {number} qflags int
+ * @returns {number} int
+ */
 function count_categories(olist, qflags) {   // pickup.c:1511
     let pack = null, counted_category = 0, ccount = 0, curr = null, do_worn = 0;
     ccount = 0;
@@ -1396,6 +1528,11 @@ function count_categories(olist, qflags) {   // pickup.c:1511
  *  object is removed from it.  Use before and after weight amounts rather
  *  than trying to match the calculation used by weight() in mkobj.c.
  */
+/**
+ * @param {$T.obj | null} container struct obj *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function delta_cwt(container, obj) {   // pickup.c:1544
     let prev = null, owt = 0, nwt = 0;
     if (container.otyp !== BAG_OF_HOLDING) {
@@ -1419,6 +1556,15 @@ async function delta_cwt(container, obj) {   // pickup.c:1544
     return owt - nwt | 0;
 }
 /* could we carry `obj'? if not, could we carry some of it/them? */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$T.obj | null} container struct obj *
+ * @param {number | bigint} count long
+ * @param {number} telekinesis boolean
+ * @param {*} wt_before int *
+ * @param {*} wt_after int *
+ * @returns {Promise<number | bigint>} long
+ */
 async function carry_count(obj, container, count, telekinesis, wt_before, wt_after) {   // pickup.c:1570
     let adjust_wt = 0, is_gold = 0, wt = 0, iw = 0, ow = 0, oow = 0, qq = 0, savequan = 0, umoney = 0, saveowt = 0, verb = null, prefx1 = null, prefx2 = null, suffx = null, obj_nambuf = new Int8Array(256), where = new Int8Array(256), $t1, $t2, $t3;
     /* object to pick up... */
@@ -1546,6 +1692,13 @@ async function carry_count(obj, container, count, telekinesis, wt_before, wt_aft
     return 0;
 }
 /* determine whether character is able and player is willing to carry `obj' */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$T.obj | null} container struct obj *
+ * @param {*} cnt_p long *
+ * @param {number} telekinesis boolean
+ * @returns {Promise<number>} int
+ */
 async function lift_object(obj, container, cnt_p, telekinesis) {   // pickup.c:1705
     let result = 0, old_wt = Int32Array.of(0), new_wt = Int32Array.of(0), prev_encumbr = 0, next_encumbr = 0, qbuf = new Int8Array(256), savequan = 0, $t1;
     /* object to pick up... */
@@ -1621,6 +1774,12 @@ async function lift_object(obj, container, cnt_p, telekinesis) {   // pickup.c:1
  * Pick up <count> of obj from the ground and add it to the hero's inventory.
  * Returns -1 if caller should break out of its loop, 0 if nothing picked
  * up, 1 if otherwise.
+ */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number | bigint} count$in long
+ * @param {number} telekinesis boolean
+ * @returns {Promise<number>} int
  */
 export async function pickup_object(obj, count$in, telekinesis) {   // pickup.c:1803
     const count = [count$in];
@@ -1708,6 +1867,10 @@ export async function pickup_object(obj, count$in, telekinesis) {   // pickup.c:
  * pointer to the object where otmp ends up.  This may be different
  * from otmp because of merging.
  */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function pick_obj(otmp) {   // pickup.c:1897
     let result = null, ox = Int16Array.of(0), oy = Int16Array.of(0), robshop = 0, fromfloor = 0, saveushops = new Int8Array(5), fakeshop = new Int8Array(2), $t1;
     fromfloor = $c.i8(otmp.where === OBJ.FLOOR ? 1 : 0);
@@ -1750,6 +1913,12 @@ export async function pick_obj(otmp) {   // pickup.c:1897
 /* pickup_object()/out_container() helper;
    print an added-to-invent message for current object, limiting feedback
    about encumbrance to the first item which causes that to change */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number | bigint} count long
+ * @param {$c.Ptr | null} verb const char *
+ * @returns {Promise<void>}
+ */
 async function pickup_prinv(obj, count, verb) {   // pickup.c:1948
     let pbuf = new Int8Array(128), prefix = null, nearload = 0;
     nearload = near_capacity();
@@ -1767,6 +1936,9 @@ async function pickup_prinv(obj, count, verb) {   // pickup.c:1948
 }
 /*
  * prints a message if encumbrance changed since the last check
+ */
+/**
+ * @returns {Promise<void>}
  */
 export async function encumber_msg() {   // pickup.c:1978
     let newcap = 0;
@@ -1807,6 +1979,12 @@ export async function encumber_msg() {   // pickup.c:1978
     go.oldcap = newcap;
 }
 /* Is there a container at x,y. Optional: return count of containers at x,y */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} countem boolean
+ * @returns {number} int
+ */
 export function container_at(x, y, countem) {   // pickup.c:2024
     let cobj = null, nobj = null, container_count = 0;
     container_count = 0;
@@ -1821,6 +1999,12 @@ export function container_at(x, y, countem) {   // pickup.c:2024
     }
     return container_count;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} looting boolean
+ * @returns {Promise<number>} boolean
+ */
 async function able_to_loot(x, y, looting) {   // pickup.c:2041
     let verb = null, t = null;
     /* loot vs tip */
@@ -1847,6 +2031,11 @@ async function able_to_loot(x, y, looting) {   // pickup.c:2041
     }
     return TRUE;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 function mon_beside(x, y) {   // pickup.c:2072
     let i = 0, j = 0, nx = 0, ny = 0;
     for (i = -1; i <= 1; i = i + 1 | 0) {
@@ -1860,6 +2049,12 @@ function mon_beside(x, y) {   // pickup.c:2072
     }
     return FALSE;
 }
+/**
+ * @param {*} cobjp struct obj **
+ * @param {number} cindex int
+ * @param {number} ccount int
+ * @returns {Promise<number>} int
+ */
 async function do_loot_cont(cobjp, cindex, ccount) {   // pickup.c:2088
     let cobj = null, res = 0, otmp = null, unlocktool = null, ox = 0, oy = 0, tmp = 0;
     /* index of this container (1..N)... */
@@ -1925,6 +2120,9 @@ async function do_loot_cont(cobjp, cindex, ccount) {   // pickup.c:2088
     return await use_container(cobjp, FALSE, $c.i8(cindex < ccount ? 1 : 0));
 }
 /* #loot extended command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doloot() {   // pickup.c:2166
     let res = 0;
     gl.loot_reset_justpicked = TRUE;
@@ -1933,6 +2131,9 @@ export async function doloot() {   // pickup.c:2166
     return res;
 }
 /* loot a container on the floor or loot saddle from mon. */
+/**
+ * @returns {Promise<number>} int
+ */
 async function doloot_core() {   // pickup.c:2178
     let cobj = [null], nobj = null, c = 0, timepassed = 0, cc = new $T.nhcoord(), underfoot = 0, dont_find_anything = null, mtmp = null, prev_inquiry = Int32Array.of(0), prev_loot = Int8Array.of(0), num_conts = 0, clr = 0, anyfound = 0, n = 0, i = 0, win = 0, any = new $T.any(), pick_list = [null], looted_mon = 0, $goto = null;
     D1: for (;;) {
@@ -2094,6 +2295,9 @@ async function doloot_core() {   // pickup.c:2178
     }
 }
 /* called when attempting to #loot while confused */
+/**
+ * @returns {Promise<number>} boolean
+ */
 async function reverse_loot() {   // pickup.c:2350
     let goldob = null, coffers = null, otmp = null, boxdummy = new $T.obj(), mon = null, contribution = 0, n = 0, x = 0, y = 0, $t1;
     goldob = null;
@@ -2173,6 +2377,12 @@ async function reverse_loot() {   // pickup.c:2350
 }
 /* loot_mon() returns amount of time passed.
  */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {*} passed_info int *
+ * @param {$c.Ptr | null} prev_loot boolean *
+ * @returns {Promise<number>} int
+ */
 export async function loot_mon(mtmp, passed_info, prev_loot) {   // pickup.c:2431
     let c = 0, timepassed = 0, otmp = null, qbuf = new Int8Array(128), count = 0;
     c = -1;
@@ -2221,6 +2431,11 @@ export async function loot_mon(mtmp, passed_info, prev_loot) {   // pickup.c:243
  * Decide whether an object being placed into a magic bag will cause
  * it to explode.  If the object is a bag itself, check recursively.
  */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} depthin int
+ * @returns {number} boolean
+ */
 function mbag_explodes(obj, depthin) {   // pickup.c:2488
     let otmp = null;
     /* these won't cause an explosion when they're empty */
@@ -2239,11 +2454,19 @@ function mbag_explodes(obj, depthin) {   // pickup.c:2488
     }
     return FALSE;
 }
+/**
+ * @returns {number} boolean
+ */
 function is_boh_item_gone() {   // pickup.c:2510
     return $c.i8(!rn2(13) ? 1 : 0);
 }
 /* Scatter most of Bag of holding contents around.  Some items will be
    destroyed with the same chance as looting a cursed bag. */
+/**
+ * @param {$T.obj | null} boh struct obj *
+ * @param {number} on_floor boolean
+ * @returns {Promise<void>}
+ */
 async function do_boh_explosion(boh, on_floor) {   // pickup.c:2518
     let otmp = null, nobj = null;
     boh.in_use = (1) & 1;   /* in case scatter() leads to bones creation */
@@ -2259,6 +2482,11 @@ async function do_boh_explosion(boh, on_floor) {   // pickup.c:2518
     }
     /* boh is about to be deleted so no need to reset its in_use flag here */
 }
+/**
+ * @param {$T.obj | null} container struct obj *
+ * @param {number} held boolean
+ * @returns {Promise<number | bigint>} long
+ */
 async function boh_loss(container, held) {   // pickup.c:2537
     let loss = 0, curr = null, otmp = null;
     /* sometimes toss objects if a cursed magic bag */
@@ -2276,6 +2504,10 @@ async function boh_loss(container, held) {   // pickup.c:2537
     return 0;
 }
 /* Returns: -1 to stop, 1 item was inserted, 0 item was not inserted. */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function in_container(obj) {   // pickup.c:2558
     let floor_container = 0, was_unpaid = 0, buf = new Int8Array(256), save_no_charge = new $T.obj(), $t1;
     floor_container = $c.i8(!carried(gc.current_container) ? 1 : 0);
@@ -2422,10 +2654,18 @@ async function in_container(obj) {   // pickup.c:2558
  * container is gone (magic bag explosion) or 'obj' is the container itself;
  * also used by getobj() when picking a single item to stash
  */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 export function ck_bag(obj) {   // pickup.c:2720
     return gc.current_container && !$c.peq(obj, gc.current_container) ? 1 : 0;
 }
 /* Returns: -1 to stop, 1 item was removed, 0 item was not removed. */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function out_container(obj) {   // pickup.c:2727
     let otmp = null, res = 0, count = [0], is_gold = 0, $t1, $t2;
     is_gold = $c.i8(obj.oclass === COIN_CLASS ? 1 : 0);
@@ -2470,6 +2710,10 @@ async function out_container(obj) {   // pickup.c:2727
     return 1;
 }
 /* taking a corpse out of an ice box needs a couple of adjustments */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function removed_from_icebox(obj) {   // pickup.c:2781
     let m = null, iceT = 0;
     if (!age_is_relative(obj)) {
@@ -2488,6 +2732,12 @@ export async function removed_from_icebox(obj) {   // pickup.c:2781
     }
 }
 /* an object inside a cursed bag of holding is being destroyed */
+/**
+ * @param {number} held boolean
+ * @param {$T.obj | null} item struct obj *
+ * @param {number} silent boolean
+ * @returns {Promise<number | bigint>} long
+ */
 async function mbag_item_gone(held, item, silent) {   // pickup.c:2803
     let shkp = null, loss = 0;
     loss = 0;
@@ -2507,6 +2757,12 @@ async function mbag_item_gone(held, item, silent) {   // pickup.c:2803
     return loss;
 }
 /* used for #loot/apply, #tip, and final disclosure */
+/**
+ * @param {$T.obj | null} box struct obj *
+ * @param {number} makecat boolean
+ * @param {number} givemsg boolean
+ * @returns {Promise<void>}
+ */
 export async function observe_quantum_cat(box, makecat, givemsg) {   // pickup.c:2826
     let deadcat = null, livecat = null, ox = Int16Array.of(0), oy = Int16Array.of(0), itsalive = 0, $t1;
     livecat = null;
@@ -2572,10 +2828,18 @@ export async function observe_quantum_cat(box, makecat, givemsg) {   // pickup.c
     return;
 }
 /* used by askchain() to check for magic bag explosion */
+/**
+ * @param {Function | null} fn int (*)(struct obj *)
+ * @returns {number} boolean
+ */
 export function container_gone(fn) {   // pickup.c:2903
     /* result is only meaningful while use_container() is executing */
     return $c.i8((fn === in_container || fn === out_container) && !gc.current_container ? 1 : 0);
 }
+/**
+ * @param {number} more_containers boolean
+ * @returns {Promise<void>}
+ */
 async function explain_container_prompt(more_containers) {   // pickup.c:2911
     let txtpp = null, win = 0;
     /* "Do what with <container>? [:oibrsq or ?] (q)" */
@@ -2590,6 +2854,9 @@ async function explain_container_prompt(more_containers) {   // pickup.c:2911
         await destroy_nhwindow()(win);
     }
 }
+/**
+ * @returns {Promise<number>} boolean
+ */
 export async function u_handsy() {   // pickup.c:2943
     if (nohands(gy.youmonst.data)) {
         await You($c.lit("have no hands!"));   /* not `body_part(HAND)' */
@@ -2601,6 +2868,10 @@ export async function u_handsy() {   // pickup.c:2943
     return TRUE;
 }
 /* getobj callback for object to be stashed into a container */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 function stash_ok(obj) {   // pickup.c:2957
     if (!obj) {
         return GETOBJ.EXCLUDE;
@@ -2613,6 +2884,12 @@ function stash_ok(obj) {   // pickup.c:2957
      * which case extract in_container()'s logic.) */
     return GETOBJ.SUGGEST;
 }
+/**
+ * @param {*} objp struct obj **
+ * @param {number} held boolean
+ * @param {number} more_containers boolean
+ * @returns {Promise<number>} int
+ */
 export async function use_container(objp, held, more_containers) {   // pickup.c:2972
     let otmp = null, obj = null, quantum_cat = 0, cursed_mbag = 0, loot_out = 0, loot_in = 0, loot_in_first = 0, stash_one = 0, inokay = 0, outokay = 0, outmaybe = 0, c = 0, emptymsg = new Int8Array(256), qbuf = new Int8Array(128), pbuf = new Int8Array(128), xbuf = new Int8Array(128), used = 0, loss = 0, $t1;
     /* True iff #loot multiple and this isn't last */
@@ -2858,6 +3135,10 @@ export async function use_container(objp, held, more_containers) {   // pickup.c
     return used;
 }
 /* loot current_container (take things out or put things in), by prompting */
+/**
+ * @param {number} put_in boolean
+ * @returns {Promise<number>} int
+ */
 async function traditional_loot(put_in) {   // pickup.c:3230
     let actionfunc = null, checkfunc = null, objlist = null, selection = new Int8Array(28), action = null, one_by_one = Int8Array.of(0), allflag = Int8Array.of(0), used = 0, menu_on_request = Int32Array.of(0);
     /* +10: room for B,U,C,X plus slop */
@@ -2885,6 +3166,11 @@ async function traditional_loot(put_in) {   // pickup.c:3230
     return used;
 }
 /* loot current_container (take things out or put things in), using a menu */
+/**
+ * @param {number} retry int
+ * @param {number} put_in boolean
+ * @returns {Promise<number>} int
+ */
 async function menu_loot(retry, put_in) {   // pickup.c:3265
     let n = 0, i = 0, n_looted = 0, all_categories = 0, loot_everything = 0, autopick = 0, buf = new Int8Array(256), loot_justpicked = 0, action = null, otmp = null, otmp2 = null, pick_list = [null], mflags = 0, res = 0, count = 0, inout_func = null, firstobj = null;
     n_looted = 0;
@@ -3008,6 +3294,15 @@ async function menu_loot(retry, put_in) {   // pickup.c:3265
     }
     return n_looted ? ECMD.TIME : ECMD.OK;
 }
+/**
+ * @param {$c.Ptr | null} prompt const char *
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} outokay boolean
+ * @param {number} inokay boolean
+ * @param {number} alreadyused boolean
+ * @param {number} more_containers boolean
+ * @returns {Promise<number>} char
+ */
 async function in_or_out_menu(prompt, obj, outokay, inokay, alreadyused, more_containers) {   // pickup.c:3397
     let win = 0, any = new $T.any(), pick_list = [null], buf = new Int8Array(256), n = 0, menuselector = null, clr = 0, k = 0;
     /* can take out */
@@ -3067,6 +3362,10 @@ async function in_or_out_menu(prompt, obj, outokay, inokay, alreadyused, more_co
     return $c.i8(n === 0 && more_containers ? 110 : 113);   /* next or quit */
 }
 /* getobj callback for object to tip */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 function tip_ok(obj) {   // pickup.c:3481
     if (!obj || obj.oclass === COIN_CLASS) {
         return GETOBJ.EXCLUDE;
@@ -3086,6 +3385,9 @@ function tip_ok(obj) {   // pickup.c:3481
    returns ECMD_CANCEL if menu was canceled,
    ECMD_TIME if a container was picked,
    otherwise returns ECMD_OK. */
+/**
+ * @returns {Promise<number>} int
+ */
 async function choose_tip_container_menu() {   // pickup.c:3505
     let n = 0, i = 0, win = 0, any = new $T.any(), pick_list = [null], dummyobj = new $T.obj(), otmp = null, clr = 0;
     pick_list[0] = null;
@@ -3135,6 +3437,9 @@ async function choose_tip_container_menu() {   // pickup.c:3505
     return ECMD.OK;
 }
 /* #tip command -- empty container contents onto floor */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dotip() {   // pickup.c:3562
     let cobj = null, nobj = null, cc = new $T.nhcoord(), boxes = 0, c = 0, buf = new Int8Array(256), qbuf = new Int8Array(256), spillage = null, res = 0;
     spillage = null;
@@ -3237,6 +3542,10 @@ export async function dotip() {   // pickup.c:3562
     }
     return ECMD.OK;
 }
+/**
+ * @param {$T.obj | null} box struct obj *
+ * @returns {Promise<void>}
+ */
 async function tipcontainer(box) {   // pickup.c:3688
     let ox = Int16Array.of(0), oy = Int16Array.of(0), srcheld = 0, dstheld = 0, maybeshopgoods = 0, targetbox = null, cancelled = Int8Array.of(0), otmp = null, nobj = null, terse = 0, highdrop = 0, altarizing = 0, cursed_mbag = 0, loss = 0, $t1, $t2;
     /* or bag */
@@ -3391,6 +3700,11 @@ async function tipcontainer(box) {   // pickup.c:3688
 /* ask user for a carried container into which they want box to be emptied;
    cancelled is TRUE if user cancelled the menu pick; hands aren't required
    when tipping to the floor but are when tipping into another container */
+/**
+ * @param {$T.obj | null} box struct obj *
+ * @param {$c.Ptr | null} cancelled boolean *
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 async function tipcontainer_gettarget(box, cancelled) {   // pickup.c:3871
     let n = 0, n_conts = 0, win = 0, any = new $T.any(), buf = new Int8Array(256), pick_list = [null], dummyobj = new $T.obj(), otmp = null, hands_available = 0, exclude_it = 0, clr = 0, $t1;
     pick_list[0] = null;
@@ -3451,6 +3765,12 @@ async function tipcontainer_gettarget(box, cancelled) {   // pickup.c:3871
 /* Perform check on box if we can tip it.
    Returns one of TIPCHECK_foo values.
    If allowempty if TRUE, return TIPCHECK_OK instead of TIPCHECK_EMPTY. */
+/**
+ * @param {$T.obj | null} box struct obj *
+ * @param {$T.obj | null} targetbox struct obj *
+ * @param {number} allowempty boolean
+ * @returns {Promise<number>} int
+ */
 async function tipcontainer_checks(box, targetbox, allowempty) {   // pickup.c:3954
     let seencount = Int32Array.of(0), res = 0, bag = 0, old_spe = 0, seen = Int32Array.of(0), totseen = 0, maybeshopgoods = 0, ox = Int16Array.of(0), oy = Int16Array.of(0), yourbuf = new Int8Array(256), empty_it = 0;
     /* container player wants to tip */

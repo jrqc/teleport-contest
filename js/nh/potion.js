@@ -103,6 +103,10 @@ const eyemsg = new Int8Array(19);
 const bottlenames = $c.nulls(7);
 const hbottlenames = $c.nulls(24);
 /* force `val' to be within valid range for intrinsic timeout value */
+/**
+ * @param {number | bigint} val long
+ * @returns {number | bigint} long
+ */
 function itimeout(val) {   // potion.c:56
     if (val >= TIMEOUT) {
         val = TIMEOUT;
@@ -112,19 +116,37 @@ function itimeout(val) {   // potion.c:56
     return val;
 }
 /* increment `old' by `incr' and force result to be valid intrinsic timeout */
+/**
+ * @param {number | bigint} old long
+ * @param {number} incr int
+ * @returns {number | bigint} long
+ */
 function itimeout_incr(old, incr) {   // potion.c:68
     return itimeout($c.add64($c.and64(old, TIMEOUT), incr));
 }
 /* set the timeout field of intrinsic `which' */
+/**
+ * @param {*} which long *
+ * @param {number | bigint} val long
+ */
 export function set_itimeout(which, val) {   // potion.c:75
     let $t1;
     which.set(0, $c.and64(which.get(0), ~TIMEOUT));
     $t1 = itimeout(val), which.set(0, $c.or64(which.get(0), $t1));
 }
 /* increment the timeout field of intrinsic `which' */
+/**
+ * @param {*} which long *
+ * @param {number} incr int
+ */
 export function incr_itimeout(which, incr) {   // potion.c:83
     set_itimeout(which, itimeout_incr(which.get(0), incr));
 }
+/**
+ * @param {number | bigint} xtime long
+ * @param {number} talk boolean
+ * @returns {Promise<void>}
+ */
 export async function make_confused(xtime, talk) {   // potion.c:89
     let old = 0;
     old = u.uprops[CONFUSION].intrinsic;
@@ -141,6 +163,11 @@ export async function make_confused(xtime, talk) {   // potion.c:89
     }
     set_itimeout(new $c.FieldRef(u.uprops[CONFUSION], "intrinsic", "i64"), xtime);
 }
+/**
+ * @param {number | bigint} xtime long
+ * @param {number} talk boolean
+ * @returns {Promise<void>}
+ */
 export async function make_stunned(xtime, talk) {   // potion.c:107
     let old = 0;
     old = u.uprops[STUNNED].intrinsic;
@@ -169,6 +196,13 @@ export async function make_stunned(xtime, talk) {   // potion.c:107
 /* Sick is overloaded with both fatal illness and food poisoning (via
    u.usick_type bit mask), but delayed killer can only support one or
    the other at a time.  They should become separate intrinsics.... */
+/**
+ * @param {number | bigint} xtime long
+ * @param {$c.Ptr | null} cause const char *
+ * @param {number} talk boolean
+ * @param {number} type int
+ * @returns {Promise<void>}
+ */
 export async function make_sick(xtime, cause, talk, type) {   // potion.c:137
     let kptr = null, old = 0, kpfx = 0;
     /* sickness cause */
@@ -221,6 +255,11 @@ export async function make_sick(xtime, cause, talk, type) {   // potion.c:137
         await dealloc_killer(kptr);
     }
 }
+/**
+ * @param {number | bigint} xtime long
+ * @param {$c.Ptr | null} msg const char *
+ * @returns {Promise<void>}
+ */
 export async function make_slimed(xtime, msg) {   // potion.c:195
     let old = 0;
     old = u.uprops[SLIMED].intrinsic;
@@ -242,6 +281,13 @@ export async function make_slimed(xtime, msg) {   // potion.c:195
     }
 }
 /* start or stop petrification */
+/**
+ * @param {number | bigint} xtime long
+ * @param {$c.Ptr | null} msg const char *
+ * @param {number} killedby int
+ * @param {$c.Ptr | null} killername const char *
+ * @returns {Promise<void>}
+ */
 export async function make_stoned(xtime, msg, killedby, killername) {   // potion.c:222
     let old = 0;
     old = u.uprops[STONED].intrinsic;
@@ -259,6 +305,11 @@ export async function make_stoned(xtime, msg, killedby, killername) {   // potio
         await delayed_killer(STONED, killedby, killername);
     }
 }
+/**
+ * @param {number | bigint} xtime long
+ * @param {number} talk boolean
+ * @returns {Promise<void>}
+ */
 export async function make_vomiting(xtime, talk) {   // potion.c:243
     let old = 0;
     old = u.uprops[VOMITING].intrinsic;
@@ -273,6 +324,11 @@ export async function make_vomiting(xtime, talk) {   // potion.c:243
         }
     }
 }
+/**
+ * @param {number | bigint} xtime long
+ * @param {number} talk boolean
+ * @returns {Promise<void>}
+ */
 export async function make_blinded(xtime, talk) {   // potion.c:261
     let old = 0, u_could_see = 0, can_see_now = 0, eyes = null;
     old = BlindedTimeout();
@@ -349,6 +405,9 @@ export async function make_blinded(xtime, talk) {   // potion.c:261
 }
 /* blindness has just started or just ended--caller enforces that;
    called by Blindf_on(), Blindf_off(), and make_blinded() */
+/**
+ * @returns {Promise<void>}
+ */
 export async function toggle_blindness() {   // potion.c:336
     let Stinging = 0;
     Stinging = $c.i8($G.uwep && $c.and64(u.uprops[WARN_OF_MON].extrinsic, W.WEP) !== 0 ? 1 : 0);
@@ -380,6 +439,12 @@ export async function toggle_blindness() {   // potion.c:336
         await learn_unseen_invent();
     }
 }
+/**
+ * @param {number | bigint} xtime long
+ * @param {number} talk boolean
+ * @param {number | bigint} mask long
+ * @returns {Promise<number>} boolean
+ */
 export async function make_hallucinated(xtime, talk, mask) {   // potion.c:369
     let old = 0, changed = 0, message = null, verb = null, eyes = null;
     /* nonzero if this is an attempt to turn on hallucination */
@@ -445,6 +510,11 @@ export async function make_hallucinated(xtime, talk, mask) {   // potion.c:369
     }
     return changed;
 }
+/**
+ * @param {number | bigint} xtime long
+ * @param {number} talk boolean
+ * @returns {Promise<void>}
+ */
 export async function make_deaf(xtime, talk) {   // potion.c:443
     let old = 0;
     old = u.uprops[DEAF].intrinsic;
@@ -460,6 +530,10 @@ export async function make_deaf(xtime, talk) {   // potion.c:443
     }
 }
 /* set or clear "slippery fingers" */
+/**
+ * @param {number} xtime int
+ * @returns {Promise<void>}
+ */
 export async function make_glib(xtime) {   // potion.c:461
     disp.botl = $c.i8(disp.botl | (!Glib() ? 1 : 0) ^ (!!xtime ? 1 : 0));
     set_itimeout(new $c.FieldRef(u.uprops[GLIB], "intrinsic", "i64"), xtime);
@@ -468,9 +542,15 @@ export async function make_glib(xtime) {   // potion.c:461
         await update_inventory();
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function self_invis_message() {   // potion.c:471
     await pline($c.lit("%s %s."), Hallucination() ? $c.lit("Far out, man!  You") : $c.lit("Gee!  All of a sudden, you"), See_invisible() ? $c.lit("can see right through yourself") : $c.lit("can't see yourself"));
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function ghost_from_bottle() {   // potion.c:481
     let mtmp = null;
     mtmp = await makemon($c.relem(mons, PM.GHOST), u.ux, u.uy, MM.NOMSG);
@@ -492,6 +572,10 @@ async function ghost_from_bottle() {   // potion.c:481
 }
 /* getobj callback for object to drink from, which also does double duty as
    the callback for dipping into (both just allow potions). */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 function drink_ok(obj) {   // potion.c:505
     /* getobj()'s callback to test whether hands/self is a valid "item" to
        pick is used here to communicate the fact that player has already
@@ -510,6 +594,9 @@ function drink_ok(obj) {   // potion.c:505
 }
 /* "Quaffing is like drinking, except you spill more." - Terry Pratchett */
 /* the #quaff command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dodrink() {   // potion.c:526
     let otmp = null;
     if (Strangled()) {
@@ -589,6 +676,10 @@ export async function dodrink() {   // potion.c:526
     }
     return await dopotion(otmp);
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function dopotion(otmp) {   // potion.c:618
     let retval = 0, $t1;
     otmp.in_use = (TRUE) & 1;
@@ -613,6 +704,10 @@ export async function dopotion(otmp) {   // potion.c:618
 }
 /* potion or spell of restore ability; for spell, otmp is a temporary
    spellbook object that will be blessed if hero is skilled in healing */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function peffect_restore_ability(otmp) {   // potion.c:646
     let i = 0, ii = 0, lim = 0;
     gp.potion_unkn = gp.potion_unkn + 1 | 0;
@@ -655,6 +750,10 @@ async function peffect_restore_ability(otmp) {   // potion.c:646
         }
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function peffect_hallucination(otmp) {   // potion.c:696
     if (Halluc_resistance()) {
         gp.potion_nothing = gp.potion_nothing + 1 | 0;
@@ -671,6 +770,10 @@ async function peffect_hallucination(otmp) {   // potion.c:696
         await exercise(A.WIS, TRUE);
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function peffect_water(otmp) {   // potion.c:717
     let $t1;
     if (!otmp.blessed && !otmp.cursed) {
@@ -725,6 +828,10 @@ async function peffect_water(otmp) {   // potion.c:717
         }
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function peffect_booze(otmp) {   // potion.c:771
     let $t1, $t2;
     gp.potion_unkn = gp.potion_unkn + 1 | 0;
@@ -746,6 +853,10 @@ async function peffect_booze(otmp) {   // potion.c:771
         gn.nomovemsg = $c.lit("You awake with a headache.");
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function peffect_enlightenment(otmp) {   // potion.c:795
     if (otmp.cursed) {
         gp.potion_unkn = gp.potion_unkn + 1 | 0;
@@ -759,6 +870,10 @@ async function peffect_enlightenment(otmp) {   // potion.c:795
         await do_enlightenment_effect();
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function peffect_invisibility(otmp) {   // potion.c:811
     let is_spell = 0;
     is_spell = $c.i8(otmp.oclass === SPBOOK_CLASS ? 1 : 0);
@@ -786,6 +901,10 @@ async function peffect_invisibility(otmp) {   // potion.c:811
         u.uprops[INVIS].intrinsic = $c.and64(u.uprops[INVIS].intrinsic, ~FROMOUTSIDE);
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function peffect_see_invisible(otmp) {   // potion.c:841
     let msg = 0, permchance = 0, $t1;
     msg = Invisible() && !Blind() ? 1 : 0;
@@ -821,6 +940,10 @@ async function peffect_see_invisible(otmp) {   // potion.c:841
         gp.potion_unkn = gp.potion_unkn - 1 | 0;
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function peffect_paralysis(otmp) {   // potion.c:881
     if (Free_action()) {
         await You($c.lit("stiffen momentarily."));
@@ -838,6 +961,10 @@ async function peffect_paralysis(otmp) {   // potion.c:881
         await exercise(A.DEX, FALSE);
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function peffect_sleeping(otmp) {   // potion.c:901
     if (Sleep_resistance() || Free_action()) {
         monstseesu(M_SEEN.SLEEP);
@@ -848,6 +975,10 @@ async function peffect_sleeping(otmp) {   // potion.c:901
         await fall_asleep(-(rn2(10) + (25 - Math.imul(12, bcsign(otmp)) | 0) | 0) | 0, TRUE);
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} int
+ */
 async function peffect_monster_detection(otmp) {   // potion.c:914
     let i = 0, x = 0, y = 0;
     if (otmp.blessed) {
@@ -891,6 +1022,10 @@ async function peffect_monster_detection(otmp) {   // potion.c:914
     await exercise(A.WIS, TRUE);
     return 0;
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} int
+ */
 async function peffect_object_detection(otmp) {   // potion.c:955
     if (await object_detect(otmp, 0)) {
         return 1;   /* nothing detected */
@@ -898,6 +1033,10 @@ async function peffect_object_detection(otmp) {   // potion.c:955
     await exercise(A.WIS, TRUE);
     return 0;
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function peffect_sickness(otmp) {   // potion.c:964
     let contaminant = new Int8Array(256), typ = 0;
     await pline($c.lit("Yecch!  This stuff tastes like poison."));
@@ -938,6 +1077,10 @@ async function peffect_sickness(otmp) {   // potion.c:964
         await make_hallucinated(0, FALSE, 0);
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function peffect_confusion(otmp) {   // potion.c:1014
     if (!u.uprops[CONFUSION].intrinsic) {
         if (Hallucination()) {
@@ -951,6 +1094,10 @@ async function peffect_confusion(otmp) {   // potion.c:1014
     }
     await make_confused(itimeout_incr(u.uprops[CONFUSION].intrinsic, rn2(7) + (16 - Math.imul(8, bcsign(otmp)) | 0) | 0), FALSE);
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function peffect_gain_ability(otmp) {   // potion.c:1030
     let itmp = 0, ii = 0, i = 0;
     if (otmp.cursed) {
@@ -973,6 +1120,10 @@ async function peffect_gain_ability(otmp) {   // potion.c:1030
         }
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function peffect_speed(otmp) {   // potion.c:1052
     let is_speed = 0;
     is_speed = $c.i8(otmp.otyp === POT_SPEED ? 1 : 0);
@@ -989,12 +1140,20 @@ async function peffect_speed(otmp) {   // potion.c:1052
         u.uprops[FAST].intrinsic = $c.or64(u.uprops[FAST].intrinsic, FROMOUTSIDE);
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function peffect_blindness(otmp) {   // potion.c:1073
     if (Blind() || (HBlinded() || EBlinded()) && BBlinded()) {
         gp.potion_nothing = gp.potion_nothing + 1 | 0;
     }
     await make_blinded(itimeout_incr(BlindedTimeout(), rn2(200) + (250 - Math.imul(125, bcsign(otmp)) | 0) | 0), $c.i8(!Blind() ? 1 : 0));
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function peffect_gain_level(otmp) {   // potion.c:1083
     let on_lvl_1 = 0, newlev = 0, newlevel = new $T.d_level(), $t1;
     if (otmp.cursed) {
@@ -1026,11 +1185,19 @@ async function peffect_gain_level(otmp) {   // potion.c:1083
         $t1 = rndexp(TRUE), u.uexp = $t1;
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function peffect_healing(otmp) {   // potion.c:1119
     await You_feel($c.lit("better."));
     await healup(8 + d(4 + Math.imul(2, bcsign(otmp)) | 0, 4) | 0, !otmp.cursed ? 1 : 0, $c.i8(!!otmp.blessed ? 1 : 0), $c.i8(!otmp.cursed ? 1 : 0));
     await exercise(A.CON, TRUE);
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function peffect_extra_healing(otmp) {   // potion.c:1128
     await You_feel($c.lit("much better."));
     await healup(16 + d(4 + Math.imul(2, bcsign(otmp)) | 0, 8) | 0, otmp.blessed | 0 ? 5 : !otmp.cursed ? 2 : 0, $c.i8(!otmp.cursed ? 1 : 0), TRUE);
@@ -1043,6 +1210,10 @@ async function peffect_extra_healing(otmp) {   // potion.c:1128
         await heal_legs(0);
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function peffect_full_healing(otmp) {   // potion.c:1144
     await You_feel($c.lit("completely healed."));
     await healup(400, 4 + Math.imul(4, bcsign(otmp)) | 0, $c.i8(!otmp.cursed ? 1 : 0), TRUE);
@@ -1062,6 +1233,10 @@ async function peffect_full_healing(otmp) {   // potion.c:1144
         await heal_legs(0);
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function peffect_levitation(otmp) {   // potion.c:1165
     let stway = null, dmg = 0;
     /*
@@ -1117,6 +1292,10 @@ async function peffect_levitation(otmp) {   // potion.c:1165
     /* levitating blocks flying */
     float_vs_flight();
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function peffect_gain_energy(otmp) {   // potion.c:1224
     let num = 0;
     if (otmp.cursed) {
@@ -1152,6 +1331,10 @@ async function peffect_gain_energy(otmp) {   // potion.c:1224
     disp.botl = TRUE;
     await exercise(A.WIS, TRUE);
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function peffect_oil(otmp) {   // potion.c:1260
     let good_for_you = 0, vulnerable = 0;
     good_for_you = FALSE;
@@ -1184,6 +1367,10 @@ async function peffect_oil(otmp) {   // potion.c:1260
     }
     await exercise(A.WIS, good_for_you);
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function peffect_acid(otmp) {   // potion.c:1297
     let dmg = 0;
     if (Acid_resistance()) {
@@ -1200,6 +1387,10 @@ async function peffect_acid(otmp) {   // potion.c:1297
     }
     gp.potion_unkn = gp.potion_unkn + 1 | 0;   /* holy/unholy water can burn like acid too */
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function peffect_polymorph(otmp) {   // potion.c:1318
     let $t1;
     await You_feel($c.lit("a little %s."), Hallucination() ? $c.lit("normal") : $c.lit("strange"));
@@ -1214,6 +1405,10 @@ async function peffect_polymorph(otmp) {   // potion.c:1318
         }
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function peffects(otmp) {   // potion.c:1333
     switch (otmp.otyp) {
         case POT_RESTORE_ABILITY:
@@ -1311,6 +1506,13 @@ export async function peffects(otmp) {   // potion.c:1333
     }
     return -1;
 }
+/**
+ * @param {number} nhp int
+ * @param {number} nxtra int
+ * @param {number} curesick boolean
+ * @param {number} cureblind boolean
+ * @returns {Promise<void>}
+ */
 export async function healup(nhp, nxtra, curesick, cureblind) {   // potion.c:1428
     let $t1, $t2;
     if (nhp) {
@@ -1344,6 +1546,11 @@ export async function healup(nhp, nxtra, curesick, cureblind) {   // potion.c:14
     disp.botl = TRUE;
     return;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$c.Ptr | null} txt const char *
+ * @returns {Promise<void>}
+ */
 export async function strange_feeling(obj, txt) {   // potion.c:1461
     if (flags.beginner || !txt) {
         await You($c.lit("have a %s feeling for a moment, then it passes."), Hallucination() ? $c.lit("normal") : $c.lit("strange"));
@@ -1358,6 +1565,9 @@ export async function strange_feeling(obj, txt) {   // potion.c:1461
     }
     await useup(obj);
 }
+/**
+ * @returns {$c.Ptr | null} const char *
+ */
 export function bottlename() {   // potion.c:1488
     if (Hallucination()) {
         return hbottlenames[rn2(24)];
@@ -1366,6 +1576,13 @@ export function bottlename() {   // potion.c:1488
     }
 }
 /* handle item dipped into water potion or steed saddle splashed by same */
+/**
+ * @param {$T.obj | null} potion struct obj *
+ * @param {$T.obj | null} targobj struct obj *
+ * @param {number} useeit boolean
+ * @param {$c.Ptr | null} objphrase const char *
+ * @returns {Promise<number>} boolean
+ */
 async function H2Opotion_dip(potion, targobj, useeit, objphrase) {   // potion.c:1498
     let func = null, glowcolor = null, costchange = 0, altfmt = 0, res = 0;
     /* water */
@@ -1462,6 +1679,12 @@ async function H2Opotion_dip(potion, targobj, useeit, objphrase) {   // potion.c
 /* used when blessed or cursed scroll of light interacts with artifact light;
    if the lit object (Sunsword or gold dragon scales/mail) doesn't resist,
    treat like dipping it in holy or unholy water (BUC change, glow message) */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} worsen boolean
+ * @param {number} seeit boolean
+ * @returns {Promise<void>}
+ */
 export async function impact_arti_light(obj, worsen, seeit) {   // potion.c:1595
     let otmp = null;
     /* wielded Sunsword or worn gold dragon scales/mail */
@@ -1487,6 +1710,12 @@ export async function impact_arti_light(obj, worsen, seeit) {   // potion.c:1595
     return;
 }
 /* potion obj hits monster mon, which might be youmonst; obj always used up */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} how int
+ * @returns {Promise<void>}
+ */
 export async function potionhit(mon, obj, how) {   // potion.c:1625
     let botlnam = null, isyou = 0, distance = 0, tx = 0, ty = 0, saddle = null, hit_saddle = 0, your_fault = 0, mnam = null, buf = new Int8Array(256), dmg = 0, mnam$2 = null, buf$2 = new Int8Array(256), saddle_glows = new Int8Array(256), affected = 0, useeit = 0, angermon = 0, cureblind = 0, sawit = 0, cursed_potion = 0, btmp = 0, shkp = null, $goto = null, $t1, $t2, $t3;
     botlnam = bottlename();
@@ -1782,6 +2011,10 @@ export async function potionhit(mon, obj, how) {   // potion.c:1625
     await obfree(obj, null);
 }
 /* vapors are inhaled or get in your eyes */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function potionbreathe(obj) {   // potion.c:1932
     let i = 0, ii = 0, isdone = 0, kn = 0, cureblind = 0, already_in_use = 0, eyes = null;
     kn = 0;
@@ -1981,6 +2214,11 @@ export async function potionbreathe(obj) {   // potion.c:1932
     return;
 }
 /* returns the potion type when o1 is dipped in o2 */
+/**
+ * @param {$T.obj | null} o1 struct obj *
+ * @param {$T.obj | null} o2 struct obj *
+ * @returns {number} short
+ */
 function mixtype(o1, o2) {   // potion.c:2122
     let o1typ = 0, o2typ = 0;
     o1typ = o1.otyp;
@@ -2066,6 +2304,10 @@ function mixtype(o1, o2) {   // potion.c:2122
 }
 /* getobj callback for object to be dipped (not the thing being dipped into,
  * that uses drink_ok) */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function dip_ok(obj) {   // potion.c:2214
     if (!obj) {
         return GETOBJ.DOWNPLAY;
@@ -2080,6 +2322,10 @@ async function dip_ok(obj) {   // potion.c:2214
     return GETOBJ.SUGGEST;
 }
 /* getobj callback for object to be dipped when hero has slippery hands */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function dip_hands_ok(obj) {   // potion.c:2231
     if (!obj && (Glib() && can_reach_floor(FALSE))) {
         return GETOBJ.SUGGEST;
@@ -2089,6 +2335,13 @@ async function dip_hands_ok(obj) {   // potion.c:2231
 /* call hold_another_object() to deal with a transformed potion; its weight
    won't have changed but it might require an extra slot that isn't available
    or it might merge into some other carried stack */
+/**
+ * @param {$T.obj | null} potobj struct obj *
+ * @param {$c.Ptr | null} drop_fmt const char *
+ * @param {$c.Ptr | null} drop_arg const char *
+ * @param {$c.Ptr | null} hold_msg const char *
+ * @returns {Promise<void>}
+ */
 async function hold_potion(potobj, drop_fmt, drop_arg, hold_msg) {   // potion.c:2243
     let cap = 0, save_pickup_burden = 0;
     cap = near_capacity();
@@ -2108,6 +2361,9 @@ async function hold_potion(potobj, drop_fmt, drop_arg, hold_msg) {   // potion.c
 }
 /* #dip command - get item to dip, then get potion to dip it into;
    precede with 'm' to bypass fountain, pool, or sink at hero's spot */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dodip() {   // potion.c:2267
     let potion = null, obj = null, qbuf = new Int8Array(128), obuf = new Int8Array(128), shortestname = null, here = 0, is_hands = 0, at_pool = 0, at_fountain = 0, at_sink = 0, at_here = 0, pooltype = null;
     /* last resort obj name for prompt */
@@ -2209,6 +2465,9 @@ export async function dodip() {   // potion.c:2267
    in the opposite order; ignores floor water; used for context-sensitive
    inventory item-action: the potion has already been selected and is in
    cmdq ready to answer the first getobj() prompt */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dip_into() {   // potion.c:2379
     let obj = null, potion = null, qbuf = new Int8Array(128);
     if (!cmdq_peek(CQ_CANNED)) {
@@ -2235,6 +2494,10 @@ export async function dip_into() {   // potion.c:2379
     }
     return await potion_dip(obj, potion);
 }
+/**
+ * @param {$T.obj | null} potion struct obj *
+ * @returns {Promise<void>}
+ */
 async function poof(potion) {   // potion.c:2408
     if (potion.dknown) {
         await trycall(potion);
@@ -2242,6 +2505,11 @@ async function poof(potion) {   // potion.c:2408
     await useup(potion);
 }
 /* do dipped potion(s) explode? */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} dmg int
+ * @returns {Promise<number>} boolean
+ */
 async function dip_potion_explosion(obj, dmg) {   // potion.c:2417
     if (obj.cursed | 0 || obj.otyp === POT_ACID || obj.otyp === POT_OIL && obj.lamplit | 0 || !rn2($G.uarmc && $G.uarmc.otyp === ALCHEMY_SMOCK ? 30 : 10)) {
         /* it would be better to use up the whole stack in advance
@@ -2263,6 +2531,11 @@ async function dip_potion_explosion(obj, dmg) {   // potion.c:2417
     return FALSE;
 }
 /* called by dodip() or dip_into() after obj and potion have been chosen */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$T.obj | null} potion struct obj *
+ * @returns {Promise<number>} int
+ */
 async function potion_dip(obj, potion) {   // potion.c:2442
     let singlepotion = null, qbuf = new Int8Array(128), mixture = 0, useeit = 0, obj_glows = null, save_otyp = 0, amt = 0, magic = 0, otmp = null, buf = new Int8Array(256), wisx = 0, oldbuf = new Int8Array(256), newbuf = new Int8Array(256), old_otyp = 0, old_dknown = 0, more_than_one = 0, fakeobj = new $T.obj(), $t1, $t2, $t3, $t4;
     if ($c.peq(potion, obj) && potion.quan === 1) {
@@ -2571,6 +2844,10 @@ async function potion_dip(obj, potion) {   // potion.c:2442
     return ECMD.TIME;
 }
 /* *monp grants a wish and then leaves the game */
+/**
+ * @param {*} monp struct monst **
+ * @returns {Promise<void>}
+ */
 export async function mongrantswish(monp) {   // potion.c:2796
     let mon = null, mx = 0, my = 0, glyph = 0;
     mon = monp.get(0);
@@ -2589,6 +2866,10 @@ export async function mongrantswish(monp) {   // potion.c:2796
     /* clean up */
     await tmp_at(DISP_END, 0);
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function djinni_from_bottle(obj) {   // potion.c:2815
     let mtmp = [null], chance = 0;
     if (!(mtmp[0] = await makemon($c.relem(mons, PM.DJINNI), u.ux, u.uy, MM.NOMSG))) {
@@ -2640,6 +2921,11 @@ export async function djinni_from_bottle(obj) {   // potion.c:2815
 }
 /* clone a gremlin or mold (2nd arg non-null implies heat as the trigger);
    hit points are cut in half (odd HP stays with original) */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<$T.monst | null>} struct monst *
+ */
 export async function split_mon(mon, mtmp) {   // potion.c:2873
     let mtmp2 = null, reason = new Int8Array(256);
     /* monster being split */
@@ -2682,6 +2968,10 @@ export async function split_mon(mon, mtmp) {   // potion.c:2873
     return mtmp2;
 }
 /* Character becomes very fast temporarily. */
+/**
+ * @param {number | bigint} duration long
+ * @returns {Promise<void>}
+ */
 export async function speed_up(duration) {   // potion.c:2919
     if (!Very_fast()) {
         await You($c.lit("are suddenly moving %sfaster."), Fast() ? $c.lit("") : $c.lit("much "));

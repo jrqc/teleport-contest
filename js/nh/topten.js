@@ -56,6 +56,13 @@ let tt_head = null;
    room for separating space or trailing newline plus string terminator */
 const zerott = new $T.toptenentry();
 /* "killed by",&c ["an"] 'svk.killer.name' */
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @param {number} siz unsigned int
+ * @param {number} how int
+ * @param {number} incl_helpless boolean
+ * @returns {Promise<void>}
+ */
 export async function formatkiller(buf, siz, how, incl_helpless) {   // topten.c:90
     let l = 0, c = 0, kname = null, $t1, $t2;
     /* DIED, CHOKING, POISONING, STARVING, */
@@ -112,6 +119,10 @@ export async function formatkiller(buf, siz, how, incl_helpless) {   // topten.c
         /* else extra death info won't fit, so leave it out */
     }
 }
+/**
+ * @param {$c.Ptr | null} x const char *
+ * @returns {Promise<void>}
+ */
 async function topten_print(x) {   // topten.c:165
     if (gt.toptenwin === WIN_ERR) {
         await raw_print()(x);
@@ -119,6 +130,10 @@ async function topten_print(x) {   // topten.c:165
         await putstr()(gt.toptenwin, ATR.NONE, x);
     }
 }
+/**
+ * @param {$c.Ptr | null} x const char *
+ * @returns {Promise<void>}
+ */
 async function topten_print_bold(x) {   // topten.c:174
     if (gt.toptenwin === WIN_ERR) {
         await raw_print_bold()(x);
@@ -126,6 +141,10 @@ async function topten_print_bold(x) {   // topten.c:174
         await putstr()(gt.toptenwin, ATR.BOLD, x);
     }
 }
+/**
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {number} int
+ */
 export function observable_depth(lev) {   // topten.c:183
     /* if we ever randomize the order of the elemental planes, we
        must use a constant external representation in the record file */
@@ -133,12 +152,20 @@ export function observable_depth(lev) {   // topten.c:183
     return depth(lev);
 }
 /* throw away characters until current record has been entirely consumed */
+/**
+ * @param {$T.__sFILE | null} rfile FILE *
+ */
 function discardexcess(rfile) {   // topten.c:208
     let c = 0;
     do {
         c = $c.fgetc(rfile);
     } while (c !== 10 && c !== -1);
 }
+/**
+ * @param {$T.__sFILE | null} rfile FILE *
+ * @param {$T.toptenentry | null} tt struct toptenentry *
+ * @returns {Promise<void>}
+ */
 async function readentry(rfile, tt) {   // topten.c:220
     let inbuf = new Int8Array(129), s1 = new Int8Array(129), s2 = new Int8Array(129), s3 = new Int8Array(129), s4 = new Int8Array(129), s5 = new Int8Array(129), s6 = new Int8Array(129), i = 0, $t1;
     /* Version_ Pts DgnLevs_ Hp___ Died__Born id */
@@ -194,6 +221,10 @@ async function readentry(rfile, tt) {   // topten.c:220
         }
     }
 }
+/**
+ * @param {$T.__sFILE | null} rfile FILE *
+ * @param {$T.toptenentry | null} tt struct toptenentry *
+ */
 function writeentry(rfile, tt) {   // topten.c:301
     /* role,gender */
     /* role,race,gndr,algn */
@@ -207,6 +238,12 @@ function writeentry(rfile, tt) {   // topten.c:301
     $c.fprintf(rfile, new $c.Ptr(writeentry$fmtX, 0), onlyspace(new $c.Ptr(tt.name, 0)) ? $c.lit("_") : new $c.Ptr(tt.name, 0), new $c.Ptr(tt.death, 0));
 }
 /* as tab is never used in eg. svp.plname or death, no need to mangle those. */
+/**
+ * @param {$T.__sFILE | null} rfile FILE *
+ * @param {$T.toptenentry | null} tt struct toptenentry *
+ * @param {number} how int
+ * @returns {Promise<void>}
+ */
 async function writexlentry(rfile, tt, how) {   // topten.c:340
     let buf = new Int8Array(256), tmpbuf = new Int8Array(101), achbuf = new Int8Array(1280);
     /* xlogfile field separator. */
@@ -236,6 +273,9 @@ async function writexlentry(rfile, tt, how) {   // topten.c:340
     $c.fprintf(rfile, $c.lit("%crerolls=%ld"), 9, u.uroleplay.numrerolls);
     $c.fprintf(rfile, $c.lit("\n"));
 }
+/**
+ * @returns {number | bigint} long
+ */
 function encodexlogflags() {   // topten.c:394
     let e = 0;
     e = 0;
@@ -253,6 +293,9 @@ function encodexlogflags() {   // topten.c:394
     }
     return e;
 }
+/**
+ * @returns {Promise<number | bigint>} long
+ */
 async function encodeconduct() {   // topten.c:411
     let e = 0;
     e = 0;
@@ -307,6 +350,10 @@ async function encodeconduct() {   // topten.c:411
     }
     return e;
 }
+/**
+ * @param {number} secondlong boolean
+ * @returns {number | bigint} long
+ */
 function encodeachieve(secondlong) {   // topten.c:455
     let i = 0, achidx = 0, offset = 0, r = 0;
     /* False: handle achievements 1..31, True: 32..62 */
@@ -329,6 +376,11 @@ function encodeachieve(secondlong) {   // topten.c:455
     return r;
 }
 /* add the achievement or conduct comma-separated to string */
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @param {$c.Ptr | null} achievement const char *
+ * @param {number} condition boolean
+ */
 function add_achieveX(buf, achievement, condition) {   // topten.c:480
     if (condition) {
         if (buf.get(0) !== 0) {
@@ -337,6 +389,10 @@ function add_achieveX(buf, achievement, condition) {   // topten.c:480
         $c.strcat(buf, achievement);
     }
 }
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @returns {$c.Ptr | null} char *
+ */
 function encode_extended_achievements(buf) {   // topten.c:491
     let rnkbuf = new Int8Array(40), achievement = null, i = 0, achidx = 0, absidx = 0;
     achievement = null;
@@ -428,6 +484,10 @@ function encode_extended_achievements(buf) {   // topten.c:491
     }
     return buf;
 }
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 async function encode_extended_conducts(buf) {   // topten.c:584
     buf.set(0, 0);
     add_achieveX(buf, $c.lit("foodless"), $c.i8(!u.uconduct.food ? 1 : 0));
@@ -455,6 +515,9 @@ async function encode_extended_conducts(buf) {   // topten.c:584
     return buf;
 }
 /* XLOGFILE */
+/**
+ * @param {$T.toptenentry | null} tt struct toptenentry *
+ */
 function free_ttlist(tt) {   // topten.c:615
     let ttnext = null;
     while (tt.points > 0) {
@@ -464,6 +527,11 @@ function free_ttlist(tt) {   // topten.c:615
     }
     dealloc_ttentry(tt);
 }
+/**
+ * @param {number} how int
+ * @param {number | bigint} when time_t
+ * @returns {Promise<void>}
+ */
 export async function topten(how, when) {   // topten.c:628
     let t0 = null, tprev = null, t1 = null, rfile = null, lfile = null, xlfile = null, uid = 0, rank = 0, rank0 = 0, rank1 = 0, occ_cnt = 0, flg = 0, t0_used = 0, skip_scores = 0, pbuf = new Int8Array(256), pbuf$2 = new Int8Array(256), pbuf$3 = new Int8Array(256), $goto = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
     D1: for (;;) {
@@ -715,6 +783,9 @@ export async function topten(how, when) {   // topten.c:628
         break;
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function outheader() {   // topten.c:929
     let linebuf = new Int8Array(256), bp = null, $t1;
     $c.strcpy(new $c.Ptr(linebuf, 0), $c.lit(" No  Points     Name"));
@@ -726,6 +797,12 @@ async function outheader() {   // topten.c:929
     await topten_print(new $c.Ptr(linebuf, 0));
 }
 /* so>0: standout line; so=0: ordinary line */
+/**
+ * @param {number} rank int
+ * @param {$T.toptenentry | null} t1 struct toptenentry *
+ * @param {number} so boolean
+ * @returns {Promise<void>}
+ */
 async function outentry(rank, t1, so) {   // topten.c:946
     let second_line = 0, linebuf = new Int8Array(256), bp = null, hpbuf = new Int8Array(24), linebuf3 = new Int8Array(256), hppos = 0, lngr = 0, arg = null, fmt = null, $t1, $t2, $t3;
     second_line = TRUE;
@@ -886,6 +963,15 @@ async function outentry(rank, t1, so) {   // topten.c:946
         await topten_print(new $c.Ptr(linebuf, 0));
     }
 }
+/**
+ * @param {number} current_ver boolean
+ * @param {number} rank int
+ * @param {$T.toptenentry | null} t1 struct toptenentry *
+ * @param {number} playerct int
+ * @param {*} players const char **
+ * @param {number} uid int
+ * @returns {Promise<number>} int
+ */
 async function score_wanted(current_ver, rank, t1, playerct, players, uid) {   // topten.c:1112
     let arg = null, nxt = null, i = 0;
     if (current_ver && (t1.ver_major !== VERSION.MAJOR || t1.ver_minor !== VERSION.MINOR || t1.patchlevel !== PATCHLEVEL)) {
@@ -948,6 +1034,11 @@ async function score_wanted(current_ver, rank, t1, playerct, players, uid) {   /
  * argc >= 2, with argv[0] untrustworthy (directory names, et al.),
  * and argv[1] starting with "-s".
  * caveat: some shells might allow argv elements to be arbitrarily long.
+ */
+/**
+ * @param {number} argc int
+ * @param {*} argv char **
+ * @returns {Promise<void>}
  */
 export async function prscore(argc, argv) {   // topten.c:1194
     let players = null, player0 = [null], i = 0, playerct = 0, rank = 0, t1 = null, rfile = null, pbuf = new Int8Array(256), p = null, ln = 0, uid = 0, current_ver = 0, init_done = 0, match_found = 0, $t1;
@@ -1081,6 +1172,10 @@ export async function prscore(argc, argv) {   // topten.c:1194
     }
     free_ttlist(tt_head);
 }
+/**
+ * @param {$c.Ptr | null} plch char *
+ * @returns {Promise<number>} int
+ */
 async function classmon(plch) {   // topten.c:1356
     let i = 0;
     /* Look for this role in the role table */
@@ -1102,6 +1197,9 @@ async function classmon(plch) {   // topten.c:1356
 }
 /*
  * Get a random player name and class from the high score list,
+ */
+/**
+ * @returns {Promise<$T.toptenentry | null>} struct toptenentry *
  */
 export async function get_rnd_toptenentry() {   // topten.c:1381
     let rank = 0, i = 0, rfile = null, tt = null;
@@ -1136,6 +1234,10 @@ export async function get_rnd_toptenentry() {   // topten.c:1381
  * Attach random player name and class from high score list
  * to an object (for statues or morgue corpses).
  */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function tt_oname(otmp) {   // topten.c:1422
     let tt = null;
     if (!otmp) {
@@ -1155,6 +1257,10 @@ export async function tt_oname(otmp) {   // topten.c:1422
     return otmp;
 }
 /* Randomly select a topten entry to mimic */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<number>} int
+ */
 export async function tt_doppel(mon) {   // topten.c:1445
     let tt = null, ret = 0;
     tt = rn2(13) ? await get_rnd_toptenentry() : null;

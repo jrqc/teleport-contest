@@ -62,6 +62,10 @@ import { obj_resists } from './zap.js';
 
 const steal$how = $c.nulls(4);   // static in steal()
 /* proportional subset of gold; return value actually fits in an int */
+/**
+ * @param {number | bigint} lmoney long
+ * @returns {number | bigint} long
+ */
 export function somegold(lmoney) {   // steal.c:14
     let igold = 0;
     igold = lmoney >= LARGEST_INT ? LARGEST_INT : $c.i32(lmoney);
@@ -90,6 +94,10 @@ export function somegold(lmoney) {   // steal.c:14
  * May search containers too.
  * Deals in gold only, as leprechauns don't care for lesser coins.
 */
+/**
+ * @param {$T.obj | null} argchain struct obj *
+ * @returns {$T.obj | null} struct obj *
+ */
 export function findgold(argchain) {   // steal.c:45
     let chain = null;
     chain = argchain;   /* allow arg to be nonnull */
@@ -101,6 +109,10 @@ export function findgold(argchain) {   // steal.c:45
 /*
  * Steal gold coins only.  Leprechauns don't care for lesser coins.
 */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function stealgold(mtmp) {   // steal.c:58
     let fgold = null, ygold = null, tmp = 0, who = null, whose = null, what = null, gold_price = 0;
     fgold = g_at(u.ux, u.uy);
@@ -168,6 +180,9 @@ export function thiefdead() {   // steal.c:120
 }
 /* checks whether hero can be responsive to seduction attempts; similar to
    Unaware but also includes paralysis */
+/**
+ * @returns {number} boolean
+ */
 export function unresponsive() {   // steal.c:133
     if (gm.multi >= 0) {
         return FALSE;
@@ -176,6 +191,9 @@ export function unresponsive() {   // steal.c:133
 }
 /* called via (*ga.afternmv)() when hero finishes taking off armor that
    was slated to be stolen but the thief died in the interim */
+/**
+ * @returns {Promise<number>} int
+ */
 async function unstolenarm() {   // steal.c:147
     let obj = null;
     /* find the object before clearing stealoid; it has already become
@@ -192,6 +210,9 @@ async function unstolenarm() {   // steal.c:147
     return 0;
 }
 /* finish stealing an item of armor which takes multiple turns to take off */
+/**
+ * @returns {Promise<number>} int
+ */
 async function stealarm() {   // steal.c:165
     let mtmp = null, otmp = null, nextobj = null, $t1;
     botm$: {
@@ -238,6 +259,11 @@ async function stealarm() {   // steal.c:165
 }
 /* An object you're wearing has been taken off by a monster (theft or
    seduction).  Also used if a worn item gets transformed (stone to flesh). */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} unchain_ball boolean
+ * @returns {Promise<void>}
+ */
 export async function remove_worn_item(obj, unchain_ball) {   // steal.c:213
     let oldinuse = 0, save_plnmsg = 0;
     /* whether to unpunish or just unwield */
@@ -324,6 +350,11 @@ export async function remove_worn_item(obj, unchain_ball) {   // steal.c:213
     obj.in_use = (oldinuse) & 1;
 }
 /* during theft of a worn item: remove_worn_item(), prefaced by a message */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function worn_item_removal(mon, obj) {   // steal.c:294
     let objbuf = new Int8Array(256), article = new Int8Array(20), p = null, verb = null, strip_art = 0;
     $c.strcpy(new $c.Ptr(objbuf, 0), await doname(obj));
@@ -359,6 +390,11 @@ async function worn_item_removal(mon, obj) {   // steal.c:294
  * Avoid stealing the object 'stealoid'.
  * Nymphs and monkeys won't steal coins (so that their "steal item" attack
  * doesn't become a superset of leprechaun's "steal gold" attack).
+ */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$c.Ptr | null} objnambuf char *
+ * @returns {Promise<number>} int
  */
 export async function steal(mtmp, objnambuf) {   // steal.c:343
     let otmp = null, Monnambuf = new Int8Array(256), tmp = 0, could_petrify = 0, armordelay = 0, olddelay = 0, icnt = 0, named = 0, retrycnt = 0, monkey_business = 0, seen = 0, was_doffing = 0, was_punished = 0, dummy = Int8Array.of(0), ostuck = 0, curssv = 0, slowly = 0, item = null, $goto = null, $t1;
@@ -629,6 +665,11 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
     }
 }
 /* Returns 1 if otmp is free'd, 0 otherwise. */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function mpickobj(mtmp, otmp) {   // steal.c:618
     let freed_otmp = 0, snuff_otmp = 0;
     snuff_otmp = FALSE;
@@ -698,6 +739,10 @@ export async function mpickobj(mtmp, otmp) {   // steal.c:618
     return freed_otmp;
 }
 /* called for AD_SAMU (the Wizard and quest nemeses) */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function stealamulet(mtmp) {   // steal.c:689
     let buf = new Int8Array(256), otmp = null, obj = null, real = 0, fake = 0, n = 0;
     otmp = null;
@@ -789,6 +834,13 @@ export async function stealamulet(mtmp) {   // steal.c:689
 }
 /* when a mimic gets poked with something, it might take that thing
    (at present, only implemented for when the hero does the poking) */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} ochance int
+ * @param {number} achance int
+ * @returns {Promise<void>}
+ */
 export async function maybe_absorb_item(mon, obj, ochance, achance) {   // steal.c:772
     let hand_s = null;
     /* percent chance for ordinary item, artifact */
@@ -826,6 +878,12 @@ export async function maybe_absorb_item(mon, obj, ochance, achance) {   // steal
     await mpickobj(mon, obj);
 }
 /* drop one object taken from a (possibly dead) monster's inventory */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} verbosely boolean
+ * @returns {Promise<void>}
+ */
 export async function mdrop_obj(mon, obj, verbosely) {   // steal.c:814
     let omx = 0, omy = 0, unwornmask = 0, obj_name = null;
     omx = mon.mx;
@@ -859,6 +917,10 @@ export async function mdrop_obj(mon, obj, verbosely) {   // steal.c:814
 /* some monsters bypass the normal rules for moving between levels or
    even leaving the game entirely; when that happens, prevent them from
    taking the Amulet, invocation items, or quest artifact with them */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<void>}
+ */
 export async function mdrop_special_objs(mon) {   // steal.c:852
     let obj = null, otmp = null;
     for (obj = mon.minvent; obj; obj = otmp) {
@@ -879,6 +941,12 @@ export async function mdrop_special_objs(mon) {   // steal.c:852
     }
 }
 /* release the objects the creature is carrying */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} show int
+ * @param {number} is_pet boolean
+ * @returns {Promise<void>}
+ */
 export async function relobj(mtmp, show, is_pet) {   // steal.c:875
     let otmp = null, omx = 0, omy = 0;
     /* If true, pet should keep wielded/worn items */

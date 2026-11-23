@@ -96,6 +96,11 @@ import { destroy_items, drain_item } from './zap.js';
 const gazemu$reactions = $c.nulls(8);   // static in gazemu()
 let mon_currwep = null;
 /* monster hits hero (most callers have been moved to uthim.c) */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @returns {Promise<void>}
+ */
 export async function hitmsg(mtmp, mattk) {   // mhitu.c:29
     let compat = 0, verb = null, again = null, punct = null, Monst_name = null;
     verb = null;
@@ -144,6 +149,12 @@ export async function hitmsg(mtmp, mattk) {   // mhitu.c:29
     gh.hitmsg_prev = mattk;
 }
 /* monster missed you */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} nearmiss boolean
+ * @param {$T.attack | null} mattk struct attack *
+ * @returns {Promise<void>}
+ */
 async function missmu(mtmp, nearmiss, mattk) {   // mhitu.c:85
     gh.hitmsg_mid = 0;
     gh.hitmsg_prev = null;
@@ -159,6 +170,11 @@ async function missmu(mtmp, nearmiss, mattk) {   // mhitu.c:85
 }
 /* strike types P|S|B: Pierce (pointed: stab) => "thrusts",
    Slash (edged: slice) or whack (blunt: Bash) => "swings" */
+/**
+ * @param {$T.obj | null} mwep struct obj *
+ * @param {number} bash boolean
+ * @returns {$c.Ptr | null} const char *
+ */
 export function mswings_verb(mwep, bash) {   // mhitu.c:105
     let verb = null, otyp = 0, lash = 0, thrust = 0;
     /* attacker's weapon */
@@ -177,6 +193,12 @@ export function mswings_verb(mwep, bash) {   // mhitu.c:105
     return verb;
 }
 /* monster swings obj */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.obj | null} otemp struct obj *
+ * @param {number} bash boolean
+ * @returns {Promise<void>}
+ */
 async function mswings(mtmp, otemp, bash) {   // mhitu.c:130
     /* attacker */
     /* attacker's weapon */
@@ -186,6 +208,11 @@ async function mswings(mtmp, otemp, bash) {   // mhitu.c:130
     }
 }
 /* return how a poison attack was delivered */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @returns {$c.Ptr | null} const char *
+ */
 export function mpoisons_subj(mtmp, mattk) {   // mhitu.c:145
     let mwep = null;
     if (mattk.aatyp === AT.WEAP) {
@@ -198,6 +225,9 @@ export function mpoisons_subj(mtmp, mattk) {   // mhitu.c:145
     }
 }
 /* called when your intrinsic speed is taken away */
+/**
+ * @returns {Promise<void>}
+ */
 export async function u_slow_down() {   // mhitu.c:163
     u.uprops[FAST].intrinsic = 0;
     if (!Fast()) {
@@ -210,6 +240,11 @@ export async function u_slow_down() {   // mhitu.c:163
 }
 /* monster attacked wrong location due to monster blindness, hero
    invisibility, hero displacement, or hero being underwater */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @returns {Promise<void>}
+ */
 async function wildmiss(mtmp, mattk) {   // mhitu.c:176
     let compat = 0, Monst_name = null, unotseen = 0, unotthere = 0, usubmerged = 0, swings = null;
     /* Monnam(), deferred until after early returns */
@@ -281,6 +316,12 @@ async function wildmiss(mtmp, mattk) {   // mhitu.c:176
         /*NOTREACHED*/
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.permonst | null} mdat struct permonst *
+ * @param {number} message boolean
+ * @returns {Promise<void>}
+ */
 export async function expels(mtmp, mdat, message) {   // mhitu.c:264
     let blast = new Int8Array(40), attk = null;
     /* if mtmp is polymorphed, mdat != mtmp->data */
@@ -322,6 +363,14 @@ export async function expels(mtmp, mdat, message) {   // mhitu.c:264
     await spoteffects(TRUE);
 }
 /* select a monster's next attack, possibly substituting for its usual one */
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {number} indx int
+ * @param {*} prev_result int *
+ * @param {$T.attack | null} alt_attk_buf struct attack *
+ * @returns {Promise<$T.attack | null>} struct attack *
+ */
 export async function getmattk(magr, mdef, indx, prev_result, alt_attk_buf) {   // mhitu.c:310
     let mptr = null, attk = null, weap = null, udefend = 0, ulev = 0, wimpy = 0, $t1;
     mptr = magr.data;
@@ -428,6 +477,13 @@ export async function getmattk(magr, mdef, indx, prev_result, alt_attk_buf) {   
     return attk;
 }
 /* calc some variables needed for mattacku() */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$c.Ptr | null} ranged boolean *
+ * @param {$c.Ptr | null} range2 boolean *
+ * @param {$c.Ptr | null} foundyou boolean *
+ * @param {$c.Ptr | null} youseeit boolean *
+ */
 function calc_mattacku_vars(mtmp, ranged, range2, foundyou, youseeit) {   // mhitu.c:448
     let $t1, $t2, $t3;
     $t1 = $c.i8(dist2(mtmp.mx, mtmp.my, u.ux, u.uy) > 3 ? 1 : 0), ranged.set(0, $t1);
@@ -441,6 +497,10 @@ function calc_mattacku_vars(mtmp, ranged, range2, foundyou, youseeit) {   // mhi
     gn.notonhead = FALSE;
 }
 /* return TRUE iff monster or hero is trapped in a (spiked) pit */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number} boolean
+ */
 export function mtrapped_in_pit(mtmp) {   // mhitu.c:467
     let ttmp = null;
     ttmp = null;
@@ -462,6 +522,10 @@ export function mtrapped_in_pit(mtmp) {   // mhitu.c:467
  *      Assumption: it's attacking you or an empty square; if there's another
  *              monster which it attacks by mistake, the caller had better
  *              take care of it...
+ */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} int
  */
 export async function mattacku(mtmp) {   // mhitu.c:491
     let mattk = null, alt_attk = new $T.attack(), i = 0, j = 0, tmp = 0, sum = new Int32Array(6), mdat = null, ranged = Int8Array.of(0), range2 = Int8Array.of(0), foundyou = Int8Array.of(0), firstfoundyou = 0, youseeit = Int8Array.of(0), skipnonmagc = 0, cc = new $T.nhcoord(), obj = null, obj$2 = null, save_spe = 0, sticky = 0, buf = new Int8Array(256), already_fleeing = 0, offended = 0, hittmp = 0, bash = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12;
@@ -903,6 +967,11 @@ export async function mattacku(mtmp) {   // mhitu.c:491
     return 0;
 }
 /* monster summons help for its fight against hero */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} youseeit boolean
+ * @returns {Promise<void>}
+ */
 async function summonmu(mtmp, youseeit) {   // mhitu.c:956
     let mdat = null, numseen = Int32Array.of(0), numhelp = 0, buf = new Int8Array(256), genericwere = new Int8Array(256), from_nowhere = null;
     mdat = mtmp.data;
@@ -975,6 +1044,10 @@ async function summonmu(mtmp, youseeit) {   // mhitu.c:956
         return;
     }   /* were creature */
 }
+/**
+ * @param {$T.permonst | null} mdat struct permonst *
+ * @returns {Promise<number>} boolean
+ */
 export async function diseasemu(mdat) {   // mhitu.c:1033
     if (await Sick_resistance()) {
         await You_feel($c.lit("a slight illness."));
@@ -985,6 +1058,11 @@ export async function diseasemu(mdat) {   // mhitu.c:1033
     }
 }
 /* check whether slippery clothing protects from hug or wrap attack */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @returns {Promise<number>} boolean
+ */
 export async function u_slip_free(mtmp, mattk) {   // mhitu.c:1047
     let obj = null;
     /* greased armor does not protect against AT_ENGL+AD_WRAP */
@@ -1014,6 +1092,10 @@ export async function u_slip_free(mtmp, mattk) {   // mhitu.c:1047
     return FALSE;
 }
 /* armor that sufficiently covers the body might be able to block magic */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {number} int
+ */
 export function magic_negation(mon) {   // mhitu.c:1089
     let o = null, wearmask = 0, armpro = 0, mc = 0, is_you = 0, via_amul = 0, gotprot = 0;
     mc = 0;
@@ -1065,6 +1147,11 @@ export function magic_negation(mon) {   // mhitu.c:1089
  * hitmu: monster hits you
  * returns MM_ flags
 */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @returns {Promise<number>} int
+ */
 async function hitmu(mtmp, mattk) {   // mhitu.c:1144
     let mdat = null, olduasmon = null, res = 0, mhm = new $T.mhitm_data(), obj = null, what = null, Amonbuf = new Int8Array(256), lowerlimit = 0, hpmax_p = null, $t1, $t2, $t3, $t4;
     mdat = mtmp.data;
@@ -1179,6 +1266,9 @@ async function hitmu(mtmp, mattk) {   // mhitu.c:1144
 /* An interface for use when taking a blindfold off, for example,
  * to see if an engulfing attack should immediately take affect, like
  * a passive attack. TRUE if engulfing blindness occurred */
+/**
+ * @returns {Promise<number>} boolean
+ */
 export async function gulp_blnd_check() {   // mhitu.c:1273
     let mattk = null;
     if (!Blinded() && u.uswallow | 0 && (mattk = attacktype_fordmg(u.ustuck.data, AT.ENGL, AD.BLND)) && await can_blnd(u.ustuck, gy.youmonst, mattk.aatyp, null)) {
@@ -1189,6 +1279,11 @@ export async function gulp_blnd_check() {   // mhitu.c:1273
     return FALSE;
 }
 /* monster swallows you, or damage if already swallowed (u.uswallow != 0) */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @returns {Promise<number>} int
+ */
 async function gulpmu(mtmp, mattk) {   // mhitu.c:1289
     let t = null, tmp = 0, tim_tmp = 0, otmp2 = null, nextobj = null, i = 0, physical_damage = 0, omx = 0, omy = 0, buf = new Int8Array(256), s = null, was_blinded = 0;
     t = t_at(u.ux, u.uy);
@@ -1470,6 +1565,12 @@ async function gulpmu(mtmp, mattk) {   // mhitu.c:1289
     return M_ATTK.HIT;
 }
 /* monster explodes in your face */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {number} ufound boolean
+ * @returns {Promise<number>} int
+ */
 async function explmu(mtmp, mattk, ufound) {   // mhitu.c:1591
     let kill_agr = 0, not_affected = 0, tmp = 0, chg = 0;
     kill_agr = TRUE;
@@ -1535,6 +1636,11 @@ async function explmu(mtmp, mattk, ufound) {   // mhitu.c:1591
     return !DEADMONSTER(mtmp) ? M_ATTK.MISS : M_ATTK.AGR_DIED;
 }
 /* monster gazes at you */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @returns {Promise<number>} int
+ */
 export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
     let react = 0, is_medusa = 0, reflectable = 0, cancelled = 0, already = 0, mcanseeu = 0, useeit = 0, conf = 0, stun = 0, blnd = 0, oldstun = 0, newstun = 0, dmg = 0, orig_dmg = 0, lev = 0, $t1, $t2;
     react = -1;
@@ -1731,6 +1837,11 @@ export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
     return M_ATTK.MISS;
 }
 /* mtmp hits you for n points damage */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} n int
+ * @returns {Promise<void>}
+ */
 export async function mdamageu(mtmp, n) {   // mhitu.c:1902
     if (n < 0) {
         await impossible($c.lit("mdamageu for negative damage? (%d)"), n);
@@ -1762,6 +1873,12 @@ export async function mdamageu(mtmp, n) {   // mhitu.c:1902
 /* returns 0 if seduction impossible,
  *         1 if fine,
  *         2 if wrong gender for nymph
+ */
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @returns {number} int
  */
 export function could_seduce(magr, mdef, mattk) {   // mhitu.c:1934
     let pagr = null, agrinvis = 0, defperc = 0, genagr = 0, gendef = 0, adtyp = 0;
@@ -1802,6 +1919,10 @@ export function could_seduce(magr, mdef, mattk) {   // mhitu.c:1934
     return genagr === (1 - gendef | 0) ? 1 : pagr.mlet === S.NYMPH ? 2 : 0;
 }
 /* returns 1 if monster teleported (or hero leaves monster's vicinity) */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<number>} int
+ */
 export async function doseduce(mon) {   // mhitu.c:1985
     let ring = null, nring = null, fem = 0, seewho = 0, naked = 0, attr_tot = 0, tried_gloves = 0, qbuf = new Int8Array(128), Who = new Int8Array(128), yourgloves = null, tmp = 0, cost = 0, umoney = 0, $t1, $t2, $t3, $t4, $t5, $t6;
     fem = $c.i8($c.peq(mon.data, $c.relem(mons, PM.AMOROUS_DEMON)) && Mgender(mon) === FEMALE ? 1 : 0);   /* otherwise incubus */
@@ -2108,6 +2229,13 @@ export async function doseduce(mon) {   // mhitu.c:1985
     return 1;
 }
 /* 'mon' tries to remove a piece of hero's armor */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$c.Ptr | null} seducer const char *
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$c.Ptr | null} str const char *
+ * @returns {Promise<void>}
+ */
 async function mayberem(mon, seducer, obj, str) {   // mhitu.c:2309
     let qbuf = new Int8Array(128), hairbuf = new Int8Array(256);
     /* only used for alternate message */
@@ -2135,6 +2263,11 @@ async function mayberem(mon, seducer, obj, str) {   // mhitu.c:2309
     }
     await remove_worn_item(obj, TRUE);
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} tmp int
+ * @returns {Promise<number>} int
+ */
 async function assess_dmg(mtmp, tmp) {   // mhitu.c:2355
     if ((mtmp.mhp = mtmp.mhp - tmp | 0) <= 0) {
         await pline_mon(mtmp, $c.lit("%s dies!"), await Monnam(mtmp));
@@ -2152,6 +2285,11 @@ async function assess_dmg(mtmp, tmp) {   // mhitu.c:2355
    active */
 /* can be used as ranged_attk_assessed() callback.
    Returns TRUE if monster is avoiding use of this attack */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} attkidx int
+ * @returns {number} boolean
+ */
 export function mon_avoiding_this_attack(mtmp, attkidx) {   // mhitu.c:2393
     let ptr = null, typ = 0;
     ptr = mtmp.data;
@@ -2165,6 +2303,10 @@ export function mon_avoiding_this_attack(mtmp, attkidx) {   // mhitu.c:2393
  * This would be equivalent to:
  *     ranged_attk_assessed(mtmp, mon_avoiding_this_attack)
  * but without the added assessment function call overhead.
+ */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number} boolean
  */
 export function ranged_attk_available(mtmp) {   // mhitu.c:2413
     let i = 0, typ = 0, ptr = null;
@@ -2183,6 +2325,12 @@ export function ranged_attk_available(mtmp) {   // mhitu.c:2413
  *  would look better if they came before reverting form, but we need
  *  to know whether hero reverted in order to decide whether passive
  *  damage applies.
+ */
+/**
+ * @param {$T.permonst | null} olduasmon struct permonst *
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @returns {Promise<number>} int
  */
 async function passiveum(olduasmon, mtmp, mattk) {   // mhitu.c:2435
     let i = 0, tmp = 0, oldu_mattk = null, protector = 0, wornitems = 0, $t1;
@@ -2363,6 +2511,9 @@ async function passiveum(olduasmon, mtmp, mattk) {   // mhitu.c:2435
     }
     return await assess_dmg(mtmp, tmp);
 }
+/**
+ * @returns {Promise<$T.monst | null>} struct monst *
+ */
 export async function cloneu() {   // mhitu.c:2616
     let mon = null, mndx = 0;
     mndx = gy.youmonst.data.pmidx;

@@ -29,10 +29,21 @@ let suppress_history = 0;
  * some text, it is removed and prompting continues as if from the start.
  * However, if there is no text yet (or anymore) then "\033" is returned.
  */
+/**
+ * @param {$c.Ptr | null} query const char *
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<void>}
+ */
 export async function tty_getlin(query, bufp) {   // getline.c:36
     suppress_history = 0;
     await hooked_tty_getlin(query, bufp, null);
 }
+/**
+ * @param {$c.Ptr | null} query const char *
+ * @param {$c.Ptr | null} bufp char *
+ * @param {Function | null} hook getlin_hook_proc
+ * @returns {Promise<void>}
+ */
 async function hooked_tty_getlin(query, bufp, hook) {   // getline.c:43
     let obufp = null, c = 0, cw = null, doprev = 0, sav = 0, i = null, i$2 = null, s = null;
     obufp = bufp;
@@ -197,6 +208,10 @@ async function hooked_tty_getlin(query, bufp, hook) {   // getline.c:43
         await dumplogmsg(new $c.Ptr(gt.toplines, 0));
     }
 }
+/**
+ * @param {$c.Ptr | null} s const char *
+ * @returns {Promise<void>}
+ */
 export async function xwaitforspace(s) {   // getline.c:230
     let c = 0, x = 0;
     /* chars allowed besides return */
@@ -234,6 +249,10 @@ export async function xwaitforspace(s) {   // getline.c:230
  *      + we don't change the characters that are already in base
  *      + base has enough room to hold our string
  */
+/**
+ * @param {$c.Ptr | null} base char *
+ * @returns {Promise<number>} boolean
+ */
 async function ext_cmd_getlin_hook(base) {   // getline.c:272
     let ecmatches = [null], nmatches = 0, ec = null;
     nmatches = await extcmds_match(base, ECM.NOFLAGS, new $c.Ptr(ecmatches, 0));
@@ -247,6 +266,9 @@ async function ext_cmd_getlin_hook(base) {   // getline.c:272
 /*
  * Read in an extended command, doing command line completion.  We
  * stop when we have found enough characters to make a unique command.
+ */
+/**
+ * @returns {Promise<number>} int
  */
 export async function tty_get_ext_cmd() {   // getline.c:292
     let buf = new Int8Array(256), nmatches = 0, ecmatches = [null], no_hook = null, extcmd_char = new Int8Array(2), $t1;

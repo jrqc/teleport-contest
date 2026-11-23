@@ -61,6 +61,10 @@ import { $G } from './globals.js';
 import { __collate_equiv_wchar, __collate_range_cmp, __global_locale, _c_locale, iswalnum_l, iswctype_l, iswlower_l, iswupper_l, towlower_l, towupper_l } from './c_locale.js';
 import { mbrtowc_l } from './mbrtowc.js';
 
+/**
+ * @param {number} val void *
+ * @returns {number} void *
+ */
 function xlocale_retain(val) {   // xlocale_private.h:96
     let obj = 0;
     obj = val;
@@ -70,6 +74,9 @@ function xlocale_retain(val) {   // xlocale_private.h:96
     $h.i32[obj >>> 2] = $h.i32[obj >>> 2] + 1 | 0;
     return val;
 }
+/**
+ * @param {number} val void *
+ */
 function xlocale_release(val) {   // xlocale_private.h:107
     let obj = 0;
     obj = val;
@@ -82,9 +89,16 @@ function xlocale_release(val) {   // xlocale_private.h:107
         }
     }
 }
+/**
+ * @returns {number} locale_t
+ */
 function __current_locale() {   // xlocale_private.h:122
     return __global_locale;
 }
+/**
+ * @param {number} __loc locale_t
+ * @returns {number} locale_t
+ */
 function __locale_ptr(__loc) {   // xlocale_private.h:128
     if (__loc === 0) {
         __loc = $h.u32[_c_locale >>> 2];
@@ -93,10 +107,21 @@ function __locale_ptr(__loc) {   // xlocale_private.h:128
     }
     return __loc;
 }
+/**
+ * @param {number} tags const tre_tag_t *
+ * @param {number} i int
+ * @returns {number} int
+ */
 function tre_tag_get(tags, i) {   // tre-match-utils.h:282
     tags = tags + i * 16;
     return $h.i32[tags >>> 2] > 0 ? $h.i32[(tags + 8) >>> 2] : -1;
 }
+/**
+ * @param {number} tags tre_tag_t *
+ * @param {number} i int
+ * @param {number} val int
+ * @param {number} touch int
+ */
 function tre_tag_set(tags, i, val, touch) {   // tre-match-utils.h:289
     let $t1;
     tags = tags + i * 16;
@@ -106,12 +131,28 @@ function tre_tag_set(tags, i, val, touch) {   // tre-match-utils.h:289
     $h.i32[(tags + 8) >>> 2] = val;
     $h.i32[(tags + 12) >>> 2] = touch;
 }
+/**
+ * @param {number} tags tre_tag_t *
+ * @param {number} i int
+ */
 function tre_tag_reset(tags, i) {   // tre-match-utils.h:299
     $h.i32[(tags + i * 16) >>> 2] = 0;
 }
+/**
+ * @param {number} tags const tre_tag_t *
+ * @param {number} i int
+ * @returns {number} int
+ */
 function tre_tag_touch_get(tags, i) {   // tre-match-utils.h:305
     return $h.i32[(tags + i * 16 + 12) >>> 2];
 }
+/**
+ * @param {number} start int
+ * @param {number} end int
+ * @param {number} tags1 const tre_tag_t *
+ * @param {number} tags2 const tre_tag_t *
+ * @returns {number} int
+ */
 function tre_minimal_tag_order(start, end, tags1, tags2) {   // tre-match-utils.h:363
     let t1 = 0, t2 = 0;
     t1 = tags1 + start * 16;
@@ -133,6 +174,13 @@ function tre_minimal_tag_order(start, end, tags1, tags2) {   // tre-match-utils.
     }
     return $h.i32[(t2 + 8) >>> 2] - $h.i32[(t1 + 8) >>> 2] | 0;
 }
+/**
+ * @param {number} i int
+ * @param {number} dir tre_tag_direction_t
+ * @param {number} t1 const tre_tag_t *
+ * @param {number} t2 const tre_tag_t *
+ * @returns {number} int
+ */
 function tre_tag_order_1(i, dir, t1, t2) {   // tre-match-utils.h:399
     let diff = 0;
     t1 = t1 + i * 16;
@@ -184,6 +232,13 @@ function tre_tag_order_1(i, dir, t1, t2) {   // tre-match-utils.h:399
     }
     return 0;
 }
+/**
+ * @param {number} num_tags int
+ * @param {number} tag_directions tre_tag_direction_t *
+ * @param {number} t1 const tre_tag_t *
+ * @param {number} t2 const tre_tag_t *
+ * @returns {number} int
+ */
 function tre_tag_order(num_tags, tag_directions, t1, t2) {   // tre-match-utils.h:482
     let i = 0, ret = 0;
     for (i = 0; i < num_tags; i = i + 1 | 0) {
@@ -193,6 +248,12 @@ function tre_tag_order(num_tags, tag_directions, t1, t2) {   // tre-match-utils.
     }
     return 0;
 }
+/**
+ * @param {number} list tre_bracket_match_list_t *restrict
+ * @param {number} wc tre_cint_t
+ * @param {number} tnfa const tre_tnfa_t *restrict
+ * @returns {number} int
+ */
 function tre_bracket_match(list, wc, tnfa) {   // tre-match-utils.h:523
     let match = 0, i = 0, b = 0, uc = 0, lc = 0, icase = 0, start = 0, end = 0;
     match = 0;
@@ -280,6 +341,16 @@ function tre_bracket_match(list, wc, tnfa) {   // tre-match-utils.h:523
     return match;
 }
 /* TRE_DEBUG */
+/**
+ * @param {number} tnfa const tre_tnfa_t *
+ * @param {number} string const void *
+ * @param {number | bigint} len ssize_t
+ * @param {number} type tre_str_type_t
+ * @param {number} match_tags tre_tag_t *
+ * @param {number} eflags int
+ * @param {number} match_end_ofs int *
+ * @returns {number} reg_errcode_t
+ */
 export function tre_tnfa_run_parallel(tnfa, string, len, type, match_tags, eflags, match_end_ofs) {   // tre-match-parallel.c:111
     let prev_c = 0, str_byte = 0, pos = 0, pos_add_next = 0, str_wide = 0, ret = 0, reg_notbol = 0, reg_noteol = 0, reg_newline = 0, buf = 0, trans_i = 0, reach = 0, reach_next = 0, reach_i = 0, reach_next_i = 0, reach_pos = 0, tag_i = 0, num_tags = 0, i = 0, match_eo = 0, tmp_tags = 0, tmp_iptr = 0, tbytes = 0, touch = 0, rbytes = 0, pbytes = 0, total_bytes = 0, tmp_buf = 0, orig_str = 0, first = 0, found_high_bit = 0, i$2 = 0, i$3 = 0, w = 0, max = 0, w$2 = 0, max$2 = 0, w$3 = 0, max$3 = 0, skip = 0, end = 0, start = 0, $goto = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9;
     const $sp0 = $h.st.sp, $fp = $h.enter(136);

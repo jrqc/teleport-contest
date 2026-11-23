@@ -34,6 +34,11 @@ const l_selection_meta = $c.recArray($T.luaL_Reg, 9);
    if ifdef'd out the prototype here and the
    function body below.
  */
+/**
+ * @param {*} L lua_State *
+ * @param {number} index int
+ * @returns {Promise<$T.selectionvar | null>} struct selectionvar *
+ */
 export async function l_selection_check(L, index) {   // nhlsel.c:58
     let sel = null;
     await luaL_checktype(L, index, LUA.TUSERDATA);
@@ -43,6 +48,10 @@ export async function l_selection_check(L, index) {   // nhlsel.c:58
     }
     return sel;
 }
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_selection_gc(L) {   // nhlsel.c:70
     let sel = null;
     sel = await l_selection_check(L, 1);
@@ -52,6 +61,10 @@ async function l_selection_gc(L) {   // nhlsel.c:70
     return 0;
 }
 /* push a new selection into lua stack, return the selectionvar */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<$T.selectionvar | null>} struct selectionvar *
+ */
 async function l_selection_push_new(L) {   // nhlsel.c:94
     let tmp = null, sel = null, $t1;
     tmp = await selection_new();
@@ -64,6 +77,11 @@ async function l_selection_push_new(L) {   // nhlsel.c:94
     return sel;
 }
 /* push a copy of selectionvar tmp to lua stack */
+/**
+ * @param {*} L lua_State *
+ * @param {$T.selectionvar | null} tmp struct selectionvar *
+ * @returns {Promise<void>}
+ */
 export async function l_selection_push_copy(L, tmp) {   // nhlsel.c:112
     let sel = null, $t1;
     sel = $c.asRec(await lua_newuserdata(L, 32), $T.selectionvar, 32);
@@ -73,12 +91,20 @@ export async function l_selection_push_copy(L, tmp) {   // nhlsel.c:112
     $t1 = await dupstr(tmp.map), sel.map = $t1;
 }
 /* local sel = selection.new(); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_selection_new(L) {   // nhlsel.c:127
     await l_selection_push_new(L);
     return 1;
 }
 /* Replace the topmost selection in the stack with a clone of it. */
 /* local sel = selection.clone(sel); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_selection_clone(L) {   // nhlsel.c:136
     let sel = null, tmp = null, $t1;
     sel = await l_selection_check(L, 1);
@@ -97,6 +123,10 @@ async function l_selection_clone(L) {   // nhlsel.c:136
 /* local sel = sel:set(); */
 /* local sel = selection.set(sel); */
 /* TODO: allow setting multiple coords at once: set({x1,y1},{x2,y2},...); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_selection_setpoint(L) {   // nhlsel.c:159
     let sel = null, x = Int16Array.of(0), y = Int16Array.of(0), val = 0, argc = 0, crd = 0;
     sel = null;
@@ -137,6 +167,10 @@ async function l_selection_setpoint(L) {   // nhlsel.c:159
     return 1;
 }
 /* local numpoints = selection.numpoints(sel); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_selection_numpoints(L) {   // nhlsel.c:203
     let sel = null, x = 0, y = 0, ret = 0, rect = new $T.nhrect();
     sel = await l_selection_check(L, 1);
@@ -155,6 +189,10 @@ async function l_selection_numpoints(L) {   // nhlsel.c:203
     return 1;
 }
 /* local value = selection.get(sel, x, y); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_selection_getpoint(L) {   // nhlsel.c:224
     let sel = null, x = Int16Array.of(0), y = Int16Array.of(0), ix = [0], iy = [0], val = 0, crd = 0;
     sel = await l_selection_check(L, 1);
@@ -180,6 +218,10 @@ async function l_selection_getpoint(L) {   // nhlsel.c:224
 /* local s = selection.negate(sel); */
 /* local s = selection.negate(); */
 /* local s = sel:negate(); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_selection_not(L) {   // nhlsel.c:260
     let argc = 0, sel = null, sel2 = null;
     argc = lua_gettop(L);
@@ -197,6 +239,10 @@ async function l_selection_not(L) {   // nhlsel.c:260
     return 1;
 }
 /* local sel = selection.area(4,5, 40,10) & selection.rect(7,8, 60,14); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_selection_and(L) {   // nhlsel.c:281
     let x = 0, y = 0, sela = null, selb = null, selr = null, rect = new $T.nhrect(), val = 0;
     sela = await l_selection_check(L, 1);
@@ -215,6 +261,10 @@ async function l_selection_and(L) {   // nhlsel.c:281
     return 1;
 }
 /* local sel = selection.area(4,5, 40,10) | selection.rect(7,8, 60,14); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_selection_or(L) {   // nhlsel.c:306
     let x = 0, y = 0, sela = null, selb = null, selr = null, rect = new $T.nhrect(), val = 0;
     sela = await l_selection_check(L, 1);
@@ -234,6 +284,10 @@ async function l_selection_or(L) {   // nhlsel.c:306
     return 1;
 }
 /* local sel = selection.area(4,5, 40,10) ~ selection.rect(7,8, 60,14); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_selection_xor(L) {   // nhlsel.c:332
     let x = 0, y = 0, sela = null, selb = null, selr = null, rect = new $T.nhrect(), val = 0;
     sela = await l_selection_check(L, 1);
@@ -256,6 +310,10 @@ async function l_selection_xor(L) {   // nhlsel.c:332
 }
 /* local sel = selection.area(10,10, 20,20) - selection.area(14,14, 17,17)
  *   - i.e. points that are in A but not in B */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_selection_sub(L) {   // nhlsel.c:361
     let x = 0, y = 0, sela = null, selb = null, selr = null, rect = new $T.nhrect(), a_pt = 0, b_pt = 0, val = 0;
     sela = await l_selection_check(L, 1);
@@ -279,6 +337,10 @@ async function l_selection_sub(L) {   // nhlsel.c:361
     return 1;
 }
 /* local s = selection.percentage(sel, 50); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_selection_filter_percent(L) {   // nhlsel.c:389
     let argc = 0, sel = null, p = 0, tmp = null;
     argc = lua_gettop(L);
@@ -292,6 +354,10 @@ async function l_selection_filter_percent(L) {   // nhlsel.c:389
 }
 /* local pt = selection.rndcoord(sel); */
 /* local pt = selection.rndcoord(sel, 1); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_selection_rndcoord(L) {   // nhlsel.c:407
     let sel = null, removeit = 0, x = Int16Array.of(0), y = Int16Array.of(0);
     sel = await l_selection_check(L, 1);
@@ -316,6 +382,10 @@ async function l_selection_rndcoord(L) {   // nhlsel.c:407
     return 1;
 }
 /* local s = selection.room(); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_selection_room(L) {   // nhlsel.c:432
     let sel = null, argc = 0, croom = null, i = 0;
     argc = lua_gettop(L);
@@ -330,6 +400,10 @@ async function l_selection_room(L) {   // nhlsel.c:432
     return 1;
 }
 /* local rect = sel:bounds(); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_selection_getbounds(L) {   // nhlsel.c:454
     let sel = null, rect = new $T.nhrect();
     sel = await l_selection_check(L, 1);
@@ -349,6 +423,15 @@ async function l_selection_getbounds(L) {   // nhlsel.c:454
 */
 /* function(selection, x1,y1, x2,y2) */
 /* selection:function(x1,y1, x2,y2) */
+/**
+ * @param {*} L lua_State *
+ * @param {*} sel struct selectionvar **
+ * @param {*} x1 coordxy *
+ * @param {*} y1 coordxy *
+ * @param {*} x2 coordxy *
+ * @param {*} y2 coordxy *
+ * @returns {Promise<number>} boolean
+ */
 async function params_sel_2coords(L, sel, x1, y1, x2, y2) {   // nhlsel.c:476
     let argc = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10;
     argc = lua_gettop(L);
@@ -378,6 +461,10 @@ async function params_sel_2coords(L, sel, x1, y1, x2, y2) {   // nhlsel.c:476
 /* local s = selection.line(sel, x1,y1, x2,y2); */
 /* local s = selection.line(x1,y1, x2,y2); */
 /* s:line(x1,y1, x2,y2); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_selection_line(L) {   // nhlsel.c:509
     let sel = [null], x1 = Int16Array.of(0), y1 = Int16Array.of(0), x2 = Int16Array.of(0), y2 = Int16Array.of(0);
     sel[0] = null;
@@ -392,6 +479,10 @@ async function l_selection_line(L) {   // nhlsel.c:509
     return 1;
 }
 /* local s = selection.rect(sel, x1,y1, x2,y2); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_selection_rect(L) {   // nhlsel.c:531
     let sel = [null], x1 = Int16Array.of(0), y1 = Int16Array.of(0), x2 = Int16Array.of(0), y2 = Int16Array.of(0);
     sel[0] = null;
@@ -412,6 +503,10 @@ async function l_selection_rect(L) {   // nhlsel.c:531
 /* local s = selection.fillrect(x1,y1, x2,y2); */
 /* s:fillrect(x1,y1, x2,y2); */
 /* selection.area(x1,y1, x2,y2); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_selection_fillrect(L) {   // nhlsel.c:559
     let sel = [null], y = 0, x1 = Int16Array.of(0), y1 = Int16Array.of(0), x2 = Int16Array.of(0), y2 = Int16Array.of(0);
     sel[0] = null;
@@ -437,6 +532,10 @@ async function l_selection_fillrect(L) {   // nhlsel.c:559
 /* local s = selection.randline(x1,y1, x2,y2, roughness); */
 /* TODO: selection.randline(x1,y1, x2,y2, roughness); */
 /* TODO: selection.randline({x1,y1}, {x2,y2}, roughness); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_selection_randline(L) {   // nhlsel.c:591
     let argc = 0, sel = null, x1 = Int16Array.of(0), y1 = Int16Array.of(0), x2 = Int16Array.of(0), y2 = Int16Array.of(0), roughness = 0;
     argc = lua_gettop(L);
@@ -472,6 +571,10 @@ async function l_selection_randline(L) {   // nhlsel.c:591
 }
 /* local s = selection.grow(sel); */
 /* local s = selection.grow(sel, "north"); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_selection_grow(L) {   // nhlsel.c:631
     let sel = null, dir = 0, argc = 0;
     argc = lua_gettop(L);
@@ -486,6 +589,10 @@ async function l_selection_grow(L) {   // nhlsel.c:631
     return 1;
 }
 /* local s = selection.filter_mapchar(sel, mapchar, lit); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_selection_filter_mapchar(L) {   // nhlsel.c:657
     let argc = 0, sel = null, mapchr = null, typ = 0, lit = 0, tmp = null;
     argc = lua_gettop(L);
@@ -506,6 +613,10 @@ async function l_selection_filter_mapchar(L) {   // nhlsel.c:657
     return 1;
 }
 /* local s = selection.match([[...]]); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_selection_match(L) {   // nhlsel.c:682
     let argc = 0, sel = null, mf = [null], x = 0, y = 0, err = null, mapstr = null;
     argc = lua_gettop(L);
@@ -539,6 +650,10 @@ async function l_selection_match(L) {   // nhlsel.c:682
 }
 /* local s = selection.floodfill(x,y); */
 /* local s = selection.floodfill(x,y, diagonals); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_selection_flood(L) {   // nhlsel.c:726
     let argc = 0, sel = null, x = Int16Array.of(0), y = Int16Array.of(0), diagonals = 0;
     argc = lua_gettop(L);
@@ -570,6 +685,10 @@ async function l_selection_flood(L) {   // nhlsel.c:726
 /* local s = selection.circle(x, y, radius, filled); */
 /* local s = selection.circle(sel, x, y, radius); */
 /* local s = selection.circle(sel, x, y, radius, filled); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_selection_circle(L) {   // nhlsel.c:762
     let argc = 0, sel = null, x = Int16Array.of(0), y = Int16Array.of(0), r = 0, filled = 0;
     argc = lua_gettop(L);
@@ -613,6 +732,10 @@ async function l_selection_circle(L) {   // nhlsel.c:762
 /* local s = selection.ellipse(x, y, radius1, radius2, filled); */
 /* local s = selection.ellipse(sel, x, y, radius1, radius2); */
 /* local s = selection.ellipse(sel, x, y, radius1, radius2, filled); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_selection_ellipse(L) {   // nhlsel.c:810
     let argc = 0, sel = null, x = Int16Array.of(0), y = Int16Array.of(0), r1 = 0, r2 = 0, filled = 0;
     argc = lua_gettop(L);
@@ -661,6 +784,10 @@ async function l_selection_ellipse(L) {   // nhlsel.c:810
  * non-obvious argument order. */
 /* selection.gradient({ type = "radial", x = 3, y = 5, x2 = 10, y2 = 12,
  *                      mindist = 4, maxdist = 10, limited = false });    */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_selection_gradient(L) {   // nhlsel.c:862
     let argc = 0, sel = null, x = Int16Array.of(0), y = Int16Array.of(0), x2 = Int16Array.of(0), y2 = Int16Array.of(0), mindist = 0, maxdist = 0, type = 0;
     argc = lua_gettop(L);
@@ -714,6 +841,10 @@ async function l_selection_gradient(L) {   // nhlsel.c:862
  * rather than absolute, unless there has been no previous map or room
  * defined.
  */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_selection_iterate(L) {   // nhlsel.c:925
     let argc = 0, sel = null, x = 0, y = 0, rect = new $T.nhrect(), tmpx = Int16Array.of(0), tmpy = Int16Array.of(0);
     argc = lua_gettop(L);
@@ -749,6 +880,10 @@ async function l_selection_iterate(L) {   // nhlsel.c:925
 }
 /* local txt = sel:describe_size(); */
 /* gives a textual description of the selection size */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_selection_size_description(L) {   // nhlsel.c:962
     let argc = 0, sel = null, buf = new Int8Array(256);
     argc = lua_gettop(L);
@@ -762,6 +897,10 @@ async function l_selection_size_description(L) {   // nhlsel.c:962
     }
     return 0;
 }
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 export async function l_selection_register(L) {   // nhlsel.c:1025
     /* Table of instance methods and static methods. */
     await luaL_checkversion_(L, LUA.VERSION_NUM, LUAL_NUMSIZES), await lua_createtable(L, 0, 24), await luaL_setfuncs(L, $c.relem(l_selection_methods, 0), 0);

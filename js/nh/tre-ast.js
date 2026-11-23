@@ -46,6 +46,10 @@ import { $G } from './globals.js';
 import { __global_locale, _c_locale } from './c_locale.js';
 import { tre_mem_alloc_impl } from './tre-mem.js';
 
+/**
+ * @param {number} val void *
+ * @returns {number} void *
+ */
 function xlocale_retain(val) {   // xlocale_private.h:96
     let obj = 0;
     obj = val;
@@ -55,6 +59,9 @@ function xlocale_retain(val) {   // xlocale_private.h:96
     $h.i32[obj >>> 2] = $h.i32[obj >>> 2] + 1 | 0;
     return val;
 }
+/**
+ * @param {number} val void *
+ */
 function xlocale_release(val) {   // xlocale_private.h:107
     let obj = 0;
     obj = val;
@@ -67,9 +74,16 @@ function xlocale_release(val) {   // xlocale_private.h:107
         }
     }
 }
+/**
+ * @returns {number} locale_t
+ */
 function __current_locale() {   // xlocale_private.h:122
     return __global_locale;
 }
+/**
+ * @param {number} __loc locale_t
+ * @returns {number} locale_t
+ */
 function __locale_ptr(__loc) {   // xlocale_private.h:128
     if (__loc === 0) {
         __loc = $h.u32[_c_locale >>> 2];
@@ -79,6 +93,12 @@ function __locale_ptr(__loc) {   // xlocale_private.h:128
     return __loc;
 }
 /* HAVE_CONFIG_H */
+/**
+ * @param {number} mem tre_mem_t
+ * @param {number} type tre_ast_type_t
+ * @param {number | bigint} size size_t
+ * @returns {number} tre_ast_node_t *
+ */
 export function tre_ast_new_node(mem, type, size) {   // tre-ast.c:18
     let node = 0, $t1;
     node = tre_mem_alloc_impl(mem, 0, 0, 1, 72);
@@ -94,6 +114,12 @@ export function tre_ast_new_node(mem, type, size) {   // tre-ast.c:18
     $h.i32[(node + 52) >>> 2] = -1;
     return node;
 }
+/**
+ * @param {number} mem tre_mem_t
+ * @param {number} code_min int
+ * @param {number} code_max int
+ * @returns {number} tre_ast_node_t *
+ */
 export function tre_ast_new_literal(mem, code_min, code_max) {   // tre-ast.c:36
     let node = 0, lit = 0;
     node = tre_ast_new_node(mem, 0, 24);
@@ -106,6 +132,14 @@ export function tre_ast_new_literal(mem, code_min, code_max) {   // tre-ast.c:36
     $h.i32[(lit + 8) >>> 2] = -1;
     return node;
 }
+/**
+ * @param {number} mem tre_mem_t
+ * @param {number} arg tre_ast_node_t *
+ * @param {number} min int
+ * @param {number} max int
+ * @param {number} minimal int
+ * @returns {number} tre_ast_node_t *
+ */
 export function tre_ast_new_iter(mem, arg, min, max, minimal) {   // tre-ast.c:53
     let node = 0, iter = 0;
     node = tre_ast_new_node(mem, 2, 32);
@@ -120,6 +154,12 @@ export function tre_ast_new_iter(mem, arg, min, max, minimal) {   // tre-ast.c:5
     $h.u32[(node + 56) >>> 2] = $h.u32[(arg + 56) >>> 2];
     return node;
 }
+/**
+ * @param {number} mem tre_mem_t
+ * @param {number} left tre_ast_node_t *
+ * @param {number} right tre_ast_node_t *
+ * @returns {number} tre_ast_node_t *
+ */
 export function tre_ast_new_union(mem, left, right) {   // tre-ast.c:73
     let node = 0;
     node = tre_ast_new_node(mem, 3, 24);
@@ -131,6 +171,12 @@ export function tre_ast_new_union(mem, left, right) {   // tre-ast.c:73
     $h.u32[(node + 56) >>> 2] = $h.u32[(left + 56) >>> 2] + $h.u32[(right + 56) >>> 2] >>> 0;
     return node;
 }
+/**
+ * @param {number} mem tre_mem_t
+ * @param {number} left tre_ast_node_t *
+ * @param {number} right tre_ast_node_t *
+ * @returns {number} tre_ast_node_t *
+ */
 export function tre_ast_new_catenation(mem, left, right) {   // tre-ast.c:88
     let node = 0;
     node = tre_ast_new_node(mem, 1, 16);

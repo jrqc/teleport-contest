@@ -40,6 +40,10 @@ import { luaH_getshortstr } from './ltable.js';
 const luaT_init$luaT_eventname = $h.data(200, 8);   // static in luaT_init()
 const udatatypename = $h.data(9, 1);
 export const luaT_typenames_ = $h.data(96, 8);
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<void>}
+ */
 export async function luaT_init(L) {   // ltm.c:38
     let i = 0, $t1;
     /* ORDER TM */
@@ -52,6 +56,12 @@ export async function luaT_init(L) {   // ltm.c:38
 ** function to be used with macro "fasttm": optimized for absence of
 ** tag methods
 */
+/**
+ * @param {number} events Table *
+ * @param {number} event TMS
+ * @param {number} ename TString *
+ * @returns {number} const TValue *
+ */
 export function luaT_gettm(events, event, ename) {   // ltm.c:60
     let tm = 0;
     tm = luaH_getshortstr(events, ename);
@@ -64,6 +74,12 @@ export function luaT_gettm(events, event, ename) {   // ltm.c:60
         return tm;
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} o const TValue *
+ * @param {number} event TMS
+ * @returns {number} const TValue *
+ */
 export function luaT_gettmbyobj(L, o, event) {   // ltm.c:71
     let mt = 0;
     switch ($h.u8[o + 8] & 15) {
@@ -82,6 +98,11 @@ export function luaT_gettmbyobj(L, o, event) {   // ltm.c:71
 ** Return the name of the type of an object. For tables and userdata
 ** with metatable, use their '__name' metafield, if present.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} o const TValue *
+ * @returns {Promise<number>} const char *
+ */
 export async function luaT_objtypename(L, o) {   // ltm.c:91
     let mt = 0, name = 0;
     if ($h.u8[o + 8] === 69 && (mt = $h.u32[($h.u32[o >>> 2] + 40) >>> 2]) !== 0 || $h.u8[o + 8] === 71 && (mt = $h.u32[($h.u32[o >>> 2] + 24) >>> 2]) !== 0) {
@@ -92,6 +113,14 @@ export async function luaT_objtypename(L, o) {   // ltm.c:91
     }
     return $h.u32[(luaT_typenames_ + (($h.u8[o + 8] & 15) + 1 | 0) * 8) >>> 2];   /* else use standard type name */
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} f const TValue *
+ * @param {number} p1 const TValue *
+ * @param {number} p2 const TValue *
+ * @param {number} p3 const TValue *
+ * @returns {Promise<void>}
+ */
 export async function luaT_callTM(L, f, p1, p2, p3) {   // ltm.c:103
     let func = 0, io1 = 0, io2 = 0, io1$2 = 0, io2$2 = 0, io1$3 = 0, io2$3 = 0, io1$4 = 0, io2$4 = 0;
     func = $h.u32[(L + 16) >>> 2];
@@ -135,6 +164,14 @@ export async function luaT_callTM(L, f, p1, p2, p3) {   // ltm.c:103
         await luaD_callnoyield(L, func, 0);
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} f const TValue *
+ * @param {number} p1 const TValue *
+ * @param {number} p2 const TValue *
+ * @param {number} res StkId
+ * @returns {Promise<void>}
+ */
 export async function luaT_callTMres(L, f, p1, p2, res) {   // ltm.c:119
     let result = 0, func = 0, io1 = 0, io2 = 0, io1$2 = 0, io2$2 = 0, io1$3 = 0, io2$3 = 0, io1$4 = 0, io2$4 = 0;
     result = res - $h.u32[(L + 48) >>> 2];
@@ -180,6 +217,14 @@ export async function luaT_callTMres(L, f, p1, p2, res) {   // ltm.c:119
         0;
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} p1 const TValue *
+ * @param {number} p2 const TValue *
+ * @param {number} res StkId
+ * @param {number} event TMS
+ * @returns {Promise<number>} int
+ */
 async function callbinTM(L, p1, p2, res, event) {   // ltm.c:137
     let tm = 0;
     tm = luaT_gettmbyobj(L, p1, event);   /* try first operand */
@@ -192,6 +237,14 @@ async function callbinTM(L, p1, p2, res, event) {   // ltm.c:137
     await luaT_callTMres(L, tm, p1, p2, res);
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} p1 const TValue *
+ * @param {number} p2 const TValue *
+ * @param {number} res StkId
+ * @param {number} event TMS
+ * @returns {Promise<void>}
+ */
 export async function luaT_trybinTM(L, p1, p2, res, event) {   // ltm.c:148
     if ((!await callbinTM(L, p1, p2, res, event) ? 1 : 0) !== 0 ? 1 : 0) {
         switch (event) {
@@ -215,6 +268,10 @@ export async function luaT_trybinTM(L, p1, p2, res, event) {   // ltm.c:148
         }
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<void>}
+ */
 export async function luaT_tryconcatTM(L) {   // ltm.c:167
     let top = 0;
     top = $h.u32[(L + 16) >>> 2];
@@ -222,6 +279,15 @@ export async function luaT_tryconcatTM(L) {   // ltm.c:167
         await luaG_concaterror(L, top - 32, top - 16);
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} p1 const TValue *
+ * @param {number} p2 const TValue *
+ * @param {number} flip int
+ * @param {number} res StkId
+ * @param {number} event TMS
+ * @returns {Promise<void>}
+ */
 export async function luaT_trybinassocTM(L, p1, p2, flip, res, event) {   // ltm.c:175
     if (flip) {
         await luaT_trybinTM(L, p2, p1, res, event);
@@ -229,6 +295,15 @@ export async function luaT_trybinassocTM(L, p1, p2, flip, res, event) {   // ltm
         await luaT_trybinTM(L, p1, p2, res, event);
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} p1 const TValue *
+ * @param {number | bigint} i2 lua_Integer
+ * @param {number} flip int
+ * @param {number} res StkId
+ * @param {number} event TMS
+ * @returns {Promise<void>}
+ */
 export async function luaT_trybiniTM(L, p1, i2, flip, res, event) {   // ltm.c:184
     let io = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
@@ -250,6 +325,13 @@ export async function luaT_trybiniTM(L, p1, i2, flip, res, event) {   // ltm.c:1
 ** the result of r<l); bit CIST_LEQ in the call status keeps that
 ** information.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} p1 const TValue *
+ * @param {number} p2 const TValue *
+ * @param {number} event TMS
+ * @returns {Promise<number>} int
+ */
 export async function luaT_callorderTM(L, p1, p2, event) {   // ltm.c:201
     if (await callbinTM(L, p1, p2, $h.u32[(L + 16) >>> 2], event)) {   /* try original event */
         return !($h.u8[$h.u32[(L + 16) >>> 2] + 8] === 1 || ($h.u8[$h.u32[(L + 16) >>> 2] + 8] & 15) === 0) ? 1 : 0;
@@ -265,6 +347,15 @@ export async function luaT_callorderTM(L, p1, p2, event) {   // ltm.c:201
     await luaG_ordererror(L, p1, p2);   /* no metamethod found */
     return 0;   /* to avoid warnings */
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} p1 const TValue *
+ * @param {number} v2 int
+ * @param {number} flip int
+ * @param {number} isfloat int
+ * @param {number} event TMS
+ * @returns {Promise<number>} int
+ */
 export async function luaT_callorderiTM(L, p1, v2, flip, isfloat, event) {   // ltm.c:221
     let p2 = 0, io = 0, io$2 = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
@@ -290,6 +381,13 @@ export async function luaT_callorderiTM(L, p1, v2, flip, isfloat, event) {   // 
         return await luaT_callorderTM(L, p1, p2, event);
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} nfixparams int
+ * @param {number} ci CallInfo *
+ * @param {number} p const Proto *
+ * @returns {Promise<void>}
+ */
 export async function luaT_adjustvarargs(L, nfixparams, ci, p) {   // ltm.c:238
     let i = 0, actual = 0, nextra = 0, io1 = 0, io2 = 0, io1$2 = 0, io2$2 = 0, $t1, $t2;
     actual = $c.i32(($h.u32[(L + 16) >>> 2] - $h.u32[ci >>> 2]) / 16) - 1 | 0;   /* number of arguments */
@@ -327,6 +425,13 @@ export async function luaT_adjustvarargs(L, nfixparams, ci, p) {   // ltm.c:238
     $h.stp(ci + 8, $h.u32[(ci + 8) >>> 2] + (actual + 1 | 0) * 16);
     0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} ci CallInfo *
+ * @param {number} where StkId
+ * @param {number} wanted int
+ * @returns {Promise<void>}
+ */
 export async function luaT_getvarargs(L, ci, where, wanted) {   // ltm.c:258
     let i = 0, nextra = 0, t__ = 0, io1 = 0, io2 = 0;
     nextra = $h.i32[(ci + 32 + 12) >>> 2];

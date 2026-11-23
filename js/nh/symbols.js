@@ -147,6 +147,11 @@ export function init_ov_primary_symbols() {   // symbols.c:122
         go.ov_primary_syms[i] = 0;
     }
 }
+/**
+ * @param {number} idx int
+ * @param {number} which_set int
+ * @returns {number} nhsym
+ */
 export function get_othersym(idx, which_set) {   // symbols.c:131
     let sym = 0, oidx = 0;
     sym = 0;
@@ -221,6 +226,9 @@ export function init_rogue_symbols() {   // symbols.c:187
      */
     gs.symset[ROGUESET].nocolor = (1) & 1;
 }
+/**
+ * @param {number} whichset int
+ */
 export function assign_graphics(whichset) {   // symbols.c:217
     let i = 0;
     switch (whichset) {
@@ -241,6 +249,10 @@ export function assign_graphics(whichset) {   // symbols.c:217
     }
     reset_glyphmap(gm_symchange);
 }
+/**
+ * @param {number} nondefault int
+ * @returns {Promise<void>}
+ */
 export async function switch_symbols(nondefault) {   // symbols.c:253
     let i = 0;
     if (nondefault) {
@@ -263,18 +275,38 @@ export async function switch_symbols(nondefault) {   // symbols.c:253
         init_showsyms();
     }
 }
+/**
+ * @param {$T.symparse | null} symp const struct symparse *
+ * @param {number} val int
+ */
 export function update_ov_primary_symset(symp, val) {   // symbols.c:295
     go.ov_primary_syms[symp.idx] = $c.u8(val);
 }
+/**
+ * @param {$T.symparse | null} symp const struct symparse *
+ * @param {number} val int
+ */
 export function update_ov_rogue_symset(symp, val) {   // symbols.c:301
     go.ov_rogue_syms[symp.idx] = $c.u8(val);
 }
+/**
+ * @param {$T.symparse | null} symp const struct symparse *
+ * @param {number} val int
+ */
 export function update_primary_symset(symp, val) {   // symbols.c:307
     gp.primary_syms[symp.idx] = $c.u8(val);
 }
+/**
+ * @param {$T.symparse | null} symp const struct symparse *
+ * @param {number} val int
+ */
 export function update_rogue_symset(symp, val) {   // symbols.c:313
     gr.rogue_syms[symp.idx] = $c.u8(val);
 }
+/**
+ * @param {number} which_set int
+ * @param {number} name_too boolean
+ */
 export function clear_symsetentry(which_set, name_too) {   // symbols.c:319
     let other_set = 0, old_handling = 0;
     other_set = which_set === PRIMARYSET ? ROGUESET : PRIMARYSET;
@@ -303,16 +335,30 @@ export function clear_symsetentry(which_set, name_too) {   // symbols.c:319
     clear_all_glyphmap_colors();
 }
 /* called from windmain.c */
+/**
+ * @param {number} handling enum symset_handling_types
+ * @param {number | bigint} wincap2 unsigned long
+ * @returns {number} boolean
+ */
 export function symset_is_compatible(handling, wincap2) {   // symbols.c:353
     if (handling === H_UTF8 && $c.andu64(wincap2, WC2_utf8_bits) !== WC2_utf8_bits) {
         return FALSE;
     }
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @returns {Promise<number>} boolean
+ */
 export async function proc_symset_line(buf) {   // symbols.c:431
     return $c.i8(!$c.i8(await parse_sym_line(buf, gs.symset_which_set)) ? 1 : 0);
 }
 /* returns 0 on error */
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @param {number} which_set int
+ * @returns {Promise<number>} int
+ */
 export async function parse_sym_line(buf, which_set) {   // symbols.c:438
     let val = 0, i = 0, symp = null, bufp = null, commentp = null, altp = null, glyph = Int32Array.of(0), enhanced_unavailable = 0, is_glyph = 0, tmpsp = null, lastsp = null, n = 0, $t1, $t2, $t3, $t4;
     symp = null;
@@ -525,6 +571,10 @@ export async function parse_sym_line(buf, which_set) {   // symbols.c:438
     }
     return 1;
 }
+/**
+ * @param {$c.Ptr | null} handling char *
+ * @param {number} which_set int
+ */
 export function set_symhandling(handling, which_set) {   // symbols.c:657
     let i = 0;
     i = 0;
@@ -538,6 +588,11 @@ export function set_symhandling(handling, which_set) {   // symbols.c:657
     }
 }
 /* bundle some common usage into one easy-to-use routine */
+/**
+ * @param {$c.Ptr | null} s const char *
+ * @param {number} which_set int
+ * @returns {Promise<number>} int
+ */
 export async function load_symset(s, which_set) {   // symbols.c:673
     let $t1;
     clear_symsetentry(which_set, TRUE);
@@ -572,6 +627,11 @@ export function savedsym_free() {   // symbols.c:712
         tmp = tmp2;
     }
 }
+/**
+ * @param {$c.Ptr | null} name const char *
+ * @param {number} which_set int
+ * @returns {$T._savedsym | null} struct _savedsym *
+ */
 function savedsym_find(name, which_set) {   // symbols.c:726
     let tmp = null;
     tmp = $G.saved_symbols;
@@ -583,6 +643,12 @@ function savedsym_find(name, which_set) {   // symbols.c:726
     }
     return null;
 }
+/**
+ * @param {$c.Ptr | null} name const char *
+ * @param {$c.Ptr | null} val const char *
+ * @param {number} which_set int
+ * @returns {Promise<void>}
+ */
 async function savedsym_add(name, val, which_set) {   // symbols.c:739
     let tmp = null, $t1, $t2, $t3;
     tmp = null;
@@ -598,6 +664,10 @@ async function savedsym_add(name, val, which_set) {   // symbols.c:739
         $G.saved_symbols = tmp;
     }
 }
+/**
+ * @param {$T.strbuf | null} sbuf strbuf_t *
+ * @returns {Promise<void>}
+ */
 export async function savedsym_strbuf(sbuf) {   // symbols.c:757
     let tmp = null, buf = new Int8Array(256);
     tmp = $G.saved_symbols;
@@ -608,6 +678,11 @@ export async function savedsym_strbuf(sbuf) {   // symbols.c:757
     }
 }
 /* Parse the value of a SYMBOLS line from a config file */
+/**
+ * @param {$c.Ptr | null} opts char *
+ * @param {number} which_set int
+ * @returns {Promise<number>} boolean
+ */
 export async function parsesymbols(opts, which_set) {   // symbols.c:773
     let val = 0, symname = null, strval = null, ch = null, first_unquoted_comma = null, first_unquoted_colon = null, symp = null, is_glyph = 0, prech = null, postch = null, buf = new Int8Array(256), glyph = Int32Array.of(0), $t1, $t2;
     first_unquoted_comma = null;
@@ -684,6 +759,10 @@ export async function parsesymbols(opts, which_set) {   // symbols.c:773
     await savedsym_add(opts, strval, which_set);
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @returns {$T.symparse | null} const struct symparse *
+ */
 export function match_sym(buf) {   // symbols.c:852
     let i = 0, len = 0, p = null, q = null, sp = null;
     len = $c.strlen(buf);
@@ -726,6 +805,10 @@ export function match_sym(buf) {   // symbols.c:852
 }
 /*
  * this is called from options.c to do the symset work.
+ */
+/**
+ * @param {number} rogueflag boolean
+ * @returns {Promise<number>} int
  */
 export async function do_symset(rogueflag) {   // symbols.c:909
     let tmpwin = 0, any = new $T.any(), n = 0, buf = new Int8Array(256), symset_pick = [null], ready_to_switch = 0, nothing_to_do = 0, symset_name = null, fmtstr = new Int8Array(20), sl = null, res = 0, which_set = 0, setcount = 0, chosen = 0, defindx = 0, clr = 0, thissize = 0, biggest = 0, big_desc = 0, ok = 0, $t1;

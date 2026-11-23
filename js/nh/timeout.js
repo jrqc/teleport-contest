@@ -109,6 +109,11 @@ const region_texts = $c.nulls(2);
  * Table of timeout functions, listed in order of enum timeout_types:
  */
 const timeout_funcs = $c.recArray($T.ttable, 9);
+/**
+ * @param {number} idx int
+ * @param {*} propertynum int *
+ * @returns {$c.Ptr | null} const char *
+ */
 export function property_by_index(idx, propertynum) {   // timeout.c:117
     if (!(idx >= 0 && idx < 68)) {
         idx = 68;
@@ -118,6 +123,9 @@ export function property_by_index(idx, propertynum) {   // timeout.c:117
     }
     return propertynames[idx].prop_name;
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function stoned_dialogue() {   // timeout.c:137
     let i = 0, buf = new Int8Array(256);
     i = $c.and64(u.uprops[STONED].intrinsic, TIMEOUT);
@@ -176,6 +184,9 @@ async function stoned_dialogue() {   // timeout.c:137
     }
     await exercise(A.DEX, FALSE);
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function vomiting_dialogue() {   // timeout.c:197
     let txt = null, buf = new Int8Array(256), v = 0;
     txt = null;
@@ -249,6 +260,9 @@ async function vomiting_dialogue() {   // timeout.c:197
     }
     await exercise(A.CON, FALSE);
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function sleep_dialogue() {   // timeout.c:268
     let i = 0;
     i = $c.and64(u.uprops[SLEEPY].intrinsic, TIMEOUT);
@@ -256,6 +270,9 @@ async function sleep_dialogue() {   // timeout.c:268
         await You($c.lit("yawn."));
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function choke_dialogue() {   // timeout.c:295
     let i = 0, str = null;
     i = $c.and64(u.uprops[STRANGLED].intrinsic, TIMEOUT);
@@ -274,6 +291,9 @@ async function choke_dialogue() {   // timeout.c:295
     }
     await exercise(A.STR, FALSE);
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function sickness_dialogue() {   // timeout.c:323
     let j = 0, i = 0, buf = new Int8Array(256), pronounbuf = new Int8Array(40);
     j = $c.and64(u.uprops[SICK].intrinsic, TIMEOUT);
@@ -295,6 +315,9 @@ async function sickness_dialogue() {   // timeout.c:323
     }
     await exercise(A.CON, FALSE);
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function levitation_dialogue() {   // timeout.c:353
     let i = 0, s = null, danger = 0;
     /* -1 because the last message comes via float_down() */
@@ -316,6 +339,9 @@ async function levitation_dialogue() {   // timeout.c:353
         await stop_occupation();
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function slime_dialogue() {   // timeout.c:389
     let t = 0, i = 0, buf = new Int8Array(256);
     t = $c.and64(u.uprops[SLIMED].intrinsic, TIMEOUT);
@@ -375,12 +401,19 @@ async function slime_dialogue() {   // timeout.c:389
     }
     await exercise(A.DEX, FALSE);
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function burn_away_slime() {   // timeout.c:448
     if (Slimed()) {
         await make_slimed(0, $c.lit("The slime that covers you is burned away!"));
     }
 }
 /* countdown timer for turning into green slime has run out; kill our hero */
+/**
+ * @param {$T.kinfo | null} kptr struct kinfo *
+ * @returns {Promise<void>}
+ */
 async function slimed_to_death(kptr) {   // timeout.c:457
     let save_mvflags = 0, slimebuf = new Int8Array(256);
     /* redundant: polymon() cures sliming when polying into green slime */
@@ -439,6 +472,9 @@ async function slimed_to_death(kptr) {   // timeout.c:457
     }
     return;
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function phaze_dialogue() {   // timeout.c:534
     let i = 0;
     i = $c.div64($c.and64(u.uprops[PASSES_WALLS].intrinsic, TIMEOUT), 2);
@@ -449,6 +485,9 @@ async function phaze_dialogue() {   // timeout.c:534
         await pline($c.lit("%s"), phaze_texts[$c.idx($c.sub64(2, i))]);
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function region_dialogue() {   // timeout.c:554
     let no_need_to_breathe = 0, in_poison_gas_cloud = 0, r = 0, i = 0;
     r = $c.and64(u.uprops[MAGICAL_BREATHING].intrinsic, TIMEOUT);
@@ -468,6 +507,11 @@ async function region_dialogue() {   // timeout.c:554
 /* when a status timeout is fatal, keep the status line indicator shown
    during end of game rundown (and potential dumplog);
    timeout has already counted down to 0 by the time we get here */
+/**
+ * @param {number} how int
+ * @param {number} which int
+ * @returns {Promise<void>}
+ */
 async function done_timeout(how, which) {   // timeout.c:575
     let intrinsic_p = null;
     intrinsic_p = new $c.FieldRef(u.uprops[which], "intrinsic", "i64");
@@ -477,6 +521,9 @@ async function done_timeout(how, which) {   // timeout.c:575
     intrinsic_p.set(0, $c.and64(intrinsic_p.get(0), ~I_SPECIAL));
     disp.botl = TRUE;
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function nh_timeout() {   // timeout.c:588
     let upp = null, kptr = null, was_flying = 0, sleeptime = 0, m_idx = 0, baseluck = 0, time_luck = 0, nostone = 0, was_blind = 0, wptr = null, $t1;
     baseluck = flags.moonphase === FULL_MOON ? 1 : 0;
@@ -847,6 +894,11 @@ export async function nh_timeout() {   // timeout.c:588
     }
     await run_timers();
 }
+/**
+ * @param {number} how_long int
+ * @param {number} wakeup_msg boolean
+ * @returns {Promise<void>}
+ */
 export async function fall_asleep(how_long, wakeup_msg) {   // timeout.c:951
     await stop_occupation();
     nomul(how_long);
@@ -868,6 +920,11 @@ export async function fall_asleep(how_long, wakeup_msg) {   // timeout.c:951
 /* Attach an egg hatch timeout to the given egg.
  *      when = Time to hatch, usually only passed if re-creating an
  *             existing hatch timer. Pass 0L for random hatch time.
+ */
+/**
+ * @param {$T.obj | null} egg struct obj *
+ * @param {number | bigint} when long
+ * @returns {Promise<void>}
  */
 export async function attach_egg_hatch_timeout(egg, when) {   // timeout.c:981
     let i = 0;
@@ -893,11 +950,20 @@ export async function attach_egg_hatch_timeout(egg, when) {   // timeout.c:981
     }
 }
 /* prevent an egg from ever hatching */
+/**
+ * @param {$T.obj | null} egg struct obj *
+ * @returns {Promise<void>}
+ */
 export async function kill_egg(egg) {   // timeout.c:1009
     /* stop previous timer, if any */
     await stop_timer(HATCH_EGG, obj_to_any(egg));
 }
 /* timer callback routine: hatch the given egg */
+/**
+ * @param {$T.any | null} arg anything *
+ * @param {number | bigint} timeout long
+ * @returns {Promise<void>}
+ */
 export async function hatch_egg(arg, timeout) {   // timeout.c:1017
     let egg = null, mon = null, mon2 = null, cc = new $T.nhcoord(), x = Int16Array.of(0), y = Int16Array.of(0), yours = 0, silent = 0, knows_egg = 0, cansee_hatchspot = 0, i = 0, mnum = 0, hatchcount = 0, monnambuf = new Int8Array(256), carriedby = new Int8Array(256), siblings = 0, redraw = 0;
     knows_egg = FALSE;
@@ -1044,6 +1110,10 @@ export async function hatch_egg(arg, timeout) {   // timeout.c:1017
     }
 }
 /* Learn to recognize eggs of the given type. */
+/**
+ * @param {number} mnum int
+ * @returns {Promise<void>}
+ */
 export async function learn_egg_type(mnum) {   // timeout.c:1193
     /* baby monsters hatch from grown-up eggs */
     mnum = little_to_big(mnum);
@@ -1052,6 +1122,10 @@ export async function learn_egg_type(mnum) {   // timeout.c:1193
     await update_inventory();
 }
 /* Attach a fig_transform timeout to the given figurine. */
+/**
+ * @param {$T.obj | null} figurine struct obj *
+ * @returns {Promise<void>}
+ */
 export async function attach_fig_transform_timeout(figurine) {   // timeout.c:1204
     let i = 0;
     /* stop previous timer, if any */
@@ -1064,6 +1138,9 @@ export async function attach_fig_transform_timeout(figurine) {   // timeout.c:12
     await start_timer(i, TIMER.OBJECT, FIG_TRANSFORM, obj_to_any(figurine));
 }
 /* give a fumble message */
+/**
+ * @returns {Promise<void>}
+ */
 async function slip_or_trip() {   // timeout.c:1222
     let otmp = null, otmp2 = null, saddle = null, what = null, buf = new Int8Array(256), on_foot = 0, ice_only = 0, $t1;
     otmp = svl.level.objects[u.ux][u.uy];
@@ -1161,6 +1238,11 @@ async function slip_or_trip() {   // timeout.c:1222
     }
 }
 /* Print a lamp flicker message with tailer.  Only called if seen. */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$c.Ptr | null} tailer const char *
+ * @returns {Promise<void>}
+ */
 async function see_lamp_flicker(obj, tailer) {   // timeout.c:1345
     switch (obj.where) {
         case OBJ.INVENT:
@@ -1173,6 +1255,10 @@ async function see_lamp_flicker(obj, tailer) {   // timeout.c:1345
     }
 }
 /* Print a dimming message for brass lanterns.  Only called if seen. */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function lantern_message(obj) {   // timeout.c:1360
     /* from adventure */
     switch (obj.where) {
@@ -1193,6 +1279,11 @@ async function lantern_message(obj) {   // timeout.c:1360
 /*
  * Timeout callback for objects that are burning. E.g. lamps, candles.
  * See begin_burn() for meanings of obj->age and obj->spe.
+ */
+/**
+ * @param {$T.any | null} arg anything *
+ * @param {number | bigint} timeout long
+ * @returns {Promise<void>}
  */
 export async function burn_object(arg, timeout) {   // timeout.c:1383
     let obj = null, canseeit = 0, many = 0, menorah = 0, need_newsym = 0, need_invupdate = 0, bytouch = 0, x = Int16Array.of(0), y = Int16Array.of(0), whose = new Int8Array(256), how_long = 0, mtmp = null, onfloor = 0, $t1, $t2;
@@ -1488,6 +1579,11 @@ export async function burn_object(arg, timeout) {   // timeout.c:1383
  *
  * This is a "silent" routine - it should not print anything out.
  */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} already_lit boolean
+ * @returns {Promise<void>}
+ */
 export async function begin_burn(obj, already_lit) {   // timeout.c:1712
     let radius = 0, turns = 0, do_timer = 0, x = Int16Array.of(0), y = Int16Array.of(0);
     radius = 3;
@@ -1575,6 +1671,11 @@ export async function begin_burn(obj, already_lit) {   // timeout.c:1712
  * Stop a burn timeout on the given object if timer attached.  Darken
  * light source.
  */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} timer_attached boolean
+ * @returns {Promise<void>}
+ */
 export async function end_burn(obj, timer_attached) {   // timeout.c:1804
     if (!obj.lamplit) {
         await impossible($c.lit("end_burn: obj %s not lit"), await xname(obj));
@@ -1597,6 +1698,11 @@ export async function end_burn(obj, timer_attached) {   // timeout.c:1804
 /*
  * Cleanup a burning object if timer stopped.
  */
+/**
+ * @param {$T.any | null} arg anything *
+ * @param {number | bigint} expire_time long
+ * @returns {Promise<void>}
+ */
 async function cleanup_burn(arg, expire_time) {   // timeout.c:1828
     let obj = null;
     obj = arg.a_obj;
@@ -1612,6 +1718,9 @@ async function cleanup_burn(arg, expire_time) {   // timeout.c:1828
         await update_inventory();
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function do_storms() {   // timeout.c:1847
     let nstrike = 0, x = 0, y = 0, dirx = 0, diry = 0, count = 0;
     /* no lightning if not stormy level or too often, even then */
@@ -1651,6 +1760,10 @@ export async function do_storms() {   // timeout.c:1847
         await You_hear($c.lit("a rumbling noise."));
     }
 }
+/**
+ * @param {number} kind short
+ * @returns {Promise<$c.Ptr | null>} const char *
+ */
 async function kind_name(kind) {   // timeout.c:1995
     switch (kind) {
         case TIMER.NONE:
@@ -1667,6 +1780,11 @@ async function kind_name(kind) {   // timeout.c:1995
     }
     return $c.lit("unknown");
 }
+/**
+ * @param {number} win winid
+ * @param {$T.fe | null} base timer_element *
+ * @returns {Promise<void>}
+ */
 async function print_queue(win, base) {   // timeout.c:2014
     let curr = null, buf = new Int8Array(256);
     if (!base) {
@@ -1680,6 +1798,9 @@ async function print_queue(win, base) {   // timeout.c:2014
     }
 }
 /* the #timeout command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_timeout_queue() {   // timeout.c:2041
     let win = 0, buf = new Int8Array(256), propname = null, intrinsic = 0, i = 0, p = 0, count = 0, longestlen = 0, ln = 0, specindx = 0;
     specindx = 0;
@@ -1758,6 +1879,9 @@ export async function wiz_timeout_queue() {   // timeout.c:2041
     await destroy_nhwindow()(win);
     return ECMD.OK;
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function timer_sanity_check() {   // timeout.c:2130
     let curr = null, t_id = 0, x = Int16Array.of(0), y = Int16Array.of(0), obj = null, top = null, obj_adr = null, owhere = 0, lwhere = 0;
     for (curr = gt.timer_base; curr; curr = curr.next) {
@@ -1833,6 +1957,9 @@ export async function timer_sanity_check() {   // timeout.c:2130
  * Pick off timeout elements from the global queue and call their functions.
  * Do this until their time is less than or equal to the move count.
  */
+/**
+ * @returns {Promise<void>}
+ */
 export async function run_timers() {   // timeout.c:2222
     let curr = null;
     /*
@@ -1853,6 +1980,13 @@ export async function run_timers() {   // timeout.c:2222
 }
 /*
  * Start a timer.  Return TRUE if successful.
+ */
+/**
+ * @param {number | bigint} when long
+ * @param {number} kind short
+ * @param {number} func_index short
+ * @param {$T.any | null} arg anything *
+ * @returns {Promise<number>} boolean
  */
 export async function start_timer(when, kind, func_index, arg) {   // timeout.c:2247
     let gnu = null, dup = null, idbuf = new Int8Array(128), $t1, $t2;
@@ -1889,6 +2023,11 @@ export async function start_timer(when, kind, func_index, arg) {   // timeout.c:
  * Remove the timer from the current list and free it up.  Return the time
  * remaining until it would have gone off, 0 if not found.
  */
+/**
+ * @param {number} func_index short
+ * @param {$T.any | null} arg anything *
+ * @returns {Promise<number | bigint>} long
+ */
 export async function stop_timer(func_index, arg) {   // timeout.c:2299
     let cleanup_func = null, doomed = null, timeout = 0;
     doomed = remove_timer(new $c.FieldRef(gt, "timer_base", "ptr"), func_index, arg);
@@ -1909,6 +2048,11 @@ export async function stop_timer(func_index, arg) {   // timeout.c:2299
 /*
  * Find the timeout of specified timer; return 0 if none.
  */
+/**
+ * @param {number} type short
+ * @param {$T.any | null} arg anything *
+ * @returns {number | bigint} long
+ */
 export function peek_timer(type, arg) {   // timeout.c:2324
     let curr = null;
     for (curr = gt.timer_base; curr; curr = curr.next) {
@@ -1920,6 +2064,11 @@ export function peek_timer(type, arg) {   // timeout.c:2324
 }
 /*
  * Move all object timers from src to dest, leaving src untimed.
+ */
+/**
+ * @param {$T.obj | null} src struct obj *
+ * @param {$T.obj | null} dest struct obj *
+ * @returns {Promise<void>}
  */
 export async function obj_move_timers(src, dest) {   // timeout.c:2339
     let count = 0, curr = null;
@@ -1938,6 +2087,11 @@ export async function obj_move_timers(src, dest) {   // timeout.c:2339
 /*
  * Find all object timers and duplicate them for the new object "dest".
  */
+/**
+ * @param {$T.obj | null} src struct obj *
+ * @param {$T.obj | null} dest struct obj *
+ * @returns {Promise<void>}
+ */
 export async function obj_split_timers(src, dest) {   // timeout.c:2359
     let curr = null, next_timer = null;
     next_timer = null;
@@ -1951,6 +2105,10 @@ export async function obj_split_timers(src, dest) {   // timeout.c:2359
 /*
  * Stop all timers attached to this object.  We can get away with this because
  * all object pointers are unique.
+ */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
  */
 export async function obj_stop_timers(obj) {   // timeout.c:2377
     let cleanup_func = null, curr = null, prev = null, next_timer = null;
@@ -1977,6 +2135,11 @@ export async function obj_stop_timers(obj) {   // timeout.c:2377
 /*
  * Check whether object has a timer of type timer_type.
  */
+/**
+ * @param {$T.obj | null} object struct obj *
+ * @param {number} timer_type short
+ * @returns {number} boolean
+ */
 export function obj_has_timer(object, timer_type) {   // timeout.c:2404
     let timeout = 0;
     timeout = peek_timer(timer_type, obj_to_any(object));
@@ -1985,6 +2148,12 @@ export function obj_has_timer(object, timer_type) {   // timeout.c:2404
 /*
  * Stop all timers of index func_index at this spot.
  *
+ */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} func_index short
+ * @returns {Promise<void>}
  */
 export async function spot_stop_timers(x, y, func_index) {   // timeout.c:2416
     let cleanup_func = null, curr = null, prev = null, next_timer = null, where = 0;
@@ -2012,6 +2181,12 @@ export async function spot_stop_timers(x, y, func_index) {   // timeout.c:2416
  * When is the spot timer of type func_index going to expire?
  * Returns 0L if no such timer.
  */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} func_index short
+ * @returns {number | bigint} long
+ */
 export function spot_time_expires(x, y, func_index) {   // timeout.c:2445
     let curr = null, where = 0;
     where = $c.or64($c.shl64(x, 16), y);
@@ -2022,12 +2197,21 @@ export function spot_time_expires(x, y, func_index) {   // timeout.c:2445
     }
     return 0;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} func_index short
+ * @returns {number | bigint} long
+ */
 export function spot_time_left(x, y, func_index) {   // timeout.c:2459
     let expires = 0;
     expires = spot_time_expires(x, y, func_index);
     return expires > 0 ? $c.sub64(expires, svm.moves) : 0;
 }
 /* Insert timer into the global queue */
+/**
+ * @param {$T.fe | null} gnu timer_element *
+ */
 function insert_timer(gnu) {   // timeout.c:2467
     let curr = null, prev = null;
     for (prev = null, curr = gt.timer_base; curr; prev = curr, curr = curr.next) {
@@ -2042,6 +2226,12 @@ function insert_timer(gnu) {   // timeout.c:2467
         gt.timer_base = gnu;
     }
 }
+/**
+ * @param {*} base timer_element **
+ * @param {number} func_index short
+ * @param {$T.any | null} arg anything *
+ * @returns {$T.fe | null} timer_element *
+ */
 function remove_timer(base, func_index, arg) {   // timeout.c:2483
     let prev = null, curr = null;
     for (prev = null, curr = base.get(0); curr; prev = curr, curr = curr.next) {
@@ -2058,6 +2248,11 @@ function remove_timer(base, func_index, arg) {   // timeout.c:2483
     }
     return curr;
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @param {$T.fe | null} timer timer_element *
+ * @returns {Promise<void>}
+ */
 async function write_timer(nhfp, timer) {   // timeout.c:2505
     let arg_save = new $T.any();
     arg_save.$copyFrom(cg.zeroany);
@@ -2104,6 +2299,10 @@ async function write_timer(nhfp, timer) {   // timeout.c:2505
  * Return TRUE if the object will stay on the level when the level is
  * saved.
  */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} boolean
+ */
 export async function obj_is_local(obj) {   // timeout.c:2560
     switch (obj.where) {
         case OBJ.INVENT:
@@ -2125,6 +2324,10 @@ export async function obj_is_local(obj) {   // timeout.c:2560
  * Return TRUE if the given monster will stay on the level when the
  * level is saved.
  */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {number} boolean
+ */
 function mon_is_local(mon) {   // timeout.c:2584
     let curr = null;
     for (curr = gm.migrating_mons; curr; curr = curr.nmon) {
@@ -2144,6 +2347,10 @@ function mon_is_local(mon) {   // timeout.c:2584
  * Return TRUE if the timer is attached to something that will stay on the
  * level when the level is saved.
  */
+/**
+ * @param {$T.fe | null} timer timer_element *
+ * @returns {Promise<number>} boolean
+ */
 async function timer_is_local(timer) {   // timeout.c:2603
     switch (timer.kind) {
         case TIMER.LEVEL:
@@ -2162,6 +2369,12 @@ async function timer_is_local(timer) {   // timeout.c:2603
 /*
  * Part of the save routine.  Count up the number of timers that would
  * be written.  If write_it is true, actually write the timer.
+ */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @param {number} range int
+ * @param {number} write_it boolean
+ * @returns {Promise<number>} int
  */
 async function maybe_write_timer(nhfp, range, write_it) {   // timeout.c:2627
     let count = 0, curr = null;
@@ -2200,6 +2413,11 @@ async function maybe_write_timer(nhfp, range, write_it) {   // timeout.c:2627
  *      + timeouts that are level-specific (e.g. storms)
  *      + timeouts that stay with the level (obj & monst)
  */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @param {number} range int
+ * @returns {Promise<void>}
+ */
 export async function save_timers(nhfp, range) {   // timeout.c:2668
     let curr = null, prev = null, next_timer = null, count = Int32Array.of(0);
     next_timer = null;
@@ -2234,6 +2452,12 @@ export async function save_timers(nhfp, range) {   // timeout.c:2668
  * Pull in the structures from disk, but don't recalculate the object and
  * monster pointers.
  */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @param {number} range int
+ * @param {number | bigint} adjust long
+ * @returns {Promise<void>}
+ */
 export async function restore_timers(nhfp, range, adjust) {   // timeout.c:2707
     let count = Int32Array.of(0), curr = null, ghostly = 0, $t1;
     count[0] = 0;
@@ -2253,6 +2477,12 @@ export async function restore_timers(nhfp, range, adjust) {   // timeout.c:2707
     }
 }
 /* to support '#stats' wizard-mode command */
+/**
+ * @param {$c.Ptr | null} hdrfmt const char *
+ * @param {$c.Ptr | null} hdrbuf char *
+ * @param {*} count long *
+ * @param {*} size long *
+ */
 export function timer_stats(hdrfmt, hdrbuf, count, size) {   // timeout.c:2735
     let te = null, $t1;
     $c.sprintf(hdrbuf, hdrfmt, 48);
@@ -2263,6 +2493,10 @@ export function timer_stats(hdrfmt, hdrbuf, count, size) {   // timeout.c:2735
     }
 }
 /* reset all timers that are marked for resetting */
+/**
+ * @param {number} ghostly boolean
+ * @returns {Promise<void>}
+ */
 export async function relink_timers(ghostly) {   // timeout.c:2751
     let curr = null, nid = Uint32Array.of(0), $t1;
     for (curr = gt.timer_base; curr; curr = curr.next) {

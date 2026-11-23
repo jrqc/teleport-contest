@@ -50,6 +50,10 @@ import { luaT_init } from './ltm.js';
 ** Rely on Address Space Layout Randomization (if present) and
 ** current time.
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {number} unsigned int
+ */
 function luai_makeseed(L) {   // lstate.c:71
     let p = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(56);
@@ -79,6 +83,10 @@ function luai_makeseed(L) {   // lstate.c:71
 ** set GCdebt to a new value keeping the value (totalbytes + GCdebt)
 ** invariant (and avoiding underflows in 'totalbytes')
 */
+/**
+ * @param {number} g global_State *
+ * @param {number | bigint} debt l_mem
+ */
 export function luaE_setdebt(g, debt) {   // lstate.c:89
     let tb = 0;
     tb = $c.i64($c.u64($c.add64($h.ld64(g + 16), $h.ld64(g + 24))));
@@ -89,11 +97,20 @@ export function luaE_setdebt(g, debt) {   // lstate.c:89
     $h.st64(g + 16, $c.sub64(tb, debt));
     $h.st64(g + 24, debt);
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} limit unsigned int
+ * @returns {number} int
+ */
 export function lua_setcstacklimit(L, limit) {   // lstate.c:99
     L;
     limit;
     return 200;   /* warning?? */
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} CallInfo *
+ */
 export async function luaE_extendCI(L) {   // lstate.c:105
     let ci = 0;
     0;
@@ -109,6 +126,10 @@ export async function luaE_extendCI(L) {   // lstate.c:105
 /*
 ** free all CallInfo structures not in use by a thread
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<void>}
+ */
 async function freeCI(L) {   // lstate.c:122
     let ci = 0, next = 0;
     ci = $h.u32[(L + 32) >>> 2];
@@ -124,6 +145,10 @@ async function freeCI(L) {   // lstate.c:122
 ** free half of the CallInfo structures not in use by a thread,
 ** keeping the first one.
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<void>}
+ */
 export async function luaE_shrinkCI(L) {   // lstate.c:138
     let ci = 0, next = 0, next2 = 0;
     ci = $h.u32[($h.u32[(L + 32) >>> 2] + 24) >>> 2];   /* first free CallInfo */
@@ -151,6 +176,10 @@ export async function luaE_shrinkCI(L) {   // lstate.c:138
 ** not much larger, does not report an error (to allow overflow
 ** handling to work).
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<void>}
+ */
 export async function luaE_checkcstack(L) {   // lstate.c:165
     if (($h.u32[(L + 176) >>> 2] & 65535) >>> 0 === 200) {
         await luaG_runerror(L, $h.lit("C stack overflow"));
@@ -158,12 +187,21 @@ export async function luaE_checkcstack(L) {   // lstate.c:165
         await luaD_errerr(L);   /* error while handling stack error */
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<void>}
+ */
 export async function luaE_incCstack(L) {   // lstate.c:173
     $h.u32[(L + 176) >>> 2] = $h.u32[(L + 176) >>> 2] + 1 >>> 0;
     if ((($h.u32[(L + 176) >>> 2] & 65535) >>> 0 >= 200 ? 1 : 0) !== 0 ? 1 : 0) {
         await luaE_checkcstack(L);
     }
 }
+/**
+ * @param {number} L1 lua_State *
+ * @param {number} L lua_State *
+ * @returns {Promise<void>}
+ */
 async function stack_init(L1, L) {   // lstate.c:180
     let i = 0, ci = 0, $t1, $t2;
     /* initialize stack array */
@@ -186,6 +224,10 @@ async function stack_init(L1, L) {   // lstate.c:180
     $h.stp(ci + 8, $h.u32[(L1 + 16) >>> 2] + 320);
     $h.stp(L1 + 32, ci);
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<void>}
+ */
 async function freestack(L) {   // lstate.c:203
     if ($h.u32[(L + 48) >>> 2] === 0) {
         return;   /* stack not completely built yet */
@@ -198,6 +240,11 @@ async function freestack(L) {   // lstate.c:203
 /*
 ** Create registry table and its predefined values
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} g global_State *
+ * @returns {Promise<void>}
+ */
 async function init_registry(L, g) {   // lstate.c:216
     let registry = 0, io = 0, x_ = 0, io$2 = 0, x_$2 = 0, io$3 = 0, x_$3 = 0;
     /* create registry */
@@ -230,6 +277,11 @@ async function init_registry(L, g) {   // lstate.c:216
 /*
 ** open parts of the state that may cause memory-allocation errors.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} ud void *
+ * @returns {Promise<void>}
+ */
 async function f_luaopen(L, ud) {   // lstate.c:231
     let g = 0;
     g = $h.u32[(L + 24) >>> 2];
@@ -247,6 +299,10 @@ async function f_luaopen(L, ud) {   // lstate.c:231
 ** preinitialize a thread with consistent values without allocating
 ** any memory (to avoid errors)
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} g global_State *
+ */
 function preinit_thread(L, g) {   // lstate.c:249
     $h.stp(L + 24, g);
     $h.stp(L + 48, 0);
@@ -265,6 +321,10 @@ function preinit_thread(L, g) {   // lstate.c:249
     $h.st64(L + 168, 0);
     $h.i32[(L + 180) >>> 2] = 0;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<void>}
+ */
 async function close_state(L) {   // lstate.c:269
     let g = 0;
     g = $h.u32[(L + 24) >>> 2];
@@ -284,6 +344,10 @@ async function close_state(L) {   // lstate.c:269
     0;
     await $h.fnAt($h.u32[g >>> 2])($h.u32[(g + 8) >>> 2], L + -$c.idx(8), 1624, 0);   /* free main block */
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} lua_State *
+ */
 export async function lua_newthread(L) {   // lstate.c:288
     let g = 0, o = 0, L1 = 0, io = 0, x_ = 0;
     g = $h.u32[(L + 24) >>> 2];
@@ -323,6 +387,11 @@ export async function lua_newthread(L) {   // lstate.c:288
     0;
     return L1;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} L1 lua_State *
+ * @returns {Promise<void>}
+ */
 export async function luaE_freethread(L, L1) {   // lstate.c:315
     let l = 0;
     l = L1 + -$c.idx(8);
@@ -332,6 +401,11 @@ export async function luaE_freethread(L, L1) {   // lstate.c:315
     await freestack(L1);
     await luaM_free_(L, l, 208);
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} status int
+ * @returns {Promise<number>} int
+ */
 export async function luaE_resetthread(L, status) {   // lstate.c:325
     let ci = 0;
     ci = $h.stp(L + 32, L + 96);   /* unwind CallInfo list */
@@ -353,6 +427,11 @@ export async function luaE_resetthread(L, status) {   // lstate.c:325
     await luaD_reallocstack(L, $c.i32(($h.u32[(ci + 8) >>> 2] - $h.u32[(L + 48) >>> 2]) / 16), 0);
     return status;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} from lua_State *
+ * @returns {Promise<number>} int
+ */
 export async function lua_closethread(L, from) {   // lstate.c:345
     let status = 0;
     0;
@@ -364,9 +443,18 @@ export async function lua_closethread(L, from) {   // lstate.c:345
 /*
 ** Deprecated! Use 'lua_closethread' instead.
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 export async function lua_resetthread(L) {   // lstate.c:358
     return await lua_closethread(L, 0);
 }
+/**
+ * @param {number} f lua_Alloc
+ * @param {number} ud void *
+ * @returns {Promise<number>} lua_State *
+ */
 export async function lua_newstate(f, ud) {   // lstate.c:363
     let i = 0, L = 0, g = 0, l = 0, io = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12;
     l = await $h.fnAt(f)(ud, 0, 8, 1624);
@@ -427,11 +515,20 @@ export async function lua_newstate(f, ud) {   // lstate.c:363
     }
     return L;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<void>}
+ */
 export async function lua_close(L) {   // lstate.c:419
     0;
     L = $h.u32[($h.u32[(L + 24) >>> 2] + 264) >>> 2];   /* only the main thread can be closed */
     await close_state(L);
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} msg const char *
+ * @param {number} tocont int
+ */
 export function luaE_warning(L, msg, tocont) {   // lstate.c:426
     let wf = 0;
     wf = $h.u32[($h.u32[(L + 24) >>> 2] + 1400) >>> 2];
@@ -442,6 +539,10 @@ export function luaE_warning(L, msg, tocont) {   // lstate.c:426
 /*
 ** Generate a warning from an error message
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} where const char *
+ */
 export function luaE_warnerror(L, where) {   // lstate.c:436
     let errobj = 0, msg = 0;
     errobj = $h.u32[(L + 16) >>> 2] - 16;   /* error object */

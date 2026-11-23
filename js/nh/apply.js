@@ -133,6 +133,10 @@ const not_enough_room = new Int8Array(42);
 const where_to_hit = new Int8Array(26);
 const cant_see_spot = new Int8Array(47);
 const cant_reach = new Int8Array(33);
+/**
+ * @param {$T.obj | null} obj$in struct obj *
+ * @returns {Promise<void>}
+ */
 export async function do_blinding_ray(obj$in) {   // apply.c:61
     const obj = [obj$in];
     let mtmp = null;
@@ -148,6 +152,10 @@ export async function do_blinding_ray(obj$in) {   // apply.c:61
        to be deferred until after flash_hits_mon() */
     await transient_light_cleanup();
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function use_camera(obj) {   // apply.c:79
     if (Underwater()) {
         await pline($c.lit("Using your camera underwater would void the warranty."));
@@ -175,6 +183,10 @@ async function use_camera(obj) {   // apply.c:79
     }
     return ECMD.TIME;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function use_towel(obj) {   // apply.c:112
     let drying_feedback = 0, old = 0, what = null, saved_ublindf = null, $t1;
     drying_feedback = $c.i8($c.peq(obj, $G.uwep) ? 1 : 0);
@@ -247,6 +259,12 @@ async function use_towel(obj) {   // apply.c:112
     return ECMD.OK;
 }
 /* maybe give a stethoscope message based on floor objects */
+/**
+ * @param {number} rx coordxy
+ * @param {number} ry coordxy
+ * @param {*} resp int *
+ * @returns {Promise<number>} boolean
+ */
 async function its_dead(rx, ry, resp) {   // apply.c:198
     let buf = new Int8Array(256), more_corpses = 0, mptr = null, corpse = null, statue = null, gndr = 0, mtmp = null, here = 0, one = 0, reviver = 0, visglyph = 0, corpseglyph = 0, what = null, how = null, ttmp = null, $t1, $t2;
     corpse = sobj_at(CORPSE, rx, ry);
@@ -354,6 +372,10 @@ async function its_dead(rx, ry, resp) {   // apply.c:198
    not take any time; however, unless it did, the stethoscope would be
    almost useless.  As a compromise, one use per turn is free, another
    uses up the turn; this makes curse status have a tangible effect. */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function use_stethoscope(obj) {   // apply.c:318
     let mtmp = null, lev = null, res = Int32Array.of(0), rx = 0, ry = 0, interference = 0, mnm = null, what = null, use_plural = 0, dummyobj = new $T.obj(), odummy = null;
     interference = $c.i8(u.uswallow | 0 && is_whirly(u.ustuck.data) && !rn2(gu.urole.mnum === PM.HEALER ? 10 : 3) ? 1 : 0);
@@ -490,6 +512,10 @@ async function use_stethoscope(obj) {   // apply.c:318
     }
     return res[0];
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function use_whistle(obj) {   // apply.c:476
     if (!can_blow(gy.youmonst)) {
         await You($c.lit("are incapable of using the whistle."));
@@ -507,6 +533,10 @@ async function use_whistle(obj) {   // apply.c:476
         }
     }
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function use_magic_whistle(obj) {   // apply.c:495
     if (!can_blow(gy.youmonst)) {
         await You($c.lit("are incapable of using the whistle."));
@@ -523,6 +553,10 @@ async function use_magic_whistle(obj) {   // apply.c:495
     }
 }
 /* 'obj' is assumed to be a magic whistle */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function magic_whistled(obj) {   // apply.c:518
     let mtmp = null, nextmon = null, buf = new Int8Array(256), mnam = null, shiftbuf = new Int8Array(272), appearbuf = new Int8Array(264), disappearbuf = new Int8Array(267), oseen = 0, nseen = 0, already_discovered = 0, omx = 0, omy = 0, shift = 0, appear = 0, disappear = 0, trapped = 0, $t1, $t2;
     mnam = null;
@@ -686,9 +720,18 @@ async function magic_whistled(obj) {   // apply.c:518
     }
     return;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} n xint16
+ * @returns {number} boolean
+ */
 export function um_dist(x, y, n) {   // apply.c:692
     return $c.i8($c.abs(u.ux - x | 0) > n || $c.abs(u.uy - y | 0) > n ? 1 : 0);
 }
+/**
+ * @returns {number} int
+ */
 export function number_leashed() {   // apply.c:698
     let i = 0, obj = null;
     i = 0;
@@ -700,6 +743,10 @@ export function number_leashed() {   // apply.c:698
     return i;
 }
 /* otmp is about to be destroyed or stolen */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 export async function o_unleash(otmp) {   // apply.c:711
     let mtmp = null;
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
@@ -712,6 +759,11 @@ export async function o_unleash(otmp) {   // apply.c:711
     await update_inventory();
 }
 /* mtmp is about to die, or become untame */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} feedback boolean
+ * @returns {Promise<void>}
+ */
 export async function m_unleash(mtmp, feedback) {   // apply.c:726
     let otmp = null;
     if (feedback) {
@@ -739,9 +791,17 @@ export function unleash_all() {   // apply.c:746
         mtmp.mleashed = (0) & 1;
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number} boolean
+ */
 export function leashable(mtmp) {   // apply.c:761
     return $c.i8(mtmp.mnum !== PM.LONG_WORM && !unsolid(mtmp.data) && (!nolimbs(mtmp.data) || has_head(mtmp.data)) ? 1 : 0);
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function use_leash(obj) {   // apply.c:769
     let cc = new $T.nhcoord(), mtmp = null;
     if (u.uswallow) {
@@ -780,6 +840,13 @@ async function use_leash(obj) {   // apply.c:769
     await use_leash_core(obj, mtmp, cc, canspotmon(mtmp));
     return ECMD.TIME;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.nhcoord | null} cc coord *
+ * @param {number} spotmon int
+ * @returns {Promise<void>}
+ */
 async function use_leash_core(obj, mtmp, cc, spotmon) {   // apply.c:821
     let lmonbuf = new Int8Array(256), lmonnam = null;
     if (!spotmon && !(svl.level.locations[cc.x][cc.y].glyph === GLYPH_INVISIBLE)) {
@@ -829,6 +896,10 @@ async function use_leash_core(obj, mtmp, cc, spotmon) {   // apply.c:821
     }
 }
 /* assuming mtmp->mleashed has been checked */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {$T.obj | null} struct obj *
+ */
 export function get_mleash(mtmp) {   // apply.c:880
     let otmp = null;
     for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
@@ -838,6 +909,10 @@ export function get_mleash(mtmp) {   // apply.c:880
     }
     return otmp;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} boolean
+ */
 async function mleashed_next2u(mtmp) {   // apply.c:891
     let otmp = null;
     if (mtmp.mleashed) {
@@ -861,6 +936,9 @@ async function mleashed_next2u(mtmp) {   // apply.c:891
     }
     return FALSE;
 }
+/**
+ * @returns {Promise<number>} boolean
+ */
 export async function next_to_u() {   // apply.c:919
     if (await get_iter_mons(mleashed_next2u)) {
         return FALSE;
@@ -871,6 +949,11 @@ export async function next_to_u() {   // apply.c:919
     }
     return TRUE;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function check_leash(x, y) {   // apply.c:931
     let otmp = null, mtmp = null, save_pacifism = 0, $t1;
     for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
@@ -932,6 +1015,9 @@ export async function check_leash(x, y) {   // apply.c:931
 }
 /* charisma is supposed to include qualities like leadership and personal
    magnetism rather than just appearance, but it has devolved to this... */
+/**
+ * @returns {$c.Ptr | null} const char *
+ */
 export function beautiful() {   // apply.c:997
     let res = null, cha = 0;
     cha = ACURR(A.CHA);
@@ -941,6 +1027,10 @@ export function beautiful() {   // apply.c:997
     res = cha >= 25 ? $c.lit("sublime") : cha >= 19 ? $c.lit("splendorous") : cha >= 16 ? poly_gender() === 1 ? $c.lit("beautiful") : $c.lit("handsome") : cha >= 14 ? poly_gender() === 1 ? $c.lit("winsome") : $c.lit("amiable") : cha >= 11 ? $c.lit("cute") : cha >= 9 ? $c.lit("plain") : cha >= 6 ? $c.lit("homely") : cha >= 4 ? $c.lit("ugly") : $c.lit("hideous");   /* 3 is the minimum possible */
     return res;
 }
+/**
+ * @param {$T.obj | null} obj$in struct obj *
+ * @returns {Promise<number>} int
+ */
 async function use_mirror(obj$in) {   // apply.c:1018
     const obj = [obj$in];
     let mirror = null, uvisage = null, mtmp = null, how_seen = 0, mlet = 0, vis = 0, invis_mirror = 0, useeit = 0, monable = 0, tmp = 0, buf = new Int8Array(256), do_react = 0;
@@ -1117,6 +1207,10 @@ async function use_mirror(obj$in) {   // apply.c:1018
     }
     return ECMD.TIME;
 }
+/**
+ * @param {*} optr struct obj **
+ * @returns {Promise<void>}
+ */
 async function use_bell(optr) {   // apply.c:1202
     let obj = null, mtmp = null, wakem = 0, learno = 0, ordinary = 0, invoking = 0, mm = new $T.nhcoord(), res = 0;
     obj = optr.get(0);
@@ -1215,6 +1309,10 @@ async function use_bell(optr) {   // apply.c:1202
         await wake_nearby(TRUE);
     }
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function use_candelabrum(obj) {   // apply.c:1319
     let s = null, otmp = null;
     s = obj.spe !== 1 ? $c.lit("candles") : $c.lit("candle");
@@ -1278,6 +1376,10 @@ async function use_candelabrum(obj) {   // apply.c:1319
     }
     await begin_burn(obj, FALSE);
 }
+/**
+ * @param {*} optr struct obj **
+ * @returns {Promise<void>}
+ */
 async function use_candle(optr) {   // apply.c:1387
     let obj = null, otmp = null, s = null, qbuf = new Int8Array(128), qsfx = new Int8Array(128), q = null, was_lamplit = 0, shkp = null, $t1;
     obj = optr.get(0);
@@ -1351,6 +1453,10 @@ async function use_candle(optr) {   // apply.c:1387
     }
 }
 /* call in drop, throw, and put in box, etc. */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} boolean
+ */
 export async function snuff_candle(otmp) {   // apply.c:1472
     let candle = 0, buf = new Int8Array(256), x = Int16Array.of(0), y = Int16Array.of(0), many = 0;
     candle = $c.i8(Is_candle(otmp));
@@ -1368,6 +1474,10 @@ export async function snuff_candle(otmp) {   // apply.c:1472
 /* called when lit lamp is hit by water or put into a container or
    you've been swallowed by a monster; obj might be in transit while
    being thrown or dropped so don't assume that its location is valid */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} boolean
+ */
 export async function snuff_lit(obj) {   // apply.c:1497
     let x = Int16Array.of(0), y = Int16Array.of(0);
     if (obj.lamplit) {
@@ -1386,6 +1496,10 @@ export async function snuff_lit(obj) {   // apply.c:1497
     return FALSE;
 }
 /* called when lit object is hit by water */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} boolean
+ */
 export async function splash_lit(obj) {   // apply.c:1518
     let result = 0, dunk = 0, mtmp = null, useeit = 0, uhearit = 0, snuff = 0, x = Int16Array.of(0), y = Int16Array.of(0);
     dunk = FALSE;
@@ -1432,6 +1546,10 @@ export async function splash_lit(obj) {   // apply.c:1518
 }
 /* Called when potentially lightable object is affected by fire_damage().
    Return TRUE if object becomes lit and FALSE otherwise --ALI */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} boolean
+ */
 export async function catch_lit(obj) {   // apply.c:1577
     let x = Int16Array.of(0), y = Int16Array.of(0), shkp = null;
     if (!obj.lamplit && ignitable(obj) && get_obj_location(obj, new $c.Ptr(x, 0), new $c.Ptr(y, 0), 0)) {
@@ -1473,6 +1591,10 @@ export async function catch_lit(obj) {   // apply.c:1577
     return FALSE;
 }
 /* light a lamp or candle */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function use_lamp(obj) {   // apply.c:1628
     let buf = new Int8Array(256), lamp = null, ithem = null, shkp = null;
     lamp = obj.otyp === OIL_LAMP || obj.otyp === MAGIC_LAMP ? $c.lit("lamp") : obj.otyp === BRASS_LANTERN ? $c.lit("lantern") : null;
@@ -1534,6 +1656,10 @@ async function use_lamp(obj) {   // apply.c:1628
         await begin_burn(obj, FALSE);
     }
 }
+/**
+ * @param {*} optr struct obj **
+ * @returns {Promise<void>}
+ */
 async function light_cocktail(optr) {   // apply.c:1703
     let obj = null, buf = new Int8Array(256), split1off = 0, shkp = null, $t1;
     obj = optr.get(0);   /* obj is a potion of oil */
@@ -1588,6 +1714,10 @@ async function light_cocktail(optr) {   // apply.c:1703
 }
 /* getobj callback for object to be rubbed - not selecting a secondary object
    to rub on a gray stone or rub jelly on */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 function rub_ok(obj) {   // apply.c:1770
     if (!obj) {
         return GETOBJ.EXCLUDE;
@@ -1598,6 +1728,9 @@ function rub_ok(obj) {   // apply.c:1770
     return GETOBJ.EXCLUDE;
 }
 /* the #rub command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dorub() {   // apply.c:1785
     let obj = [null], $t1;
     if (nohands(gy.youmonst.data)) {
@@ -1659,11 +1792,20 @@ export async function dorub() {   // apply.c:1785
     return ECMD.TIME;
 }
 /* the #jump command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dojump() {   // apply.c:1847
     /* Physical jump */
     return await jump(0);
 }
 /* callback routine for walk_path() */
+/**
+ * @param {*} arg void *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 function check_jump(arg, x, y) {   // apply.c:1862
     let traj = 0, lev = null;
     traj = $c.asArr(arg, Int32Array).get(0);
@@ -1695,6 +1837,13 @@ function check_jump(arg, x, y) {   // apply.c:1862
     }
     return TRUE;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} magic int
+ * @param {number} showmsg boolean
+ * @returns {Promise<number>} boolean
+ */
 async function is_valid_jump_pos(x, y, magic, showmsg) {   // apply.c:1893
     let uc = new $T.nhcoord(), tc = new $T.nhcoord(), lev = null, diag = 0, traj = Int32Array.of(0), dx = 0, dy = 0, ax = 0, ay = 0;
     if (!magic && !$c.and64(u.uprops[JUMPING].intrinsic, ~INTRINSIC) && !EJumping() && distu(x, y) !== 5) {
@@ -1760,9 +1909,18 @@ async function is_valid_jump_pos(x, y, magic, showmsg) {   // apply.c:1893
     }
     return TRUE;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} boolean
+ */
 async function get_valid_jump_position(x, y) {   // apply.c:1959
     return $c.i8(isok(x, y) && (svl.level.locations[x][y].typ >= DOOR || Passes_walls()) && await is_valid_jump_pos(x, y, gj.jumping_is_magic, FALSE) ? 1 : 0);
 }
+/**
+ * @param {number} on_off boolean
+ * @returns {Promise<void>}
+ */
 async function display_jump_positions(on_off) {   // apply.c:1967
     let x = 0, y = 0, dx = 0, dy = 0;
     if (on_off) {
@@ -1782,6 +1940,10 @@ async function display_jump_positions(on_off) {   // apply.c:1967
         await tmp_at(DISP_END, 0);
     }
 }
+/**
+ * @param {number} magic int
+ * @returns {Promise<number>} int
+ */
 export async function jump(magic) {   // apply.c:1988
     let cc = new $T.nhcoord(), mtmp = null, uc = new $T.nhcoord(), side = 0, range = Int32Array.of(0), temp = 0, wastrapped = 0, t = null;
     /* 0=Physical, otherwise skill level */
@@ -1946,6 +2108,10 @@ export async function jump(magic) {   // apply.c:1988
         return ECMD.TIME;
     }
 }
+/**
+ * @param {$T.obj | null} corpse struct obj *
+ * @returns {number} boolean
+ */
 export function tinnable(corpse) {   // apply.c:2167
     if (corpse.oeaten) {
         return 0;
@@ -1955,6 +2121,10 @@ export function tinnable(corpse) {   // apply.c:2167
     }
     return 1;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function use_tinning_kit(obj) {   // apply.c:2177
     let corpse = null, can = null, mptr = null, kbuf = new Int8Array(256), corpse_name = null, shkp = null, shkp$2 = null, $t1;
     /* This takes only 1 move.  If this is to be changed to take many
@@ -2022,6 +2192,10 @@ async function use_tinning_kit(obj) {   // apply.c:2177
         await impossible($c.lit("Tinning failed."));
     }
 }
+/**
+ * @param {*} optr struct obj **
+ * @returns {Promise<void>}
+ */
 export async function use_unicorn_horn(optr) {   // apply.c:2259
     let idx = 0, val = 0, val_limit = 0, trouble_count = 0, unfixable_trbl = 0, did_prop = 0, trouble_list = new Int32Array(7), obj = null, lcount = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13, $t14;
     /* number of properties we're dealing with */
@@ -2149,6 +2323,11 @@ export async function use_unicorn_horn(optr) {   // apply.c:2259
 /*
  * Timer callback routine: turn figurine into monster
  */
+/**
+ * @param {$T.any | null} arg anything *
+ * @param {number | bigint} timeout long
+ * @returns {Promise<void>}
+ */
 export async function fig_transform(arg, timeout) {   // apply.c:2398
     let figurine = null, mtmp = null, cc = new $T.nhcoord(), cansee_spot = 0, silent = 0, okay_spot = 0, redraw = 0, suppress_see = 0, monnambuf = new Int8Array(256), carriedby = new Int8Array(256), and_vanish = new Int8Array(256), mshelter = null, mon = null;
     figurine = arg.a_obj;
@@ -2236,6 +2415,12 @@ export async function fig_transform(arg, timeout) {   // apply.c:2398
         await newsym(cc.x, cc.y);
     }
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$T.nhcoord | null} cc coord *
+ * @param {number} quietly boolean
+ * @returns {Promise<number>} boolean
+ */
 async function figurine_location_checks(obj, cc, quietly) {   // apply.c:2511
     let x = 0, y = 0;
     if (carried(obj) && u.uswallow | 0) {
@@ -2266,6 +2451,10 @@ async function figurine_location_checks(obj, cc, quietly) {   // apply.c:2511
     }
     return TRUE;
 }
+/**
+ * @param {*} optr struct obj **
+ * @returns {Promise<number>} int
+ */
 async function use_figurine(optr) {   // apply.c:2544
     let obj = null, x = 0, y = 0, cc = new $T.nhcoord(), $t1;
     obj = optr.get(0);
@@ -2298,6 +2487,10 @@ async function use_figurine(optr) {   // apply.c:2544
     return ECMD.TIME;
 }
 /* getobj callback for object to apply grease to */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function grease_ok(obj) {   // apply.c:2585
     if (!obj) {
         return GETOBJ.SUGGEST;
@@ -2314,6 +2507,10 @@ async function grease_ok(obj) {   // apply.c:2585
      * greased. */
     return GETOBJ.SUGGEST;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function use_grease(obj) {   // apply.c:2604
     let otmp = null, oldglib = 0;
     if (Glib()) {
@@ -2359,6 +2556,10 @@ async function use_grease(obj) {   // apply.c:2604
     return ECMD.TIME;
 }
 /* getobj callback for object to rub on a known touchstone */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 function touchstone_ok(obj) {   // apply.c:2658
     if (!obj) {
         return GETOBJ.EXCLUDE;
@@ -2376,6 +2577,10 @@ function touchstone_ok(obj) {   // apply.c:2658
     return GETOBJ.DOWNPLAY;
 }
 /* touchstones - by Ken Arnold */
+/**
+ * @param {$T.obj | null} tstone struct obj *
+ * @returns {Promise<number>} int
+ */
 async function use_stone(tstone) {   // apply.c:2680
     let obj = null, do_scratch = 0, streak_color = null, stonebuf = new Int8Array(128), oclass = 0, known = 0;
     /* in case it was acquired while blinded */
@@ -2492,6 +2697,10 @@ export function reset_trapset() {   // apply.c:2813
     gt.trapinfo.force_bungle = 0;
 }
 /* Place a landmine/bear trap.  Helge Hafting */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function use_trap(otmp) {   // apply.c:2821
     let ttyp = 0, tmp = 0, what = null, buf = new Int8Array(256), levtyp = 0, occutext = null, stway = null, chance = 0;
     what = null;
@@ -2578,6 +2787,9 @@ async function use_trap(otmp) {   // apply.c:2821
     return;
 }
 /* occupation routine called each turn while arming a beartrap or landmine */
+/**
+ * @returns {Promise<number>} int
+ */
 async function set_trap() {   // apply.c:2916
     let otmp = null, ttmp = null, ttyp = 0;
     otmp = gt.trapinfo.tobj;
@@ -2611,6 +2823,10 @@ async function set_trap() {   // apply.c:2916
     reset_trapset();
     return 0;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function use_whip(obj) {   // apply.c:2955
     let buf = new Int8Array(256), mtmp = null, otmp = null, rx = 0, ry = 0, proficient = 0, res = 0, msg_slipsfree = null, msg_snap = null, dam = 0, wrapped_what = null, cc = new $T.nhcoord(), spotitnow = 0, onambuf = new Int8Array(256), mon_hand = null, gotit = 0, kbuf = new Int8Array(256), do_snap = 0, $goto = null;
     D1: for (;;) {
@@ -2888,6 +3104,10 @@ export async function use_whip(obj) {   // apply.c:2955
     }
 }
 /* find pos of monster in range, if only one monster */
+/**
+ * @param {$T.nhcoord | null} pos coord *
+ * @returns {number} boolean
+ */
 function find_poleable_mon(pos) {   // apply.c:3284
     let mtmp = null, mpos = new $T.nhcoord(), impaired = 0, x = 0, y = 0, lo_x = 0, hi_x = 0, lo_y = 0, hi_y = 0, rt = 0, glyph = 0;
     mpos.$copyFrom(new $T.nhcoord());
@@ -2920,11 +3140,20 @@ function find_poleable_mon(pos) {   // apply.c:3284
     pos.$copyFrom(mpos);
     return TRUE;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 function get_valid_polearm_position(x, y) {   // apply.c:3321
     let glyph = 0;
     glyph = glyph_at(x, y);
     return $c.i8(isok(x, y) && distu(x, y) >= gp.polearm_range_min && distu(x, y) <= gp.polearm_range_max && (cansee(x, y) || couldsee(x, y) && glyph_is_poleable(glyph)) ? 1 : 0);
 }
+/**
+ * @param {number} on_off boolean
+ * @returns {Promise<void>}
+ */
 async function display_polearm_positions(on_off) {   // apply.c:3334
     let x = 0, y = 0, dx = 0, dy = 0;
     if (on_off) {
@@ -2959,6 +3188,10 @@ async function display_polearm_positions(on_off) {   // apply.c:3334
  *  (Note: no roles in NetHack can become expert or better
  *  for polearm skill; Yeoman in slash'em can become expert.)
  */
+/**
+ * @param {*} min_range int *
+ * @param {*} max_range int *
+ */
 function calc_pole_range(min_range, max_range) {   // apply.c:3371
     let typ = 0;
     typ = uwep_skill_type();
@@ -2975,6 +3208,9 @@ function calc_pole_range(min_range, max_range) {   // apply.c:3371
 }
 /* return TRUE if hero is wielding a polearm and there's
    at least one monster they could hit with it */
+/**
+ * @returns {number} boolean
+ */
 export function could_pole_mon() {   // apply.c:3391
     let min_range = Int32Array.of(0), max_range = Int32Array.of(0), cc = new $T.nhcoord(), hitm = null;
     hitm = svc.context.polearm.hitmon;
@@ -2994,6 +3230,10 @@ export function could_pole_mon() {   // apply.c:3391
     return FALSE;
 }
 /* was Snickersnee used to attack at distance this turn already? */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 function snickersnee_used_dist_attk(obj) {   // apply.c:3416
     if (obj && $c.peq(obj, $G.uwep) && u_wield_art(ART.SNICKERSNEE) && svc.context.snickersnee_turn === svm.moves) {
         return TRUE;
@@ -3001,6 +3241,11 @@ function snickersnee_used_dist_attk(obj) {   // apply.c:3416
     return FALSE;
 }
 /* Distance attacks by pole-weapons */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} autohit boolean
+ * @returns {Promise<number>} int
+ */
 export async function use_pole(obj, autohit) {   // apply.c:3426
     let thump = new Int8Array(49), res = 0, max_range = Int32Array.of(0), min_range = Int32Array.of(0), glyph = 0, cc = new $T.nhcoord(), mtmp = null, hitm = null, freehit = 0, t = null;
     thump.fill(0);
@@ -3120,6 +3365,10 @@ export async function use_pole(obj, autohit) {   // apply.c:3426
     await u_wipe_engr(2);   /* same as for melee or throwing */
     return freehit ? ECMD.OK : ECMD.TIME;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function use_cream_pie(obj) {   // apply.c:3568
     let wasblind = 0, wascreamed = 0, several = 0, blindinc = 0;
     wasblind = $c.i8(Blind());
@@ -3153,12 +3402,20 @@ async function use_cream_pie(obj) {   // apply.c:3568
     return ECMD.OK;
 }
 /* getobj callback for object to rub royal jelly on */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 function jelly_ok(obj) {   // apply.c:3607
     if (obj && obj.otyp === EGG) {
         return GETOBJ.SUGGEST;
     }
     return GETOBJ.EXCLUDE;
 }
+/**
+ * @param {*} optr struct obj **
+ * @returns {Promise<number>} int
+ */
 async function use_royal_jelly(optr) {   // apply.c:3616
     let oldcorpsenm = 0, was_timed = 0, eobj = null, obj = null, splitit = 0;
     obj = optr.get(0);
@@ -3223,6 +3480,9 @@ async function use_royal_jelly(optr) {   // apply.c:3616
     optr.set(0, null);
     return ECMD.TIME;
 }
+/**
+ * @returns {number} int
+ */
 function grapple_range() {   // apply.c:3686
     let typ = 0, max_range = 0;
     typ = uwep_skill_type();
@@ -3236,9 +3496,18 @@ function grapple_range() {   // apply.c:3686
     }
     return max_range;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 function can_grapple_location(x, y) {   // apply.c:3701
     return $c.i8(isok(x, y) && cansee(x, y) && distu(x, y) <= grapple_range() ? 1 : 0);
 }
+/**
+ * @param {number} on_off boolean
+ * @returns {Promise<void>}
+ */
 async function display_grapple_positions(on_off) {   // apply.c:3707
     let x = 0, y = 0, dx = 0, dy = 0;
     if (on_off) {
@@ -3258,6 +3527,10 @@ async function display_grapple_positions(on_off) {   // apply.c:3707
         await tmp_at(DISP_END, 0);
     }
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function use_grapple(obj) {   // apply.c:3729
     let res = 0, typ = 0, tohit = 0, save_confirm = 0, cc = new $T.nhcoord(), mtmp = null, otmp = null, tmpwin = 0, any = new $T.any(), buf = new Int8Array(256), selected = [null], clr = 0;
     res = ECMD.OK;
@@ -3390,6 +3663,9 @@ async function use_grapple(obj) {   // apply.c:3729
     await pline($c.lit("%s"), c_common_strings.c_nothing_happens);
     return ECMD.TIME;
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function discard_broken_wand() {   // apply.c:3876
     let obj = null;
     obj = gc.current_wand;   /* [see dozap() and destroy_items()] */
@@ -3399,12 +3675,23 @@ async function discard_broken_wand() {   // apply.c:3876
     }
     nomul(0);
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} dmg int
+ * @param {number} expltype int
+ * @returns {Promise<void>}
+ */
 async function broken_wand_explode(obj, dmg, expltype) {   // apply.c:3888
     await explode(u.ux, u.uy, -obj.otyp | 0, dmg, WAND_CLASS, expltype);
     await discover_object(obj.otyp, TRUE, TRUE, TRUE);   /* explode describes the effect */
     await discard_broken_wand();
 }
 /* if x,y has lava or water, dunk any boulders at that location into it */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function maybe_dunk_boulders(x, y) {   // apply.c:3897
     let otmp = null;
     while (is_pool_or_lava(x, y) && (otmp = sobj_at(BOULDER, x, y)) !== null) {
@@ -3413,6 +3700,10 @@ export async function maybe_dunk_boulders(x, y) {   // apply.c:3897
     }
 }
 /* return 1 if the wand is broken, hence some time elapsed */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function do_break_wand(obj) {   // apply.c:3909
     let i = 0, x = 0, y = 0, mon = null, dmg = 0, damage = 0, affects_objects = 0, shop_damage = 0, fillmsg = 0, confirm = new Int8Array(128), buf = new Int8Array(256), is_fragile = 0, typ = 0, dcres = 0, $t1, $t2, $t3;
     shop_damage = FALSE;
@@ -3624,6 +3915,10 @@ async function do_break_wand(obj) {   // apply.c:3909
 }
 /* getobj callback for object to apply - this is more complex than most other
  * callbacks because there are a lot of appliables */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 function apply_ok(obj) {   // apply.c:4151
     if (!obj) {
         return GETOBJ.EXCLUDE;
@@ -3677,6 +3972,9 @@ function apply_ok(obj) {   // apply.c:4151
     return GETOBJ.EXCLUDE_SELECTABLE;
 }
 /* the #apply command, 'a' */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doapply() {   // apply.c:4214
     let obj = [null], res = 0;
     res = ECMD.TIME;
@@ -3890,6 +4188,10 @@ export async function doapply() {   // apply.c:4214
 /* Keep track of unfixable troubles for purposes of messages saying you feel
  * great.
  */
+/**
+ * @param {number} is_horn boolean
+ * @returns {number} int
+ */
 export function unfixable_trouble_count(is_horn) {   // apply.c:4431
     let unfixable_trbl = 0;
     unfixable_trbl = 0;
@@ -3938,6 +4240,10 @@ export function unfixable_trouble_count(is_horn) {   // apply.c:4431
     }
     return unfixable_trbl;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function flip_through_book(obj) {   // apply.c:4473
     let findx = 0;
     if (Underwater()) {
@@ -3970,6 +4276,10 @@ async function flip_through_book(obj) {   // apply.c:4473
     }
     return ECMD.TIME;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function flip_coin(obj) {   // apply.c:4527
     let otmp = null, lose_coin = 0;
     otmp = obj;

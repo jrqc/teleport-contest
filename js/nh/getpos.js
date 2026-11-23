@@ -57,6 +57,11 @@ let getpos_hilite_state = 0;
 let defaultHiliteState = 0;
 const gloc_descr = $c.arrayOf(6, () => $c.nulls(4));
 const gloc_filtertxt = $c.nulls(3);
+/**
+ * @param {Function | null} gp_hilitef void (*)(boolean)
+ * @param {Function | null} gp_getvalidf boolean (*)(coordxy, coordxy)
+ * @returns {Promise<void>}
+ */
 export async function getpos_sethilite(gp_hilitef, gp_getvalidf) {   // getpos.c:41
     let old_getvalid = null, old_map_frame_color = 0, sel = null;
     old_getvalid = getpos_getvalid;
@@ -81,6 +86,9 @@ export async function getpos_sethilite(gp_hilitef, gp_getvalidf) {   // getpos.c
    positions and showing them via temporary S_goodpos symbol;
    when 'bgcolors' is On, there are three states and showing them via
    setting background color becomes the default */
+/**
+ * @returns {Promise<void>}
+ */
 async function getpos_toggle_hilite_state() {   // getpos.c:72
     /* getpos_hilitefunc isn't Null */
     if (getpos_hilite_state === HiliteGoodposSymbol) {
@@ -97,12 +105,22 @@ async function getpos_toggle_hilite_state() {   // getpos.c:72
         await getpos_hilitefunc(TRUE);
     }
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} boolean
+ */
 export async function mapxy_valid(x, y) {   // getpos.c:94
     if (getpos_getvalid) {
         return await getpos_getvalid(x, y);
     }
     return FALSE;
 }
+/**
+ * @param {$T.selectionvar | null} sel struct selectionvar *
+ * @param {Function | null} validf boolean (*)(coordxy, coordxy)
+ * @returns {Promise<void>}
+ */
 async function getpos_getvalids_selection(sel, validf) {   // getpos.c:102
     let x = 0, y = 0;
     if (!sel || !validf) {
@@ -116,6 +134,13 @@ async function getpos_getvalids_selection(sel, validf) {   // getpos.c:102
         }
     }
 }
+/**
+ * @param {number} tmpwin winid
+ * @param {$c.Ptr | null} k1 const char *
+ * @param {$c.Ptr | null} k2 const char *
+ * @param {number} gloc int
+ * @returns {Promise<void>}
+ */
 async function getpos_help_keyxhelp(tmpwin, k1, k2, gloc) {   // getpos.c:137
     let sbuf = new Int8Array(256), fbuf = new Int8Array(128), move_cursor_to = null, filtertxt = null;
     move_cursor_to = $c.lit("move the cursor to ");
@@ -134,6 +159,11 @@ async function getpos_help_keyxhelp(tmpwin, k1, k2, gloc) {   // getpos.c:137
     await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
 }
 /* the response for '?' help request in getpos() */
+/**
+ * @param {number} force boolean
+ * @param {$c.Ptr | null} goal const char *
+ * @returns {Promise<void>}
+ */
 async function getpos_help(force, goal) {   // getpos.c:167
     let sbuf = new Int8Array(256), doing_what_is = 0, tmpwin = 0, kbuf = new Int8Array(256), $goto = null;
     D1: for (;;) {
@@ -230,6 +260,11 @@ async function getpos_help(force, goal) {   // getpos.c:167
         break;
     }
 }
+/**
+ * @param {*} a const void *
+ * @param {*} b const void *
+ * @returns {number} int
+ */
 function cmp_coord_distu(a, b) {   // getpos.c:312
     let c1 = null, c2 = null, dx = 0, dy = 0, dist_1 = 0, dist_2 = 0;
     c1 = $c.asRec(a, $T.nhcoord, 4);
@@ -245,6 +280,10 @@ function cmp_coord_distu(a, b) {   // getpos.c:312
     }
     return dist_1 - dist_2 | 0;
 }
+/**
+ * @param {number} glyph int
+ * @returns {number} int
+ */
 function gloc_filter_classify_glyph(glyph) {   // getpos.c:341
     let c = 0;
     if (!glyph_is_cmap(glyph)) {
@@ -264,6 +303,11 @@ function gloc_filter_classify_glyph(glyph) {   // getpos.c:341
     }
     return 0;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} int
+ */
 async function gloc_filter_floodfill_matcharea(x, y) {   // getpos.c:364
     let glyph = 0;
     glyph = await back_to_glyph(x, y);
@@ -278,12 +322,20 @@ async function gloc_filter_floodfill_matcharea(x, y) {   // getpos.c:364
     }
     return FALSE;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 async function gloc_filter_floodfill(x, y) {   // getpos.c:382
     let $t1;
     $t1 = await back_to_glyph(x, y), gg.gloc_filter_floodfill_match_glyph = $t1;
     set_selection_floodfillchk(gloc_filter_floodfill_matcharea);
     await selection_floodfill(gg.gloc_filter_map, x, y, FALSE);
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function gloc_filter_init() {   // getpos.c:391
     let $t1;
     if (iflags.getloc_filter === GFILTER_AREA) {
@@ -309,6 +361,11 @@ function gloc_filter_done() {   // getpos.c:412
         gg.gloc_filter_map = null;
     }
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 function known_vibrating_square_at(x, y) {   // getpos.c:422
     let ttmp = null;
     /* note: this only acknowledges the genuine vibrating square, not
@@ -320,6 +377,12 @@ function known_vibrating_square_at(x, y) {   // getpos.c:422
     }
     return FALSE;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} gloc int
+ * @returns {Promise<number>} boolean
+ */
 export async function gather_locs_interesting(x, y, gloc) {   // getpos.c:438
     let glyph = 0, sym = 0;
     if (iflags.getloc_filter === GFILTER_VIEW && !cansee(x, y)) {
@@ -354,6 +417,12 @@ export async function gather_locs_interesting(x, y, gloc) {   // getpos.c:438
     return FALSE;
 }
 /* gather locations for monsters or objects shown on the map */
+/**
+ * @param {*} arr_p coord **
+ * @param {*} cnt_p int *
+ * @param {number} gloc int
+ * @returns {Promise<void>}
+ */
 async function gather_locs(arr_p, cnt_p, gloc) {   // getpos.c:513
     let pass = 0, idx = 0, x = 0, y = 0, $t1, $t2;
     /*
@@ -392,6 +461,12 @@ async function gather_locs(arr_p, cnt_p, gloc) {   // getpos.c:513
     }   /* pass */
     gloc_filter_done();
 }
+/**
+ * @param {number} dx coordxy
+ * @param {number} dy coordxy
+ * @param {number} fulldir boolean
+ * @returns {$c.Ptr | null} char *
+ */
 export function dxdy_to_dist_descr(dx, dy, fulldir) {   // getpos.c:557
     let dst = 0;
     if (!dx && !dy) {
@@ -418,6 +493,13 @@ export function dxdy_to_dist_descr(dx, dy, fulldir) {   // getpos.c:557
     return new $c.Ptr(dxdy_to_dist_descr$buf, 0);
 }
 /* coordinate formatting for 'whatis_coord' option */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$c.Ptr | null} outbuf char *
+ * @param {number} cmode char
+ * @returns {$c.Ptr | null} char *
+ */
 export function coord_desc(x, y, outbuf, cmode) {   // getpos.c:595
     let dx = 0, dy = 0;
     /* [12] suffices: "[%02d,%02d]" */
@@ -457,6 +539,11 @@ export function coord_desc(x, y, outbuf, cmode) {   // getpos.c:595
     }
     return outbuf;
 }
+/**
+ * @param {number} cx coordxy
+ * @param {number} cy coordxy
+ * @returns {Promise<void>}
+ */
 export async function auto_describe(cx, cy) {   // getpos.c:640
     let cc = new $T.nhcoord(), sym = 0, tmpbuf = new Int8Array(256), firstmatch = [null];
     sym = 0;
@@ -470,6 +557,11 @@ export async function auto_describe(cx, cy) {   // getpos.c:640
         await flush_screen(0);
     }
 }
+/**
+ * @param {$T.nhcoord | null} ccp coord *
+ * @param {number} gloc int
+ * @returns {Promise<number>} boolean
+ */
 export async function getpos_menu(ccp, gloc) {   // getpos.c:665
     let garr = [null], gcount = Int32Array.of(0), tmpwin = 0, any = new $T.any(), i = 0, pick_cnt = 0, picks = [null], tmpbuf = new Int8Array(256), clr = 0, fullbuf = new Int8Array(256), tmpcc = new $T.nhcoord(), firstmatch = [null], sym = 0;
     garr[0] = null;
@@ -512,6 +604,12 @@ export async function getpos_menu(ccp, gloc) {   // getpos.c:665
     return $c.i8(pick_cnt > 0 ? 1 : 0);
 }
 /* add dx,dy to cx,cy, truncating at map edges */
+/**
+ * @param {*} cx coordxy *
+ * @param {*} cy coordxy *
+ * @param {number} dx schar
+ * @param {number} dy schar
+ */
 function truncate_to_map(cx, cy, dx, dy) {   // getpos.c:729
     /* diagonal moves complicate this... */
     if ((cx.get(0) + dx | 0) < 1) {
@@ -533,6 +631,9 @@ function truncate_to_map(cx, cy, dx, dy) {   // getpos.c:729
 }
 /* called when ^R typed; if '$' is being shown for valid spots, remove that;
    if alternate background color is being shown for that, redraw it */
+/**
+ * @returns {Promise<void>}
+ */
 async function getpos_refresh() {   // getpos.c:753
     if (getpos_hilitefunc && getpos_hilite_state === HiliteGoodposSymbol) {
         await getpos_hilitefunc(FALSE);   /* tmp_at(DISP_END) */
@@ -546,6 +647,12 @@ async function getpos_refresh() {   // getpos.c:753
 }
 /* have the player use movement keystrokes to position the cursor at a
    particular map location, then use one of [.,:;] to pick the spot */
+/**
+ * @param {$T.nhcoord | null} ccp coord *
+ * @param {number} force boolean
+ * @param {$c.Ptr | null} goal const char *
+ * @returns {Promise<number>} int
+ */
 export async function getpos(ccp, force, goal) {   // getpos.c:771
     let cq = new $T._cmd_queue(), cmdq = null, cp = null, pick_chars = new Int8Array(6), mMoOdDxX = new Int8Array(13), result = 0, i = 0, c = 0, sidx = Int32Array.of(0), cx = Int16Array.of(0), cy = Int16Array.of(0), tx = Int16Array.of(0), ty = Int16Array.of(0), msg_given = 0, show_goal_msg = 0, garr = $c.nulls(6), gcount = new Int32Array(6), gidx = new Int32Array(6), udx = 0, udy = 0, udz = 0, dx = 0, dy = 0, rushrun = 0, glyph = 0, gtmp = 0, gloc = 0, tmpcrd = new $T.nhcoord(), matching = new Int8Array(105), pass = 0, k = 0, lo_x = 0, lo_y = 0, hi_x = 0, hi_y = 0, note = new Int8Array(128), $goto = null, $t1, $t2, $t3;
     result = 0;

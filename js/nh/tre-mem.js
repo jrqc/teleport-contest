@@ -51,6 +51,10 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { __global_locale, _c_locale } from './c_locale.js';
 
+/**
+ * @param {number} val void *
+ * @returns {number} void *
+ */
 function xlocale_retain(val) {   // xlocale_private.h:96
     let obj = 0;
     obj = val;
@@ -60,6 +64,9 @@ function xlocale_retain(val) {   // xlocale_private.h:96
     $h.i32[obj >>> 2] = $h.i32[obj >>> 2] + 1 | 0;
     return val;
 }
+/**
+ * @param {number} val void *
+ */
 function xlocale_release(val) {   // xlocale_private.h:107
     let obj = 0;
     obj = val;
@@ -72,9 +79,16 @@ function xlocale_release(val) {   // xlocale_private.h:107
         }
     }
 }
+/**
+ * @returns {number} locale_t
+ */
 function __current_locale() {   // xlocale_private.h:122
     return __global_locale;
 }
+/**
+ * @param {number} __loc locale_t
+ * @returns {number} locale_t
+ */
 function __locale_ptr(__loc) {   // xlocale_private.h:128
     if (__loc === 0) {
         __loc = $h.u32[_c_locale >>> 2];
@@ -85,6 +99,11 @@ function __locale_ptr(__loc) {   // xlocale_private.h:128
 }
 /* HAVE_CONFIG_H */
 /* Returns a new memory allocator or NULL if out of memory. */
+/**
+ * @param {number} provided int
+ * @param {number} provided_block void *
+ * @returns {number} tre_mem_t
+ */
 export function tre_mem_new_impl(provided, provided_block) {   // tre-mem.c:29
     let mem = 0;
     if (provided) {
@@ -99,6 +118,9 @@ export function tre_mem_new_impl(provided, provided_block) {   // tre-mem.c:29
     return mem;
 }
 /* Frees the memory allocator and all memory allocated with it. */
+/**
+ * @param {number} mem tre_mem_t
+ */
 export function tre_mem_destroy(mem) {   // tre-mem.c:47
     let tmp = 0, l = 0;
     l = $h.u32[mem >>> 2];
@@ -112,6 +134,14 @@ export function tre_mem_destroy(mem) {   // tre-mem.c:47
 }
 /* Allocates a block of `size' bytes from `mem'.  Returns a pointer to the
    allocated block or NULL if an underlying malloc() failed. */
+/**
+ * @param {number} mem tre_mem_t
+ * @param {number} provided int
+ * @param {number} provided_block void *
+ * @param {number} zero int
+ * @param {number | bigint} size size_t
+ * @returns {number} void *
+ */
 export function tre_mem_alloc_impl(mem, provided, provided_block, zero, size) {   // tre-mem.c:65
     let ptr = 0, l = 0, block_size = 0, $t1;
     if ($h.i32[(mem + 32) >>> 2]) {

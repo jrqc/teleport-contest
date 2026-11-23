@@ -140,6 +140,10 @@ const oth_symbols = new Int8Array(2);
 const oth_names = $c.nulls(1);
 /* sortloot() classification for in-use sort;
    called at most once [per sort] for each object */
+/**
+ * @param {$T.sortloot_item | null} sort_item Loot *
+ * @param {$T.obj | null} obj struct obj *
+ */
 function inuse_classify(sort_item, obj) {   // invent.c:70
     let w_mask = 0, rating = 0, altclass = 0;
     w_mask = $c.and64(obj.owornmask, W_ACCESSORY | W_WEAPONS | W_ARMOR);
@@ -286,6 +290,11 @@ function inuse_classify(sort_item, obj) {   // invent.c:70
 }
 /* sortloot() classification; called at most once [per sort] for each object;
    also called by '\' command if discoveries use sortloot order */
+/**
+ * @param {$T.sortloot_item | null} sort_item Loot *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function loot_classify(sort_item, obj) {   // invent.c:149
     let classorder = null, p = null, k = 0, otyp = 0, oclass = 0, seen = 0, discovered = 0;
     /* we may eventually make this a settable option to always use
@@ -436,6 +445,10 @@ export async function loot_classify(sort_item, obj) {   // invent.c:149
     sort_item.inuse = 0;
 }
 /* sortloot() formatting routine; for alphabetizing, not shown to user */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 async function loot_xname(obj) {   // invent.c:309
     let saveo = new $T.obj(), save_debug = 0, res = null, save_oname = null;
     /*
@@ -513,12 +526,21 @@ async function loot_xname(obj) {   // invent.c:309
     return res;
 }
 /* '$'==1, 'a'-'z'==2..27, 'A'-'Z'==28..53, '#'==54, catchall 55 */
+/**
+ * @param {number} c char
+ * @returns {number} int
+ */
 function invletter_value(c) {   // invent.c:391
     return 97 <= c && c <= 122 ? (c - 97 | 0) + 2 | 0 : 65 <= c && c <= 90 ? ((c - 65 | 0) + 2 | 0) + 26 | 0 : c === 36 ? 1 : c === 35 ? 1 + invlet_basic + 1 : 1 + invlet_basic + 1 + 1;
     /* none of the above
      * (shouldn't happen) */
 }
 /* qsort comparison routine for sortloot() */
+/**
+ * @param {*} vptr1 const void *
+ * @param {*} vptr2 const void *
+ * @returns {Promise<number>} int
+ */
 async function sortloot_cmp(vptr1, vptr2) {   // invent.c:403
     let sli1 = null, sli2 = null, obj1 = null, obj2 = null, nam1 = null, nam2 = null, tmpstr = null, val1 = 0, val2 = 0, namcmp = 0, $t1, $t2;
     sli1 = $c.asRec(vptr1, $T.sortloot_item, 24);
@@ -705,6 +727,13 @@ async function sortloot_cmp(vptr1, vptr2) {   // invent.c:403
  *      array contains 'struct sortloot_item' (aka 'Loot') entries
  *      instead of simple 'struct obj *' entries.
  */
+/**
+ * @param {*} olist struct obj **
+ * @param {number} mode unsigned int
+ * @param {number} by_nexthere boolean
+ * @param {Function | null} filterfunc boolean (*)(struct obj *)
+ * @returns {Promise<$T.sortloot_item | null>} Loot *
+ */
 export async function sortloot(olist, mode, by_nexthere, filterfunc) {   // invent.c:593
     let sliarray = null, o = null, n = 0, i = 0, augment_filter = 0;
     /* old version might have changed *olist, we don't */
@@ -751,6 +780,9 @@ export async function sortloot(olist, mode, by_nexthere, filterfunc) {   // inve
     return sliarray;
 }
 /* sortloot() callers should use this to free up memory it allocates */
+/**
+ * @param {*} loot_array_p Loot **
+ */
 export function unsortloot(loot_array_p) {   // invent.c:647
     if (loot_array_p.get(0)) {
         $c.free(loot_array_p.get(0)), loot_array_p.set(0, null);
@@ -761,6 +793,9 @@ export function unsortloot(loot_array_p) {   // invent.c:647
 /* T: traverse via obj->nexthere, F: via obj->nobj */
 /* extra input for sortloot_cmp() */
 /*0*/
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ */
 export function assigninvlet(otmp) {   // invent.c:694
     let inuse = new Int8Array(52), i = 0, obj = null;
     /* there should be at most one of these in inventory... */
@@ -831,6 +866,11 @@ function reorder_invent() {   // invent.c:739
 /* scan a list of objects to see whether another object will merge with
    one of them; used in pickup.c when all 52 inventory slots are in use,
    to figure out whether another object could still be picked up */
+/**
+ * @param {$T.obj | null} objlist struct obj *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function merge_choice(objlist, obj) {   // invent.c:775
     let shkp = null, save_nocharge = 0;
     if (!objlist) {   /* might be checking 'obj' against empty inventory */
@@ -868,6 +908,11 @@ export async function merge_choice(objlist, obj) {   // invent.c:775
     return objlist;
 }
 /* merge obj with otmp and delete obj if types agree */
+/**
+ * @param {*} potmp struct obj **
+ * @param {*} pobj struct obj **
+ * @returns {Promise<number>} int
+ */
 export async function merged(potmp, pobj) {   // invent.c:814
     let otmp = null, obj = null, discovered = 0, wmask = 0, $t1, $t2, $t3;
     otmp = potmp.get(0);
@@ -1004,6 +1049,10 @@ export async function merged(potmp, pobj) {   // invent.c:814
  * addinv) or when an object in the hero's inventory has been polymorphed
  * in-place.
  */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function addinv_core1(obj) {   // invent.c:960
     if (obj.oclass === COIN_CLASS) {
         disp.botl = TRUE;
@@ -1070,6 +1119,10 @@ export async function addinv_core1(obj) {   // invent.c:960
  * so it should be written to work even if called multiple times in a row
  * (e.g. do not assume that the object was not in inventory already).
  */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function addinv_core2(obj) {   // invent.c:1025
     let $t1;
     if (confers_luck(obj)) {
@@ -1094,6 +1147,12 @@ export async function addinv_core2(obj) {   // invent.c:1025
 /*
  * Add obj to the hero's inventory.  Make sure the object is "free".
  * Adjust hero attributes as necessary.
+ */
+/**
+ * @param {$T.obj | null} obj$in struct obj *
+ * @param {$T.obj | null} other_obj struct obj *
+ * @param {number} update_perm_invent boolean
+ * @returns {Promise<$T.obj | null>} struct obj *
  */
 async function addinv_core0(obj$in, other_obj, update_perm_invent) {   // invent.c:1056
     const obj = [obj$in];
@@ -1187,16 +1246,29 @@ async function addinv_core0(obj$in, other_obj, update_perm_invent) {   // invent
     return obj[0];
 }
 /* add obj to the hero's inventory in the default fashion */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function addinv(obj) {   // invent.c:1152
     return await addinv_core0(obj, null, TRUE);
 }
 /* add obj to the hero's inventory by inserting in front of a specific item;
    used for throw-and-return in case '!fixinv' is in effect */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$T.obj | null} other_obj struct obj *
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function addinv_before(obj, other_obj) {   // invent.c:1160
     /* if 'other_obj' is present this will implicitly be 'nomerge' */
     return await addinv_core0(obj, other_obj, TRUE);
 }
 /* return value will always be 'obj' */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function addinv_nomerge(obj) {   // invent.c:1169
     let result = null, save_nomerge = 0;
     save_nomerge = obj.nomerge;
@@ -1210,6 +1282,10 @@ export async function addinv_nomerge(obj) {   // invent.c:1169
  * Make those adjustments here. Called _after_ the object
  * has been added to the hero's or monster's inventory,
  * and after hero's intrinsics have been updated.
+ */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
  */
 export async function carry_obj_effects(obj) {   // invent.c:1187
     /* Cursed figurines can spontaneously transform when carried. */
@@ -1225,6 +1301,13 @@ export async function carry_obj_effects(obj) {   // invent.c:1187
  * If both success and failure messages are NULL, then we're just doing the
  * fumbling/slot-limit checking for a silent grab.  In any case,
  * touch_artifact will print its own messages if they are warranted.
+ */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$c.Ptr | null} drop_fmt const char *
+ * @param {$c.Ptr | null} drop_arg const char *
+ * @param {$c.Ptr | null} hold_msg const char *
+ * @returns {Promise<$T.obj | null>} struct obj *
  */
 export async function hold_another_object(obj, drop_fmt, drop_arg, hold_msg) {   // invent.c:1208
     let buf = new Int8Array(256), crysknife = 0, oerode = 0, wasUpolyd = 0, oquan = 0, prev_encumbr = 0;
@@ -1322,12 +1405,20 @@ export async function hold_another_object(obj, drop_fmt, drop_arg, hold_msg) {  
     return null;   /* might be gone */
 }
 /* useup() all of an item regardless of its quantity */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function useupall(obj) {   // invent.c:1312
     await setnotworn(obj);
     await freeinv(obj);
     await obfree(obj, null);   /* deletes contents also */
 }
 /* an item in inventory is going away after being used */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function useup(obj) {   // invent.c:1321
     let $t1;
     /* Note:  This works correctly for containers because they (containers)
@@ -1342,6 +1433,11 @@ export async function useup(obj) {   // invent.c:1321
     }
 }
 /* use one charge from an item and possibly incur shop debt for it */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} maybe_unpaid boolean
+ * @returns {Promise<void>}
+ */
 export async function consume_obj_charge(obj, maybe_unpaid) {   // invent.c:1337
     /* false if caller handles shop billing */
     if (maybe_unpaid) {
@@ -1358,6 +1454,10 @@ export async function consume_obj_charge(obj, maybe_unpaid) {   // invent.c:1337
  * where we are polymorphing an object already in the hero's inventory.
  *
  * Should think of a better name...
+ */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
  */
 export async function freeinv_core(obj) {   // invent.c:1356
     if (obj.oclass === COIN_CLASS) {
@@ -1406,6 +1506,10 @@ export async function freeinv_core(obj) {   // invent.c:1356
     }
 }
 /* remove an object from the hero's inventory */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function freeinv(obj) {   // invent.c:1403
     await extract_nobj(obj, new $c.FieldRef(gi, "invent", "ptr"));
     obj.pickup_prev = (0) & 1;
@@ -1413,6 +1517,11 @@ export async function freeinv(obj) {   // invent.c:1403
     await update_inventory();
 }
 /* drawbridge is destroying all objects at <x,y> */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function delallobj(x, y) {   // invent.c:1413
     let otmp = null, otmp2 = null;
     for (otmp = svl.level.objects[x][y]; otmp; otmp = otmp2) {
@@ -1428,11 +1537,20 @@ export async function delallobj(x, y) {   // invent.c:1413
     }
 }
 /* normal object deletion (if unpaid, it remains on the bill) */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function delobj(obj) {   // invent.c:1430
     await delobj_core(obj, FALSE);
 }
 /* destroy object; caller has control over whether to destroy something
    that ordinarily shouldn't be destroyed */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} force boolean
+ * @returns {Promise<void>}
+ */
 export async function delobj_core(obj, force) {   // invent.c:1438
     let update_map = 0;
     /* 'force==TRUE' used when reviving Rider corpses */
@@ -1457,6 +1575,12 @@ export async function delobj_core(obj, force) {   // invent.c:1438
     await obfree(obj, null);   /* frees contents also */
 }
 /* try to find a particular type of object at designated map location */
+/**
+ * @param {number} otyp int
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {$T.obj | null} struct obj *
+ */
 export function sobj_at(otyp, x, y) {   // invent.c:1466
     let otmp = null;
     for (otmp = svl.level.objects[x][y]; otmp; otmp = otmp.v.v_nexthere) {
@@ -1467,6 +1591,12 @@ export function sobj_at(otyp, x, y) {   // invent.c:1466
     return otmp;
 }
 /* sobj_at(&c) traversal -- find next object of specified type */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} type int
+ * @param {number} by_nexthere boolean
+ * @returns {$T.obj | null} struct obj *
+ */
 export function nxtobj(obj, type, by_nexthere) {   // invent.c:1479
     let otmp = null;
     otmp = obj;   /* start with the object after this one */
@@ -1479,6 +1609,10 @@ export function nxtobj(obj, type, by_nexthere) {   // invent.c:1479
     return otmp;
 }
 /* return inventory object of type 'type' if hero has one, otherwise Null */
+/**
+ * @param {number} type int
+ * @returns {$T.obj | null} struct obj *
+ */
 export function carrying(type) {   // invent.c:1495
     let otmp = null;
     /* this could be replaced by 'return m_carrying(&gy.youmonst, type);' */
@@ -1490,6 +1624,9 @@ export function carrying(type) {   // invent.c:1495
     return otmp;
 }
 /* return inventory object of type that will petrify on touch */
+/**
+ * @returns {$T.obj | null} struct obj *
+ */
 export function carrying_stoning_corpse() {   // invent.c:1508
     let otmp = null;
     for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
@@ -1499,6 +1636,10 @@ export function carrying_stoning_corpse() {   // invent.c:1508
     }
     return otmp;
 }
+/**
+ * @param {number | bigint} amount long
+ * @returns {Promise<$c.Ptr | null>} const char *
+ */
 export async function currency(amount) {   // invent.c:1546
     let res = null;
     res = Hallucination() ? currencies[rn2(21)] : $c.lit("zorkmid");
@@ -1507,6 +1648,9 @@ export async function currency(amount) {   // invent.c:1546
     }
     return res;
 }
+/**
+ * @returns {$T.obj | null} struct obj *
+ */
 export function u_carried_gloves() {   // invent.c:1557
     let otmp = null, gloves = null;
     gloves = null;
@@ -1523,6 +1667,9 @@ export function u_carried_gloves() {   // invent.c:1557
     return gloves;
 }
 /* 3.6 tribute */
+/**
+ * @returns {$T.obj | null} struct obj *
+ */
 export function u_have_novel() {   // invent.c:1576
     let otmp = null;
     for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
@@ -1532,6 +1679,11 @@ export function u_have_novel() {   // invent.c:1576
     }
     return null;
 }
+/**
+ * @param {number} id unsigned int
+ * @param {$T.obj | null} objchn struct obj *
+ * @returns {$T.obj | null} struct obj *
+ */
 export function o_on(id, objchn) {   // invent.c:1587
     let temp = null;
     while (objchn) {
@@ -1545,6 +1697,12 @@ export function o_on(id, objchn) {   // invent.c:1587
     }
     return null;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 export function obj_here(obj, x, y) {   // invent.c:1602
     let otmp = null;
     for (otmp = svl.level.objects[x][y]; otmp; otmp = otmp.v.v_nexthere) {
@@ -1554,6 +1712,11 @@ export function obj_here(obj, x, y) {   // invent.c:1602
     }
     return FALSE;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {$T.obj | null} struct obj *
+ */
 export function g_at(x, y) {   // invent.c:1613
     let obj = null;
     obj = svl.level.objects[x][y];
@@ -1566,6 +1729,9 @@ export function g_at(x, y) {   // invent.c:1613
     return null;
 }
 /* compact a string of inventory letters by dashing runs of letters */
+/**
+ * @param {$c.Ptr | null} buf char *
+ */
 function compactify(buf) {   // invent.c:1627
     let i1 = 0, i2 = 0, ilet = 0, ilet1 = 0, ilet2 = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
     i1 = 1;
@@ -1600,13 +1766,25 @@ function compactify(buf) {   // invent.c:1627
     }
 }
 /* some objects shouldn't be split when count given to getobj or askchain */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} boolean
+ */
 export async function splittable(obj) {   // invent.c:1664
     return $c.i8(!(obj.otyp === LOADSTONE && obj.cursed | 0 || $c.peq(obj, $G.uwep) && await welded($G.uwep)) ? 1 : 0);
 }
 /* match the prompt for either 'T' or 'R' command */
+/**
+ * @param {$c.Ptr | null} action const char *
+ * @returns {number} boolean
+ */
 function taking_off(action) {   // invent.c:1672
     return $c.i8(!$c.strcmp(action, $c.lit("take off")) || !$c.strcmp(action, $c.lit("remove")) ? 1 : 0);
 }
+/**
+ * @param {$c.Ptr | null} word const char *
+ * @returns {Promise<void>}
+ */
 async function mime_action(word) {   // invent.c:1678
     let buf = new Int8Array(256), bp = null, pfx = null, sfx = null;
     $c.strcpy(new $c.Ptr(buf, 0), word);
@@ -1631,6 +1809,10 @@ async function mime_action(word) {   // invent.c:1678
     await You($c.lit("mime %s%s%s something%s%s."), ing_suffix(bp), pfx ? $c.lit(" ") : $c.lit(""), pfx ? pfx : $c.lit(""), sfx ? $c.lit(" ") : $c.lit(""), sfx ? sfx : $c.lit(""));
 }
 /* getobj callback that allows any object - but not hands. */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 export function any_obj_ok(obj) {   // invent.c:1710
     if (obj) {
         return GETOBJ.SUGGEST;
@@ -1638,6 +1820,11 @@ export function any_obj_ok(obj) {   // invent.c:1710
     return GETOBJ.EXCLUDE;
 }
 /* return string describing your hands based on action. */
+/**
+ * @param {$c.Ptr | null} action const char *
+ * @param {$c.Ptr | null} qbuf char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 async function getobj_hands_txt(action, qbuf) {   // invent.c:1719
     if (!$c.strcmp(action, $c.lit("grease"))) {
         $c.sprintf(qbuf, $c.lit("your %s"), await fingers_or_gloves(FALSE));
@@ -1664,6 +1851,12 @@ async function getobj_hands_txt(action, qbuf) {   // invent.c:1719
  * which represents the validity of doing that action on HANDS_SYM. getobj
  * won't call it with &hands_obj, so its behavior can be undefined in that
  * case.
+ */
+/**
+ * @param {$c.Ptr | null} word const char *
+ * @param {Function | null} obj_ok int (*)(struct obj *)
+ * @param {number} ctrlflags unsigned int
+ * @returns {Promise<$T.obj | null>} struct obj *
  */
 export async function getobj(word, obj_ok, ctrlflags) {   // invent.c:1752
     let otmp = null, ilet = 0, buf = new Int8Array(256), qbuf = new Int8Array(128), lets = new Int8Array(256), altlets = new Int8Array(256), suggested = 0, bp = null, ap = null, allowcnt = 0, forceprompt = 0, allownone = 0, inaccess = 0, cnt = 0, cntgiven = 0, msggiven = 0, oneloop = 0, sortedinvent = [null], srtinv = null, cq = new $T._cmd_queue(), cmdq = null, need_more_cq = 0, v = 0, tmpcnt = [0], allowed_choices = null, ctmp = [0], menuquery = new Int8Array(128), handsbuf = null, coins = 0, $t1, $t2, $t3, $t4, $t5, $t6;
@@ -2014,6 +2207,11 @@ export async function getobj(word, obj_ok, ctrlflags) {   // invent.c:1752
     }
     return otmp;
 }
+/**
+ * @param {$c.Ptr | null} word const char *
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 export async function silly_thing(word, otmp) {   // invent.c:2094
     /* 'P','R' vs 'W','T' handling is obsolete */
     /* check for attempted use of accessory commands ('P','R') on armor
@@ -2026,36 +2224,71 @@ export async function silly_thing(word, otmp) {   // invent.c:2094
         await pline(c_common_strings.c_silly_thing_to, word);
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} int
+ */
 async function ckvalidcat(otmp) {   // invent.c:2136
     /* use allow_category() from pickup.c */
     return await allow_category(otmp);
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {number} int
+ */
 function ckunpaid(otmp) {   // invent.c:2143
     return otmp.unpaid | 0 || Has_contents(otmp) && count_unpaid(otmp.cobj) ? 1 : 0;
 }
+/**
+ * @returns {number} boolean
+ */
 export function wearing_armor() {   // invent.c:2149
     return $c.i8($G.uarm || $G.uarmc || $G.uarmf || $G.uarmg || $G.uarmh || $G.uarms || $G.uarmu ? 1 : 0);
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {number} boolean
+ */
 export function is_worn(otmp) {   // invent.c:2156
     return $c.i8($c.and64(otmp.owornmask, W_ARMOR | W_ACCESSORY | W.SADDLE | W_WEAPONS) ? TRUE : FALSE);
 }
 /* is 'obj' being used by the hero?  worn, wielded, active lamp or leash;
    not to be confused with obj->in_use, which finishes using up an item
    (destroys it) if restoring a save file finds that bit set */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 export function is_inuse(obj) {   // invent.c:2167
     return $c.i8(carried(obj) && (is_worn(obj) || tool_being_used(obj)) ? 1 : 0);
 }
 /* safe_qbuf() -> short_oname() callback */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 async function safeq_xprname(obj) {   // invent.c:2180
     return await xprname(obj, null, safeq_xprn_ctx.let, safeq_xprn_ctx.dot, 0, 0);
 }
 /* alternate safe_qbuf() -> short_oname() callback */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 async function safeq_shortxprname(obj) {   // invent.c:2188
     return await xprname(obj, await ansimpleoname(obj), safeq_xprn_ctx.let, safeq_xprn_ctx.dot, 0, 0);
 }
 /* Interactive version of getobj - used for Drop, Identify, and Takeoff (A).
    Return the number of times fn was called successfully.
    If combo is TRUE, we just use this to get a category list. */
+/**
+ * @param {$c.Ptr | null} word const char *
+ * @param {Function | null} fn int (*)(struct obj *)
+ * @param {number} mx int
+ * @param {number} combo boolean
+ * @param {*} resultflags unsigned int *
+ * @returns {Promise<number>} int
+ */
 export async function ggetobj(word, fn, mx, combo, resultflags) {   // invent.c:2202
     let ckfn = null, ofilter = null, takeoff = 0, ident = 0, allflag = 0, m_seen = 0, itemcount = Int32Array.of(0), oletct = 0, iletct = 0, unpaid = 0, oc_of_sym = 0, sym = 0, ip = null, olets = new Int8Array(24), ilets = new Int8Array(29), extra_removeables = new Int8Array(4), buf = new Int8Array(256), qbuf = new Int8Array(128), ailets = new Int8Array(60), otmp = null, nextobj = null, cnt = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12;
     /* combination menu flag */
@@ -2228,6 +2461,16 @@ export async function ggetobj(word, fn, mx, combo, resultflags) {   // invent.c:
  * Walk through the chain starting at objchn and ask for all objects
  * with olet in olets (if nonNULL) and satisfying ckfn (if nonnull)
  * whether the action in question (i.e., fn) has to be performed.
+ */
+/**
+ * @param {*} objchn struct obj **
+ * @param {$c.Ptr | null} olets const char *
+ * @param {number} allflag int
+ * @param {Function | null} fn int (*)(struct obj *)
+ * @param {Function | null} ckfn int (*)(struct obj *)
+ * @param {number} mx int
+ * @param {$c.Ptr | null} word const char *
+ * @returns {Promise<number>} int
  */
 export async function askchain(objchn, olets, allflag, fn, ckfn, mx, word) {   // invent.c:2377
     let otmp = null, otmpo = null, sym = 0, ilet = 0, cnt = 0, dud = 0, tmp = 0, takeoff = 0, nodot = 0, ident = 0, take_out = 0, put_in = 0, first = 0, ininv = 0, bycat = 0, qbuf = new Int8Array(128), qpfx = new Int8Array(128), sortedchn = [null], $goto = null, $t1;
@@ -2403,6 +2646,9 @@ export async function askchain(objchn, olets, allflag, fn, ckfn, mx, word) {   /
    can't see the whole list at once).
 
    Returns TRUE (and increases numrerolls) if a reroll was requested. */
+/**
+ * @returns {Promise<number>} boolean
+ */
 export async function reroll_menu() {   // invent.c:2552
     let win = 0, any = new $T.any(), pick_list = [null], otmp = null, tmpglyph = 0, tmpglyphinfo = new $T.glyphinfo(), option = 0, buf = new Int8Array(256), $t1;
     pick_list[0] = null;
@@ -2448,6 +2694,9 @@ export async function reroll_menu() {   // invent.c:2552
  *      Object identification routines:
  */
 /* set the cknown and lknown flags on an object if they're applicable */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ */
 export function set_cknown_lknown(obj) {   // invent.c:2624
     let $t1;
     if (Is_container(obj) || obj.otyp === STATUE) {
@@ -2460,6 +2709,10 @@ export function set_cknown_lknown(obj) {   // invent.c:2624
     return;
 }
 /* make an object actually be identified; no display updating */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 export async function fully_identify_obj(otmp) {   // invent.c:2637
     let $t1, $t2;
     await discover_object(otmp.otyp, TRUE, TRUE, TRUE);
@@ -2474,12 +2727,20 @@ export async function fully_identify_obj(otmp) {   // invent.c:2637
     }
 }
 /* ggetobj callback routine; identify an object and give immediate feedback */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function identify(otmp) {   // invent.c:2651
     await fully_identify_obj(otmp);
     await prinv(null, otmp, 0);
     return 1;
 }
 /* menu of unidentified objects; select and identify up to id_limit of them */
+/**
+ * @param {number} id_limit int
+ * @returns {Promise<void>}
+ */
 async function menu_identify(id_limit) {   // invent.c:2660
     let pick_list = [null], n = 0, i = 0, first = 0, tryct = 0, buf = new Int8Array(256);
     first = 1;
@@ -2518,6 +2779,10 @@ async function menu_identify(id_limit) {   // invent.c:2660
     }
 }
 /* count the unidentified items */
+/**
+ * @param {$T.obj | null} objchn struct obj *
+ * @returns {number} int
+ */
 export function count_unidentified(objchn) {   // invent.c:2698
     let unid_cnt = 0, obj = null;
     unid_cnt = 0;
@@ -2529,6 +2794,11 @@ export function count_unidentified(objchn) {   // invent.c:2698
     return unid_cnt;
 }
 /* dialog with user to identify a given number of items; 0 means all */
+/**
+ * @param {number} id_limit int
+ * @param {number} learning_id boolean
+ * @returns {Promise<void>}
+ */
 export async function identify_pack(id_limit, learning_id) {   // invent.c:2711
     let obj = null, n = 0, unid_cnt = 0;
     /* T: just read unknown identify scroll */
@@ -2565,6 +2835,9 @@ export async function identify_pack(id_limit, learning_id) {   // invent.c:2711
 }
 /* called when regaining sight; mark inventory objects which were picked
    up while blind as now having been seen */
+/**
+ * @returns {Promise<void>}
+ */
 export async function learn_unseen_invent() {   // invent.c:2750
     let otmp = null, invupdated = 0;
     invupdated = FALSE;
@@ -2593,6 +2866,9 @@ export async function learn_unseen_invent() {   // invent.c:2750
    'update_inventory' used to be a macro for
    (*windowprocs.win_update_inventory) but the restore hackery to suppress
    screen updates was getting out of hand; this is now a central call point */
+/**
+ * @returns {Promise<void>}
+ */
 export async function update_inventory() {   // invent.c:2782
     let save_suppress_price = 0;
     if (!program_state.in_moveloop) {   /* not covered by suppress_map_output */
@@ -2622,6 +2898,9 @@ export async function update_inventory() {   // invent.c:2782
     iflags.suppress_price = save_suppress_price;
 }
 /* the #perminv command - call interface's persistent inventory routine */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doperminv() {   // invent.c:2814
     /*
      * If persistent inventory window is enabled, interact with it.
@@ -2655,6 +2934,10 @@ export async function doperminv() {   // invent.c:2814
     return ECMD.OK;
 }
 /* should of course only be called for things in invent */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} char
+ */
 function obj_to_let(obj) {   // invent.c:2861
     if (!flags.invlet_constant) {
         obj.invlet = NOINVSYM;
@@ -2665,6 +2948,12 @@ function obj_to_let(obj) {   // invent.c:2861
 /*
  * Print the indicated quantity of the given object.  If quan == 0L then use
  * the current quantity.
+ */
+/**
+ * @param {$c.Ptr | null} prefix const char *
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number | bigint} quan long
+ * @returns {Promise<void>}
  */
 export async function prinv(prefix, obj, quan) {   // invent.c:2875
     let total_of = 0, totalbuf = new Int8Array(128);
@@ -2678,6 +2967,15 @@ export async function prinv(prefix, obj, quan) {   // invent.c:2875
     }
     await pline($c.lit("%s%s%s%s"), prefix, prefix.get(0) ? $c.lit(" ") : $c.lit(""), await xprname(obj, null, obj_to_let(obj), $c.i8(!total_of ? 1 : 0), 0, quan), flags.verbose ? new $c.Ptr(totalbuf, 0) : $c.lit(""));
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$c.Ptr | null} txt const char *
+ * @param {number} let_ char
+ * @param {number} dot boolean
+ * @param {number | bigint} cost long
+ * @param {number | bigint} quan long
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function xprname(obj, txt, let_, dot, cost, quan) {   // invent.c:2895
     let suffix = new Int8Array(80), sfxlen = 0, txtlen = 0, fmt = null, use_invlet = 0, savequan = 0;
     /* text to print instead of obj */
@@ -2738,6 +3036,12 @@ export async function xprname(obj, txt, let_, dot, cost, quan) {   // invent.c:2
    order to preform context-sensitive item action on it; always returns 'ok';
    invent subsets specified by the ')', '[', '(', '=', '"', or '*' commands
    when they're invoked with the 'm' prefix (or without it for '*') */
+/**
+ * @param {$c.Ptr | null} lets char *
+ * @param {number} use_inuse_ordering boolean
+ * @param {$c.Ptr | null} alt_label const char *
+ * @returns {Promise<number>} int
+ */
 async function dispinv_with_action(lets, use_inuse_ordering, alt_label) {   // invent.c:2964
     let otmp = null, nextobj = null, save_accessories = null, c = 0, save_sortloot = 0, len = 0, menumode = 0, save_force_invmenu = 0;
     /* list of invlet values to include */
@@ -2774,6 +3078,9 @@ async function dispinv_with_action(lets, use_inuse_ordering, alt_label) {   // i
     return ECMD.OK;
 }
 /* the #inventory command (not much left...) */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function ddoinv() {   // invent.c:3006
     return await dispinv_with_action(null, FALSE, null);
 }
@@ -2785,6 +3092,11 @@ export async function ddoinv() {   // invent.c:3006
  * objects until last_found is reached, then set last_found to NULL so the
  * next unpaid object is returned.  This routine recursively follows
  * containers.
+ */
+/**
+ * @param {$T.obj | null} list struct obj *
+ * @param {*} last_found struct obj **
+ * @returns {$T.obj | null} struct obj *
  */
 function find_unpaid(list, last_found) {   // invent.c:3021
     let obj = null;
@@ -2808,6 +3120,9 @@ function find_unpaid(list, last_found) {   // invent.c:3021
     }
     return null;
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function free_pickinv_cache() {   // invent.c:3044
     if (gc.cached_pickinv_win !== WIN_ERR) {
         await destroy_nhwindow()(gc.cached_pickinv_win);
@@ -2817,6 +3132,15 @@ export async function free_pickinv_cache() {   // invent.c:3044
 /*
  * Internal function used by display_inventory and getobj that can display
  * inventory and return a count as well as a letter.
+ */
+/**
+ * @param {$c.Ptr | null} lets const char *
+ * @param {$c.Ptr | null} xtra_choice const char *
+ * @param {$c.Ptr | null} query const char *
+ * @param {number} allowxtra boolean
+ * @param {number} want_reply boolean
+ * @param {*} out_cnt long *
+ * @returns {Promise<number>} char
  */
 async function display_pickinv(lets, xtra_choice, query, allowxtra, want_reply, out_cnt) {   // invent.c:3057
     let otmp = null, wizid_fakeobj = new $T.obj(), inuse_fakeobj = new $T.obj(), ilet = 0, ret = 0, formattedobj = null, invlet = null, n = 0, classcount = 0, inusecount = 0, win = 0, any = new $T.any(), selected = [null], sortflags = 0, sortedinvent = [null], srtinv = null, prevorderclass = 0, filter = null, wizid = 0, gotsomething = 0, clr = 0, menu_behavior = 0, show_gold = 0, inuse_only = 0, skipped_gold = 0, doing_perm_invent = 0, save_flags_sortpack = 0, usextra = 0, unid_cnt = 0, prompt = new Int8Array(128), tmpglyph = 0, tmpglyphinfo = new $T.glyphinfo(), withsym = 0, class_header = null, barehands = new Int8Array(128), menutext = null, all_id = 0, i = 0, $t1, $t2, $t3;
@@ -3141,6 +3465,11 @@ async function display_pickinv(lets, xtra_choice, query, allowxtra, want_reply, 
  * Returns the letter identifier of a selected item, or 0 if nothing
  * was selected.
  */
+/**
+ * @param {$c.Ptr | null} lets const char *
+ * @param {number} want_reply boolean
+ * @returns {Promise<number>} char
+ */
 export async function display_inventory(lets, want_reply) {   // invent.c:3428
     let cmdq = null, otmp = null;
     cmdq = cmdq_pop();
@@ -3160,12 +3489,19 @@ export async function display_inventory(lets, want_reply) {   // invent.c:3428
     }
     return await display_pickinv(lets, null, null, FALSE, want_reply, null);
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function repopulate_perminvent() {   // invent.c:3456
     await display_pickinv(null, null, null, FALSE, FALSE, null);
 }
 /*
  * Show what is current using inventory letters.
  *
+ */
+/**
+ * @param {number} avoidlet char
+ * @returns {Promise<number>} char
  */
 async function display_used_invlets(avoidlet) {   // invent.c:3467
     let otmp = null, ilet = 0, ret = 0, invlet = null, n = 0, classcount = 0, invdone = 0, tmpglyph = 0, tmpglyphinfo = new $T.glyphinfo(), win = 0, any = new $T.any(), selected = [null], clr = 0, $t1;
@@ -3218,6 +3554,10 @@ async function display_used_invlets(avoidlet) {   // invent.c:3467
  * Returns the number of unpaid items within the given list.  This includes
  * contained objects.
  */
+/**
+ * @param {$T.obj | null} list struct obj *
+ * @returns {number} int
+ */
 export function count_unpaid(list) {   // invent.c:3526
     let count = 0;
     count = 0;
@@ -3238,6 +3578,12 @@ export function count_unpaid(list) {   // invent.c:3526
  *
  * Assumes that the hero sees or touches or otherwise senses the objects
  * at some point:  bknown is forced for priest[ess], like in xname().
+ */
+/**
+ * @param {$T.obj | null} list struct obj *
+ * @param {number} type int
+ * @param {Function | null} filterfunc boolean (*)(struct obj *)
+ * @returns {Promise<number>} int
  */
 export async function count_buc(list, type, filterfunc) {   // invent.c:3548
     let count = 0;
@@ -3267,6 +3613,16 @@ export async function count_buc(list, type, filterfunc) {   // invent.c:3548
 }
 /* similar to count_buc(), but tallies all states at once
    rather than looking for a specific type */
+/**
+ * @param {$T.obj | null} list struct obj *
+ * @param {number} by_nexthere boolean
+ * @param {*} bcp int *
+ * @param {*} ucp int *
+ * @param {*} ccp int *
+ * @param {*} xcp int *
+ * @param {*} ocp int *
+ * @param {*} jcp int *
+ */
 export function tally_BUCX(list, by_nexthere, bcp, ucp, ccp, xcp, ocp, jcp) {   // invent.c:3580
     let $t1, $t2, $t3, $t4, $t5;
     /* Future extensions:
@@ -3307,6 +3663,14 @@ export function tally_BUCX(list, by_nexthere, bcp, ucp, ccp, xcp, ocp, jcp) {   
     }
 }
 /* count everything inside a container, or just shop-owned items inside */
+/**
+ * @param {$T.obj | null} container struct obj *
+ * @param {number} nested boolean
+ * @param {number} quantity boolean
+ * @param {number} everything boolean
+ * @param {number} newdrop boolean
+ * @returns {Promise<number | bigint>} long
+ */
 export async function count_contents(container, nested, quantity, everything, newdrop) {   // invent.c:3620
     let otmp = null, topc = null, shoppy = 0, count = 0, x = Int16Array.of(0), y = Int16Array.of(0);
     /* include contents of any nested containers */
@@ -3336,6 +3700,12 @@ export async function count_contents(container, nested, quantity, everything, ne
     }
     return count;
 }
+/**
+ * @param {number} count int
+ * @param {number} floorcount int
+ * @param {number} buriedcount int
+ * @returns {Promise<void>}
+ */
 async function dounpaid(count, floorcount, buriedcount) {   // invent.c:3654
     let win = 0, otmp = null, marker = [null], contnr = null, ilet = 0, invlet = null, classcount = 0, num_so_far = 0, xtracount = 0, cost = 0, totcost = 0, contcost = 0, contbuf = new Int8Array(256), buf = new Int8Array(256), floorverb = null, where = null;
     /* unpaid items in inventory */
@@ -3444,6 +3814,10 @@ async function dounpaid(count, floorcount, buriedcount) {   // invent.c:3654
     await destroy_nhwindow()(win);
     return;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 function this_type_only(obj) {   // invent.c:3793
     let res = 0;
     res = $c.i8(obj.oclass === gt.this_type ? 1 : 0);
@@ -3476,6 +3850,9 @@ function this_type_only(obj) {   // invent.c:3793
     return res;
 }
 /* the #inventtype command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dotypeinv() {   // invent.c:3827
     let c = 0, n = 0, i = 0, extra_types = null, types = new Int8Array(256), title = new Int8Array(128), before = null, after = null, class_count = 0, oclass = 0, itemcount = Int32Array.of(0), any_unpaid = 0, u_carried = 0, u_floor = 0, u_buried = 0, bcnt = Int32Array.of(0), ccnt = Int32Array.of(0), ucnt = Int32Array.of(0), xcnt = Int32Array.of(0), ocnt = Int32Array.of(0), jcnt = Int32Array.of(0), billx = 0, pick_list = [null], traditional = 0, otmp = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13, $t14, $t15, $t16, $t17, $t18;
     c = 0;
@@ -3686,6 +4063,12 @@ export async function dotypeinv() {   // invent.c:3827
 }
 /* return a string describing the dungeon feature at <x,y> if there
    is one worth mentioning at that location; otherwise null */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$c.Ptr | null} buf char *
+ * @returns {Promise<$c.Ptr | null>} const char *
+ */
 export async function dfeature_at(x, y, buf) {   // invent.c:4037
     let lev = null, ltyp = 0, cmap = 0, dfeature = null, stway = null;
     lev = $c.relem(svl.level.locations[x], y);
@@ -3750,6 +4133,11 @@ export async function dfeature_at(x, y, buf) {   // invent.c:4037
 }
 /* look at what is here; if there are many objects (pile_limit or more),
    don't show them unless obj_cnt is 0 */
+/**
+ * @param {number} obj_cnt int
+ * @param {number} lookhere_flags unsigned int
+ * @returns {Promise<number>} int
+ */
 export async function look_here(obj_cnt, lookhere_flags) {   // invent.c:4104
     let otmp = null, trap = null, verb = null, dfeature = null, fbuf = new Int8Array(256), fbuf2 = new Int8Array(256), tmpwin = 0, skip_objects = 0, felt_cockatrice = 0, picked_some = 0, skip_dfeature = 0, mtmp = null, reg = null, regbuf = new Int8Array(128), drift = 0, cant_reach = 0, surf = null, where = null, onwhat = null, p = null, article = 0, buf = new Int8Array(256);
     /* obj_cnt > 0 implies that autopickup is in progress */
@@ -3932,6 +4320,9 @@ export async function look_here(obj_cnt, lookhere_flags) {   // invent.c:4104
     return !!Blind() ? ECMD.TIME : ECMD.OK;
 }
 /* #look command - explicitly look at what is here, including all objects */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dolook() {   // invent.c:4319
     let res = 0;
     /* don't let
@@ -3943,12 +4334,22 @@ export async function dolook() {   // invent.c:4319
     hide_unhide_msgtypes(FALSE, MSGTYP_MASK_REP_SHOW);
     return res;
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} force_touch boolean
+ * @returns {number} boolean
+ */
 export function will_feel_cockatrice(otmp, force_touch) {   // invent.c:4334
     if ((Blind() || force_touch) && !$G.uarmg && !Stone_resistance() && (otmp.otyp === CORPSE && touch_petrifies($c.relem(mons, otmp.corpsenm)))) {
         return TRUE;
     }
     return FALSE;
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} force_touch boolean
+ * @returns {Promise<void>}
+ */
 export async function feel_cockatrice(otmp, force_touch) {   // invent.c:4343
     let kbuf = new Int8Array(256);
     if (will_feel_cockatrice(otmp, force_touch)) {
@@ -3967,6 +4368,10 @@ export async function feel_cockatrice(otmp, force_touch) {   // invent.c:4343
 }
 /* 'obj' is being placed on the floor; if it can merge with something that
    is already there, combine them and discard obj as a separate object */
+/**
+ * @param {$T.obj | null} obj$in struct obj *
+ * @returns {Promise<void>}
+ */
 export async function stackobj(obj$in) {   // invent.c:4366
     const obj = [obj$in];
     let otmp = [null];
@@ -3978,6 +4383,11 @@ export async function stackobj(obj$in) {   // invent.c:4366
     return;
 }
 /* returns TRUE if obj & otmp can be merged; used in invent.c and mkobj.c */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} boolean
+ */
 export async function mergable(otmp, obj) {   // invent.c:4379
     let objnamelth = 0, otmpnamelth = 0;
     /* potential 'into' stack */
@@ -4076,6 +4486,9 @@ export async function mergable(otmp, obj) {   // invent.c:4379
     return TRUE;
 }
 /* the #showgold command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doprgold() {   // invent.c:4503
     let umoney = 0, hmoney = 0, buf = new Int8Array(256), total = 0, dollarsign = new Int8Array(2);
     /* Command takes containers into account. */
@@ -4112,6 +4525,9 @@ export async function doprgold() {   // invent.c:4503
     return ECMD.OK;
 }
 /* the #seeweapon command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doprwep() {   // invent.c:4550
     let lets = new Int8Array(4), ct = 0, $t1, $t2, $t3, $t4, $t5;
     if (!$G.uwep) {
@@ -4139,6 +4555,10 @@ export async function doprwep() {   // invent.c:4550
     return ECMD.OK;
 }
 /* caller is responsible for checking !wearing_armor() */
+/**
+ * @param {number} report_uskin boolean
+ * @returns {Promise<void>}
+ */
 async function noarmor(report_uskin) {   // invent.c:4578
     let p = null, uskinname = null, buf = new Int8Array(256);
     if (!$G.uskin || !report_uskin) {
@@ -4159,6 +4579,9 @@ async function noarmor(report_uskin) {   // invent.c:4578
     }
 }
 /* the #seearmor command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doprarm() {   // invent.c:4601
     let lets = new Int8Array(8), ct = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13, $t14, $t15, $t16, $t17, $t18, $t19, $t20, $t21;
     /*
@@ -4202,6 +4625,9 @@ export async function doprarm() {   // invent.c:4601
     return ECMD.OK;
 }
 /* the #seerings command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doprring() {   // invent.c:4642
     let lets = new Int8Array(3), use_inuse_mode = 0, ct = 0, $t1, $t2, $t3, $t4, $t5, $t6;
     if (!$G.uleft && !$G.uright) {
@@ -4237,6 +4663,9 @@ export async function doprring() {   // invent.c:4642
     return ECMD.OK;
 }
 /* the #seeamulet command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dopramulet() {   // invent.c:4679
     let lets = new Int8Array(2), $t1;
     if (!$G.uamul) {
@@ -4251,6 +4680,10 @@ export async function dopramulet() {   // invent.c:4679
     return ECMD.OK;
 }
 /* is 'obj' a tool that's in use?  can't simply check obj->owornmask */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 function tool_being_used(obj) {   // invent.c:4698
     /*
      * [Should this also include lit potions of oil?  They're not tools
@@ -4266,6 +4699,9 @@ function tool_being_used(obj) {   // invent.c:4698
     return $c.i8($c.peq(obj, $G.uwep) || obj.lamplit | 0 || obj.otyp === LEASH && obj.corpsenm ? 1 : 0);
 }
 /* the #seetools command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doprtool() {   // invent.c:4715
     let otmp = null, ct = 0, lets = new Int8Array(53), $t1, $t2, $t3;
     ct = 0;
@@ -4289,6 +4725,9 @@ export async function doprtool() {   // invent.c:4715
 }
 /* the #seeall command; combines the ')' + '[' + '=' + '"' + '(' commands;
    show inventory of all currently wielded, worn, or used objects */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doprinuse() {   // invent.c:4740
     let otmp = null, ct = 0;
     ct = 0;
@@ -4309,6 +4748,11 @@ export async function doprinuse() {   // invent.c:4740
 }
 /*
  * uses up an object that's on the floor, charging for it as necessary
+ */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number | bigint} numused long
+ * @returns {Promise<void>}
  */
 export async function useupf(obj, numused) {   // invent.c:4763
     let otmp = null, at_u = 0;
@@ -4332,6 +4776,12 @@ export async function useupf(obj, numused) {   // invent.c:4763
         await hideunder(gy.youmonst);
     }
 }
+/**
+ * @param {number} let_ char
+ * @param {number} unpaid boolean
+ * @param {number} showsym boolean
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function let_to_name(let_, unpaid, showsym) {   // invent.c:4800
     let ocsymfmt = null, invbuf_sympadding = 0, class_name = null, pos = null, oclass = 0, len = 0, bp = null, mlen = 0, $t1;
     ocsymfmt = $c.lit("  ('%c')");
@@ -4410,6 +4860,10 @@ export function reassign() {   // invent.c:4855
 }
 /* invent gold sanity check; used by doorganize() to control how getobj()
    deals with gold and also by wizard mode sanity_check() */
+/**
+ * @param {$c.Ptr | null} why const char *
+ * @returns {Promise<number>} boolean
+ */
 export async function check_invent_gold(why) {   // invent.c:4889
     let otmp = null, goldstacks = 0, wrongslot = 0;
     /* 'why' == caller in case of warning */
@@ -4431,6 +4885,10 @@ export async function check_invent_gold(why) {   // invent.c:4889
     return FALSE;   /* gold can't be #adjusted */
 }
 /* normal getobj callback for item to #adjust; excludes gold */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 function adjust_ok(obj) {   // invent.c:4917
     if (!obj || obj.oclass === COIN_CLASS) {
         return GETOBJ.EXCLUDE;
@@ -4438,6 +4896,10 @@ function adjust_ok(obj) {   // invent.c:4917
     return GETOBJ.SUGGEST;
 }
 /* getobj callback for item to #adjust if gold is wonky; allows gold */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 function adjust_gold_ok(obj) {   // invent.c:4927
     if (!obj) {
         return GETOBJ.EXCLUDE;
@@ -4489,6 +4951,9 @@ function adjust_gold_ok(obj) {   // invent.c:4927
  *      to get multiple stacks and/or it is in a slot other than '$'.
  *      Specifying a count to split it into two stacks is not allowed.
  */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doorganize() {   // invent.c:4981
     let adjust_filter = null, obj = null;
     /* inventory organizer by Del Lamb */
@@ -4507,6 +4972,9 @@ export async function doorganize() {   // invent.c:4981
     return await doorganize_core(obj);
 }
 /* alternate version of #adjust used by itemactions() for splitting */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function adjust_split() {   // invent.c:5008
     let obj = null, splitamount = [0], let_ = 0, dig = 0;
     splitamount[0] = 0;
@@ -4559,6 +5027,10 @@ export async function adjust_split() {   // invent.c:5008
     obj = await splitobj(obj, splitamount[0]);
     return await doorganize_core(obj);
 }
+/**
+ * @param {$T.obj | null} obj$in struct obj *
+ * @returns {Promise<number>} int
+ */
 async function doorganize_core(obj$in) {   // invent.c:5068
     const obj = [obj$in];
     let otmp = [null], splitting = [null], bumped = null, ix = 0, cur = 0, trycnt = 0, let_ = 0, lets = new Int8Array(55), qbuf = new Int8Array(128), objname = null, otmpname = null, adj_type = null, ever_mind = 0, collect = 0, isgold = 0, $goto = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9;
@@ -4783,6 +5255,11 @@ async function doorganize_core(obj$in) {   // invent.c:5068
     return ECMD.OK;
 }
 /* common to display_minventory and display_cinventory */
+/**
+ * @param {$c.Ptr | null} hdr const char *
+ * @param {$c.Ptr | null} txt const char *
+ * @returns {Promise<void>}
+ */
 async function invdisp_nothing(hdr, txt) {   // invent.c:5290
     let win = 0, selected = [null];
     win = await create_nhwindow()(NHW.MENU);
@@ -4798,6 +5275,10 @@ async function invdisp_nothing(hdr, txt) {   // invent.c:5290
     return;
 }
 /* query_objlist callback: return things that are worn or wielded */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 function worn_wield_only(obj) {   // invent.c:5309
     /* check for things that *are* worn or wielded (only used for monsters,
        so we don't worry about excluding W_CHAIN, W_ARTI and the like) */
@@ -4817,6 +5298,12 @@ function worn_wield_only(obj) {   // invent.c:5309
  *      PICK_ANY            - allowed, but we only return a single object
  *      MINV_NOLET          - nothing selectable
  *      MINV_ALL            - display all inventory
+ */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} dflags int
+ * @param {$c.Ptr | null} title char *
+ * @returns {Promise<$T.obj | null>} struct obj *
  */
 export async function display_minventory(mon, dflags, title) {   // invent.c:5341
     let ret = null, tmp = new Int8Array(128), n = 0, selected = [null], do_all = 0, incl_hero = 0, have_inv = 0, have_any = 0, pickings = 0;
@@ -4855,6 +5342,10 @@ export async function display_minventory(mon, dflags, title) {   // invent.c:534
 }
 /* format a container name for cinventory_display(), inserting "trapped"
    if that's appropriate */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 async function cinv_doname(obj) {   // invent.c:5391
     let result = null, p = null, q = null;
     result = await doname(obj);
@@ -4883,6 +5374,10 @@ async function cinv_doname(obj) {   // invent.c:5391
     return result;
 }
 /* used by safe_qbuf() if the full doname() result is too long */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 async function cinv_ansimpleoname(obj) {   // invent.c:5423
     let result = null;
     result = await ansimpleoname(obj);
@@ -4904,6 +5399,10 @@ async function cinv_ansimpleoname(obj) {   // invent.c:5423
 }
 /* Display the contents of a container in inventory style.
    Used for wand of probing of non-empty containers and statues. */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function display_cinventory(obj) {   // invent.c:5446
     let ret = null, qbuf = new Int8Array(128), n = 0, selected = [null];
     selected[0] = null;
@@ -4926,6 +5425,10 @@ export async function display_cinventory(obj) {   // invent.c:5446
     obj.cknown = (1) & 1;
     return ret;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 function only_here(obj) {   // invent.c:5477
     return $c.i8(obj.ox === go.only.x && obj.oy === go.only.y ? 1 : 0);
 }
@@ -4934,6 +5437,12 @@ function only_here(obj) {   // invent.c:5477
  * Return a non-zero value if there were items at that spot.
  *
  * Currently, this is only used with a wand of probing zapped downwards.
+ */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} as_if_seen boolean
+ * @returns {Promise<number>} int
  */
 export async function display_binventory(x, y, as_if_seen) {   // invent.c:5489
     let obj = null, qbuf = new Int8Array(128), underwhat = null, selected = [null], n = 0, n2 = 0, real_liquid = null, seen_liquid = null, more_than_1 = 0, $t1;
@@ -4988,6 +5497,9 @@ export async function display_binventory(x, y, as_if_seen) {   // invent.c:5489
     }
     return n + n2 | 0;
 }
+/**
+ * @param {number} window winid
+ */
 export function prepare_perminvent(window) {   // invent.c:5549
     let wri = null, invmode = 0;
     invmode = iflags.perminv_mode;
@@ -5000,6 +5512,9 @@ export function prepare_perminvent(window) {   // invent.c:5549
         nhUse(wri);
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function sync_perminvent() {   // invent.c:5565
     let wport_id = null;
     if ($G.WIN_INVEN === WIN_ERR) {
@@ -5071,6 +5586,10 @@ export async function sync_perminvent() {   // invent.c:5565
         gi.in_sync_perminvent = 0;
     }
 }
+/**
+ * @param {number} negated boolean
+ * @returns {Promise<void>}
+ */
 export async function perm_invent_toggled(negated) {   // invent.c:5661
     in_perm_invent_toggled = TRUE;
     if (negated) {

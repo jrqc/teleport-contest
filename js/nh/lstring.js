@@ -41,6 +41,11 @@ import { luaM_malloc_, luaM_realloc_, luaM_toobig } from './lmem.js';
 /*
 ** equality for long strings
 */
+/**
+ * @param {number} a TString *
+ * @param {number} b TString *
+ * @returns {number} int
+ */
 export function luaS_eqlngstr(a, b) {   // lstring.c:34
     let len = 0;
     len = $h.ldu64(a + 16);
@@ -49,6 +54,12 @@ export function luaS_eqlngstr(a, b) {   // lstring.c:34
     /* equal length and ... */
     return a === b || len === $h.ldu64(b + 16) && $hl.memcmp(a + 24, b + 24, len) === 0 ? 1 : 0;   /* equal contents */
 }
+/**
+ * @param {number} str const char *
+ * @param {number | bigint} l size_t
+ * @param {number} seed unsigned int
+ * @returns {number} unsigned int
+ */
 export function luaS_hash(str, l, seed) {   // lstring.c:43
     let h = 0;
     h = (seed ^ $c.u32(l)) >>> 0;
@@ -57,6 +68,10 @@ export function luaS_hash(str, l, seed) {   // lstring.c:43
     }
     return h;
 }
+/**
+ * @param {number} ts TString *
+ * @returns {number} unsigned int
+ */
 export function luaS_hashlongstr(ts) {   // lstring.c:51
     let len = 0, $t1;
     0;
@@ -68,6 +83,11 @@ export function luaS_hashlongstr(ts) {   // lstring.c:51
     }
     return $h.u32[(ts + 12) >>> 2];
 }
+/**
+ * @param {number} vect TString **
+ * @param {number} osize int
+ * @param {number} nsize int
+ */
 function tablerehash(vect, osize, nsize) {   // lstring.c:62
     let i = 0, p = 0, hnext = 0, h = 0;
     for (i = osize; i < nsize; i = i + 1 | 0) {   /* clear new elements */
@@ -92,6 +112,11 @@ function tablerehash(vect, osize, nsize) {   // lstring.c:62
 ** (This can degrade performance, but any non-zero size should work
 ** correctly.)
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} nsize int
+ * @returns {Promise<void>}
+ */
 export async function luaS_resize(L, nsize) {   // lstring.c:85
     let tb = 0, osize = 0, newvect = 0;
     tb = $h.u32[(L + 24) >>> 2] + 48;
@@ -119,6 +144,9 @@ export async function luaS_resize(L, nsize) {   // lstring.c:85
 ** Clear API string cache. (Entries cannot be empty, so fill them with
 ** a non-collectable string.)
 */
+/**
+ * @param {number} g global_State *
+ */
 export function luaS_clearcache(g) {   // lstring.c:110
     let i = 0, j = 0;
     for (i = 0; i < 53; i = i + 1 | 0) {
@@ -132,6 +160,10 @@ export function luaS_clearcache(g) {   // lstring.c:110
 /*
 ** Initialize the string table and the string cache
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<void>}
+ */
 export async function luaS_init(L) {   // lstring.c:123
     let g = 0, i = 0, j = 0, tb = 0, $t1, $t2;
     g = $h.u32[(L + 24) >>> 2];
@@ -151,6 +183,13 @@ export async function luaS_init(L) {   // lstring.c:123
 /*
 ** creates a new string object
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number | bigint} l size_t
+ * @param {number} tag int
+ * @param {number} h unsigned int
+ * @returns {Promise<number>} TString *
+ */
 async function createstrobj(L, l, tag, h) {   // lstring.c:143
     let ts = 0, o = 0, totalsize = 0;
     /* total size of TString object */
@@ -162,6 +201,11 @@ async function createstrobj(L, l, tag, h) {   // lstring.c:143
     $h.i8[ts + 24 + $c.idx(l)] = 0;   /* ending 0 */
     return ts;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number | bigint} l size_t
+ * @returns {Promise<number>} TString *
+ */
 export async function luaS_createlngstrobj(L, l) {   // lstring.c:157
     let ts = 0;
     ts = await createstrobj(L, l, 20, $h.u32[($h.u32[(L + 24) >>> 2] + 96) >>> 2]);
@@ -169,6 +213,10 @@ export async function luaS_createlngstrobj(L, l) {   // lstring.c:157
     $h.u8[ts + 11] = 255;   /* signals that it is a long string */
     return ts;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} ts TString *
+ */
 export function luaS_remove(L, ts) {   // lstring.c:165
     let tb = 0, p = 0;
     tb = $h.u32[(L + 24) >>> 2] + 48;
@@ -179,6 +227,11 @@ export function luaS_remove(L, ts) {   // lstring.c:165
     $h.stp(p, $h.u32[($h.u32[p >>> 2] + 16) >>> 2]);   /* remove element from its list */
     $h.i32[(tb + 8) >>> 2] = $h.i32[(tb + 8) >>> 2] - 1 | 0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} tb stringtable *
+ * @returns {Promise<void>}
+ */
 async function growstrtab(L, tb) {   // lstring.c:175
     if (($h.i32[(tb + 8) >>> 2] === 2147483647 ? 1 : 0) !== 0 ? 1 : 0) {
         /* too many strings? */
@@ -194,6 +247,12 @@ async function growstrtab(L, tb) {   // lstring.c:175
 /*
 ** Checks whether short string exists and reuses it or creates a new one.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} str const char *
+ * @param {number | bigint} l size_t
+ * @returns {Promise<number>} TString *
+ */
 async function internshrstr(L, str, l) {   // lstring.c:189
     let ts = 0, g = 0, tb = 0, h = 0, list = 0;
     g = $h.u32[(L + 24) >>> 2];
@@ -227,6 +286,12 @@ async function internshrstr(L, str, l) {   // lstring.c:189
 /*
 ** new string (with explicit length)
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} str const char *
+ * @param {number | bigint} l size_t
+ * @returns {Promise<number>} TString *
+ */
 export async function luaS_newlstr(L, str, l) {   // lstring.c:222
     let ts = 0;
     if (l <= 40) {   /* short string? */
@@ -246,6 +311,11 @@ export async function luaS_newlstr(L, str, l) {   // lstring.c:222
 ** only zero-terminated strings, so it is safe to use 'strcmp' to
 ** check hits.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} str const char *
+ * @returns {Promise<number>} TString *
+ */
 export async function luaS_new(L, str) {   // lstring.c:242
     let i = 0, j = 0, p = 0, $t1;
     i = $c.remu32($c.u32($c.andu64(str, 4294967295)), 53);   /* hash */
@@ -263,6 +333,12 @@ export async function luaS_new(L, str) {   // lstring.c:242
     $t1 = await luaS_newlstr(L, str, $hl.strlen(str)), $h.stp(p, $t1);
     return $h.u32[p >>> 2];
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number | bigint} s size_t
+ * @param {number} nuvalue int
+ * @returns {Promise<number>} Udata *
+ */
 export async function luaS_newudata(L, s, nuvalue) {   // lstring.c:259
     let u = 0, i = 0, o = 0;
     if ((s > $c.subu64(9223372036854775807n, nuvalue === 0 ? 32 : $c.addu64(40, $c.mulu64(16, $c.u64(nuvalue)))) ? 1 : 0) !== 0 ? 1 : 0) {

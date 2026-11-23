@@ -126,6 +126,11 @@ const o_ranges = $c.recArray($T.o_range, 19);
    vs "pick-axe") then there is no need for inclusion in this list;
    likewise for ``"of" inversions'' ("boots of speed" vs "speed boots") */
 const spellings = $c.recArray($T.alt_spellings, 47);
+/**
+ * @param {$c.Ptr | null} s char *
+ * @param {$c.Ptr | null} pref const char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 async function strprepend(s, pref) {   // objnam.c:123
     let star_s = 0, i = 0;
     star_s = s.get(0);
@@ -138,11 +143,17 @@ async function strprepend(s, pref) {   // objnam.c:123
     s.set(0, star_s);
     return s.add(-i);
 }
+/**
+ * @returns {$c.Ptr | null} char *
+ */
 function nextobuf() {   // objnam.c:142
     obufidx = $c.rem32(obufidx + 1 | 0, NUMOBUF);
     return new $c.Ptr(obufs[obufidx], 0);
 }
 /* put the most recently allocated buffer back if possible */
+/**
+ * @param {$c.Ptr | null} bufp char *
+ */
 function releaseobuf(bufp) {   // objnam.c:150
     /* caller may not know whether bufp is the most recently allocated
        buffer; if it isn't, do nothing; note that because of the somewhat
@@ -157,6 +168,9 @@ function releaseobuf(bufp) {   // objnam.c:150
    release each successive doname() result in order to try to avoid
    clobbering all the obufs when 'perm_invent' is enabled and updated
    while one or more obufs have been allocated but not released yet */
+/**
+ * @param {$c.Ptr | null} obuffer char *
+ */
 export function maybereleaseobuf(obuffer) {   // objnam.c:167
     releaseobuf(obuffer);
     /*
@@ -187,6 +201,10 @@ export function maybereleaseobuf(obuffer) {   // objnam.c:167
      * hold_another_object() rather than by avoiding using all the obufs.
      */
 }
+/**
+ * @param {number} otyp int
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function obj_typename(otyp) {   // objnam.c:201
     let buf = null, ocl = null, actualn = null, dn = null, un = null, nn = 0;
     buf = nextobuf();
@@ -291,6 +309,10 @@ export async function obj_typename(otyp) {   // objnam.c:201
 }
 /* less verbose result than obj_typename(); either the actual name
    or the description (but not both); user-assigned name is ignored */
+/**
+ * @param {number} otyp int
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function simple_typename(otyp) {   // objnam.c:298
     let bufp = null, pp = null, save_uname = null;
     save_uname = objects[otyp].oc_uname;
@@ -303,6 +325,10 @@ export async function simple_typename(otyp) {   // objnam.c:298
     return bufp;
 }
 /* typename for debugging feedback where data involved might be suspect */
+/**
+ * @param {number} otyp int
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function safe_typename(otyp) {   // objnam.c:312
     let save_nameknown = 0, res = null;
     res = null;
@@ -319,6 +345,10 @@ export async function safe_typename(otyp) {   // objnam.c:312
     }
     return res;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 export function obj_is_pname(obj) {   // objnam.c:333
     if (!obj.oartifact || !has_oname(obj)) {
         return FALSE;
@@ -332,6 +362,11 @@ export function obj_is_pname(obj) {   // objnam.c:333
 }
 /* Give the name of an object seen at a distance.  Unlike xname/doname,
    we usually don't want to set dknown if it's not set already. */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {Function | null} func char *(*)(struct obj *)
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function distant_name(obj, func) {   // objnam.c:347
     let str = null, save_oid = 0, ox = Int16Array.of(0), oy = Int16Array.of(0), r = 0, neardist = 0;
     /* object to be formatted */
@@ -392,6 +427,10 @@ export async function distant_name(obj, func) {   // objnam.c:347
 }
 /* convert player specified fruit name into corresponding fruit juice name
    ("slice of pizza" -> "pizza juice" rather than "slice of pizza juice") */
+/**
+ * @param {number} juice boolean
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function fruitname(juice) {   // objnam.c:414
     let buf = null, fruit_nam = null;
     /* whether or not to append " juice" to the name */
@@ -406,6 +445,10 @@ export async function fruitname(juice) {   // objnam.c:414
     return buf;
 }
 /* look up a named fruit by index (1..127) */
+/**
+ * @param {number} indx int
+ * @returns {$T.fruit | null} struct fruit *
+ */
 export function fruit_from_indx(indx) {   // objnam.c:431
     let f = null;
     for (f = gf.ffruit; f; f = f.nextf) {
@@ -416,6 +459,12 @@ export function fruit_from_indx(indx) {   // objnam.c:431
     return f;
 }
 /* look up a named fruit by name */
+/**
+ * @param {$c.Ptr | null} fname const char *
+ * @param {number} exact boolean
+ * @param {*} highest_fid int *
+ * @returns {Promise<$T.fruit | null>} struct fruit *
+ */
 export async function fruit_from_name(fname, exact, highest_fid) {   // objnam.c:443
     let f = null, tentativef = null, altfname = null, k = 0, fnamebuf = new Int8Array(256), p = null, fname_k = 0;
     /* False: prefix or exact match, True: exact match only */
@@ -489,6 +538,10 @@ export async function fruit_from_name(fname, exact, highest_fid) {   // objnam.c
     return f;
 }
 /* sort the named-fruit linked list by fruit index number */
+/**
+ * @param {number} forward boolean
+ * @returns {Promise<void>}
+ */
 export async function reorder_fruit(forward) {   // objnam.c:523
     let f = null, allfr = $c.nulls(128), i = 0, j = 0, k = 0;
     k = 128;
@@ -521,6 +574,13 @@ export async function reorder_fruit(forward) {   // objnam.c:523
     }
 }
 /* add "<pfx> called <sfx>" to end of buf, truncating if necessary */
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @param {number} siz int
+ * @param {$c.Ptr | null} pfx const char *
+ * @param {$c.Ptr | null} sfx const char *
+ * @returns {Promise<void>}
+ */
 async function xcalled(buf, siz, pfx, sfx) {   // objnam.c:558
     let bufsiz = 0, pfxlen = 0;
     /* eos(obuf) or eos(&obuf[PREFIX]) */
@@ -534,9 +594,18 @@ async function xcalled(buf, siz, pfx, sfx) {   // objnam.c:558
     }
     $c.sprintf(eos(buf), $c.lit("%s called %.*s"), pfx, bufsiz - pfxlen | 0, sfx);
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function xname(obj) {   // objnam.c:575
     return await xname_flags(obj, CXN.NORMAL);
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} cxn_flags unsigned int
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 async function xname_flags(obj, cxn_flags) {   // objnam.c:581
     let buf = null, obufp = null, buf_end = null, buf_eos = null, bufspaceleft = 0, typ = 0, ocl = null, nn = 0, omndx = 0, actualn = null, dn = null, un = null, pluralize = 0, known = 0, dknown = 0, bknown = 0, anbuf = new Int8Array(10), pm_name = null, f = null, anbuf$2 = new Int8Array(10), statue_pmname = null, rock = null, lbl = null, tmpbuf = new Int8Array(256), $goto = null, $t1, $t2, $t3;
     D1: for (;;) {
@@ -1024,6 +1093,10 @@ async function xname_flags(obj, cxn_flags) {   // objnam.c:581
      brown potion               -- if oc_name_known not set
      potion of object detection -- if discovered
  */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 async function minimal_xname(obj) {   // objnam.c:1038
     let bufp = null, bareobj = new $T.obj(), saveobcls = new $T.objclass(), otyp = 0;
     otyp = obj.otyp;
@@ -1069,6 +1142,10 @@ async function minimal_xname(obj) {   // objnam.c:1038
     return bufp;
 }
 /* xname() output augmented for multishot missile feedback */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function mshot_xname(obj) {   // objnam.c:1090
     let tmpbuf = new Int8Array(256), onm = null;
     onm = await xname(obj);
@@ -1081,6 +1158,10 @@ export async function mshot_xname(obj) {   // objnam.c:1090
     return onm;
 }
 /* used for naming "the unique_item" instead of "a unique_item" */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 export function the_unique_obj(obj) {   // objnam.c:1106
     let known = 0;
     known = $c.i8(obj.known | 0 || iflags.override_ID ? 1 : 0);
@@ -1093,6 +1174,10 @@ export function the_unique_obj(obj) {   // objnam.c:1106
     }
 }
 /* should monster type be prefixed with "the"? (mostly used for corpses) */
+/**
+ * @param {$T.permonst | null} ptr struct permonst *
+ * @returns {number} boolean
+ */
 export function the_unique_pm(ptr) {   // objnam.c:1121
     let uniq = 0;
     /* even though monsters with personal names are unique, we want to
@@ -1113,6 +1198,10 @@ export function the_unique_pm(ptr) {   // objnam.c:1121
     }
     return uniq;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$c.Ptr | null} prefix char *
+ */
 function add_erosion_words(obj, prefix) {   // objnam.c:1143
     let iscrys = 0, rknown = 0;
     iscrys = $c.i8(obj.otyp === CRYSKNIFE ? 1 : 0);
@@ -1154,6 +1243,10 @@ function add_erosion_words(obj, prefix) {   // objnam.c:1143
     /* hardened */
 }
 /* used to prevent rust on items where rust makes no difference */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 export function erosion_matters(obj) {   // objnam.c:1195
     switch (obj.oclass) {
         case TOOL_CLASS:
@@ -1176,6 +1269,11 @@ export function erosion_matters(obj) {   // objnam.c:1195
 }
 /* [not used anywhere yet] */
 /* core of doname() */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} doname_flags unsigned int
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 async function doname_base(obj, doname_flags) {   // objnam.c:1223
     let ispoisoned = 0, with_price = 0, vague_quan = 0, for_menu = 0, known = 0, dknown = 0, cknown = 0, bknown = 0, lknown = 0, fake_arti = 0, force_the = 0, prefix = new Int8Array(80), tmpbuf = new Int8Array(81), aname = null, omndx = 0, bp = null, bp_eos = [null], bp_end = null, bpspaceleft = 0, itemcount = 0, mlsh = null, suffix = new Int8Array(20), timer = new $T.any(), full_burn_time = 0, turns_left = 0, cxarg = 0, cxstr = null, save_xnamep = null, cgend = 0, mgend = 0, twoweap_primary = 0, tethered = 0, hand_s = null, obufp = null, handsbuf = new Int8Array(40), Qtyp = 0, pricebuf = new Int8Array(40), quotedprice = 0, nochrg = Int32Array.of(0), price = 0, pricebuf$2 = new Int8Array(40), offsetbp = 0, $goto = null, $t1;
     /* object to format */
@@ -1722,14 +1820,26 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
     }
     return bp;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function doname(obj) {   // objnam.c:1754
     return await doname_base(obj, 0);
 }
 /* Name of object including price. */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function doname_with_price(obj) {   // objnam.c:1761
     return await doname_base(obj, DONAME_WITH_PRICE);
 }
 /* "some" instead of precise quantity if obj->dknown not set */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function doname_vague_quan(obj) {   // objnam.c:1768
     /* Used by farlook.
      * If it hasn't been seen up close and quantity is more than one,
@@ -1746,6 +1856,10 @@ export async function doname_vague_quan(obj) {   // objnam.c:1768
     return await doname_base(obj, DONAME_VAGUE_QUAN);
 }
 /* used from invent.c */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {number} boolean
+ */
 export function not_fully_identified(otmp) {   // objnam.c:1787
     /* gold doesn't have any interesting attributes [yet?] */
     if (otmp.oclass === COIN_CLASS) {
@@ -1777,6 +1891,12 @@ export function not_fully_identified(otmp) {   // objnam.c:1787
 }
 /* format a corpse name (xname() omits monster type; doname() calls us);
    eatcorpse() also uses us for death reason when eating tainted glob */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {$c.Ptr | null} adjective const char *
+ * @param {number} cxn_flags unsigned int
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function corpse_xname(otmp, adjective, cxn_flags) {   // objnam.c:1824
     let nambuf = null, omndx = 0, ignore_quan = 0, no_prefix = 0, the_prefix = 0, any_prefix = 0, omit_corpse = 0, possessive = 0, glob = 0, mnam = null, obufp = null, $t1;
     /* bitmask of CXN_xxx values */
@@ -1870,6 +1990,10 @@ export async function corpse_xname(otmp, adjective, cxn_flags) {   // objnam.c:1
     return nambuf;
 }
 /* xname doesn't include monster type for "corpse"; cxname does */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function cxname(obj) {   // objnam.c:1924
     if (obj.otyp === CORPSE) {
         return await corpse_xname(obj, null, CXN.NORMAL);
@@ -1877,6 +2001,10 @@ export async function cxname(obj) {   // objnam.c:1924
     return await xname(obj);
 }
 /* like cxname, but ignores quantity */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function cxname_singular(obj) {   // objnam.c:1933
     if (obj.otyp === CORPSE) {
         return await corpse_xname(obj, null, CXN.SINGULAR);
@@ -1884,6 +2012,10 @@ export async function cxname_singular(obj) {   // objnam.c:1933
     return await xname_flags(obj, CXN.SINGULAR);
 }
 /* treat an object as fully ID'd when it might be used as reason for death */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function killer_xname(obj) {   // objnam.c:1942
     let save_obj = new $T.obj(), save_ocknown = 0, buf = null, save_ocuname = null, save_oname = null, $t1, $t2, $t3, $t4;
     save_oname = null;
@@ -1947,6 +2079,13 @@ export async function killer_xname(obj) {   // objnam.c:1942
     return buf;
 }
 /* xname,doname,&c with long results reformatted to omit some stuff */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {Function | null} func char *(*)(struct obj *)
+ * @param {Function | null} altfunc char *(*)(struct obj *)
+ * @param {number} lenlimit unsigned int
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function short_oname(obj, func, altfunc, lenlimit) {   // objnam.c:2009
     let save_obj = new $T.obj(), unamebuf = new Int8Array(12), onamebuf = new Int8Array(12), save_oname = null, save_uname = null, outbuf = null, $t1, $t2, $t3;
     /* main formatting routine */
@@ -2021,6 +2160,11 @@ export async function short_oname(obj, func, altfunc, lenlimit) {   // objnam.c:
 /*
  * Used if only one of a collection of objects is named (e.g. in eat.c).
  */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {Function | null} func char *(*)(struct obj *)
+ * @returns {Promise<$c.Ptr | null>} const char *
+ */
 export async function singular(otmp, func) {   // objnam.c:2091
     let savequan = 0, nam = null;
     /* using xname for corpses does not give the monster type */
@@ -2034,6 +2178,11 @@ export async function singular(otmp, func) {   // objnam.c:2091
     return nam;
 }
 /* pick "", "a ", or "an " as article for 'str'; used by an() and doname() */
+/**
+ * @param {$c.Ptr | null} outbuf char *
+ * @param {$c.Ptr | null} str const char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function just_an(outbuf, str) {   // objnam.c:2109
     let c0 = 0;
     outbuf.set(0, 0);
@@ -2060,6 +2209,10 @@ export function just_an(outbuf, str) {   // objnam.c:2109
     }
     return outbuf;
 }
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function an(str) {   // objnam.c:2145
     let buf = null;
     buf = nextobuf();
@@ -2070,6 +2223,10 @@ export async function an(str) {   // objnam.c:2145
     just_an(buf, str);
     return $c.strncat(buf, str, BUFSZ - 1 - await Strlen_(buf, $c.lit("an"), 2154) >>> 0);
 }
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function An(str) {   // objnam.c:2158
     let tmp = null, $t1;
     tmp = await an(str);
@@ -2079,6 +2236,10 @@ export async function An(str) {   // objnam.c:2158
 /*
  * Prepend "the" if necessary; assumes str is a subject derived from xname.
  * Use type_is_pname() for monster names, not the().  the() is idempotent.
+ */
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function the(str) {   // objnam.c:2171
     let aname = null, buf = null, insert_the = 0, named = null, called = null, tmp = null, l = 0, $t1;
@@ -2131,6 +2292,10 @@ export async function the(str) {   // objnam.c:2171
     }
     return $c.strncat(buf, str, BUFSZ - 1 - await Strlen_(buf, $c.lit("the"), 2230) >>> 0);
 }
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function The(str) {   // objnam.c:2234
     let tmp = null, $t1;
     tmp = await the(str);
@@ -2138,6 +2303,11 @@ export async function The(str) {   // objnam.c:2234
     return tmp;
 }
 /* returns "count cxname(otmp)" or just cxname(otmp) if count == 1 */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {$c.Ptr | null} verb const char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function aobjnam(otmp, verb) {   // objnam.c:2244
     let prefix = new Int8Array(80), bp = null;
     bp = await cxname(otmp);
@@ -2152,6 +2322,11 @@ export async function aobjnam(otmp, verb) {   // objnam.c:2244
     return bp;
 }
 /* combine yname and aobjnam eg "your count cxname(otmp)" */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$c.Ptr | null} verb const char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function yobjnam(obj, verb) {   // objnam.c:2262
     let s = null, outbuf = null, space_left = 0;
     s = await aobjnam(obj, verb);
@@ -2165,6 +2340,11 @@ export async function yobjnam(obj, verb) {   // objnam.c:2262
     return s;
 }
 /* combine Yname2 and aobjnam eg "Your count cxname(otmp)" */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$c.Ptr | null} verb const char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function Yobjnam2(obj, verb) {   // objnam.c:2280
     let s = null, $t1;
     s = await yobjnam(obj, verb);
@@ -2172,6 +2352,11 @@ export async function Yobjnam2(obj, verb) {   // objnam.c:2280
     return s;
 }
 /* like aobjnam, but prepend "The", not count, and use xname */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {$c.Ptr | null} verb const char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function Tobjnam(otmp, verb) {   // objnam.c:2290
     let bp = null;
     bp = await The(await xname(otmp));
@@ -2182,6 +2367,10 @@ export async function Tobjnam(otmp, verb) {   // objnam.c:2290
     return bp;
 }
 /* capitalized variant of doname() */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function Doname2(obj) {   // objnam.c:2303
     let s = null, $t1;
     s = await doname(obj);
@@ -2189,6 +2378,10 @@ export async function Doname2(obj) {   // objnam.c:2303
     return s;
 }
 /* doname() for itemized buying of 'obj' from a shop */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function paydoname(obj) {   // objnam.c:2313
     let p = null, save_cknown = 0, save_wizweight = 0;
     save_cknown = obj.cknown;
@@ -2230,6 +2423,10 @@ export async function paydoname(obj) {   // objnam.c:2313
     return p;
 }
 /* returns "[your ]xname(obj)" or "Foobar's xname(obj)" or "the xname(obj)" */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function yname(obj) {   // objnam.c:2359
     let s = null, outbuf = null, space_left = 0;
     s = await cxname(obj);
@@ -2243,6 +2440,10 @@ export async function yname(obj) {   // objnam.c:2359
     return s;
 }
 /* capitalized variant of yname() */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function Yname2(obj) {   // objnam.c:2378
     let s = null, $t1;
     s = await yname(obj);
@@ -2253,6 +2454,10 @@ export async function Yname2(obj) {   // objnam.c:2378
  * or "Foobar's minimal_xname(obj)"
  * or "the minimal_xname(obj)"
  */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function ysimple_name(obj) {   // objnam.c:2391
     let outbuf = null, s = null, space_left = 0;
     outbuf = nextobuf();
@@ -2261,6 +2466,10 @@ export async function ysimple_name(obj) {   // objnam.c:2391
     return $c.strncat(s, await minimal_xname(obj), $c.u64(space_left));
 }
 /* capitalized variant of ysimple_name() */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function Ysimple_name2(obj) {   // objnam.c:2402
     let s = null, $t1;
     s = await ysimple_name(obj);
@@ -2283,6 +2492,10 @@ export async function Ysimple_name2(obj) {   // objnam.c:2402
  *  enough to added plural suffix or "an" or "the" prefix.]
  */
 /* "scroll" or "scrolls" */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function simpleonames(obj) {   // objnam.c:2428
     let obufp = null, simpleoname = null;
     simpleoname = await minimal_xname(obj);
@@ -2298,6 +2511,10 @@ export async function simpleonames(obj) {   // objnam.c:2428
     return simpleoname;
 }
 /* "a scroll" or "scrolls"; "a silver bell" or "the Bell of Opening" */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function ansimpleoname(obj) {   // objnam.c:2446
     let obufp = null, simpleoname = null, otyp = 0;
     simpleoname = await simpleonames(obj);
@@ -2323,6 +2540,10 @@ export async function ansimpleoname(obj) {   // objnam.c:2446
     return simpleoname;
 }
 /* "the scroll" or "the scrolls" */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function thesimpleoname(obj) {   // objnam.c:2474
     let obufp = null, simpleoname = null;
     simpleoname = await simpleonames(obj);
@@ -2336,6 +2557,10 @@ export async function thesimpleoname(obj) {   // objnam.c:2474
    items, we can't just use OBJ_NAME() because it doesn't always include
    the class (for instance "light" when we want "spellbook of light");
    minimal_xname() uses xname() to get that */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function actualoname(obj) {   // objnam.c:2490
     let res = null;
     iflags.override_ID = TRUE;
@@ -2344,6 +2569,10 @@ export async function actualoname(obj) {   // objnam.c:2490
     return res;
 }
 /* artifact's name without any object type or known/dknown/&c feedback */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function bare_artifactname(obj) {   // objnam.c:2502
     let outbuf = null, $t1;
     if (obj.oartifact) {
@@ -2358,6 +2587,11 @@ export async function bare_artifactname(obj) {   // objnam.c:2502
     return outbuf;
 }
 /* return form of the verb (input plural) if xname(otmp) were the subject */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {$c.Ptr | null} verb const char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function otense(otmp, verb) {   // objnam.c:2531
     let buf = null;
     /*
@@ -2373,6 +2607,11 @@ export async function otense(otmp, verb) {   // objnam.c:2531
     return buf;
 }
 /* return form of the verb (input plural) for present tense 3rd person subj */
+/**
+ * @param {$c.Ptr | null} subj const char *
+ * @param {$c.Ptr | null} verb const char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function vtense(subj, verb) {   // objnam.c:2563
     let buf = null, bspot = null, len = 0, ltmp = 0, sp = null, spot = null, spec = null;
     buf = nextobuf();
@@ -2452,6 +2691,13 @@ export async function vtense(subj, verb) {   // objnam.c:2563
     return buf;
 }
 /* singularize/pluralize decisions common to both makesingular & makeplural */
+/**
+ * @param {$c.Ptr | null} basestr char *
+ * @param {$c.Ptr | null} endstring char *
+ * @param {number} to_plural boolean
+ * @param {*} alt_as_is const char *const *
+ * @returns {Promise<number>} boolean
+ */
 async function singplur_lookup(basestr, endstring, to_plural, alt_as_is) {   // objnam.c:2708
     let sp = null, same = null, other = null, as = null, al = 0, baselen = 0;
     /* base string, pointer to eos(string) */
@@ -2522,6 +2768,10 @@ async function singplur_lookup(basestr, endstring, to_plural, alt_as_is) {   // 
     return FALSE;
 }
 /* searches for common compounds, ex. lump of royal jelly */
+/**
+ * @param {$c.Ptr | null} str char *
+ * @returns {$c.Ptr | null} char *
+ */
 function singplur_compound(str) {   // objnam.c:2783
     let cmpd = null, p = null;
     /* if new entries are added, be sure to keep compound_start[] in sync */
@@ -2560,6 +2810,10 @@ function singplur_compound(str) {   // objnam.c:2783
  *
  * Also misused by muse.c to convert 1st person present verbs to 2nd person.
  * 3.6.0: made case-insensitive.
+ */
+/**
+ * @param {$c.Ptr | null} oldstr const char *
+ * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function makeplural(oldstr) {   // objnam.c:2836
     let spot = null, lo_c = 0, str = null, excess = null, len = 0, i = 0, $t1;
@@ -2731,6 +2985,10 @@ export async function makeplural(oldstr) {   // objnam.c:2836
  * from plural, doesn't make much sense for them so we don't bother trying.
  * 3.6.0: made case-insensitive.
  */
+/**
+ * @param {$c.Ptr | null} oldstr const char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function makesingular(oldstr) {   // objnam.c:3037
     let p = null, bp = null, excess = null, str = null, $t1;
     excess = null;
@@ -2846,6 +3104,10 @@ export async function makesingular(oldstr) {   // objnam.c:3037
     }
     return bp;
 }
+/**
+ * @param {$c.Ptr | null} basestr const char *
+ * @returns {number} boolean
+ */
 function ch_ksound(basestr) {   // objnam.c:3168
     let i = 0, al = 0, endstr = null;
     /* these are some *ch words/suffixes that make a k-sound. They pluralize by
@@ -2862,6 +3124,11 @@ function ch_ksound(basestr) {   // objnam.c:3168
     }
     return FALSE;
 }
+/**
+ * @param {$c.Ptr | null} basestr const char *
+ * @param {number} to_plural boolean
+ * @returns {number} boolean
+ */
 function badman(basestr, to_plural) {   // objnam.c:3194
     let i = 0, al = 0, endstr = null, spot = null;
     /* True: makeplural, False: makesingular */
@@ -2891,6 +3158,12 @@ function badman(basestr, to_plural) {   // objnam.c:3194
     return FALSE;
 }
 /* compare user string against object name string using fuzzy matching */
+/**
+ * @param {$c.Ptr | null} u_str const char *
+ * @param {$c.Ptr | null} o_str const char *
+ * @param {number} retry_inverted boolean
+ * @returns {Promise<number>} boolean
+ */
 async function wishymatch(u_str, o_str, retry_inverted) {   // objnam.c:3243
     let p = null, buf = new Int8Array(256), u_of = null, o_of = null;
     /* from user, so might be variant spelling */
@@ -2983,6 +3256,10 @@ async function wishymatch(u_str, o_str, retry_inverted) {   // objnam.c:3243
     }
     return FALSE;
 }
+/**
+ * @param {number} skill schar
+ * @returns {number} short
+ */
 function rnd_otyp_by_wpnskill(skill) {   // objnam.c:3432
     let i = 0, n = 0, otyp = 0;
     n = 0;
@@ -3005,6 +3282,12 @@ function rnd_otyp_by_wpnskill(skill) {   // objnam.c:3432
     }
     return otyp;
 }
+/**
+ * @param {$c.Ptr | null} name const char *
+ * @param {number} oclass char
+ * @param {number} xtra_prob int
+ * @returns {Promise<number>} short
+ */
 async function rnd_otyp_by_namedesc(name, oclass, xtra_prob) {   // objnam.c:3455
     let i = 0, n = 0, validobjs = new Int16Array(481), zn = null, of = null, check_of = 0, lo = 0, hi = 0, minglob = 0, maxglob = 0, prob = 0, maxprob = 0, $t1;
     /* add to item's chance of being chosen; non-zero causes
@@ -3068,10 +3351,17 @@ async function rnd_otyp_by_namedesc(name, oclass, xtra_prob) {   // objnam.c:345
     }
     return STRANGE_OBJECT;
 }
+/**
+ * @param {number} oclass char
+ * @returns {Promise<number>} int
+ */
 export async function shiny_obj(oclass) {   // objnam.c:3532
     return await rnd_otyp_by_namedesc($c.lit("shiny"), oclass, 0);
 }
 /* set wall under hero undiggable/unphaseable from string */
+/**
+ * @param {$c.Ptr | null} bp char *
+ */
 function set_wallprop_from_str(bp) {   // objnam.c:3539
     let wall_prop = 0;
     wall_prop = 0;
@@ -3087,6 +3377,10 @@ function set_wallprop_from_str(bp) {   // objnam.c:3539
     }
 }
 /* in wizard mode, readobjnam() can accept wishes for traps and terrain */
+/**
+ * @param {$T._readobjnam_data | null} d struct _readobjnam_data *
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 async function wizterrainwish(d) {   // objnam.c:3554
     let lev = null, madeterrain = 0, badterrain = 0, is_dbridge = 0, trap = 0, oldtyp = 0, ltyp = 0, x = 0, y = 0, bp = null, p = null, t = null, tname = null, save_prop = 0, new_water = null, icebuf = new Int8Array(40), al = 0, dbuf = new Int8Array(40), old_wall_info = 0, secret = 0, wall = 0, t$2 = null, $t1, $t2, $t3, $t4;
     madeterrain = FALSE;
@@ -3422,9 +3716,19 @@ async function wizterrainwish(d) {   // objnam.c:3554
     return null;
 }
 /* message common to several wizterrainwish() results */
+/**
+ * @param {$c.Ptr | null} newtype const char *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 async function dbterrainmesg(newtype, x, y) {   // objnam.c:3920
     await pline($c.lit("%s %s the drawbridge."), newtype, svl.level.locations[x][y].typ === DRAWBRIDGE_UP ? $c.lit("in front of") : $c.lit("under"));
 }
+/**
+ * @param {$c.Ptr | null} bp char *
+ * @param {$T._readobjnam_data | null} d struct _readobjnam_data *
+ */
 function readobjnam_init(bp, d) {   // objnam.c:3933
     let $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13, $t14, $t15, $t16, $t17, $t18, $t19, $t20, $t21, $t22, $t23, $t24, $t25, $t26, $t27, $t28, $t29, $t30;
     d.otmp = null;
@@ -3452,6 +3756,10 @@ function readobjnam_init(bp, d) {   // objnam.c:3933
 }
 /* return 1 if d->bp is empty or contains only various qualifiers like
    "blessed", "rustproof", and so on, or 0 if anything else is present */
+/**
+ * @param {$T._readobjnam_data | null} d struct _readobjnam_data *
+ * @returns {number} int
+ */
 function readobjnam_preparse(d) {   // objnam.c:3966
     let save_bp = null, more_l = 0, res = 0, l = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13, $t14, $t15, $t16, $t17, $t18, $t19, $t20, $t21, $t22, $t23, $t24, $t25, $t26, $t27, $t28, $t29, $t30, $t31;
     save_bp = null;
@@ -3637,6 +3945,9 @@ function readobjnam_preparse(d) {   // objnam.c:3966
     }
     return res;
 }
+/**
+ * @param {$T._readobjnam_data | null} d struct _readobjnam_data *
+ */
 function readobjnam_parse_charges(d) {   // objnam.c:4178
     let keeptrailingchars = 0, idx = 0, pp = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8;
     if ($c.strlen(d.bp) > 1 && ($t1 = $c.strrchr(d.bp, 40), d.p = $t1) !== null) {
@@ -3700,6 +4011,10 @@ function readobjnam_parse_charges(d) {   // objnam.c:4178
         d.rechrg = 7;   /* recharge_limit */
     }
 }
+/**
+ * @param {$T._readobjnam_data | null} d struct _readobjnam_data *
+ * @returns {Promise<number>} int
+ */
 async function readobjnam_postparse1(d) {   // objnam.c:4240
     let i = 0, s = null, rest = [null], obp = null, sng = null, as = null, dbp = null, j = 0, k = 0, l = 0, amubuf = new Int8Array(256), beartrap = 0, zp = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13, $t14, $t15, $t16, $t17, $t18, $t19, $t20, $t21, $t22, $t23;
     /* now we have the actual name, as delivered by xname, say
@@ -4085,6 +4400,10 @@ async function readobjnam_postparse1(d) {   // objnam.c:4240
     }
     return 0;
 }
+/**
+ * @param {$T._readobjnam_data | null} d struct _readobjnam_data *
+ * @returns {number} int
+ */
 function readobjnam_postparse2(d) {   // objnam.c:4666
     let i = 0, s = null, tbuf = new Int8Array(256), $t1, $t2, $t3;
     /* "grey stone" check must be before general "stone" */
@@ -4142,6 +4461,10 @@ function readobjnam_postparse2(d) {   // objnam.c:4666
     }
     return 0;
 }
+/**
+ * @param {$T._readobjnam_data | null} d struct _readobjnam_data *
+ * @returns {Promise<number>} int
+ */
 async function readobjnam_postparse3(d) {   // objnam.c:4727
     let i = 0, zn = null, j = null, fp = null, l = 0, cntf = 0, blessedf = 0, iscursedf = 0, uncursedf = 0, halfeatenf = 0, f = null, ftyp = 0, objtyp = Int16Array.of(0), as = null, $t1, $t2, $t3, $t4, $t5;
     /* check real names of gems first */
@@ -4296,6 +4619,11 @@ async function readobjnam_postparse3(d) {   // objnam.c:4727
  * if asking explicitly for "nothing" (or "nil") return no_wish;
  * if not an object return &hands_obj; if an error (no matching object),
  * return null.
+ */
+/**
+ * @param {$c.Ptr | null} bp char *
+ * @param {$T.obj | null} no_wish struct obj *
+ * @returns {Promise<$T.obj | null>} struct obj *
  */
 export async function readobjnam(bp, no_wish) {   // objnam.c:4910
     let d = new $T._readobjnam_data(), rn1cnt = 0, P$ = null, humanwere = 0, aname = null, novelname = null, objtyp = Int16Array.of(0), nut = 0, $goto = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13, $t14, $t15;
@@ -4778,6 +5106,11 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
         break;
     }
 }
+/**
+ * @param {number} first int
+ * @param {number} last int
+ * @returns {number} int
+ */
 export function rnd_class(first, last) {   // objnam.c:5403
     let i = 0, x = 0, sum = 0;
     sum = 0;
@@ -4797,6 +5130,11 @@ export function rnd_class(first, last) {   // objnam.c:5403
     }
     return first === last ? first : STRANGE_OBJECT;
 }
+/**
+ * @param {number} i int
+ * @param {$c.Ptr | null} ordinaryname const char *
+ * @returns {$c.Ptr | null} const char *
+ */
 export function Japanese_item_name(i, ordinaryname) {   // objnam.c:5422
     let j = null;
     j = $c.relem(Japanese_items, 0);
@@ -4808,6 +5146,10 @@ export function Japanese_item_name(i, ordinaryname) {   // objnam.c:5422
     }
     return ordinaryname;
 }
+/**
+ * @param {$T.obj | null} armor struct obj *
+ * @returns {Promise<$c.Ptr | null>} const char *
+ */
 export async function armor_simple_name(armor) {   // objnam.c:5435
     let result = null, armcat = 0;
     result = null;
@@ -4841,6 +5183,10 @@ export async function armor_simple_name(armor) {   // objnam.c:5435
     }
     return result;
 }
+/**
+ * @param {$T.obj | null} suit struct obj *
+ * @returns {$c.Ptr | null} const char *
+ */
 export function suit_simple_name(suit) {   // objnam.c:5471
     let suitnm = null, esuitp = null;
     if (suit) {
@@ -4860,6 +5206,10 @@ export function suit_simple_name(suit) {   // objnam.c:5471
     /* "suit" is lame but "armor" is ambiguous and "body armor" is absurd */
     return $c.lit("suit");
 }
+/**
+ * @param {$T.obj | null} cloak struct obj *
+ * @returns {$c.Ptr | null} const char *
+ */
 export function cloak_simple_name(cloak) {   // objnam.c:5492
     if (cloak) {
         switch (cloak.otyp) {
@@ -4876,6 +5226,10 @@ export function cloak_simple_name(cloak) {   // objnam.c:5492
     return $c.lit("cloak");
 }
 /* helm vs hat for messages */
+/**
+ * @param {$T.obj | null} helmet struct obj *
+ * @returns {$c.Ptr | null} const char *
+ */
 export function helm_simple_name(helmet) {   // objnam.c:5513
     /*
      *  There is some wiggle room here; the result has been chosen
@@ -4892,6 +5246,10 @@ export function helm_simple_name(helmet) {   // objnam.c:5513
     return !hard_helmet(helmet) ? $c.lit("hat") : $c.lit("helm");
 }
 /* gloves vs gauntlets; depends upon discovery state */
+/**
+ * @param {$T.obj | null} gloves struct obj *
+ * @returns {$c.Ptr | null} const char *
+ */
 export function gloves_simple_name(gloves) {   // objnam.c:5532
     let otyp = 0, ocl = null, actualn = null, descrpn = null;
     if (gloves && gloves.dknown | 0) {
@@ -4906,6 +5264,10 @@ export function gloves_simple_name(gloves) {   // objnam.c:5532
     return $c.lit("gloves");
 }
 /* boots vs shoes; depends upon discovery state */
+/**
+ * @param {$T.obj | null} boots struct obj *
+ * @returns {$c.Ptr | null} const char *
+ */
 export function boots_simple_name(boots) {   // objnam.c:5551
     let otyp = 0, ocl = null, actualn = null, descrpn = null;
     if (boots && boots.dknown | 0) {
@@ -4920,6 +5282,10 @@ export function boots_simple_name(boots) {   // objnam.c:5551
     return $c.lit("boots");
 }
 /* simplified shield for messages */
+/**
+ * @param {$T.obj | null} shield struct obj *
+ * @returns {$c.Ptr | null} const char *
+ */
 export function shield_simple_name(shield) {   // objnam.c:5570
     if (shield) {
         /* xname() describes unknown (unseen) reflection as smooth */
@@ -4943,9 +5309,17 @@ export function shield_simple_name(shield) {   // objnam.c:5570
     return $c.lit("shield");
 }
 /* for completeness */
+/**
+ * @param {$T.obj | null} shirt struct obj *
+ * @returns {$c.Ptr | null} const char *
+ */
 export function shirt_simple_name(shirt) {   // objnam.c:5600
     return $c.lit("shirt");
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<$c.Ptr | null>} const char *
+ */
 export async function mimic_obj_name(mtmp) {   // objnam.c:5606
     if (M_AP_TYPE(mtmp) === M_AP.OBJECT) {
         if (mtmp.mappearance === GOLD_PIECE) {
@@ -4962,6 +5336,16 @@ export async function mimic_obj_name(mtmp) {   // objnam.c:5606
  * guaranteed to fit within [QBUFSZ].  Takes an optional prefix, three
  * choices for filling in the middle (two object formatting functions and a
  * last resort literal which should be very short), and an optional suffix.
+ */
+/**
+ * @param {$c.Ptr | null} qbuf char *
+ * @param {$c.Ptr | null} qprefix const char *
+ * @param {$c.Ptr | null} qsuffix const char *
+ * @param {$T.obj | null} obj struct obj *
+ * @param {Function | null} func char *(*)(struct obj *)
+ * @param {Function | null} altfunc char *(*)(struct obj *)
+ * @param {$c.Ptr | null} lastR const char *
+ * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function safe_qbuf(qbuf, qprefix, qsuffix, obj, func, altfunc, lastR) {   // objnam.c:5624
     let bufp = null, endp = null, len = 0, lenlimit = 0, len_qpfx = 0, len_qsfx = 0, len_lastR = 0;

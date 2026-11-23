@@ -43,6 +43,11 @@ import { luaZ_fill } from './lzio.js';
 
 /* ORDER RESERVED */
 const luaX_tokens = $h.data(296, 8);
+/**
+ * @param {number} ls LexState *
+ * @param {number} c int
+ * @returns {Promise<void>}
+ */
 async function save(ls, c) {   // llex.c:57
     let b = 0, newsize = 0, $t1, $t2;
     b = $h.u32[(ls + 72) >>> 2];
@@ -55,6 +60,10 @@ async function save(ls, c) {   // llex.c:57
     }
     $h.i8[$h.u32[b >>> 2] + $c.idx(($t2 = $h.ldu64(b + 8), $h.st64(b + 8, $c.addu64($t2, 1)), $t2))] = $c.i8(c);
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<void>}
+ */
 export async function luaX_init(L) {   // llex.c:70
     let i = 0, e = 0, ts = 0;
     e = await luaS_newlstr(L, $h.lit("_ENV"), 4);   /* create env name */
@@ -65,6 +74,11 @@ export async function luaX_init(L) {   // llex.c:70
         $h.u8[ts + 10] = $c.u8(i + 1 | 0);   /* reserved word */
     }
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} token int
+ * @returns {Promise<number>} const char *
+ */
 export async function luaX_token2str(ls, token) {   // llex.c:82
     let s = 0;
     if (token < 256) {
@@ -85,6 +99,11 @@ export async function luaX_token2str(ls, token) {   // llex.c:82
         }
     }
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} token int
+ * @returns {Promise<number>} const char *
+ */
 async function txtToken(ls, token) {   // llex.c:99
     switch (token) {
         case 291 /* TK_NAME */:
@@ -97,6 +116,12 @@ async function txtToken(ls, token) {   // llex.c:99
             return await luaX_token2str(ls, token);
     }
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} msg const char *
+ * @param {number} token int
+ * @returns {Promise<void>}
+ */
 async function lexerror(ls, msg, token) {   // llex.c:111
     msg = await luaG_addinfo($h.u32[(ls + 56) >>> 2], msg, $h.u32[(ls + 96) >>> 2], $h.i32[(ls + 4) >>> 2]);
     if (token) {
@@ -104,6 +129,11 @@ async function lexerror(ls, msg, token) {   // llex.c:111
     }
     await luaD_throw($h.u32[(ls + 56) >>> 2], 3);
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} msg const char *
+ * @returns {Promise<void>}
+ */
 export async function luaX_syntaxerror(ls, msg) {   // llex.c:119
     await lexerror(ls, msg, $h.i32[(ls + 16) >>> 2]);
 }
@@ -117,6 +147,12 @@ export async function luaX_syntaxerror(ls, msg) {   // llex.c:119
 ** is a TValue readily available. Later, the code generation can change
 ** this value.
 */
+/**
+ * @param {number} ls LexState *
+ * @param {number} str const char *
+ * @param {number | bigint} l size_t
+ * @returns {Promise<number>} TString *
+ */
 export async function luaX_newstring(ls, str, l) {   // llex.c:134
     let L = 0, ts = 0, o = 0, stv = 0, io = 0, x_ = 0, $t1;
     L = $h.u32[(ls + 56) >>> 2];
@@ -152,6 +188,10 @@ export async function luaX_newstring(ls, str, l) {   // llex.c:134
 ** increment line number and skips newline sequence (any of
 ** \n, \r, \n\r, or \r\n)
 */
+/**
+ * @param {number} ls LexState *
+ * @returns {Promise<void>}
+ */
 async function inclinenumber(ls) {   // llex.c:156
     let old = 0, $t1, $t2, $t3, $t4, $t5, $t6;
     old = $h.i32[ls >>> 2];
@@ -164,6 +204,14 @@ async function inclinenumber(ls) {   // llex.c:156
         await lexerror(ls, $h.lit("chunk has too many lines"), 0);
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} ls LexState *
+ * @param {number} z ZIO *
+ * @param {number} source TString *
+ * @param {number} firstchar int
+ * @returns {Promise<void>}
+ */
 export async function luaX_setinput(L, ls, z, source, firstchar) {   // llex.c:167
     let $t1, $t2;
     $h.i32[(ls + 16) >>> 2] = 0;
@@ -183,6 +231,11 @@ export async function luaX_setinput(L, ls, z, source, firstchar) {   // llex.c:1
 ** LEXICAL ANALYZER
 ** =======================================================
 */
+/**
+ * @param {number} ls LexState *
+ * @param {number} c int
+ * @returns {Promise<number>} int
+ */
 async function check_next1(ls, c) {   // llex.c:191
     let $t1, $t2, $t3;
     if ($h.i32[ls >>> 2] === c) {
@@ -196,6 +249,11 @@ async function check_next1(ls, c) {   // llex.c:191
 ** Check whether current char is in set 'set' (with two chars) and
 ** saves it
 */
+/**
+ * @param {number} ls LexState *
+ * @param {number} set const char *
+ * @returns {Promise<number>} int
+ */
 async function check_next2(ls, set) {   // llex.c:204
     let $t1, $t2, $t3;
     0;
@@ -219,6 +277,11 @@ async function check_next2(ls, set) {   // llex.c:204
 **
 ** The caller might have already read an initial dot.
 */
+/**
+ * @param {number} ls LexState *
+ * @param {number} seminfo SemInfo *
+ * @returns {Promise<number>} int
+ */
 async function read_numeral(ls, seminfo) {   // llex.c:227
     let expo = 0, first = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9;
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
@@ -262,6 +325,10 @@ async function read_numeral(ls, seminfo) {   // llex.c:227
 ** return 1 if it is a single bracket (no '='s and no 2nd bracket);
 ** otherwise (an unfinished '[==...') return 0.
 */
+/**
+ * @param {number} ls LexState *
+ * @returns {Promise<number | bigint>} size_t
+ */
 async function skip_sep(ls) {   // llex.c:265
     let count = 0, s = 0, $t1, $t2, $t3, $t4, $t5, $t6;
     count = 0;
@@ -274,6 +341,12 @@ async function skip_sep(ls) {   // llex.c:265
     }
     return $h.i32[ls >>> 2] === s ? $c.addu64(count, 2) : $c.u64(count === 0 ? 1 : 0);
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} seminfo SemInfo *
+ * @param {number | bigint} sep size_t
+ * @returns {Promise<void>}
+ */
 async function read_long_string(ls, seminfo, sep) {   // llex.c:280
     let line = 0, what = 0, msg = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13;
     line = $h.i32[(ls + 4) >>> 2];   /* initial line (for error message) */
@@ -325,6 +398,12 @@ async function read_long_string(ls, seminfo, sep) {   // llex.c:280
         $t13 = await luaX_newstring(ls, $h.u32[($h.u32[(ls + 72) >>> 2]) >>> 2] + $c.idx(sep), $c.subu64($h.ldu64($h.u32[(ls + 72) >>> 2] + 8), $c.mulu64(2, sep))), $h.stp(seminfo, $t13);
     }
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} c int
+ * @param {number} msg const char *
+ * @returns {Promise<void>}
+ */
 async function esccheck(ls, c, msg) {   // llex.c:319
     let $t1, $t2, $t3;
     if (!c) {
@@ -334,12 +413,20 @@ async function esccheck(ls, c, msg) {   // llex.c:319
         await lexerror(ls, msg, 292 /* TK_STRING */);
     }
 }
+/**
+ * @param {number} ls LexState *
+ * @returns {Promise<number>} int
+ */
 async function gethexa(ls) {   // llex.c:328
     let $t1, $t2, $t3;
     await save(ls, $h.i32[ls >>> 2]), ($t3 = ($t1 = $h.ldu64($h.u32[(ls + 64) >>> 2]), $h.st64($h.u32[(ls + 64) >>> 2], $c.subu64($t1, 1)), $t1) > 0 ? $c.u8($h.i8[($t2 = $h.u32[($h.u32[(ls + 64) >>> 2] + 8) >>> 2], $h.stp($h.u32[(ls + 64) >>> 2] + 8, $t2 + 1), $t2)]) : await luaZ_fill($h.u32[(ls + 64) >>> 2]), $h.i32[ls >>> 2] = $t3);
     await esccheck(ls, $h.u8[luai_ctype_ + ($h.i32[ls >>> 2] + 1 | 0)] & 16, $h.lit("hexadecimal digit expected"));
     return luaO_hexavalue($h.i32[ls >>> 2]);
 }
+/**
+ * @param {number} ls LexState *
+ * @returns {Promise<number>} int
+ */
 async function readhexaesc(ls) {   // llex.c:335
     let r = 0;
     r = await gethexa(ls);
@@ -347,6 +434,10 @@ async function readhexaesc(ls) {   // llex.c:335
     $h.st64($h.u32[(ls + 72) >>> 2] + 8, $c.subu64($h.ldu64($h.u32[(ls + 72) >>> 2] + 8), 2));   /* remove saved chars from buffer */
     return r;
 }
+/**
+ * @param {number} ls LexState *
+ * @returns {Promise<number | bigint>} unsigned long
+ */
 async function readutf8esc(ls) {   // llex.c:343
     let r = 0, i = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9;
     i = 4;   /* chars to be removed: '\', 'u', '{', and first digit */
@@ -363,6 +454,10 @@ async function readutf8esc(ls) {   // llex.c:343
     $h.st64($h.u32[(ls + 72) >>> 2] + 8, $c.subu64($h.ldu64($h.u32[(ls + 72) >>> 2] + 8), $c.u64(i)));   /* remove saved chars from buffer */
     return r;
 }
+/**
+ * @param {number} ls LexState *
+ * @returns {Promise<void>}
+ */
 async function utf8esc(ls) {   // llex.c:361
     let n = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
@@ -373,6 +468,10 @@ async function utf8esc(ls) {   // llex.c:361
         }
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} ls LexState *
+ * @returns {Promise<number>} int
+ */
 async function readdecesc(ls) {   // llex.c:369
     let i = 0, r = 0, $t1, $t2, $t3;
     r = 0;   /* result accumulator */
@@ -385,6 +484,12 @@ async function readdecesc(ls) {   // llex.c:369
     $h.st64($h.u32[(ls + 72) >>> 2] + 8, $c.subu64($h.ldu64($h.u32[(ls + 72) >>> 2] + 8), $c.u64(i)));   /* remove read digits from buffer */
     return r;
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} del int
+ * @param {number} seminfo SemInfo *
+ * @returns {Promise<void>}
+ */
 async function read_string(ls, del, seminfo) {   // llex.c:382
     let c = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13, $t14, $t15, $t16, $t17, $t18, $t19, $t20, $t21, $t22;
     await save(ls, $h.i32[ls >>> 2]), ($t3 = ($t1 = $h.ldu64($h.u32[(ls + 64) >>> 2]), $h.st64($h.u32[(ls + 64) >>> 2], $c.subu64($t1, 1)), $t1) > 0 ? $c.u8($h.i8[($t2 = $h.u32[($h.u32[(ls + 64) >>> 2] + 8) >>> 2], $h.stp($h.u32[(ls + 64) >>> 2] + 8, $t2 + 1), $t2)]) : await luaZ_fill($h.u32[(ls + 64) >>> 2]), $h.i32[ls >>> 2] = $t3);   /* keep delimiter (for error messages) */
@@ -483,6 +588,11 @@ async function read_string(ls, del, seminfo) {   // llex.c:382
     await save(ls, $h.i32[ls >>> 2]), ($t21 = ($t19 = $h.ldu64($h.u32[(ls + 64) >>> 2]), $h.st64($h.u32[(ls + 64) >>> 2], $c.subu64($t19, 1)), $t19) > 0 ? $c.u8($h.i8[($t20 = $h.u32[($h.u32[(ls + 64) >>> 2] + 8) >>> 2], $h.stp($h.u32[(ls + 64) >>> 2] + 8, $t20 + 1), $t20)]) : await luaZ_fill($h.u32[(ls + 64) >>> 2]), $h.i32[ls >>> 2] = $t21);   /* skip delimiter */
     $t22 = await luaX_newstring(ls, $h.u32[($h.u32[(ls + 72) >>> 2]) >>> 2] + 1, $c.subu64($h.ldu64($h.u32[(ls + 72) >>> 2] + 8), 2)), $h.stp(seminfo, $t22);
 }
+/**
+ * @param {number} ls LexState *
+ * @param {number} seminfo SemInfo *
+ * @returns {Promise<number>} int
+ */
 async function llex(ls, seminfo) {   // llex.c:445
     let sep = 0, sep$2 = 0, ts = 0, c = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13, $t14, $t15, $t16, $t17, $t18, $t19, $t20, $t21, $t22, $t23, $t24, $t25, $t26, $t27, $t28, $t29, $t30, $t31, $t32, $t33, $t34, $t35, $t36, $t37, $t38, $t39;
     $h.st64($h.u32[(ls + 72) >>> 2] + 8, 0);
@@ -663,6 +773,10 @@ async function llex(ls, seminfo) {   // llex.c:445
         }
     }
 }
+/**
+ * @param {number} ls LexState *
+ * @returns {Promise<void>}
+ */
 export async function luaX_next(ls) {   // llex.c:565
     let $t1;
     $h.i32[(ls + 8) >>> 2] = $h.i32[(ls + 4) >>> 2];
@@ -674,6 +788,10 @@ export async function luaX_next(ls) {   // llex.c:565
         $t1 = await llex(ls, ls + 16 + 8), $h.i32[(ls + 16) >>> 2] = $t1;   /* read next token */
     }
 }
+/**
+ * @param {number} ls LexState *
+ * @returns {Promise<number>} int
+ */
 export async function luaX_lookahead(ls) {   // llex.c:576
     let $t1;
     0;

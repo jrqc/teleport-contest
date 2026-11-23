@@ -52,9 +52,17 @@ import { regcomp, regerror, regexec, regfree } from './luabridge.js';
  * feedback.
  */
 export const regex_id = new Int8Array(11);
+/**
+ * @returns {Promise<$T.nhregex | null>} struct nhregex *
+ */
 export async function regex_init() {   // posixregex.c:60
     return $c.asRec(await alloc(40), $T.nhregex, 40);
 }
+/**
+ * @param {$c.Ptr | null} s const char *
+ * @param {$T.nhregex | null} re struct nhregex *
+ * @returns {number} boolean
+ */
 export function regex_compile(s, re) {   // posixregex.c:66
     let $t1;
     if (!re) {
@@ -65,6 +73,11 @@ export function regex_compile(s, re) {   // posixregex.c:66
     }
     return TRUE;
 }
+/**
+ * @param {$T.nhregex | null} re struct nhregex *
+ * @param {$c.Ptr | null} errbuf char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function regex_error_desc(re, errbuf) {   // posixregex.c:76
     if (!re) {
         $c.strcpy(errbuf, $c.lit("no regexp"));
@@ -79,6 +92,11 @@ export function regex_error_desc(re, errbuf) {   // posixregex.c:76
     }
     return errbuf;
 }
+/**
+ * @param {$c.Ptr | null} s const char *
+ * @param {$T.nhregex | null} re struct nhregex *
+ * @returns {number} boolean
+ */
 export function regex_match(s, re) {   // posixregex.c:92
     let result = 0;
     if (!re || !s) {
@@ -92,6 +110,9 @@ export function regex_match(s, re) {   // posixregex.c:92
     }
     return TRUE;
 }
+/**
+ * @param {$T.nhregex | null} re struct nhregex *
+ */
 export function regex_free(re) {   // posixregex.c:108
     regfree(re.re);
     $c.free(re);

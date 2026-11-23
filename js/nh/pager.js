@@ -106,6 +106,10 @@ const suptext2 = $c.nulls(7);
 /* data for dohelp() */
 const help_menu_items = $c.recArray($T.anon_pager_2830, 17);
 /* Returns "true" for characters that could represent a monster's stomach. */
+/**
+ * @param {number} c int
+ * @returns {number} boolean
+ */
 function is_swallow_sym(c) {   // pager.c:68
     let i = 0;
     for (i = S.sw_tl; i <= S.sw_br; i = i + 1 | 0) {
@@ -118,6 +122,11 @@ function is_swallow_sym(c) {   // pager.c:68
 /* Append " or "+new_str to the end of buf if new_str doesn't already exist
    as a substring of buf.  Return 1 if the string was appended, 0 otherwise.
    It is expected that buf is of size BUFSZ. */
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @param {$c.Ptr | null} new_str const char *
+ * @returns {Promise<number>} int
+ */
 async function append_str(buf, new_str) {   // pager.c:82
     let oldlen = 0, space_left = 0;
     if (strstri(buf, new_str)) {
@@ -139,6 +148,10 @@ async function append_str(buf, new_str) {   // pager.c:82
     return 1;   /* something was appended, possibly just part of " or " */
 }
 /* shared by monster probing (via query_objlist!) as well as lookat() */
+/**
+ * @param {$c.Ptr | null} outbuf char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function self_lookat(outbuf) {   // pager.c:108
     let race = new Int8Array(128), trapbuf = new Int8Array(128);
     /* include race with role unless polymorphed */
@@ -164,6 +177,12 @@ export async function self_lookat(outbuf) {   // pager.c:108
 }
 /* format a description of 'mon's health for look_at_monster(), done_in_by();
    result isn't Healer-specific (not trained for arbitrary creatures) */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} addspace boolean
+ * @param {$c.Ptr | null} outbuf char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function monhealthdescr(mon, addspace, outbuf) {   // pager.c:138
     /* [disable this for the time being] */
     /* bullet proofing */
@@ -173,6 +192,12 @@ export function monhealthdescr(mon, addspace, outbuf) {   // pager.c:138
     return outbuf;
 }
 /* copy a trap's description into outbuf[] */
+/**
+ * @param {$c.Ptr | null} outbuf char *
+ * @param {number} tnum int
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ */
 function trap_description(outbuf, tnum, x, y) {   // pager.c:167
     /*
      * Trap detection used to display a bear trap at locations having
@@ -190,6 +215,12 @@ function trap_description(outbuf, tnum, x, y) {   // pager.c:167
 }
 /* describe a hidden monster; used for look_at during extended monster
    detection and for probing; also when looking at self and camera feedback */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} mhid_flags unsigned int
+ * @param {$c.Ptr | null} outbuf char *
+ * @returns {Promise<void>}
+ */
 export async function mhidden_description(mon, mhid_flags, outbuf) {   // pager.c:186
     let otmp = [null], what = null, reg = null, buflen = 0, incl_prefix = 0, incl_article = 0, show_altmon = 0, force_region = 0, fakeobj = 0, isyou = 0, x = 0, y = 0, glyph = 0, r = 0, rglyph = 0, poison_gas = 0, $goto = null;
     D1: for (;;) {
@@ -290,6 +321,13 @@ export async function mhidden_description(mon, mhid_flags, outbuf) {   // pager.
     }
 }
 /* extracted from lookat(); also used by namefloorobj() */
+/**
+ * @param {number} glyph int
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {*} obj_p struct obj **
+ * @returns {Promise<number>} boolean
+ */
 export async function object_from_map(glyph, x, y, obj_p) {   // pager.c:284
     let fakeobj = 0, mimic_obj = 0, mtmp = null, otmp = null, glyphotyp = 0, $t1;
     fakeobj = FALSE;
@@ -383,6 +421,13 @@ export async function object_from_map(glyph, x, y, obj_p) {   // pager.c:284
     obj_p.set(0, otmp);
     return fakeobj;   /* when True, caller needs to dealloc *obj_p */
 }
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} glyph int
+ * @returns {Promise<void>}
+ */
 async function look_at_object(buf, x, y, glyph) {   // pager.c:380
     let otmp = [null], fakeobj = 0;
     /* output buffer */
@@ -415,6 +460,14 @@ async function look_at_object(buf, x, y, glyph) {   // pager.c:380
     }
     return;
 }
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @param {$c.Ptr | null} monbuf char *
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 async function look_at_monster(buf, monbuf, mtmp, x, y) {   // pager.c:422
     let name = null, monnambuf = new Int8Array(256), healthbuf = new Int8Array(256), accurate = 0, t = null, tt = 0, how_seen = 0, mW = 0, m2 = 0, whom = null;
     /* buf: output, monbuf: optional output */
@@ -530,6 +583,11 @@ async function look_at_monster(buf, monbuf, mtmp, x, y) {   // pager.c:422
 /* describe a pool location's contents; might return a static buffer so
    caller should use it or copy it before calling waterbody_name() again
    [5.0: moved here from mkmaze.c] */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {$c.Ptr | null} const char *
+ */
 export function waterbody_name(x, y) {   // pager.c:561
     let ltyp = 0, hallucinate = 0;
     hallucinate = $c.i8(Hallucination() && !program_state.gameover ? 1 : 0);
@@ -580,6 +638,12 @@ export function waterbody_name(x, y) {   // pager.c:561
     /* default; should be unreachable */
     return $c.lit("water");   /* don't hallucinate this as some other liquid */
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$c.Ptr | null} outbuf char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function ice_descr(x, y, outbuf) {   // pager.c:614
     let r = 0, neardist = 0, time_left = 0;
     /* same formula as is used in distant_name() for objects */
@@ -608,6 +672,13 @@ export function ice_descr(x, y, outbuf) {   // pager.c:614
 /*
  * Return the name of the glyph found at (x,y).
  * If not hallucinating and the glyph is a monster, also monster data.
+ */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$c.Ptr | null} buf char *
+ * @param {$c.Ptr | null} monbuf char *
+ * @returns {Promise<$T.permonst | null>} struct permonst *
  */
 async function lookat(x, y, buf, monbuf) {   // pager.c:657
     let mtmp = null, pm = null, glyph = 0, how = 0, tnum = 0, warnindx = 0, amsk = 0, algn = 0, symidx = 0, $t1;
@@ -739,6 +810,10 @@ async function lookat(x, y, buf, monbuf) {   // pager.c:657
 }
 /* used to decide whether the context-sensitive inventory action menu for
    item 'otmp' should include the "/ - look up this item" choice */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} boolean
+ */
 export async function ia_checkfile(otmp) {   // pager.c:807
     let itemnam = new Int8Array(256);
     /* singular() of xname() of otmp is what "/i" looks up */
@@ -756,6 +831,13 @@ export async function ia_checkfile(otmp) {   // pager.c:807
  *       Therefore, we create a copy of inp _just_ for data.base lookup.
  *
  * Returns True if an entry is found, False otherwise.
+ */
+/**
+ * @param {$c.Ptr | null} inp char *
+ * @param {$T.permonst | null} pm struct permonst *
+ * @param {number} chkflags unsigned int
+ * @param {$c.Ptr | null} supplemental_name char *
+ * @returns {Promise<number>} boolean
  */
 async function checkfile(inp, pm, chkflags, supplemental_name) {   // pager.c:830
     let fp = null, buf = new Int8Array(256), newstr = new Int8Array(256), givenname = new Int8Array(256), ep = null, dbase_str = null, user_typed_name = 0, without_asking = 0, ia_checking = 0, txt_offset = [0], datawin = 0, res = 0, pass1offset = 0, chk_skip = 0, pass = 0, yes_to_moreinfo = 0, found_in_file = 0, pass1found_in_file = 0, skipping_entry = 0, sp = null, ap = null, alt = null, entry_offset = [0], fseekoffset = 0, entry_count = Int32Array.of(0), i = 0, entrytext = null, question = new Int8Array(128), tabbuf = new Int8Array(264), tp = null;
@@ -1062,6 +1144,19 @@ async function checkfile(inp, pm, chkflags, supplemental_name) {   // pager.c:83
     return res;
 }
 /* extracted from do_screen_description() */
+/**
+ * @param {number} found int
+ * @param {number} idx int
+ * @param {number} glyph int
+ * @param {number} article int
+ * @param {$T.nhcoord} cc$in coord
+ * @param {$c.Ptr | null} x_str const char *
+ * @param {$c.Ptr | null} prefix const char *
+ * @param {$c.Ptr | null} hit_trap boolean *
+ * @param {*} firstmatch const char **
+ * @param {$c.Ptr | null} out_str char *
+ * @returns {Promise<number>} int
+ */
 async function add_cmap_descr(found, idx, glyph, article, cc$in, x_str, prefix, hit_trap, firstmatch, out_str) {   // pager.c:1133
     const cc = cc$in;   // passed by value: the caller copies
     let mbuf = null, p = null, absidx = 0, save_ltyp = 0, save_prop = 0;
@@ -1147,6 +1242,15 @@ async function add_cmap_descr(found, idx, glyph, article, cc$in, x_str, prefix, 
     }
     return found;
 }
+/**
+ * @param {$T.nhcoord} cc$in coord
+ * @param {number} looked boolean
+ * @param {number} sym int
+ * @param {$c.Ptr | null} out_str char *
+ * @param {*} firstmatch const char **
+ * @param {*} for_supplement struct permonst **
+ * @returns {Promise<number>} int
+ */
 export async function do_screen_description(cc$in, looked, sym, out_str, firstmatch, for_supplement) {   // pager.c:1247
     const cc = cc$in;   // passed by value: the caller copies
     let prefix = new Int8Array(256), i = 0, j = 0, alt_i = 0, glyph = 0, skipped_venom = 0, found = 0, hit_trap = Int8Array.of(0), need_to_look = 0, submerged = 0, hallucinate = 0, x_str = null, tmpsym = 0, glyphinfo = new $T.glyphinfo(), oc_ptr = null, bouldersym = 0, usealt = 0, unseen_explain = null, article = 0, pm = null, monbuf = new Int8Array(256), temp_buf = new Int8Array(256);
@@ -1467,6 +1571,13 @@ export async function do_screen_description(cc$in, looked, sym, out_str, firstma
     return found;
 }
 /* when farlook is reporting on an engraving, include its text */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$c.Ptr | null} buf char *
+ * @param {number} force boolean
+ * @returns {number} boolean
+ */
 function add_quoted_engraving(x, y, buf, force) {   // pager.c:1631
     let temp_buf = new Int8Array(256), ep = null, floorengr = 0, headstone = 0;
     /* True: '/e' or '/E', False: '//' or ';' */
@@ -1497,6 +1608,11 @@ function add_quoted_engraving(x, y, buf, force) {   // pager.c:1631
     $c.strncat(buf, new $c.Ptr(temp_buf, 0), $c.subu64($c.subu64(BUFSZ, $c.strlen(buf)), 1));
     return TRUE;
 }
+/**
+ * @param {number} mode int
+ * @param {$T.nhcoord | null} click_cc coord *
+ * @returns {Promise<number>} int
+ */
 export async function do_look(mode, click_cc) {   // pager.c:1673
     let quick = 0, clicklook = 0, out_str = new Int8Array(256), cq = new $T._cmd_queue(), cmdq = null, firstmatch = [null], pm = null, supplemental_pm = [null], i = 0, ans = 0, sym = 0, found = 0, cc = new $T.nhcoord(), save_verbose = 0, from_screen = 0, clr = 0, pick_list = [null], win = 0, any = new $T.any(), invlet = 0, invobj = null, dmpbuf = new Int8Array(256), temp_buf = new Int8Array(256), supplemental_name = new Int8Array(256), $goto = null;
     D1: for (;;) {
@@ -1744,6 +1860,13 @@ export async function do_look(mode, click_cc) {   // pager.c:1673
         break;
     }
 }
+/**
+ * @param {*} lo_x coordxy *
+ * @param {*} lo_y coordxy *
+ * @param {*} hi_x coordxy *
+ * @param {*} hi_y coordxy *
+ * @param {number} nearby boolean
+ */
 function look_region_nearby(lo_x, lo_y, hi_x, hi_y, nearby) {   // pager.c:1966
     lo_y.set(0, $c.i16(nearby ? (u.uy - BOLT_LIM | 0) > 0 ? u.uy - BOLT_LIM | 0 : 0 : 0));
     lo_x.set(0, $c.i16(nearby ? (u.ux - BOLT_LIM | 0) > 1 ? u.ux - BOLT_LIM | 0 : 1 : 1));
@@ -1751,6 +1874,11 @@ function look_region_nearby(lo_x, lo_y, hi_x, hi_y, nearby) {   // pager.c:1966
     hi_x.set(0, $c.i16(nearby ? (u.ux + BOLT_LIM | 0) < COLNO - 1 ? u.ux + BOLT_LIM | 0 : COLNO - 1 : COLNO - 1));
 }
 /* RESTORE is after do_supplemental_info() */
+/**
+ * @param {number} nearby boolean
+ * @param {number} do_mons boolean
+ * @returns {Promise<void>}
+ */
 async function look_all(nearby, do_mons) {   // pager.c:1979
     let win = 0, glyph = 0, count = 0, x = 0, y = 0, lo_x = Int16Array.of(0), lo_y = Int16Array.of(0), hi_x = Int16Array.of(0), hi_y = Int16Array.of(0), lookbuf = new Int8Array(256), outbuf = new Int8Array(256), mtmp = null, warnindx = 0, coordbuf = new Int8Array(20), which = new Int8Array(12), cmode = 0;
     /* True => within BOLTLIM, False => entire map */
@@ -1832,6 +1960,10 @@ async function look_all(nearby, do_mons) {   // pager.c:1979
     await destroy_nhwindow()(win);
 }
 /* give a /M style display of discovered traps, even when they're covered */
+/**
+ * @param {number} nearby boolean
+ * @returns {Promise<void>}
+ */
 async function look_traps(nearby) {   // pager.c:2078
     let win = 0, t = null, glyph = 0, tnum = 0, count = 0, x = 0, y = 0, lo_x = Int16Array.of(0), lo_y = Int16Array.of(0), hi_x = Int16Array.of(0), hi_y = Int16Array.of(0), lookbuf = new Int8Array(256), outbuf = new Int8Array(256), coordbuf = new Int8Array(20), cmode = 0;
     count = 0;
@@ -1882,6 +2014,10 @@ async function look_traps(nearby) {   // pager.c:2078
 }
 /* display of discovered engravings including headstones, even when they're
    covered provided they've been read */
+/**
+ * @param {number} nearby boolean
+ * @returns {Promise<void>}
+ */
 async function look_engrs(nearby) {   // pager.c:2144
     let win = 0, e = null, lookbuf = new Int8Array(256), outbuf = new Int8Array(256), x = 0, y = 0, lo_x = Int16Array.of(0), lo_y = Int16Array.of(0), hi_x = Int16Array.of(0), hi_y = Int16Array.of(0), is_headstone = 0, sym = 0, glyph = 0, count = 0, coordbuf = new Int8Array(20), cmode = 0;
     count = 0;
@@ -1953,6 +2089,12 @@ async function look_engrs(nearby) {   // pager.c:2144
     }
     await destroy_nhwindow()(win);
 }
+/**
+ * @param {$c.Ptr | null} name char *
+ * @param {$T.permonst | null} pm struct permonst *
+ * @param {number} without_asking boolean
+ * @returns {Promise<void>}
+ */
 async function do_supplemental_info(name, pm, without_asking) {   // pager.c:2253
     let textp = null, datawin = 0, entrytext = null, bp = null, bp2 = null, question = new Int8Array(128), yes_to_moreinfo = 0, is_marauder = 0, fullname = new Int8Array(256), i = 0, subs = 0, gang = null, buf = new Int8Array(256), txt = null, $t1;
     datawin = WIN_ERR;
@@ -2008,14 +2150,23 @@ async function do_supplemental_info(name, pm, without_asking) {   // pager.c:225
     }
 }
 /* the #whatis command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dowhatis() {   // pager.c:2322
     return await do_look(0, null);
 }
 /* the #glance command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doquickwhatis() {   // pager.c:2329
     return await do_look(1, null);
 }
 /* the #showtrap command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doidtrap() {   // pager.c:2336
     let trap = null, tt = 0, glyph = 0, x = 0, y = 0, chesttrap = 0;
     if (!await getdir($c.lit("^"))) {
@@ -2084,6 +2235,9 @@ export async function doidtrap() {   // pager.c:2336
     supported option that has a value; the few others (wizard/debug,
     rest_on_space, #if SHELL, #if SUSPEND) are booleans.
 */
+/**
+ * @returns {Promise<void>}
+ */
 async function whatdoes_help() {   // pager.c:2421
     let fp = null, p = null, buf = new Int8Array(256), tmpwin = 0;
     fp = $c.fopen($c.lit("keyhelp"), $c.lit("r"));
@@ -2128,6 +2282,11 @@ async function whatdoes_help() {   // pager.c:2421
 /* so that stack[*depth - 1] is a valid access */
 /* if */
 /* 0 */
+/**
+ * @param {number} q char
+ * @param {$c.Ptr | null} cbuf char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function dowhatdoes_core(q, cbuf) {   // pager.c:2577
     let buf = new Int8Array(256), ec_desc = null, keybuf = new Int8Array(128);
     /* 0 */
@@ -2143,6 +2302,9 @@ export function dowhatdoes_core(q, cbuf) {   // pager.c:2577
     /* 0 */
 }
 /* the whatdoes command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dowhatdoes() {   // pager.c:2659
     let bufr = new Int8Array(256), q = 0, reslt = null, p = null;
     if (!dowhatdoes$once) {
@@ -2187,6 +2349,9 @@ export async function dowhatdoes() {   // pager.c:2659
     }
     return ECMD.OK;
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function docontact() {   // pager.c:2718
     let cwin = 0, buf = new Int8Array(256);
     cwin = await create_nhwindow()(NHW.TEXT);
@@ -2212,42 +2377,81 @@ async function docontact() {   // pager.c:2718
     await display_nhwindow()(cwin, FALSE);
     await destroy_nhwindow()(cwin);
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function dispfile_help() {   // pager.c:2748
     await display_file()($c.lit("help"), TRUE);
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function dispfile_shelp() {   // pager.c:2754
     await display_file()($c.lit("hh"), TRUE);
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function dispfile_optionfile() {   // pager.c:2760
     await display_file()($c.lit("opthelp"), TRUE);
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function dispfile_optmenu() {   // pager.c:2766
     await display_file()($c.lit("optmenu"), TRUE);
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function dispfile_license() {   // pager.c:2772
     await display_file()($c.lit("license"), TRUE);
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function dispfile_debughelp() {   // pager.c:2778
     await display_file()($c.lit("wizhelp"), TRUE);
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function dispfile_usagehelp() {   // pager.c:2784
     await display_file()($c.lit("usagehlp"), TRUE);
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function hmenu_doextversion() {   // pager.c:2790
     await doextversion();
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function hmenu_dohistory() {   // pager.c:2796
     await dohistory();
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function hmenu_dowhatis() {   // pager.c:2802
     await dowhatis();
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function hmenu_dowhatdoes() {   // pager.c:2808
     await dowhatdoes();
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function hmenu_doextlist() {   // pager.c:2814
     await doextlist();
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function domenucontrols() {   // pager.c:2820
     let cwin = 0;
     cwin = await create_nhwindow()(NHW.TEXT);
@@ -2256,6 +2460,9 @@ async function domenucontrols() {   // pager.c:2820
     await destroy_nhwindow()(cwin);
 }
 /* the #help command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dohelp() {   // pager.c:2860
     let tmpwin = 0, helpbuf = new Int8Array(128), tmpbuf = new Int8Array(128), i = 0, n = 0, selected = [null], any = new $T.any(), sel = 0, clr = 0;
     tmpwin = await create_nhwindow()(NHW.MENU);
@@ -2293,6 +2500,10 @@ export async function dohelp() {   // pager.c:2860
    normally 'O' but could be bound to something else, or not bound at all;
    with the implementation of a simple options subset, now need 'mO' to get
    the full options command; format it as 'm O' */
+/**
+ * @param {$c.Ptr | null} outbuf char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 async function setopt_cmd(outbuf) {   // pager.c:2908
     let cmdbuf = new Int8Array(128), cmdnm = null, key = 0;
     $c.strcpy(outbuf, $c.lit("'"));
@@ -2342,6 +2553,9 @@ async function setopt_cmd(outbuf) {   // pager.c:2908
     return outbuf;
 }
 /* the 'V' command; also a choice for '?' */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dohistory() {   // pager.c:2961
     await display_file()($c.lit("history"), TRUE);
     return ECMD.OK;

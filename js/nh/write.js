@@ -35,6 +35,10 @@ const new_book_description$compositions = $c.nulls(4);   // static in new_book_d
 /*
  * returns base cost of a scroll or a spellbook
  */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} int
+ */
 async function cost(otmp) {   // write.c:14
     if (otmp.oclass === SPBOOK_CLASS) {
         return Math.imul(10, objects[otmp.otyp].oc_oc2);
@@ -77,6 +81,10 @@ async function cost(otmp) {   // write.c:14
     return 1000;
 }
 /* getobj callback for object to write on */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 function write_ok(obj) {   // write.c:61
     if (!obj || obj.oclass !== SCROLL_CLASS && obj.oclass !== SPBOOK_CLASS) {
         return GETOBJ.EXCLUDE;
@@ -87,6 +95,10 @@ function write_ok(obj) {   // write.c:61
     return GETOBJ.DOWNPLAY;
 }
 /* write -- applying a magic marker */
+/**
+ * @param {$T.obj | null} pen struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function dowrite(pen) {   // write.c:74
     let paper = null, namebuf = new Int8Array(256), nm = null, bp = null, new_obj = null, basecost = 0, actualcost = 0, curseval = 0, qbuf = new Int8Array(128), first = 0, last = 0, i = 0, deferred = 0, deferralchance = 0, real = 0, by_descr = 0, typeword = null, spell_knowledge = 0, fanfic = 0, tearup = 0, $t1;
     namebuf.fill(0);
@@ -365,6 +377,11 @@ export async function dowrite(pen) {   // write.c:74
    looks funny, so we want to insert "into " prior to such descriptions;
    even that's rather iffy, indicating that such descriptions probably
    ought to be eliminated (especially "cloth"!) */
+/**
+ * @param {number} booktype int
+ * @param {$c.Ptr | null} outbuf char *
+ * @returns {$c.Ptr | null} char *
+ */
 function new_book_description(booktype, outbuf) {   // write.c:395
     let descr = null, comp_p = null;
     /* subset of description strings from objects.c; if it grows

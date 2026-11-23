@@ -107,6 +107,12 @@ const shade_miss$harmlessly_thru = new Int8Array(21);   // static in shade_miss(
 const gulpum$msgbuf = new Int8Array(256);   // static in gulpum()
 const that_is_a_mimic$generic = new Int8Array(10);   // static in that_is_a_mimic()
 const brief_feeling = new Int8Array(48);
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {number} verbosely boolean
+ * @returns {Promise<number>} boolean
+ */
 async function mhitm_mgc_atk_negated(magr, mdef, verbosely) {   // uhitm.c:75
     let armpro = 0, negated = 0;
     /* give mesg if magical cancellation prevents damage */
@@ -131,6 +137,12 @@ async function mhitm_mgc_atk_negated(magr, mdef, verbosely) {   // uhitm.c:75
 }
 /* multi_reason is usually a literal string; here we generate one that
    has the causing monster's type included */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$c.Ptr | null} verb const char *
+ * @param {number} by_gaze boolean
+ * @returns {Promise<void>}
+ */
 export async function dynamic_multi_reason(mon, verb, by_gaze) {   // uhitm.c:104
     let who = null, p = null;
     /* combination of noname_monnam() and m_monnam(), more or less;
@@ -144,6 +156,11 @@ export async function dynamic_multi_reason(mon, verb, by_gaze) {   // uhitm.c:10
     $c.sprintf(p, $c.lit("%s by %s%s"), verb, !by_gaze ? who : s_suffix(who), !by_gaze ? $c.lit("") : $c.lit(" gaze"));
     gm.multi_reason = p;
 }
+/**
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {number} hurt int
+ * @returns {Promise<void>}
+ */
 export async function erode_armor(mdef, hurt) {   // uhitm.c:126
     let target = null;
     /* What the following code does: it keeps looping until it
@@ -195,6 +212,11 @@ export async function erode_armor(mdef, hurt) {   // uhitm.c:126
     }
 }
 /* FALSE means it's OK to attack */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.obj | null} wep struct obj *
+ * @returns {Promise<number>} boolean
+ */
 export async function attack_checks(mtmp, wep) {   // uhitm.c:189
     let glyph = 0, obj = null, lmonbuf = new Int8Array(256), notseen = 0, qbuf = new Int8Array(128), $t1;
     /* target */
@@ -310,6 +332,10 @@ export async function attack_checks(mtmp, wep) {   // uhitm.c:189
     return FALSE;
 }
 /* it is unchivalrous for a knight to attack the defenseless or from behind */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function check_caitiff(mtmp) {   // uhitm.c:331
     if (u.ualign.record <= -10) {
         return;
@@ -324,6 +350,9 @@ export async function check_caitiff(mtmp) {   // uhitm.c:331
     }
 }
 /* maybe unparalyze monster */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ */
 export function mon_maybe_unparalyze(mtmp) {   // uhitm.c:351
     if (!mtmp.mcanmove) {
         if (!rn2(10)) {
@@ -335,6 +364,14 @@ export function mon_maybe_unparalyze(mtmp) {   // uhitm.c:351
 /* how easy it is for hero to hit a monster,
    using attack type aatyp and/or weapon.
    larger value == easier to hit */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} aatyp uchar
+ * @param {$T.obj | null} weapon struct obj *
+ * @param {*} attk_count int *
+ * @param {*} role_roll_penalty int *
+ * @returns {Promise<number>} int
+ */
 export async function find_roll_to_hit(mtmp, aatyp, weapon, attk_count, role_roll_penalty) {   // uhitm.c:365
     let tmp = 0, tmp2 = 0, $t1;
     /* usually AT_WEAP or AT_KICK */
@@ -394,6 +431,11 @@ export async function find_roll_to_hit(mtmp, aatyp, weapon, attk_count, role_rol
 }
 /* temporarily override 'safepet' (by faking use of 'F' prefix) when possibly
    unintentionally attacking peaceful monsters and optionally pets */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} pets_too boolean
+ * @returns {Promise<number>} boolean
+ */
 export async function force_attack(mtmp, pets_too) {   // uhitm.c:432
     let attacked = 0, save_Forcefight = 0;
     save_Forcefight = svc.context.forcefight;
@@ -407,6 +449,10 @@ export async function force_attack(mtmp, pets_too) {   // uhitm.c:432
 }
 /* try to attack; return False if monster evaded;
    u.dx and u.dy must be set */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} boolean
+ */
 export async function do_attack(mtmp) {   // uhitm.c:448
     let mdat = null, foo = 0, inshop = 0, p = null, buf = new Int8Array(256), $t1;
     mdat = mtmp.data;
@@ -530,6 +576,16 @@ export async function do_attack(mtmp) {   // uhitm.c:448
     return TRUE;
 }
 /* really hit target monster; returns TRUE if it still lives */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} weapon struct obj *
+ * @param {*} mhit int *
+ * @param {number} rollneeded int
+ * @param {number} armorpenalty int
+ * @param {$T.attack | null} uattk struct attack *
+ * @param {number} dieroll int
+ * @returns {Promise<number>} boolean
+ */
 async function known_hitum(mon, weapon, mhit, rollneeded, armorpenalty, uattk, dieroll) {   // uhitm.c:587
     let malive = 0, slice_or_chop = 0, oldhp = 0, oldweaphit = 0;
     /* target */
@@ -587,6 +643,11 @@ async function known_hitum(mon, weapon, mhit, rollneeded, armorpenalty, uattk, d
 }
 /* hit the monster next to you and the monsters to the left and right of it;
    return False if the primary target is killed, True otherwise */
+/**
+ * @param {$T.monst | null} target struct monst *
+ * @param {$T.attack | null} uattk struct attack *
+ * @returns {Promise<number>} boolean
+ */
 async function hitum_cleave(target, uattk) {   // uhitm.c:651
     let i = 0, save_bhitpos = new $T.nhcoord(), save_notonhead = 0, count = 0, umort = 0, x = 0, y = 0, mtmp = null, tx = 0, ty = 0, tmp = 0, dieroll = 0, mhit = Int32Array.of(0), attknum = Int32Array.of(0), armorpenalty = Int32Array.of(0);
     /* non-Null; forcefight at nothing doesn't cleave +*/
@@ -660,6 +721,9 @@ async function hitum_cleave(target, uattk) {   // uhitm.c:651
 }
 /* returns True if hero is fighting without a weapon and without a shield and
    has sufficient skill in bare-handed/martial arts to attack twice */
+/**
+ * @returns {number} boolean
+ */
 function double_punch() {   // uhitm.c:736
     let skl_lvl = 0;
     /* note: P_BARE_HANDED_COMBAT and P_MARTIAL_ARTS are equivalent */
@@ -680,6 +744,11 @@ function double_punch() {   // uhitm.c:736
     return FALSE;
 }
 /* hit target monster; returns TRUE if it still lives */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.attack | null} uattk struct attack *
+ * @returns {Promise<number>} boolean
+ */
 async function hitum(mon, uattk) {   // uhitm.c:758
     let malive = 0, wep_was_destroyed = 0, wepbefore = null, secondwep = null, tmp = 0, dieroll = 0, mhit = Int32Array.of(0), armorpenalty = Int32Array.of(0), attknum = Int32Array.of(0), x = 0, y = 0, oldumort = 0, $t1;
     wep_was_destroyed = FALSE;
@@ -734,6 +803,13 @@ async function hitum(mon, uattk) {   // uhitm.c:758
     return malive;
 }
 /* general "damage monster" routine; return True if mon still alive */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} thrown int
+ * @param {number} dieroll int
+ * @returns {Promise<number>} boolean
+ */
 export async function hmon(mon, obj, thrown, dieroll) {   // uhitm.c:819
     let result = 0, anger_guards = 0;
     /* HMON_xxx (0 => hand-to-hand, other => ranged) */
@@ -748,6 +824,11 @@ export async function hmon(mon, obj, thrown, dieroll) {   // uhitm.c:819
     return result;
 }
 /* hero hits monster bare handed */
+/**
+ * @param {$T._hitmon_data | null} hmd struct _hitmon_data *
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<void>}
+ */
 async function hmon_hitmon_barehands(hmd, mon) {   // uhitm.c:838
     let spcdmgflg = 0, silverhit = [0], $t1, $t2;
     silverhit[0] = 0;   /* worn masks */
@@ -793,6 +874,12 @@ async function hmon_hitmon_barehands(hmd, mon) {   // uhitm.c:838
         hmd.silvermsg = TRUE;
     }
 }
+/**
+ * @param {$T._hitmon_data | null} hmd struct _hitmon_data *
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function hmon_hitmon_weapon_ranged(hmd, mon, obj) {   // uhitm.c:885
     let more_than_1 = 0, $t1, $t2, $t3;
     /* obj is not NULL */
@@ -825,9 +912,19 @@ async function hmon_hitmon_weapon_ranged(hmd, mon, obj) {   // uhitm.c:885
     }
 }
 /* can monster be stabbed in the back? */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {number} boolean
+ */
 function backstabbable(mon) {   // uhitm.c:921
     return $c.i8(!amorphous(mon.data) && !is_whirly(mon.data) && !noncorporeal(mon.data) && mon.data.mlet !== S.BLOB && mon.data.mlet !== S.EYE && mon.data.mlet !== S.FUNGUS && canseemon(mon) && (mon.mflee | 0 || helpless(mon)) ? 1 : 0);
 }
+/**
+ * @param {$T._hitmon_data | null} hmd struct _hitmon_data *
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function hmon_hitmon_weapon_melee(hmd, mon, obj) {   // uhitm.c:934
     let wtype = 0, monwep = null, buf = new Int8Array(256), $t1, $t2, $t3, $t4;
     /* obj is not NULL */
@@ -938,6 +1035,12 @@ async function hmon_hitmon_weapon_melee(hmd, mon, obj) {   // uhitm.c:934
         hmd.ispoisoned = TRUE;
     }
 }
+/**
+ * @param {$T._hitmon_data | null} hmd struct _hitmon_data *
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function hmon_hitmon_weapon(hmd, mon, obj) {   // uhitm.c:1070
     /* obj is not NULL */
     /* is it not a melee weapon? */
@@ -954,6 +1057,12 @@ async function hmon_hitmon_weapon(hmd, mon, obj) {   // uhitm.c:1070
         }
     }
 }
+/**
+ * @param {$T._hitmon_data | null} hmd struct _hitmon_data *
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function hmon_hitmon_potion(hmd, mon, obj) {   // uhitm.c:1095
     /* obj is not NULL */
     if (obj.quan > 1) {
@@ -973,6 +1082,12 @@ async function hmon_hitmon_potion(hmd, mon, obj) {   // uhitm.c:1095
     hmd.mdat = mon.data;
     hmd.dmg = $c.peq(hmd.mdat, $c.relem(mons, PM.SHADE)) ? 0 : 1;
 }
+/**
+ * @param {$T._hitmon_data | null} hmd struct _hitmon_data *
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function hmon_hitmon_misc_obj(hmd, mon, obj) {   // uhitm.c:1119
     let cnt = 0, mnum = 0, eggp = null, whom = null, what = null, more_than_1 = 0, more_than_1$2 = 0, doubld = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12;
     /* obj is not NULL */
@@ -1235,6 +1350,12 @@ async function hmon_hitmon_misc_obj(hmd, mon, obj) {   // uhitm.c:1119
     }
 }
 /* do the actual hitting monster with obj/fists */
+/**
+ * @param {$T._hitmon_data | null} hmd struct _hitmon_data *
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function hmon_hitmon_do_hit(hmd, mon, obj) {   // uhitm.c:1387
     /* obj can be NULL */
     if (!obj) {
@@ -1280,6 +1401,11 @@ async function hmon_hitmon_do_hit(hmd, mon, obj) {   // uhitm.c:1387
         }
     }
 }
+/**
+ * @param {$T._hitmon_data | null} hmd struct _hitmon_data *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function hmon_hitmon_dmg_recalc(hmd, obj) {   // uhitm.c:1436
     let dmgbonus = 0, strbonus = 0, absbonus = 0, skillwep = null, wtype = 0;
     dmgbonus = 0;
@@ -1348,6 +1474,12 @@ async function hmon_hitmon_dmg_recalc(hmd, obj) {   // uhitm.c:1436
         hmd.dmg = 1;
     }
 }
+/**
+ * @param {$T._hitmon_data | null} hmd struct _hitmon_data *
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function hmon_hitmon_poison(hmd, mon, obj) {   // uhitm.c:1510
     let nopoison = 0, $t1;
     /* obj is not NULL */
@@ -1376,6 +1508,12 @@ async function hmon_hitmon_poison(hmd, mon, obj) {   // uhitm.c:1510
         hmd.poiskilled = TRUE;
     }
 }
+/**
+ * @param {$T._hitmon_data | null} hmd struct _hitmon_data *
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function hmon_hitmon_jousting(hmd, mon, obj) {   // uhitm.c:1541
     let $t1;
     /* target */
@@ -1405,6 +1543,12 @@ async function hmon_hitmon_jousting(hmd, mon, obj) {   // uhitm.c:1541
     }
     hmd.hittxt = TRUE;
 }
+/**
+ * @param {$T._hitmon_data | null} hmd struct _hitmon_data *
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function hmon_hitmon_stagger(hmd, mon, obj) {   // uhitm.c:1570
     /* VERY small chance of stunning opponent if unarmed. */
     if (rnd(100) < u.weapon_skills[P.BARE_HANDED_COMBAT].skill && !bigmonst(hmd.mdat) && !thick_skinned(hmd.mdat)) {
@@ -1417,6 +1561,12 @@ async function hmon_hitmon_stagger(hmd, mon, obj) {   // uhitm.c:1570
         hmd.hittxt = TRUE;
     }
 }
+/**
+ * @param {$T._hitmon_data | null} hmd struct _hitmon_data *
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function hmon_hitmon_pet(hmd, mon, obj) {   // uhitm.c:1588
     if (mon.mtame && hmd.dmg > 0) {
         /* do this even if the pet is being killed or migrating (affects revival) */
@@ -1428,6 +1578,12 @@ async function hmon_hitmon_pet(hmd, mon, obj) {   // uhitm.c:1588
         }
     }
 }
+/**
+ * @param {$T._hitmon_data | null} hmd struct _hitmon_data *
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function hmon_hitmon_splitmon(hmd, mon, obj) {   // uhitm.c:1604
     let mclone = null, withwhat = new Int8Array(256);
     /* obj can be NULL but guards are in place below */
@@ -1448,6 +1604,12 @@ async function hmon_hitmon_splitmon(hmd, mon, obj) {   // uhitm.c:1604
         }
     }
 }
+/**
+ * @param {$T._hitmon_data | null} hmd struct _hitmon_data *
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function hmon_hitmon_msg_hit(hmd, mon, obj) {   // uhitm.c:1637
     /* obj can be NULL for hand_to_hand; otherwise not */
     /*( thrown => obj exists )*/
@@ -1462,6 +1624,12 @@ async function hmon_hitmon_msg_hit(hmd, mon, obj) {   // uhitm.c:1637
         }
     }
 }
+/**
+ * @param {$T._hitmon_data | null} hmd struct _hitmon_data *
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function hmon_hitmon_msg_silver(hmd, mon, obj) {   // uhitm.c:1663
     let fmt = null, whom = null, silverobjbuf = new Int8Array(256), $t1;
     whom = await mon_nam(mon);
@@ -1490,6 +1658,12 @@ async function hmon_hitmon_msg_silver(hmd, mon, obj) {   // uhitm.c:1663
     }
     await pline(fmt, whom);
 }
+/**
+ * @param {$T._hitmon_data | null} hmd struct _hitmon_data *
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function hmon_hitmon_msg_lightobj(hmd, mon, obj) {   // uhitm.c:1702
     let fmt = null, whom = null, emitlightobjbuf = new Int8Array(256), $t1;
     whom = await mon_nam(mon);
@@ -1531,6 +1705,13 @@ async function hmon_hitmon_msg_lightobj(hmd, mon, obj) {   // uhitm.c:1702
  *       hmon_hitmon_msg_hit,       - has !obj guards exc. thrown which is ok
  */
 /* guts of hmon(); returns True if 'mon' survives */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} thrown int
+ * @param {number} dieroll int
+ * @returns {Promise<number>} boolean
+ */
 async function hmon_hitmon(mon, obj, thrown, dieroll) {   // uhitm.c:1754
     let hmd = new $T._hitmon_data(), maybe_knockback = 0, mon_is_shade = 0, hitflags = Int32Array.of(0), $t1, $t2;
     /* HMON_xxx (0 => hand-to-hand, other => ranged) */
@@ -1697,6 +1878,12 @@ async function hmon_hitmon(mon, obj, thrown, dieroll) {   // uhitm.c:1754
 /* joust or martial arts punch is knocking the target back; that might
    kill 'mon' (via trap) before known_hitum() has a chance to do so;
    return True if we kill mon, False otherwise */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} tmp int
+ * @param {*} mptr struct permonst **
+ * @returns {Promise<number>} boolean
+ */
 async function mhurtle_to_doom(mon, tmp, mptr) {   // uhitm.c:1942
     /* target monster */
     /* amount of pending damage */
@@ -1716,6 +1903,10 @@ async function mhurtle_to_doom(mon, tmp, mptr) {   // uhitm.c:1942
 }
 /* gamelog version of "you've broken never-hit-with-wielded-weapon conduct;
    the conduct is tracked in known_hitum(); we're called by hmon_hitmon() */
+/**
+ * @param {$T.obj | null} weapon struct obj *
+ * @returns {Promise<void>}
+ */
 async function first_weapon_hit(weapon) {   // uhitm.c:1963
     let buf = new Int8Array(256);
     /* avoid xname() since that includes "named <foo>" and we don't want
@@ -1741,6 +1932,10 @@ async function first_weapon_hit(weapon) {   // uhitm.c:1963
        reported on the same turn (N) looks "suboptimal" */
     await livelog_printf(LL.CONDUCT, $c.lit("hit with a wielded weapon (%s) for the first time"), new $c.Ptr(buf, 0));
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 function shade_aware(obj) {   // uhitm.c:1992
     if (!obj) {
         return FALSE;
@@ -1762,6 +1957,14 @@ function shade_aware(obj) {   // uhitm.c:1992
 }
 /* used for hero vs monster and monster vs monster; also handles
    monster vs hero but that won't happen because hero can't be a shade */
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} thrown boolean
+ * @param {number} verbose boolean
+ * @returns {Promise<number>} boolean
+ */
 export async function shade_miss(magr, mdef, obj, thrown, verbose) {   // uhitm.c:2016
     let what = null, whose = null, target = null, youagr = 0, youdef = 0;
     youagr = $c.i8($c.peq(magr, gy.youmonst) ? 1 : 0);
@@ -1791,6 +1994,11 @@ export async function shade_miss(magr, mdef, obj, thrown, verbose) {   // uhitm.
 }
 /* check whether slippery clothing protects from hug or wrap attack */
 /* [currently assumes that you are the attacker] */
+/**
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @returns {Promise<number>} boolean
+ */
 async function m_slips_free(mdef, mattk) {   // uhitm.c:2056
     let obj = null;
     if (mattk.adtyp === AD.DRIN) {
@@ -1822,6 +2030,11 @@ async function m_slips_free(mdef, mattk) {   // uhitm.c:2056
 }
 /* used when hitting a monster with a lance while mounted;
    1: joust hit; 0: ordinary hit; -1: joust but break lance */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 function joust(mon, obj) {   // uhitm.c:2098
     let skill_rating = 0, joust_dieroll = 0;
     /* target */
@@ -1857,6 +2070,9 @@ function joust(mon, obj) {   // uhitm.c:2098
     return 0;   /* no joust bonus; revert to ordinary attack */
 }
 /* send in a demon pet for the hero; exercise wisdom */
+/**
+ * @returns {Promise<void>}
+ */
 async function demonpet() {   // uhitm.c:2133
     let i = 0, pm = null, dtmp = null;
     await pline($c.lit("Some hell-p has arrived!"));
@@ -1867,6 +2083,10 @@ async function demonpet() {   // uhitm.c:2133
     }
     await exercise(A.WIS, TRUE);
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} boolean
+ */
 async function theft_petrifies(otmp) {   // uhitm.c:2148
     if ($G.uarmg || otmp.otyp !== CORPSE || !touch_petrifies($c.relem(mons, otmp.corpsenm)) || Stone_resistance()) {
         return FALSE;
@@ -1883,6 +2103,11 @@ async function theft_petrifies(otmp) {   // uhitm.c:2148
  *
  * If the target is wearing body armor, take all of its possessions;
  * otherwise, take one object.  [Is this really the behavior we want?]
+ */
+/**
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @returns {Promise<void>}
  */
 async function steal_it(mdef, mattk) {   // uhitm.c:2174
     let otmp = null, gold = null, ustealo = null, minvent_ptr = null, unwornmask = 0, heshe = new Int8Array(20);
@@ -1990,6 +2215,13 @@ async function steal_it(mdef, mattk) {   // uhitm.c:2174
         await mpickobj(mdef, gold);
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_rust(magr, mattk, mdef, mhm) {   // uhitm.c:2281
     let pd = null, $t1;
     pd = mdef.data;
@@ -2043,6 +2275,13 @@ export async function mhitm_ad_rust(magr, mattk, mdef, mhm) {   // uhitm.c:2281
         mhm.damage = 0;   /* mdamagem(), int tmp */
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_corr(magr, mattk, mdef, mhm) {   // uhitm.c:2338
     if ($c.peq(magr, gy.youmonst)) {
         /* uhitm */
@@ -2065,6 +2304,13 @@ export async function mhitm_ad_corr(magr, mattk, mdef, mhm) {   // uhitm.c:2338
         mhm.damage = 0;
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_dcay(magr, mattk, mdef, mhm) {   // uhitm.c:2363
     let pd = null, $t1;
     pd = mdef.data;
@@ -2117,6 +2363,13 @@ export async function mhitm_ad_dcay(magr, mattk, mdef, mhm) {   // uhitm.c:2363
         mhm.damage = 0;
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_dren(magr, mattk, mdef, mhm) {   // uhitm.c:2418
     let negated = 0;
     negated = await mhitm_mgc_atk_negated(magr, mdef, FALSE);
@@ -2141,6 +2394,13 @@ export async function mhitm_ad_dren(magr, mattk, mdef, mhm) {   // uhitm.c:2418
         mhm.damage = 0;
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_drli(magr, mattk, mdef, mhm) {   // uhitm.c:2445
     let is_death = 0, $t1, $t2;
     if ($c.peq(magr, gy.youmonst)) {
@@ -2211,6 +2471,13 @@ export async function mhitm_ad_drli(magr, mattk, mdef, mhm) {   // uhitm.c:2445
         }
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_fire(magr, mattk, mdef, mhm) {   // uhitm.c:2521
     let pd = null, orig_dmg = 0, $t1, $t2, $t3;
     pd = mdef.data;
@@ -2313,6 +2580,13 @@ export async function mhitm_ad_fire(magr, mattk, mdef, mhm) {   // uhitm.c:2521
         await ignite_items(mdef.minvent);
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_cold(magr, mattk, mdef, mhm) {   // uhitm.c:2626
     let orig_dmg = 0, $t1, $t2;
     orig_dmg = mhm.damage;
@@ -2372,6 +2646,13 @@ export async function mhitm_ad_cold(magr, mattk, mdef, mhm) {   // uhitm.c:2626
         $t2 = await destroy_items(mdef, AD.COLD, orig_dmg), mhm.damage = mhm.damage + $t2 | 0;
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_elec(magr, mattk, mdef, mhm) {   // uhitm.c:2684
     let orig_dmg = 0, $t1, $t2;
     orig_dmg = mhm.damage;
@@ -2431,6 +2712,13 @@ export async function mhitm_ad_elec(magr, mattk, mdef, mhm) {   // uhitm.c:2684
         $t2 = await destroy_items(mdef, AD.ELEC, orig_dmg), mhm.damage = mhm.damage + $t2 | 0;
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_acid(magr, mattk, mdef, mhm) {   // uhitm.c:2742
     if ($c.peq(magr, gy.youmonst)) {
         /* uhitm */
@@ -2477,6 +2765,13 @@ export async function mhitm_ad_acid(magr, mattk, mdef, mhm) {   // uhitm.c:2742
     }
 }
 /* steal gold */
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_sgld(magr, mattk, mdef, mhm) {   // uhitm.c:2790
     let pa = null, pd = null, mongold = null, buf = new Int8Array(256), gold = null, couldspot = 0;
     pa = magr.data;
@@ -2538,6 +2833,13 @@ export async function mhitm_ad_sgld(magr, mattk, mdef, mhm) {   // uhitm.c:2790
         }
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_tlpt(magr, mattk, mdef, mhm) {   // uhitm.c:2859
     let nambuf = new Int8Array(256), u_saw_mon = 0, tmphp = 0, mdef_Monnam = new Int8Array(256), wasseen = 0;
     if ($c.peq(magr, gy.youmonst)) {
@@ -2637,6 +2939,13 @@ export async function mhitm_ad_tlpt(magr, mattk, mdef, mhm) {   // uhitm.c:2859
         }
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_blnd(magr, mattk, mdef, mhm) {   // uhitm.c:2958
     let buf = new Int8Array(256), rnd_tmp = 0;
     /* attacker */
@@ -2695,6 +3004,13 @@ export async function mhitm_ad_blnd(magr, mattk, mdef, mhm) {   // uhitm.c:2958
         }
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_curs(magr, mattk, mdef, mhm) {   // uhitm.c:3015
     let pa = null, pd = null, $t1;
     pa = magr.data;
@@ -2779,6 +3095,13 @@ export async function mhitm_ad_curs(magr, mattk, mdef, mhm) {   // uhitm.c:3015
  * cancellation or a 1/8 chance roll.
  * In this specific case, the "mhitm" in the name ACTUALLY means just that -
  * this should be called only for monster versus monster situations. */
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 async function mhitm_really_poison(magr, mattk, mdef, mhm) {   // uhitm.c:3104
     let $t1;
     if (gv.vis && canspotmon(magr)) {
@@ -2795,6 +3118,13 @@ async function mhitm_really_poison(magr, mattk, mdef, mhm) {   // uhitm.c:3104
         }
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_drst(magr, mattk, mdef, mhm) {   // uhitm.c:3122
     let negated = 0, pa = null, ptmp = 0, buf = new Int8Array(256), $t1;
     negated = await mhitm_mgc_atk_negated(magr, mdef, FALSE);
@@ -2840,6 +3170,13 @@ export async function mhitm_ad_drst(magr, mattk, mdef, mhm) {   // uhitm.c:3122
         }
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_drin(magr, mattk, mdef, mhm) {   // uhitm.c:3168
     let pd = null, amu = null, lifsav = 0, helmet = null, oldmort = 0, mhitu = 0, buf = new Int8Array(256), $t1;
     pd = mdef.data;
@@ -2961,6 +3298,13 @@ export async function mhitm_ad_drin(magr, mattk, mdef, mhm) {   // uhitm.c:3168
         }
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_stck(magr, mattk, mdef, mhm) {   // uhitm.c:3306
     let negated = 0, pd = null, barbs = 0;
     negated = await mhitm_mgc_atk_negated(magr, mdef, FALSE);
@@ -2990,6 +3334,13 @@ export async function mhitm_ad_stck(magr, mattk, mdef, mhm) {   // uhitm.c:3306
         }
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_wrap(magr, mattk, mdef, mhm) {   // uhitm.c:3337
     let pd = null, pa = null, coil = 0, tailmiss = 0, moat = 0;
     pd = mdef.data;
@@ -3070,6 +3421,13 @@ export async function mhitm_ad_wrap(magr, mattk, mdef, mhm) {   // uhitm.c:3337
         }
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_plys(magr, mattk, mdef, mhm) {   // uhitm.c:3431
     let buf = new Int8Array(256);
     if ($c.peq(magr, gy.youmonst)) {
@@ -3111,6 +3469,13 @@ export async function mhitm_ad_plys(magr, mattk, mdef, mhm) {   // uhitm.c:3431
         }
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_slee(magr, mattk, mdef, mhm) {   // uhitm.c:3479
     let buf = new Int8Array(256);
     if ($c.peq(magr, gy.youmonst)) {
@@ -3150,6 +3515,13 @@ export async function mhitm_ad_slee(magr, mattk, mdef, mhm) {   // uhitm.c:3479
     }
 }
 /* slime */
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_slim(magr, mattk, mdef, mhm) {   // uhitm.c:3526
     let negated = 0, pd = null, ncflags = 0;
     negated = await mhitm_mgc_atk_negated(magr, mdef, FALSE);
@@ -3228,6 +3600,13 @@ export async function mhitm_ad_slim(magr, mattk, mdef, mhm) {   // uhitm.c:3526
     }
     nhUse(pd);
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_ench(magr, mattk, mdef, mhm) {   // uhitm.c:3603
     let negated = 0, obj = null;
     if ($c.peq(magr, gy.youmonst)) {
@@ -3270,6 +3649,13 @@ export async function mhitm_ad_ench(magr, mattk, mdef, mhm) {   // uhitm.c:3603
         /* there's no msomearmor() function, so just do damage */
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_slow(magr, mattk, mdef, mhm) {   // uhitm.c:3652
     let negated = 0, oldspeed = 0, oldspeed$2 = 0;
     negated = await mhitm_mgc_atk_negated(magr, mdef, FALSE);
@@ -3303,6 +3689,13 @@ export async function mhitm_ad_slow(magr, mattk, mdef, mhm) {   // uhitm.c:3652
         }
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_conf(magr, mattk, mdef, mhm) {   // uhitm.c:3690
     let $t1;
     if ($c.peq(magr, gy.youmonst)) {
@@ -3341,6 +3734,13 @@ export async function mhitm_ad_conf(magr, mattk, mdef, mhm) {   // uhitm.c:3690
         }
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_poly(magr, mattk, mdef, mhm) {   // uhitm.c:3729
     let negated = 0, $t1, $t2, $t3;
     negated = $c.i8(await mhitm_mgc_atk_negated(magr, mdef, FALSE) || magr.mspec_used ? 1 : 0);
@@ -3386,6 +3786,13 @@ export async function mhitm_ad_poly(magr, mattk, mdef, mhm) {   // uhitm.c:3729
         }
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_famn(magr, mattk, mdef, mhm) {   // uhitm.c:3777
     let pd = null, $goto = null;
     D1: for (;;) {
@@ -3419,6 +3826,13 @@ export async function mhitm_ad_famn(magr, mattk, mdef, mhm) {   // uhitm.c:3777
         break;
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_pest(magr, mattk, mdef, mhm) {   // uhitm.c:3808
     let alt_attk = new $T.attack(), pa = null, $goto = null;
     D1: for (;;) {
@@ -3448,6 +3862,13 @@ export async function mhitm_ad_pest(magr, mattk, mdef, mhm) {   // uhitm.c:3808
         break;
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_deth(magr, mattk, mdef, mhm) {   // uhitm.c:3837
     let pd = null, $goto = null, $t1;
     D1: for (;;) {
@@ -3511,6 +3932,13 @@ export async function mhitm_ad_deth(magr, mattk, mdef, mhm) {   // uhitm.c:3837
         break;
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_halu(magr, mattk, mdef, mhm) {   // uhitm.c:3897
     let pd = null;
     pd = mdef.data;
@@ -3532,6 +3960,10 @@ export async function mhitm_ad_halu(magr, mattk, mdef, mhm) {   // uhitm.c:3897
         mhm.damage = 0;
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} boolean
+ */
 export async function do_stone_u(mtmp) {   // uhitm.c:3924
     let kformat = 0, kname = null;
     if (!Stoned() && !Stone_resistance() && !(poly_when_stoned(gy.youmonst.data) && await polymon(PM.STONE_GOLEM))) {
@@ -3549,6 +3981,13 @@ export async function do_stone_u(mtmp) {   // uhitm.c:3924
     }
     return 0;
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function do_stone_mon(magr, mattk, mdef, mhm) {   // uhitm.c:3945
     let pd = null, $goto = null, $t1;
     D1: for (;;) {
@@ -3594,6 +4033,13 @@ export async function do_stone_mon(magr, mattk, mdef, mhm) {   // uhitm.c:3945
         break;
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_phys(magr, mattk, mdef, mhm) {   // uhitm.c:3981
     let pa = null, pd = null, otmp = null, marmg = null, tmp = 0, was_poisoned = 0, buf = new Int8Array(256), mwep = null, vis = 0, marmg$2 = null, $t1, $t2, $t3, $t4, $t5;
     pa = magr.data;
@@ -3792,6 +4238,13 @@ export async function mhitm_ad_phys(magr, mattk, mdef, mhm) {   // uhitm.c:3981
         }
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_ston(magr, mattk, mdef, mhm) {   // uhitm.c:4203
     if ($c.peq(magr, gy.youmonst)) {
         /* uhitm */
@@ -3851,6 +4304,13 @@ export async function mhitm_ad_ston(magr, mattk, mdef, mhm) {   // uhitm.c:4203
         }
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_were(magr, mattk, mdef, mhm) {   // uhitm.c:4265
     let pa = null;
     pa = magr.data;
@@ -3877,6 +4337,13 @@ export async function mhitm_ad_were(magr, mattk, mdef, mhm) {   // uhitm.c:4265
         }
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_heal(magr, mattk, mdef, mhm) {   // uhitm.c:4296
     let pd = null, goaway = 0, $t1, $t2;
     pd = mdef.data;
@@ -3971,6 +4438,13 @@ export async function mhitm_ad_heal(magr, mattk, mdef, mhm) {   // uhitm.c:4296
         }
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_stun(magr, mattk, mdef, mhm) {   // uhitm.c:4388
     let pd = null;
     pd = mdef.data;
@@ -4006,6 +4480,13 @@ export async function mhitm_ad_stun(magr, mattk, mdef, mhm) {   // uhitm.c:4388
         }
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_legs(magr, mattk, mdef, mhm) {   // uhitm.c:4425
     let side = 0, sidestr = null, Monst_name = null, leg = null;
     if ($c.peq(magr, gy.youmonst)) {
@@ -4060,6 +4541,13 @@ export async function mhitm_ad_legs(magr, mattk, mdef, mhm) {   // uhitm.c:4425
         }
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_dgst(magr, mattk, mdef, mhm) {   // uhitm.c:4492
     let pd = null, num = 0, obj = null, virtualcorpse = null, nutrit = 0;
     pd = mdef.data;
@@ -4123,6 +4611,13 @@ export async function mhitm_ad_dgst(magr, mattk, mdef, mhm) {   // uhitm.c:4492
         }
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_samu(magr, mattk, mdef, mhm) {   // uhitm.c:4570
     if ($c.peq(magr, gy.youmonst)) {
         /* uhitm */
@@ -4142,6 +4637,13 @@ export async function mhitm_ad_samu(magr, mattk, mdef, mhm) {   // uhitm.c:4570
     }
 }
 /* disease */
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_dise(magr, mattk, mdef, mhm) {   // uhitm.c:4593
     let pa = null, pd = null, $goto = null;
     D1: for (;;) {
@@ -4176,6 +4678,13 @@ export async function mhitm_ad_dise(magr, mattk, mdef, mhm) {   // uhitm.c:4593
     }
 }
 /* seduce and also steal item */
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_sedu(magr, mattk, mdef, mhm) {   // uhitm.c:4623
     let pa = null, buf = new Int8Array(256), obj = null, buf$2 = new Int8Array(256), onambuf = new Int8Array(256), mdefnambuf = new Int8Array(256), couldspot = 0, $t1;
     pa = magr.data;
@@ -4287,6 +4796,13 @@ export async function mhitm_ad_sedu(magr, mattk, mdef, mhm) {   // uhitm.c:4623
         mhm.damage = 0;
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_ad_ssex(magr, mattk, mdef, mhm) {   // uhitm.c:4751
     if ($c.peq(magr, gy.youmonst)) {
         /* uhitm */
@@ -4318,6 +4834,13 @@ export async function mhitm_ad_ssex(magr, mattk, mdef, mhm) {   // uhitm.c:4751
         }
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.mhitm_data | null} mhm struct mhitm_data *
+ * @returns {Promise<void>}
+ */
 export async function mhitm_adtyping(magr, mattk, mdef, mhm) {   // uhitm.c:4782
     switch (mattk.adtyp) {
         case AD.STUN:
@@ -4444,6 +4967,12 @@ export async function mhitm_adtyping(magr, mattk, mdef, mhm) {   // uhitm.c:4782
             mhm.damage = 0;
     }
 }
+/**
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {number} specialdmg int
+ * @returns {Promise<number>} int
+ */
 export async function damageum(mdef, mattk, specialdmg) {   // uhitm.c:4835
     let mhm = new $T.mhitm_data(), $t1;
     /* target */
@@ -4495,6 +5024,11 @@ export async function damageum(mdef, mattk, specialdmg) {   // uhitm.c:4835
  * exploding at a target monster mdef, or just exploding at nothing (e.g. with
  * forcefight) if mdef is null.
  */
+/**
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @returns {Promise<number>} int
+ */
 export async function explum(mdef, mattk) {   // uhitm.c:4891
     let tmp = 0;
     tmp = d(mattk.damn, mattk.damd);
@@ -4531,6 +5065,10 @@ export async function explum(mdef, mattk) {   // uhitm.c:4891
     await wake_nearto(u.ux, u.uy, 49);   /* same radius as exploding monster */
     return M_ATTK.HIT;
 }
+/**
+ * @param {$T.monst | null} mdef struct monst *
+ * @returns {Promise<void>}
+ */
 async function start_engulf(mdef) {   // uhitm.c:4931
     let u_digest = 0, u_enfold = 0;
     u_digest = $c.i8(dmgtype_fromattack(gy.youmonst.data, AD.DGST, AT.ENGL) !== null ? 1 : 0);
@@ -4544,12 +5082,20 @@ async function start_engulf(mdef) {   // uhitm.c:4931
     await nh_delay_output()();
     await nh_delay_output()();
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function end_engulf() {   // uhitm.c:4949
     if (!Invisible()) {
         await tmp_at(DISP_END, 0);
         await newsym(u.ux, u.uy);
     }
 }
+/**
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @returns {Promise<number>} int
+ */
 async function gulpum(mdef, mattk) {   // uhitm.c:4958
     let tmp = 0, dam = 0, fatal_gulp = 0, u_digest = 0, u_enfold = 0, otmp = null, pd = null, expel_verb = null, kbuf = new Int8Array(256), mnam = null;
     /* for gn.nomovemsg */
@@ -4768,6 +5314,12 @@ async function gulpum(mdef, mattk) {   // uhitm.c:4958
     }
     return M_ATTK.MISS;
 }
+/**
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {number} wouldhavehit boolean
+ * @returns {Promise<void>}
+ */
 export async function missum(mdef, mattk, wouldhavehit) {   // uhitm.c:5198
     if (wouldhavehit) {   /* monk is missing due to penalty for wearing suit */
         await Your($c.lit("armor is rather cumbersome..."));
@@ -4784,6 +5336,10 @@ export async function missum(mdef, mattk, wouldhavehit) {   // uhitm.c:5198
     }
 }
 /* check whether equipment protects against knockback */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number} boolean
+ */
 export function m_is_steadfast(mtmp) {   // uhitm.c:5218
     let is_u = 0, otmp = null;
     is_u = $c.i8($c.peq(mtmp, gy.youmonst) ? 1 : 0);
@@ -4809,6 +5365,14 @@ export function m_is_steadfast(mtmp) {   // uhitm.c:5218
     return FALSE;
 }
 /* monster hits another monster hard enough to knock it back? */
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {*} hitflags int *
+ * @param {number} weapon_used boolean
+ * @returns {Promise<number>} boolean
+ */
 export async function mhitm_knockback(magr, mdef, mattk, hitflags, weapon_used) {   // uhitm.c:5247
     let magrbuf = new Int8Array(256), mdefbuf = new Int8Array(256), otmp = null, knockedhow = null, dx = 0, dy = 0, defx = 0, defy = 0, knockdistance = 0, chance = 0, u_agr = 0, u_def = 0, was_u = 0, dismount = 0, wep = null;
     /* attacker; might be hero */
@@ -4967,6 +5531,10 @@ export async function mhitm_knockback(magr, mdef, mattk, hitflags, weapon_used) 
     return TRUE;
 }
 /* attack monster as a monster; returns True if mon survives */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<number>} boolean
+ */
 async function hmonas(mon) {   // uhitm.c:5424
     let mattk = null, alt_attk = new $T.attack(), weapon = null, originalweapon = null, altwep = 0, weapon_used = 0, odd_claw = 0, i = 0, tmp = 0, dieroll = 0, armorpenalty = Int32Array.of(0), sum = new Int32Array(6), dhit = Int32Array.of(0), attknum = Int32Array.of(0), multi_claw = 0, multi_weap = 0, monster_survived = 0, compat = 0, specialdmg = 0, silverhit = [0], verb = null, specialdmg$2 = 0, silverhit$2 = [0], byhand = 0, unconcerned = 0, verb$2 = null, $goto = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10;
     altwep = FALSE;
@@ -5373,6 +5941,15 @@ async function hmonas(mon) {   // uhitm.c:5424
 }
 /*      Special (passive) attacks on you by monsters done here.
  */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} weapon struct obj *
+ * @param {number} mhitb boolean
+ * @param {number} maliveb boolean
+ * @param {number} aatyp uchar
+ * @param {number} wep_was_destroyed boolean
+ * @returns {Promise<number>} int
+ */
 export async function passive(mon, weapon, mhitb, maliveb, aatyp, wep_was_destroyed) {   // uhitm.c:5865
     let ptr = null, i = 0, tmp = 0, mhit = 0, malive = 0, protector = 0;
     /* uwep or uswapwep or uarmg or uarmf or Null */
@@ -5621,6 +6198,12 @@ export async function passive(mon, weapon, mhitb, maliveb, aatyp, wep_was_destro
  * Special (passive) attacks on an attacking object by monsters done here.
  * Assumes the attack was successful.
  */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$T.attack | null} mattk struct attack *
+ * @returns {Promise<void>}
+ */
 export async function passive_obj(mon, obj, mattk) {   // uhitm.c:6127
     let ptr = null, i = 0;
     /* null means pick uwep, uswapwep or uarmg */
@@ -5687,6 +6270,11 @@ export async function passive_obj(mon, obj, mattk) {   // uhitm.c:6127
     }
 }
 /* used by stumble_onto_mimic() and bhitm() cases WAN_LOCKING, WAN_OPENING */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} mimic_flags unsigned int
+ * @returns {Promise<void>}
+ */
 export async function that_is_a_mimic(mtmp, mimic_flags) {   // uhitm.c:6201
     let fmtbuf = new Int8Array(256), what = null, reveal_it = 0, omit_wait = 0, x = 0, y = 0, glyph = 0, sym = 0, fakeobj = 0, otmp_name = null, otmp = [null], mtmp_name = null, mndx = 0, i = 0;
     /* a hidden mimic (nonnull) */
@@ -5746,6 +6334,10 @@ export async function that_is_a_mimic(mtmp, mimic_flags) {   // uhitm.c:6201
     }
 }
 /* Note: caller must ascertain mtmp is mimicking... */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function stumble_onto_mimic(mtmp) {   // uhitm.c:6282
     await that_is_a_mimic(mtmp, MIM.REVEAL);
     /* must be adjacent; attack via polearm could be from farther away */
@@ -5759,12 +6351,24 @@ export async function stumble_onto_mimic(mtmp) {   // uhitm.c:6282
         await map_invisible(mtmp.mx, mtmp.my);
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number} boolean
+ */
 export function disguised_as_non_mon(mtmp) {   // uhitm.c:6300
     return $c.i8(!sensemon(mtmp) && M_AP_TYPE(mtmp) && M_AP_TYPE(mtmp) !== M_AP.MONSTER ? 1 : 0);
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number} boolean
+ */
 export function disguised_as_mon(mtmp) {   // uhitm.c:6308
     return $c.i8(M_AP_TYPE(mtmp) && M_AP_TYPE(mtmp) === M_AP.MONSTER ? 1 : 0);
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<void>}
+ */
 async function nohandglow(mon) {   // uhitm.c:6315
     let hands = null, altfeedback = 0;
     if (!u.umconf || mon.mconf | 0) {
@@ -5788,6 +6392,11 @@ async function nohandglow(mon) {   // uhitm.c:6315
     u.umconf = u.umconf - 1 >>> 0;
 }
 /* returns 1 if light flash has noticeable effect on 'mtmp', 0 otherwise */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function flash_hits_mon(mtmp, otmp) {   // uhitm.c:6341
     let lev = null, mx = 0, my = 0, tmp = 0, amt = 0, useeit = 0, res = 0, whatbuf = new Int8Array(256), oldglyph = 0, $t1;
     /* source of flash */
@@ -5865,6 +6474,11 @@ export async function flash_hits_mon(mtmp, otmp) {   // uhitm.c:6341
     }
     return res;
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} dmg int
+ * @returns {Promise<void>}
+ */
 export async function light_hits_gremlin(mon, dmg) {   // uhitm.c:6425
     if (!Deaf() && dist2(mon.mx, mon.my, u.ux, u.uy) <= 90) {
         /* cry of pain can be heard somewhat farther than the waking radius */

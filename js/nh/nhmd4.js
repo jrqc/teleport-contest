@@ -50,6 +50,12 @@ import { $G } from './globals.js';
  * This processes one or more 64-byte data blocks, but does NOT update
  * the bit counters.  There're no alignment requirements.
  */
+/**
+ * @param {*} ctx struct nhmd4_context *
+ * @param {$c.Ptr | null} data const unsigned char *
+ * @param {number | bigint} size size_t
+ * @returns {$c.Ptr | null} const unsigned char *
+ */
 function nhmd4_body(ctx, data, size) {   // nhmd4.c:83
     let ptr = null, a = 0, b = 0, c = 0, d = 0, saved_a = 0, saved_b = 0, saved_c = 0, saved_d = 0;
     ptr = data;
@@ -125,6 +131,9 @@ function nhmd4_body(ctx, data, size) {   // nhmd4.c:83
     ctx.d = d;
     return ptr;
 }
+/**
+ * @param {*} ctx struct nhmd4_context *
+ */
 export function nhmd4_init(ctx) {   // nhmd4.c:183
     ctx.a = 1732584193;
     ctx.b = 4023233417;
@@ -133,6 +142,11 @@ export function nhmd4_init(ctx) {   // nhmd4.c:183
     ctx.lo = 0;
     ctx.hi = 0;
 }
+/**
+ * @param {*} ctx struct nhmd4_context *
+ * @param {$c.Ptr | null} data const unsigned char *
+ * @param {number | bigint} size size_t
+ */
 export function nhmd4_update(ctx, data, size) {   // nhmd4.c:196
     let saved_lo = 0, used = 0, free = 0;
     /* @UNSAFE */
@@ -159,6 +173,10 @@ export function nhmd4_update(ctx, data, size) {   // nhmd4.c:196
     }
     $c.memcpy(new $c.Ptr(ctx.buffer, 0), data, size);
 }
+/**
+ * @param {*} ctx struct nhmd4_context *
+ * @param {$c.Ptr | null} result unsigned char *
+ */
 export function nhmd4_final(ctx, result) {   // nhmd4.c:235
     let used = 0, free = 0, $t1;
     /* @UNSAFE */

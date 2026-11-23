@@ -38,6 +38,11 @@ import { display_file, init_nhwindows, mark_synch, player_selection, raw_print }
 
 let get_unix_pw$pw = null;   // static in get_unix_pw()
 const get_login_name$buf = new Int8Array(256);   // static in get_login_name()
+/**
+ * @param {number} argc$in int
+ * @param {*} argv$in char **
+ * @returns {Promise<number>} int
+ */
 export async function main(argc$in, argv$in) {   // unixmain.c:58
     const argc = Int32Array.of(argc$in);
     const argv = [argv$in];
@@ -243,6 +248,11 @@ export async function main(argc$in, argv$in) {   // unixmain.c:58
     return 0;
 }
 /* caveat: argv elements might be arbitrarily long */
+/**
+ * @param {number} argc int
+ * @param {*} argv char **
+ * @returns {Promise<void>}
+ */
 async function process_options(argc, argv) {   // unixmain.c:330
     let arg = null, origarg = null, i = 0, l = 0, mxplyrs = 0, mx_ok = 0;
     await config_error_init(FALSE, $c.lit("command line"), FALSE);
@@ -385,6 +395,11 @@ async function process_options(argc, argv) {   // unixmain.c:330
     await config_error_done();
     return;
 }
+/**
+ * @param {$c.Ptr | null} dir const char *
+ * @param {number} wr boolean
+ * @returns {Promise<void>}
+ */
 export async function chdirx(dir, wr) {   // unixmain.c:491
     /* User specified directory? */
     /* and not the default? */
@@ -423,6 +438,9 @@ export async function chdirx(dir, wr) {   // unixmain.c:491
 }
 /* CHDIR */
 /* returns True iff we set plname[] to username which contains a hyphen */
+/**
+ * @returns {number} boolean
+ */
 export function whoami() {   // unixmain.c:558
     let s = null;
     /*
@@ -453,6 +471,9 @@ export function whoami() {   // unixmain.c:558
     }
     return FALSE;
 }
+/**
+ * @param {Function | null} handler void (*)(int)
+ */
 export function sethanguphandler(handler) {   // unixmain.c:590
     let sact = new $T.sigaction();
     /* don't want reads to restart.  If SA_RESTART is defined, we know
@@ -473,6 +494,9 @@ export function sethanguphandler(handler) {   // unixmain.c:590
  * named by PORT_HELP.
  */
 /* validate wizard mode if player has requested access to it */
+/**
+ * @returns {number} boolean
+ */
 export function authorize_wizard_mode() {   // unixmain.c:629
     if (sysopt.wizards && sysopt.wizards.get(0)) {
         if (check_user_string(sysopt.wizards)) {
@@ -483,6 +507,9 @@ export function authorize_wizard_mode() {   // unixmain.c:629
     return FALSE;
 }
 /* similar to above, validate explore mode access */
+/**
+ * @returns {number} boolean
+ */
 export function authorize_explore_mode() {   // unixmain.c:641
     if (sysopt.explorers && sysopt.explorers.get(0)) {
         if (check_user_string(sysopt.explorers)) {
@@ -493,6 +520,9 @@ export function authorize_explore_mode() {   // unixmain.c:641
     return FALSE;
     /* if sysconf disabled, no restrictions on explore mode */
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function wd_message() {   // unixmain.c:656
     let tmp = null, $t1;
     if (iflags.wiz_error_flag) {
@@ -518,6 +548,9 @@ async function wd_message() {   // unixmain.c:656
  * Add a slash to any name not ending in /. There must
  * be room for the /
  */
+/**
+ * @param {$c.Ptr | null} name char *
+ */
 export function append_slash(name) {   // unixmain.c:682
     let ptr = null;
     if (!name.get(0)) {
@@ -530,6 +563,10 @@ export function append_slash(name) {   // unixmain.c:682
     }
     return;
 }
+/**
+ * @param {$c.Ptr | null} optstr const char *
+ * @returns {number} boolean
+ */
 export function check_user_string(optstr) {   // unixmain.c:697
     let pw = null, pwlen = 0, eop = null, w = null, pwname = null;
     pwname = null;
@@ -566,6 +603,9 @@ export function check_user_string(optstr) {   // unixmain.c:697
     }
     return FALSE;
 }
+/**
+ * @returns {*} struct passwd *
+ */
 function get_unix_pw() {   // unixmain.c:733
     let user = null, uid = 0;
     if (get_unix_pw$pw) {
@@ -593,6 +633,9 @@ function get_unix_pw() {   // unixmain.c:733
     }
     return get_unix_pw$pw;
 }
+/**
+ * @returns {$c.Ptr | null} char *
+ */
 export function get_login_name() {   // unixmain.c:764
     let pw = null;
     pw = get_unix_pw();
@@ -602,6 +645,10 @@ export function get_login_name() {   // unixmain.c:764
     }
     return new $c.Ptr(get_login_name$buf, 0);
 }
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @returns {Promise<void>}
+ */
 export async function port_insert_pastebuf(buf) {   // unixmain.c:780
     let errarg = null, len = 0, PB = null;
     /* This should be replaced when there is a Cocoa port. */
@@ -629,6 +676,9 @@ export async function port_insert_pastebuf(buf) {   // unixmain.c:780
     await raw_printf($c.lit("%s: %s (%d)\n"), errarg, $c.strerror($c.$libc.errno), $c.$libc.errno);
 }
 /* __APPLE__ */
+/**
+ * @returns {number | bigint} unsigned long
+ */
 export function sys_random_seed() {   // unixmain.c:814
     let env_seed = null, seed = 0, seed$2 = [0], pid = 0, no_seed = 0, fptr = null;
     /* Harness comparison testing: if NETHACK_SEED is set, use it directly.

@@ -57,6 +57,11 @@ export const lua_ident = $h.data(129, 1);
 ** Convert an acceptable index to a pointer to its respective value.
 ** Non-valid indices return the special nil value 'G(L)->nilvalue'.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @returns {number} TValue *
+ */
 function index2value(L, idx) {   // lapi.c:60
     let ci = 0, o = 0, func = 0;
     ci = $h.u32[(L + 32) >>> 2];
@@ -92,6 +97,11 @@ function index2value(L, idx) {   // lapi.c:60
 /*
 ** Convert a valid actual index (not a pseudo-index) to its address.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @returns {number} StkId
+ */
 function index2stack(L, idx) {   // lapi.c:95
     let ci = 0, o = 0;
     ci = $h.u32[(L + 32) >>> 2];
@@ -106,6 +116,11 @@ function index2stack(L, idx) {   // lapi.c:95
         return $h.u32[(L + 16) >>> 2] + idx * 16;
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} n int
+ * @returns {Promise<number>} int
+ */
 export async function lua_checkstack(L, n) {   // lapi.c:111
     let res = 0, ci = 0;
     0;
@@ -123,6 +138,11 @@ export async function lua_checkstack(L, n) {   // lapi.c:111
     0;
     return res;
 }
+/**
+ * @param {number} from lua_State *
+ * @param {number} to lua_State *
+ * @param {number} n int
+ */
 export function lua_xmove(from, to, n) {   // lapi.c:128
     let i = 0, io1 = 0, io2 = 0;
     if (from === to) {
@@ -146,6 +166,11 @@ export function lua_xmove(from, to, n) {   // lapi.c:128
     }
     0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} panicf lua_CFunction
+ * @returns {number} lua_CFunction
+ */
 export function lua_atpanic(L, panicf) {   // lapi.c:144
     let old = 0;
     0;
@@ -154,6 +179,10 @@ export function lua_atpanic(L, panicf) {   // lapi.c:144
     0;
     return old;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {number} lua_Number
+ */
 export function lua_version(L) {   // lapi.c:154
     L;
     return 504;
@@ -164,12 +193,26 @@ export function lua_version(L) {   // lapi.c:154
 /*
 ** convert an acceptable stack index into an absolute index
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @returns {number} int
+ */
 export function lua_absindex(L, idx) {   // lapi.c:169
     return idx > 0 || idx <= -1001000 ? idx : $c.i32(($h.u32[(L + 16) >>> 2] - $h.u32[($h.u32[(L + 32) >>> 2]) >>> 2]) / 16) + idx | 0;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {number} int
+ */
 export function lua_gettop(L) {   // lapi.c:176
     return $c.i32(($h.u32[(L + 16) >>> 2] - ($h.u32[($h.u32[(L + 32) >>> 2]) >>> 2] + 16)) / 16);
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @returns {Promise<void>}
+ */
 export async function lua_settop(L, idx) {   // lapi.c:181
     let ci = 0, func = 0, newtop = 0, diff = 0, $t1;
     /* difference for new top */
@@ -195,6 +238,11 @@ export async function lua_settop(L, idx) {   // lapi.c:181
     $h.stp(L + 16, newtop);   /* correct top only after closing any upvalue */
     0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @returns {Promise<void>}
+ */
 export async function lua_closeslot(L, idx) {   // lapi.c:209
     let level = 0;
     0;
@@ -210,6 +258,11 @@ export async function lua_closeslot(L, idx) {   // lapi.c:209
 ** Note that we move(copy) only the value inside the stack.
 ** (We do not move additional fields that may exist.)
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} from StkId
+ * @param {number} to StkId
+ */
 function reverse(L, from, to) {   // lapi.c:227
     let io1 = 0, io2 = 0, io1$2 = 0, io2$2 = 0, io1$3 = 0, io2$3 = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
@@ -246,6 +299,11 @@ function reverse(L, from, to) {   // lapi.c:227
 ** Let x = AB, where A is a prefix of length 'n'. Then,
 ** rotate x n == BA. But BA == (A^r . B^r)^r.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @param {number} n int
+ */
 export function lua_rotate(L, idx, n) {   // lapi.c:241
     let p = 0, t = 0, m = 0;
     0;
@@ -258,6 +316,11 @@ export function lua_rotate(L, idx, n) {   // lapi.c:241
     reverse(L, p, t);   /* reverse the entire segment */
     0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} fromidx int
+ * @param {number} toidx int
+ */
 export function lua_copy(L, fromidx, toidx) {   // lapi.c:255
     let fr = 0, to = 0, io1 = 0, io2 = 0;
     0;
@@ -279,6 +342,10 @@ export function lua_copy(L, fromidx, toidx) {   // lapi.c:255
        (collector revisits it before finishing collection) */
     0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ */
 export function lua_pushvalue(L, idx) {   // lapi.c:270
     let io1 = 0, io2 = 0;
     0;
@@ -299,26 +366,51 @@ export function lua_pushvalue(L, idx) {   // lapi.c:270
 /*
 ** access functions (stack -> C)
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @returns {number} int
+ */
 export function lua_type(L, idx) {   // lapi.c:284
     let o = 0;
     o = index2value(L, idx);
     return !(($h.u8[o + 8] & 15) === 0) || o !== $h.u32[(L + 24) >>> 2] + 80 ? $h.u8[o + 8] & 15 : -1;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} t int
+ * @returns {number} const char *
+ */
 export function lua_typename(L, t) {   // lapi.c:290
     L;
     L, 0;
     return $h.u32[(luaT_typenames_ + (t + 1 | 0) * 8) >>> 2];
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @returns {number} int
+ */
 export function lua_iscfunction(L, idx) {   // lapi.c:297
     let o = 0;
     o = index2value(L, idx);
     return $h.u8[o + 8] === 22 || $h.u8[o + 8] === 102 ? 1 : 0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @returns {number} int
+ */
 export function lua_isinteger(L, idx) {   // lapi.c:303
     let o = 0;
     o = index2value(L, idx);
     return $h.u8[o + 8] === 3 ? 1 : 0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @returns {number} int
+ */
 export function lua_isnumber(L, idx) {   // lapi.c:309
     let o = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
@@ -327,22 +419,43 @@ export function lua_isnumber(L, idx) {   // lapi.c:309
         return $h.u8[o + 8] === 19 ? ($h.f64[$fp >>> 3] = $h.f64[o >>> 3], 1) : luaV_tonumber_(o, $fp);
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @returns {number} int
+ */
 export function lua_isstring(L, idx) {   // lapi.c:316
     let o = 0;
     o = index2value(L, idx);
     return ($h.u8[o + 8] & 15) === 4 || ($h.u8[o + 8] & 15) === 3 ? 1 : 0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @returns {number} int
+ */
 export function lua_isuserdata(L, idx) {   // lapi.c:322
     let o = 0;
     o = index2value(L, idx);
     return $h.u8[o + 8] === 71 || $h.u8[o + 8] === 2 ? 1 : 0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} index1 int
+ * @param {number} index2 int
+ * @returns {Promise<number>} int
+ */
 export async function lua_rawequal(L, index1, index2) {   // lapi.c:328
     let o1 = 0, o2 = 0;
     o1 = index2value(L, index1);
     o2 = index2value(L, index2);
     return (!(($h.u8[o1 + 8] & 15) === 0) || o1 !== $h.u32[(L + 24) >>> 2] + 80) && (!(($h.u8[o2 + 8] & 15) === 0) || o2 !== $h.u32[(L + 24) >>> 2] + 80) ? await luaV_equalobj(0, o1, o2) : 0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} op int
+ * @returns {Promise<void>}
+ */
 export async function lua_arith(L, op) {   // lapi.c:335
     let io1 = 0, io2 = 0;
     0;
@@ -369,6 +482,13 @@ export async function lua_arith(L, op) {   // lapi.c:335
     $h.stp(L + 16, $h.u32[(L + 16) >>> 2] - 16);   /* remove second operand */
     0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} index1 int
+ * @param {number} index2 int
+ * @param {number} op int
+ * @returns {Promise<number>} int
+ */
 export async function lua_compare(L, index1, index2, op) {   // lapi.c:351
     let o1 = 0, o2 = 0, i = 0;
     i = 0;
@@ -393,6 +513,11 @@ export async function lua_compare(L, index1, index2, op) {   // lapi.c:351
     0;
     return i;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} s const char *
+ * @returns {number | bigint} size_t
+ */
 export function lua_stringtonumber(L, s) {   // lapi.c:371
     let sz = 0;
     sz = luaO_str2num(s, $h.u32[(L + 16) >>> 2]);
@@ -402,6 +527,12 @@ export function lua_stringtonumber(L, s) {   // lapi.c:371
     }
     return sz;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @param {number} pisnum int *
+ * @returns {number} lua_Number
+ */
 export function lua_tonumberx(L, idx, pisnum) {   // lapi.c:379
     let o = 0, isnum = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
@@ -415,6 +546,12 @@ export function lua_tonumberx(L, idx, pisnum) {   // lapi.c:379
         return $h.f64[$fp >>> 3];
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @param {number} pisnum int *
+ * @returns {number | bigint} lua_Integer
+ */
 export function lua_tointegerx(L, idx, pisnum) {   // lapi.c:389
     let o = 0, isnum = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
@@ -428,11 +565,22 @@ export function lua_tointegerx(L, idx, pisnum) {   // lapi.c:389
         return $h.ld64($fp);
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @returns {number} int
+ */
 export function lua_toboolean(L, idx) {   // lapi.c:399
     let o = 0;
     o = index2value(L, idx);
     return !($h.u8[o + 8] === 1 || ($h.u8[o + 8] & 15) === 0) ? 1 : 0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @param {number} len size_t *
+ * @returns {Promise<number>} const char *
+ */
 export async function lua_tolstring(L, idx, len) {   // lapi.c:405
     let o = 0;
     0;
@@ -463,6 +611,11 @@ export async function lua_tolstring(L, idx, len) {   // lapi.c:405
     0;
     return $h.u32[o >>> 2] + 24;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @returns {number | bigint} lua_Unsigned
+ */
 export function lua_rawlen(L, idx) {   // lapi.c:426
     let o = 0;
     o = index2value(L, idx);
@@ -479,6 +632,11 @@ export function lua_rawlen(L, idx) {   // lapi.c:426
             return 0;
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @returns {number} lua_CFunction
+ */
 export function lua_tocfunction(L, idx) {   // lapi.c:438
     let o = 0;
     o = index2value(L, idx);
@@ -490,6 +648,10 @@ export function lua_tocfunction(L, idx) {   // lapi.c:438
         return 0;   /* not a C function */
     }
 }
+/**
+ * @param {number} o const TValue *
+ * @returns {number} void *
+ */
 function touserdata(o) {   // lapi.c:447
     switch ($h.u8[o + 8] & 15) {
         case 7:
@@ -500,11 +662,21 @@ function touserdata(o) {   // lapi.c:447
             return 0;
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @returns {number} void *
+ */
 export function lua_touserdata(L, idx) {   // lapi.c:456
     let o = 0;
     o = index2value(L, idx);
     return touserdata(o);
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @returns {number} lua_State *
+ */
 export function lua_tothread(L, idx) {   // lapi.c:462
     let o = 0;
     o = index2value(L, idx);
@@ -517,6 +689,11 @@ export function lua_tothread(L, idx) {   // lapi.c:462
 ** a 'size_t'. (As the returned pointer is only informative, this
 ** conversion should not be a problem.)
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @returns {number} const void *
+ */
 export function lua_topointer(L, idx) {   // lapi.c:475
     let o = 0;
     o = index2value(L, idx);
@@ -539,6 +716,9 @@ export function lua_topointer(L, idx) {   // lapi.c:475
 /*
 ** push functions (C -> stack)
 */
+/**
+ * @param {number} L lua_State *
+ */
 export function lua_pushnil(L) {   // lapi.c:497
     0;
     $h.u8[$h.u32[(L + 16) >>> 2] + 8] = 0;
@@ -548,6 +728,10 @@ export function lua_pushnil(L) {   // lapi.c:497
     }
     0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} n lua_Number
+ */
 export function lua_pushnumber(L, n) {   // lapi.c:505
     let io = 0;
     0;
@@ -562,6 +746,10 @@ export function lua_pushnumber(L, n) {   // lapi.c:505
     }
     0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number | bigint} n lua_Integer
+ */
 export function lua_pushinteger(L, n) {   // lapi.c:513
     let io = 0;
     0;
@@ -581,6 +769,12 @@ export function lua_pushinteger(L, n) {   // lapi.c:513
 ** 'len' == 0 (as 's' can be NULL in that case), due to later use of
 ** 'memcmp' and 'memcpy'.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} s const char *
+ * @param {number | bigint} len size_t
+ * @returns {Promise<number>} const char *
+ */
 export async function lua_pushlstring(L, s, len) {   // lapi.c:526
     let ts = 0, io = 0, x_ = 0;
     0;
@@ -607,6 +801,11 @@ export async function lua_pushlstring(L, s, len) {   // lapi.c:526
     0;
     return ts + 24;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} s const char *
+ * @returns {Promise<number>} const char *
+ */
 export async function lua_pushstring(L, s) {   // lapi.c:538
     let ts = 0, io = 0, x_ = 0;
     0;
@@ -638,6 +837,12 @@ export async function lua_pushstring(L, s) {   // lapi.c:538
     0;
     return s;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} fmt const char *
+ * @param {number} argp va_list
+ * @returns {Promise<number>} const char *
+ */
 export async function lua_pushvfstring(L, fmt, argp) {   // lapi.c:555
     let ret = 0;
     0;
@@ -653,6 +858,12 @@ export async function lua_pushvfstring(L, fmt, argp) {   // lapi.c:555
     0;
     return ret;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} fmt const char *
+ * @param {...*} $va the C variable arguments (...)
+ * @returns {Promise<number>} const char *
+ */
 export async function lua_pushfstring(L, fmt, ...$va) {   // lapi.c:566
     let ret = 0, argp = null;
     0;
@@ -670,6 +881,12 @@ export async function lua_pushfstring(L, fmt, ...$va) {   // lapi.c:566
     0;
     return ret;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} fn lua_CFunction
+ * @param {number} n int
+ * @returns {Promise<void>}
+ */
 export async function lua_pushcclosure(L, fn, n) {   // lapi.c:579
     let io = 0, cl = 0, io1 = 0, io2 = 0, io$2 = 0, x_ = 0, $t1;
     0;
@@ -723,6 +940,10 @@ export async function lua_pushcclosure(L, fn, n) {   // lapi.c:579
     }
     0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} b int
+ */
 export function lua_pushboolean(L, b) {   // lapi.c:605
     0;
     if (b) {
@@ -736,6 +957,10 @@ export function lua_pushboolean(L, b) {   // lapi.c:605
     }
     0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} p void *
+ */
 export function lua_pushlightuserdata(L, p) {   // lapi.c:616
     let io = 0;
     0;
@@ -750,6 +975,10 @@ export function lua_pushlightuserdata(L, p) {   // lapi.c:616
     }
     0;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {number} int
+ */
 export function lua_pushthread(L) {   // lapi.c:624
     let io = 0, x_ = 0;
     0;
@@ -770,6 +999,12 @@ export function lua_pushthread(L) {   // lapi.c:624
 /*
 ** get functions (Lua -> stack)
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} t const TValue *
+ * @param {number} k const char *
+ * @returns {Promise<number>} int
+ */
 async function auxgetstr(L, t, k) {   // lapi.c:639
     let slot = 0, str = 0, io1 = 0, io2 = 0, io = 0, x_ = 0;
     str = await luaS_new(L, k);
@@ -809,12 +1044,22 @@ async function auxgetstr(L, t, k) {   // lapi.c:639
 ** was created and never removed, they must always be in the array
 ** part of the registry.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} name const char *
+ * @returns {Promise<number>} int
+ */
 export async function lua_getglobal(L, name) {   // lapi.c:666
     let G_ = 0;
     0;
     G_ = $h.u32[($h.u32[($h.u32[(L + 24) >>> 2] + 64) >>> 2] + 16) >>> 2] + 16;
     return await auxgetstr(L, G_, name);
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @returns {Promise<number>} int
+ */
 export async function lua_gettable(L, idx) {   // lapi.c:674
     let slot = 0, t = 0, io1 = 0, io2 = 0;
     0;
@@ -834,10 +1079,22 @@ export async function lua_gettable(L, idx) {   // lapi.c:674
     0;
     return $h.u8[$h.u32[(L + 16) >>> 2] - 16 + 8] & 15;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @param {number} k const char *
+ * @returns {Promise<number>} int
+ */
 export async function lua_getfield(L, idx, k) {   // lapi.c:689
     0;
     return await auxgetstr(L, index2value(L, idx), k);
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @param {number | bigint} n lua_Integer
+ * @returns {Promise<number>} int
+ */
 export async function lua_geti(L, idx, n) {   // lapi.c:695
     let t = 0, slot = 0, io1 = 0, io2 = 0, io = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
@@ -869,6 +1126,11 @@ export async function lua_geti(L, idx, n) {   // lapi.c:695
         return $h.u8[$h.u32[(L + 16) >>> 2] - 16 + 8] & 15;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} val const TValue *
+ * @returns {number} int
+ */
 function finishrawget(L, val) {   // lapi.c:714
     let io1 = 0, io2 = 0;
     if (($h.u8[val + 8] & 15) === 0) {   /* avoid copying empty items to the stack */
@@ -888,12 +1150,22 @@ function finishrawget(L, val) {   // lapi.c:714
     0;
     return $h.u8[$h.u32[(L + 16) >>> 2] - 16 + 8] & 15;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @returns {number} Table *
+ */
 function gettable(L, idx) {   // lapi.c:725
     let t = 0;
     t = index2value(L, idx);
     L, 0;
     return $h.u32[t >>> 2];
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @returns {number} int
+ */
 export function lua_rawget(L, idx) {   // lapi.c:732
     let t = 0, val = 0;
     0;
@@ -903,12 +1175,24 @@ export function lua_rawget(L, idx) {   // lapi.c:732
     $h.stp(L + 16, $h.u32[(L + 16) >>> 2] - 16);   /* remove key */
     return finishrawget(L, val);
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @param {number | bigint} n lua_Integer
+ * @returns {number} int
+ */
 export function lua_rawgeti(L, idx, n) {   // lapi.c:744
     let t = 0;
     0;
     t = gettable(L, idx);
     return finishrawget(L, luaH_getint(t, n));
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @param {number} p const void *
+ * @returns {number} int
+ */
 export function lua_rawgetp(L, idx, p) {   // lapi.c:752
     let t = 0, io = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
@@ -923,6 +1207,12 @@ export function lua_rawgetp(L, idx, p) {   // lapi.c:752
         return finishrawget(L, luaH_get(t, $fp));
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} narray int
+ * @param {number} nrec int
+ * @returns {Promise<void>}
+ */
 export async function lua_createtable(L, narray, nrec) {   // lapi.c:762
     let t = 0, io = 0, x_ = 0;
     0;
@@ -951,6 +1241,11 @@ export async function lua_createtable(L, narray, nrec) {   // lapi.c:762
     }
     0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} objindex int
+ * @returns {number} int
+ */
 export function lua_getmetatable(L, objindex) {   // lapi.c:775
     let obj = 0, mt = 0, res = 0, io = 0, x_ = 0;
     res = 0;
@@ -984,6 +1279,12 @@ export function lua_getmetatable(L, objindex) {   // lapi.c:775
     0;
     return res;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @param {number} n int
+ * @returns {number} int
+ */
 export function lua_getiuservalue(L, idx, n) {   // lapi.c:802
     let o = 0, t = 0, io1 = 0, io2 = 0;
     0;
@@ -1016,6 +1317,12 @@ export function lua_getiuservalue(L, idx, n) {   // lapi.c:802
 /*
 ** t[k] = value at the top of the stack (where 'k' is a string)
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} t const TValue *
+ * @param {number} k const char *
+ * @returns {Promise<void>}
+ */
 async function auxsetstr(L, t, k) {   // lapi.c:829
     let slot = 0, str = 0, io1 = 0, io2 = 0, io = 0, x_ = 0;
     str = await luaS_new(L, k);
@@ -1050,12 +1357,22 @@ async function auxsetstr(L, t, k) {   // lapi.c:829
     }
     0;   /* lock done by caller */
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} name const char *
+ * @returns {Promise<void>}
+ */
 export async function lua_setglobal(L, name) {   // lapi.c:847
     let G_ = 0;
     0;   /* unlock done in 'auxsetstr' */
     G_ = $h.u32[($h.u32[($h.u32[(L + 24) >>> 2] + 64) >>> 2] + 16) >>> 2] + 16;
     await auxsetstr(L, G_, name);
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @returns {Promise<void>}
+ */
 export async function lua_settable(L, idx) {   // lapi.c:855
     let t = 0, slot = 0, io1 = 0, io2 = 0;
     0;
@@ -1079,10 +1396,22 @@ export async function lua_settable(L, idx) {   // lapi.c:855
     $h.stp(L + 16, $h.u32[(L + 16) >>> 2] - 32);   /* pop index and value */
     0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @param {number} k const char *
+ * @returns {Promise<void>}
+ */
 export async function lua_setfield(L, idx, k) {   // lapi.c:871
     0;   /* unlock done in 'auxsetstr' */
     await auxsetstr(L, index2value(L, idx), k);
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @param {number | bigint} n lua_Integer
+ * @returns {Promise<void>}
+ */
 export async function lua_seti(L, idx, n) {   // lapi.c:877
     let t = 0, slot = 0, io1 = 0, io2 = 0, io = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
@@ -1114,6 +1443,13 @@ export async function lua_seti(L, idx, n) {   // lapi.c:877
         0;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @param {number} key TValue *
+ * @param {number} n int
+ * @returns {Promise<void>}
+ */
 async function aux_rawset(L, idx, key, n) {   // lapi.c:896
     let t = 0;
     0;
@@ -1125,9 +1461,20 @@ async function aux_rawset(L, idx, key, n) {   // lapi.c:896
     $h.stp(L + 16, $h.u32[(L + 16) >>> 2] + -n * 16);
     0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @returns {Promise<void>}
+ */
 export async function lua_rawset(L, idx) {   // lapi.c:909
     await aux_rawset(L, idx, $h.u32[(L + 16) >>> 2] - 32, 2);
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @param {number} p const void *
+ * @returns {Promise<void>}
+ */
 export async function lua_rawsetp(L, idx, p) {   // lapi.c:914
     let io = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
@@ -1140,6 +1487,12 @@ export async function lua_rawsetp(L, idx, p) {   // lapi.c:914
         await aux_rawset(L, idx, $fp, 1);
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @param {number | bigint} n lua_Integer
+ * @returns {Promise<void>}
+ */
 export async function lua_rawseti(L, idx, n) {   // lapi.c:921
     let t = 0;
     0;
@@ -1150,6 +1503,11 @@ export async function lua_rawseti(L, idx, n) {   // lapi.c:921
     $h.stp(L + 16, $h.u32[(L + 16) >>> 2] - 16);
     0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} objindex int
+ * @returns {Promise<number>} int
+ */
 export async function lua_setmetatable(L, objindex) {   // lapi.c:933
     let obj = 0, mt = 0;
     0;
@@ -1190,6 +1548,12 @@ export async function lua_setmetatable(L, objindex) {   // lapi.c:933
     0;
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @param {number} n int
+ * @returns {number} int
+ */
 export function lua_setiuservalue(L, idx, n) {   // lapi.c:973
     let o = 0, res = 0, io1 = 0, io2 = 0;
     0;
@@ -1217,6 +1581,14 @@ export function lua_setiuservalue(L, idx, n) {   // lapi.c:973
 /*
 ** 'load' and 'call' functions (run Lua code)
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} nargs int
+ * @param {number} nresults int
+ * @param {number | bigint} ctx lua_KContext
+ * @param {number} k lua_KFunction
+ * @returns {Promise<void>}
+ */
 export async function lua_callk(L, nargs, nresults, ctx, k) {   // lapi.c:1004
     let func = 0;
     0;
@@ -1241,11 +1613,25 @@ export async function lua_callk(L, nargs, nresults, ctx, k) {   // lapi.c:1004
     }
     0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} ud void *
+ * @returns {Promise<void>}
+ */
 async function f_call(L, ud) {   // lapi.c:1036
     let c = 0;
     c = ud;
     await luaD_callnoyield(L, $h.u32[c >>> 2], $h.i32[(c + 8) >>> 2]);
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} nargs int
+ * @param {number} nresults int
+ * @param {number} errfunc int
+ * @param {number | bigint} ctx lua_KContext
+ * @param {number} k lua_KFunction
+ * @returns {Promise<number>} int
+ */
 export async function lua_pcallk(L, nargs, nresults, errfunc, ctx, k) {   // lapi.c:1043
     let status = 0, func = 0, o = 0, ci = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
@@ -1292,6 +1678,14 @@ export async function lua_pcallk(L, nargs, nresults, errfunc, ctx, k) {   // lap
         return status;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} reader lua_Reader
+ * @param {number} data void *
+ * @param {number} chunkname const char *
+ * @param {number} mode const char *
+ * @returns {Promise<number>} int
+ */
 export async function lua_load(L, reader, data, chunkname, mode) {   // lapi.c:1087
     let status = 0, f = 0, gt = 0, io1 = 0, io2 = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(40);
@@ -1325,6 +1719,13 @@ export async function lua_load(L, reader, data, chunkname, mode) {   // lapi.c:1
         return status;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} writer lua_Writer
+ * @param {number} data void *
+ * @param {number} strip int
+ * @returns {Promise<number>} int
+ */
 export async function lua_dump(L, writer, data, strip) {   // lapi.c:1110
     let status = 0, o = 0;
     0;
@@ -1338,12 +1739,22 @@ export async function lua_dump(L, writer, data, strip) {   // lapi.c:1110
     0;
     return status;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {number} int
+ */
 export function lua_status(L) {   // lapi.c:1125
     return $h.u8[L + 10];
 }
 /*
 ** Garbage-collection function
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} what int
+ * @param {...*} $va the C variable arguments (...)
+ * @returns {Promise<number>} int
+ */
 export async function lua_gc(L, what, ...$va) {   // lapi.c:1133
     let argp = null, res = 0, g = 0, data = 0, debt = 0, oldstp = 0, data$2 = 0, data$3 = 0, minormul = 0, majormul = 0, pause = 0, stepmul = 0, stepsize = 0;
     res = 0;
@@ -1470,6 +1881,10 @@ export async function lua_gc(L, what, ...$va) {   // lapi.c:1133
 /*
 ** miscellaneous functions
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 export async function lua_error(L) {   // lapi.c:1238
     let errobj = 0;
     0;
@@ -1484,6 +1899,11 @@ export async function lua_error(L) {   // lapi.c:1238
     /* code unreachable; will unlock when control actually leaves the kernel */
     return 0;   /* to avoid warnings */
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @returns {Promise<number>} int
+ */
 export async function lua_next(L, idx) {   // lapi.c:1253
     let t = 0, more = 0;
     0;
@@ -1502,6 +1922,11 @@ export async function lua_next(L, idx) {   // lapi.c:1253
     0;
     return more;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @returns {Promise<void>}
+ */
 export async function lua_toclose(L, idx) {   // lapi.c:1270
     let nresults = 0, o = 0;
     0;
@@ -1515,6 +1940,11 @@ export async function lua_toclose(L, idx) {   // lapi.c:1270
     0;
     0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} n int
+ * @returns {Promise<void>}
+ */
 export async function lua_concat(L, n) {   // lapi.c:1285
     let io = 0, x_ = 0;
     0;
@@ -1545,6 +1975,11 @@ export async function lua_concat(L, n) {   // lapi.c:1285
     }
     0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @returns {Promise<void>}
+ */
 export async function lua_len(L, idx) {   // lapi.c:1299
     let t = 0;
     0;
@@ -1556,6 +1991,11 @@ export async function lua_len(L, idx) {   // lapi.c:1299
     }
     0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} ud void **
+ * @returns {number} lua_Alloc
+ */
 export function lua_getallocf(L, ud) {   // lapi.c:1309
     let f = 0;
     0;
@@ -1566,23 +2006,44 @@ export function lua_getallocf(L, ud) {   // lapi.c:1309
     0;
     return f;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} f lua_Alloc
+ * @param {number} ud void *
+ */
 export function lua_setallocf(L, f, ud) {   // lapi.c:1319
     0;
     $h.stp($h.u32[(L + 24) >>> 2] + 8, ud);
     $h.stp($h.u32[(L + 24) >>> 2], f);
     0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} f lua_WarnFunction
+ * @param {number} ud void *
+ */
 export function lua_setwarnf(L, f, ud) {   // lapi.c:1327
     0;
     $h.stp($h.u32[(L + 24) >>> 2] + 1408, ud);
     $h.stp($h.u32[(L + 24) >>> 2] + 1400, f);
     0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} msg const char *
+ * @param {number} tocont int
+ */
 export function lua_warning(L, msg, tocont) {   // lapi.c:1335
     0;
     luaE_warning(L, msg, tocont);
     0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number | bigint} size size_t
+ * @param {number} nuvalue int
+ * @returns {Promise<number>} void *
+ */
 export async function lua_newuserdatauv(L, size, nuvalue) {   // lapi.c:1343
     let u = 0, io = 0, x_ = 0;
     0;
@@ -1610,6 +2071,13 @@ export async function lua_newuserdatauv(L, size, nuvalue) {   // lapi.c:1343
     0;
     return u + $c.idx($h.u16[(u + 10) >>> 1] === 0 ? 32 : $c.addu64(40, $c.mulu64(16, $h.u16[(u + 10) >>> 1])));
 }
+/**
+ * @param {number} fi TValue *
+ * @param {number} n int
+ * @param {number} val TValue **
+ * @param {number} owner GCObject **
+ * @returns {number} const char *
+ */
 function aux_upvalue(fi, n, val, owner) {   // lapi.c:1357
     let f = 0, f$2 = 0, name = 0, p = 0;
     switch ($h.u8[fi + 8] & 63) {
@@ -1645,6 +2113,12 @@ function aux_upvalue(fi, n, val, owner) {   // lapi.c:1357
             return 0;   /* not a closure */
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} funcindex int
+ * @param {number} n int
+ * @returns {number} const char *
+ */
 export function lua_getupvalue(L, funcindex, n) {   // lapi.c:1384
     let name = 0, io1 = 0, io2 = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
@@ -1670,6 +2144,12 @@ export function lua_getupvalue(L, funcindex, n) {   // lapi.c:1384
         return name;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} funcindex int
+ * @param {number} n int
+ * @returns {number} const char *
+ */
 export function lua_setupvalue(L, funcindex, n) {   // lapi.c:1398
     let name = 0, fi = 0, io1 = 0, io2 = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
@@ -1696,6 +2176,13 @@ export function lua_setupvalue(L, funcindex, n) {   // lapi.c:1398
         return name;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} fidx int
+ * @param {number} n int
+ * @param {number} pf LClosure **
+ * @returns {number} UpVal **
+ */
 function getupvalref(L, fidx, n, pf) {   // lapi.c:1417
     let f = 0, fi = 0;
     fi = index2value(L, fidx);
@@ -1710,6 +2197,12 @@ function getupvalref(L, fidx, n, pf) {   // lapi.c:1417
         return getupvalref$nullup;
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} fidx int
+ * @param {number} n int
+ * @returns {number} void *
+ */
 export function lua_upvalueid(L, fidx, n) {   // lapi.c:1431
     let fi = 0, f = 0;
     fi = index2value(L, fidx);
@@ -1737,6 +2230,13 @@ export function lua_upvalueid(L, fidx, n) {   // lapi.c:1431
             }
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} fidx1 int
+ * @param {number} n1 int
+ * @param {number} fidx2 int
+ * @param {number} n2 int
+ */
 export function lua_upvaluejoin(L, fidx1, n1, fidx2, n2) {   // lapi.c:1453
     let up1 = 0, up2 = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(8);

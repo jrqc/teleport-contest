@@ -115,6 +115,10 @@ const doread$card_msgs = $c.nulls(14);   // static in doread()
 const doread$red_mons = new Int32Array(14);   // static in doread()
 const candy_wrappers = $c.nulls(13);
 let gremlins = null;
+/**
+ * @param {number} scrolltyp short
+ * @returns {Promise<number>} boolean
+ */
 async function learnscrolltyp(scrolltyp) {   // read.c:58
     if (!objects[scrolltyp].oc_name_known) {
         await makeknown(scrolltyp);
@@ -125,6 +129,10 @@ async function learnscrolltyp(scrolltyp) {   // read.c:58
     }
 }
 /* also called from teleport.c for scroll of teleportation */
+/**
+ * @param {$T.obj | null} sobj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function learnscroll(sobj) {   // read.c:70
     /* it's implied that sobj->dknown is set;
        we couldn't be reading this scroll otherwise */
@@ -133,6 +141,9 @@ export async function learnscroll(sobj) {   // read.c:70
     }
 }
 /* max spe is +99, min is -99 */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ */
 function cap_spe(obj) {   // read.c:80
     let $t1;
     if (obj) {
@@ -141,6 +152,11 @@ function cap_spe(obj) {   // read.c:80
         }
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {$c.Ptr | null} buf char *
+ * @returns {$c.Ptr | null} char *
+ */
 function erode_obj_text(otmp, buf) {   // read.c:89
     let erosion = 0;
     erosion = greatest_erosion(otmp);
@@ -149,11 +165,21 @@ function erode_obj_text(otmp, buf) {   // read.c:89
     }
     return buf;
 }
+/**
+ * @param {$T.obj | null} tshirt struct obj *
+ * @param {$c.Ptr | null} buf char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function tshirt_text(tshirt, buf) {   // read.c:100
     /* Scott Bigham */
     $c.strcpy(buf, tshirt_text$shirt_msgs[$c.remu32(tshirt.o_id, 70)]);
     return erode_obj_text(tshirt, buf);
 }
+/**
+ * @param {$T.obj | null} shirt struct obj *
+ * @param {$c.Ptr | null} buf char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function hawaiian_motif(shirt, buf) {   // read.c:190
     let motif = 0;
     /* birds */
@@ -163,6 +189,11 @@ export function hawaiian_motif(shirt, buf) {   // read.c:190
     $c.strcpy(buf, hawaiian_motif$hawaiian_motifs[$c.remu32(motif, 16)]);
     return buf;
 }
+/**
+ * @param {$T.obj | null} shirt struct obj *
+ * @param {$c.Ptr | null} buf char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 async function hawaiian_design(shirt, buf) {   // read.c:224
     let bg = 0;
     /* solid colors */
@@ -173,16 +204,28 @@ async function hawaiian_design(shirt, buf) {   // read.c:224
     $c.sprintf(buf, $c.lit("%s on %s background"), await makeplural(hawaiian_motif(shirt, buf)), await an(hawaiian_design$hawaiian_bgs[$c.remu32(bg, 11)]));
     return buf;
 }
+/**
+ * @param {$T.obj | null} apron struct obj *
+ * @param {$c.Ptr | null} buf char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function apron_text(apron, buf) {   // read.c:254
     $c.strcpy(buf, apron_text$apron_msgs[$c.remu32(apron.o_id, 10)]);
     return erode_obj_text(apron, buf);
 }
 /* return the text of a candy bar's wrapper */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {$c.Ptr | null} const char *
+ */
 export function candy_wrapper_text(obj) {   // read.c:296
     /* modulo operation is just bullet proofing; 'spe' is already in range */
     return candy_wrappers[$c.rem32(obj.spe, 13)];
 }
 /* assign a wrapper to a candy bar stack */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ */
 export function assign_candy_wrapper(obj) {   // read.c:304
     let $t1;
     if (obj.otyp === CANDY_BAR) {
@@ -192,6 +235,10 @@ export function assign_candy_wrapper(obj) {   // read.c:304
     return;
 }
 /* getobj callback for object to read */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 function read_ok(obj) {   // read.c:315
     if (!obj) {
         return GETOBJ.EXCLUDE;
@@ -202,6 +249,9 @@ function read_ok(obj) {   // read.c:315
     return GETOBJ.DOWNPLAY;
 }
 /* the #read command; read a scroll or spell book or various other things */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doread() {   // read.c:330
     let scroll = null, confused = 0, nodisappear = 0, otyp = 0, buf = new Int8Array(256), mesg = null, endpunct = null, ln = 0, cap_text = null, buf$2 = new Int8Array(256), pm = null, wrapper = null, what = null, silently = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9;
     /*
@@ -448,6 +498,10 @@ export async function doread() {   // read.c:330
     }
     return ECMD.TIME;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function stripspe(obj) {   // read.c:652
     if (obj.blessed | 0 || obj.spe <= 0) {
         await pline($c.lit("%s"), c_common_strings.c_nothing_happens);
@@ -461,16 +515,34 @@ async function stripspe(obj) {   // read.c:652
         }
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function p_glow1(otmp) {   // read.c:667
     await pline($c.lit("%s briefly."), await Yobjnam2(otmp, Blind() ? $c.lit("vibrate") : $c.lit("glow")));
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {$c.Ptr | null} color const char *
+ * @returns {Promise<void>}
+ */
 async function p_glow2(otmp, color) {   // read.c:673
     await pline($c.lit("%s%s%s for a moment."), await Yobjnam2(otmp, Blind() ? $c.lit("vibrate") : $c.lit("glow")), Blind() ? $c.lit("") : $c.lit(" "), Blind() ? $c.lit("") : hcolor(color));
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {$c.Ptr | null} color const char *
+ * @returns {Promise<void>}
+ */
 async function p_glow3(otmp, color) {   // read.c:680
     await pline($c.lit("%s feebly%s%s for a moment."), await Yobjnam2(otmp, Blind() ? $c.lit("vibrate") : $c.lit("glow")), Blind() ? $c.lit("") : $c.lit(" "), Blind() ? $c.lit("") : hcolor(color));
 }
 /* getobj callback for object to charge */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 export function charge_ok(obj) {   // read.c:689
     if (!obj) {
         return GETOBJ.EXCLUDE;
@@ -503,6 +575,11 @@ export function charge_ok(obj) {   // read.c:689
 }
 /* recharge an object; curse_bless is -1 if the recharging implement
    was cursed, +1 if blessed, 0 otherwise. */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} curse_bless int
+ * @returns {Promise<void>}
+ */
 export async function recharge(obj, curse_bless) {   // read.c:729
     let n = 0, is_cursed = 0, is_blessed = 0, lim = 0, s = 0, is_on = 0, mask = 0, rechrg = 0, chrg = 0, chrg$2 = 0, $goto = null, $t1, $t2, $t3, $t4, $t5, $t6;
     D1: for (;;) {
@@ -800,6 +877,10 @@ export async function recharge(obj, curse_bless) {   // read.c:729
  * Other things are subject to flags:
  *      howmuch & ALL_SPELLS    = forget all spells
  */
+/**
+ * @param {number} howmuch int
+ * @returns {Promise<void>}
+ */
 async function forget(howmuch) {   // read.c:1020
     let mtmp = null;
     if (Punished()) {
@@ -822,6 +903,11 @@ async function forget(howmuch) {   // read.c:1020
     }
 }
 /* monster is hit by scroll of taming's effect */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.obj | null} sobj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function maybe_tame(mtmp, sobj) {   // read.c:1044
     let was_tame = 0, was_peaceful = 0;
     was_tame = mtmp.mtame;
@@ -846,6 +932,11 @@ async function maybe_tame(mtmp, sobj) {   // read.c:1044
 /* Can a stinking cloud physically exist at a certain position?
  * NOT the same thing as can_center_cloud.
  */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 export function valid_cloud_pos(x, y) {   // read.c:1069
     if (!isok(x, y)) {
         return FALSE;
@@ -855,12 +946,21 @@ export function valid_cloud_pos(x, y) {   // read.c:1069
 /* Callback for getpos_sethilite, also used in determining whether a scroll
  * should have its regular effects, or not because it was out of range.
  */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 function can_center_cloud(x, y) {   // read.c:1080
     if (!valid_cloud_pos(x, y)) {
         return FALSE;
     }
     return $c.i8(cansee(x, y) && distu(x, y) < 32 ? 1 : 0);
 }
+/**
+ * @param {number} on_off boolean
+ * @returns {Promise<void>}
+ */
 async function display_stinking_cloud_positions(on_off) {   // read.c:1088
     let x = 0, y = 0, dx = 0, dy = 0, dist = 0;
     dist = 6;
@@ -887,6 +987,10 @@ async function display_stinking_cloud_positions(on_off) {   // read.c:1088
         await tmp_at(DISP_END, 0);
     }
 }
+/**
+ * @param {*} sobjp struct obj **
+ * @returns {Promise<void>}
+ */
 async function seffect_enchant_armor(sobjp) {   // read.c:1115
     let sobj = null, s = 0, special_armor = 0, same_color = 0, otmp = null, sblessed = 0, scursed = 0, confused = 0, old_erodeproof = 0, new_erodeproof = 0, was_lit = 0, old_light = 0, oldspe = 0, $t1;
     sobj = sobjp.get(0);
@@ -1046,6 +1150,9 @@ async function seffect_enchant_armor(sobjp) {   // read.c:1115
     }
 }
 /* destroy a random cursed armor worn by hero */
+/**
+ * @returns {Promise<number>} boolean
+ */
 async function disintegrate_cursed_armor() {   // read.c:1294
     let armors = $c.nulls(10), idx = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
     idx = 0;
@@ -1079,6 +1186,10 @@ async function disintegrate_cursed_armor() {   // read.c:1294
     }
     return FALSE;
 }
+/**
+ * @param {*} sobjp struct obj **
+ * @returns {Promise<void>}
+ */
 async function seffect_destroy_armor(sobjp) {   // read.c:1324
     let sobj = null, otmp = null, scursed = 0, confused = 0, old_erodeproof = 0, new_erodeproof = 0, gets_choice = 0, atmp = null;
     sobj = sobjp.get(0);
@@ -1148,6 +1259,10 @@ async function seffect_destroy_armor(sobjp) {   // read.c:1324
         }
     }
 }
+/**
+ * @param {*} sobjp struct obj **
+ * @returns {Promise<void>}
+ */
 async function seffect_confuse_monster(sobjp) {   // read.c:1399
     let sobj = null, sblessed = 0, scursed = 0, confused = 0, altfeedback = 0, hands = null, incr = 0;
     sobj = sobjp.get(0);
@@ -1196,6 +1311,10 @@ async function seffect_confuse_monster(sobjp) {   // read.c:1399
         u.umconf = u.umconf + (incr >>> 0) >>> 0;
     }
 }
+/**
+ * @param {*} sobjp struct obj **
+ * @returns {Promise<void>}
+ */
 async function seffect_scare_monster(sobjp) {   // read.c:1454
     let sobj = null, otyp = 0, scursed = 0, confused = 0, ct = 0, mtmp = null, $t1, $t2;
     sobj = sobjp.get(0);
@@ -1226,6 +1345,10 @@ async function seffect_scare_monster(sobjp) {   // read.c:1454
         await You_hear($c.lit("%s %s."), confused || scursed ? $c.lit("sad wailing") : $c.lit("maniacal laughter"), !ct ? $c.lit("in the distance") : $c.lit("close by"));
     }
 }
+/**
+ * @param {*} sobjp struct obj **
+ * @returns {Promise<void>}
+ */
 async function seffect_remove_curse(sobjp) {   // read.c:1489
     let sobj = null, otyp = 0, sblessed = 0, scursed = 0, confused = 0, obj = null, nxto = null, wornmask = 0, shop_h2o = 0;
     sobj = sobjp.get(0);   /* scroll or fake spellbook */
@@ -1341,6 +1464,10 @@ async function seffect_remove_curse(sobjp) {   // read.c:1489
     }
     await update_inventory();
 }
+/**
+ * @param {*} sobjp struct obj **
+ * @returns {Promise<void>}
+ */
 async function seffect_create_monster(sobjp) {   // read.c:1608
     let sobj = null, sblessed = 0, scursed = 0, confused = 0;
     sobj = sobjp.get(0);
@@ -1354,6 +1481,10 @@ async function seffect_create_monster(sobjp) {   // read.c:1608
      * monsters are not visible
      */
 }
+/**
+ * @param {*} sobjp struct obj **
+ * @returns {Promise<void>}
+ */
 async function seffect_enchant_weapon(sobjp) {   // read.c:1627
     let sobj = null, sblessed = 0, scursed = 0, confused = 0, old_erodeproof = 0, new_erodeproof = 0, s = 0, $t1;
     sobj = sobjp.get(0);
@@ -1397,6 +1528,10 @@ async function seffect_enchant_weapon(sobjp) {   // read.c:1627
         cap_spe($G.uwep);
     }
 }
+/**
+ * @param {*} sobjp struct obj **
+ * @returns {Promise<void>}
+ */
 async function seffect_taming(sobjp) {   // read.c:1679
     let sobj = null, confused = 0, candidates = 0, res = 0, results = 0, vis_results = 0, i = 0, j = 0, bd = 0, mtmp = null;
     sobj = sobjp.get(0);
@@ -1434,6 +1569,10 @@ async function seffect_taming(sobjp) {   // read.c:1679
         }
     }
 }
+/**
+ * @param {*} sobjp struct obj **
+ * @returns {Promise<void>}
+ */
 async function seffect_genocide(sobjp) {   // read.c:1722
     let sobj = null, otyp = 0, sblessed = 0, scursed = 0, already_known = 0;
     sobj = sobjp.get(0);
@@ -1452,6 +1591,10 @@ async function seffect_genocide(sobjp) {   // read.c:1722
         await do_genocide((!scursed ? 1 : 0) | Math.imul(2, !!u.uprops[CONFUSION].intrinsic ? 1 : 0));
     }
 }
+/**
+ * @param {*} sobjp struct obj **
+ * @returns {Promise<void>}
+ */
 async function seffect_light(sobjp) {   // read.c:1741
     let sobj = null, sblessed = 0, scursed = 0, confused = 0, pm = 0, mon = null, sawlights = 0, i = 0, numlights = 0;
     sobj = sobjp.get(0);
@@ -1495,6 +1638,10 @@ async function seffect_light(sobjp) {   // read.c:1741
         }
     }
 }
+/**
+ * @param {*} sobjp struct obj **
+ * @returns {Promise<void>}
+ */
 async function seffect_charging(sobjp) {   // read.c:1788
     let sobj = null, otyp = 0, sblessed = 0, scursed = 0, confused = 0, already_known = 0, otmp = null, $t1;
     sobj = sobjp.get(0);
@@ -1535,6 +1682,10 @@ async function seffect_charging(sobjp) {   // read.c:1788
         await recharge(otmp, scursed ? -1 : sblessed ? 1 : 0);
     }
 }
+/**
+ * @param {*} sobjp struct obj **
+ * @returns {Promise<void>}
+ */
 async function seffect_amnesia(sobjp) {   // read.c:1830
     let sobj = null, sblessed = 0;
     sobj = sobjp.get(0);
@@ -1552,6 +1703,10 @@ async function seffect_amnesia(sobjp) {   // read.c:1830
     }
     await exercise(A.WIS, FALSE);
 }
+/**
+ * @param {*} sobjp struct obj **
+ * @returns {Promise<void>}
+ */
 async function seffect_fire(sobjp) {   // read.c:1850
     let sobj = null, otyp = 0, sblessed = 0, confused = 0, already_known = 0, cc = new $T.nhcoord(), dam = 0, cval = 0;
     sobj = sobjp.get(0);
@@ -1613,6 +1768,10 @@ async function seffect_fire(sobjp) {   // read.c:1850
     /* explained in splatter_burning_oil(explode.c) */
     await explode(cc.x, cc.y, ZT_SPELL_O_FIRE, dam, SCROLL_CLASS, EXPL.FIERY);
 }
+/**
+ * @param {*} sobjp struct obj **
+ * @returns {Promise<void>}
+ */
 async function seffect_earth(sobjp) {   // read.c:1919
     let sobj = null, sblessed = 0, scursed = 0, confused = 0, x = 0, y = 0, nboulders = 0, matbuf = new Int8Array(256), avalanche = null;
     sobj = sobjp.get(0);
@@ -1655,6 +1814,10 @@ async function seffect_earth(sobjp) {   // read.c:1919
         }
     }
 }
+/**
+ * @param {*} sobjp struct obj **
+ * @returns {Promise<void>}
+ */
 async function seffect_punishment(sobjp) {   // read.c:1976
     let sobj = null, sblessed = 0, confused = 0;
     sobj = sobjp.get(0);
@@ -1667,6 +1830,10 @@ async function seffect_punishment(sobjp) {   // read.c:1976
     }
     await punish(sobj);
 }
+/**
+ * @param {*} sobjp struct obj **
+ * @returns {Promise<void>}
+ */
 async function seffect_stinking_cloud(sobjp) {   // read.c:1991
     let sobj = null, otyp = 0, already_known = 0;
     sobj = sobjp.get(0);
@@ -1679,6 +1846,10 @@ async function seffect_stinking_cloud(sobjp) {   // read.c:1991
     gk.known = TRUE;
     await do_stinking_cloud(sobj, already_known);
 }
+/**
+ * @param {*} sobjp struct obj **
+ * @returns {Promise<void>}
+ */
 async function seffect_blank_paper(sobjp) {   // read.c:2005
     if (Blind()) {
         await You($c.lit("don't remember there being any magic words on this scroll."));
@@ -1687,6 +1858,10 @@ async function seffect_blank_paper(sobjp) {   // read.c:2005
     }
     gk.known = TRUE;
 }
+/**
+ * @param {*} sobjp struct obj **
+ * @returns {Promise<void>}
+ */
 async function seffect_teleportation(sobjp) {   // read.c:2015
     let sobj = null, scursed = 0, confused = 0;
     sobj = sobjp.get(0);
@@ -1704,6 +1879,10 @@ async function seffect_teleportation(sobjp) {   // read.c:2015
            either way, no need to set gk.known here */
     }
 }
+/**
+ * @param {*} sobjp struct obj **
+ * @returns {Promise<void>}
+ */
 async function seffect_gold_detection(sobjp) {   // read.c:2035
     let sobj = null, scursed = 0, confused = 0;
     sobj = sobjp.get(0);
@@ -1713,6 +1892,10 @@ async function seffect_gold_detection(sobjp) {   // read.c:2035
         sobjp.set(0, null);   /* failure: strange_feeling() -> useup() */
     }
 }
+/**
+ * @param {*} sobjp struct obj **
+ * @returns {Promise<void>}
+ */
 async function seffect_food_detection(sobjp) {   // read.c:2046
     let sobj = null;
     sobj = sobjp.get(0);
@@ -1720,6 +1903,10 @@ async function seffect_food_detection(sobjp) {   // read.c:2046
         sobjp.set(0, null);   /* nothing detected: strange_feeling -> useup */
     }
 }
+/**
+ * @param {*} sobjp struct obj **
+ * @returns {Promise<void>}
+ */
 async function seffect_identify(sobjp) {   // read.c:2055
     let sobj = null, otyp = 0, is_scroll = 0, sblessed = 0, scursed = 0, confused = 0, already_known = 0, cval = 0;
     sobj = sobjp.get(0);
@@ -1767,6 +1954,10 @@ async function seffect_identify(sobjp) {   // read.c:2055
         await pline($c.lit("You're not carrying anything%s to be identified."), is_scroll ? $c.lit(" else") : $c.lit(""));
     }
 }
+/**
+ * @param {*} sobjp struct obj **
+ * @returns {Promise<void>}
+ */
 async function seffect_magic_mapping(sobjp) {   // read.c:2102
     let sobj = null, is_scroll = 0, sblessed = 0, scursed = 0, confused = 0, cval = 0, x = 0, y = 0;
     sobj = sobjp.get(0);
@@ -1825,6 +2016,10 @@ async function seffect_magic_mapping(sobjp) {   // read.c:2102
         await pline($c.lit("Unfortunately, you can't grasp the details."));
     }
 }
+/**
+ * @param {*} sobjp struct obj **
+ * @returns {Promise<void>}
+ */
 async function seffect_mail(sobjp) {   // read.c:2157
     let sobj = null, odd = 0;
     sobj = sobjp.get(0);
@@ -1852,6 +2047,10 @@ async function seffect_mail(sobjp) {   // read.c:2157
 /* MAIL_STRUCTURES */
 /* scroll effects; return 1 if we use up the scroll and possibly make it
    become discovered, 0 if caller should take care of those side-effects */
+/**
+ * @param {$T.obj | null} sobj$in struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function seffects(sobj$in) {   // read.c:2194
     const sobj = [sobj$in];
     let otyp = 0;
@@ -1949,6 +2148,13 @@ export async function seffects(sobj$in) {   // read.c:2194
     }
     return sobj[0] ? 0 : 1;
 }
+/**
+ * @param {number} confused boolean
+ * @param {number} helmet_protects boolean
+ * @param {number} byu boolean
+ * @param {number} skip_uswallow boolean
+ * @returns {Promise<void>}
+ */
 export async function drop_boulder_on_player(confused, helmet_protects, byu, skip_uswallow) {   // read.c:2294
     let dmg = 0, otmp2 = null, $t1, $t2;
     /* hit monster if swallowed */
@@ -1989,6 +2195,13 @@ export async function drop_boulder_on_player(confused, helmet_protects, byu, ski
         await losehp(Maybe_Half_Phys(dmg), $c.lit("scroll of earth"), KILLED.BY_AN);
     }
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} confused boolean
+ * @param {number} byu boolean
+ * @returns {Promise<number>} boolean
+ */
 export async function drop_boulder_on_monster(x, y, confused, byu) {   // read.c:2341
     let otmp2 = null, mtmp = null, helmet = null, mdmg = 0, $t1, $t2;
     /* Make the object(s) */
@@ -2054,6 +2267,11 @@ export async function drop_boulder_on_monster(x, y, confused, byu) {   // read.c
     return TRUE;
 }
 /* overcharging any wand or zapping/engraving cursed wand */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} chg int
+ * @returns {Promise<void>}
+ */
 export async function wand_explode(obj, chg) {   // read.c:2414
     let expl = null, dmg = 0, n = 0, k = 0;
     /* recharging */
@@ -2102,6 +2320,12 @@ export async function wand_explode(obj, chg) {   // read.c:2414
 /*
  * Low-level lit-field update routine.
  */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {*} val genericptr_t
+ * @returns {Promise<void>}
+ */
 async function set_lit(x, y, val) {   // read.c:2471
     let mtmp = null, gremlin = null;
     if (val) {
@@ -2117,6 +2341,11 @@ async function set_lit(x, y, val) {   // read.c:2471
         await snuff_light_source(x, y);
     }
 }
+/**
+ * @param {number} on boolean
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function litroom(on, obj) {   // read.c:2491
     let otmp = null, nextobj = null, blessed_effect = 0, no_op = 0, is_lit = Int8Array.of(0), still_lit = 0, rnum = 0, rx = 0, ry = 0, gremlin = null;
     /* True: make nearby area lit; False: cursed scroll */
@@ -2254,6 +2483,9 @@ export async function litroom(on, obj) {   // read.c:2491
     }
     return;
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function do_class_genocide() {   // read.c:2638
     let i = 0, j = 0, immunecnt = 0, gonecnt = 0, goodcnt = 0, class_ = 0, feel_dead = 0, ll_done = 0, buf = new Int8Array(256), promptbuf = new Int8Array(128), gameover = 0, mtmp = null, mtmp2 = null, nam = new Int8Array(256), named = 0, uniq = 0, $t1, $t2, $t3, $t4;
     feel_dead = 0;
@@ -2414,6 +2646,10 @@ async function do_class_genocide() {   // read.c:2638
         return;
     }
 }
+/**
+ * @param {number} how int
+ * @returns {Promise<void>}
+ */
 export async function do_genocide(how) {   // read.c:2826
     let buf = new Int8Array(256), realbuf = new Int8Array(256), promptbuf = new Int8Array(128), i = 0, killplayer = 0, mndx = 0, ptr = null, which = null, cnt = 0, census = 0, $t1;
     /* 0 = no genocide; create monsters (cursed scroll)
@@ -2587,6 +2823,10 @@ export async function do_genocide(how) {   // read.c:2826
         }
     }
 }
+/**
+ * @param {$T.obj | null} sobj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function punish(sobj) {   // read.c:3019
     let reuse_ball = null, cursed_levy = 0;
     /* angrygods() calls this with NULL sobj arg */
@@ -2631,6 +2871,9 @@ export async function punish(sobj) {   // read.c:3019
     }
 }
 /* remove the ball and chain */
+/**
+ * @returns {Promise<void>}
+ */
 export async function unpunish() {   // read.c:3066
     let savechain = null;
     savechain = $G.uchain;
@@ -2643,6 +2886,11 @@ export async function unpunish() {   // read.c:3066
 }
 /* prompt the player to create a stinking cloud and then create it if they
    give a location */
+/**
+ * @param {$T.obj | null} sobj struct obj *
+ * @param {number} mention_stinking boolean
+ * @returns {Promise<void>}
+ */
 async function do_stinking_cloud(sobj, mention_stinking) {   // read.c:3082
     let cc = new $T.nhcoord();
     await pline($c.lit("Where do you want to center the %scloud?"), mention_stinking ? $c.lit("stinking ") : $c.lit(""));
@@ -2666,6 +2914,12 @@ async function do_stinking_cloud(sobj, mention_stinking) {   // read.c:3082
  * normal locations -- if the player tries to create one elsewhere, or to
  * revive one, the disoriented creature becomes a zombie
  */
+/**
+ * @param {*} mtype int *
+ * @param {number} revival boolean
+ * @param {$T.obj | null} from_obj struct obj *
+ * @returns {number} boolean
+ */
 export function cant_revive(mtype, revival, from_obj) {   // read.c:3112
     /* SHOPKEEPERS can be revived now */
     if (mtype.get(0) === PM.GUARD || mtype.get(0) === PM.SHOPKEEPER && !revival || mtype.get(0) === PM.HIGH_CLERIC || mtype.get(0) === PM.ALIGNED_CLERIC || mtype.get(0) === PM.ANGEL) {
@@ -2683,6 +2937,11 @@ export function cant_revive(mtype, revival, from_obj) {   // read.c:3112
     }
     return FALSE;
 }
+/**
+ * @param {$c.Ptr | null} str char *
+ * @param {$T._create_particular_data | null} d struct _create_particular_data *
+ * @returns {Promise<number>} boolean
+ */
 async function create_particular_parse(str, d) {   // read.c:3137
     let gender_name_var = Int32Array.of(0), bufp = null, tmpp = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9;
     gender_name_var[0] = NEUTRAL;
@@ -2796,6 +3055,10 @@ async function create_particular_parse(str, d) {   // read.c:3137
     }
     return FALSE;
 }
+/**
+ * @param {$T._create_particular_data | null} d struct _create_particular_data *
+ * @returns {Promise<number>} boolean
+ */
 async function create_particular_creation(d) {   // read.c:3252
     let whichpm = null, i = 0, mx = 0, my = 0, firstchoice = 0, mtmp = null, madeany = 0, buf = new Int8Array(256), mmflags = 0;
     whichpm = null;
@@ -2900,6 +3163,9 @@ async function create_particular_creation(d) {   // read.c:3252
  * Used in wizard mode only (for ^G command and for scroll or spell
  * of create monster).  Once upon a time, an earlier incarnation of
  * this code was also used for the scroll/spell in explore mode.
+ */
+/**
+ * @returns {Promise<number>} boolean
  */
 export async function create_particular() {   // read.c:3372
     let d = new $T._create_particular_data(), bufp = null, buf = new Int8Array(256), prompt = new Int8Array(128), tryct = 0, altmsg = 0;

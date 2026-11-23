@@ -70,6 +70,10 @@ import { URIGHTY, u_at } from './you.macros.js';
 import { Punished } from './youprop.macros.js';
 import { get_obj_location } from './zap.js';
 
+/**
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {number} boolean
+ */
 function no_bones_level(lev) {   // bones.c:18
     let sptr = null;
     if (ledger_no(gs.save_dlevel)) {
@@ -85,6 +89,9 @@ function no_bones_level(lev) {   // bones.c:18
  * ID is positive instead of negative).  This way, when we later save the
  * chain of fruit types, we know to only save the types that exist.
  */
+/**
+ * @param {number} id int
+ */
 function goodfruit(id) {   // bones.c:42
     let f = null;
     f = fruit_from_indx(-id | 0);
@@ -92,6 +99,11 @@ function goodfruit(id) {   // bones.c:42
         f.fid = id;
     }
 }
+/**
+ * @param {$T.obj | null} ochain struct obj *
+ * @param {number} restore boolean
+ * @returns {Promise<void>}
+ */
 async function resetobjs(ochain, restore) {   // bones.c:51
     let otmp = null, nobj = null, top = null, p = null, ox = Int16Array.of(0), oy = Int16Array.of(0), mnum = Int32Array.of(0), $t1, $t2, $t3;
     for (otmp = ochain; otmp; otmp = nobj) {
@@ -221,6 +233,9 @@ async function resetobjs(ochain, restore) {   // bones.c:51
 }
 /* while loading bones, strip out text possibly supplied by old player
    that might accidentally or maliciously disrupt new player's display */
+/**
+ * @param {$c.Ptr | null} namebuf char *
+ */
 export function sanitize_name(namebuf) {   // bones.c:198
     let c = 0, strip_8th_bit = 0;
     strip_8th_bit = $c.i8(windowprocs.wp_id === wp_tty && !iflags.wc_eight_bit_input ? 1 : 0);
@@ -245,6 +260,12 @@ export function sanitize_name(namebuf) {   // bones.c:198
 /* Give object to a random object-liking monster on or adjacent to x,y
    but skipping hero's location.
    If no such monster, place object on floor at x,y. */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 async function give_to_nearby_mon(otmp, x, y) {   // bones.c:226
     let mtmp = null, selected = null, nmon = 0, xx = 0, yy = 0;
     selected = null;
@@ -279,6 +300,13 @@ async function give_to_nearby_mon(otmp, x, y) {   // bones.c:226
     }
 }
 /* called by savebones(); also by finish_paybill(shk.c) */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.obj | null} cont struct obj *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function drop_upon_death(mtmp, cont, x, y) {   // bones.c:259
     let otmp = null, $t1;
     /* monster if hero rises as one (non ghost) */
@@ -325,6 +353,10 @@ export async function drop_upon_death(mtmp, cont, x, y) {   // bones.c:259
 }
 /* possibly restore oracle's room and/or put her back inside it; returns
    False if she's on the wrong level and should be removed, True otherwise */
+/**
+ * @param {$T.monst | null} oracle struct monst *
+ * @returns {Promise<number>} boolean
+ */
 async function fixuporacle(oracle) {   // bones.c:308
     let cc = new $T.nhcoord(), ridx = 0, o_ridx = 0;
     /* oracle doesn't move, but knight's joust or monk's staggering blow
@@ -369,6 +401,9 @@ async function fixuporacle(oracle) {   // bones.c:308
     return TRUE;   /* keep oracle in new bones file */
 }
 /* check whether bones are feasible */
+/**
+ * @returns {number} boolean
+ */
 export function can_make_bones() {   // bones.c:356
     let ttmp = null;
     if (!flags.bones) {
@@ -405,6 +440,10 @@ export function can_make_bones() {   // bones.c:356
 }
 /* monster might need to be removed before saving a bones file,
    in case these characters are not in their home bases */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 async function remove_mon_from_bones(mtmp) {   // bones.c:390
     let mptr = null;
     mptr = mtmp.data;
@@ -414,6 +453,12 @@ async function remove_mon_from_bones(mtmp) {   // bones.c:390
     }
 }
 /* save bones and possessions of a deceased adventurer */
+/**
+ * @param {number} how int
+ * @param {number | bigint} when time_t
+ * @param {$T.obj | null} corpse struct obj *
+ * @returns {Promise<void>}
+ */
 export async function savebones(how, when, corpse) {   // bones.c:403
     let x = 0, y = 0, ttmp = null, mtmp = null, f = null, newbones = null, c = Int8Array.of(0), bonesid = [null], whynot = new Int8Array(256), nhfp = null, otmp = null, i = 0, $t1, $t2, $t3;
     /* caller has already checked `can_make_bones()' */
@@ -625,6 +670,9 @@ export async function savebones(how, when, corpse) {   // bones.c:403
     await compress_bonesfile();
 }
 /* !SFCTOOL */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function getbones() {   // bones.c:630
     let ok = 0, nhfp = null, c = Int8Array.of(0), bonesid = [null], oldbonesid = new Int8Array(40), ancestor_nhuuid = new Int8Array(37), save_plnmsg = 0, errbuf = new Int8Array(256), mtmp = null, save_plnmsg$2 = 0;
     nhfp = null;
@@ -760,6 +808,10 @@ export async function getbones() {   // bones.c:630
     return ok;
 }
 /* check whether current level contains bones from a particular player */
+/**
+ * @param {$c.Ptr | null} name const char *
+ * @returns {number} boolean
+ */
 export function bones_include_name(name) {   // bones.c:762
     let bp = null, len = 0, buf = new Int8Array(256);
     /* prepare buffer by appending terminal hyphen to name, to avoid partial
@@ -775,6 +827,9 @@ export function bones_include_name(name) {   // bones.c:762
     return FALSE;
 }
 /* set the ghostly bit in a list of objects */
+/**
+ * @param {$T.obj | null} objchain struct obj *
+ */
 function set_ghostly_objlist(objchain) {   // bones.c:784
     while (objchain) {
         objchain.ghostly = (1) & 1;
@@ -784,6 +839,10 @@ function set_ghostly_objlist(objchain) {   // bones.c:784
 /* This is called when a marked object from a bones file is picked-up.
    Some could result in a message, and the obj->ghostly flag is always
    cleared. obj->ghostly has no other usage at this time. */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function fix_ghostly_obj(obj) {   // bones.c:796
     if (!obj.ghostly) {
         return;
@@ -802,6 +861,10 @@ export async function fix_ghostly_obj(obj) {   // bones.c:796
     }
     obj.ghostly = (0) & 1;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function newebones(mtmp) {   // bones.c:818
     let $t1, $t2;
     if (!mtmp.mextra) {
@@ -814,6 +877,9 @@ export async function newebones(mtmp) {   // bones.c:818
     }
 }
 /* this is not currently used */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ */
 export function free_ebones(mtmp) {   // bones.c:833
     if (mtmp.mextra && EBONES(mtmp)) {
         $c.free(mtmp.mextra.ebones);

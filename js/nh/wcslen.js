@@ -32,6 +32,10 @@ import * as $hl from '../crt/heaplibc.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
 
+/**
+ * @param {number} s const wchar_t *
+ * @returns {number | bigint} unsigned long
+ */
 export function wcslen(s) {   // wcslen.c:40
     let p = 0;
     p = s;

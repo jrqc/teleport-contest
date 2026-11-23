@@ -133,6 +133,10 @@ const blindgas = $c.nulls(6);
 const lava_killer = new Int8Array(12);
 /* called when you're hit by fire (dofiretrap,buzz,zapyourself,explode);
    returns TRUE if hit on torso */
+/**
+ * @param {$T.monst | null} victim struct monst *
+ * @returns {Promise<number>} boolean
+ */
 export async function burnarmor(victim) {   // trap.c:88
     let item = null, buf = new Int8Array(256), mat_idx = 0, oldspe = 0, hitting_u = 0;
     if (!victim) {
@@ -210,6 +214,13 @@ export async function burnarmor(victim) {   // trap.c:88
  * "flags" is an or-ed list of EF_* flags
  *
  * Returns an erosion return value (ER_*)
+ */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {$c.Ptr | null} ostr const char *
+ * @param {number} type int
+ * @param {number} ef_flags int
+ * @returns {Promise<number>} int
  */
 export async function erode_obj(otmp, ostr, type, ef_flags) {   // trap.c:171
     let vulnerable = 0, is_primary = 0, check_grease = 0, print = 0, crackers = 0, uvictim = 0, vismon = 0, visobj = 0, erosion = 0, cost_type = 0, victim = null, adverb = null, actbuf = new Int8Array(256);
@@ -369,6 +380,12 @@ export async function erode_obj(otmp, ostr, type, ef_flags) {   // trap.c:171
 /* Protect an item from erosion with grease. Returns TRUE if the grease
  * wears off.
  */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {$c.Ptr | null} ostr const char *
+ * @param {$T.monst | null} victim struct monst *
+ * @returns {Promise<number>} boolean
+ */
 export async function grease_protect(otmp, ostr, victim) {   // trap.c:360
     let vismon = 0;
     vismon = $c.i8(victim && !$c.peq(victim, gy.youmonst) && canseemon(victim) ? 1 : 0);
@@ -392,6 +409,11 @@ export async function grease_protect(otmp, ostr, victim) {   // trap.c:360
     return FALSE;
 }
 /* create a "living" statue at x,y */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 async function mk_trap_statue(x, y) {   // trap.c:390
     let mtmp = null, otmp = null, statue = null, mptr = null, trycount = 0, $t1;
     trycount = 10;
@@ -414,6 +436,10 @@ async function mk_trap_statue(x, y) {   // trap.c:390
     await mongone(mtmp);
 }
 /* find "bottom" level of specified dungeon, stopping at quest locate */
+/**
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {number} int
+ */
 function dng_bottom(lev) {   // trap.c:418
     let bottom = 0, qlocate_depth = 0;
     bottom = dunlevs_in_dungeon(lev);
@@ -436,6 +462,9 @@ function dng_bottom(lev) {   // trap.c:418
     return bottom;
 }
 /* destination dlevel for holes or trapdoors */
+/**
+ * @param {$T.d_level | null} dst d_level *
+ */
 function hole_destination(dst) {   // trap.c:442
     let bottom = 0, $t1;
     bottom = dng_bottom(u.uz);
@@ -448,6 +477,12 @@ function hole_destination(dst) {   // trap.c:442
         }
     }
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} typ int
+ * @returns {Promise<$T.trap | null>} struct trap *
+ */
 export async function maketrap(x, y, typ) {   // trap.c:456
     let oldplace = 0, was_ice = 0, clear_flags = 0, ttmp = null, lev = null, $t1, $t2, $t3;
     lev = $c.relem(svl.level.locations[x], y);
@@ -569,12 +604,21 @@ export async function maketrap(x, y, typ) {   // trap.c:456
 }
 /* limit the destination of a hole or trapdoor to the furthest level you
    should be able to fall to */
+/**
+ * @param {$T.d_level | null} dlev d_level *
+ * @returns {$T.d_level | null} d_level *
+ */
 export function clamp_hole_destination(dlev) {   // trap.c:593
     let bottom = 0;
     bottom = dng_bottom(dlev);
     dlev.dlevel = $c.i16(min(dlev.dlevel, bottom));
     return dlev;
 }
+/**
+ * @param {number} td boolean
+ * @param {number} ftflags unsigned int
+ * @returns {Promise<void>}
+ */
 export async function fall_through(td, ftflags) {   // trap.c:602
     let dtmp = new $T.d_level(), msgbuf = new Int8Array(256), dont_fall = null, newlevel = 0, t = null, controlled_flight = 0, dist = 0;
     /* td == TRUE : trap door or hole */
@@ -677,6 +721,14 @@ export async function fall_through(td, ftflags) {   // trap.c:602
  *       wrong, but to avoid that we'd have to clone the statue contents
  *       first in order to give them to the monster before checking their
  *       shop status--it's not worth the hassle.]
+ */
+/**
+ * @param {$T.obj | null} statue struct obj *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} cause int
+ * @param {*} fail_reason int *
+ * @returns {Promise<$T.monst | null>} struct monst *
  */
 export async function animate_statue(statue, x, y, cause, fail_reason) {   // trap.c:726
     let mnum = Int32Array.of(0), mptr = null, mon = null, shkp = null, item = null, cc = new $T.nhcoord(), historic = 0, golem_xform = 0, use_saved_traits = 0, comes_to_life = null, statuename = new Int8Array(256), tmpbuf = new Int8Array(256), sgend = 0, mmflags = 0;
@@ -829,6 +881,13 @@ export async function animate_statue(statue, x, y, cause, fail_reason) {   // tr
  * statue trap by searching next to it or by trying to break it with a wand
  * or pick-axe.
  */
+/**
+ * @param {$T.trap | null} trap struct trap *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} shatter boolean
+ * @returns {Promise<$T.monst | null>} struct monst *
+ */
 export async function activate_statue_trap(trap, x, y, shatter) {   // trap.c:908
     let mtmp = null, otmp = null, fail_reason = Int32Array.of(0);
     mtmp = null;
@@ -849,6 +908,12 @@ export async function activate_statue_trap(trap, x, y, shatter) {   // trap.c:90
     await feel_newsym(x, y);
     return mtmp;
 }
+/**
+ * @param {number} steed_mid unsigned int
+ * @param {$T.obj | null} objchn struct obj *
+ * @param {$T.obj | null} saddle struct obj *
+ * @returns {Promise<number>} boolean
+ */
 async function keep_saddle_with_steedcorpse(steed_mid, objchn, saddle) {   // trap.c:939
     let mtmp = null, x = Int16Array.of(0), y = Int16Array.of(0);
     if (!saddle) {
@@ -876,6 +941,12 @@ async function keep_saddle_with_steedcorpse(steed_mid, objchn, saddle) {   // tr
 }
 /* monster or you go through and possibly destroy a web.
    return TRUE if could go through. */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} domsg boolean
+ * @param {$T.trap | null} trap struct trap *
+ * @returns {Promise<number>} boolean
+ */
 async function mu_maybe_destroy_web(mtmp, domsg, trap) {   // trap.c:972
     let isyou = 0, mptr = null, x = 0, y = 0;
     isyou = $c.i8($c.peq(mtmp, gy.youmonst) ? 1 : 0);
@@ -908,6 +979,11 @@ async function mu_maybe_destroy_web(mtmp, domsg, trap) {   // trap.c:972
     return FALSE;
 }
 /* make a single arrow/dart/rock for a trap to shoot or drop */
+/**
+ * @param {number} otyp int
+ * @param {$T.trap | null} trap struct trap *
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 async function t_missile(otyp, trap) {   // trap.c:1018
     let otmp = null, $t1;
     otmp = await mksobj(otyp, TRUE, FALSE);
@@ -917,6 +993,10 @@ async function t_missile(otyp, trap) {   // trap.c:1018
     otmp.ox = trap.tx, otmp.oy = trap.ty;
     return otmp;
 }
+/**
+ * @param {number} tim unsigned int
+ * @param {number} typ unsigned int
+ */
 export function set_utrap(tim, typ) {   // trap.c:1030
     /* if we get here through reset_utrap(), the caller of that might
        have already set u.utrap to 0 so this check won't be sufficient
@@ -928,6 +1008,10 @@ export function set_utrap(tim, typ) {   // trap.c:1030
     u.utraptype = tim ? typ : TT.NONE;
     float_vs_flight();   /* maybe block Lev and/or Fly */
 }
+/**
+ * @param {number} msg boolean
+ * @returns {Promise<void>}
+ */
 export async function reset_utrap(msg) {   // trap.c:1045
     let was_Lev = 0, was_Fly = 0;
     was_Lev = $c.i8(Levitation() !== 0 ? 1 : 0);
@@ -943,6 +1027,10 @@ export async function reset_utrap(msg) {   // trap.c:1045
     }
 }
 /* is trap type ttyp triggered by touching the floor? */
+/**
+ * @param {number} ttyp int
+ * @returns {number} boolean
+ */
 function floor_trigger(ttyp) {   // trap.c:1061
     switch (ttyp) {
         case ARROW_TRAP:
@@ -965,6 +1053,11 @@ function floor_trigger(ttyp) {   // trap.c:1061
     }
 }
 /* return TRUE if monster mtmp is up in the air, considering trap flags */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} trflags unsigned int
+ * @returns {number} boolean
+ */
 function check_in_air(mtmp, trflags) {   // trap.c:1086
     let is_you = 0, plunged = 0;
     is_you = $c.i8($c.peq(mtmp, gy.youmonst) ? 1 : 0);
@@ -972,12 +1065,21 @@ function check_in_air(mtmp, trflags) {   // trap.c:1086
     return $c.i8((trflags & HURTLING) >>> 0 !== 0 || (is_you ? Levitation() : is_floater(mtmp.data)) || (is_you ? (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked : is_flyer(mtmp.data)) && !plunged ? 1 : 0);
 }
 /* return TRUE if mtmp is wearing shoes made of iron (iron/kicking) */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} boolean
+ */
 export async function wearing_iron_shoes(mtmp) {   // trap.c:1098
     let armf = null;
     armf = await which_armor(mtmp, W.ARMF);
     return $c.i8(armf && (objects[armf.otyp].oc_material | 0) === IRON ? 1 : 0);
 }
 /* is trap ttmp harmless to monster mtmp? */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.trap | null} ttmp struct trap *
+ * @returns {Promise<number>} boolean
+ */
 export async function m_harmless_trap(mtmp, ttmp) {   // trap.c:1106
     let mdat = null;
     mdat = mtmp.data;
@@ -1060,6 +1162,12 @@ export async function m_harmless_trap(mtmp, ttmp) {   // trap.c:1106
     }
     return FALSE;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.trap | null} trap struct trap *
+ * @param {number} trflags unsigned int
+ * @returns {Promise<number>} int
+ */
 async function trapeffect_arrow_trap(mtmp, trap, trflags) {   // trap.c:1190
     let otmp = [null], dam = 0, in_sight = 0, see_it = 0, trapkilled = 0;
     if ($c.peq(mtmp, gy.youmonst)) {
@@ -1112,6 +1220,12 @@ async function trapeffect_arrow_trap(mtmp, trap, trflags) {   // trap.c:1190
     }
     return Trap.Effect_Finished;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.trap | null} trap struct trap *
+ * @param {number} trflags unsigned int
+ * @returns {Promise<number>} int
+ */
 async function trapeffect_dart_trap(mtmp, trap, trflags) {   // trap.c:1251
     let otmp = [null], dam = 0, oldumort = 0, in_sight = 0, see_it = 0, trapkilled = 0;
     if ($c.peq(mtmp, gy.youmonst)) {
@@ -1176,6 +1290,12 @@ async function trapeffect_dart_trap(mtmp, trap, trflags) {   // trap.c:1251
     }
     return Trap.Effect_Finished;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.trap | null} trap struct trap *
+ * @param {number} trflags unsigned int
+ * @returns {Promise<number>} int
+ */
 async function trapeffect_rocktrap(mtmp, trap, trflags) {   // trap.c:1324
     let otmp = null, harmless = 0, dmg = 0, in_sight = 0, see_it = 0, trapkilled = 0;
     harmless = FALSE;
@@ -1241,6 +1361,12 @@ async function trapeffect_rocktrap(mtmp, trap, trflags) {   // trap.c:1324
     }
     return Trap.Effect_Finished;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.trap | null} trap struct trap *
+ * @param {number} trflags unsigned int
+ * @returns {Promise<number>} int
+ */
 async function trapeffect_sqky_board(mtmp, trap, trflags) {   // trap.c:1403
     let tsnds = new Uint32Array(12), forcetrap = 0, in_sight = 0, range = 0;
     tsnds.fill(0);
@@ -1302,6 +1428,12 @@ async function trapeffect_sqky_board(mtmp, trap, trflags) {   // trap.c:1403
     }
     return Trap.Effect_Finished;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.trap | null} trap struct trap *
+ * @param {number} trflags unsigned int
+ * @returns {Promise<number>} int
+ */
 async function trapeffect_bear_trap(mtmp, trap, trflags) {   // trap.c:1479
     let is_you = 0, forcetrap = 0, dmg = 0, mptr = null, in_sight = 0, trapkilled = 0;
     is_you = $c.i8($c.peq(mtmp, gy.youmonst) ? 1 : 0);
@@ -1366,6 +1498,12 @@ async function trapeffect_bear_trap(mtmp, trap, trflags) {   // trap.c:1479
     }
     return Trap.Effect_Finished;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.trap | null} trap struct trap *
+ * @param {number} trflags unsigned int
+ * @returns {Promise<number>} int
+ */
 async function trapeffect_slp_gas_trap(mtmp, trap, trflags) {   // trap.c:1563
     let in_sight = 0;
     if ($c.peq(mtmp, gy.youmonst)) {
@@ -1390,6 +1528,12 @@ async function trapeffect_slp_gas_trap(mtmp, trap, trflags) {   // trap.c:1563
     }
     return Trap.Effect_Finished;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.trap | null} trap struct trap *
+ * @param {number} trflags unsigned int
+ * @returns {Promise<number>} int
+ */
 async function trapeffect_rust_trap(mtmp, trap, trflags) {   // trap.c:1595
     let otmp = null, nextobj = null, dam = 0, in_sight = 0, trapkilled = 0, mptr = null, target = null, $goto = null;
     if ($c.peq(mtmp, gy.youmonst)) {
@@ -1523,6 +1667,12 @@ async function trapeffect_rust_trap(mtmp, trap, trflags) {   // trap.c:1595
     }
     return Trap.Effect_Finished;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.trap | null} trap struct trap *
+ * @param {number} trflags unsigned int
+ * @returns {Promise<number>} int
+ */
 async function trapeffect_fire_trap(mtmp, trap, trflags) {   // trap.c:1730
     let tx = 0, ty = 0, in_sight = 0, see_it = 0, trapkilled = 0, mptr = null, orig_dmg = 0, num = 0, alt = 0, immolate = 0, xtradmg = 0, $t1;
     if ($c.peq(mtmp, gy.youmonst)) {
@@ -1613,6 +1763,12 @@ async function trapeffect_fire_trap(mtmp, trap, trflags) {   // trap.c:1730
     }
     return Trap.Effect_Finished;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.trap | null} trap struct trap *
+ * @param {number} trflags unsigned int
+ * @returns {Promise<number>} int
+ */
 async function trapeffect_pit(mtmp, trap, trflags) {   // trap.c:1825
     let ttype = 0, relevant_spikes = 0, plunged = 0, viasitting = 0, conj_pit = 0, adj_pit = 0, already_known = 0, deliberate = 0, steed_article = 0, verbbuf = new Int8Array(256), predicament = null, oldumort = 0, in_sight = 0, trapkilled = 0, forcetrap = 0, inescapable = 0, mptr = null, fallverb = null;
     ttype = trap.ttyp | 0;
@@ -1765,6 +1921,12 @@ async function trapeffect_pit(mtmp, trap, trflags) {   // trap.c:1825
     }
     return Trap.Effect_Finished;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.trap | null} trap struct trap *
+ * @param {number} trflags unsigned int
+ * @returns {Promise<number>} int
+ */
 async function trapeffect_hole(mtmp, trap, trflags) {   // trap.c:2013
     let tt = 0, mptr = null, in_sight = 0, forcetrap = 0, inescapable = 0;
     if ($c.peq(mtmp, gy.youmonst)) {
@@ -1812,6 +1974,12 @@ async function trapeffect_hole(mtmp, trap, trflags) {   // trap.c:2013
     }
     return Trap.Effect_Finished;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.trap | null} trap struct trap *
+ * @param {number} trflags unsigned int
+ * @returns {Promise<number>} int
+ */
 async function trapeffect_telep_trap(mtmp, trap, trflags) {   // trap.c:2070
     let in_sight = 0;
     if ($c.peq(mtmp, gy.youmonst)) {
@@ -1824,6 +1992,12 @@ async function trapeffect_telep_trap(mtmp, trap, trflags) {   // trap.c:2070
     }
     return Trap.Effect_Finished;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.trap | null} trap struct trap *
+ * @param {number} trflags unsigned int
+ * @returns {Promise<number>} int
+ */
 async function trapeffect_level_telep(mtmp, trap, trflags) {   // trap.c:2088
     let in_sight = 0, forcetrap = 0;
     if ($c.peq(mtmp, gy.youmonst)) {
@@ -1836,6 +2010,12 @@ async function trapeffect_level_telep(mtmp, trap, trflags) {   // trap.c:2088
     }
     return Trap.Effect_Finished;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.trap | null} trap struct trap *
+ * @param {number} trflags unsigned int
+ * @returns {Promise<number>} int
+ */
 async function trapeffect_web(mtmp, trap, trflags) {   // trap.c:2106
     let webmsgok = 0, forcetrap = 0, viasitting = 0, steed_article = 0, verbbuf = new Int8Array(256), tim = 0, str = 0, tear_web = 0, in_sight = 0, forcetrap$2 = 0, mptr = null;
     if ($c.peq(mtmp, gy.youmonst)) {
@@ -1988,6 +2168,12 @@ async function trapeffect_web(mtmp, trap, trflags) {   // trap.c:2106
     }
     return Trap.Effect_Finished;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.trap | null} trap struct trap *
+ * @param {number} trflags unsigned int
+ * @returns {Promise<number>} int
+ */
 async function trapeffect_statue_trap(mtmp, trap, trflags) {   // trap.c:2279
     if ($c.peq(mtmp, gy.youmonst)) {
         await activate_statue_trap(trap, u.ux, u.uy, FALSE);
@@ -1996,6 +2182,12 @@ async function trapeffect_statue_trap(mtmp, trap, trflags) {   // trap.c:2279
     }
     return Trap.Effect_Finished;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.trap | null} trap struct trap *
+ * @param {number} trflags unsigned int
+ * @returns {Promise<number>} int
+ */
 async function trapeffect_magic_trap(mtmp, trap, trflags) {   // trap.c:2293
     let $t1;
     if ($c.peq(mtmp, gy.youmonst)) {
@@ -2023,6 +2215,12 @@ async function trapeffect_magic_trap(mtmp, trap, trflags) {   // trap.c:2293
     }
     return Trap.Effect_Finished;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.trap | null} trap struct trap *
+ * @param {number} trflags unsigned int
+ * @returns {Promise<number>} int
+ */
 async function trapeffect_anti_magic(mtmp, trap, trflags) {   // trap.c:2323
     let shoes = null, drain = 0, halfd = 0, exclaim_it = 0, otmp = null, dmgval2 = 0, hp = 0, trapkilled = 0, in_sight = 0, see_it = 0, mptr = null, otmp$2 = null, dmgval2$2 = 0, $t1;
     /* monster, possibly youmonst */
@@ -2146,6 +2344,12 @@ async function trapeffect_anti_magic(mtmp, trap, trflags) {   // trap.c:2323
     }
     return Trap.Effect_Finished;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.trap | null} trap struct trap *
+ * @param {number} trflags unsigned int
+ * @returns {Promise<number>} int
+ */
 async function trapeffect_poly_trap(mtmp, trap, trflags) {   // trap.c:2453
     let viasitting = 0, steed_article = 0, verbbuf = new Int8Array(256), in_sight = 0, shoes = null;
     if ($c.peq(mtmp, gy.youmonst)) {
@@ -2212,6 +2416,12 @@ async function trapeffect_poly_trap(mtmp, trap, trflags) {   // trap.c:2453
     }
     return Trap.Effect_Finished;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.trap | null} trap struct trap *
+ * @param {number} trflags unsigned int
+ * @returns {Promise<number>} int
+ */
 async function trapeffect_landmine(mtmp, trap, trflags) {   // trap.c:2528
     let damage = 0, already_seen = 0, forcetrap = 0, forcebungle = 0, steed_mid = 0, saddle = null, trapkilled = 0, in_sight = 0, tx = 0, ty = 0, already_seen$2 = 0;
     damage = rnd(16);
@@ -2327,6 +2537,12 @@ async function trapeffect_landmine(mtmp, trap, trflags) {   // trap.c:2528
     }
     return Trap.Effect_Finished;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.trap | null} trap struct trap *
+ * @param {number} trflags unsigned int
+ * @returns {Promise<number>} int
+ */
 async function trapeffect_rolling_boulder_trap(mtmp, trap, trflags) {   // trap.c:2661
     let style = 0, in_sight = 0, style$2 = 0, trapkilled = 0;
     if ($c.peq(mtmp, gy.youmonst)) {
@@ -2365,6 +2581,12 @@ async function trapeffect_rolling_boulder_trap(mtmp, trap, trflags) {   // trap.
     }
     return Trap.Effect_Finished;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.trap | null} trap struct trap *
+ * @param {number} trflags unsigned int
+ * @returns {Promise<number>} int
+ */
 async function trapeffect_magic_portal(mtmp, trap, trflags) {   // trap.c:2710
     if ($c.peq(mtmp, gy.youmonst)) {
         await feeltrap(trap);
@@ -2374,6 +2596,12 @@ async function trapeffect_magic_portal(mtmp, trap, trflags) {   // trap.c:2710
     }
     return Trap.Effect_Finished;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.trap | null} trap struct trap *
+ * @param {number} trflags unsigned int
+ * @returns {Promise<number>} int
+ */
 async function trapeffect_vibrating_square(mtmp, trap, trflags) {   // trap.c:2725
     let in_sight = 0, see_it = 0, buf = new Int8Array(256), p = null, monnm = null;
     if ($c.peq(mtmp, gy.youmonst)) {
@@ -2422,6 +2650,11 @@ async function trapeffect_vibrating_square(mtmp, trap, trflags) {   // trap.c:27
  *  TRAP_HIDDEN_IMMUNE = immune but in non-obvious way such as an unidentified
  *    item or hidden intrinsic providing a resistance; the player should still
  *    be warned of this trap, while monsters implicitly know they're immune.
+ */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} ttype unsigned int
+ * @returns {Promise<number>} int
  */
 export async function immune_to_trap(mon, ttype) {   // trap.c:2783
     let pm = null, obj = null, is_you = 0;
@@ -2570,6 +2803,12 @@ export async function immune_to_trap(mon, ttype) {   // trap.c:2783
     }
     return TRAP.NOT_IMMUNE;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.trap | null} trap struct trap *
+ * @param {number} trflags unsigned int
+ * @returns {Promise<number>} int
+ */
 async function trapeffect_selector(mtmp, trap, trflags) {   // trap.c:2937
     switch (trap.ttyp | 0) {
         case ARROW_TRAP:
@@ -2621,6 +2860,11 @@ async function trapeffect_selector(mtmp, trap, trflags) {   // trap.c:2937
     }
     return Trap.Effect_Finished;
 }
+/**
+ * @param {$T.trap | null} trap struct trap *
+ * @param {number} trflags unsigned int
+ * @returns {Promise<void>}
+ */
 export async function dotrap(trap, trflags) {   // trap.c:2996
     let ttype = 0, already_seen = 0, forcetrap = 0, forcebungle = 0, plunged = 0, conj_pit = 0, adj_pit = 0;
     ttype = trap.ttyp | 0;
@@ -2669,6 +2913,11 @@ export async function dotrap(trap, trflags) {   // trap.c:2996
      */
     await trapeffect_selector(gy.youmonst, trap, trflags);
 }
+/**
+ * @param {$T.trap | null} trap struct trap *
+ * @param {number} noprefix boolean
+ * @returns {$c.Ptr | null} char *
+ */
 function trapnote(trap, noprefix) {   // trap.c:3063
     let tn = null;
     /* result buffer */
@@ -2681,6 +2930,10 @@ function trapnote(trap, noprefix) {   // trap.c:3063
 }
 /* choose a note not used by any trap on current level,
    ignoring ttmp; if all are in use, pick a random one */
+/**
+ * @param {$T.trap | null} ttmp struct trap *
+ * @returns {number} int
+ */
 function choose_trapnote(ttmp) {   // trap.c:3083
     let tavail = new Int32Array(12), tpick = new Int32Array(12), tcnt = 0, k = 0, t = null, $t1, $t2;
     tcnt = 0;
@@ -2701,6 +2954,11 @@ function choose_trapnote(ttmp) {   // trap.c:3083
     /* choose an unused note; if all are in use, pick a random one */
     return tcnt > 0 ? tpick[rn2(tcnt)] : rn2(12);
 }
+/**
+ * @param {$T.trap | null} trap struct trap *
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} int
+ */
 async function steedintrap(trap, otmp) {   // trap.c:3102
     let steed = null, tt = 0, trapkilled = 0, steedhit = 0;
     steed = u.usteed;
@@ -2762,6 +3020,10 @@ async function steedintrap(trap, otmp) {   // trap.c:3102
     return steedhit ? 1 : 0;
 }
 /* some actions common to both player and monsters for triggered landmine */
+/**
+ * @param {$T.trap | null} trap struct trap *
+ * @returns {Promise<void>}
+ */
 export async function blow_up_landmine(trap) {   // trap.c:3172
     let x = 0, y = 0, dbx = Int16Array.of(0), dby = Int16Array.of(0), lev = null, old_typ = 0, typ = 0;
     x = trap.tx;
@@ -2807,6 +3069,11 @@ export async function blow_up_landmine(trap) {   // trap.c:3172
     recalc_block_point(x, y);
     await spot_checks(x, y, old_typ);
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ */
 function launch_drop_spot(obj, x, y) {   // trap.c:3222
     if (!obj) {
         gl.launchplace.obj = null;
@@ -2818,12 +3085,18 @@ function launch_drop_spot(obj, x, y) {   // trap.c:3222
         gl.launchplace.y = y;
     }
 }
+/**
+ * @returns {number} boolean
+ */
 export function launch_in_progress() {   // trap.c:3236
     if (gl.launchplace.obj) {
         return TRUE;
     }
     return FALSE;
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function force_launch_placement() {   // trap.c:3244
     if (gl.launchplace.obj) {
         gl.launchplace.obj.otrapped = (0) & 1;
@@ -2836,6 +3109,15 @@ export async function force_launch_placement() {   // trap.c:3244
  * Return 0 if no object was launched.
  *        1 if an object was launched and placed somewhere.
  *        2 if an object was launched, but used up.
+ */
+/**
+ * @param {number} otyp short
+ * @param {number} x1 coordxy
+ * @param {number} y1 coordxy
+ * @param {number} x2 coordxy
+ * @param {number} y2 coordxy
+ * @param {number} style int
+ * @returns {Promise<number>} int
  */
 export async function launch_obj(otyp, x1, y1, x2, y2, style) {   // trap.c:3260
     let mtmp = null, otmp = null, otmp2 = null, dx = 0, dy = 0, x = 0, y = 0, singleobj = [null], used_up = 0, otherside = 0, dist = 0, tmp = 0, delaycnt = 0, tx = 0, ty = 0, t = null, dam = 0, newlev = 0, dest = new $T.d_level(), bmsg = null, fx = 0, fy = 0, fx$2 = 0, fy$2 = 0, typ = 0, $goto = null, $t1, $t2, $t3;
@@ -3128,6 +3410,10 @@ export async function launch_obj(otyp, x1, y1, x2, y2, style) {   // trap.c:3260
     }
     return 2;
 }
+/**
+ * @param {$T.trap | null} trap struct trap *
+ * @returns {Promise<void>}
+ */
 export async function seetrap(trap) {   // trap.c:3578
     if (!trap.tseen) {
         trap.tseen = (1) & 1;
@@ -3135,6 +3421,10 @@ export async function seetrap(trap) {   // trap.c:3578
     }
 }
 /* like seetrap() but overrides vision */
+/**
+ * @param {$T.trap | null} trap struct trap *
+ * @returns {Promise<void>}
+ */
 export async function feeltrap(trap) {   // trap.c:3588
     trap.tseen = (1) & 1;
     await map_trap(trap, 1);
@@ -3143,6 +3433,11 @@ export async function feeltrap(trap) {   // trap.c:3588
 }
 /* try to find a random coordinate where launching a rolling boulder
    could work. return TRUE if found, with coordinate in cc. */
+/**
+ * @param {$T.trap | null} ttmp struct trap *
+ * @param {$T.nhcoord | null} cc coord *
+ * @returns {number} boolean
+ */
 function find_random_launch_coord(ttmp, cc) {   // trap.c:3599
     let tmp = 0, success = 0, bcc = new $T.nhcoord(), distance = 0, mindist = 0, trycount = 0, dx = 0, dy = 0, x = 0, y = 0, success_otherway = 0;
     success = FALSE;
@@ -3198,6 +3493,14 @@ function find_random_launch_coord(ttmp, cc) {   // trap.c:3599
     }
     return success;
 }
+/**
+ * @param {$T.trap | null} ttmp struct trap *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} otyp short
+ * @param {number | bigint} ocount long
+ * @returns {Promise<number>} int
+ */
 async function mkroll_launch(ttmp, x, y, otyp, ocount) {   // trap.c:3659
     let otmp = null, cc = new $T.nhcoord(), success = 0, $t1;
     cc.$copyFrom(new $T.nhcoord());
@@ -3226,6 +3529,13 @@ async function mkroll_launch(ttmp, x, y, otyp, ocount) {   // trap.c:3659
     await newsym(ttmp.launch.x, ttmp.launch.y);
     return 1;
 }
+/**
+ * @param {$T.nhcoord | null} cc coord *
+ * @param {number} distance int
+ * @param {number} dx schar
+ * @param {number} dy schar
+ * @returns {number} boolean
+ */
 function isclearpath(cc, distance, dx, dy) {   // trap.c:3695
     let t = null, typ = 0, x = 0, y = 0, $t1;
     x = cc.x;
@@ -3249,9 +3559,18 @@ function isclearpath(cc, distance, dx, dy) {   // trap.c:3695
     return TRUE;
 }
 /* can monster escape from a pit easily */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number} boolean
+ */
 function m_easy_escape_pit(mtmp) {   // trap.c:3726
     return $c.i8($c.peq(mtmp.data, $c.relem(mons, PM.PIT_FIEND)) || mtmp.data.msize >= MZ.HUGE ? 1 : 0);
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} mintrapflags unsigned int
+ * @returns {Promise<number>} int
+ */
 export async function mintrap(mtmp, mintrapflags) {   // trap.c:3733
     let trap = null, mptr = null, trap_result = 0, tt = 0, forcetrap = 0, forcebungle = 0, already_seen = 0, alreadyspotted = 0;
     trap = t_at(mtmp.mx, mtmp.my);
@@ -3349,6 +3668,10 @@ export async function mintrap(mtmp, mintrapflags) {   // trap.c:3733
     return trap_result;
 }
 /* Combine cockatrice checks into single functions to avoid repeating code. */
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @returns {Promise<void>}
+ */
 export async function instapetrify(str) {   // trap.c:3844
     if (Stone_resistance()) {
         return;
@@ -3363,6 +3686,11 @@ export async function instapetrify(str) {   // trap.c:3844
     }
     await done(STONING);
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} byplayer boolean
+ * @returns {Promise<void>}
+ */
 export async function minstapetrify(mon, byplayer) {   // trap.c:3858
     if (await resists_ston(mon)) {
         return;
@@ -3387,6 +3715,10 @@ export async function minstapetrify(mon, byplayer) {   // trap.c:3858
         await monstone(mon);
     }
 }
+/**
+ * @param {$c.Ptr | null} arg const char *
+ * @returns {Promise<void>}
+ */
 export async function selftouch(arg) {   // trap.c:3883
     let kbuf = new Int8Array(256), corpse_pmname = null;
     if ($G.uwep && $G.uwep.otyp === CORPSE && touch_petrifies($c.relem(mons, $G.uwep.corpsenm)) && !Stone_resistance()) {
@@ -3412,6 +3744,12 @@ export async function selftouch(arg) {   // trap.c:3883
         }
     }
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$c.Ptr | null} arg const char *
+ * @param {number} byplayer boolean
+ * @returns {Promise<void>}
+ */
 export async function mselftouch(mon, arg, byplayer) {   // trap.c:3913
     let mwep = null;
     mwep = mon.mw;
@@ -3427,6 +3765,9 @@ export async function mselftouch(mon, arg, byplayer) {   // trap.c:3913
     }
 }
 /* start levitating */
+/**
+ * @returns {Promise<void>}
+ */
 export async function float_up() {   // trap.c:3937
     let cc = new $T.nhcoord();
     disp.botl = TRUE;
@@ -3491,6 +3832,11 @@ export async function float_up() {   // trap.c:3937
     return;
 }
 /* a boulder fills a pit or a hole at x,y */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function fill_pit(x, y) {   // trap.c:4010
     let otmp = null, t = null;
     if ((t = t_at(x, y)) !== null && (is_pit(t.ttyp) || is_hole(t.ttyp)) && (otmp = sobj_at(BOULDER, x, y)) !== null) {
@@ -3499,6 +3845,11 @@ export async function fill_pit(x, y) {   // trap.c:4010
     }
 }
 /* stop levitating */
+/**
+ * @param {number | bigint} hmask long
+ * @param {number | bigint} emask long
+ * @returns {Promise<number>} int
+ */
 export async function float_down(hmask, emask) {   // trap.c:4024
     let trap = null, current_dungeon_level = new $T.d_level(), no_msg = 0, trapped = 0;
     /* might cancel timeout */
@@ -3641,6 +3992,9 @@ export async function float_down(hmask, emask) {   // trap.c:4024
     return 1;
 }
 /* shared code for climbing out of a pit */
+/**
+ * @returns {Promise<void>}
+ */
 export async function climb_pit() {   // trap.c:4183
     let pitname = null;
     if (!u.utrap || u.utraptype !== TT.PIT) {
@@ -3682,6 +4036,10 @@ export async function climb_pit() {   // trap.c:4183
         }
     }
 }
+/**
+ * @param {$T.obj | null} box struct obj *
+ * @returns {Promise<void>}
+ */
 async function dofiretrap(box) {   // trap.c:4233
     let see_it = 0, orig_dmg = 0, num = 0, alt = 0, uhpmin = 0, olduhpmax = 0, $t1, $t2;
     /* null for floor trap */
@@ -3767,6 +4125,9 @@ async function dofiretrap(box) {   // trap.c:4233
         await melt_ice(u.ux, u.uy, null);
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function domagictrap() {   // trap.c:4317
     let fate = 0, cnt = 0, i = 0, j = 0, mtmp = null, pseudo = new $T.obj(), save_conf = 0, $t1;
     fate = rnd(20);
@@ -3893,6 +4254,13 @@ async function domagictrap() {   // trap.c:4317
     }
 }
 /* Set an item on fire.  Return whether the object was destroyed. */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} force boolean
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} boolean
+ */
 export async function fire_damage(obj, force, x, y) {   // trap.c:4455
     let chance = 0, otmp = null, ncobj = null, in_sight = 0, dindx = 0;
     /* if True, skip luck-based protection check */
@@ -3984,6 +4352,14 @@ export async function fire_damage(obj, force, x, y) {   // trap.c:4455
  *
  * Return number of objects destroyed. --ALI
  */
+/**
+ * @param {$T.obj | null} chain struct obj *
+ * @param {number} force boolean
+ * @param {number} here boolean
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} int
+ */
 export async function fire_damage_chain(chain, force, here, x, y) {   // trap.c:4550
     let obj = null, nobj = null, num = 0;
     num = 0;
@@ -4002,6 +4378,12 @@ export async function fire_damage_chain(chain, force, here, x, y) {   // trap.c:
     return num;
 }
 /* obj has been thrown or dropped into lava; damage is worse than mere fire */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} boolean
+ */
 export async function lava_damage(obj, x, y) {   // trap.c:4576
     let otyp = 0, ocls = 0;
     otyp = obj.otyp;
@@ -4040,6 +4422,10 @@ export async function lava_damage(obj, x, y) {   // trap.c:4576
     }
     return await fire_damage(obj, TRUE, x, y);
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function acid_damage(obj) {   // trap.c:4618
     let victim = null, vismon = 0;
     /* Scrolls but not spellbooks can be erased by acid. */
@@ -4070,6 +4456,12 @@ export async function acid_damage(obj) {   // trap.c:4618
         await erode_obj(obj, null, ERODE.CORRODE, EF.GREASE | EF.VERBOSE);
     }
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} in_invent boolean
+ * @param {number} described boolean
+ * @returns {Promise<void>}
+ */
 async function pot_acid_damage(obj, in_invent, described) {   // trap.c:4657
     let bufp = null, one = 0, exploded = 0;
     one = $c.i8(obj.quan === 1 ? 1 : 0);
@@ -4116,6 +4508,12 @@ async function pot_acid_damage(obj, in_invent, described) {   // trap.c:4657
 }
 /* Get an object wet and damage it appropriately.
    Returns an erosion return value (ER_*). */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$c.Ptr | null} ostr const char *
+ * @param {number} force boolean
+ * @returns {Promise<number>} int
+ */
 export async function water_damage(obj, ostr, force) {   // trap.c:4712
     let in_invent = 0, described = 0, otyp = 0, ox = Int16Array.of(0), oy = Int16Array.of(0), $t1, $t2;
     /* might be Null; return ER_NOTHING if so */
@@ -4262,6 +4660,11 @@ export async function water_damage(obj, ostr, force) {   // trap.c:4712
     }
     return ER.NOTHING;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} here boolean
+ * @returns {Promise<void>}
+ */
 export async function water_damage_chain(obj, here) {   // trap.c:4855
     let otmp = null, x = Int16Array.of(0), y = Int16Array.of(0), save_bhitpos = new $T.nhcoord(), $t1, $t2;
     if (!obj) {
@@ -4294,6 +4697,10 @@ export async function water_damage_chain(obj, here) {   // trap.c:4855
  * inventory list multiple times.  Luckily it's seldom needed.
  * Returns TRUE if disrobing made player unencumbered enough to
  * crawl out of the current predicament.
+ */
+/**
+ * @param {$c.Ptr | null} lostsome boolean *
+ * @returns {Promise<number>} boolean
  */
 async function emergency_disrobe(lostsome) {   // trap.c:4897
     let invc = 0, obj = null, nextobj = null, otmp = null, i = 0;
@@ -4337,6 +4744,12 @@ async function emergency_disrobe(lostsome) {   // trap.c:4897
 /* pick a random goodpos() next to x,y for monster mtmp.
    mtmp could be &gy.youmonst, uses then crawl_destination().
    returns TRUE if any good position found, with the coord in x,y */
+/**
+ * @param {*} x coordxy *
+ * @param {*} y coordxy *
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} boolean
+ */
 export async function rnd_nextto_goodpos(x, y, mtmp) {   // trap.c:4947
     let i = 0, j = 0, is_u = 0, nx = 0, ny = 0, k = 0, dirs = new Int16Array(8);
     is_u = $c.i8($c.peq(mtmp, gy.youmonst) ? 1 : 0);
@@ -4362,6 +4775,10 @@ export async function rnd_nextto_goodpos(x, y, mtmp) {   // trap.c:4947
     return FALSE;
 }
 /* print a message about being back on the ground after leaving a pool */
+/**
+ * @param {number} rescued boolean
+ * @returns {Promise<void>}
+ */
 export async function back_on_ground(rescued) {   // trap.c:4976
     let preposit = null, surf = null, you_are_back = null, icebuf = new Int8Array(128);
     preposit = Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked ? $c.lit("over") : $c.lit("on");
@@ -4395,6 +4812,10 @@ export async function back_on_ground(rescued) {   // trap.c:4976
 /* life-saving or divine rescue has attempted to get the hero out of hostile
    terrain and put hero in an unexpected spot or failed due to overfull level
    and just prevented death so "back on solid ground" may be inappropriate */
+/**
+ * @param {number} how int
+ * @returns {Promise<void>}
+ */
 export async function rescued_from_terrain(how) {   // trap.c:5014
     let lev = null, mesggiven = 0;
     lev = $c.relem(svl.level.locations[u.ux], u.uy);
@@ -4433,6 +4854,9 @@ export async function rescued_from_terrain(how) {   // trap.c:5014
     iflags.prev_decor = svl.lastseentyp[u.ux][u.uy];
 }
 /* return TRUE iff player relocated */
+/**
+ * @returns {Promise<number>} boolean
+ */
 export async function drown() {   // trap.c:5059
     let pool_of_water = null, inpool_ok = 0, i = 0, x = Int16Array.of(0), y = Int16Array.of(0), is_solid = 0, lost = Int8Array.of(0), succ = 0;
     inpool_ok = FALSE;
@@ -4571,6 +4995,11 @@ export async function drown() {   // trap.c:5059
     await rescued_from_terrain(DROWNING);
     return TRUE;
 }
+/**
+ * @param {number} n int
+ * @param {number} max_already_drained boolean
+ * @returns {Promise<void>}
+ */
 export async function drain_en(n, max_already_drained) {   // trap.c:5202
     let mesg = null, punct = 0, $t1, $t2;
     punct = $c.i8(max_already_drained ? 33 : 46);
@@ -4615,6 +5044,9 @@ export async function drain_en(n, max_already_drained) {   // trap.c:5202
     await You_feel($c.lit("%s%c"), mesg, punct);
 }
 /* the #untrap command - disarm a trap */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dountrap() {   // trap.c:5248
     if (!await could_untrap(TRUE, FALSE)) {
         return ECMD.OK;
@@ -4622,6 +5054,11 @@ export async function dountrap() {   // trap.c:5248
     return await untrap(FALSE, 0, 0, null) ? ECMD.TIME : ECMD.OK;
 }
 /* preliminary checks for dountrap(); also used for autounlock */
+/**
+ * @param {number} verbosely boolean
+ * @param {number} check_floor boolean
+ * @returns {Promise<number>} int
+ */
 export async function could_untrap(verbosely, check_floor) {   // trap.c:5258
     let buf = new Int8Array(256);
     buf[0] = 0;
@@ -4648,6 +5085,10 @@ export async function could_untrap(verbosely, check_floor) {   // trap.c:5258
 }
 /* Probability of disabling a trap.  Helge Hafting;
    Returns 0 for success, non-0 for failure. */
+/**
+ * @param {$T.trap | null} ttmp struct trap *
+ * @returns {number} int
+ */
 function untrap_prob(ttmp) {   // trap.c:5289
     let chance = 0, wep = null;
     /* must not be Null */
@@ -4705,6 +5146,13 @@ function untrap_prob(ttmp) {   // trap.c:5289
     return rn2(chance);
 }
 /* Replace trap with object(s).  Helge Hafting */
+/**
+ * @param {number} otyp int
+ * @param {number} cnt int
+ * @param {$T.trap | null} ttmp struct trap *
+ * @param {number} bury_it boolean
+ * @returns {Promise<void>}
+ */
 export async function cnv_trap_obj(otyp, cnt, ttmp, bury_it) {   // trap.c:5341
     let otmp = null, mtmp = null, $t1;
     otmp = await mksobj(otyp, TRUE, FALSE);
@@ -4735,6 +5183,10 @@ export async function cnv_trap_obj(otyp, cnt, ttmp, bury_it) {   // trap.c:5341
     await deltrap(ttmp);
 }
 /* whether moving to a trap location is moving "into" the trap or "onto" it */
+/**
+ * @param {number} traptype int
+ * @returns {number} boolean
+ */
 export function into_vs_onto(traptype) {   // trap.c:5375
     switch (traptype) {
         case BEAR_TRAP:
@@ -4750,6 +5202,10 @@ export function into_vs_onto(traptype) {   // trap.c:5375
     return FALSE;
 }
 /* while attempting to disarm an adjacent trap, we've fallen into it */
+/**
+ * @param {$T.trap | null} ttmp struct trap *
+ * @returns {Promise<void>}
+ */
 async function move_into_trap(ttmp) {   // trap.c:5393
     let bc = Int32Array.of(0), x = 0, y = 0, bx = Int16Array.of(0), by = Int16Array.of(0), cx = Int16Array.of(0), cy = Int16Array.of(0), unused = Int8Array.of(0);
     bc[0] = 0;
@@ -4794,6 +5250,11 @@ async function move_into_trap(ttmp) {   // trap.c:5393
     }
 }
 /* 0: doesn't even try; 1: tries and fails; 2: succeeds */
+/**
+ * @param {$T.trap | null} ttmp struct trap *
+ * @param {number} force_failure boolean
+ * @returns {Promise<number>} int
+ */
 async function try_disarm(ttmp, force_failure) {   // trap.c:5441
     let mtmp = null, ttype = 0, under_u = 0, holdingtrap = 0, ttmp2 = null, $t1;
     mtmp = svl.level.monsters[ttmp.tx][ttmp.ty];
@@ -4872,6 +5333,11 @@ async function try_disarm(ttmp, force_failure) {   // trap.c:5441
     }
     return 2;
 }
+/**
+ * @param {$T.trap | null} ttmp struct trap *
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 async function reward_untrap(ttmp, mtmp) {   // trap.c:5530
     if (!ttmp.madeby_u) {
         if (rnl(10) < 8 && !mtmp.mpeaceful && !helpless(mtmp) && !mtmp.mfrozen && !mindless(mtmp.data) && !unique_corpstat(mtmp.data) && mtmp.data.mlet !== S.HUMAN) {
@@ -4889,6 +5355,10 @@ async function reward_untrap(ttmp, mtmp) {   // trap.c:5530
 }
 /* Help a monster out of a bear trap or web, or if no monster is
    present, disarm a bear trap or destroy a web.  Helge Hafting */
+/**
+ * @param {$T.trap | null} ttmp struct trap *
+ * @returns {Promise<number>} int
+ */
 async function disarm_holdingtrap(ttmp) {   // trap.c:5553
     let mtmp = null, which = null, fails = 0, wep = null;
     which = c_common_strings.c_the_your[ttmp.madeby_u];
@@ -4920,6 +5390,10 @@ async function disarm_holdingtrap(ttmp) {   // trap.c:5553
     await newsym($c.i16(u.ux + u.dx | 0), $c.i16(u.uy + u.dy | 0));
     return 1;
 }
+/**
+ * @param {$T.trap | null} ttmp struct trap *
+ * @returns {Promise<number>} int
+ */
 async function disarm_landmine(ttmp) {   // trap.c:5594
     let fails = 0;
     /* Helge Hafting */
@@ -4932,6 +5406,10 @@ async function disarm_landmine(ttmp) {   // trap.c:5594
     return 1;
 }
 /* getobj callback for object to disarm a squeaky board with */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 function unsqueak_ok(obj) {   // trap.c:5607
     if (!obj) {
         return GETOBJ.EXCLUDE;
@@ -4951,6 +5429,10 @@ function unsqueak_ok(obj) {   // trap.c:5607
     return GETOBJ.EXCLUDE;
 }
 /* it may not make much sense to use grease on floor boards, but so what? */
+/**
+ * @param {$T.trap | null} ttmp struct trap *
+ * @returns {Promise<number>} int
+ */
 async function disarm_squeaky_board(ttmp) {   // trap.c:5630
     let obj = null, bad_tool = 0, fails = 0;
     obj = await getobj($c.lit("untrap with"), unsqueak_ok, GETOBJ_PROMPT);
@@ -4977,6 +5459,11 @@ async function disarm_squeaky_board(ttmp) {   // trap.c:5630
     return 1;
 }
 /* removes traps that shoot arrows, darts, etc. */
+/**
+ * @param {$T.trap | null} ttmp struct trap *
+ * @param {number} otyp int
+ * @returns {Promise<number>} int
+ */
 async function disarm_shooting_trap(ttmp, otyp) {   // trap.c:5664
     let fails = 0;
     fails = await try_disarm(ttmp, FALSE);
@@ -4988,6 +5475,13 @@ async function disarm_shooting_trap(ttmp, otyp) {   // trap.c:5664
     return 1;
 }
 /* trying to #untrap a monster from a pit; is the weight too heavy? */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.trap | null} ttmp struct trap *
+ * @param {number} xtra_wt int
+ * @param {number} stuff boolean
+ * @returns {Promise<number>} int
+ */
 async function try_lift(mtmp, ttmp, xtra_wt, stuff) {   // trap.c:5677
     /* trapped monster */
     /* pit, possibly made by hero, or spiked pit */
@@ -5005,6 +5499,11 @@ async function try_lift(mtmp, ttmp, xtra_wt, stuff) {   // trap.c:5677
     return 1;
 }
 /* Help trapped monster (out of a (spiked) pit) */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.trap | null} ttmp struct trap *
+ * @returns {Promise<number>} int
+ */
 async function help_monster_out(mtmp, ttmp) {   // trap.c:5700
     let xtra_wt = 0, otmp = null, uprob = 0, mtmp_pmname = null, kbuf = new Int8Array(256);
     /*
@@ -5081,6 +5580,12 @@ async function help_monster_out(mtmp, ttmp) {   // trap.c:5700
     await fill_pit(mtmp.mx, mtmp.my);
     return 1;
 }
+/**
+ * @param {$T.obj | null} box struct obj *
+ * @param {number} force boolean
+ * @param {number} confused boolean
+ * @returns {Promise<void>}
+ */
 async function disarm_box(box, force, confused) {   // trap.c:5794
     let ch = 0;
     if (box.otrapped) {
@@ -5105,6 +5610,12 @@ async function disarm_box(box, force, confused) {   // trap.c:5794
     }
 }
 /* check a particular container for a trap and optionally disarm it */
+/**
+ * @param {$T.obj | null} box struct obj *
+ * @param {number} force boolean
+ * @param {number} confused boolean
+ * @returns {Promise<void>}
+ */
 async function untrap_box(box, force, confused) {   // trap.c:5821
     if (box.otrapped | 0 && (force || !confused && rn2(MAXULEV + 1 - u.ulevel | 0) < 10) || box.tknown | 0 || !force && confused && !rn2(3)) {
         if (!(box.tknown | 0 && box.dknown | 0)) {
@@ -5125,6 +5636,13 @@ async function untrap_box(box, force, confused) {   // trap.c:5821
     }
 }
 /* hero is able to attempt untrap, so do so */
+/**
+ * @param {number} force boolean
+ * @param {number} rx coordxy
+ * @param {number} ry coordxy
+ * @param {$T.obj | null} container struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function untrap(force, rx, ry, container) {   // trap.c:5848
     let otmp = null, x = 0, y = 0, ch = 0, ttmp = null, mtmp = null, trapdescr = null, here = 0, useplural = 0, deal_with_floor_trap = 0, confused = 0, trap_skipped = 0, autounlock_door = 0, boxcnt = 0, the_trap = new Int8Array(256), qbuf = new Int8Array(128);
     confused = $c.i8(u.uprops[CONFUSION].intrinsic || Hallucination() ? 1 : 0);
@@ -5353,6 +5871,11 @@ export async function untrap(force, rx, ry, container) {   // trap.c:5848
 }
 /* for magic unlocking; returns true if targeted monster (which might
    be hero) gets untrapped; the trap remains intact */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$c.Ptr | null} noticed boolean *
+ * @returns {Promise<number>} boolean
+ */
 export async function openholdingtrap(mon, noticed) {   // trap.c:6101
     let t = null, tdummy = new $T.trap(), buf = new Int8Array(256), whichbuf = new Int8Array(20), trapdescr = null, which = null, ishero = 0;
     /* set to true iff hero notices the effect;
@@ -5461,6 +5984,11 @@ export async function openholdingtrap(mon, noticed) {   // trap.c:6101
 }
 /* for magic locking; returns true if targeted monster (which might
    be hero) gets hit by a trap (might avoid actually becoming trapped) */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$c.Ptr | null} noticed boolean *
+ * @returns {Promise<number>} boolean
+ */
 export async function closeholdingtrap(mon, noticed) {   // trap.c:6210
     let t = null, dotrapflags = 0, ishero = 0, result = 0, $t1;
     /* set to true iff hero notices the effect;
@@ -5502,6 +6030,12 @@ export async function closeholdingtrap(mon, noticed) {   // trap.c:6210
 }
 /* for magic unlocking; returns true if targeted monster (which might
    be hero) gets hit by a trap (target might avoid its effect) */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} trapdoor_only boolean
+ * @param {$c.Ptr | null} noticed boolean *
+ * @returns {Promise<number>} boolean
+ */
 export async function openfallingtrap(mon, trapdoor_only, noticed) {   // trap.c:6252
     let t = null, ishero = 0, result = 0, $t1;
     /* set to true iff hero notices the effect; */
@@ -5542,6 +6076,12 @@ export async function openfallingtrap(mon, trapdoor_only, noticed) {   // trap.c
 }
 /* only called when the player is doing something to the chest directly;
    returns True if chest is destroyed, False if it remains in play */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} bodypart int
+ * @param {number} disarm boolean
+ * @returns {Promise<number>} boolean
+ */
 export async function chest_trap(obj, bodypart, disarm) {   // trap.c:6294
     let otmp = null, otmp2 = null, buf = new Int8Array(80), msg = null, cc = new $T.nhcoord(), shkp = null, loss = 0, costly = 0, insider = 0, chestgone = 0, ox = 0, oy = 0, dmg = 0, orig_dmg = 0;
     otmp = obj;
@@ -5735,6 +6275,11 @@ export async function chest_trap(obj, bodypart, disarm) {   // trap.c:6294
     obj.tknown = (1) & 1;   /* hero knows chest is no longer trapped */
     return FALSE;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {$T.trap | null} struct trap *
+ */
 export function t_at(x, y) {   // trap.c:6502
     let trap = null;
     trap = gf.ftrap;
@@ -5747,6 +6292,10 @@ export function t_at(x, y) {   // trap.c:6502
     return null;
 }
 /* return number of traps of type ttyp on this level */
+/**
+ * @param {number} ttyp int
+ * @returns {number} int
+ */
 export function count_traps(ttyp) {   // trap.c:6516
     let ret = 0, trap = null;
     ret = 0;
@@ -5759,6 +6308,10 @@ export function count_traps(ttyp) {   // trap.c:6516
     }
     return ret;
 }
+/**
+ * @param {$T.trap | null} trap struct trap *
+ * @returns {Promise<void>}
+ */
 export async function deltrap(trap) {   // trap.c:6531
     let ttmp = null;
     clear_conjoined_pits(trap);
@@ -5780,6 +6333,12 @@ export async function deltrap(trap) {   // trap.c:6531
     }
     dealloc_trap(trap);
 }
+/**
+ * @param {$T.trap | null} trap2 struct trap *
+ * @param {$T.trap | null} trap1 struct trap *
+ * @param {number} u_entering_trap2 boolean
+ * @returns {number} boolean
+ */
 export function conjoined_pits(trap2, trap1, u_entering_trap2) {   // trap.c:6552
     let dx = 0, dy = 0, diridx = 0, adjidx = 0;
     if (!trap1 || !trap2) {
@@ -5799,6 +6358,9 @@ export function conjoined_pits(trap2, trap1, u_entering_trap2) {   // trap.c:655
     }
     return FALSE;
 }
+/**
+ * @param {$T.trap | null} trap struct trap *
+ */
 function clear_conjoined_pits(trap) {   // trap.c:6580
     let diridx = 0, adjidx = 0, x = 0, y = 0, t = null;
     if (trap && is_pit(trap.ttyp)) {
@@ -5815,6 +6377,10 @@ function clear_conjoined_pits(trap) {   // trap.c:6580
         }
     }
 }
+/**
+ * @param {$T.trap | null} adjtrap struct trap *
+ * @returns {number} boolean
+ */
 function adj_nonconjoined_pit(adjtrap) {   // trap.c:6604
     let trap_with_u = null;
     trap_with_u = t_at(u.ux0, u.uy0);
@@ -5833,6 +6399,10 @@ function adj_nonconjoined_pit(adjtrap) {   // trap.c:6604
 /*
  * Returns TRUE if you escaped a pit and are standing on the precipice.
  */
+/**
+ * @param {$T.trap | null} trap struct trap *
+ * @returns {number} boolean
+ */
 export function uteetering_at_seen_pit(trap) {   // trap.c:6648
     return $c.i8(trap && is_pit(trap.ttyp) && trap.tseen | 0 && (trap.tx === u.ux && trap.ty === u.uy) && !(u.utrap && u.utraptype === TT.PIT) ? 1 : 0);
 }
@@ -5840,10 +6410,18 @@ export function uteetering_at_seen_pit(trap) {   // trap.c:6648
  * Returns TRUE if you didn't fall through a hole or didn't
  * release a trap door
  */
+/**
+ * @param {$T.trap | null} trap struct trap *
+ * @returns {number} boolean
+ */
 export function uescaped_shaft(trap) {   // trap.c:6660
     return $c.i8(trap && is_hole(trap.ttyp) && trap.tseen | 0 && (trap.tx === u.ux && trap.ty === u.uy) ? 1 : 0);
 }
 /* Destroy a trap that emanates from the floor. */
+/**
+ * @param {$T.trap | null} ttmp struct trap *
+ * @returns {Promise<number>} boolean
+ */
 export async function delfloortrap(ttmp) {   // trap.c:6668
     let mtmp = null;
     /* some of these are arbitrary -dlc */
@@ -5861,6 +6439,11 @@ export async function delfloortrap(ttmp) {   // trap.c:6668
     return FALSE;
 }
 /* used for doors (also tins).  can be used for anything else that opens. */
+/**
+ * @param {$c.Ptr | null} item const char *
+ * @param {number} bodypart int
+ * @returns {Promise<void>}
+ */
 export async function b_trapped(item, bodypart) {   // trap.c:6694
     let lvl = 0, dmg = 0;
     lvl = await level_difficulty();
@@ -5875,6 +6458,14 @@ export async function b_trapped(item, bodypart) {   // trap.c:6694
     await make_stunned($c.add64($c.and64(u.uprops[STUNNED].intrinsic, TIMEOUT), dmg), TRUE);
 }
 /* Monster is hit by trap. */
+/**
+ * @param {number} tlev int
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} d_override int
+ * @param {number} nocorpse boolean
+ * @returns {Promise<number>} boolean
+ */
 async function thitm(tlev, mon, obj, d_override, nocorpse) {   // trap.c:6711
     let strike = 0, trapkilled = 0, dam = 0, harmless = 0, xx = 0, yy = 0;
     /* missile's attack level */
@@ -5934,6 +6525,9 @@ async function thitm(tlev, mon, obj, d_override, nocorpse) {   // trap.c:6711
     }
     return trapkilled;
 }
+/**
+ * @returns {number} boolean
+ */
 export function unconscious() {   // trap.c:6776
     if (gm.multi >= 0) {
         return FALSE;
@@ -5943,6 +6537,9 @@ export function unconscious() {   // trap.c:6776
 /* hero enters pool of molten lava; returns True if hero is killed and
    then life-saved (with teleport to safe spot), False for other survival;
    no return at all if hero dies and isn't life-saved */
+/**
+ * @returns {Promise<number>} boolean
+ */
 export async function lava_effects() {   // trap.c:6794
     let obj = null, obj2 = null, nextobj = null, usurvive = 0, boil_away = 0, protect_oid = 0, burncount = 0, burnmesgcount = 0, dmg = 0, save_plnmsg = 0;
     protect_oid = 0;
@@ -6123,6 +6720,9 @@ export async function lava_effects() {   // trap.c:6794
     return FALSE;
 }
 /* called each turn when trapped in lava */
+/**
+ * @returns {Promise<void>}
+ */
 export async function sink_into_lava() {   // trap.c:6991
     let $t1;
     if (!u.utrap || u.utraptype !== TT.LAVA) {
@@ -6185,6 +6785,9 @@ export function sokoban_guilt() {   // trap.c:7039
     }
 }
 /* called when a trap has been deleted or had its ttyp replaced */
+/**
+ * @returns {Promise<void>}
+ */
 async function maybe_finish_sokoban() {   // trap.c:7059
     let t = null, sokonum = 0;
     if ((svl.level.flags.sokoban_rules | 0) && !gi.in_mklev) {
@@ -6220,6 +6823,11 @@ async function maybe_finish_sokoban() {   // trap.c:7059
 }
 /* Return the string name of the trap type passed in, unless the player is
    hallucinating, in which case return a random or hallucinatory trap name. */
+/**
+ * @param {number} ttyp int
+ * @param {number} override boolean
+ * @returns {$c.Ptr | null} const char *
+ */
 export function trapname(ttyp, override) {   // trap.c:7100
     let total_names = 0, nameidx = 0, fem = 0;
     /* if True, ignore Hallucination */
@@ -6247,6 +6855,10 @@ export function trapname(ttyp, override) {   // trap.c:7100
 /* Ignite ignitable items (limited to light sources) in the given object
    chain, due to some external source of fire.  The object chain should
    be somewhere exposed, like someone's open inventory or the floor. */
+/**
+ * @param {$T.obj | null} objchn struct obj *
+ * @returns {Promise<void>}
+ */
 export async function ignite_items(objchn) {   // trap.c:7161
     let obj = null, nextobj = null, bynexthere = 0;
     bynexthere = $c.i8(objchn && objchn.where === OBJ.FLOOR ? 1 : 0);
@@ -6258,6 +6870,12 @@ export async function ignite_items(objchn) {   // trap.c:7161
         }
     }
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} ice_is_melting boolean
+ * @returns {Promise<void>}
+ */
 export async function trap_ice_effects(x, y, ice_is_melting) {   // trap.c:7175
     let ttmp = null, mtmp = null, otyp = 0;
     ttmp = t_at(x, y);
@@ -6278,6 +6896,9 @@ export async function trap_ice_effects(x, y, ice_is_melting) {   // trap.c:7175
     }
 }
 /* sanity check traps */
+/**
+ * @returns {Promise<void>}
+ */
 export async function trap_sanity_check() {   // trap.c:7198
     let ttmp = null;
     ttmp = gf.ftrap;

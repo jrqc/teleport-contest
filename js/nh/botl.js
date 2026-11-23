@@ -133,6 +133,9 @@ const is_out_of_range = new Int8Array(17);
 /* these don't need to be in 'struct g' */
 let status_hilite_str = null;
 let status_hilite_str_id = 0;
+/**
+ * @returns {$c.Ptr | null} char *
+ */
 export function get_strength_str() {   // botl.c:21
     let st = 0;
     st = ACURR(A.STR);
@@ -154,6 +157,9 @@ export function check_gold_symbol() {   // botl.c:40
     goldch = gs.showsyms[COIN_CLASS + SYM_OFF_O];
     iflags.invis_goldsym = $c.i8(goldch <= 32 ? 1 : 0);
 }
+/**
+ * @returns {$c.Ptr | null} char *
+ */
 export function do_statusline1() {   // botl.c:48
     let nb = null, i = 0, j = 0, mbot = new Int8Array(256), k = 0;
     if (suppress_map_output()) {
@@ -188,6 +194,9 @@ export function do_statusline1() {   // botl.c:48
     $c.sprintf(nb = eos(nb), $c.lit("%s"), u.ualign.type === A.CHAOTIC ? $c.lit("  Chaotic") : u.ualign.type === A.NEUTRAL ? $c.lit("  Neutral") : $c.lit("  Lawful"));
     return new $c.Ptr(do_statusline1$newbot1, 0);
 }
+/**
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function do_statusline2() {   // botl.c:101
     let nb = null, dln = 0, dx = 0, hln = 0, xln = 0, tln = 0, cln = 0, vrn = 0, hp = 0, hpmax = 0, cap = 0, money = 0;
     /* MAXCO: botl.h */
@@ -333,6 +342,9 @@ export async function do_statusline2() {   // botl.c:101
     }
     return new $c.Ptr(do_statusline2$newbot2, 0);
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function bot() {   // botl.c:253
     let $t1, $t2;
     if (gb.bot_disabled) {
@@ -353,6 +365,9 @@ export async function bot() {   // botl.c:253
     $t2 = ($t1 = disp.time_botl = FALSE, disp.botlx = $t1), disp.botl = $t2;
 }
 /* special purpose status update: move counter ('time' status) only */
+/**
+ * @returns {Promise<void>}
+ */
 export async function timebot() {   // botl.c:275
     if (gb.bot_disabled) {
         return;
@@ -374,6 +389,10 @@ export async function timebot() {   // botl.c:275
     disp.time_botl = FALSE;
 }
 /* convert experience level (1..30) to rank index (0..8) */
+/**
+ * @param {number} xlev int
+ * @returns {number} int
+ */
 export function xlev_to_rank(xlev) {   // botl.c:298
     /*
      *   1..2  => 0
@@ -388,6 +407,10 @@ export function xlev_to_rank(xlev) {   // botl.c:298
     return xlev <= 2 ? 0 : xlev <= 30 ? $c.div32(xlev + 2 | 0, 4) : 8;
 }
 /* convert rank index (0..8) to experience level (1..30) */
+/**
+ * @param {number} rank int
+ * @returns {number} int
+ */
 export function rank_to_xlev(rank) {   // botl.c:315
     /*
      *  0 =>  1..2
@@ -401,6 +424,12 @@ export function rank_to_xlev(rank) {   // botl.c:315
      */
     return rank < 1 ? 1 : rank < 2 ? 3 : rank < 8 ? Math.imul(rank, 4) - 2 | 0 : 30;
 }
+/**
+ * @param {number} lev int
+ * @param {number} monnum short
+ * @param {number} female boolean
+ * @returns {$c.Ptr | null} const char *
+ */
 export function rank_of(lev, monnum, female) {   // botl.c:332
     let role = null, i = 0;
     /* Find the role */
@@ -429,9 +458,18 @@ export function rank_of(lev, monnum, female) {   // botl.c:332
     }
     return $c.lit("Player");
 }
+/**
+ * @returns {$c.Ptr | null} const char *
+ */
 function rank() {   // botl.c:361
     return rank_of(u.ulevel, gu.urole.mnum, flags.female);
 }
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @param {*} rank_indx int *
+ * @param {*} title_length int *
+ * @returns {Promise<number>} int
+ */
 export async function title_to_mon(str, rank_indx, title_length) {   // botl.c:367
     let i = 0, j = 0, $t1, $t2;
     /* Loop through each of the roles */
@@ -483,6 +521,11 @@ export function max_rank_sz() {   // botl.c:402
    weight); u.urexp might */
 /* SCORE_ON_BOTL */
 /* provide the name of the current level for display by various ports */
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @param {number} dflgs int
+ * @returns {number} int
+ */
 export function describe_level(buf, dflgs) {   // botl.c:441
     let addspace = 0, addbranch = 0, ret = 0;
     /* output buffer */
@@ -524,6 +567,10 @@ export function describe_level(buf, dflgs) {   // botl.c:441
 }
 /* weapon description for status lines; started as a terser version of
    what ^X shows but has diverged to some extent */
+/**
+ * @param {$c.Ptr | null} outbuf char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function weapon_status(outbuf) {   // botl.c:481
     let res = null, p = null, skill = 0, $t1;
     res = null;
@@ -596,6 +643,10 @@ export async function weapon_status(outbuf) {   // botl.c:481
     return $c.peq(outbuf, res) ? outbuf : $c.strcpy(outbuf, res);
 }
 /* armor description for status lines */
+/**
+ * @param {$c.Ptr | null} armbuf char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function armor_status(armbuf) {   // botl.c:559
     let n = 0, p = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
     n = ((((((!!$G.uarmg ? 1 : 0) + (!!$G.uarmc ? 1 : 0) | 0) + (!!$G.uarm ? 1 : 0) | 0) + (!!$G.uarmu ? 1 : 0) | 0) + (!!$G.uarmh ? 1 : 0) | 0) + (!!$G.uarmf ? 1 : 0) | 0) + (!!$G.uarms ? 1 : 0) | 0;
@@ -657,6 +708,9 @@ export function armor_status(armbuf) {   // botl.c:559
  * but we need to pass the first array element as
  * the final argument of status_update, with or
  * without STATUS_HILITES.
+ */
+/**
+ * @returns {Promise<void>}
  */
 async function bot_via_windowport() {   // botl.c:962
     let buf = new Int8Array(256), titl = null, nb = null, i = 0, idx = 0, cap = 0, money = 0, clear_cache = 0, refresh_cache = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13, $t14, $t15, $t16, $t17, $t18, $t19, $t20;
@@ -974,6 +1028,9 @@ async function bot_via_windowport() {   // botl.c:962
     await evaluate_and_notify_windowport(new $c.Ptr(gv.valset, 0), idx);
 }
 /* update just the status lines' 'time' field */
+/**
+ * @returns {Promise<void>}
+ */
 async function stat_update_time() {   // botl.c:1285
     let idx = 0, fld = 0;
     idx = gn.now_or_before_idx;   /* no 0/1 toggle */
@@ -988,6 +1045,12 @@ async function stat_update_time() {   // botl.c:1285
     return;
 }
 /* deal with player's choice to change processing of a condition */
+/**
+ * @param {number} idx int
+ * @param {$c.Ptr | null} addr boolean *
+ * @param {number} negated boolean
+ * @returns {Promise<void>}
+ */
 export async function condopt(idx, addr, negated) {   // botl.c:1303
     let i = 0;
     /* sanity check */
@@ -1012,6 +1075,11 @@ export async function condopt(idx, addr, negated) {   // botl.c:1303
     }
 }
 /* qsort callback routine for sorting the condition index */
+/**
+ * @param {*} vptr1 const void *
+ * @param {*} vptr2 const void *
+ * @returns {number} int
+ */
 function cond_cmp(vptr1, vptr2) {   // botl.c:1333
     let indx1 = 0, indx2 = 0, c1 = 0, c2 = 0;
     indx1 = $c.asArr(vptr1, Int32Array).get(0);
@@ -1025,12 +1093,22 @@ function cond_cmp(vptr1, vptr2) {   // botl.c:1333
     return strncmpi(condtests[indx1].useroption, condtests[indx2].useroption, -1);
 }
 /* qsort callback routine for alphabetical sorting of index */
+/**
+ * @param {*} vptr1 const void *
+ * @param {*} vptr2 const void *
+ * @returns {number} int
+ */
 function menualpha_cmp(vptr1, vptr2) {   // botl.c:1346
     let indx1 = 0, indx2 = 0;
     indx1 = $c.asArr(vptr1, Int32Array).get(0);
     indx2 = $c.asArr(vptr2, Int32Array).get(0);
     return strncmpi(condtests[indx1].useroption, condtests[indx2].useroption, -1);
 }
+/**
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @returns {Promise<number>} int
+ */
 export async function parse_cond_option(negated, opts) {   // botl.c:1354
     let i = 0, sl = 0, compareto = null, uniqpart = null, prefix = new Int8Array(6);
     prefix.fill(0);
@@ -1051,6 +1129,9 @@ export async function parse_cond_option(negated, opts) {   // botl.c:1354
 }
 /* display a menu of all available status condition options and let player
    toggled them on or off; returns True iff any changes are made */
+/**
+ * @returns {Promise<number>} boolean
+ */
 export async function cond_menu() {   // botl.c:1376
     let i = 0, res = 0, idx = 0, sequence = new Int32Array(30), tmpwin = 0, any = new $T.any(), picks = [null], mbuf = new Int8Array(128), showmenu = 0, clr = 0, changed = 0, $t1;
     idx = 0;
@@ -1114,6 +1195,11 @@ export async function cond_menu() {   // botl.c:1376
 /* called by all_options_conds() to get value for next cond_xyz option
    so that #saveoptions can collect it and write the set into new RC file.
    returns zero-length string if the option is the default value. */
+/**
+ * @param {number} indx int
+ * @param {$c.Ptr | null} outbuf char *
+ * @returns {number} boolean
+ */
 export function opt_next_cond(indx, outbuf) {   // botl.c:1460
     outbuf.set(0, 0);
     if (indx >= CONDITION_COUNT) {
@@ -1141,6 +1227,12 @@ export function opt_next_cond(indx, outbuf) {   // botl.c:1460
     }
     return TRUE;
 }
+/**
+ * @param {number} fld int
+ * @param {$c.Ptr | null} valsetlist boolean *
+ * @param {number} idx int
+ * @returns {Promise<number>} boolean
+ */
 async function eval_notify_windowport_field(fld, valsetlist, idx) {   // botl.c:1493
     let pc = 0, chg = 0, color = Int32Array.of(0), anytype = 0, updated = 0, reset = 0, curr = null, prev = null, fldmax = 0, $t1, $t2, $t3, $t4;
     color[0] = NO_COLOR;
@@ -1238,6 +1330,11 @@ async function eval_notify_windowport_field(fld, valsetlist, idx) {   // botl.c:
     }
     return updated;
 }
+/**
+ * @param {$c.Ptr | null} valsetlist boolean *
+ * @param {number} idx int
+ * @returns {Promise<void>}
+ */
 async function evaluate_and_notify_windowport(valsetlist, idx) {   // botl.c:1621
     let i = 0, fld = 0, updated = 0, $t1, $t2;
     updated = 0;
@@ -1284,6 +1381,10 @@ async function evaluate_and_notify_windowport(valsetlist, idx) {   // botl.c:162
     $t2 = ($t1 = disp.time_botl = FALSE, disp.botlx = $t1), disp.botl = $t2;
     gu.update_all = FALSE;
 }
+/**
+ * @param {number} reassessment boolean
+ * @returns {Promise<void>}
+ */
 export async function status_initialize(reassessment) {   // botl.c:1683
     let fld = 0, fldenabl = 0, i = 0, fieldfmt = null, fieldname = null;
     /* True: just recheck fields without other init */
@@ -1307,6 +1408,9 @@ export async function status_initialize(reassessment) {   // botl.c:1683
     gu.update_all = TRUE;
     disp.botlx = TRUE;
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function status_finish() {   // botl.c:1723
     let i = 0, temp = null, next = null, $t1, $t2;
     /* call the window port cleanup routine first */
@@ -1334,6 +1438,9 @@ export async function status_finish() {   // botl.c:1723
         /* STATUS_HILITES */
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function init_blstats() {   // botl.c:1759
     let i = 0, j = 0, keep_hilite_chain = null, $t1;
     if (init_blstats$initalready) {
@@ -1373,6 +1480,11 @@ async function init_blstats() {   // botl.c:1759
  *     - for bitmasks, 0 = stayed the same, 1 = changed
  *     - for strings,  0 = stayed the same, 1 = changed
  *
+ */
+/**
+ * @param {$T.istat_s | null} bl1 struct istat_s *
+ * @param {$T.istat_s | null} bl2 struct istat_s *
+ * @returns {Promise<number>} int
  */
 async function compare_blstats(bl1, bl2) {   // botl.c:1809
     let a1 = null, a2 = null, use_rawval = 0, anytype = 0, fld = 0, result = 0;
@@ -1429,6 +1541,12 @@ async function compare_blstats(bl1, bl2) {   // botl.c:1809
     }
     return result;
 }
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @param {$T.any | null} a anything *
+ * @param {number} anytype int
+ * @returns {$c.Ptr | null} char *
+ */
 function anything_to_s(buf, a, anytype) {   // botl.c:1886
     if (!buf) {
         return null;
@@ -1469,6 +1587,11 @@ function anything_to_s(buf, a, anytype) {   // botl.c:1886
     }
     return buf;
 }
+/**
+ * @param {$T.any | null} a anything *
+ * @param {$c.Ptr | null} buf char *
+ * @param {number} anytype int
+ */
 function s_to_anything(a, buf, anytype) {   // botl.c:1930
     let $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9;
     if (!buf || !a) {
@@ -1518,6 +1641,11 @@ function s_to_anything(a, buf, anytype) {   // botl.c:1930
 }
 /* STATUS_HILITES */
 /* integer percentage is 100 * bl->a / maxbl->a */
+/**
+ * @param {$T.istat_s | null} bl struct istat_s *
+ * @param {$T.istat_s | null} maxbl struct istat_s *
+ * @returns {Promise<number>} int
+ */
 async function percentage(bl, maxbl) {   // botl.c:1977
     let result = 0, anytype = 0, ival = 0, mval = 0, lval = 0, uval = 0, ulval = 0, fld = 0, use_rawval = 0;
     result = 0;
@@ -1580,6 +1708,9 @@ async function percentage(bl, maxbl) {   // botl.c:1977
 }
 /* percentage for both xp (level) and exp (points) is the percentage for
    (curr_exp - this_level_start) in (next_level_start - this_level_start) */
+/**
+ * @returns {Promise<number>} int
+ */
 async function exp_percentage() {   // botl.c:2052
     let res = 0, exp_val = 0, nxt_exp_val = 0, curlvlstart = 0, curval = new $T.istat_s(), maxval = new $T.istat_s(), $t1, $t2;
     res = 0;
@@ -1611,6 +1742,9 @@ async function exp_percentage() {   // botl.c:2052
 }
 /* experience points have changed but experience level hasn't; decide whether
    botl update is needed for a different percentage highlight rule for Xp */
+/**
+ * @returns {Promise<number>} boolean
+ */
 export async function exp_percent_changing() {   // botl.c:2090
     let pc = 0, a = new $T.any(), color_dummy = Int32Array.of(0), rule = null, curr = null;
     /* if status update is already requested, skip this processing */
@@ -1636,6 +1770,9 @@ export async function exp_percent_changing() {   // botl.c:2090
 /* callback so that interface can get capacity index rather than trying
    to reconstruct that from the encumbrance string or asking the general
    core what the value is */
+/**
+ * @returns {number} int
+ */
 export function stat_cap_indx() {   // botl.c:2131
     let cap = 0;
     cap = gb.blstats[gn.now_or_before_idx][BL.CAP].a.a_int;
@@ -1643,12 +1780,19 @@ export function stat_cap_indx() {   // botl.c:2131
 }
 /* callback so that interface can get hunger index rather than trying to
    reconstruct that from the hunger string or dipping into core internals */
+/**
+ * @returns {number} int
+ */
 export function stat_hunger_indx() {   // botl.c:2146
     let uhs = 0;
     uhs = gb.blstats[gn.now_or_before_idx][BL.HUNGER].a.a_int;
     return uhs;
 }
 /* used by X11 for "tty status" even when STATUS_HILITES is disabled */
+/**
+ * @param {number} idx int
+ * @returns {$c.Ptr | null} const char *
+ */
 export function bl_idx_to_fldname(idx) {   // botl.c:2160
     if (idx >= 0 && idx < MAXBLSTATS) {
         return initblstats[idx].fldname;
@@ -1657,6 +1801,9 @@ export function bl_idx_to_fldname(idx) {   // botl.c:2160
 }
 /* used when rendering hitpointbar; inoutbuf[] has been padded with
    trailing spaces; replace pairs of spaces with pairs of space+dash */
+/**
+ * @param {$c.Ptr | null} inoutbuf char *
+ */
 export function repad_with_dashes(inoutbuf) {   // botl.c:2170
     let p = null;
     p = eos(inoutbuf);
@@ -1666,6 +1813,10 @@ export function repad_with_dashes(inoutbuf) {   // botl.c:2170
     }
 }
 /* field name to bottom line index */
+/**
+ * @param {$c.Ptr | null} name const char *
+ * @returns {number} enum statusfields
+ */
 function fldname_to_bl_indx(name) {   // botl.c:2221
     let i = 0, nmatches = 0, fld = 0, len = 0;
     nmatches = 0;
@@ -1700,6 +1851,11 @@ function fldname_to_bl_indx(name) {   // botl.c:2221
     }
     return nmatches === 1 ? fld : BL.FLUSH;
 }
+/**
+ * @param {$T.istat_s | null} bl_p struct istat_s *
+ * @param {number | bigint} augmented_time long
+ * @returns {number} boolean
+ */
 function hilite_reset_needed(bl_p, augmented_time) {   // botl.c:2257
     /* no longer augmented; it once encoded fractional
      * amounts for multiple moves within same turn */
@@ -1764,6 +1920,10 @@ export function reset_status_hilites() {   // botl.c:2321
 }
 /* test whether the text from a title rule matches the string for
    title-while-polymorphed in the 'textmatch' menu */
+/**
+ * @param {$c.Ptr | null} hl_text const char *
+ * @returns {number} boolean
+ */
 function noneoftheabove(hl_text) {   // botl.c:2336
     if (fuzzymatch(hl_text, $c.lit("none of the above"), $c.lit("\" -_"), TRUE) || fuzzymatch(hl_text, $c.lit("(polymorphed)"), $c.lit("\"()"), TRUE) || fuzzymatch(hl_text, $c.lit("none of the above (polymorphed)"), $c.lit("\" -_()"), TRUE)) {
         return TRUE;
@@ -1786,6 +1946,15 @@ function noneoftheabove(hl_text) {   // botl.c:2336
  *
  * Get back:
  *     pointer to rule that applies; Null if no rule does.
+ */
+/**
+ * @param {number} idx int
+ * @param {number} fldidx int
+ * @param {*} vp genericptr_t
+ * @param {number} chg int
+ * @param {number} pc int
+ * @param {*} colorptr int *
+ * @returns {$T.hilite_s | null} struct hilite_s *
  */
 function get_hilite(idx, fldidx, vp, chg, pc, colorptr) {   // botl.c:2364
     let hl = null, rule = null, value = null, txtstr = null, dt = 0, max_pc = 0, min_pc = 0, max_ival = 0, min_ival = 0, max_lval = 0, min_lval = 0, exactmatch = 0, updown = 0, changed = 0, perc_or_abs = 0, crit_hp = 0;
@@ -1972,6 +2141,11 @@ function get_hilite(idx, fldidx, vp, chg, pc, colorptr) {   // botl.c:2364
     colorptr.set(0, rule ? rule.coloridx : NO_COLOR);
     return rule;
 }
+/**
+ * @param {number} idx int
+ * @param {*} coloridx int *
+ * @param {*} attrib int *
+ */
 function split_clridx(idx, coloridx, attrib) {   // botl.c:2576
     if (coloridx) {
         coloridx.set(0, idx & 255);
@@ -1987,6 +2161,11 @@ function split_clridx(idx, coloridx, attrib) {   // botl.c:2576
  * a set of field threshold/action component strings,
  * then calls parse_status_hl2() to parse further
  * and configure the hilite.
+ */
+/**
+ * @param {$c.Ptr | null} op char *
+ * @param {number} from_configfile boolean
+ * @returns {Promise<number>} boolean
  */
 export async function parse_status_hl1(op, from_configfile) {   // botl.c:2593
     let hsbuf = $c.matrix(Int8Array, [21, 128]), rslt = 0, badopt = 0, i = 0, fldnum = 0, ccount = 0, c = 0, $t1, $t2;
@@ -2043,6 +2222,10 @@ export async function parse_status_hl1(op, from_configfile) {   // botl.c:2593
     return TRUE;
 }
 /* is str in the format of "[<>]?=?[-+]?[0-9]+%?" regex */
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @returns {number} boolean
+ */
 function is_ltgt_percentnumber(str) {   // botl.c:2652
     let s = null;
     s = str;
@@ -2067,6 +2250,10 @@ function is_ltgt_percentnumber(str) {   // botl.c:2652
     return $c.i8(s.get(0) === 0 ? 1 : 0);
 }
 /* does str only contain "<>=-+0-9%" chars */
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @returns {number} boolean
+ */
 function has_ltgt_percentnumber(str) {   // botl.c:2673
     let s = null;
     s = str;
@@ -2080,6 +2267,12 @@ function has_ltgt_percentnumber(str) {   // botl.c:2673
 }
 /* splitsubfields(): splits str in place into '+' or '&' separated strings.
    returns number of strings, or -1 if more than maxsf or MAX_SUBFIELDS */
+/**
+ * @param {$c.Ptr | null} str char *
+ * @param {*} sfarr char ***
+ * @param {number} maxsf int
+ * @returns {number} int
+ */
 function splitsubfields(str, sfarr, maxsf) {   // botl.c:2688
     let st = null, sf = 0, c = null, $t1;
     st = null;
@@ -2117,6 +2310,14 @@ function splitsubfields(str, sfarr, maxsf) {   // botl.c:2688
     sfarr.set(0, new $c.Ptr(splitsubfields$subfields, 0));
     return sf;
 }
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @param {*} arr const char *const *
+ * @param {number} arrmin int
+ * @param {number} arrmax int
+ * @param {*} retidx int *
+ * @returns {number} boolean
+ */
 function is_fld_arrayvalues(str, arr, arrmin, arrmax, retidx) {   // botl.c:2730
     let i = 0;
     for (i = arrmin; i < arrmax; i = i + 1 | 0) {
@@ -2127,6 +2328,13 @@ function is_fld_arrayvalues(str, arr, arrmin, arrmax, retidx) {   // botl.c:2730
     }
     return FALSE;
 }
+/**
+ * @param {$c.Ptr | null} querystr const char *
+ * @param {*} arr const char *const *
+ * @param {number} arrmin int
+ * @param {number} arrmax int
+ * @returns {Promise<number>} int
+ */
 async function query_arrayvalue(querystr, arr, arrmin, arrmax) {   // botl.c:2747
     let i = 0, res = 0, ret = 0, tmpwin = 0, any = new $T.any(), picks = [null], adj = 0, clr = 0;
     ret = arrmin - 1 | 0;
@@ -2152,6 +2360,11 @@ async function query_arrayvalue(querystr, arr, arrmin, arrmax) {   // botl.c:274
     }
     return ret;
 }
+/**
+ * @param {number} fld int
+ * @param {$T.hilite_s | null} hilite struct hilite_s *
+ * @returns {Promise<void>}
+ */
 async function status_hilite_add_threshold(fld, hilite) {   // botl.c:2784
     let new_hilite = null, old_hilite = null;
     if (!hilite) {
@@ -2176,6 +2389,11 @@ async function status_hilite_add_threshold(fld, hilite) {   // botl.c:2784
     /* current and prev must both point at the same hilites */
     gb.blstats[1][fld].thresholds = gb.blstats[0][fld].thresholds;
 }
+/**
+ * @param {*} s char (*)[128]
+ * @param {number} from_configfile boolean
+ * @returns {Promise<number>} boolean
+ */
 async function parse_status_hl2(s, from_configfile) {   // botl.c:2814
     let tmp = null, how = null, sidx = 0, i = 0, dt = 0, coloridx = 0, successes = 0, disp_attrib = 0, percent = 0, changed = 0, numeric = 0, down = 0, up = 0, grt = 0, lt = 0, gte = 0, le = 0, eq = 0, txtval = 0, always = 0, criticalhp = 0, txt = null, fld = 0, hilite = new $T.hilite_s(), tmpbuf = new Int8Array(256), res = 0, buf = new Int8Array(256), subfields = [null], sf = 0, kidx = Int32Array.of(0), op = null, a = 0, c = 0;
     /* hu_stat[] from eat.c has trailing spaces which foul up comparisons;
@@ -2406,6 +2624,9 @@ async function parse_status_hl2(s, from_configfile) {   // botl.c:2814
     }
     return $c.i8(successes > 0 ? 1 : 0);
 }
+/**
+ * @returns {Promise<number | bigint>} unsigned long
+ */
 async function query_conditions() {   // botl.c:3109
     let i = 0, res = 0, ret = 0, tmpwin = 0, any = new $T.any(), picks = [null], clr = 0;
     ret = 0;
@@ -2429,6 +2650,10 @@ async function query_conditions() {   // botl.c:3109
     }
     return ret;
 }
+/**
+ * @param {number | bigint} ul unsigned long
+ * @returns {$c.Ptr | null} char *
+ */
 function conditionbitmask2str(ul) {   // botl.c:3141
     let i = 0, first = 0, alias = null;
     first = TRUE;
@@ -2453,6 +2678,10 @@ function conditionbitmask2str(ul) {   // botl.c:3141
     }
     return new $c.Ptr(conditionbitmask2str$buf, 0);
 }
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @returns {number | bigint} unsigned long
+ */
 function match_str2conditionbitmask(str) {   // botl.c:3171
     let i = 0, nmatches = 0, mask = 0, len = 0;
     nmatches = 0;
@@ -2487,6 +2716,10 @@ function match_str2conditionbitmask(str) {   // botl.c:3171
     }
     return mask;
 }
+/**
+ * @param {$c.Ptr | null} str char *
+ * @returns {Promise<number | bigint>} unsigned long
+ */
 async function str2conditionbitmask(str) {   // botl.c:3209
     let conditions_bitmask = 0, subfields = [null], i = 0, sf = 0, bm = 0;
     conditions_bitmask = 0;
@@ -2504,6 +2737,11 @@ async function str2conditionbitmask(str) {   // botl.c:3209
     }
     return conditions_bitmask;
 }
+/**
+ * @param {*} s char (*)[128]
+ * @param {number} sidx int
+ * @returns {Promise<number>} boolean
+ */
 async function parse_condition(s, sidx) {   // botl.c:3233
     let i = 0, coloridx = 0, tmp = null, how = null, conditions_bitmask = 0, result = 0, sf = 0, buf = new Int8Array(256), subfields = [null], a = 0, k = 0;
     coloridx = NO_COLOR;
@@ -2617,6 +2855,12 @@ export function clear_status_hilites() {   // botl.c:3351
         $t2 = gb.blstats[1][i].hilite_rule = null, gb.blstats[0][i].hilite_rule = $t2;
     }
 }
+/**
+ * @param {number} attrib int
+ * @param {$c.Ptr | null} buf char *
+ * @param {number | bigint} bufsz size_t
+ * @returns {$c.Ptr | null} char *
+ */
 function hlattr2attrname(attrib, buf, bufsz) {   // botl.c:3369
     let attbuf = new Int8Array(256), first = 0, k = 0, $t1, $t2, $t3, $t4, $t5, $t6;
     if (attrib && buf) {
@@ -2652,6 +2896,13 @@ function hlattr2attrname(attrib, buf, bufsz) {   // botl.c:3369
     }
     return null;
 }
+/**
+ * @param {number} fld int
+ * @param {$T.hilite_s | null} hl struct hilite_s *
+ * @param {number | bigint} mask unsigned long
+ * @param {$c.Ptr | null} str const char *
+ * @returns {Promise<void>}
+ */
 async function status_hilite_linestr_add(fld, hl, mask, str) {   // botl.c:3417
     let tmp = null, nxt = null, $t1;
     tmp = $c.asRec(await alloc(288), $T._status_hilite_line_str, 288);
@@ -2686,6 +2937,10 @@ function status_hilite_linestr_done() {   // botl.c:3448
     status_hilite_str = null;
     status_hilite_str_id = 0;
 }
+/**
+ * @param {number} fld int
+ * @returns {number} int
+ */
 function status_hilite_linestr_countfield(fld) {   // botl.c:3462
     let tmp = null, countall = 0, count = 0;
     countall = $c.i8(fld === BL.FLUSH ? 1 : 0);
@@ -2698,6 +2953,9 @@ function status_hilite_linestr_countfield(fld) {   // botl.c:3462
     return count;
 }
 /* used by options handling, doset(options.c) */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function count_status_hilites() {   // botl.c:3477
     let count = 0;
     await status_hilite_linestr_gather();
@@ -2705,6 +2963,9 @@ export async function count_status_hilites() {   // botl.c:3477
     status_hilite_linestr_done();
     return count;
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function status_hilite_linestr_gather_conditions() {   // botl.c:3488
     let i = 0, cond_maps = $c.recArray($T._cond_map, 30), clr = 0, atr = 0, j = 0, ca = 0, added_condmap = 0, clr$2 = Int32Array.of(0), atr$2 = Int32Array.of(0), clrbuf = new Int8Array(256), attrbuf = new Int8Array(256), condbuf = new Int8Array(256), tmpattr = null;
     $c.memset($c.relem(cond_maps, 0), 0, 480);
@@ -2776,6 +3037,9 @@ async function status_hilite_linestr_gather_conditions() {   // botl.c:3488
         }
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function status_hilite_linestr_gather() {   // botl.c:3570
     let i = 0, hl = null;
     status_hilite_linestr_done();
@@ -2788,6 +3052,10 @@ async function status_hilite_linestr_gather() {   // botl.c:3570
     }
     await status_hilite_linestr_gather_conditions();
 }
+/**
+ * @param {$T.hilite_s | null} hl struct hilite_s *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 async function status_hilite2str(hl) {   // botl.c:3590
     let clr = Int32Array.of(0), attr = Int32Array.of(0), behavebuf = new Int8Array(256), clrbuf = new Int8Array(256), attrbuf = new Int8Array(256), tmpattr = null, op = null;
     clr[0] = NO_COLOR;
@@ -2859,6 +3127,9 @@ async function status_hilite2str(hl) {   // botl.c:3590
     nh_snprintf($c.lit("status_hilite2str"), 3666, new $c.Ptr(status_hilite2str$buf, 0), 256, $c.lit("%s/%s/%s"), initblstats[hl.fld].fldname, new $c.Ptr(behavebuf, 0), new $c.Ptr(clrbuf, 0));
     return new $c.Ptr(status_hilite2str$buf, 0);
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function status_hilite_menu_choose_field() {   // botl.c:3672
     let tmpwin = 0, i = 0, res = 0, fld = 0, any = new $T.any(), picks = [null], clr = 0;
     fld = BL.FLUSH;
@@ -2883,6 +3154,10 @@ async function status_hilite_menu_choose_field() {   // botl.c:3672
     }
     return fld;
 }
+/**
+ * @param {number} fld int
+ * @returns {Promise<number>} int
+ */
 async function status_hilite_menu_choose_behavior(fld) {   // botl.c:3707
     let tmpwin = 0, res = 0, beh = 0, any = new $T.any(), picks = [null], buf = new Int8Array(256), at = 0, onlybeh = 0, nopts = 0, clr = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
     res = 0;
@@ -2962,6 +3237,13 @@ async function status_hilite_menu_choose_behavior(fld) {   // botl.c:3707
     }
     return beh;
 }
+/**
+ * @param {number} fld int
+ * @param {$c.Ptr | null} str const char *
+ * @param {number} ltok boolean
+ * @param {number} gtok boolean
+ * @returns {Promise<number>} int
+ */
 async function status_hilite_menu_choose_updownboth(fld, str, ltok, gtok) {   // botl.c:3811
     let res = 0, ret = 0, tmpwin = 0, buf = new Int8Array(256), any = new $T.any(), picks = [null], clr = 0;
     ret = NO_LTEQGT;
@@ -3019,6 +3301,10 @@ async function status_hilite_menu_choose_updownboth(fld, str, ltok, gtok) {   //
     }
     return ret;
 }
+/**
+ * @param {number} origfld int
+ * @returns {Promise<number>} boolean
+ */
 async function status_hilite_menu_add(origfld) {   // botl.c:3890
     let fld = 0, behavior = 0, lt_gt_eq = 0, clr = 0, atr = 0, hilite = new $T.hilite_s(), cond = 0, colorqry = new Int8Array(256), attrqry = new Int8Array(256), retry = 0, inbuf = new Int8Array(256), buf = new Int8Array(256), aval = new $T.any(), val = 0, dt = 0, gotnum = 0, percent = 0, inp = null, numstart = null, op = null, ltok = 0, gtok = 0, ltok$2 = 0, gtok$2 = 0, qry_buf = new Int8Array(256), rv = 0, rv$2 = 0, rv$3 = 0, rolelist = $c.nulls(28), mbuf = new Int8Array(80), fbuf = new Int8Array(80), obuf = new Int8Array(80), i = 0, j = 0, rv$4 = 0, inbuf$2 = new Int8Array(256), clrbuf = new Int8Array(256), attrbuf = new Int8Array(256), tmpattr = null, p = null, q = null, $goto = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13, $t14, $t15, $t16, $t17, $t18, $t19, $t20, $t21, $t22, $t23, $t24, $t25, $t26, $t27, $t28, $t29, $t30;
     D1: for (;;) {
@@ -3346,6 +3632,10 @@ async function status_hilite_menu_add(origfld) {   // botl.c:3890
         break;
     }
 }
+/**
+ * @param {number} id int
+ * @returns {number} boolean
+ */
 function status_hilite_remove(id) {   // botl.c:4305
     let hlstr = null, i = 0, fld = 0, hl = null, hlprev = null, $t1, $t2;
     hlstr = status_hilite_str;
@@ -3389,6 +3679,10 @@ function status_hilite_remove(id) {   // botl.c:4305
     }
     return FALSE;
 }
+/**
+ * @param {number} fld int
+ * @returns {Promise<number>} boolean
+ */
 async function status_hilite_menu_fld(fld) {   // botl.c:4357
     let tmpwin = 0, i = 0, res = 0, picks = [null], any = new $T.any(), count = 0, hlstr = null, buf = new Int8Array(256), acted = 0, clr = 0, idx = 0, mode = 0;
     picks[0] = null;
@@ -3469,6 +3763,9 @@ async function status_hilite_menu_fld(fld) {   // botl.c:4357
     await destroy_nhwindow()(tmpwin);
     return acted;
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function status_hilites_viewall() {   // botl.c:4456
     let datawin = 0, hlstr = null, buf = new Int8Array(256);
     hlstr = status_hilite_str;
@@ -3481,6 +3778,10 @@ async function status_hilites_viewall() {   // botl.c:4456
     await display_nhwindow()(datawin, FALSE);
     await destroy_nhwindow()(datawin);
 }
+/**
+ * @param {$T.strbuf | null} sbuf strbuf_t *
+ * @returns {Promise<void>}
+ */
 export async function all_options_statushilites(sbuf) {   // botl.c:4477
     let hlstr = null, buf = new Int8Array(256);
     status_hilite_linestr_done();
@@ -3493,6 +3794,9 @@ export async function all_options_statushilites(sbuf) {   // botl.c:4477
     }
     status_hilite_linestr_done();
 }
+/**
+ * @returns {Promise<number>} boolean
+ */
 export async function status_hilite_menu() {   // botl.c:4498
     let tmpwin = 0, i = 0, fld = 0, res = 0, picks = [null], any = new $T.any(), redo = 0, countall = 0, clr = 0, count = 0, buf = new Int8Array(256);
     picks[0] = null;

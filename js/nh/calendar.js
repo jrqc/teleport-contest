@@ -11,6 +11,9 @@ import { nh_snprintf } from './hacklib.js';
 import { nh_getenv } from './options.js';
 
 const yyyymmddhhmmss$datestr = new Int8Array(15);   // static in yyyymmddhhmmss()
+/**
+ * @returns {number | bigint} time_t
+ */
 export function getnow() {   // calendar.c:32
     let fixed_dt = null, datetime = [0], parsed = 0;
     fixed_dt = nh_getenv($c.lit("NETHACK_FIXED_DATETIME"));
@@ -24,14 +27,24 @@ export function getnow() {   // calendar.c:32
     $c.time(new $c.Ptr(datetime, 0));
     return datetime[0];
 }
+/**
+ * @returns {$T.tm | null} struct tm *
+ */
 function getlt() {   // calendar.c:47
     let date = [0];
     date[0] = getnow();
     return $c.localtime(new $c.Ptr(date, 0));
 }
+/**
+ * @returns {number} int
+ */
 export function getyear() {   // calendar.c:55
     return 1900 + getlt().tm_year | 0;
 }
+/**
+ * @param {number | bigint} date$in time_t
+ * @returns {number | bigint} long
+ */
 export function yyyymmdd(date$in) {   // calendar.c:62
     const date = [date$in];
     let datenum = 0, lt = null;
@@ -53,6 +66,10 @@ export function yyyymmdd(date$in) {   // calendar.c:62
     datenum = $c.add64($c.mul64(datenum, 100), lt.tm_mday);
     return datenum;
 }
+/**
+ * @param {number | bigint} date$in time_t
+ * @returns {number | bigint} long
+ */
 export function hhmmss(date$in) {   // calendar.c:86
     const date = [date$in];
     let timenum = 0, lt = null;
@@ -64,6 +81,10 @@ export function hhmmss(date$in) {   // calendar.c:86
     timenum = $c.add64($c.add64($c.mul64(lt.tm_hour, 10000), $c.mul64(lt.tm_min, 100)), lt.tm_sec);
     return timenum;
 }
+/**
+ * @param {number | bigint} date$in time_t
+ * @returns {$c.Ptr | null} char *
+ */
 export function yyyymmddhhmmss(date$in) {   // calendar.c:101
     const date = [date$in];
     let datenum = 0, lt = null;
@@ -83,6 +104,10 @@ export function yyyymmddhhmmss(date$in) {   // calendar.c:101
     //debugpline1("yyyymmddhhmmss() produced date string %s", datestr);
     return new $c.Ptr(yyyymmddhhmmss$datestr, 0);
 }
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @returns {number | bigint} time_t
+ */
 export function time_from_yyyymmddhhmmss(buf) {   // calendar.c:126
     let k = 0, timeresult = 0, t = new $T.tm(), lt = null, now = [0], d = null, p = null, y = new Int8Array(5), mo = new Int8Array(3), md = new Int8Array(3), h = new Int8Array(3), mi = new Int8Array(3), s = new Int8Array(3), $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13, $t14, $t15, $t16, $t17, $t18, $t19, $t20, $t21, $t22, $t23, $t24, $t25, $t26, $t27, $t28, $t29, $t30;
     timeresult = 0;
@@ -151,6 +176,9 @@ export function time_from_yyyymmddhhmmss(buf) {   // calendar.c:126
  * 177 ~= 8 reported phases * 22
  * + 11/22 for rounding
  */
+/**
+ * @returns {number} int
+ */
 export function phase_of_the_moon() {   // calendar.c:200
     let lt = null, epact = 0, diy = 0, goldn = 0;
     /* 0-7, with 0: new, 4: full */
@@ -163,17 +191,26 @@ export function phase_of_the_moon() {   // calendar.c:200
     }
     return $c.div32($c.rem32(Math.imul(diy + epact | 0, 6) + 11 | 0, 177), 22) & 7;
 }
+/**
+ * @returns {number} boolean
+ */
 export function friday_13th() {   // calendar.c:215
     let lt = null;
     lt = getlt();
     /* tm_wday (day of week; 0==Sunday) == 5 => Friday */
     return $c.i8(lt.tm_wday === 5 && lt.tm_mday === 13 ? 1 : 0);
 }
+/**
+ * @returns {number} int
+ */
 export function night() {   // calendar.c:224
     let hour = 0;
     hour = getlt().tm_hour;
     return hour < 6 || hour > 21 ? 1 : 0;
 }
+/**
+ * @returns {number} int
+ */
 export function midnight() {   // calendar.c:232
     return getlt().tm_hour === 0 ? 1 : 0;
 }

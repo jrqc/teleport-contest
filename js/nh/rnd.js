@@ -56,17 +56,33 @@ export function rng_log_init() {   // rnd.c:38
     }
     rng_log_disp = $c.i8(disp && disp.get(0) && disp.get(0) !== 48 ? TRUE : FALSE);
 }
+/**
+ * @returns {number} boolean
+ */
 export function rng_log_enabled() {   // rnd.c:52
     return $c.i8(rng_logfile ? TRUE : FALSE);
 }
+/**
+ * @param {$c.Ptr | null} file const char *
+ * @param {number} line int
+ * @param {$c.Ptr | null} func const char *
+ */
 export function rng_log_set_caller(file, line, func) {   // rnd.c:58
     rng_caller_file = file;
     rng_caller_line = line;
     rng_caller_func = func;
 }
+/**
+ * @returns {number} int
+ */
 export function rng_log_get_call_count() {   // rnd.c:66
     return rng_call_count;
 }
+/**
+ * @param {$c.Ptr | null} func const char *
+ * @param {$c.Ptr | null} args const char *
+ * @param {number} result int
+ */
 function rng_log_write(func, args, result) {   // rnd.c:72
     if (!rng_logfile) {
         return;
@@ -84,6 +100,10 @@ function rng_log_write(func, args, result) {   // rnd.c:72
         $c.fprintf(rng_logfile, $c.lit("%d %s(%s) = %d\n"), rng_call_count, func, args, result);
     }
 }
+/**
+ * @param {Function | null} fn int (*)(int)
+ * @returns {number} int
+ */
 function whichrng(fn) {   // rnd.c:120
     let i = 0;
     for (i = 0; i < 2; i = i + 1 | 0) {
@@ -93,6 +113,11 @@ function whichrng(fn) {   // rnd.c:120
     }
     return -1;
 }
+/**
+ * @param {number | bigint} seed unsigned long
+ * @param {Function | null} fn int (*)(int)
+ * @returns {Promise<void>}
+ */
 export async function init_isaac64(seed, fn) {   // rnd.c:131
     let new_rng_state = new Uint8Array(8), i = 0, rngindx = 0;
     rngindx = whichrng(fn);
@@ -105,12 +130,20 @@ export async function init_isaac64(seed, fn) {   // rnd.c:131
     }
     $c.isaac64_init(rnglist[rngindx].rng_state, new $c.Ptr(new_rng_state, 0), 8);
 }
+/**
+ * @param {number} x int
+ * @returns {number} int
+ */
 function RND(x) {   // rnd.c:149
     return $c.i32($c.remu64($c.isaac64_next_uint64(rnglist[CORE].rng_state), $c.u64(x)));
 }
 /* 0 <= rn2(x) < x, but on a different sequence from the "main" rn2;
    used in cases where the answer doesn't affect gameplay and we don't
    want to give users easy control over the main RNG sequence. */
+/**
+ * @param {number} x int
+ * @returns {number} int
+ */
 export function rn2_on_display_rng(x) {   // rnd.c:158
     let result = 0;
     result = $c.i32($c.remu64($c.isaac64_next_uint64(rnglist[DISP].rng_state), $c.u64(x)));
@@ -133,6 +166,10 @@ export function rn2_on_display_rng(x) {   // rnd.c:158
 /* Good luck: the bottom order bits are cyclic. */
 /* USE_ISAAC64 */
 /* 0 <= rn2(x) < x */
+/**
+ * @param {number} x int
+ * @returns {number} int
+ */
 export function rn2(x) {   // rnd.c:199
     let result = 0, buf = new Int8Array(32);
     result = RND(x);
@@ -144,6 +181,10 @@ export function rn2(x) {   // rnd.c:199
 }
 /* 0 <= rnl(x) < x; sometimes subtracting Luck;
    good luck approaches 0, bad luck approaches (x-1) */
+/**
+ * @param {number} x int
+ * @returns {number} int
+ */
 export function rnl(x) {   // rnd.c:220
     let i = 0, adjustment = 0, buf = new Int8Array(32);
     /* Internal rn2 call inherits caller context from the rnl macro --
@@ -182,6 +223,10 @@ export function rnl(x) {   // rnd.c:220
     return i;
 }
 /* 1 <= rnd(x) <= x */
+/**
+ * @param {number} x int
+ * @returns {number} int
+ */
 export function rnd(x) {   // rnd.c:270
     let result = 0, buf = new Int8Array(32);
     result = RND(x) + 1 | 0;
@@ -191,10 +236,19 @@ export function rnd(x) {   // rnd.c:270
     }
     return result;
 }
+/**
+ * @param {number} x int
+ * @returns {number} int
+ */
 export function rnd_on_display_rng(x) {   // rnd.c:289
     return rn2_on_display_rng(x) + 1 | 0;
 }
 /* d(N,X) == NdX == dX+dX+...+dX N times; n <= d(n,x) <= (n*x) */
+/**
+ * @param {number} n int
+ * @param {number} x int
+ * @returns {number} int
+ */
 export function d(n, x) {   // rnd.c:296
     let tmp = 0, orig_n = 0, buf = new Int8Array(64), $t1;
     tmp = n;
@@ -209,6 +263,10 @@ export function d(n, x) {   // rnd.c:296
     return tmp;   /* Alea iacta est. -- J.C. */
 }
 /* 1 <= rne(x) <= max(u.ulevel/3,5) */
+/**
+ * @param {number} x int
+ * @returns {number} int
+ */
 export function rne(x) {   // rnd.c:319
     let tmp = 0, utmp = 0, buf = new Int8Array(32);
     /* Internal rn2 calls inherit caller context from the rne macro --
@@ -233,6 +291,10 @@ export function rne(x) {   // rnd.c:319
      */
 }
 /* rnz: everyone's favorite! */
+/**
+ * @param {number} i int
+ * @returns {number} int
+ */
 export function rnz(i) {   // rnd.c:348
     let x = 0, tmp = 0, buf = new Int8Array(32);
     x = i;
@@ -255,6 +317,11 @@ export function rnz(i) {   // rnd.c:348
     return $c.i32(x);
 }
 /* Sets the seed for the random number generator */
+/**
+ * @param {number | bigint} seed unsigned long
+ * @param {Function | null} fn int (*)(int)
+ * @returns {Promise<void>}
+ */
 async function set_random(seed, fn) {   // rnd.c:376
     await init_isaac64(seed, fn);
 }
@@ -262,10 +329,18 @@ async function set_random(seed, fn) {   // rnd.c:376
  * Initializes the random number generator.
  * Only call once.
  */
+/**
+ * @param {Function | null} fn int (*)(int)
+ * @returns {Promise<void>}
+ */
 export async function init_random(fn) {   // rnd.c:423
     await set_random(sys_random_seed(), fn);
 }
 /* Reshuffles the random number generator. */
+/**
+ * @param {Function | null} fn int (*)(int)
+ * @returns {Promise<void>}
+ */
 export async function reseed_random(fn) {   // rnd.c:430
     /* only reseed if we are certain that the seed generation is unguessable
      * by the players. */
@@ -274,6 +349,10 @@ export async function reseed_random(fn) {   // rnd.c:430
     }
 }
 /* randomize the given list of numbers  0 <= i < count */
+/**
+ * @param {*} indices int *
+ * @param {number} count int
+ */
 export function shuffle_int_array(indices, count) {   // rnd.c:440
     let i = 0, iswap = 0, temp = 0;
     for (i = count - 1 | 0; i > 0; i = i - 1 | 0) {

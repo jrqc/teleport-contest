@@ -104,6 +104,9 @@ const level_detects = $c.recArray($T.crystalballlevels, 4);
    input but it's no longer used for that function */
 /* bring hero out from underwater or underground or being engulfed;
    return True iff any change occurred */
+/**
+ * @returns {number} boolean
+ */
 function unconstrain_map() {   // detect.c:70
     let res = 0;
     res = $c.i8(u.uinwater | 0 || u.uburied | 0 || u.uswallow | 0 ? 1 : 0);
@@ -121,6 +124,9 @@ function reconstrain_map() {   // detect.c:85
     u.uburied = (iflags.save_uburied) & 1, iflags.save_uburied = (0) & 1;
     u.uswallow = (iflags.save_uswallow) & 1, iflags.save_uswallow = (0) & 1;
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function map_redisplay() {   // detect.c:94
     reconstrain_map();
     await docrt();   /* redraw the screen to remove unseen traps from the map */
@@ -132,6 +138,11 @@ async function map_redisplay() {   // detect.c:94
     }
 }
 /* use getpos()'s 'autodescribe' to view whatever is currently shown on map */
+/**
+ * @param {number} ter_typ unsigned int
+ * @param {$c.Ptr | null} ter_explain const char *
+ * @returns {Promise<void>}
+ */
 async function browse_map(ter_typ, ter_explain) {   // detect.c:106
     let dummy_pos = new $T.nhcoord(), save_autodescribe = 0;
     /* don't care whether player actually picks a spot */
@@ -144,6 +155,11 @@ async function browse_map(ter_typ, ter_explain) {   // detect.c:106
     iflags.autodescribe = save_autodescribe;
 }
 /* extracted from monster_detection() so can be shared by do_vicinity_map() */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} showtail boolean
+ * @returns {Promise<void>}
+ */
 async function map_monst(mtmp, showtail) {   // detect.c:122
     let glyph = 0;
     glyph = def_monsyms[mtmp.data.mlet].sym === 32 ? (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : mtmp.data.pmidx) + ((mtmp.female | 0) === 0 ? GLYPH.DETECT_MALE_OFF : GLYPH.DETECT_FEM_OFF) | 0 : mtmp.mtame ? (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : mtmp.data.pmidx) + ((mtmp.female | 0) === 0 ? GLYPH.PET_MALE_OFF : GLYPH.PET_FEM_OFF) | 0 : (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : mtmp.data.pmidx) + ((mtmp.female | 0) === 0 ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0;
@@ -154,6 +170,12 @@ async function map_monst(mtmp, showtail) {   // detect.c:122
 }
 /* this is checking whether a trap symbol represents a trapped chest,
    not whether a trapped chest is actually present */
+/**
+ * @param {number} ttyp int
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 export function trapped_chest_at(ttyp, x, y) {   // detect.c:139
     let mtmp = null, otmp = null;
     if (!(glyph_at(x, y) >= GLYPH_TRAP_OFF && glyph_at(x, y) < GLYPH_TRAP_OFF + MAXTCHARS)) {
@@ -201,6 +223,12 @@ export function trapped_chest_at(ttyp, x, y) {   // detect.c:139
 }
 /* this is checking whether a trap symbol represents a trapped door,
    not whether the door here is actually trapped */
+/**
+ * @param {number} ttyp int
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 export function trapped_door_at(ttyp, x, y) {   // detect.c:182
     let lev = null;
     if (!(glyph_at(x, y) >= GLYPH_TRAP_OFF && glyph_at(x, y) < GLYPH_TRAP_OFF + MAXTCHARS)) {
@@ -219,6 +247,11 @@ export function trapped_door_at(ttyp, x, y) {   // detect.c:182
     return TRUE;
 }
 /* recursively search obj for an object in class oclass, return 1st found */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} oclass char
+ * @returns {$T.obj | null} struct obj *
+ */
 export function o_in(obj, oclass) {   // detect.c:201
     let otmp = null, temp = null;
     if (obj.oclass === oclass) {
@@ -245,6 +278,11 @@ export function o_in(obj, oclass) {   // detect.c:201
 /* Recursively search obj for an object made of specified material.
  * Return first found.
  */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} material unsigned int
+ * @returns {$T.obj | null} struct obj *
+ */
 export function o_material(obj, material) {   // detect.c:229
     let otmp = null, temp = null;
     if (objects[obj.otyp].oc_material === material) {
@@ -261,6 +299,10 @@ export function o_material(obj, material) {   // detect.c:229
     }
     return null;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function observe_recursively(obj) {   // detect.c:249
     let otmp = null;
     await observe_object(obj);
@@ -271,6 +313,13 @@ async function observe_recursively(obj) {   // detect.c:249
     }
 }
 /* Check whether the location has an outdated object displayed on it. */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} oclass char
+ * @param {number} material unsigned int
+ * @returns {number} boolean
+ */
 function check_map_spot(x, y, oclass, material) {   // detect.c:262
     let glyph = 0, otmp = null, mtmp = null;
     glyph = glyph_at(x, y);
@@ -326,6 +375,11 @@ function check_map_spot(x, y, oclass, material) {   // detect.c:262
  * reappear after the detection has completed.  Return true if noticeable
  * change occurs.
  */
+/**
+ * @param {number} oclass char
+ * @param {number} material unsigned int
+ * @returns {Promise<number>} boolean
+ */
 async function clear_stale_map(oclass, material) {   // detect.c:318
     let zx = 0, zy = 0, change_made = 0;
     change_made = FALSE;
@@ -340,6 +394,10 @@ async function clear_stale_map(oclass, material) {   // detect.c:318
     return change_made;
 }
 /* look for gold, on the floor or in monsters' possession */
+/**
+ * @param {$T.obj | null} sobj struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function gold_detect(sobj) {   // detect.c:335
     let obj = null, mtmp = null, gold = new $T.obj(), temp = null, stale = 0, ugold = 0, steedgold = 0, ter_typ = 0, buf = new Int8Array(256), $t1, $t2;
     temp = null;
@@ -473,6 +531,10 @@ export async function gold_detect(sobj) {   // detect.c:335
     return 0;
 }
 /* returns 1 if nothing was detected, 0 if something was detected */
+/**
+ * @param {$T.obj | null} sobj struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function food_detect(sobj) {   // detect.c:479
     let obj = null, mtmp = null, ct = 0, ctu = 0, confused = 0, stale = 0, oclass = 0, what = null, buf = new Int8Array(256), savebeginner = 0, temp = null, ter_typ = 0;
     ct = 0;
@@ -593,6 +655,11 @@ export async function food_detect(sobj) {   // detect.c:479
  *
  *      1 - nothing was detected
  *      0 - something was detected
+ */
+/**
+ * @param {$T.obj | null} detector struct obj *
+ * @param {number} class_ int
+ * @returns {Promise<number>} int
  */
 export async function object_detect(detector, class_) {   // detect.c:603
     let x = 0, y = 0, stuff = new Int8Array(256), is_cursed = 0, do_dknown = 0, ct = 0, ctu = 0, obj = null, otmp = null, mtmp = null, sym = 0, boulder = 0, ter_typ = 0, temp = new $T.obj(), gold = new $T.obj(), $t1;
@@ -784,6 +851,11 @@ export async function object_detect(detector, class_) {   // detect.c:603
  * Returns 1 if nothing was detected.
  * Returns 0 if something was detected.
  */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} mclass int
+ * @returns {Promise<number>} int
+ */
 export async function monster_detect(otmp, mclass) {   // detect.c:798
     let mtmp = null, mcnt = 0, unconstrained = 0, woken = 0, swallowed = 0, $t1;
     /* detecting object (if any) */
@@ -845,6 +917,13 @@ export async function monster_detect(otmp, mclass) {   // detect.c:798
     }
     return 0;
 }
+/**
+ * @param {$T.trap | null} trap struct trap *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} src_cursed int
+ * @returns {Promise<void>}
+ */
 async function sense_trap(trap, x, y, src_cursed) {   // detect.c:865
     let obj = new $T.obj(), $t1, $t2, $t3;
     if (Hallucination() || src_cursed) {
@@ -882,6 +961,13 @@ async function sense_trap(trap, x, y, src_cursed) {   // detect.c:865
 /* check a list of objects for chest traps; return 1 if found at <ux,uy>,
    2 if found at some other spot, 3 if both, 0 otherwise; optionally
    update the map to show where such traps were found */
+/**
+ * @param {$T.obj | null} objlist struct obj *
+ * @param {number} show_them boolean
+ * @param {number} how int
+ * @param {$T.found_things | null} ft struct found_things *
+ * @returns {Promise<number>} int
+ */
 async function detect_obj_traps(objlist, show_them, how, ft) {   // detect.c:907
     let otmp = null, x = Int16Array.of(0), y = Int16Array.of(0), trapglyph = 0, result = 0;
     /* 1 for misleading map feedback */
@@ -923,6 +1009,10 @@ async function detect_obj_traps(objlist, show_them, how, ft) {   // detect.c:907
     }
     return result;
 }
+/**
+ * @param {number} cursed_src int
+ * @returns {Promise<void>}
+ */
 async function display_trap_map(cursed_src) {   // detect.c:956
     let mon = null, ttmp = null, door = 0, glyph = 0, ter_typ = 0, cc = new $T.nhcoord();
     ter_typ = (TER.DETECT | (cursed_src ? TER.OBJ : TER.TRP)) >>> 0 | 0;
@@ -968,6 +1058,10 @@ async function display_trap_map(cursed_src) {   // detect.c:956
  * also be used in the crystal ball routine
  * returns 1 if nothing was detected
  * returns 0 if something was detected
+ */
+/**
+ * @param {$T.obj | null} sobj struct obj *
+ * @returns {Promise<number>} int
  */
 export async function trap_detect(sobj) {   // detect.c:1011
     let ttmp = null, mon = null, door = 0, tr = 0, cursed_src = 0, found = 0, cc = new $T.nhcoord(), buf = new Int8Array(256);
@@ -1041,6 +1135,9 @@ export async function trap_detect(sobj) {   // detect.c:1011
     await Your($c.lit("%s itch."), await makeplural(await body_part(TOE)));
     return 0;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function furniture_detect() {   // detect.c:1091
     let mon = null, x = 0, y = 0, glyph = 0, sym = 0, found = 0, revealed = 0;
     found = 0;
@@ -1089,6 +1186,10 @@ async function furniture_detect() {   // detect.c:1091
    Wizard guarded the Amulet and was located on a random maze level, and you
    were expected to level teleport deep into Hell and hunt for him while
    working your way up; this isn't of much use anymore */
+/**
+ * @param {$T.d_level | null} where d_level *
+ * @returns {$c.Ptr | null} const char *
+ */
 export function level_distance(where) {   // detect.c:1142
     let ll = 0, indun = 0, res = null;
     ll = $c.i8(depth(u.uz) - depth(where) | 0);
@@ -1140,6 +1241,10 @@ export function level_distance(where) {   // detect.c:1142
     }
     return res;
 }
+/**
+ * @param {*} optr struct obj **
+ * @returns {Promise<void>}
+ */
 export async function use_crystal_ball(optr) {   // detect.c:1206
     let ch = 0, oops = 0, obj = null, charged = 0, impair = 0, class_ = 0, i = 0, ret = 0, $goto = null, $t1, $t2;
     D1: for (;;) {
@@ -1305,6 +1410,12 @@ export async function use_crystal_ball(optr) {   // detect.c:1206
     }
 }
 /* used by magic mapping, clairvoyance, and wand of probing */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} cnf boolean
+ * @returns {Promise<void>}
+ */
 export async function show_map_spot(x, y, cnf) {   // detect.c:1372
     let lev = null, t = null, ep = null, oldglyph = 0;
     if (cnf && rn2(7)) {
@@ -1348,6 +1459,9 @@ export async function show_map_spot(x, y, cnf) {   // detect.c:1372
         await room_discovered((lev.roomno | 0) - ROOMOFFSET | 0);
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function do_mapping() {   // detect.c:1422
     let zx = 0, zy = 0, unconstrained = 0;
     unconstrained = unconstrain_map();
@@ -1369,6 +1483,10 @@ export async function do_mapping() {   // detect.c:1422
     await exercise(A.WIS, TRUE);
 }
 /* clairvoyance */
+/**
+ * @param {$T.obj | null} sobj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function do_vicinity_map(sobj) {   // detect.c:1448
     let zx = 0, zy = 0, mtmp = null, otmp = null, save_EDetect_mons = 0, save_viz_uyux = 0, unconstrained = 0, refresh = 0, mdetected = 0, odetected = 0, extended = 0, random_farsight = 0, newglyph = 0, oldglyph = 0, lo_y = 0, hi_y = 0, lo_x = 0, hi_x = 0, ter_typ = 0;
     /* scroll--actually fake spellbook--object */
@@ -1505,6 +1623,9 @@ export async function do_vicinity_map(sobj) {   // detect.c:1448
     }
 }
 /* convert a secret door into a normal door; it might be trapped */
+/**
+ * @param {$T.rm | null} lev struct rm *
+ */
 export function cvt_sdoor_to_door(lev) {   // detect.c:1589
     let newmask = 0;
     newmask = (lev.flags | 0) & ~WM_MASK;
@@ -1524,6 +1645,12 @@ export function cvt_sdoor_to_door(lev) {   // detect.c:1589
 /* update the map for something which has just been found by wand of secret
    door detection or wizard mode ^E; will be called multiple times during a
    single operation if multiple things of interest are discovered */
+/**
+ * @param {number} zx coordxy
+ * @param {number} zy coordxy
+ * @param {number} glyph int
+ * @returns {Promise<void>}
+ */
 async function foundone(zx, zy, glyph) {   // detect.c:1610
     let save_viz = 0;
     if (glyph_is_cmap(glyph) || glyph_is_unexplored(glyph)) {
@@ -1546,6 +1673,12 @@ async function foundone(zx, zy, glyph) {   // detect.c:1610
 }
 /* find something at one location; this should find all somethings there
    since it is used for magical detection rather than physical searching */
+/**
+ * @param {number} zx coordxy
+ * @param {number} zy coordxy
+ * @param {*} whatfound genericptr_t
+ * @returns {Promise<void>}
+ */
 async function findone(zx, zy, whatfound) {   // detect.c:1639
     let lev = null, ttmp = null, mtmp = null, found_p = null, sym = 0;
     lev = $c.relem(svl.level.locations[zx], zy);
@@ -1627,6 +1760,12 @@ async function findone(zx, zy, whatfound) {   // detect.c:1639
         found_p.num_cleared_invis = $c.u8(found_p.num_cleared_invis + 1);
     }
 }
+/**
+ * @param {number} zx$in coordxy
+ * @param {number} zy$in coordxy
+ * @param {*} num genericptr_t
+ * @returns {Promise<void>}
+ */
 async function openone(zx$in, zy$in, num) {   // detect.c:1729
     const zx = Int16Array.of(zx$in);
     const zy = Int16Array.of(zy$in);
@@ -1684,6 +1823,9 @@ async function openone(zx$in, zy$in, num) {   // detect.c:1729
     }
 }
 /* returns number of things found */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function findit() {   // detect.c:1792
     let num = 0, k = 0, buf = new Int8Array(256), found = new $T.found_things();
     num = 0;
@@ -1777,6 +1919,9 @@ export async function findit() {   // detect.c:1792
     return num;
 }
 /* returns number of things found and opened */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function openit() {   // detect.c:1902
     let num = Int32Array.of(0);
     num[0] = 0;
@@ -1798,9 +1943,17 @@ export async function openit() {   // detect.c:1902
     return num[0];
 }
 /* callback hack for overriding vision in do_clear_area() */
+/**
+ * @param {Function | null} func void (*)(coordxy, coordxy, genericptr_t)
+ * @returns {number} boolean
+ */
 export function detecting(func) {   // detect.c:1929
     return $c.i8(func === findone || func === openone ? 1 : 0);
 }
+/**
+ * @param {$T.trap | null} trap struct trap *
+ * @returns {Promise<void>}
+ */
 export async function find_trap(trap) {   // detect.c:1935
     let cleared = 0;
     cleared = FALSE;
@@ -1824,6 +1977,11 @@ export async function find_trap(trap) {   // detect.c:1935
         await docrt();
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} via_warning boolean
+ * @returns {Promise<number>} int
+ */
 async function mfind0(mtmp, via_warning) {   // detect.c:1965
     let x = 0, y = 0, found_something = 0;
     x = mtmp.mx;
@@ -1871,6 +2029,10 @@ async function mfind0(mtmp, via_warning) {   // detect.c:1965
     }
     return 0;
 }
+/**
+ * @param {number} aflag int
+ * @returns {Promise<number>} int
+ */
 export async function dosearch0(aflag) {   // detect.c:2016
     let x = 0, y = 0, trap = null, mtmp = null, fund = 0, mfres = 0;
     /* intrinsic autosearch vs explicit searching */
@@ -1953,12 +2115,18 @@ export async function dosearch0(aflag) {   // detect.c:2016
     return 1;
 }
 /* the #search command -- explicit searching */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dosearch() {   // detect.c:2097
     if (await cmd_safety_prevention($c.lit("Searching"), $c.lit("another search"), $c.lit("You already found a monster."), new $c.FieldRef(ga, "already_found_flag", "i32"))) {
         return ECMD.OK;
     }
     return await dosearch0(0) ? ECMD.TIME : ECMD.OK;
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function warnreveal() {   // detect.c:2107
     let x = 0, y = 0, mtmp = null;
     for (x = $c.i16(u.ux - 1 | 0); x <= (u.ux + 1 | 0); x = $c.i16(x + 1)) {
@@ -1973,6 +2141,11 @@ export async function warnreveal() {   // detect.c:2107
     }
 }
 /* skip premap detection of areas outside Sokoban map */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 function skip_premap_detect(x, y) {   // detect.c:2124
     if (svl.level.locations[x][y].typ === STONE && ((svl.level.locations[x][y].flags | 0) & (W.NONDIGGABLE | W.NONPASSWALL)) !== 0) {
         return TRUE;
@@ -1980,6 +2153,9 @@ function skip_premap_detect(x, y) {   // detect.c:2124
     return FALSE;
 }
 /* Pre-map (the sokoban) levels */
+/**
+ * @returns {Promise<void>}
+ */
 export async function premap_detect() {   // detect.c:2134
     let x = 0, y = 0, ttmp = null, obj = null;
     /* Map the background and boulders */
@@ -2006,6 +2182,14 @@ export async function premap_detect() {   // detect.c:2134
     }
 }
 /* used to see under visible gas/cloud regions; caller must declare cmaptmp */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} swallowed unsigned int
+ * @param {number} default_glyph int
+ * @param {number} which_subset unsigned int
+ * @returns {Promise<number>} int
+ */
 async function reveal_terrain_getglyph(x, y, swallowed, default_glyph, which_subset) {   // detect.c:2167
     let t = null, mtmp = null, glyph = 0, levl_glyph = 0, seenv = 0, keep_traps = 0, keep_objs = 0, keep_mons = 0, full = 0, cmaptmp = 0, reg = null, was_mon = 0, save_spot = new $T.rm();
     keep_traps = $c.i8((which_subset & TER.TRP) >>> 0 !== 0 ? 1 : 0);
@@ -2122,6 +2306,10 @@ async function reveal_terrain_getglyph(x, y, swallowed, default_glyph, which_sub
 /* idea from crawl; show known portion of map without any monsters,
    objects, or traps occluding the view of the underlying terrain;
    in explore or wizard modes, can also display unexplored portion */
+/**
+ * @param {number} which_subset unsigned int
+ * @returns {Promise<void>}
+ */
 export async function reveal_terrain(which_subset) {   // detect.c:2356
     let full = 0, x = 0, y = 0, glyph = 0, default_glyph = 0, buf = new Int8Array(256), keep_traps = 0, keep_objs = 0, keep_mons = 0, swallowed = 0, default_sym = 0;
     /* TER_TRP | TER_OBJ | TER_MON | TER_FULL */

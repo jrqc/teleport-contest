@@ -69,9 +69,18 @@ const ll_funcs = $h.data(32, 8);
 ** is undefined according to ISO C, but POSIX assumes that it works.
 ** (The '__extension__' in gnu compilers is only to avoid warnings.)
 */
+/**
+ * @param {number} lib void *
+ */
 function lsys_unloadlib(lib) {   // loadlib.c:119
     $c.missing("dlclose")(lib);
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} path const char *
+ * @param {number} seeglb int
+ * @returns {Promise<number>} void *
+ */
 async function lsys_load(L, path, seeglb) {   // loadlib.c:124
     let lib = 0;
     lib = $c.missing("dlopen")(path, 2 | (seeglb ? 8 : 4));
@@ -80,6 +89,12 @@ async function lsys_load(L, path, seeglb) {   // loadlib.c:124
     }
     return lib;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} lib void *
+ * @param {number} sym const char *
+ * @returns {Promise<number>} lua_CFunction
+ */
 async function lsys_sym(L, lib, sym) {   // loadlib.c:132
     let f = 0;
     f = $c.missing("dlsym")(lib, sym);
@@ -130,6 +145,10 @@ async function lsys_sym(L, lib, sym) {   // loadlib.c:132
 /*
 ** return registry.LUA_NOENV as a boolean
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function noenv(L) {   // loadlib.c:276
     let b = 0;
     await lua_getfield(L, -1001000, $h.lit("LUA_NOENV"));
@@ -140,6 +159,13 @@ async function noenv(L) {   // loadlib.c:276
 /*
 ** Set a path
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} fieldname const char *
+ * @param {number} envname const char *
+ * @param {number} dft const char *
+ * @returns {Promise<void>}
+ */
 async function setpath(L, fieldname, envname, dft) {   // loadlib.c:288
     let dftmark = 0, nver = 0, path = 0, len = 0, $t1, $t2;
     const $sp0 = $h.st.sp, $fp = $h.enter(1056);
@@ -179,6 +205,11 @@ async function setpath(L, fieldname, envname, dft) {   // loadlib.c:288
 /*
 ** return registry.CLIBS[path]
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} path const char *
+ * @returns {Promise<number>} void *
+ */
 async function checkclib(L, path) {   // loadlib.c:326
     let plib = 0;
     await lua_getfield(L, -1001000, $h.u32[CLIBS >>> 2]);
@@ -191,6 +222,12 @@ async function checkclib(L, path) {   // loadlib.c:326
 ** registry.CLIBS[path] = plib        -- for queries
 ** registry.CLIBS[#CLIBS + 1] = plib  -- also keep a list of all libraries
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} path const char *
+ * @param {number} plib void *
+ * @returns {Promise<void>}
+ */
 async function addtoclib(L, path, plib) {   // loadlib.c:340
     await lua_getfield(L, -1001000, $h.u32[CLIBS >>> 2]);
     lua_pushlightuserdata(L, plib);
@@ -203,6 +240,10 @@ async function addtoclib(L, path, plib) {   // loadlib.c:340
 ** __gc tag method for CLIBS table: calls 'lsys_unloadlib' for all lib
 ** handles in list CLIBS
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function gctm(L) {   // loadlib.c:354
     let n = 0;
     n = await luaL_len(L, 1);
@@ -226,6 +267,12 @@ async function gctm(L) {   // loadlib.c:354
 ** Return 0 and 'true' or a function in the stack; in case of
 ** errors, return an error code and an error message in the stack.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} path const char *
+ * @param {number} sym const char *
+ * @returns {Promise<number>} int
+ */
 async function lookforfunc(L, path, sym) {   // loadlib.c:381
     let reg = 0, f = 0;
     reg = await checkclib(L, path);   /* check loaded C libraries */
@@ -250,6 +297,10 @@ async function lookforfunc(L, path, sym) {   // loadlib.c:381
         return 0;   /* no errors */
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function ll_loadlib(L) {   // loadlib.c:402
     let path = 0, init = 0, stat = 0;
     path = await luaL_checklstring(L, 1, 0);
@@ -270,6 +321,10 @@ async function ll_loadlib(L) {   // loadlib.c:402
 ** 'require' function
 ** =======================================================
 */
+/**
+ * @param {number} filename const char *
+ * @returns {number} int
+ */
 function readable(filename) {   // loadlib.c:425
     let f = 0;
     f = $h.handle($c.fopen($h.P(filename), $h.P($h.lit("r"))));   /* try to open file */
@@ -284,6 +339,11 @@ function readable(filename) {   // loadlib.c:425
 ** the ending ';' to '\0' to create a zero-terminated string. Return
 ** NULL when list ends.
 */
+/**
+ * @param {number} path char **
+ * @param {number} end char *
+ * @returns {number} const char *
+ */
 function getnextfilename(path, end) {   // loadlib.c:438
     let sep = 0, name = 0;
     name = $h.u32[path >>> 2];
@@ -308,6 +368,11 @@ function getnextfilename(path, end) {   // loadlib.c:438
 ** no file 'blabla.so'
 **	no file 'blublu.so'
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} path const char *
+ * @returns {Promise<void>}
+ */
 async function pusherrornotfound(L, path) {   // loadlib.c:462
     const $sp0 = $h.st.sp, $fp = $h.enter(1056);
     try {
@@ -318,6 +383,14 @@ async function pusherrornotfound(L, path) {   // loadlib.c:462
         await luaL_pushresult($fp);
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} name const char *
+ * @param {number} path const char *
+ * @param {number} sep const char *
+ * @param {number} dirsep const char *
+ * @returns {Promise<number>} const char *
+ */
 async function searchpath(L, name, path, sep, dirsep) {   // loadlib.c:472
     let endpathname = 0, filename = 0, $t1;
     const $sp0 = $h.st.sp, $fp = $h.enter(1064);
@@ -344,6 +417,10 @@ async function searchpath(L, name, path, sep, dirsep) {   // loadlib.c:472
         return 0;   /* not found */
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function ll_searchpath(L) {   // loadlib.c:499
     let f = 0;
     f = await searchpath(L, await luaL_checklstring(L, 1, 0), await luaL_checklstring(L, 2, 0), await luaL_optlstring(L, 3, $h.lit("."), 0), await luaL_optlstring(L, 4, $h.lit("/"), 0));
@@ -356,6 +433,13 @@ async function ll_searchpath(L) {   // loadlib.c:499
         return 2;   /* return fail + error message */
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} name const char *
+ * @param {number} pname const char *
+ * @param {number} dirsep const char *
+ * @returns {Promise<number>} const char *
+ */
 async function findfile(L, name, pname, dirsep) {   // loadlib.c:513
     let path = 0;
     await lua_getfield(L, -1001001, pname);
@@ -365,6 +449,12 @@ async function findfile(L, name, pname, dirsep) {   // loadlib.c:513
     }
     return await searchpath(L, name, path, $h.lit("."), dirsep);
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} stat int
+ * @param {number} filename const char *
+ * @returns {Promise<number>} int
+ */
 async function checkload(L, stat, filename) {   // loadlib.c:525
     if (stat !== 0 ? 1 : 0) {
         /* module loaded successfully? */
@@ -374,6 +464,10 @@ async function checkload(L, stat, filename) {   // loadlib.c:525
         return await luaL_error(L, $h.lit("error loading module '%s' from file '%s':\n\t%s"), await lua_tolstring(L, 1, 0), filename, await lua_tolstring(L, -1, 0));
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function searcher_Lua(L) {   // loadlib.c:536
     let filename = 0, name = 0;
     name = await luaL_checklstring(L, 1, 0);
@@ -391,6 +485,12 @@ async function searcher_Lua(L) {   // loadlib.c:536
 ** fails, it also tries "luaopen_Y".) If there is no ignore mark,
 ** look for a function named "luaopen_modname".
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} filename const char *
+ * @param {number} modname const char *
+ * @returns {Promise<number>} int
+ */
 async function loadfunc(L, filename, modname) {   // loadlib.c:553
     let openfunc = 0, mark = 0, stat = 0;
     modname = await luaL_gsub(L, modname, $h.lit("."), $h.lit("_"));
@@ -407,6 +507,10 @@ async function loadfunc(L, filename, modname) {   // loadlib.c:553
     openfunc = await lua_pushfstring(L, $h.lit("luaopen_%s"), modname);
     return await lookforfunc(L, filename, openfunc);
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function searcher_C(L) {   // loadlib.c:571
     let name = 0, filename = 0;
     name = await luaL_checklstring(L, 1, 0);
@@ -416,6 +520,10 @@ async function searcher_C(L) {   // loadlib.c:571
     }
     return await checkload(L, await loadfunc(L, filename, name) === 0 ? 1 : 0, filename);
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function searcher_Croot(L) {   // loadlib.c:579
     let filename = 0, name = 0, p = 0, stat = 0;
     name = await luaL_checklstring(L, 1, 0);
@@ -440,6 +548,10 @@ async function searcher_Croot(L) {   // loadlib.c:579
     await lua_pushstring(L, filename);   /* will be 2nd argument to module */
     return 2;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function searcher_preload(L) {   // loadlib.c:601
     let name = 0;
     name = await luaL_checklstring(L, 1, 0);
@@ -453,6 +565,11 @@ async function searcher_preload(L) {   // loadlib.c:601
         return 2;
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} name const char *
+ * @returns {Promise<void>}
+ */
 async function findloader(L, name) {   // loadlib.c:615
     let i = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(1056);
@@ -489,6 +606,10 @@ async function findloader(L, name) {   // loadlib.c:615
         }
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function ll_require(L) {   // loadlib.c:648
     let name = 0;
     name = await luaL_checklstring(L, 1, 0);
@@ -521,6 +642,10 @@ async function ll_require(L) {   // loadlib.c:648
     lua_rotate(L, -2, 1);   /* loader data <-> module result  */
     return 2;   /* return module result and loader data */
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<void>}
+ */
 async function createsearcherstable(L) {   // loadlib.c:701
     let i = 0;
     /* create 'searchers' table */
@@ -537,6 +662,10 @@ async function createsearcherstable(L) {   // loadlib.c:701
 ** create table CLIBS to keep track of loaded C libraries,
 ** setting a finalizer to close all libraries when closing state.
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<void>}
+ */
 async function createclibstable(L) {   // loadlib.c:726
     await luaL_getsubtable(L, -1001000, $h.u32[CLIBS >>> 2]);   /* create CLIBS table */
     await lua_createtable(L, 0, 1);   /* create metatable for CLIBS */
@@ -544,6 +673,10 @@ async function createclibstable(L) {   // loadlib.c:726
     await lua_setfield(L, -2, $h.lit("__gc"));   /* set finalizer for CLIBS table */
     await lua_setmetatable(L, -2);
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 export async function luaopen_package(L) {   // loadlib.c:735
     await createclibstable(L);
     await luaL_checkversion_(L, 504, 136), await lua_createtable(L, 0, 7), await luaL_setfuncs(L, pk_funcs, 0);   /* create 'package' table */

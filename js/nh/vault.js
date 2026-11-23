@@ -70,6 +70,10 @@ import { Upolyd, u_at } from './you.macros.js';
 import { Blind, Deaf, Punished, Strangled } from './youprop.macros.js';
 import { fracture_rock } from './zap.js';
 
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function newegd(mtmp) {   // vault.c:23
     let $t1, $t2;
     if (!mtmp.mextra) {
@@ -81,6 +85,9 @@ export async function newegd(mtmp) {   // vault.c:23
         mtmp.mextra.egd.parentmid = mtmp.m_id;
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ */
 export function free_egd(mtmp) {   // vault.c:35
     if (mtmp.mextra && EGD(mtmp)) {
         $c.free(mtmp.mextra.egd);
@@ -91,6 +98,11 @@ export function free_egd(mtmp) {   // vault.c:35
 /* try to remove the temporary corridor (from vault to rest of map) being
    maintained by guard 'grd'; if guard is still in it, removal will fail,
    to be tried again later */
+/**
+ * @param {$T.monst | null} grd struct monst *
+ * @param {number} forceshow boolean
+ * @returns {Promise<number>} boolean
+ */
 async function clear_fcorr(grd, forceshow) {   // vault.c:48
     let fcx = 0, fcy = 0, fcbeg = 0, mtmp = null, sawcorridor = 0, silently = 0, egrd = null, trap = null, lev = null;
     sawcorridor = FALSE;
@@ -162,6 +174,10 @@ async function clear_fcorr(grd, forceshow) {   // vault.c:48
    spots to unlit; if player used scroll/wand/spell of light while inside
    the corridor, we don't want the light to reappear if/when a new tunnel
    goes through the same area */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ */
 function blackout(x, y) {   // vault.c:123
     let lev = null, i = 0, j = 0, $t1;
     for (i = x - 1 | 0; i <= (x + 1 | 0); i = i + 1 | 0) {
@@ -181,6 +197,10 @@ function blackout(x, y) {   // vault.c:123
         }
     }
 }
+/**
+ * @param {$T.monst | null} grd struct monst *
+ * @returns {Promise<void>}
+ */
 async function restfakecorr(grd) {   // vault.c:144
     /* it seems you left the corridor - let the guard disappear */
     if (await clear_fcorr(grd, FALSE)) {
@@ -189,6 +209,10 @@ async function restfakecorr(grd) {   // vault.c:144
     }
 }
 /* move guard--dead to alive--to <0,0> until temporary corridor is removed */
+/**
+ * @param {$T.monst | null} grd struct monst *
+ * @returns {Promise<void>}
+ */
 async function parkguard(grd) {   // vault.c:155
     /* either guard is dead or will now be treated as if so;
        monster traversal loops should skip it */
@@ -208,6 +232,10 @@ async function parkguard(grd) {   // vault.c:155
     grd.mextra.egd.ogy = grd.my;
 }
 /* called in mon.c */
+/**
+ * @param {$T.monst | null} grd struct monst *
+ * @returns {Promise<number>} boolean
+ */
 export async function grddead(grd) {   // vault.c:175
     let dispose = 0;
     dispose = await clear_fcorr(grd, TRUE);
@@ -223,6 +251,12 @@ export async function grddead(grd) {   // vault.c:175
     }
     return dispose;
 }
+/**
+ * @param {$T.monst | null} grd struct monst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 function in_fcorridor(grd, x, y) {   // vault.c:192
     let fci = 0, egrd = null;
     egrd = grd.mextra.egd;
@@ -233,6 +267,9 @@ function in_fcorridor(grd, x, y) {   // vault.c:192
     }
     return FALSE;
 }
+/**
+ * @returns {Promise<$T.monst | null>} struct monst *
+ */
 export async function findgd() {   // vault.c:204
     let mtmp = null, mprev = null, $t1;
     /* this might find a guard parked at <0,0> since it'll be on fmon list */
@@ -262,11 +299,18 @@ export async function findgd() {   // vault.c:204
     }
     return null;
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function vault_summon_gd() {   // vault.c:237
     if (vault_occupied(new $c.Ptr(u.urooms, 0)) && !await findgd()) {
         u.uinvault = VAULT_GUARD_TIME - 1;
     }
 }
+/**
+ * @param {$c.Ptr | null} array char *
+ * @returns {number} char
+ */
 export function vault_occupied(array) {   // vault.c:244
     let ptr = null;
     for (ptr = array; ptr.get(0); ptr = ptr.add(1)) {
@@ -277,6 +321,10 @@ export function vault_occupied(array) {   // vault.c:244
     return 0;
 }
 /* hero has teleported out of vault while a guard is active */
+/**
+ * @param {$T.monst | null} grd struct monst *
+ * @returns {Promise<void>}
+ */
 export async function uleftvault(grd) {   // vault.c:256
     /* only called if caller has checked vault_occupied() and findgd() */
     if (!grd || !grd.isgd || DEADMONSTER(grd)) {
@@ -300,6 +348,12 @@ export async function uleftvault(grd) {   // vault.c:256
         }
     }
 }
+/**
+ * @param {$T.monst | null} guard struct monst *
+ * @param {*} rx coordxy *
+ * @param {*} ry coordxy *
+ * @returns {Promise<number>} boolean
+ */
 async function find_guard_dest(guard, rx, ry) {   // vault.c:281
     let x = 0, y = 0, dd = 0, lx = 0, ly = 0;
     for (dd = 2; dd < ROWNO || dd < COLNO; dd = $c.i16(dd + 1)) {
@@ -336,6 +390,9 @@ async function find_guard_dest(guard, rx, ry) {   // vault.c:281
     await tele();
     return FALSE;
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function invault() {   // vault.c:317
     let guard = null, otmp = null, spotted = 0, trycount = 0, vaultroom = 0, vgdeathcount = 0, buf = new Int8Array(256), x = 0, y = 0, gdx = 0, gdy = 0, typ = 0, rx = Int16Array.of(0), ry = Int16Array.of(0), umoney = 0, dx = 0, dy = 0, func = null, bname = null, bcnt = 0, vlt = 0, lowx = 0, hix = 0, lowy = 0, hiy = 0;
     vaultroom = vault_occupied(new $c.Ptr(u.urooms, 0));
@@ -609,6 +666,11 @@ export async function invault() {   // vault.c:317
         guard.mextra.egd.warncnt = 1;
     }
 }
+/**
+ * @param {$T.obj | null} gold struct obj *
+ * @param {number} vroom int
+ * @returns {Promise<void>}
+ */
 async function move_gold(gold, vroom) {   // vault.c:632
     let nx = 0, ny = 0;
     await remove_object(gold);
@@ -619,6 +681,10 @@ async function move_gold(gold, vroom) {   // vault.c:632
     await stackobj(gold);
     await newsym(nx, ny);
 }
+/**
+ * @param {$T.monst | null} grd struct monst *
+ * @returns {Promise<void>}
+ */
 async function wallify_vault(grd) {   // vault.c:646
     let typ = 0, x = 0, y = 0, vlt = 0, tmp_viz = 0, lox = 0, hix = 0, loy = 0, hiy = 0, mon = null, gold = null, rocks = null, trap = null, fixed = 0, movedgold = 0;
     vlt = grd.mextra.egd.vroom;
@@ -700,6 +766,12 @@ async function wallify_vault(grd) {   // vault.c:646
         }
     }
 }
+/**
+ * @param {$T.monst | null} grd struct monst *
+ * @param {number} nx int
+ * @param {number} ny int
+ * @returns {Promise<void>}
+ */
 async function gd_mv_monaway(grd, nx, ny) {   // vault.c:734
     let mtmp = null;
     mtmp = svl.level.monsters[nx][ny];
@@ -715,6 +787,12 @@ async function gd_mv_monaway(grd, nx, ny) {   // vault.c:734
 }
 /* have guard pick gold off the floor, possibly moving to the gold's
    position before message and back to his current spot after */
+/**
+ * @param {$T.monst | null} grd struct monst *
+ * @param {number} goldx int
+ * @param {number} goldy int
+ * @returns {Promise<void>}
+ */
 async function gd_pick_corridor_gold(grd, goldx, goldy) {   // vault.c:752
     let gold = null, newcc = new $T.nhcoord(), bestcc = new $T.nhcoord(), gdelta = 0, newdelta = 0, bestdelta = 0, tryct = 0, guardx = 0, guardy = 0, under_u = 0, see_it = 0;
     guardx = grd.mx;
@@ -785,6 +863,12 @@ async function gd_pick_corridor_gold(grd, goldx, goldy) {   // vault.c:752
     return;
 }
 /* return 1: guard moved, -2: died  */
+/**
+ * @param {$T.monst | null} grd struct monst *
+ * @param {number} semi_dead boolean
+ * @param {number} disappear_msg_seen boolean
+ * @returns {Promise<number>} int
+ */
 async function gd_move_cleanup(grd, semi_dead, disappear_msg_seen) {   // vault.c:836
     let x = 0, y = 0, see_guard = 0, save_plnmsg = 0;
     /*
@@ -815,6 +899,10 @@ async function gd_move_cleanup(grd, semi_dead, disappear_msg_seen) {   // vault.
     }
     return -2;
 }
+/**
+ * @param {$T.monst | null} grd struct monst *
+ * @returns {Promise<void>}
+ */
 async function gd_letknow(grd) {   // vault.c:869
     if (!cansee(grd.mx, grd.my) || !mon_visible(grd)) {
         await You_hear($c.lit("%s."), m_carrying(grd, TIN_WHISTLE) ? $c.lit("the shrill sound of a guard's whistle") : $c.lit("angry shouting"));
@@ -825,6 +913,10 @@ async function gd_letknow(grd) {   // vault.c:869
 }
 /*
  * return  1: guard moved,  0: guard didn't,  -1: let m_move do it,  -2: died
+ */
+/**
+ * @param {$T.monst | null} grd struct monst *
+ * @returns {Promise<number>} int
  */
 export async function gd_move(grd) {   // vault.c:888
     let x = 0, y = 0, nx = 0, ny = 0, m = 0, n = 0, ex = 0, ey = 0, dx = 0, dy = 0, ggx = 0, ggy = 0, fci = 0, typ = 0, crm = null, fcp = null, egrd = null, umoney = 0, goldincorridor = 0, u_in_vault = 0, grd_in_vault = 0, semi_dead = 0, u_carry_gold = 0, newspot = 0, save_plnmsg = 0, buf = new Int8Array(256), $goto = null, $t1;
@@ -1144,6 +1236,10 @@ export async function gd_move(grd) {   // vault.c:888
     }
 }
 /* Routine when dying or quitting with a vault guard around */
+/**
+ * @param {number} silently boolean
+ * @returns {Promise<void>}
+ */
 export async function paygd(silently) {   // vault.c:1205
     let grd = null, umoney = 0, coins = null, nextcoins = null, gdx = 0, gdy = 0, buf = new Int8Array(256);
     grd = await findgd();
@@ -1190,6 +1286,10 @@ export async function paygd(silently) {   // vault.c:1205
  *   True:  all gold
  *   False: limit to known contents
  */
+/**
+ * @param {number} even_if_unknown boolean
+ * @returns {number | bigint} long
+ */
 export function hidden_gold(even_if_unknown) {   // vault.c:1257
     let value = 0, obj = null;
     value = 0;
@@ -1202,9 +1302,16 @@ export function hidden_gold(even_if_unknown) {   // vault.c:1257
     return value;
 }
 /* prevent "You hear footsteps.." when inappropriate */
+/**
+ * @returns {Promise<number>} boolean
+ */
 export async function gd_sound() {   // vault.c:1272
     return $c.i8(!(vault_occupied(new $c.Ptr(u.urooms, 0)) || await findgd()) ? 1 : 0);
 }
+/**
+ * @param {number} activity unsigned int
+ * @returns {Promise<void>}
+ */
 export async function vault_gd_watching(activity) {   // vault.c:1278
     let guard = null;
     guard = await findgd();

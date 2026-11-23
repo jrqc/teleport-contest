@@ -107,6 +107,11 @@ const nosound_procs = new $T.sound_procs();
    order of the enum soundlib_ids in sndprocs.h */
 const soundlib_choices = $c.recArray($T.sound_choices, 1);
 /* this easily could be a macro, but it might overtax dumb compilers */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} rmtyp int
+ * @returns {number} int
+ */
 function mon_in_room(mon, rmtyp) {   // sounds.c:20
     let rno = 0;
     rno = svl.level.locations[mon.mx][mon.my].roomno | 0;
@@ -115,6 +120,10 @@ function mon_in_room(mon, rmtyp) {   // sounds.c:20
     }
     return FALSE;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} boolean
+ */
 async function throne_mon_sound(mtmp) {   // sounds.c:30
     let which = 0;
     if ((mtmp.msleeping | 0 || is_lord(mtmp.data) || is_prince(mtmp.data)) && !is_animal(mtmp.data) && mon_in_room(mtmp, COURT)) {
@@ -131,6 +140,10 @@ async function throne_mon_sound(mtmp) {   // sounds.c:30
     }
     return FALSE;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} boolean
+ */
 async function beehive_mon_sound(mtmp) {   // sounds.c:62
     let hallu = 0;
     if (mtmp.data.mlet === S.ANT && is_flyer(mtmp.data) && mon_in_room(mtmp, BEEHIVE)) {
@@ -150,6 +163,10 @@ async function beehive_mon_sound(mtmp) {   // sounds.c:62
     }
     return FALSE;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} boolean
+ */
 async function morgue_mon_sound(mtmp) {   // sounds.c:89
     let hallu = 0, hair = null;
     if ((is_undead(mtmp.data) || is_vampshifter(mtmp)) && mon_in_room(mtmp, MORGUE)) {
@@ -170,6 +187,10 @@ async function morgue_mon_sound(mtmp) {   // sounds.c:89
     }
     return FALSE;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} boolean
+ */
 async function zoo_mon_sound(mtmp) {   // sounds.c:115
     let hallu = 0, selection = 0;
     if ((mtmp.msleeping | 0 || is_animal(mtmp.data)) && mon_in_room(mtmp, ZOO)) {
@@ -180,6 +201,10 @@ async function zoo_mon_sound(mtmp) {   // sounds.c:115
     }
     return FALSE;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} boolean
+ */
 async function temple_priest_sound(mtmp) {   // sounds.c:131
     let msg = null, hallu = 0, trycount = 0, ax = 0, ay = 0, speechless = 0, in_sight = 0;
     /* priest must be active */
@@ -221,6 +246,10 @@ async function temple_priest_sound(mtmp) {   // sounds.c:131
     }
     return FALSE;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} boolean
+ */
 async function oracle_sound(mtmp) {   // sounds.c:181
     let hallu = 0;
     if (!$c.peq(mtmp.data, $c.relem(mons, PM.ORACLE))) {
@@ -233,6 +262,9 @@ async function oracle_sound(mtmp) {   // sounds.c:181
     }
     return TRUE;
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function dosounds() {   // sounds.c:202
     let sroom = null, hallu = 0, vx = 0, vy = 0, mtmp = null, gold_in_vault = 0, count = 0;
     if (Deaf() || !flags.acoustics || u.uswallow | 0 || (u.uinwater | 0)) {
@@ -344,6 +376,10 @@ export async function dosounds() {   // sounds.c:202
         }
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {$c.Ptr | null} const char *
+ */
 export function growl_sound(mtmp) {   // sounds.c:351
     let ret = null;
     switch (mtmp.data.msound) {
@@ -391,6 +427,10 @@ export function growl_sound(mtmp) {   // sounds.c:351
     return ret;
 }
 /* the sounds of a seriously abused pet, including player attacking it */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function growl(mtmp) {   // sounds.c:402
     let growl_verb = null;
     growl_verb = null;
@@ -415,6 +455,10 @@ export async function growl(mtmp) {   // sounds.c:402
     }
 }
 /* the sounds of mistreated pets */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function yelp(mtmp) {   // sounds.c:427
     let yelp_verb = null, se = 0;
     yelp_verb = null;
@@ -464,6 +508,10 @@ export async function yelp(mtmp) {   // sounds.c:427
     nhUse(se);
 }
 /* the sounds of distressed pets */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function whimper(mtmp) {   // sounds.c:479
     let whimper_verb = null, se = 0;
     whimper_verb = null;
@@ -501,6 +549,10 @@ export async function whimper(mtmp) {   // sounds.c:479
     nhUse(se);
 }
 /* pet makes "I'm hungry" noises */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function beg(mtmp) {   // sounds.c:519
     if (helpless(mtmp) || !(carnivorous(mtmp.data) || herbivorous(mtmp.data))) {
         return;
@@ -525,6 +577,10 @@ export async function beg(mtmp) {   // sounds.c:519
     }
 }
 /* hero has attacked a peaceful monster within 'mon's view */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {$c.Ptr | null} const char *
+ */
 export function maybe_gasp(mon) {   // sounds.c:546
     let mptr = null, msound = 0, dogasp = 0;
     mptr = mon.data;
@@ -606,6 +662,10 @@ export function maybe_gasp(mon) {   // sounds.c:546
    [the old message when a carried egg hatches was
    "its cries sound like {mommy,daddy}"
    regardless of what type of sound--if any--the creature made] */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {$c.Ptr | null} const char *
+ */
 export function cry_sound(mtmp) {   // sounds.c:617
     let ret = null, ptr = null;
     ret = null;
@@ -654,6 +714,10 @@ export function cry_sound(mtmp) {   // sounds.c:617
     return ret;
 }
 /* return True if mon is a gecko or seems to look like one (hallucination) */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {number} boolean
+ */
 function mon_is_gecko(mon) {   // sounds.c:659
     let glyph = 0;
     /* return True if it is actually a gecko */
@@ -670,6 +734,10 @@ function mon_is_gecko(mon) {   // sounds.c:659
     glyph = glyph_at(mon.mx, mon.my);
     return $c.i8(glyph_to_mon(glyph) === PM.GECKO ? 1 : 0);
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} int
+ */
 export async function domonnoise(mtmp) {   // sounds.c:679
     let verbuf = new Int8Array(256), pline_msg = null, verbl_msg = null, verbl_msg_mcan = null, ptr = null, msound = 0, gnomeplan = 0, isnight = 0, kindred = 0, nightchild = 0, racenoun = null, vampindex = 0, t = null, swval = 0, tribtitle = null, book = null, ms_Death = 0, tmpbuf = new Int8Array(256);
     /* check calls to this */
@@ -1143,11 +1211,17 @@ export async function domonnoise(mtmp) {   // sounds.c:679
     return ECMD.TIME;
 }
 /* #chat command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dotalk() {   // sounds.c:1248
     let result = 0;
     result = await dochat();
     return result;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function dochat() {   // sounds.c:1257
     let mtmp = null, tx = 0, ty = 0, otmp = null, idx = 0, xresponse = null;
     if (is_silent(gy.youmonst.data)) {
@@ -1270,6 +1344,11 @@ async function dochat() {   // sounds.c:1257
     return await domonnoise(mtmp);
 }
 /* is there a monster at <x,y> that can see the hero and react? */
+/**
+ * @param {number} x int
+ * @param {number} y int
+ * @returns {$T.monst | null} struct monst *
+ */
 function responsive_mon_at(x, y) {   // sounds.c:1413
     let mtmp = null;
     mtmp = isok($c.i16(x), $c.i16(y)) ? svl.level.monsters[x][y] : null;
@@ -1282,6 +1361,9 @@ function responsive_mon_at(x, y) {   // sounds.c:1413
     return mtmp;
 }
 /* player chose 'uarmh' for #tip (pickup.c); visual #chat, sort of... */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function tiphat() {   // sounds.c:1427
     let mtmp = null, otmp = null, x = 0, y = 0, range = 0, glyph = 0, vismon = 0, unseen = 0, statue = 0, res = 0, which = 0, twice = 0, $goto = null;
     D1: for (;;) {
@@ -1394,6 +1476,9 @@ export async function tiphat() {   // sounds.c:1427
         break;
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function activate_chosen_soundlib() {   // sounds.c:1779
     let idx = 0;
     idx = gc.chosen_soundlib | 0;
@@ -1412,6 +1497,10 @@ export async function activate_chosen_soundlib() {   // sounds.c:1779
     ga.active_soundlib = soundprocs.soundlib_id;
     gc.chosen_soundlib = ga.active_soundlib;
 }
+/**
+ * @param {number} idx int
+ * @returns {Promise<void>}
+ */
 export async function assign_soundlib(idx) {   // sounds.c:1798
     if (!(idx >= 0 && idx < 1)) {
         await panic($c.lit("assign_soundlib: invalid soundlib (%d)"), idx);
@@ -1427,6 +1516,11 @@ export async function assign_soundlib(idx) {   // sounds.c:1798
 /*, tmps = 0*/
 /* copy up to maxlen-1 characters; 'dest' must be able to hold maxlen;
    treat comma as alternate end of 'src' */
+/**
+ * @param {$c.Ptr | null} dest char *
+ * @param {number} maxlen int
+ * @returns {Promise<void>}
+ */
 export async function get_soundlib_name(dest, maxlen) {   // sounds.c:1864
     let count = 0, idx = 0, src = null, $t1, $t2, $t3, $t4;
     idx = ga.active_soundlib | 0;
@@ -1442,6 +1536,10 @@ export async function get_soundlib_name(dest, maxlen) {   // sounds.c:1864
     }
     dest.set(0, 0);
 }
+/**
+ * @param {$c.Ptr | null} op char *
+ * @returns {number} enum soundlib_ids
+ */
 export function soundlib_id_from_opt(op) {   // sounds.c:1883
     let idx = 0, defproc = null, sp = null;
     defproc = nosound_procs;
@@ -1474,6 +1572,13 @@ export function soundlib_id_from_opt(op) {   // sounds.c:1883
 /* existinglen could be >= bufsz if caller didn't initialize buf
  * to properly include a trailing NUL */
 /* SND_SOUNDEFFECTS_AUTOMAP */
+/**
+ * @param {$c.Ptr | null} basename char *
+ * @param {$c.Ptr | null} buf char *
+ * @param {number | bigint} bufsz size_t
+ * @param {number} approach int32_t
+ * @returns {$c.Ptr | null} char *
+ */
 export function base_soundname_to_filename(basename, buf, bufsz, approach) {   // sounds.c:2084
     let consumes = 0, baselen = 0, existinglen = 0, cp = null, needslash = 0;
     consumes = 0;
@@ -1524,8 +1629,17 @@ export function base_soundname_to_filename(basename, buf, bufsz, approach) {   /
     }
     return buf;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} tone int32_t
+ * @param {number} volume int32_t
+ * @param {number} moreinfo int32_t
+ */
 export function set_voice(mtmp, tone, volume, moreinfo) {   // sounds.c:2161
 }
+/**
+ * @param {$c.Ptr | null} text const char *
+ */
 export function sound_speak(text) {   // sounds.c:2185
     /* last non-NUL */
     /* cp1 -> 1st, cp2 -> last non-nul) */

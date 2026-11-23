@@ -147,6 +147,11 @@ const use_misc$MissingMiscellaneousItem = new Int8Array(16);   // static in use_
  * the item.  Returns 0 if nothing happened, 2 if the monster can't do
  * anything (i.e. it teleported) and 1 if it's dead.
  */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function precheck(mon, obj) {   // muse.c:59
     let vis = 0, cc = new $T.nhcoord(), mtmp = null, dam = 0, range = 0, $t1, $t2;
     if (!obj) {
@@ -234,6 +239,12 @@ async function precheck(mon, obj) {   // muse.c:59
 }
 /* when a monster zaps a wand give a message, deduct a charge, and if it
    isn't directly seen, remove hero's memory of the number of charges */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} self boolean
+ * @returns {Promise<void>}
+ */
 async function mzapwand(mtmp, otmp, self) {   // muse.c:165
     let range = 0;
     if (otmp.spe < 1) {
@@ -254,6 +265,12 @@ async function mzapwand(mtmp, otmp, self) {   // muse.c:165
     otmp.spe = $c.i8(otmp.spe - 1 | 0);
 }
 /* similar to mzapwand() but for magical horns (only instrument mons play) */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} self boolean
+ * @returns {Promise<void>}
+ */
 async function mplayhorn(mtmp, otmp, self) {   // muse.c:195
     let objnamp = null, objbuf = new Int8Array(256), range = 0;
     if (!canseemon(mtmp)) {
@@ -287,6 +304,11 @@ async function mplayhorn(mtmp, otmp, self) {   // muse.c:195
 }
 /* see or hear a monster reading a scroll;
    when scroll hasn't been seen, its label is revealed unless hero is deaf */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function mreadmsg(mtmp, otmp) {   // muse.c:238
     let onambuf = new Int8Array(256), vismon = 0, tpindicator = 0, blindbuf = new Int8Array(256), similar = 0, uniqmon = 0, recognize = 0, mflags = 0;
     vismon = $c.i8(canseemon(mtmp));
@@ -330,6 +352,11 @@ async function mreadmsg(mtmp, otmp) {   // muse.c:238
         await pline($c.lit("Being confused, %s mispronounces the magic words..."), vismon ? await mon_nam(mtmp) : genders[pronoun_gender(mtmp, PRONOUN.HALLU)].he);
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function mquaffmsg(mtmp, otmp) {   // muse.c:293
     if (canseemon(mtmp)) {
         await observe_object(otmp);
@@ -349,6 +376,10 @@ async function mquaffmsg(mtmp, otmp) {   // muse.c:293
  * were allowed to teleport at will you could never catch them.  Instead,
  * assume they only teleport at random times, despite the inconsistency
  * that if you polymorph into one you teleport at will.
+ */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number} boolean
  */
 function m_use_healing(mtmp) {   // muse.c:337
     let obj = null;
@@ -370,6 +401,10 @@ function m_use_healing(mtmp) {   // muse.c:337
     return FALSE;
 }
 /* return TRUE if monster mtmp can see at least one sleeping soldier */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number} boolean
+ */
 function m_sees_sleepy_soldier(mtmp) {   // muse.c:361
     let x = 0, y = 0, xx = 0, yy = 0, mon = null;
     x = mtmp.mx;
@@ -390,6 +425,13 @@ function m_sees_sleepy_soldier(mtmp) {   // muse.c:361
     }
     return FALSE;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} vismon boolean
+ * @param {number} oseen boolean
+ * @param {number} how int
+ * @returns {Promise<void>}
+ */
 async function m_tele(mtmp, vismon, oseen, how) {   // muse.c:384
     /* monst that might be teleported */
     /* can see it */
@@ -428,6 +470,10 @@ async function m_tele(mtmp, vismon, oseen, how) {   // muse.c:384
  * Called from find_defensive() where it is limited to Is_knox()
  * only, otherwise you could trap two monsters next to each other
  * in a boulder fort, and they would be happy to stay in there. */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number} boolean
+ */
 function m_next2m(mtmp) {   // muse.c:420
     let x = 0, y = 0, m2 = null;
     if (DEADMONSTER(mtmp) || mon_offmap(mtmp)) {
@@ -447,6 +493,11 @@ function m_next2m(mtmp) {   // muse.c:420
 }
 /* Select a defensive item/action for a monster.  Returns TRUE iff one is
    found. */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} tryescape boolean
+ * @returns {Promise<number>} boolean
+ */
 export async function find_defensive(mtmp, tryescape) {   // muse.c:441
     let obj = null, t = null, fraction = 0, x = 0, y = 0, stuck = 0, immobile = 0, stway = null, liztin = null, xx = 0, yy = 0, i = 0, locs = $c.matrix(Int16Array, [10, 2]), ignore_boulders = 0, diag_ok = 0, $t1, $t2;
     x = mtmp.mx;
@@ -753,6 +804,11 @@ export async function find_defensive(mtmp, tryescape) {   // muse.c:441
    accessible (trap doors and teleporters inside niches are located at
    secret corridor locations; convert such into normal corridor even if
    hero doesn't see it happen) */
+/**
+ * @param {$T.trap | null} t struct trap *
+ * @param {number} seeit boolean
+ * @returns {Promise<void>}
+ */
 async function reveal_trap(t, seeit) {   // muse.c:757
     let lev = null;
     lev = $c.relem(svl.level.locations[t.tx], t.ty);
@@ -774,6 +830,11 @@ async function reveal_trap(t, seeit) {   // muse.c:757
  * anything of interest unless there are more than 1
  * of him.
  */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} vismon boolean
+ * @returns {Promise<number>} int
+ */
 async function mon_escape(mtmp, vismon) {   // muse.c:780
     if (mon_has_special(mtmp) || mtmp.iswiz | 0 && svc.context.no_of_wizards < 2) {
         return 0;
@@ -787,6 +848,10 @@ async function mon_escape(mtmp, vismon) {   // muse.c:780
 /* Perform a defensive action for a monster.  Must be called immediately
  * after find_defensive().  Return values are 0: did something, 1: died,
  * 2: did something and can't attack again (i.e. teleported).
+ */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} int
  */
 export async function use_defensive(mtmp) {   // muse.c:796
     let i = 0, fleetim = 0, otmp = null, vis = 0, vismon = 0, oseen = 0, t = null, stway = null, obj_is_cursed = 0, nlev = 0, flev = new $T.d_level(), cc = new $T.nhcoord(), mon = null, pm = null, cc$2 = new $T.nhcoord(), pm$2 = null, fish = null, cnt = 0, mon$2 = null, known = 0, $t1, $t2;
@@ -1235,6 +1300,10 @@ export async function use_defensive(mtmp) {   // muse.c:796
     }
     return 0;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} int
+ */
 export async function rnd_defensive_item(mtmp) {   // muse.c:1222
     let pm = null, difficulty = 0, trycnt = 0;
     pm = mtmp.data;
@@ -1291,9 +1360,19 @@ export async function rnd_defensive_item(mtmp) {   // muse.c:1222
 /*#define MUSE_WAN_UNDEAD_TURNING 20*/
 /* also a defensive item so don't
 * redefine; nonconsecutive value is ok */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 function linedup_chk_corpse(x, y) {   // muse.c:1294
     return $c.i8(sobj_at(CORPSE, x, y) !== null ? 1 : 0);
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function m_use_undead_turning(mtmp, obj) {   // muse.c:1300
     let ax = 0, ay = 0, bx = 0, by = 0;
     ax = $c.i16(u.ux + Math.imul(sgn(mtmp.mux - mtmp.mx | 0), 3) | 0);
@@ -1334,6 +1413,10 @@ async function m_use_undead_turning(mtmp, obj) {   // muse.c:1300
     }
 }
 /* from monster's point of view, is hero behind a chokepoint? */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number} boolean
+ */
 function hero_behind_chokepoint(mtmp) {   // muse.c:1344
     let dx = 0, dy = 0, x = 0, y = 0, dir = 0, dir_l = 0, dir_r = 0, c1 = new $T.nhcoord(), c2 = new $T.nhcoord();
     dx = $c.i16(sgn(mtmp.mx - mtmp.mux | 0));
@@ -1353,6 +1436,10 @@ function hero_behind_chokepoint(mtmp) {   // muse.c:1344
     return FALSE;
 }
 /* hostile monster has another hostile next to it */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number} boolean
+ */
 function mon_has_friends(mtmp) {   // muse.c:1371
     let dx = 0, dy = 0, mon2 = null, x = 0, y = 0;
     if (mtmp.mtame || mtmp.mpeaceful | 0) {
@@ -1370,6 +1457,12 @@ function mon_has_friends(mtmp) {   // muse.c:1371
     return FALSE;
 }
 /* does monster like object pile at x,y? */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} boolean
+ */
 async function mon_likes_objpile_at(mtmp, x, y) {   // muse.c:1395
     let i = 0, otmp = null;
     if (!isok(x, y) || !OBJ_AT(x, y)) {
@@ -1390,6 +1483,10 @@ async function mon_likes_objpile_at(mtmp, x, y) {   // muse.c:1395
 }
 /* Select an offensive item/action for a monster.  Returns TRUE iff one is
  * found.
+ */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} boolean
  */
 export async function find_offensive(mtmp) {   // muse.c:1421
     let obj = null, mtmp_helmet = null, reflection_skip = 0;
@@ -1557,6 +1654,11 @@ export async function find_offensive(mtmp) {   // muse.c:1421
     }
     return $c.i8(!!gm.m.has_offense ? 1 : 0);
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} int
+ */
 async function mbhitm(mtmp, otmp) {   // muse.c:1597
     let tmp = 0, reveal_invis = 0, learnit = 0, hits_you = 0, wake = 0;
     reveal_invis = FALSE;
@@ -1667,6 +1769,13 @@ async function mbhitm(mtmp, otmp) {   // muse.c:1597
     return 0;
 }
 /* hit all objects at x,y with fhito function */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} tx coordxy
+ * @param {number} ty coordxy
+ * @param {Function | null} fhito int (*)(struct obj *, struct obj *)
+ * @returns {Promise<number>} boolean
+ */
 async function fhito_loc(obj, tx, ty, fhito) {   // muse.c:1707
     let otmp = null, next_obj = null, hitanything = 0;
     hitanything = 0;
@@ -1686,6 +1795,14 @@ async function fhito_loc(obj, tx, ty, fhito) {   // muse.c:1707
  * buzz(), bhit() doesn't take into account the possibility of a monster
  * zapping you, so we need a special function for it.  (Unless someone wants
  * to merge the two functions...)
+ */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} range int
+ * @param {Function | null} fhitm int (*)(struct monst *, struct obj *)
+ * @param {Function | null} fhito int (*)(struct obj *, struct obj *)
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
  */
 async function mbhit(mon, range, fhitm, fhito, obj) {   // muse.c:1734
     let mtmp = null, ltyp = 0, ddx = 0, ddy = 0, otyp = 0, x = 0, y = 0, dbx = Int16Array.of(0), dby = Int16Array.of(0), $t1;
@@ -1759,11 +1876,24 @@ async function mbhit(mon, range, fhitm, fhito, obj) {   // muse.c:1734
         }
     }
 }
+/**
+ * @param {number} type int
+ * @param {number} nd int
+ * @param {number} sx coordxy
+ * @param {number} sy coordxy
+ * @param {number} dx int
+ * @param {number} dy int
+ * @returns {Promise<void>}
+ */
 async function buzz_force_miss(type, nd, sx, sy, dx, dy) {   // muse.c:1815
     await dobuzz(type, nd, sx, sy, dx, dy, TRUE, FALSE, TRUE);
 }
 /* Perform an offensive action for a monster.  Must be called immediately
  * after find_offensive().  Return values are same as use_defensive().
+ */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} int
  */
 export async function use_offensive(mtmp) {   // muse.c:1824
     let i = 0, otmp = null, oseen = 0, buzzfn = null, x = 0, y = 0, confused = 0, mmx = 0, mmy = 0, is_cursed = 0, is_blessed = 0;
@@ -1909,6 +2039,10 @@ export async function use_offensive(mtmp) {   // muse.c:1824
     }
     return 0;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} int
+ */
 export async function rnd_offensive_item(mtmp) {   // muse.c:2035
     let pm = null, difficulty = 0, mtmp_helmet = null;
     pm = mtmp.data;
@@ -1955,6 +2089,10 @@ export async function rnd_offensive_item(mtmp) {   // muse.c:2035
     /*NOTREACHED*/
     return 0;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} boolean
+ */
 export async function find_misc(mtmp) {   // muse.c:2095
     let obj = null, mdat = null, x = 0, y = 0, t = null, xx = 0, yy = 0, pmidx = 0, immobile = 0, stuck = 0, ignore_boulders = 0, diag_ok = 0;
     mdat = mtmp.data;
@@ -2097,6 +2235,10 @@ export async function find_misc(mtmp) {   // muse.c:2095
 }
 /* type of monster to polymorph into; defaults to one suitable for the
    current level rather than the totally arbitrary choice of newcham() */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<$T.permonst | null>} struct permonst *
+ */
 async function muse_newcham_mon(mon) {   // muse.c:2250
     let m_armr = null;
     if ((m_armr = await which_armor(mon, W.ARM)) !== null) {
@@ -2108,6 +2250,12 @@ async function muse_newcham_mon(mon) {   // muse.c:2250
     }
     return await rndmonst();
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} container struct obj *
+ * @param {number} vismon boolean
+ * @returns {Promise<number>} int
+ */
 async function mloot_container(mon, container, vismon) {   // muse.c:2264
     let contnr_nam = new Int8Array(256), mpronounbuf = new Int8Array(20), nearby = 0, takeout_indx = 0, takeout_count = 0, howfar = 0, res = 0, xobj = null, nitems = 0, already_nomerge = 0, just_xobj = 0, $t1, $t2;
     res = 0;
@@ -2226,6 +2374,10 @@ async function mloot_container(mon, container, vismon) {   // muse.c:2264
     }   /* takeout_count */
     return res;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} int
+ */
 export async function use_misc(mtmp) {   // muse.c:2383
     let nambuf = new Int8Array(256), vis = 0, vismon = 0, vistrapspot = 0, oseen = 0, i = 0, t = null, otmp = null, tolev = 0, tolevel = new $T.d_level(), The_whip = null, where_to = 0, obj = null, hand = null, the_weapon = new Int8Array(256), hand_buf = new Int8Array(256), $goto = null;
     otmp = gm.m.misc;
@@ -2473,6 +2625,10 @@ export async function use_misc(mtmp) {   // muse.c:2383
     }
     return 0;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 async function you_aggravate(mtmp) {   // muse.c:2631
     await pline($c.lit("For some reason, %s presence is known to you."), s_suffix(await noit_mon_nam(mtmp)));
     await cls();
@@ -2491,6 +2647,10 @@ async function you_aggravate(mtmp) {   // muse.c:2631
         await map_invisible(mtmp.mx, mtmp.my);
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number} int
+ */
 export function rnd_misc_item(mtmp) {   // muse.c:2654
     let pm = null, difficulty = 0;
     pm = mtmp.data;
@@ -2526,6 +2686,11 @@ export function rnd_misc_item(mtmp) {   // muse.c:2654
     return 0;
 }
 /* check whether hero is carrying a corpse or contained petrifier corpse */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} boolean
+ */
 export async function searches_for_item(mon, obj) {   // muse.c:2706
     let typ = 0;
     typ = obj.otyp;
@@ -2611,6 +2776,11 @@ export async function searches_for_item(mon, obj) {   // muse.c:2706
     }
     return FALSE;
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$c.Ptr | null} str const char *
+ * @returns {Promise<number>} boolean
+ */
 export async function mon_reflects(mon, str) {   // muse.c:2797
     let orefl = null;
     orefl = await which_armor(mon, W.ARMS);
@@ -2646,6 +2816,11 @@ export async function mon_reflects(mon, str) {   // muse.c:2797
     }
     return FALSE;
 }
+/**
+ * @param {$c.Ptr | null} fmt const char *
+ * @param {$c.Ptr | null} str const char *
+ * @returns {Promise<number>} boolean
+ */
 export async function ureflects(fmt, str) {   // muse.c:2836
     /* Check from outermost to innermost objects */
     if ($c.and64(u.uprops[REFLECTING].extrinsic, W.ARMS)) {
@@ -2680,6 +2855,11 @@ export async function ureflects(fmt, str) {   // muse.c:2836
     return FALSE;
 }
 /* cure mon's blindness (use_defensive, dog_eat, meatobj) */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} verbos boolean
+ * @returns {Promise<void>}
+ */
 export async function mcureblindness(mon, verbos) {   // muse.c:2872
     if (!mon.mcansee) {
         mon.mcansee = (1) & 1;
@@ -2690,6 +2870,11 @@ export async function mcureblindness(mon, verbos) {   // muse.c:2872
     }
 }
 /* TRUE if the monster ate something */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} by_you boolean
+ * @returns {Promise<number>} boolean
+ */
 export async function munstone(mon, by_you) {   // muse.c:2884
     let obj = null, tinok = 0;
     if (await resists_ston(mon)) {
@@ -2708,6 +2893,13 @@ export async function munstone(mon, by_you) {   // muse.c:2884
     }
     return FALSE;
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} by_you boolean
+ * @param {number} stoning boolean
+ * @returns {Promise<void>}
+ */
 async function mon_consume_unstone(mon, obj, by_you, stoning) {   // muse.c:2906
     let vis = 0, tinned = 0, food = 0, acid = 0, lizard = 0, nutrit = 0, save_quan = 0, edog = null, $t1;
     /* T: stop petrification, F: cure stun && confusion */
@@ -2777,6 +2969,12 @@ async function mon_consume_unstone(mon, obj, by_you, stoning) {   // muse.c:2906
     mon.mlstmv = svm.moves;
 }
 /* decide whether obj can cure petrification; also used when picking up */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} tinok boolean
+ * @returns {number} boolean
+ */
 function cures_stoning(mon, obj, tinok) {   // muse.c:2985
     if (obj.otyp === POT_ACID) {
         return TRUE;
@@ -2793,6 +2991,10 @@ function cures_stoning(mon, obj, tinok) {   // muse.c:2985
     }
     return $c.i8(obj.corpsenm === PM.LIZARD || acidic($c.relem(mons, obj.corpsenm)) ? 1 : 0);
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {number} boolean
+ */
 function mcould_eat_tin(mon) {   // muse.c:3001
     let obj = null, mwep = null, welded_wep = 0;
     /* monkeys who manage to steal tins can't open and eat them
@@ -2816,6 +3018,11 @@ function mcould_eat_tin(mon) {   // muse.c:3001
     return FALSE;
 }
 /* TRUE if monster does something to avoid turning into green slime */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} by_you boolean
+ * @returns {Promise<number>} boolean
+ */
 export async function munslime(mon, by_you) {   // muse.c:3031
     let obj = null, odummy = new $T.obj(), mptr = null, t = null, xy = $c.matrix(Int16Array, [2, 8]), x = 0, y = 0, idx = 0, ridx = 0, nxy = 0;
     mptr = mon.data;
@@ -2880,6 +3087,13 @@ export async function munslime(mon, by_you) {   // muse.c:3031
     return FALSE;
 }
 /* mon uses an item--selected by caller--to burn away incipient slime */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$T.trap | null} trap struct trap *
+ * @param {number} by_you boolean
+ * @returns {Promise<number>} boolean
+ */
 async function muse_unslime(mon, obj, trap, by_you) {   // muse.c:3104
     let odummyp = [null], otyp = 0, dmg = 0, vis = 0, res = 0, Mnam = null, Pronoun = new Int8Array(40), was_lit = 0, saw_lit = 0, $t1;
     /* true: if mon kills itself, hero gets credit/blame */
@@ -3021,6 +3235,11 @@ async function muse_unslime(mon, obj, trap, by_you) {   // muse.c:3104
     return res;
 }
 /* decide whether obj can be used to cure green slime */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 function cures_sliming(mon, obj) {   // muse.c:3246
     /* scroll of fire */
     if (obj.otyp === SCR_FIRE) {
@@ -3039,6 +3258,10 @@ function cures_sliming(mon, obj) {   // muse.c:3246
    seem plausibly green (which didn't necessarily match the categorization
    by the color of the text).
    iflags.use_color is not meant for game behavior decisions */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {number} boolean
+ */
 function green_mon(mon) {   // muse.c:3269
     let ptr = null;
     ptr = mon.data;

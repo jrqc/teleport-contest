@@ -37,6 +37,10 @@ import { luaL_argerror, luaL_checkany, luaL_checkinteger, luaL_checklstring, lua
 const luaB_collectgarbage$opts = $h.data(88, 8);   // static in luaB_collectgarbage()
 const luaB_collectgarbage$optsnum = $h.data(40, 4);   // static in luaB_collectgarbage()
 const base_funcs = $h.data(416, 8);
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function luaB_print(L) {   // lbaselib.c:24
     let n = 0, i = 0, s = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
@@ -60,6 +64,10 @@ async function luaB_print(L) {   // lbaselib.c:24
 ** Check first for errors; otherwise an error may interrupt
 ** the composition of a warning, leaving it unfinished.
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function luaB_warn(L) {   // lbaselib.c:45
     let n = 0, i = 0;
     n = lua_gettop(L);   /* number of arguments */
@@ -73,6 +81,12 @@ async function luaB_warn(L) {   // lbaselib.c:45
     lua_warning(L, await lua_tolstring(L, n, 0), 0);   /* close warning */
     return 0;
 }
+/**
+ * @param {number} s const char *
+ * @param {number} base int
+ * @param {number} pn lua_Integer *
+ * @returns {number} const char *
+ */
 function b_str2int(s, base, pn) {   // lbaselib.c:60
     let n = 0, neg = 0, digit = 0;
     n = 0;
@@ -100,6 +114,10 @@ function b_str2int(s, base, pn) {   // lbaselib.c:60
     $h.st64(pn, $c.i64(neg ? $c.subu64(0, n) : n));
     return s;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function luaB_tonumber(L) {   // lbaselib.c:81
     let s = 0, s$2 = 0, base = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(24);
@@ -133,6 +151,10 @@ async function luaB_tonumber(L) {   // lbaselib.c:81
         return 1;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function luaB_error(L) {   // lbaselib.c:114
     let level = 0;
     level = $c.i32(await luaL_optinteger(L, 2, 1));
@@ -144,6 +166,10 @@ async function luaB_error(L) {   // lbaselib.c:114
     }
     return await lua_error(L);
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function luaB_getmetatable(L) {   // lbaselib.c:126
     await luaL_checkany(L, 1);
     if (!lua_getmetatable(L, 1)) {
@@ -153,6 +179,10 @@ async function luaB_getmetatable(L) {   // lbaselib.c:126
     await luaL_getmetafield(L, 1, $h.lit("__metatable"));
     return 1;   /* returns either __metatable field (if present) or metatable */
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function luaB_setmetatable(L) {   // lbaselib.c:137
     let t = 0;
     t = lua_type(L, 2);
@@ -165,12 +195,20 @@ async function luaB_setmetatable(L) {   // lbaselib.c:137
     await lua_setmetatable(L, 1);
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function luaB_rawequal(L) {   // lbaselib.c:149
     await luaL_checkany(L, 1);
     await luaL_checkany(L, 2);
     lua_pushboolean(L, await lua_rawequal(L, 1, 2));
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function luaB_rawlen(L) {   // lbaselib.c:157
     let t = 0;
     t = lua_type(L, 1);
@@ -178,6 +216,10 @@ async function luaB_rawlen(L) {   // lbaselib.c:157
     lua_pushinteger(L, $c.i64(lua_rawlen(L, 1)));
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function luaB_rawget(L) {   // lbaselib.c:166
     await luaL_checktype(L, 1, 5);
     await luaL_checkany(L, 2);
@@ -185,6 +227,10 @@ async function luaB_rawget(L) {   // lbaselib.c:166
     lua_rawget(L, 1);
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function luaB_rawset(L) {   // lbaselib.c:174
     await luaL_checktype(L, 1, 5);
     await luaL_checkany(L, 2);
@@ -193,6 +239,11 @@ async function luaB_rawset(L) {   // lbaselib.c:174
     await lua_rawset(L, 1);
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} oldmode int
+ * @returns {Promise<number>} int
+ */
 async function pushmode(L, oldmode) {   // lbaselib.c:184
     if (oldmode === -1) {
         lua_pushnil(L);   /* invalid call to 'lua_gc' */
@@ -204,6 +255,10 @@ async function pushmode(L, oldmode) {   // lbaselib.c:184
 /*
 ** check whether call to 'lua_gc' was valid (not inside a finalizer)
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function luaB_collectgarbage(L) {   // lbaselib.c:199
     let o = 0, k = 0, b = 0, step = 0, res = 0, p = 0, previous = 0, res$2 = 0, minormul = 0, majormul = 0, pause = 0, stepmul = 0, stepsize = 0, res$3 = 0;
     o = $h.i32[(luaB_collectgarbage$optsnum + await luaL_checkoption(L, 1, $h.lit("collect"), luaB_collectgarbage$opts) * 4) >>> 2];
@@ -284,6 +339,10 @@ async function luaB_collectgarbage(L) {   // lbaselib.c:199
     lua_pushnil(L);   /* invalid call (inside a finalizer) */
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function luaB_type(L) {   // lbaselib.c:259
     let t = 0;
     t = lua_type(L, 1);
@@ -291,6 +350,10 @@ async function luaB_type(L) {   // lbaselib.c:259
     await lua_pushstring(L, lua_typename(L, t));
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function luaB_next(L) {   // lbaselib.c:267
     await luaL_checktype(L, 1, 5);
     await lua_settop(L, 2);   /* create a 2nd argument if there isn't one */
@@ -301,12 +364,22 @@ async function luaB_next(L) {   // lbaselib.c:267
         return 1;
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} status int
+ * @param {number | bigint} k lua_KContext
+ * @returns {number} int
+ */
 function pairscont(L, status, k) {   // lbaselib.c:279
     L;
     status;
     k;   /* unused */
     return 3;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function luaB_pairs(L) {   // lbaselib.c:284
     await luaL_checkany(L, 1);
     if (await luaL_getmetafield(L, 1, $h.lit("__pairs")) === 0) {
@@ -323,6 +396,10 @@ async function luaB_pairs(L) {   // lbaselib.c:284
 /*
 ** Traversal function for 'ipairs'
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function ipairsaux(L) {   // lbaselib.c:302
     let i = 0;
     i = await luaL_checkinteger(L, 2);
@@ -334,6 +411,10 @@ async function ipairsaux(L) {   // lbaselib.c:302
 ** 'ipairs' function. Returns 'ipairsaux', given "table", 0.
 ** (The given "table" may not be a table.)
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function luaB_ipairs(L) {   // lbaselib.c:314
     await luaL_checkany(L, 1);
     await lua_pushcclosure(L, $h.fn(ipairsaux), 0);   /* iteration function */
@@ -341,6 +422,12 @@ async function luaB_ipairs(L) {   // lbaselib.c:314
     lua_pushinteger(L, 0);   /* initial value */
     return 3;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} status int
+ * @param {number} envidx int
+ * @returns {Promise<number>} int
+ */
 async function load_aux(L, status, envidx) {   // lbaselib.c:323
     if ((status === 0 ? 1 : 0) !== 0 ? 1 : 0) {
         if (envidx !== 0) {
@@ -358,6 +445,10 @@ async function load_aux(L, status, envidx) {   // lbaselib.c:323
         return 2;   /* return fail plus error message */
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function luaB_loadfile(L) {   // lbaselib.c:340
     let fname = 0, mode = 0, env = 0, status = 0;
     fname = await luaL_optlstring(L, 1, 0, 0);
@@ -382,6 +473,12 @@ async function luaB_loadfile(L) {   // lbaselib.c:340
 ** stack top. Instead, it keeps its resulting string in a
 ** reserved slot inside the stack.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} ud void *
+ * @param {number} size size_t *
+ * @returns {Promise<number>} const char *
+ */
 async function generic_reader(L, ud, size) {   // lbaselib.c:370
     ud;   /* not used */
     await luaL_checkstack(L, 2, $h.lit("too many nested functions"));
@@ -397,6 +494,10 @@ async function generic_reader(L, ud, size) {   // lbaselib.c:370
     lua_copy(L, -1, 5), await lua_settop(L, -2);   /* save string in reserved slot */
     return await lua_tolstring(L, 5, size);
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function luaB_load(L) {   // lbaselib.c:387
     let status = 0, s = 0, mode = 0, env = 0, chunkname = 0, chunkname$2 = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
@@ -419,11 +520,21 @@ async function luaB_load(L) {   // lbaselib.c:387
     } finally { $h.st.sp = $sp0; }
 }
 /* }====================================================== */
+/**
+ * @param {number} L lua_State *
+ * @param {number} d1 int
+ * @param {number | bigint} d2 lua_KContext
+ * @returns {number} int
+ */
 function dofilecont(L, d1, d2) {   // lbaselib.c:409
     d1;
     d2;   /* only to match 'lua_Kfunction' prototype */
     return lua_gettop(L) - 1 | 0;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function luaB_dofile(L) {   // lbaselib.c:415
     let fname = 0;
     fname = await luaL_optlstring(L, 1, 0, 0);
@@ -434,6 +545,10 @@ async function luaB_dofile(L) {   // lbaselib.c:415
     await lua_callk(L, 0, -1, 0, $h.fn(dofilecont));
     return dofilecont(L, 0, 0);
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function luaB_assert(L) {   // lbaselib.c:425
     if (lua_toboolean(L, 1) !== 0 ? 1 : 0) {   /* condition is true? */
         return lua_gettop(L);   /* return all arguments */
@@ -446,6 +561,10 @@ async function luaB_assert(L) {   // lbaselib.c:425
         return await luaB_error(L);   /* call 'error' */
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function luaB_select(L) {   // lbaselib.c:438
     let n = 0, i = 0;
     n = lua_gettop(L);
@@ -470,6 +589,12 @@ async function luaB_select(L) {   // lbaselib.c:438
 ** 'extra' values (where 'extra' is exactly the number of items to be
 ** ignored).
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} status int
+ * @param {number | bigint} extra lua_KContext
+ * @returns {number} int
+ */
 function finishpcall(L, status, extra) {   // lbaselib.c:461
     if ((status !== 0 && status !== 1 ? 1 : 0) !== 0 ? 1 : 0) {
         /* error? */
@@ -480,6 +605,10 @@ function finishpcall(L, status, extra) {   // lbaselib.c:461
         return lua_gettop(L) - $c.i32(extra) | 0;   /* return all results */
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function luaB_pcall(L) {   // lbaselib.c:472
     let status = 0;
     await luaL_checkany(L, 1);
@@ -493,6 +622,10 @@ async function luaB_pcall(L) {   // lbaselib.c:472
 ** stack will have <f, err, true, f, [args...]>; so, the function passes
 ** 2 to 'finishpcall' to skip the 2 first values when returning results.
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function luaB_xpcall(L) {   // lbaselib.c:487
     let status = 0, n = 0;
     n = lua_gettop(L);
@@ -503,11 +636,19 @@ async function luaB_xpcall(L) {   // lbaselib.c:487
     status = await lua_pcallk(L, n - 2 | 0, -1, 2, 2, $h.fn(finishpcall));
     return finishpcall(L, status, 2);
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function luaB_tostring(L) {   // lbaselib.c:499
     await luaL_checkany(L, 1);
     await luaL_tolstring(L, 1, 0);
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 export async function luaopen_base(L) {   // lbaselib.c:537
     /* open lib into global table */
     lua_rawgeti(L, -1001000, 2);

@@ -76,6 +76,9 @@ const init_dungeon_branches$brdirstr2i = new Int32Array(3);   // static in init_
 const init_dungeon_branches$brtypes = $c.nulls(5);   // static in init_dungeon_branches()
 const init_dungeon_branches$brtypes2i = new Int32Array(5);   // static in init_dungeon_branches()
 const level_map = $c.recArray($T.level_map, 27);
+/**
+ * @returns {Promise<void>}
+ */
 async function dumpit() {   // dungeon.c:91
     let i = 0, x = null, br = null;
     if (!debugcore($c.lit("dungeon.c"), FALSE)) {
@@ -105,6 +108,12 @@ async function dumpit() {   // dungeon.c:91
     return;
 }
 /* Save the dungeon structures. */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @param {number} perform_write boolean
+ * @param {number} free_data boolean
+ * @returns {Promise<void>}
+ */
 export async function save_dungeon(nhfp, perform_write, free_data) {   // dungeon.c:149
     let i = 0, count = Int32Array.of(0), curr = null, next = null, curr_ms = null, next_ms = null;
     if (perform_write) {
@@ -156,6 +165,10 @@ export async function save_dungeon(nhfp, perform_write, free_data) {   // dungeo
 }
 /* !SFCTOOL */
 /* Restore the dungeon structures. */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 export async function restore_dungeon(nhfp) {   // dungeon.c:211
     let curr = null, last = null, count = Int32Array.of(0), i = 0, curr_ms = null, last_ms = null;
     count[0] = 0;
@@ -199,6 +212,10 @@ export async function restore_dungeon(nhfp) {   // dungeon.c:211
         last_ms = curr_ms;
     }
 }
+/**
+ * @param {$c.Ptr | null} s const char *
+ * @returns {Promise<number>} xint16
+ */
 async function dname_to_dnum(s) {   // dungeon.c:284
     let i = 0;
     for (i = 0; i < svn.n_dgns; i = $c.i16(i + 1)) {
@@ -210,6 +227,10 @@ async function dname_to_dnum(s) {   // dungeon.c:284
     /*NOT REACHED*/
     return 0;
 }
+/**
+ * @param {$c.Ptr | null} s const char *
+ * @returns {$T.s_level | null} s_level *
+ */
 export function find_level(s) {   // dungeon.c:300
     let curr = null;
     for (curr = svs.sp_levchn; curr; curr = curr.next) {
@@ -220,6 +241,11 @@ export function find_level(s) {   // dungeon.c:300
     return curr;
 }
 /* Find the branch that links the named dungeon. */
+/**
+ * @param {$c.Ptr | null} s const char *
+ * @param {$T.proto_dungeon | null} pd struct proto_dungeon *
+ * @returns {Promise<number>} int
+ */
 async function find_branch(s, pd) {   // dungeon.c:311
     let i = 0, br = null, dnam = null;
     /* dungeon name */
@@ -248,6 +274,11 @@ async function find_branch(s, pd) {   // dungeon.c:311
  * Find the "parent" by searching the prototype branch list for the branch
  * listing, then figuring out to which dungeon it belongs.
  */
+/**
+ * @param {$c.Ptr | null} s const char *
+ * @param {$T.proto_dungeon | null} pd struct proto_dungeon *
+ * @returns {Promise<number>} xint16
+ */
 async function parent_dnum(s, pd) {   // dungeon.c:346
     let i = 0, pdnum = 0;
     /* dungeon name */
@@ -274,6 +305,15 @@ async function parent_dnum(s, pd) {   // dungeon.c:346
  *       in dgn_comp.y.  The acouple [absolute couple] section says that
  *       a negative random component means from the (adjusted) base to the
  *       end of the dungeon.
+ */
+/**
+ * @param {number} dgn xint16
+ * @param {number} base int
+ * @param {number} randc int
+ * @param {number} chain int
+ * @param {$T.proto_dungeon | null} pd struct proto_dungeon *
+ * @param {*} adjusted_base int *
+ * @returns {Promise<number>} int
  */
 async function level_range(dgn, base, randc, chain, pd, adjusted_base) {   // dungeon.c:380
     let lmax = 0, levtmp = null;
@@ -305,6 +345,11 @@ async function level_range(dgn, base, randc, chain, pd, adjusted_base) {   // du
     }   /* else only one choice */
     return 1;
 }
+/**
+ * @param {$c.Ptr | null} s const char *
+ * @param {$T.proto_dungeon | null} pd struct proto_dungeon *
+ * @returns {Promise<number>} xint16
+ */
 async function parent_dlevel(s, pd) {   // dungeon.c:415
     let i = 0, j = 0, num = 0, base = Int32Array.of(0), dnum = 0, curr = null;
     dnum = await parent_dnum(s, pd);
@@ -325,6 +370,10 @@ async function parent_dlevel(s, pd) {   // dungeon.c:415
     return $c.i16(base[0] + i | 0);
 }
 /* Convert from the temporary branch type to the dungeon branch type. */
+/**
+ * @param {$T.tmpbranch | null} tbr struct tmpbranch *
+ * @returns {Promise<number>} int
+ */
 async function correct_branch_type(tbr) {   // dungeon.c:440
     switch (tbr.type) {
         case TBR.STAIR:
@@ -344,6 +393,11 @@ async function correct_branch_type(tbr) {   // dungeon.c:440
  * by end1 dungeon and level followed by end2 dungeon and level.  If
  * extract_first is true, then the branch is already part of the list
  * but needs to be repositioned.
+ */
+/**
+ * @param {$T.branch | null} new_branch branch *
+ * @param {number} extract_first boolean
+ * @returns {Promise<void>}
  */
 export async function insert_branch(new_branch, extract_first) {   // dungeon.c:463
     let curr = null, prev = null, new_val = 0, curr_val = 0, prev_val = 0;
@@ -385,6 +439,12 @@ export async function insert_branch(new_branch, extract_first) {   // dungeon.c:
     }
 }
 /* Add a dungeon branch to the branch list. */
+/**
+ * @param {number} dgn int
+ * @param {number} child_entry_level int
+ * @param {$T.proto_dungeon | null} pd struct proto_dungeon *
+ * @returns {Promise<$T.branch | null>} branch *
+ */
 async function add_branch(dgn, child_entry_level, pd) {   // dungeon.c:514
     let branch_num = 0, new_branch = null, $t1, $t2, $t3, $t4, $t5;
     branch_num = await find_branch(new $c.Ptr(svd.dungeons[dgn].dname, 0), pd);
@@ -407,6 +467,9 @@ async function add_branch(dgn, child_entry_level, pd) {   // dungeon.c:514
  * level that has a dungeon number less than the dungeon number of the
  * last entry.
  */
+/**
+ * @param {$T.s_level | null} new_lev s_level *
+ */
 function add_level(new_lev) {   // dungeon.c:545
     let prev = null, curr = null;
     prev = null;
@@ -424,6 +487,12 @@ function add_level(new_lev) {   // dungeon.c:545
         prev.next = new_lev;
     }
 }
+/**
+ * @param {number} dgn int
+ * @param {number} proto_index int
+ * @param {$T.proto_dungeon | null} pd struct proto_dungeon *
+ * @returns {Promise<void>}
+ */
 async function init_level(dgn, proto_index, pd) {   // dungeon.c:566
     let new_level = null, tlevel = null, $t1;
     tlevel = $c.relem(pd.tmplevel, proto_index);
@@ -449,6 +518,12 @@ async function init_level(dgn, proto_index, pd) {   // dungeon.c:566
     new_level.rndlevs = $c.u8(tlevel.rndlevs);
     new_level.next = null;
 }
+/**
+ * @param {number} idx int
+ * @param {$c.Ptr | null} map boolean *
+ * @param {$T.proto_dungeon | null} pd struct proto_dungeon *
+ * @returns {Promise<number>} int
+ */
 async function possible_places(idx, map, pd) {   // dungeon.c:598
     let i = 0, start = Int32Array.of(0), count = 0, lev = null;
     /* prototype index */
@@ -473,6 +548,11 @@ async function possible_places(idx, map, pd) {   // dungeon.c:598
     return count;
 }
 /* Pick the nth TRUE entry in the given boolean array. */
+/**
+ * @param {$c.Ptr | null} map boolean *
+ * @param {number} nth int
+ * @returns {Promise<number>} xint16
+ */
 async function pick_level(map, nth) {   // dungeon.c:632
     let i = 0, $t1;
     /* an array MAXLEVEL+1 in size */
@@ -491,6 +571,11 @@ async function pick_level(map, nth) {   // dungeon.c:632
  * successful, we're done.  Otherwise, try another (and another) until
  * all possible places have been tried.  If all possible places have
  * been exhausted, return false.
+ */
+/**
+ * @param {number} proto_index int
+ * @param {$T.proto_dungeon | null} pd struct proto_dungeon *
+ * @returns {Promise<number>} boolean
  */
 async function place_level(proto_index, pd) {   // dungeon.c:666
     let map = new Int8Array(33), lev = null, npossible = 0, $t1;
@@ -513,6 +598,10 @@ async function place_level(proto_index, pd) {   // dungeon.c:666
     }
     return FALSE;
 }
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function get_dgn_flags(L) {   // dungeon.c:744
     let dgn_flags = 0, f = 0, nflags = 0;
     dgn_flags = 0;
@@ -539,11 +628,21 @@ async function get_dgn_flags(L) {   // dungeon.c:744
     await lua_settop(L, -2);
     return dgn_flags;
 }
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function get_dgn_align(L) {   // dungeon.c:781
     let a = 0;
     a = get_dgn_align$dgnaligns2i[await get_table_option(L, $c.lit("alignment"), $c.lit("unaligned"), new $c.Ptr(get_dgn_align$dgnaligns, 0))];
     return a;
 }
+/**
+ * @param {*} L lua_State *
+ * @param {$T.proto_dungeon | null} pd struct proto_dungeon *
+ * @param {number} dngidx int
+ * @returns {Promise<void>}
+ */
 async function init_dungeon_levels(L, pd, dngidx) {   // dungeon.c:797
     let lvl_name = null, lvl_bonetag = null, lvl_chain = null, lvl_base = 0, lvl_range = 0, lvl_nlevels = 0, lvl_chance = 0, lvl_align = 0, lvl_flags = 0, tmpl = null, bi = 0, f = 0, nlevels = 0, save_plnmsg = 0, save_plnmsg$2 = 0, save_plnmsg$3 = 0;
     await lua_len(L, -1);
@@ -620,6 +719,12 @@ async function init_dungeon_levels(L, pd, dngidx) {   // dungeon.c:797
         await panic($c.lit("init_dungeon: too many special levels"));
     }
 }
+/**
+ * @param {*} L lua_State *
+ * @param {$T.proto_dungeon | null} pd struct proto_dungeon *
+ * @param {number} dngidx int
+ * @returns {Promise<void>}
+ */
 async function init_dungeon_branches(L, pd, dngidx) {   // dungeon.c:867
     let br_name = null, br_chain = null, br_base = 0, br_range = 0, br_type = 0, br_up = 0, tmpb = null, bi = 0, f = 0, nbranches = 0, save_plnmsg = 0, save_plnmsg$2 = 0;
     await lua_len(L, -1);
@@ -679,6 +784,10 @@ async function init_dungeon_branches(L, pd, dngidx) {   // dungeon.c:867
         await panic($c.lit("init_dungeon: too many branches"));
     }
 }
+/**
+ * @param {$T.proto_dungeon | null} pd struct proto_dungeon *
+ * @param {number} dngidx int
+ */
 function init_dungeon_set_entry(pd, dngidx) {   // dungeon.c:933
     let dgn_entry = 0;
     dgn_entry = pd.tmpdungeon[dngidx].entry_lev;
@@ -706,6 +815,11 @@ function init_dungeon_set_entry(pd, dngidx) {   // dungeon.c:933
         svd.dungeons[dngidx].entry_lev = 1;   /* defaults to top level */
     }
 }
+/**
+ * @param {$T.proto_dungeon | null} pd struct proto_dungeon *
+ * @param {number} dngidx int
+ * @returns {Promise<void>}
+ */
 async function init_dungeon_set_depth(pd, dngidx) {   // dungeon.c:960
     let br = null, from_depth = 0, from_up = 0;
     br = await add_branch(dngidx, svd.dungeons[dngidx].entry_lev, pd);
@@ -733,6 +847,12 @@ async function init_dungeon_set_depth(pd, dngidx) {   // dungeon.c:960
      */
     svd.dungeons[dngidx].depth_start = (from_depth + (br.type === BR.PORTAL ? 0 : from_up ? -1 : 1) | 0) - (svd.dungeons[dngidx].entry_lev - 1 | 0) | 0;
 }
+/**
+ * @param {*} L lua_State *
+ * @param {$T.proto_dungeon | null} pd struct proto_dungeon *
+ * @param {number} dngidx int
+ * @returns {Promise<number>} boolean
+ */
 async function init_dungeon_dungeons(L, pd, dngidx) {   // dungeon.c:997
     let dgn_name = null, dgn_bonetag = null, dgn_protoname = null, dgn_fill = null, dgn_themerms = null, dgn_base = 0, dgn_range = 0, dgn_align = 0, dgn_entry = 0, dgn_chance = 0, dgn_flags = 0, save_plnmsg = 0, save_plnmsg$2 = 0, $t1;
     dgn_name = await get_table_str(L, $c.lit("name"));
@@ -847,6 +967,9 @@ function init_castle_tune() {   // dungeon.c:1111
     svt.tune[5] = 0;
 }
 /* fix up the special level names and locations for quick access */
+/**
+ * @returns {Promise<void>}
+ */
 async function fixup_level_locations() {   // dungeon.c:1122
     let i = 0, x = null, lev_map = null, br = null, $t1, $t2, $t3, $t4, $t5;
     /*
@@ -903,6 +1026,9 @@ async function fixup_level_locations() {   // dungeon.c:1122
            so that it's hidden from '#wizwhere' feedback. */
     }
 }
+/**
+ * @param {$T.proto_dungeon | null} pd struct proto_dungeon *
+ */
 function free_proto_dungeon(pd) {   // dungeon.c:1185
     let i = 0;
     for (i = 0; i < pd.n_brs; i = i + 1 | 0) {
@@ -920,6 +1046,9 @@ function free_proto_dungeon(pd) {   // dungeon.c:1185
     }
 }
 /* initialize the "dungeon" structs */
+/**
+ * @returns {Promise<void>}
+ */
 export async function init_dungeons() {   // dungeon.c:1205
     let L = null, i = 0, cl = 0, pd = new $T.proto_dungeon(), tidx = 0, sbi = new $T.nhl_sandbox_info(), tbuf = new Int8Array(256), save_plnmsg = 0, $t1, $t2;
     cl = 0;
@@ -1008,14 +1137,26 @@ export async function init_dungeons() {   // dungeon.c:1205
     await dumpit();
 }
 /* return the level number for lev in *this* dungeon */
+/**
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {number} xint16
+ */
 export function dunlev(lev) {   // dungeon.c:1325
     return lev.dlevel;
 }
 /* return the lowest level number for *this* dungeon */
+/**
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {number} xint16
+ */
 export function dunlevs_in_dungeon(lev) {   // dungeon.c:1332
     return svd.dungeons[lev.dnum].num_dunlevs;
 }
 /* return the lowest level explored in the game*/
+/**
+ * @param {number} noquest boolean
+ * @returns {number} xint16
+ */
 export function deepest_lev_reached(noquest) {   // dungeon.c:1339
     let i = 0, tmp = new $T.d_level(), ret = 0;
     /* this function is used for three purposes: to provide a factor
@@ -1051,6 +1192,10 @@ export function deepest_lev_reached(noquest) {   // dungeon.c:1339
 }
 /* return a bookkeeping level number for purpose of comparisons and
    save/restore */
+/**
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {number} xint16
+ */
 export function ledger_no(lev) {   // dungeon.c:1376
     return $c.i16(lev.dlevel + svd.dungeons[lev.dnum].ledger_start | 0);
 }
@@ -1064,10 +1209,17 @@ export function ledger_no(lev) {   // dungeon.c:1376
  * not be confused with deepest_lev_reached() -- which returns the lowest
  * depth visited by the player.
  */
+/**
+ * @returns {number} xint16
+ */
 export function maxledgerno() {   // dungeon.c:1392
     return $c.i16(svd.dungeons[svn.n_dgns - 1 | 0].ledger_start + svd.dungeons[svn.n_dgns - 1 | 0].num_dunlevs | 0);
 }
 /* return the dungeon that this ledgerno exists in */
+/**
+ * @param {number} ledgerno xint16
+ * @returns {Promise<number>} xint16
+ */
 export async function ledger_to_dnum(ledgerno) {   // dungeon.c:1402
     let i = 0;
     /* find i such that (i->base + 1) <= ledgerno <= (i->base + i->count) */
@@ -1081,20 +1233,37 @@ export async function ledger_to_dnum(ledgerno) {   // dungeon.c:1402
     return 0;
 }
 /* return the level of the dungeon this ledgerno exists in */
+/**
+ * @param {number} ledgerno xint16
+ * @returns {Promise<number>} xint16
+ */
 export async function ledger_to_dlev(ledgerno) {   // dungeon.c:1422
     return $c.i16(ledgerno - svd.dungeons[await ledger_to_dnum(ledgerno)].ledger_start | 0);
 }
 /* returns the depth of a level, in floors below the surface
    (note levels in different dungeons can have the same depth) */
+/**
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {number} schar
+ */
 export function depth(lev) {   // dungeon.c:1431
     return $c.i8((svd.dungeons[lev.dnum].depth_start + lev.dlevel | 0) - 1 | 0);
 }
 /* !SFCTOOL */
 /* are "lev1" and "lev2" actually the same? */
+/**
+ * @param {$T.d_level | null} lev1 d_level *
+ * @param {$T.d_level | null} lev2 d_level *
+ * @returns {number} boolean
+ */
 export function on_level(lev1, lev2) {   // dungeon.c:1439
     return $c.i8(lev1.dnum === lev2.dnum && lev1.dlevel === lev2.dlevel ? 1 : 0);
 }
 /* is this level referenced in the special level chain? */
+/**
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {$T.s_level | null} s_level *
+ */
 export function Is_special(lev) {   // dungeon.c:1448
     let levtmp = null;
     for (levtmp = svs.sp_levchn; levtmp; levtmp = levtmp.next) {
@@ -1108,6 +1277,10 @@ export function Is_special(lev) {   // dungeon.c:1448
  * Is this a multi-dungeon branch level?  If so, return a pointer to the
  * branch.  Otherwise, return null.
  */
+/**
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {$T.branch | null} branch *
+ */
 export function Is_branchlev(lev) {   // dungeon.c:1464
     let curr = null;
     for (curr = svb.branches; curr; curr = curr.next) {
@@ -1118,6 +1291,10 @@ export function Is_branchlev(lev) {   // dungeon.c:1464
     return null;
 }
 /* returns True iff the branch 'lev' is in a branch which builds up */
+/**
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {Promise<number>} boolean
+ */
 export async function builds_up(lev) {   // dungeon.c:1477
     let dptr = null, br = null;
     dptr = $c.relem(svd.dungeons, lev.dnum);
@@ -1136,6 +1313,10 @@ export async function builds_up(lev) {   // dungeon.c:1477
     return FALSE;
 }
 /* goto the next level (or appropriate dungeon) */
+/**
+ * @param {number} at_stairs boolean
+ * @returns {Promise<void>}
+ */
 export async function next_level(at_stairs) {   // dungeon.c:1497
     let stway = null, newlevel = new $T.d_level();
     stway = stairway_at(u.ux, u.uy);
@@ -1153,6 +1334,10 @@ export async function next_level(at_stairs) {   // dungeon.c:1497
     }
 }
 /* goto the previous level (or appropriate dungeon) */
+/**
+ * @param {number} at_stairs boolean
+ * @returns {Promise<void>}
+ */
 export async function prev_level(at_stairs) {   // dungeon.c:1518
     let stway = null, newlevel = new $T.d_level();
     stway = stairway_at(u.ux, u.uy);
@@ -1179,6 +1364,9 @@ export async function prev_level(at_stairs) {   // dungeon.c:1518
 }
 /* Dwarves have "earth sense",
    able to sense if something is buried under their feet */
+/**
+ * @returns {Promise<void>}
+ */
 async function earth_sense() {   // dungeon.c:1548
     let otmp = null;
     if (!(gu.urace.mnum === PM.DWARF)) {
@@ -1197,6 +1385,11 @@ async function earth_sense() {   // dungeon.c:1548
         }
     }
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function u_on_newpos(x, y) {   // dungeon.c:1568
     let func = null;
     if (!isok(x, y)) {
@@ -1230,6 +1423,10 @@ export async function u_on_newpos(x, y) {   // dungeon.c:1568
     await earth_sense();
 }
 /* place you on a random location when arriving on a level */
+/**
+ * @param {number} upflag int
+ * @returns {Promise<void>}
+ */
 export async function u_on_rndspot(upflag) {   // dungeon.c:1605
     let up = 0, was_in_W_tower = 0;
     up = upflag & 1;
@@ -1255,9 +1452,17 @@ export async function u_on_rndspot(upflag) {   // dungeon.c:1605
     await switch_terrain();
 }
 /* !SFCTOOL */
+/**
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {number} boolean
+ */
 export function Is_botlevel(lev) {   // dungeon.c:1643
     return $c.i8(lev.dlevel === svd.dungeons[lev.dnum].num_dunlevs ? 1 : 0);
 }
+/**
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {number} boolean
+ */
 export function Can_dig_down(lev) {   // dungeon.c:1649
     return $c.i8(!svl.level.flags.hardfloor && !Is_botlevel(lev) && !Invocation_lev(lev) ? 1 : 0);
 }
@@ -1265,6 +1470,10 @@ export function Can_dig_down(lev) {   // dungeon.c:1649
  * Like Can_dig_down (above), but also allows falling through on the
  * stronghold level.  Normally, the bottom level of a dungeon resists
  * both digging and falling.
+ */
+/**
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {number} boolean
  */
 export function Can_fall_thru(lev) {   // dungeon.c:1662
     return $c.i8(Can_dig_down(lev) || (svd.dungeon_topology.d_stronghold_level.dlevel || svd.dungeon_topology.d_stronghold_level.dnum) && on_level(lev, svd.dungeon_topology.d_stronghold_level) ? 1 : 0);
@@ -1274,6 +1483,12 @@ export function Can_fall_thru(lev) {   // dungeon.c:1662
  * This happens on intermediate dungeon levels or on any top dungeon
  * level that has a stairwell style branch to the next higher dungeon.
  * Checks for amulets and such must be done elsewhere.
+ */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {Promise<number>} boolean
  */
 export async function Can_rise_up(x, y, lev) {   // dungeon.c:1674
     let stway = null;
@@ -1285,6 +1500,10 @@ export async function Can_rise_up(x, y, lev) {   // dungeon.c:1674
     }
     return $c.i8(lev.dlevel > 1 || svd.dungeons[lev.dnum].entry_lev === 1 && ledger_no(lev) !== 1 && stway && stway.up ? 1 : 0);
 }
+/**
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {number} boolean
+ */
 export function has_ceiling(lev) {   // dungeon.c:1690
     /* FIXME: some (most? all?) of the quest home levels are conceptually
        above ground and don't have ceilings outside of their buildings
@@ -1294,6 +1513,10 @@ export function has_ceiling(lev) {   // dungeon.c:1690
     }
     return TRUE;
 }
+/**
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {number} boolean
+ */
 export function avoid_ceiling(lev) {   // dungeon.c:1701
     /* The quest is challenging since parts of the level
        may have ceilings and other parts may not; Avoid
@@ -1305,6 +1528,11 @@ export function avoid_ceiling(lev) {   // dungeon.c:1701
     }
     return FALSE;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {$c.Ptr | null} const char *
+ */
 export function ceiling(x, y) {   // dungeon.c:1714
     let lev = null, what = null;
     lev = $c.relem(svl.level.locations[x], y);
@@ -1334,6 +1562,11 @@ export function ceiling(x, y) {   // dungeon.c:1714
     }
     return what;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {$c.Ptr | null} const char *
+ */
 export function surface(x, y) {   // dungeon.c:1750
     let lev = null, levtyp = 0;
     lev = $c.relem(svl.level.locations[x], y);
@@ -1379,6 +1612,11 @@ export function surface(x, y) {   // dungeon.c:1750
  * "down" is confined to the current dungeon.  At present, level teleport
  * in dungeons that build up is confined within them.
  */
+/**
+ * @param {$T.d_level | null} newlevel d_level *
+ * @param {number} levnum int
+ * @returns {Promise<void>}
+ */
 export async function get_level(newlevel, levnum) {   // dungeon.c:1802
     let br = null, dgn = 0;
     dgn = u.uz.dnum;
@@ -1420,10 +1658,18 @@ export async function get_level(newlevel, levnum) {   // dungeon.c:1802
     newlevel.dlevel = $c.i16(levnum);
 }
 /* are you in the quest dungeon? */
+/**
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {number} boolean
+ */
 export function In_quest(lev) {   // dungeon.c:1849
     return $c.i8(lev.dnum === svd.dungeon_topology.d_quest_dnum ? 1 : 0);
 }
 /* are you in the mines dungeon? */
+/**
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {number} boolean
+ */
 export function In_mines(lev) {   // dungeon.c:1856
     return $c.i8(lev.dnum === svd.dungeon_topology.d_mines_dnum ? 1 : 0);
 }
@@ -1434,6 +1680,10 @@ export function In_mines(lev) {   // dungeon.c:1856
  *      + This is not called with "Dungeons of Doom".
  *      + There is only _one_ branch to a given dungeon.
  *      + Field end2 is the "child" dungeon.
+ */
+/**
+ * @param {$c.Ptr | null} s const char *
+ * @returns {Promise<$T.branch | null>} branch *
  */
 export async function dungeon_branch(s) {   // dungeon.c:1870
     let br = null, dnum = 0;
@@ -1457,20 +1707,38 @@ export async function dungeon_branch(s) {   // dungeon.c:1870
  *
  * Assumes that end1 is always the "parent".
  */
+/**
+ * @param {$c.Ptr | null} s const char *
+ * @returns {Promise<number>} boolean
+ */
 export async function at_dgn_entrance(s) {   // dungeon.c:1897
     let br = null;
     br = await dungeon_branch(s);
     return $c.i8(on_level(u.uz, br.end1) ? TRUE : FALSE);
 }
 /* is `lev' part of Vlad's tower? */
+/**
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {number} boolean
+ */
 export function In_V_tower(lev) {   // dungeon.c:1907
     return $c.i8(lev.dnum === svd.dungeon_topology.d_tower_dnum ? 1 : 0);
 }
 /* is `lev' a level containing the Wizard's tower? */
+/**
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {number} boolean
+ */
 export function On_W_tower_level(lev) {   // dungeon.c:1914
     return $c.i8((svd.dungeon_topology.d_wiz1_level.dlevel || svd.dungeon_topology.d_wiz1_level.dnum) && on_level(lev, svd.dungeon_topology.d_wiz1_level) || (svd.dungeon_topology.d_wiz2_level.dlevel || svd.dungeon_topology.d_wiz2_level.dnum) && on_level(lev, svd.dungeon_topology.d_wiz2_level) || (svd.dungeon_topology.d_wiz3_level.dlevel || svd.dungeon_topology.d_wiz3_level.dnum) && on_level(lev, svd.dungeon_topology.d_wiz3_level) ? 1 : 0);
 }
 /* is <x,y> of `lev' inside the Wizard's tower? */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {Promise<number>} boolean
+ */
 export async function In_W_tower(x, y, lev) {   // dungeon.c:1923
     if (!On_W_tower_level(lev)) {
         return FALSE;
@@ -1487,21 +1755,37 @@ export async function In_W_tower(x, y, lev) {   // dungeon.c:1923
     return $c.i8(x >= svd.dndest.nlx && x <= svd.dndest.nhx && y >= svd.dndest.nly && y <= svd.dndest.nhy ? 1 : 0);
 }
 /* are you in one of the Hell levels? */
+/**
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {number} boolean
+ */
 export function In_hell(lev) {   // dungeon.c:1942
     return $c.i8(svd.dungeons[lev.dnum].flags.hellish);
 }
 /* sets *lev to be the gateway to Gehennom... */
+/**
+ * @param {$T.d_level | null} lev d_level *
+ */
 export function find_hell(lev) {   // dungeon.c:1949
     lev.dnum = svd.dungeon_topology.d_valley_level.dnum;
     lev.dlevel = 1;
 }
 /* go directly to hell... */
+/**
+ * @param {number} at_stairs boolean
+ * @param {number} falling boolean
+ * @returns {Promise<void>}
+ */
 export async function goto_hell(at_stairs, falling) {   // dungeon.c:1957
     let lev = new $T.d_level();
     find_hell(lev);
     await goto_level(lev, at_stairs, falling, FALSE);
 }
 /* is 'lev' the only level in its branch?  affects level teleporters */
+/**
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {number} boolean
+ */
 export function single_level_branch(lev) {   // dungeon.c:1967
     /*
      * TODO:  this should be generalized instead of assuming that
@@ -1510,11 +1794,20 @@ export function single_level_branch(lev) {   // dungeon.c:1967
     return $c.i8((svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(lev, svd.dungeon_topology.d_knox_level) ? 1 : 0);
 }
 /* equivalent to dest = source */
+/**
+ * @param {$T.d_level | null} dest d_level *
+ * @param {$T.d_level | null} src d_level *
+ */
 export function assign_level(dest, src) {   // dungeon.c:1978
     dest.dnum = src.dnum;
     dest.dlevel = src.dlevel;
 }
 /* dest = src + rn1(range) */
+/**
+ * @param {$T.d_level | null} dest d_level *
+ * @param {$T.d_level | null} src d_level *
+ * @param {number} range int
+ */
 export function assign_rnd_level(dest, src, range) {   // dungeon.c:1986
     let $t1, $t2;
     dest.dnum = src.dnum;
@@ -1526,6 +1819,10 @@ export function assign_rnd_level(dest, src, range) {   // dungeon.c:1986
     }
 }
 /* return an alignment mask */
+/**
+ * @param {number} pct int
+ * @returns {number} unsigned int
+ */
 export function induced_align(pct) {   // dungeon.c:1999
     let lev = null, al = 0;
     lev = Is_special(u.uz);
@@ -1542,11 +1839,18 @@ export function induced_align(pct) {   // dungeon.c:1999
     al = $c.i8(rn2(3) - 1 | 0);
     return Align2amask(al);
 }
+/**
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {number} boolean
+ */
 export function Invocation_lev(lev) {   // dungeon.c:2017
     return $c.i8(In_hell(lev) && lev.dlevel === (svd.dungeons[lev.dnum].num_dunlevs - 1 | 0) ? 1 : 0);
 }
 /* use instead of depth() wherever a degree of difficulty is made
  * dependent on the location in the dungeon (eg. monster creation).
+ */
+/**
+ * @returns {Promise<number>} xint16
  */
 export async function level_difficulty() {   // dungeon.c:2027
     let res = 0;
@@ -1606,6 +1910,10 @@ export async function level_difficulty() {   // dungeon.c:2027
 /* within same branch, or else main dungeon <-> gehennom */
 /* Take one word and try to match it to a level.
  * Recognized levels are as shown by print_dungeon().
+ */
+/**
+ * @param {$c.Ptr | null} nam const char *
+ * @returns {Promise<number>} schar
  */
 export async function lev_by_name(nam) {   // dungeon.c:2098
     let lev = 0, slev = null, dlev = new $T.d_level(), p = null, idx = 0, idxtoo = 0, buf = new Int8Array(256), mseen = null, $t1, $t2;
@@ -1674,6 +1982,10 @@ export async function lev_by_name(nam) {   // dungeon.c:2098
     }
     return lev;
 }
+/**
+ * @param {$T.dungeon | null} dptr struct dungeon *
+ * @returns {number} boolean
+ */
 function unplaced_floater(dptr) {   // dungeon.c:2175
     let br = null, idx = 0;
     idx = $c.i32($c.rdiff(dptr, $c.relem(svd.dungeons, 0)));
@@ -1688,6 +2000,11 @@ function unplaced_floater(dptr) {   // dungeon.c:2175
     }
     return FALSE;
 }
+/**
+ * @param {$T.d_level | null} lvl_p d_level *
+ * @param {number} unplaced boolean
+ * @returns {number} boolean
+ */
 function unreachable_level(lvl_p, unplaced) {   // dungeon.c:2190
     let dummy = null;
     if (unplaced) {
@@ -1701,6 +2018,14 @@ function unreachable_level(lvl_p, unplaced) {   // dungeon.c:2190
     }
     return FALSE;
 }
+/**
+ * @param {number} win winid
+ * @param {$c.Ptr | null} entry char *
+ * @param {$T.lchoice | null} lchoices struct lchoice *
+ * @param {$T.d_level | null} lvl_p d_level *
+ * @param {number} cannotreach boolean
+ * @returns {Promise<void>}
+ */
 async function tport_menu(win, entry, lchoices, lvl_p, cannotreach) {   // dungeon.c:2204
     let tmpbuf = new Int8Array(256), any = new $T.any(), clr = 0, $t1;
     clr = NO_COLOR;
@@ -1727,6 +2052,10 @@ async function tport_menu(win, entry, lchoices, lvl_p, cannotreach) {   // dunge
     return;
 }
 /* Convert a branch type to a string usable by print_dungeon(). */
+/**
+ * @param {number} type int
+ * @returns {$c.Ptr | null} const char *
+ */
 function br_string(type) {   // dungeon.c:2240
     switch (type) {
         case BR.PORTAL:
@@ -1740,10 +2069,23 @@ function br_string(type) {   // dungeon.c:2240
     }
     return $c.lit(" (unknown)");
 }
+/**
+ * @param {$T.d_level | null} dlev d_level *
+ * @returns {number} char
+ */
 function chr_u_on_lvl(dlev) {   // dungeon.c:2256
     return $c.i8(u.uz.dnum === dlev.dnum && u.uz.dlevel === dlev.dlevel ? 42 : 32);
 }
 /* Print all child branches between the lower and upper bounds. */
+/**
+ * @param {number} win winid
+ * @param {number} dnum int
+ * @param {number} lower_bound int
+ * @param {number} upper_bound int
+ * @param {number} bymenu boolean
+ * @param {$T.lchoice | null} lchoices_p struct lchoice *
+ * @returns {Promise<void>}
+ */
 async function print_branch(win, dnum, lower_bound, upper_bound, bymenu, lchoices_p) {   // dungeon.c:2263
     let br = null, buf = new Int8Array(256);
     /* This assumes that end1 is the "parent". */
@@ -1759,6 +2101,12 @@ async function print_branch(win, dnum, lower_bound, upper_bound, bymenu, lchoice
     }
 }
 /* Print available dungeon information. */
+/**
+ * @param {number} bymenu boolean
+ * @param {$c.Ptr | null} rlev schar *
+ * @param {*} rdgn xint16 *
+ * @returns {Promise<number>} schar
+ */
 export async function print_dungeon(bymenu, rlev, rdgn) {   // dungeon.c:2290
     let i = 0, last_level = 0, nlev = 0, buf = new Int8Array(256), descr = null, first = 0, unplaced = 0, slev = null, dptr = null, br = null, lchoices = new $T.lchoice(), win = 0, n = 0, selected = [null], idx = 0, trap = null;
     win = await create_nhwindow()(NHW.MENU);
@@ -1881,6 +2229,11 @@ export async function print_dungeon(bymenu, rlev, rdgn) {   // dungeon.c:2290
  * This function should not be called for a transition done via level
  * teleport or via the Eye.
  */
+/**
+ * @param {$T.d_level | null} source d_level *
+ * @param {$T.d_level | null} dest d_level *
+ * @returns {Promise<void>}
+ */
 export async function recbranch_mapseen(source, dest) {   // dungeon.c:2446
     let mptr = null, br = null;
     /* not a branch */
@@ -1909,6 +2262,10 @@ export async function recbranch_mapseen(source, dest) {   // dungeon.c:2446
         await impossible($c.lit("Can't note branch for unseen level (%d, %d)"), source.dnum, source.dlevel);
     }
 }
+/**
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {$c.Ptr | null} char *
+ */
 function get_annotation(lev) {   // dungeon.c:2478
     let mptr = null;
     if (mptr = find_mapseen(lev)) {
@@ -1917,6 +2274,9 @@ function get_annotation(lev) {   // dungeon.c:2478
     return null;
 }
 /* print the annotation for the current level, if it exists */
+/**
+ * @returns {Promise<void>}
+ */
 export async function print_level_annotation() {   // dungeon.c:2489
     let annotation = null;
     if ((annotation = get_annotation(u.uz)) !== null) {
@@ -1925,6 +2285,10 @@ export async function print_level_annotation() {   // dungeon.c:2489
 }
 /* ask user to annotate level lev.
    if lev is NULL, uses current level. */
+/**
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {Promise<void>}
+ */
 async function query_annotation(lev) {   // dungeon.c:2500
     let mptr = null, nbuf = new Int8Array(256), tmpbuf = new Int8Array(256), qbuf = new Int8Array(128), lbuf = new Int8Array(128), dflgs = 0, save_uz = new $T.d_level(), $t1, $t2;
     /* Buffer for response */
@@ -1977,6 +2341,9 @@ async function query_annotation(lev) {   // dungeon.c:2500
     }
 }
 /* #annotate command - add a custom name to the current level */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function donamelevel() {   // dungeon.c:2571
     if (iflags.menu_requested) {
         return await dooverview();
@@ -1996,6 +2363,10 @@ export function free_exclusions() {   // dungeon.c:2582
     }
     sve.exclusion_zones = null;
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 export async function save_exclusions(nhfp) {   // dungeon.c:2596
     let ez = null, nez = Int32Array.of(0);
     for (nez[0] = 0, ez = sve.exclusion_zones; ez; ez = ez.next, nez[0] = nez[0] + 1 | 0) {
@@ -2011,6 +2382,10 @@ export async function save_exclusions(nhfp) {   // dungeon.c:2596
         }
     }
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 export async function load_exclusions(nhfp) {   // dungeon.c:2617
     let ez = null, nez = Int32Array.of(0), $t1;
     nez[0] = 0;
@@ -2027,6 +2402,10 @@ export async function load_exclusions(nhfp) {   // dungeon.c:2617
     }
 }
 /* find the particular mapseen object in the chain; may return null */
+/**
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {$T.mapseen | null} mapseen *
+ */
 function find_mapseen(lev) {   // dungeon.c:2640
     let mptr = null;
     for (mptr = svm.mapseenchn; mptr; mptr = mptr.next) {
@@ -2036,6 +2415,10 @@ function find_mapseen(lev) {   // dungeon.c:2640
     }
     return mptr;
 }
+/**
+ * @param {$c.Ptr | null} s const char *
+ * @returns {$T.mapseen | null} mapseen *
+ */
 function find_mapseen_by_str(s) {   // dungeon.c:2652
     let mptr = null;
     for (mptr = svm.mapseenchn; mptr; mptr = mptr.next) {
@@ -2045,6 +2428,9 @@ function find_mapseen_by_str(s) {   // dungeon.c:2652
     }
     return mptr;
 }
+/**
+ * @param {number} ledger_num int
+ */
 export function rm_mapseen(ledger_num) {   // dungeon.c:2665
     let mptr = null, mprev = null, bp = null, bpnext = null;
     mprev = null;
@@ -2071,6 +2457,11 @@ export function rm_mapseen(ledger_num) {   // dungeon.c:2665
     }
     $c.free(mptr);
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @param {$T.mapseen | null} mptr mapseen *
+ * @returns {Promise<void>}
+ */
 async function save_mapseen(nhfp, mptr) {   // dungeon.c:2695
     let curr = null, i = 0, brindx = Int32Array.of(0);
     for (brindx[0] = 0, curr = svb.branches; curr; curr = curr.next, brindx[0] = brindx[0] + 1 | 0) {
@@ -2092,6 +2483,10 @@ async function save_mapseen(nhfp, mptr) {   // dungeon.c:2695
     await savecemetery(nhfp, new $c.FieldRef(mptr, "final_resting_place", "ptr"));
 }
 /* !SFCTOOL */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<$T.mapseen | null>} mapseen *
+ */
 async function load_mapseen(nhfp) {   // dungeon.c:2721
     let i = 0, branchnum = Int32Array.of(0), brindx = 0, load = null, curr = null, $t1;
     branchnum[0] = 0;
@@ -2122,6 +2517,13 @@ async function load_mapseen(nhfp) {   // dungeon.c:2721
     return load;
 }
 /* for '#stats' wizard-mode command, to show memory used for #overview data */
+/**
+ * @param {number} win winid
+ * @param {$c.Ptr | null} statsfmt const char *
+ * @param {*} total_count long *
+ * @param {*} total_size long *
+ * @returns {Promise<void>}
+ */
 export async function overview_stats(win, statsfmt, total_count, total_size) {   // dungeon.c:2761
     let buf = new Int8Array(256), hdrbuf = new Int8Array(128), ocount = 0, osize = 0, bcount = 0, bsize = 0, acount = 0, asize = 0, ce = null, mptr = null;
     /* output window */
@@ -2161,6 +2563,9 @@ export async function overview_stats(win, statsfmt, total_count, total_size) {  
  * [No longer deleted, just marked as notreachable.  #overview will
  * ignore such levels, end of game disclosure will include them.]
  */
+/**
+ * @param {number} dnum int
+ */
 export function remdun_mapseen(dnum) {   // dungeon.c:2811
     let mptr = null, mptraddr = null;
     mptraddr = new $c.FieldRef(svm, "mapseenchn", "ptr");
@@ -2173,6 +2578,10 @@ export function remdun_mapseen(dnum) {   // dungeon.c:2811
         mptraddr = new $c.FieldRef(mptr, "next", "ptr");
     }
 }
+/**
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {Promise<void>}
+ */
 export async function init_mapseen(lev) {   // dungeon.c:2835
     let mptr = null, init = null, prev = null;
     /* Create a level and insert in "sorted" order.  This is an insertion
@@ -2206,6 +2615,10 @@ export async function init_mapseen(lev) {   // dungeon.c:2835
 }
 /* || (feat).water || (feat).ice || (feat).lava */
 /* returns true if this level has something interesting to print out */
+/**
+ * @param {$T.mapseen | null} mptr mapseen *
+ * @returns {number} boolean
+ */
 function interest_mapseen(mptr) {   // dungeon.c:2880
     if (on_level(u.uz, mptr.lev)) {
         return TRUE;
@@ -2247,6 +2660,10 @@ function interest_mapseen(mptr) {   // dungeon.c:2880
     return $c.i8(mptr.feat.nfount | 0 || mptr.feat.nsink | 0 || mptr.feat.nthrone | 0 || mptr.feat.naltar | 0 || mptr.feat.ngrave | 0 || mptr.feat.ntree | 0 || mptr.feat.nshop | 0 || mptr.feat.ntemple | 0 || mptr.final_resting_place && (mptr.flags.knownbones | 0 || wizard()) || mptr.custom || mptr.br || mptr.lev.dlevel === svd.dungeons[mptr.lev.dnum].dunlev_ureached ? 1 : 0);
 }
 /* update the lastseentyp at x,y */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ */
 export function update_lastseentyp(x, y) {   // dungeon.c:2927
     let mtmp = null, ltyp = 0;
     ltyp = svl.level.locations[x][y].typ;
@@ -2260,11 +2677,21 @@ export function update_lastseentyp(x, y) {   // dungeon.c:2927
 }
 /* for some cases where deferred update needs to be done immediately;
    hide details from caller */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} int
+ */
 export async function update_mapseen_for(x, y) {   // dungeon.c:2943
     await recalc_mapseen();   /* whole level */
     return svl.lastseentyp[x][y];
 }
 /* count mapseen feature from lastseentyp at x,y */
+/**
+ * @param {$T.mapseen | null} mptr mapseen *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ */
 function count_feat_lastseentyp(mptr, x, y) {   // dungeon.c:2951
     let count = 0, atmp = 0, ty = 0, tx = 0;
     /* remembered data for a level; update feat.X counts */
@@ -2370,6 +2797,9 @@ function count_feat_lastseentyp(mptr, x, y) {   // dungeon.c:2951
     }
 }
 /* recalculate mapseen for the current level */
+/**
+ * @returns {Promise<void>}
+ */
 export async function recalc_mapseen() {   // dungeon.c:3075
     let mptr = null, oth_mptr = null, mtmp = null, bp = null, bonesaddr = null, t = null, i = 0, ridx = 0, count = 0, x = 0, y = 0, uroom = 0, mptrtmp = null, invocat_lvl = new $T.d_level(), $t1, $t2, $t3, $t4, $t5, $t6, $t7;
     /* Should not happen in general, but possible if in the process
@@ -2540,6 +2970,9 @@ export async function recalc_mapseen() {   // dungeon.c:3075
 /*ARGUSED*/
 /* valley and sanctum levels get automatic annotation once their temple
    is entered */
+/**
+ * @param {$T.monst | null} priest struct monst *
+ */
 export function mapseen_temple(priest) {   // dungeon.c:3267
     let mptr = null;
     /* not used; might be useful someday */
@@ -2554,6 +2987,10 @@ export function mapseen_temple(priest) {   // dungeon.c:3267
     }
 }
 /* room entry message has just been delivered so learn room even if blind */
+/**
+ * @param {number} roomno int
+ * @returns {Promise<void>}
+ */
 export async function room_discovered(roomno) {   // dungeon.c:3282
     let mptr = null;
     mptr = find_mapseen(u.uz);
@@ -2563,6 +3000,9 @@ export async function room_discovered(roomno) {   // dungeon.c:3282
     }
 }
 /* #overview command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dooverview() {   // dungeon.c:3294
     /* game in progress; 'why' is 0 for normal #overview, -1 if user prefixed
        #overview with 'm'; 'reason' for end of game isn't applicable: use 0 */
@@ -2571,6 +3011,11 @@ export async function dooverview() {   // dungeon.c:3294
     return ECMD.OK;
 }
 /* called for #overview or for end of game disclosure */
+/**
+ * @param {number} why int
+ * @param {number} reason int
+ * @returns {Promise<void>}
+ */
 export async function show_overview(why, reason) {   // dungeon.c:3305
     let win = 0, lastdun = Int32Array.of(0), selected = [null], n = 0, ledger = 0, lev = new $T.d_level(), $t1, $t2;
     /* 0 => normal #overview command, -1 => 'm' prefix #overview;
@@ -2602,6 +3047,14 @@ export async function show_overview(why, reason) {   // dungeon.c:3305
     await destroy_nhwindow()(win);
 }
 /* display endgame levels or non-endgame levels, not both */
+/**
+ * @param {number} viewendgame int
+ * @param {number} win winid
+ * @param {number} why int
+ * @param {number} reason int
+ * @param {*} lastdun_p int *
+ * @returns {Promise<void>}
+ */
 async function traverse_mapseenchn(viewendgame, win, why, reason, lastdun_p) {   // dungeon.c:3344
     let mptr = null, showheader = 0;
     /* 0: show endgame branch; 1: show other branches */
@@ -2621,6 +3074,11 @@ async function traverse_mapseenchn(viewendgame, win, why, reason, lastdun_p) {  
         }
     }
 }
+/**
+ * @param {number} x xint16
+ * @param {$c.Ptr | null} obj const char *
+ * @returns {$c.Ptr | null} const char *
+ */
 function seen_string(x, obj) {   // dungeon.c:3368
     /* players are computer scientists: 0, 1, 2, n */
     switch (x) {
@@ -2637,6 +3095,10 @@ function seen_string(x, obj) {   // dungeon.c:3368
     return $c.lit("(unknown)");
 }
 /* better br_string */
+/**
+ * @param {$T.branch | null} br branch *
+ * @returns {$c.Ptr | null} const char *
+ */
 function br_string2(br) {   // dungeon.c:3388
     let closed_portal = 0;
     /* Special case: quest portal says closed if kicked from quest */
@@ -2654,6 +3116,11 @@ function br_string2(br) {   // dungeon.c:3388
     return $c.lit("(unknown)");
 }
 /* get the name of an endgame level; topten.c does something similar */
+/**
+ * @param {$c.Ptr | null} outbuf char *
+ * @param {number} indx int
+ * @returns {$c.Ptr | null} const char *
+ */
 export function endgamelevelname(outbuf, indx) {   // dungeon.c:3410
     let planename = null;
     planename = null;
@@ -2683,6 +3150,10 @@ export function endgamelevelname(outbuf, indx) {   // dungeon.c:3410
     return outbuf;
 }
 /* short shop description */
+/**
+ * @param {number} rtype int
+ * @returns {$c.Ptr | null} const char *
+ */
 function shop_string(rtype) {   // dungeon.c:3441
     let shoptype = 0, str = null;
     /* defined in shknam.c */
@@ -2699,6 +3170,12 @@ function shop_string(rtype) {   // dungeon.c:3441
 }
 /* if player knows about the mastermind tune, append it to Castle annotation;
    if drawbridge has been destroyed, flags.castletune will be zero */
+/**
+ * @param {$T.mapseen | null} mptr mapseen *
+ * @param {$c.Ptr | null} outbuf char *
+ * @param {number | bigint} bsz size_t
+ * @returns {$c.Ptr | null} char *
+ */
 function tunesuffix(mptr, outbuf, bsz) {   // dungeon.c:3460
     let tmp = new Int8Array(256);
     /* size of outbuf */
@@ -2722,6 +3199,14 @@ function tunesuffix(mptr, outbuf, bsz) {   // dungeon.c:3460
 /* "iterate" once; safe to use as ``if (cond) ADDTOBUF(); else whatever;'' */
 /* ADD2NTOBUF: for "M temples and N altars"; seen_string() is safe to use
    multiple times within one expression; so is plur() */
+/**
+ * @param {number} win winid
+ * @param {$T.mapseen | null} mptr mapseen *
+ * @param {number} final int
+ * @param {number} how int
+ * @param {number} printdun boolean
+ * @returns {Promise<void>}
+ */
 async function print_mapseen(win, mptr, final, how, printdun) {   // dungeon.c:3516
     let buf = new Int8Array(256), tmpbuf = new Int8Array(256), i = 0, depthstart = 0, dnum = 0, died_here = 0, any = new $T.any(), slev = null, atmp = 0, bp = null, kncnt = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12;
     /* -1: as menu; 0: not final;

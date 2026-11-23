@@ -48,6 +48,10 @@ import { mbrtowc_l } from './mbrtowc.js';
 import { tre_compile, tre_free } from './tre-compile.js';
 import { wcslen } from './wcslen.js';
 
+/**
+ * @param {number} val void *
+ * @returns {number} void *
+ */
 function xlocale_retain(val) {   // xlocale_private.h:96
     let obj = 0;
     obj = val;
@@ -57,6 +61,9 @@ function xlocale_retain(val) {   // xlocale_private.h:96
     $h.i32[obj >>> 2] = $h.i32[obj >>> 2] + 1 | 0;
     return val;
 }
+/**
+ * @param {number} val void *
+ */
 function xlocale_release(val) {   // xlocale_private.h:107
     let obj = 0;
     obj = val;
@@ -69,9 +76,16 @@ function xlocale_release(val) {   // xlocale_private.h:107
         }
     }
 }
+/**
+ * @returns {number} locale_t
+ */
 function __current_locale() {   // xlocale_private.h:122
     return __global_locale;
 }
+/**
+ * @param {number} __loc locale_t
+ * @returns {number} locale_t
+ */
 function __locale_ptr(__loc) {   // xlocale_private.h:128
     if (__loc === 0) {
         __loc = $h.u32[_c_locale >>> 2];
@@ -81,6 +95,14 @@ function __locale_ptr(__loc) {   // xlocale_private.h:128
     return __loc;
 }
 /* HAVE_CONFIG_H */
+/**
+ * @param {number} preg regex_t *
+ * @param {number} regex const char *
+ * @param {number | bigint} n size_t
+ * @param {number} cflags int
+ * @param {number} loc locale_t
+ * @returns {number} int
+ */
 export function regncomp_l(preg, regex, n, cflags, loc) {   // regcomp.c:23
     let ret = 0, wregex = 0, wlen = 0, i = 0, str = 0, wstr = 0, consumed = 0, wcptr = 0, $t1, $t2, $t3, $t4;
     const $sp0 = $h.st.sp, $fp = $h.enter(128);
@@ -154,6 +176,13 @@ export function regncomp_l(preg, regex, n, cflags, loc) {   // regcomp.c:23
 /* !TRE_WCHAR */
 /* !TRE_WCHAR */
 /* !__APPLE__ */
+/**
+ * @param {number} preg regex_t *
+ * @param {number} regex const char *
+ * @param {number | bigint} n size_t
+ * @param {number} cflags int
+ * @returns {number} int
+ */
 export function regncomp(preg, regex, n, cflags) {   // regcomp.c:139
     let loc = 0;
     loc = __current_locale();
@@ -161,6 +190,13 @@ export function regncomp(preg, regex, n, cflags) {   // regcomp.c:139
     /* !__LIBC__ */
     return regncomp_l(preg, regex, n, cflags, loc);
 }
+/**
+ * @param {number} preg regex_t *
+ * @param {number} regex const char *
+ * @param {number} cflags int
+ * @param {number} loc locale_t
+ * @returns {number} int
+ */
 export function regcomp_l(preg, regex, cflags, loc) {   // regcomp.c:154
     let len = 0;
     if (cflags & 32) {
@@ -178,6 +214,12 @@ export function regcomp_l(preg, regex, cflags, loc) {   // regcomp.c:154
     return regncomp(preg, regex, len, cflags);
 }
 /* !BUILDING_VARIANT */
+/**
+ * @param {number} preg regex_t *
+ * @param {number} regex const char *
+ * @param {number} cflags int
+ * @returns {number} int
+ */
 export function regcomp(preg, regex, cflags) {   // regcomp.c:176
     let loc = 0;
     loc = __current_locale();
@@ -186,6 +228,14 @@ export function regcomp(preg, regex, cflags) {   // regcomp.c:176
     return regcomp_l(preg, regex, cflags, loc);
 }
 /* !__APPLE__ */
+/**
+ * @param {number} preg regex_t *
+ * @param {number} regex const wchar_t *
+ * @param {number | bigint} n size_t
+ * @param {number} cflags int
+ * @param {number} loc locale_t
+ * @returns {number} int
+ */
 export function regwncomp_l(preg, regex, n, cflags, loc) {   // regcomp.c:219
     if (n > 65536) {
         return 12;
@@ -198,6 +248,13 @@ export function regwncomp_l(preg, regex, n, cflags, loc) {   // regcomp.c:219
     /* __LIBC__ */
     return tre_compile(preg, regex, n, cflags, loc);
 }
+/**
+ * @param {number} preg regex_t *
+ * @param {number} regex const wchar_t *
+ * @param {number | bigint} n size_t
+ * @param {number} cflags int
+ * @returns {number} int
+ */
 export function regwncomp(preg, regex, n, cflags) {   // regcomp.c:230
     let loc = 0;
     loc = __current_locale();
@@ -205,6 +262,13 @@ export function regwncomp(preg, regex, n, cflags) {   // regcomp.c:230
     /* !__LIBC__ */
     return tre_compile(preg, regex, n, cflags, loc);
 }
+/**
+ * @param {number} preg regex_t *
+ * @param {number} regex const wchar_t *
+ * @param {number} cflags int
+ * @param {number} loc locale_t
+ * @returns {number} int
+ */
 export function regwcomp_l(preg, regex, cflags, loc) {   // regcomp.c:245
     let n = 0;
     n = regex ? wcslen(regex) : 0;
@@ -219,6 +283,12 @@ export function regwcomp_l(preg, regex, cflags, loc) {   // regcomp.c:245
     /* __LIBC__ */
     return tre_compile(preg, regex, n, cflags, loc);
 }
+/**
+ * @param {number} preg regex_t *
+ * @param {number} regex const wchar_t *
+ * @param {number} cflags int
+ * @returns {number} int
+ */
 export function regwcomp(preg, regex, cflags) {   // regcomp.c:258
     let loc = 0;
     loc = __current_locale();
@@ -227,6 +297,9 @@ export function regwcomp(preg, regex, cflags) {   // regcomp.c:258
     return regwcomp_l(preg, regex, cflags, loc);
 }
 /* TRE_WCHAR */
+/**
+ * @param {number} preg regex_t *
+ */
 export function regfree(preg) {   // regcomp.c:274
     tre_free(preg);
 }

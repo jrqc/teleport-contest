@@ -36,6 +36,10 @@ import { possibly_unwield } from './weapon.js';
 import { mon_break_armor } from './worn.js';
 import { Deaf, Hallucination, Polymorph_control, Protection_from_shape_changers, Unaware, Unchanging } from './youprop.macros.js';
 
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<void>}
+ */
 export async function were_change(mon) {   // were.c:9
     let howler = null;
     if (!is_were(mon.data)) {
@@ -68,6 +72,10 @@ export async function were_change(mon) {   // were.c:9
         gw.were_changes = $c.add64(gw.were_changes, 1);
     }
 }
+/**
+ * @param {number} pm int
+ * @returns {number} int
+ */
 export function counter_were(pm) {   // were.c:48
     switch (pm) {
         case PM.WEREWOLF:
@@ -87,6 +95,10 @@ export function counter_were(pm) {   // were.c:48
     }
 }
 /* convert monsters similar to werecritters into appropriate werebeast */
+/**
+ * @param {number} pm int
+ * @returns {number} int
+ */
 export function were_beastie(pm) {   // were.c:70
     switch (pm) {
         case PM.WERERAT:
@@ -110,6 +122,10 @@ export function were_beastie(pm) {   // were.c:70
     }
     return NON_PM;
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<void>}
+ */
 export async function new_were(mon) {   // were.c:96
     let pm = 0;
     /* neither hero nor werecreature can change from human form to
@@ -146,6 +162,13 @@ export async function new_were(mon) {   // were.c:96
     }
 }
 /* were-creature (even you) summons a horde */
+/**
+ * @param {$T.permonst | null} ptr struct permonst *
+ * @param {number} yours boolean
+ * @param {*} visible int *
+ * @param {$c.Ptr | null} genbuf char *
+ * @returns {Promise<number>} int
+ */
 export async function were_summon(ptr, yours, visible, genbuf) {   // were.c:142
     let i = 0, typ = 0, pm = 0, mtmp = null, total = 0;
     /* number of visible helpers created */
@@ -194,6 +217,9 @@ export async function were_summon(ptr, yours, visible, genbuf) {   // were.c:142
     }
     return total;
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function you_were() {   // were.c:192
     let qbuf = new Int8Array(128), controllable_poly = 0;
     controllable_poly = $c.i8(Polymorph_control() && !(u.uprops[STUNNED].intrinsic || Unaware()) ? 1 : 0);
@@ -212,6 +238,10 @@ export async function you_were() {   // were.c:192
     gw.were_changes = $c.add64(gw.were_changes, 1);
     await polymon(u.ulycn);
 }
+/**
+ * @param {number} purify boolean
+ * @returns {Promise<void>}
+ */
 export async function you_unwere(purify) {   // were.c:213
     let controllable_poly = 0, $t1;
     controllable_poly = $c.i8(Polymorph_control() && !(u.uprops[STUNNED].intrinsic || Unaware()) ? 1 : 0);
@@ -226,6 +256,10 @@ export async function you_unwere(purify) {   // were.c:213
     }
 }
 /* lycanthropy is being caught or cured, but no shape change is involved */
+/**
+ * @param {number} which int
+ * @returns {Promise<void>}
+ */
 export async function set_ulycn(which) {   // were.c:232
     u.ulycn = which;
     /* add or remove lycanthrope's innate intrinsics (Drain_resistance) */

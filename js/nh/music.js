@@ -102,6 +102,11 @@ let do_improvisation$improvisation = null;   // static in do_improvisation()
 const improvised_notes$notes = new Int8Array(7);   // static in improvised_notes()
 const beats = $c.nulls(8);
 /* wake up monster, possibly scare it */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} scary boolean
+ * @returns {Promise<void>}
+ */
 async function awaken_scare(mtmp, scary) {   // music.c:45
     mtmp.msleeping = (0) & 1;
     mtmp.mcanmove = (1) & 1;
@@ -117,6 +122,10 @@ async function awaken_scare(mtmp, scary) {   // music.c:45
 /*
  * Wake every monster in range...
  */
+/**
+ * @param {number} distance int
+ * @returns {Promise<void>}
+ */
 async function awaken_monsters(distance) {   // music.c:67
     let mtmp = null, distm = 0;
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
@@ -130,6 +139,10 @@ async function awaken_monsters(distance) {   // music.c:67
 }
 /*
  * Make monsters fall asleep.  Note that they may resist the spell.
+ */
+/**
+ * @param {number} distance int
+ * @returns {Promise<void>}
  */
 async function put_monsters_to_sleep(distance) {   // music.c:85
     let mtmp = null;
@@ -145,6 +158,10 @@ async function put_monsters_to_sleep(distance) {   // music.c:85
 }
 /*
  * Charm snakes in range.  Note that the snakes are NOT tamed.
+ */
+/**
+ * @param {number} distance int
+ * @returns {Promise<void>}
  */
 async function charm_snakes(distance) {   // music.c:105
     let mtmp = null, could_see_mon = 0, was_peaceful = 0;
@@ -173,6 +190,10 @@ async function charm_snakes(distance) {   // music.c:105
 /*
  * Calm nymphs in range.
  */
+/**
+ * @param {number} distance int
+ * @returns {Promise<void>}
+ */
 async function calm_nymphs(distance) {   // music.c:139
     let mtmp = null;
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
@@ -191,6 +212,10 @@ async function calm_nymphs(distance) {   // music.c:139
     }
 }
 /* Awake soldiers anywhere the level (and any nearby monster). */
+/**
+ * @param {$T.monst | null} bugler struct monst *
+ * @returns {Promise<void>}
+ */
 export async function awaken_soldiers(bugler) {   // music.c:162
     let mtmp = null, distance = 0, distm = 0, $t1;
     /* monster that played instrument */
@@ -218,6 +243,10 @@ export async function awaken_soldiers(bugler) {   // music.c:162
     }
 }
 /* Charm monsters in range.  Note that they may resist the spell. */
+/**
+ * @param {number} distance int
+ * @returns {Promise<void>}
+ */
 async function charm_monsters(distance) {   // music.c:196
     let mtmp = null, mtmp2 = null;
     if (u.uswallow) {
@@ -241,6 +270,12 @@ async function charm_monsters(distance) {   // music.c:196
     }
 }
 /* Try to make a pit. */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} tu_pit unsigned int
+ * @returns {Promise<void>}
+ */
 async function do_pit(x, y, tu_pit) {   // music.c:221
     let mtmp = null, otmp = null, chasm = null, filltype = 0, m_already_trapped = 0, keepfooting = 0, $t1;
     chasm = await maketrap(x, y, PIT);
@@ -342,6 +377,10 @@ async function do_pit(x, y, tu_pit) {   // music.c:221
 }
 /* Generate earthquake :-) of desired force.
  * That is:  create random chasms (pits).
+ */
+/**
+ * @param {number} force int
+ * @returns {Promise<void>}
  */
 async function do_earthquake(force) {   // music.c:344
     let x = 0, y = 0, mtmp = null, trap_at_u = null, start_x = 0, start_y = 0, end_x = 0, end_y = 0, amsk = 0, algn = 0, tu_pit = 0;
@@ -478,6 +517,9 @@ async function do_earthquake(force) {   // music.c:344
         }
     }
 }
+/**
+ * @returns {$c.Ptr | null} const char *
+ */
 function generic_lvl_desc() {   // music.c:478
     if ((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level)) {
         return $c.lit("astral plane");
@@ -495,6 +537,10 @@ function generic_lvl_desc() {   // music.c:478
 }
 /*
  * The player is trying to extract something from his/her instrument.
+ */
+/**
+ * @param {$T.obj | null} instr struct obj *
+ * @returns {Promise<number>} int
  */
 async function do_improvisation(instr) {   // music.c:503
     let damage = 0, mode = 0, do_spec = 0, itmp = new $T.obj(), mundane = 0, same_old_song = Int8Array.of(0), buf = new Int8Array(256), type = 0;
@@ -701,6 +747,10 @@ async function do_improvisation(instr) {   // music.c:503
     nhUse(do_improvisation$improvisation);
     return 2;   /* That takes time */
 }
+/**
+ * @param {$c.Ptr | null} same_as_last_time boolean *
+ * @returns {$c.Ptr | null} char *
+ */
 function improvised_notes(same_as_last_time) {   // music.c:733
     let i = 0, notecount = 0, $t1;
     /* target buffer has to be in svc.context, otherwise saving game
@@ -721,6 +771,10 @@ function improvised_notes(same_as_last_time) {   // music.c:733
 }
 /*
  * So you want music...
+ */
+/**
+ * @param {$T.obj | null} instr struct obj *
+ * @returns {Promise<number>} int
  */
 export async function do_play_instrument(instr) {   // music.c:759
     let buf = new Int8Array(256), c = 0, s = null, x = Int16Array.of(0), y = Int16Array.of(0), ok = 0, tumblers = 0, gears = 0, matched = new Int8Array(5), $t1;
@@ -854,6 +908,10 @@ export async function do_play_instrument(instr) {   // music.c:759
     await pline($c.lit("%s"), c_common_strings.c_Never_mind);
     return ECMD.OK;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} enum instruments
+ */
 export function obj_to_instr(obj) {   // music.c:902
     let ret_instr = 0;
     ret_instr = ins_no_instrument;

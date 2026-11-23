@@ -106,15 +106,24 @@ const mfmt1 = new Int8Array(18);
 const mfmt2 = new Int8Array(24);
 /* This must stay consistent with the defines in obj.h. */
 const obj_state_names = $c.nulls(10);
+/**
+ * @param {$T.oextra | null} oex struct oextra *
+ */
 function init_oextra(oex) {   // mkobj.c:80
     oex.$copyFrom(zerooextra);
 }
+/**
+ * @returns {Promise<$T.oextra | null>} struct oextra *
+ */
 export async function newoextra() {   // mkobj.c:86
     let oextra = null;
     oextra = $c.asRec(await alloc(32), $T.oextra, 32);
     init_oextra(oextra);
     return oextra;
 }
+/**
+ * @param {$T.obj | null} o struct obj *
+ */
 export function dealloc_oextra(o) {   // mkobj.c:96
     let x = null;
     x = o.oextra;
@@ -132,6 +141,10 @@ export function dealloc_oextra(o) {   // mkobj.c:96
         o.oextra = null;
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 export async function newomonst(otmp) {   // mkobj.c:114
     let m = null, $t1;
     if (!otmp.oextra) {
@@ -143,6 +156,9 @@ export async function newomonst(otmp) {   // mkobj.c:114
         otmp.oextra.omonst = m;
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ */
 export function free_omonst(otmp) {   // mkobj.c:128
     let m = null;
     if (otmp.oextra) {
@@ -156,6 +172,10 @@ export function free_omonst(otmp) {   // mkobj.c:128
         }
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 export async function newomid(otmp) {   // mkobj.c:143
     let $t1;
     if (!otmp.oextra) {
@@ -163,9 +183,17 @@ export async function newomid(otmp) {   // mkobj.c:143
     }
     otmp.oextra.omid = 0;
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ */
 export function free_omid(otmp) {   // mkobj.c:151
     otmp.oextra.omid = 0;
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {$c.Ptr | null} response_cmd const char *
+ * @returns {Promise<void>}
+ */
 export async function new_omailcmd(otmp, response_cmd) {   // mkobj.c:157
     let $t1, $t2;
     if (!otmp.oextra) {
@@ -176,6 +204,9 @@ export async function new_omailcmd(otmp, response_cmd) {   // mkobj.c:157
     }
     $t2 = await dupstr(response_cmd), otmp.oextra.omailcmd = $t2;
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ */
 export function free_omailcmd(otmp) {   // mkobj.c:167
     if (otmp.oextra && OMAILCMD(otmp)) {
         $c.free(otmp.oextra.omailcmd);
@@ -183,6 +214,10 @@ export function free_omailcmd(otmp) {   // mkobj.c:167
     }
 }
 /* can object be generated eroded? */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {number} boolean
+ */
 function may_generate_eroded(otmp) {   // mkobj.c:177
     /* initial hero inventory */
     if (svm.moves <= 1 && !gi.in_mklev) {
@@ -203,6 +238,9 @@ function may_generate_eroded(otmp) {   // mkobj.c:177
     return TRUE;
 }
 /* random chance of applying erosions/grease to object */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ */
 function mkobj_erosions(otmp) {   // mkobj.c:196
     if (may_generate_eroded(otmp)) {
         /* A small fraction of non-artifact items will generate eroded or
@@ -231,6 +269,13 @@ function mkobj_erosions(otmp) {   // mkobj.c:196
 }
 /* make a random object of class 'let' at a specific location;
    'let' might be random class; place_object() will validate <x,y> */
+/**
+ * @param {number} let_ char
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} artif boolean
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function mkobj_at(let_, x, y, artif) {   // mkobj.c:227
     let otmp = null;
     otmp = await mkobj(let_, artif);
@@ -238,6 +283,14 @@ export async function mkobj_at(let_, x, y, artif) {   // mkobj.c:227
     return otmp;
 }
 /* make a specific object at a specific location */
+/**
+ * @param {number} otyp int
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} init boolean
+ * @param {number} artif boolean
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function mksobj_at(otyp, x, y, init, artif) {   // mkobj.c:238
     let otmp = null;
     otmp = await mksobj(otyp, init, artif);
@@ -245,6 +298,13 @@ export async function mksobj_at(otyp, x, y, init, artif) {   // mkobj.c:238
     return otmp;
 }
 /* used for extra orctown loot */
+/**
+ * @param {number} otyp int
+ * @param {number} mflags2 unsigned int
+ * @param {number} init boolean
+ * @param {number} artif boolean
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function mksobj_migr_to_species(otyp, mflags2, init, artif) {   // mkobj.c:253
     let otmp = null;
     otmp = await mksobj(otyp, init, artif);
@@ -255,6 +315,11 @@ export async function mksobj_migr_to_species(otyp, mflags2, init, artif) {   // 
 }
 /* mkobj(): select a type of item from a class, use mksobj() to create it;
    result is always non-Null */
+/**
+ * @param {number} oclass int
+ * @param {number} artif boolean
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function mkobj(oclass, artif) {   // mkobj.c:270
     let tprob = 0, i = 0, prob = 0, iprobs = null;
     if (oclass === RANDOM_CLASS) {
@@ -280,6 +345,10 @@ export async function mkobj(oclass, artif) {   // mkobj.c:270
     }
     return await mksobj(i, TRUE, artif);
 }
+/**
+ * @param {$T.obj | null} box struct obj *
+ * @returns {Promise<void>}
+ */
 async function mkbox_cnts(box) {   // mkobj.c:304
     let n = 0, otmp = null, tprob = 0, iprobs = null, $t1, $t2, $t3, $t4, $t5, $t6;
     box.cobj = null;
@@ -358,10 +427,18 @@ async function mkbox_cnts(box) {   // mkobj.c:304
     /* caller will update box->owt */
 }
 /* select a random, common monster type */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function rndmonnum() {   // mkobj.c:388
     return await rndmonnum_adj(0, 0);
 }
 /* select a random, common monster type, with adjusted difficulty */
+/**
+ * @param {number} minadj int
+ * @param {number} maxadj int
+ * @returns {Promise<number>} int
+ */
 export async function rndmonnum_adj(minadj, maxadj) {   // mkobj.c:395
     let ptr = null, i = 0, excludeflags = 0;
     /* Plan A: get a level-appropriate common monster */
@@ -377,6 +454,11 @@ export async function rndmonnum_adj(minadj, maxadj) {   // mkobj.c:395
     } while ((ptr.geno & excludeflags) !== 0);
     return i;
 }
+/**
+ * @param {$T.obj | null} obj2 struct obj *
+ * @param {$T.obj | null} obj1 struct obj *
+ * @returns {Promise<void>}
+ */
 export async function copy_oextra(obj2, obj1) {   // mkobj.c:417
     let $t1;
     if (!obj2 || !obj1 || !obj1.oextra) {
@@ -415,6 +497,11 @@ export async function copy_oextra(obj2, obj1) {   // mkobj.c:417
  * put in the object structure delivered by this call.  The returned object
  * has its wornmask cleared and is positioned just following the original
  * in the nobj chain (and nexthere chain when on the floor).
+ */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number | bigint} num long
+ * @returns {Promise<$T.obj | null>} struct obj *
  */
 export async function splitobj(obj, num) {   // mkobj.c:457
     let otmp = null, $t1, $t2, $t3;
@@ -468,6 +555,9 @@ export async function splitobj(obj, num) {   // mkobj.c:457
 /* return the value of context.ident and then increment it to be ready for
    its next use; used to be simple += 1 so that every value from 1 to N got
    used but now has a random increase that skips half of potential values */
+/**
+ * @returns {number} unsigned int
+ */
 export function next_ident() {   // mkobj.c:509
     let res = 0, $t1, $t2;
     res = svc.context.ident;
@@ -491,6 +581,11 @@ export function next_ident() {   // mkobj.c:509
 }
 /* when splitting a stack that has o_id-based shop prices, pick an
    o_id value for the new stack that will maintain the same price */
+/**
+ * @param {$T.obj | null} oldobj struct obj *
+ * @param {$T.obj | null} newobj struct obj *
+ * @returns {number} unsigned int
+ */
 function nextoid(oldobj, newobj) {   // mkobj.c:536
     let olddif = 0, newdif = 0, trylimit = 0, oid = 0;
     trylimit = 256;   /* limit of 4 suffices at present */
@@ -509,6 +604,10 @@ function nextoid(oldobj, newobj) {   // mkobj.c:536
 }
 /* try to find the stack obj was split from, then merge them back together;
    returns the combined object if unsplit is successful, null otherwise */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function unsplitobj(obj) {   // mkobj.c:556
     let target_oid = 0, oparent = [null], ochild = [null], list = null;
     target_oid = 0;
@@ -594,6 +693,11 @@ export function clear_splitobjs() {   // mkobj.c:626
  * Note:  Don't use obj_extract_self() -- we are doing an in-place swap,
  * not actually moving something.
  */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 export async function replace_object(obj, otmp) {   // mkobj.c:641
     otmp.where = obj.where;
     switch (obj.where) {
@@ -634,6 +738,10 @@ export async function replace_object(obj, otmp) {   // mkobj.c:641
 }
 /* is 'obj' inside a container whose contents aren't known?
    if so, return the outermost container meeting that criterium */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {$T.obj | null} struct obj *
+ */
 export function unknwn_contnr_contents(obj) {   // mkobj.c:684
     let result = null, parent = null;
     result = null;
@@ -659,6 +767,10 @@ export function unknwn_contnr_contents(obj) {   // mkobj.c:684
  *
  * Note that check_unpaid_usage() should be used instead for partial
  * usage of an object.
+ */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
  */
 export async function bill_dummy_object(otmp) {   // mkobj.c:712
     let dummy = null, cost = 0, $t1;
@@ -691,6 +803,11 @@ export async function bill_dummy_object(otmp) {   // mkobj.c:712
     return;
 }
 /* possibly bill for an object which the player has just modified */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} alter_type int
+ * @returns {Promise<void>}
+ */
 export async function costly_alteration(obj, alter_type) {   // mkobj.c:752
     let ox = Int16Array.of(0), oy = Int16Array.of(0), objroom = 0, learn_bknown = 0, those = null, them = null, shkp = [null];
     shkp[0] = null;
@@ -762,6 +879,9 @@ export async function costly_alteration(obj, alter_type) {   // mkobj.c:752
 }
 /* set obj->dknown to 0 for most types of objects, to 1 otherwise;
    split off from unknow_object() */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ */
 export function clear_dknown(obj) {   // mkobj.c:835
     let $t1;
     /* note: this is an unobserving not an observing, so don't call
@@ -779,6 +899,9 @@ export function clear_dknown(obj) {   // mkobj.c:835
 /* some init for a brand new object, or partial re-init when hero loses
    potentially known info about an object (called when an unseen monster
    picks up or uses it); moved from invent.c to here for access to dknowns */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ */
 export function unknow_object(obj) {   // mkobj.c:854
     let $t1, $t2;
     clear_dknown(obj);   /* obj->dknown = 0; */
@@ -791,6 +914,11 @@ export function unknow_object(obj) {   // mkobj.c:854
     obj.known = ((objects[obj.otyp].oc_uses_known | 0 ? 0 : 1) >>> 0) & 1;
 }
 /* do some initialization to newly created object; otyp must already be set */
+/**
+ * @param {*} obj struct obj **
+ * @param {number} artif boolean
+ * @returns {Promise<void>}
+ */
 async function mksobj_init(obj, artif) {   // mkobj.c:869
     let mndx = 0, tryct = 0, otmp = null, let_ = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13, $t14, $t15, $t16, $t17, $t18, $t19, $t20, $t21, $t22, $t23, $t24, $t25, $t26, $t27, $t28, $t29, $t30;
     otmp = obj.get(0);
@@ -1087,6 +1215,12 @@ async function mksobj_init(obj, artif) {   // mkobj.c:869
     }
 }
 /* mksobj(): create a specific type of object; result is always non-Null */
+/**
+ * @param {number} otyp int
+ * @param {number} init boolean
+ * @param {number} artif boolean
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function mksobj(otyp, init, artif) {   // mkobj.c:1179
     let otmp = [null], let_ = 0, ptr = null, $t1, $t2, $t3, $t4, $t5;
     let_ = objects[otyp].oc_class;
@@ -1160,6 +1294,10 @@ export async function mksobj(otyp, init, artif) {   // mkobj.c:1179
 }
 /* potential mimic shapes that should be undone by stone-to-flesh;
    not used for objects that will be transformed when hit by stone-to-flesh */
+/**
+ * @param {number} mappearance unsigned int
+ * @returns {number} boolean
+ */
 export function stone_object_type(mappearance) {   // mkobj.c:1264
     let otyp = 0;
     otyp = mappearance | 0;
@@ -1169,6 +1307,10 @@ export function stone_object_type(mappearance) {   // mkobj.c:1264
 }
 /* possible mimic shapes that are affected by stone-to-flesh;
    mappearance for furniture is a display symbol rather than a terrain type */
+/**
+ * @param {number} mappearance unsigned int
+ * @returns {number} boolean
+ */
 export function stone_furniture_type(mappearance) {   // mkobj.c:1276
     let sym = 0;
     sym = mappearance | 0;
@@ -1209,6 +1351,11 @@ export function stone_furniture_type(mappearance) {   // mkobj.c:1276
  *
  * Existing timeout value for egg hatch is preserved.
  *
+ */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} id int
+ * @returns {Promise<void>}
  */
 export async function set_corpsenm(obj, id) {   // mkobj.c:1318
     let old_id = 0, when = 0, $t1, $t2, $t3;
@@ -1258,6 +1405,11 @@ export async function set_corpsenm(obj, id) {   // mkobj.c:1318
     }
 }
 /* Return the number of turns after which a Rider corpse revives */
+/**
+ * @param {$T.obj | null} body struct obj *
+ * @param {number} retry boolean
+ * @returns {number | bigint} long
+ */
 export function rider_revival_time(body, retry) {   // mkobj.c:1371
     let when = 0, minturn = 0;
     minturn = retry ? 3 : body.corpsenm === PM.DEATH ? 6 : 12;
@@ -1273,6 +1425,10 @@ export function rider_revival_time(body, retry) {   // mkobj.c:1371
 /*
  * Start a corpse decay or revive timer.
  * This takes the age of the corpse into consideration as of 3.4.0.
+ */
+/**
+ * @param {$T.obj | null} body struct obj *
+ * @returns {Promise<void>}
  */
 export async function start_corpse_timeout(body) {   // mkobj.c:1389
     let when = 0, age = 0, rot_adjust = 0, action = 0;
@@ -1315,6 +1471,10 @@ export async function start_corpse_timeout(body) {   // mkobj.c:1389
     await start_timer(when, TIMER.OBJECT, action, obj_to_any(body));
 }
 /* used by shrink_glob(); is 'item' or enclosing container on or under ice? */
+/**
+ * @param {$T.obj | null} item struct obj *
+ * @returns {number} int
+ */
 function item_on_ice(item) {   // mkobj.c:1443
     let otmp = null, ox = Int16Array.of(0), oy = Int16Array.of(0);
     otmp = item;
@@ -1342,6 +1502,11 @@ function item_on_ice(item) {   // mkobj.c:1443
     return NOT_ON_ICE;
 }
 /* schedule a timer that will shrink the target glob by 1 unit of weight */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number | bigint} when long
+ * @returns {Promise<void>}
+ */
 export async function start_glob_timeout(obj, when) {   // mkobj.c:1473
     /* glob */
     /* when to shrink; if 0L, use random value close to 25 */
@@ -1366,6 +1531,11 @@ export async function start_glob_timeout(obj, when) {   // mkobj.c:1473
    part of the program destroys it, the timer will be cancelled);
    note: timer keeps going if an object gets buried or scheduled to
    migrate to another level and can delete the glob in those states */
+/**
+ * @param {$T.any | null} arg anything *
+ * @param {number | bigint} expire_time long
+ * @returns {Promise<void>}
+ */
 export async function shrink_glob(arg, expire_time) {   // mkobj.c:1500
     let globnambuf = new Int8Array(256), obj = null, globloc = 0, ininv = 0, shrink = 0, gone = 0, updinv = 0, contnr = null, topcontnr = null, old_top_owt = 0, delta = 0, moddelta = 0, basewt = 0, msgwt = 0, ox = Int16Array.of(0), oy = Int16Array.of(0), seeit = 0;
     /* glob (in arg->a_obj) */
@@ -1525,6 +1695,10 @@ export async function shrink_glob(arg, expire_time) {   // mkobj.c:1500
     }
 }
 /* a glob has shrunk away to nothing; handle owornmask, then delete glob */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function shrinking_glob_gone(obj) {   // mkobj.c:1673
     let owhere = 0;
     owhere = $c.i16(obj.where);
@@ -1555,6 +1729,11 @@ async function shrinking_glob_gone(obj) {   // mkobj.c:1673
         await obfree(obj, null);
     }
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} old_range int
+ * @returns {Promise<void>}
+ */
 export async function maybe_adjust_light(obj, old_range) {   // mkobj.c:1704
     let buf = new Int8Array(256), ox = Int16Array.of(0), oy = Int16Array.of(0), new_range = 0, delta = 0;
     new_range = arti_light_radius(obj);
@@ -1589,6 +1768,10 @@ export async function maybe_adjust_light(obj, old_range) {   // mkobj.c:1704
  *      about glowing amber/black/&c should be delivered prior to calling
  *      these routines to make the actual curse/bless state change.
  */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 export async function bless(otmp) {   // mkobj.c:1745
     let old_light = 0, $t1;
     old_light = 0;
@@ -1612,6 +1795,10 @@ export async function bless(otmp) {   // mkobj.c:1745
     }
     return;
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 export async function unbless(otmp) {   // mkobj.c:1767
     let old_light = 0, $t1;
     old_light = 0;
@@ -1628,6 +1815,10 @@ export async function unbless(otmp) {   // mkobj.c:1767
         await maybe_adjust_light(otmp, old_light);
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 export async function curse(otmp) {   // mkobj.c:1783
     let already_cursed = 0, old_light = 0, $t1;
     old_light = 0;
@@ -1669,6 +1860,10 @@ export async function curse(otmp) {   // mkobj.c:1783
     }
     return;
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 export async function uncurse(otmp) {   // mkobj.c:1822
     let old_light = 0, $t1;
     old_light = 0;
@@ -1688,6 +1883,11 @@ export async function uncurse(otmp) {   // mkobj.c:1822
     }
     return;
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} chance int
+ * @returns {Promise<void>}
+ */
 export async function blessorcurse(otmp, chance) {   // mkobj.c:1841
     if (otmp.blessed | 0 || otmp.cursed | 0) {
         return;
@@ -1701,10 +1901,19 @@ export async function blessorcurse(otmp, chance) {   // mkobj.c:1841
     }
     return;
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {number} int
+ */
 export function bcsign(otmp) {   // mkobj.c:1857
     return (!!otmp.blessed ? 1 : 0) - (!!otmp.cursed ? 1 : 0) | 0;
 }
 /* set the object's bless/curse-state known flag */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} onoff unsigned int
+ * @returns {Promise<void>}
+ */
 export async function set_bknown(obj, onoff) {   // mkobj.c:1864
     /* 1 or 0 */
     if (obj.bknown !== onoff) {
@@ -1725,6 +1934,10 @@ export async function set_bknown(obj, onoff) {   // mkobj.c:1864
  *  Note too: obj->owt is an unsigned int and objects[].oc_weight an
  *         unsigned short int, so weight() should probably be changed to
  *         use and return unsigned int instead of signed int.
+ */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
  */
 export async function weight(obj) {   // mkobj.c:1888
     let wt = 0, contents = null, cwt = 0, msize = 0, minwt = 0, long_wt = 0;
@@ -1810,10 +2023,19 @@ export async function weight(obj) {   // mkobj.c:1888
     return wt ? Math.imul(wt, $c.i32(obj.quan)) : ($c.i32(obj.quan) + 1 | 0) >> 1;
 }
 /* called when a tree is kicked; never returns Null */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function rnd_treefruit_at(x, y) {   // mkobj.c:1984
     return await mksobj_at(treefruits[rn2(5)], x, y, TRUE, FALSE);
 }
 /* for describing objects embedded in trees */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {number} boolean
+ */
 export function is_treefruit(otmp) {   // mkobj.c:1991
     let fruitidx = 0;
     for (fruitidx = 0; fruitidx < 5; fruitidx = fruitidx + 1 | 0) {
@@ -1824,6 +2046,12 @@ export function is_treefruit(otmp) {   // mkobj.c:1991
     return FALSE;
 }
 /* create a stack of N gold pieces; never returns Null */
+/**
+ * @param {number | bigint} amount long
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function mkgold(amount, x, y) {   // mkobj.c:2003
     let gold = null, mul = 0, $t1;
     gold = g_at(x, y);
@@ -1842,6 +2070,10 @@ export async function mkgold(amount, x, y) {   // mkobj.c:2003
 }
 /* potions of oil use their obj->age field differently from other potions
    so changing potion type to or from oil needs to have that fixed up */
+/**
+ * @param {$T.obj | null} potion struct obj *
+ * @param {$T.obj | null} source struct obj *
+ */
 export function fixup_oil(potion, source) {   // mkobj.c:2025
     /* potion that just had its otyp changed */
     /* item used to create potion; might be Null */
@@ -1878,6 +2110,15 @@ export function fixup_oil(potion, source) {   // mkobj.c:2025
  *      i.e.  vampire -> human corpse
  * yet still allow restoration of the original monster upon
  * resurrection.
+ */
+/**
+ * @param {number} objtype int
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.permonst | null} ptr struct permonst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} corpstatflags unsigned int
+ * @returns {Promise<$T.obj | null>} struct obj *
  */
 export async function mkcorpstat(objtype, mtmp, ptr, x, y, corpstatflags) {   // mkobj.c:2067
     let otmp = null, init = 0, old_corpsenm = 0, $t1;
@@ -1933,6 +2174,10 @@ export async function mkcorpstat(objtype, mtmp, ptr, x, y, corpstatflags) {   //
  * type can, and often is, different.
  * The return value is an index into mons[].
  */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function corpse_revive_type(obj) {   // mkobj.c:2129
     let revivetype = 0, mtmp = null;
     revivetype = obj.corpsenm;
@@ -1947,6 +2192,11 @@ export async function corpse_revive_type(obj) {   // mkobj.c:2129
  * Attach a monster id to an object, to provide
  * a lasting association between the two.
  */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} mid unsigned int
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function obj_attach_mid(obj, mid) {   // mkobj.c:2147
     if (!mid || !obj) {
         return null;
@@ -1955,6 +2205,11 @@ export async function obj_attach_mid(obj, mid) {   // mkobj.c:2147
     obj.oextra.omid = mid;
     return obj;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 async function save_mtraits(obj, mtmp) {   // mkobj.c:2157
     let baselevel = 0, mtmp2 = null;
     if (mtmp.ispriest) {
@@ -2002,6 +2257,11 @@ async function save_mtraits(obj, mtmp) {   // mkobj.c:2157
 /* returns a pointer to a new monst structure based on
  * the one contained within the obj.
  */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} copyof boolean
+ * @returns {Promise<$T.monst | null>} struct monst *
+ */
 export async function get_mtraits(obj, copyof) {   // mkobj.c:2201
     let mtmp = null, mnew = null;
     mtmp = null;
@@ -2027,6 +2287,12 @@ export async function get_mtraits(obj, copyof) {   // mkobj.c:2201
 }
 /* make an object named after someone listed in the scoreboard file;
    never returns Null */
+/**
+ * @param {number} objtype int
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function mk_tt_object(objtype, x, y) {   // mkobj.c:2227
     let otmp = null, initialize_it = 0, pm = 0;
     /* CORPSE or STATUE */
@@ -2044,6 +2310,14 @@ export async function mk_tt_object(objtype, x, y) {   // mkobj.c:2227
 }
 /* make a new corpse or statue, uninitialized if a statue (i.e. no books);
    never returns Null */
+/**
+ * @param {number} objtype int
+ * @param {$T.permonst | null} ptr struct permonst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$c.Ptr | null} nm const char *
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function mk_named_object(objtype, ptr, x, y, nm) {   // mkobj.c:2253
     let otmp = null, corpstatflags = 0;
     /* CORPSE or STATUE */
@@ -2054,6 +2328,10 @@ export async function mk_named_object(objtype, ptr, x, y, nm) {   // mkobj.c:225
     }
     return otmp;
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {number} boolean
+ */
 export function is_flammable(otmp) {   // mkobj.c:2270
     let otyp = 0, omat = 0;
     otyp = otmp.otyp;
@@ -2070,6 +2348,10 @@ export function is_flammable(otmp) {   // mkobj.c:2270
     }
     return $c.i8(omat <= WOOD && omat !== LIQUID || omat === PLASTIC ? 1 : 0);
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {number} boolean
+ */
 export function is_rottable(otmp) {   // mkobj.c:2289
     let otyp = 0;
     otyp = otmp.otyp;
@@ -2080,6 +2362,12 @@ export function is_rottable(otmp) {   // mkobj.c:2289
  * and threaded through the nexthere fields in the object-instance structure.
  */
 /* put the object at the given location */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function place_object(otmp, x, y) {   // mkobj.c:2305
     let otmp2 = null, func = null;
     if (!isok(x, y)) {
@@ -2135,6 +2423,11 @@ export async function place_object(otmp, x, y) {   // mkobj.c:2305
 }
 /* tear down the object pile at <x,y> and create it again, so that any
    boulders which are present get forced to the top */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function recreate_pile_at(x, y) {   // mkobj.c:2371
     let otmp = null, next_obj = null, reversed = null;
     reversed = null;
@@ -2156,6 +2449,12 @@ export async function recreate_pile_at(x, y) {   // mkobj.c:2371
 /* rotting on ice takes 2 times as long */
 /* If ice was affecting any objects correct that now
  * Also used for starting ice effects too. [zap.c]
+ */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} do_buried boolean
+ * @returns {Promise<void>}
  */
 export async function obj_ice_effects(x, y, do_buried) {   // mkobj.c:2397
     let otmp = null;
@@ -2181,6 +2480,10 @@ export async function obj_ice_effects(x, y, do_buried) {   // mkobj.c:2397
  * rot timers pertaining to the object don't have to be stopped and
  * restarted etc.
  */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number | bigint>} long
+ */
 export async function peek_at_iced_corpse_age(otmp) {   // mkobj.c:2423
     let age = 0, retval = 0, save_plnmsg = 0, save_plnmsg$2 = 0;
     retval = otmp.age;
@@ -2205,6 +2508,13 @@ export async function peek_at_iced_corpse_age(otmp) {   // mkobj.c:2423
     }
     return retval;
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} force int
+ * @returns {Promise<void>}
+ */
 async function obj_timer_checks(otmp, x, y, force) {   // mkobj.c:2440
     let tleft = 0, action = 0, restart_timer = 0, on_floor = 0, buried = 0, age = 0, save_plnmsg = 0, age$2 = 0, save_plnmsg$2 = 0;
     /* 0 = no force so do checks, <0 = force off, >0 force on */
@@ -2270,6 +2580,10 @@ async function obj_timer_checks(otmp, x, y, force) {   // mkobj.c:2440
         await start_timer(tleft, TIMER.OBJECT, action, obj_to_any(otmp));
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 export async function remove_object(otmp) {   // mkobj.c:2508
     let x = 0, y = 0;
     x = otmp.ox;
@@ -2287,6 +2601,11 @@ export async function remove_object(otmp) {   // mkobj.c:2508
     }
 }
 /* throw away all of a monster's inventory */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} uncreate_artifacts boolean
+ * @returns {Promise<void>}
+ */
 export async function discard_minvent(mtmp, uncreate_artifacts) {   // mkobj.c:2525
     let otmp = null;
     while ((otmp = mtmp.minvent) !== null) {
@@ -2315,6 +2634,10 @@ export async function discard_minvent(mtmp, uncreate_artifacts) {   // mkobj.c:2
  *      OBJ_ONBILL      on gb.billobjs chain
  *      OBJ_LUAFREE     obj is dealloc'd from core, but still used by lua
  *      OBJ_DELETED     obj has been deleted from play but not yet deallocated
+ */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
  */
 export async function obj_extract_self(obj) {   // mkobj.c:2557
     switch (obj.where) {
@@ -2352,6 +2675,11 @@ export async function obj_extract_self(obj) {   // mkobj.c:2557
     }
 }
 /* Extract the given object from the chain, following nobj chain. */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {*} head_ptr struct obj **
+ * @returns {Promise<void>}
+ */
 export async function extract_nobj(obj, head_ptr) {   // mkobj.c:2596
     let curr = null, prev = null;
     curr = head_ptr.get(0);
@@ -2377,6 +2705,11 @@ export async function extract_nobj(obj, head_ptr) {   // mkobj.c:2596
  * This does not set obj->where, this function is expected to be called
  * in tandem with extract_nobj, which does set it.
  */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {*} head_ptr struct obj **
+ * @returns {Promise<void>}
+ */
 export async function extract_nexthere(obj, head_ptr) {   // mkobj.c:2623
     let curr = null, prev = null;
     curr = head_ptr.get(0);
@@ -2399,6 +2732,11 @@ export async function extract_nexthere(obj, head_ptr) {   // mkobj.c:2623
  * Add obj to mon's inventory.  If obj is able to merge with something already
  * in the inventory, then the passed obj is deleted and 1 is returned.
  * Otherwise 0 is returned.
+ */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj$in struct obj *
+ * @returns {Promise<number>} int
  */
 export async function add_to_minv(mon, obj$in) {   // mkobj.c:2648
     const obj = [obj$in];
@@ -2427,6 +2765,11 @@ export async function add_to_minv(mon, obj$in) {   // mkobj.c:2648
  * prevent that from being recalculated repeatedly when adding multiple
  * items].
  */
+/**
+ * @param {$T.obj | null} container struct obj *
+ * @param {$T.obj | null} obj$in struct obj *
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function add_to_container(container, obj$in) {   // mkobj.c:2676
     const obj = [obj$in];
     let otmp = [null];
@@ -2448,6 +2791,10 @@ export async function add_to_container(container, obj$in) {   // mkobj.c:2676
     container.cobj = obj[0];
     return obj[0];
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function add_to_migration(obj) {   // mkobj.c:2698
     if (obj.where !== OBJ.FREE) {
         await panic($c.lit("add_to_migration: obj where=%d, not free"), obj.where);
@@ -2466,6 +2813,10 @@ export async function add_to_migration(obj) {   // mkobj.c:2698
     obj.omigr_from_dlevel = u.uz.dlevel;
     gm.migrating_objs = obj;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function add_to_buried(obj) {   // mkobj.c:2720
     if (obj.where !== OBJ.FREE) {
         await panic($c.lit("add_to_buried: obj where=%d, not free"), obj.where);
@@ -2476,6 +2827,10 @@ export async function add_to_buried(obj) {   // mkobj.c:2720
 }
 /* recalculate weight of object, which doesn't have to be a container
    itself; if it is contained, recursively handle _its_ container(s) */
+/**
+ * @param {$T.obj | null} object struct obj *
+ * @returns {Promise<void>}
+ */
 export async function container_weight(object) {   // mkobj.c:2733
     let $t1;
     $t1 = await weight(object) >>> 0, object.owt = $t1;
@@ -2486,6 +2841,10 @@ export async function container_weight(object) {   // mkobj.c:2733
 /*
  * Mark object to be deallocated.  _All_ objects should be run through here
  * for them to be deallocated.
+ */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
  */
 export async function dealloc_obj(obj) {   // mkobj.c:2745
     let $t1;
@@ -2555,6 +2914,9 @@ export async function dealloc_obj(obj) {   // mkobj.c:2745
     }
 }
 /* actually deallocate the object */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ */
 function dealloc_obj_real(obj) {   // mkobj.c:2815
     if (obj.oextra) {
         dealloc_oextra(obj);
@@ -2568,6 +2930,9 @@ function dealloc_obj_real(obj) {   // mkobj.c:2815
     $c.free(obj);
 }
 /* free all the objects marked for deletion */
+/**
+ * @returns {Promise<void>}
+ */
 export async function dobjsfree() {   // mkobj.c:2831
     let otmp = null;
     while (go.objs_deleted) {
@@ -2581,6 +2946,12 @@ export async function dobjsfree() {   // mkobj.c:2831
     }
 }
 /* create an object from a horn of plenty; mirrors bagotricks(makemon.c) */
+/**
+ * @param {$T.obj | null} horn struct obj *
+ * @param {number} tipping boolean
+ * @param {$T.obj | null} targetbox struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function hornoplenty(horn, tipping, targetbox) {   // mkobj.c:2847
     let objcount = 0, obj = null, what = null, $t1, $t2, $t3;
     /* caller emptying entire contents; affects shop mesgs */
@@ -2662,6 +3033,9 @@ export async function hornoplenty(horn, tipping, targetbox) {   // mkobj.c:2847
     return objcount;
 }
 /* Check all object lists for consistency. */
+/**
+ * @returns {Promise<void>}
+ */
 export async function obj_sanity_check() {   // mkobj.c:2949
     let x = 0, y = 0, obj = null, otop = null, prevo = null, at_fmt = new Int8Array(256);
     await objlist_sanity(svl.level.objlist, OBJ.FLOOR, $c.lit("floor sanity"));
@@ -2725,6 +3099,12 @@ export async function obj_sanity_check() {   // mkobj.c:2949
     }
 }
 /* sanity check for objects on specified list (fobj, &c) */
+/**
+ * @param {$T.obj | null} objlist struct obj *
+ * @param {number} wheretype int
+ * @param {$c.Ptr | null} mesg const char *
+ * @returns {Promise<void>}
+ */
 async function objlist_sanity(objlist, wheretype, mesg) {   // mkobj.c:3032
     let obj = null, lostbuf = new Int8Array(40), maskbuf = new Int8Array(40), bc_ok = 0, buf = new Int8Array(256), mtmp = null, mtmp2 = null;
     for (obj = objlist; obj; obj = obj.nobj) {
@@ -2813,6 +3193,11 @@ async function objlist_sanity(objlist, wheretype, mesg) {   // mkobj.c:3032
 }
 /* check obj->unpaid and obj->no_charge for shop sanity; caller has
    verified that at least one of them is set */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$c.Ptr | null} mesg const char *
+ * @returns {Promise<void>}
+ */
 async function shop_obj_sanity(obj, mesg) {   // mkobj.c:3134
     let otop = null, shkp = null, why = null, costly = 0, costlytoo = 0, x = Int16Array.of(0), y = Int16Array.of(0);
     x[0] = 0;
@@ -2875,6 +3260,11 @@ async function shop_obj_sanity(obj, mesg) {   // mkobj.c:3134
     return;
 }
 /* sanity check for objects carried by all monsters in specified list */
+/**
+ * @param {$T.monst | null} monlist struct monst *
+ * @param {$c.Ptr | null} mesg const char *
+ * @returns {Promise<void>}
+ */
 async function mon_obj_sanity(monlist, mesg) {   // mkobj.c:3204
     let mon = null, obj = null, mwep = null;
     for (mon = monlist; mon; mon = mon.nmon) {
@@ -2920,6 +3310,11 @@ async function mon_obj_sanity(monlist, mesg) {   // mkobj.c:3204
         }
     }
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<void>}
+ */
 async function insane_obj_bits(obj, mon) {   // mkobj.c:3249
     let o_in_use = 0, o_bypass = 0, o_nomerge = 0, o_boulder = 0, infobuf = new Int8Array(128);
     if (obj.where === OBJ.DELETED) {
@@ -2938,6 +3333,10 @@ async function insane_obj_bits(obj, mon) {   // mkobj.c:3249
     }
 }
 /* does 'obj' use the 'nomerge' flag persistently? */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 function nomerge_exception(obj) {   // mkobj.c:3278
     /* special prize objects for achievement tracking are set 'nomerge'
        until they get picked up by the hero */
@@ -2946,6 +3345,10 @@ function nomerge_exception(obj) {   // mkobj.c:3278
     }
     return FALSE;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {$c.Ptr | null} const char *
+ */
 function where_name(obj) {   // mkobj.c:3296
     let where = 0;
     /* big enough to handle rogue 64-bit int */
@@ -2959,6 +3362,13 @@ function where_name(obj) {   // mkobj.c:3296
     }
     return obj_state_names[where];
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$c.Ptr | null} fmt const char *
+ * @param {$c.Ptr | null} mesg const char *
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<void>}
+ */
 async function insane_object(obj, fmt, mesg, mon) {   // mkobj.c:3314
     let objnm = null, monnm = null, altfmt = new Int8Array(256);
     objnm = monnm = $c.lit("null!");
@@ -2980,6 +3390,12 @@ async function insane_object(obj, fmt, mesg, mon) {   // mkobj.c:3314
 /* initialize a dummy obj with just enough info to allow some of the tests in
    obj.h that take an obj pointer to work; used when applying a stethoscope
    toward a mimic mimicking an object */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} otyp short
+ * @param {number | bigint} oquan long
+ * @returns {$T.obj | null} struct obj *
+ */
 export function init_dummyobj(obj, otyp, oquan) {   // mkobj.c:3347
     if (obj) {
         obj.$copyFrom(cg.zeroobj);
@@ -3005,6 +3421,11 @@ export function init_dummyobj(obj, otyp, oquan) {   // mkobj.c:3347
     return obj;
 }
 /* obj sanity check: check objects inside container */
+/**
+ * @param {$T.obj | null} container struct obj *
+ * @param {$c.Ptr | null} mesg const char *
+ * @returns {Promise<void>}
+ */
 async function check_contained(container, mesg) {   // mkobj.c:3374
     let obj = null, mesgbuf = new Int8Array(40), nestedmesg = new Int8Array(120);
     /* big enough to work with, not too big to blow out stack in recursion */
@@ -3046,6 +3467,11 @@ async function check_contained(container, mesg) {   // mkobj.c:3374
     }
 }
 /* called when 'obj->globby' is set so we don't recheck it here */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$c.Ptr | null} mesg const char *
+ * @returns {Promise<void>}
+ */
 async function check_glob(obj, mesg) {   // mkobj.c:3420
     let mesgbuf = new Int8Array(256), globbuf = new Int8Array(128);
     /*
@@ -3061,6 +3487,10 @@ async function check_glob(obj, mesg) {   // mkobj.c:3420
     }
 }
 /* check an object in hero's or monster's inventory which has worn mask set */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function sanity_check_worn(obj) {   // mkobj.c:3447
     let maskbuf = new Int8Array(60), what = null, owornmask = 0, allmask = 0, embedded = 0, i = 0, n = 0, oclassname = new Int8Array(30), mon = null;
     allmask = 0;
@@ -3260,6 +3690,10 @@ async function sanity_check_worn(obj) {   // mkobj.c:3447
 /*
  * wrapper to make "near this object" convenient
  */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function obj_nexto(otmp) {   // mkobj.c:3643
     if (!otmp) {
         await impossible($c.lit("obj_nexto: wasn't given an object to check"));
@@ -3274,6 +3708,13 @@ export async function obj_nexto(otmp) {   // mkobj.c:3643
  *
  * TODO: return a list of all objects near us so we can more
  * reliably predict which one we want to 'find' first
+ */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} recurs boolean
+ * @returns {Promise<$T.obj | null>} struct obj *
  */
 export async function obj_nexto_xy(obj, x, y, recurs) {   // mkobj.c:3661
     let otmp = null, fx = 0, fy = 0, ex = 0, ey = 0, otyp = 0, dx = 0, dy = 0;
@@ -3310,6 +3751,11 @@ export async function obj_nexto_xy(obj, x, y, recurs) {   // mkobj.c:3661
 /*
  * Causes one object to absorb another, increasing weight
  * accordingly.  Frees obj2; obj1 remains and is returned.
+ */
+/**
+ * @param {*} obj1 struct obj **
+ * @param {*} obj2 struct obj **
+ * @returns {Promise<$T.obj | null>} struct obj *
  */
 export async function obj_absorb(obj1, obj2) {   // mkobj.c:3702
     let otmp1 = null, otmp2 = null, o1wt = 0, o2wt = 0, agetmp = 0, tm1 = 0, tm2 = 0, $t1, $t2, $t3, $t4;
@@ -3372,6 +3818,11 @@ export async function obj_absorb(obj1, obj2) {   // mkobj.c:3702
  * Wrapper for obj_absorb() so that floor_effects works more
  * cleanly (since we don't know which we want to stay around).
  */
+/**
+ * @param {*} obj1 struct obj **
+ * @param {*} obj2 struct obj **
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function obj_meld(obj1, obj2) {   // mkobj.c:3768
     let otmp1 = null, otmp2 = null, result = null, ox = 0, oy = 0;
     result = null;
@@ -3420,6 +3871,11 @@ export async function obj_meld(obj1, obj2) {   // mkobj.c:3768
     return result;
 }
 /* give a message if hero notices two globs merging [used to be in pline.c] */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {$T.obj | null} otmp2 struct obj *
+ * @returns {Promise<void>}
+ */
 export async function pudding_merge_message(otmp, otmp2) {   // mkobj.c:3818
     let visible = 0, onfloor = 0, inpack = 0, adj = 0;
     visible = $c.i8(cansee(otmp.ox, otmp.oy) || cansee(otmp2.ox, otmp2.oy) ? 1 : 0);

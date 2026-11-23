@@ -70,6 +70,12 @@ const ZT_SPELL_O_FIRE = 11;
 /* Note: Arrays are column first, while the screen is row first */
 const explosion = $c.matrix(Int32Array, [3, 3]);
 /* check if shield effects are needed for location affected by explosion */
+/**
+ * @param {$T.monst | null} m struct monst *
+ * @param {number} adtyp uchar
+ * @param {number} olet char
+ * @returns {Promise<number>} int
+ */
 async function explosionmask(m, adtyp, olet) {   // explode.c:26
     let res = 0;
     /* target monster (might be youmonst) */
@@ -167,6 +173,11 @@ async function explosionmask(m, adtyp, olet) {   // explode.c:26
     }
     return res;
 }
+/**
+ * @param {number} adtyp uchar
+ * @param {number} olet char
+ * @returns {Promise<void>}
+ */
 async function engulfer_explosion_msg(adtyp, olet) {   // explode.c:118
     let adj = null;
     adj = null;
@@ -246,6 +257,15 @@ async function engulfer_explosion_msg(adtyp, olet) {   // explode.c:118
  *      It has to be done this way because the damage value is applied to
  *      things beside the player. Care is taken within explode() to ensure
  *      that Half_physical_damage only affects the damage applied to the hero.
+ */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} type int
+ * @param {number} dam int
+ * @param {number} olet char
+ * @param {number} expltype int
+ * @returns {Promise<void>}
  */
 export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:199
     let i = 0, j = 0, k = 0, damu = 0, starting = 0, visible = 0, any_shield = 0, uhurt = 0, str = null, mtmp = null, mdef = null, adtyp = 0, explmask = $c.matrix(Int32Array, [3, 3]), xx = 0, yy = 0, shopdamage = Int8Array.of(0), generic = 0, do_hallu = 0, inside_engulfer = 0, grabbed = 0, grabbing = 0, grabxy = new $T.nhcoord(), hallu_buf = new Int8Array(256), killr_buf = new Int8Array(256), exploding_wand_typ = 0, you_exploding = 0, didmsg = 0, adstr = null, itemdmg = 0, tryct = 0, mdam = 0, xkflg = 0, $t1, $t2, $t3, $t4;
@@ -734,6 +754,14 @@ export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:
  *      MAY_FRACTURE    Stone objects can be fractured (statues, boulders)
  */
 /* returns number of scattered objects */
+/**
+ * @param {number} sx coordxy
+ * @param {number} sy coordxy
+ * @param {number} blastforce int
+ * @param {number} scflags unsigned int
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number | bigint>} long
+ */
 export async function scatter(sx, sy, blastforce, scflags, obj) {   // explode.c:721
     let otmp = null, tmp = 0, farthest = 0, typ = 0, qtmp = 0, used_up = 0, individual_object = 0, shop_origin = 0, lostgoods = 0, mtmp = null, shkp = null, stmp = null, stmp2 = null, schain = null, total = 0, waschain = 0, trap = null, dam = 0, hitvalu = 0, hitu = 0, x = 0, y = 0, obj_left_shop = 0, $t1, $t2, $t3;
     /* location of objects to scatter */
@@ -957,6 +985,12 @@ export async function scatter(sx, sy, blastforce, scflags, obj) {   // explode.c
  *
  * For now, just perform a "regular" explosion.
  */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} diluted_oil boolean
+ * @returns {Promise<void>}
+ */
 export async function splatter_burning_oil(x, y, diluted_oil) {   // explode.c:962
     let dmg = 0;
     dmg = d(diluted_oil ? 3 : 4, 4);
@@ -966,6 +1000,12 @@ export async function splatter_burning_oil(x, y, diluted_oil) {   // explode.c:9
 }
 /* lit potion of oil is exploding; extinguish it as a light source before
    possibly killing the hero and attempting to save bones */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function explode_oil(obj, x, y) {   // explode.c:974
     let diluted_oil = 0;
     diluted_oil = $c.i8(obj.oeroded);
@@ -977,6 +1017,10 @@ export async function explode_oil(obj, x, y) {   // explode.c:974
     await splatter_burning_oil(x, y, diluted_oil);
 }
 /* Convert a damage type into an explosion display type. */
+/**
+ * @param {number} adtyp const int
+ * @returns {Promise<number>} int
+ */
 export async function adtyp_to_expltype(adtyp) {   // explode.c:987
     switch (adtyp) {
         case AD.ELEC:
@@ -1006,6 +1050,11 @@ export async function adtyp_to_expltype(adtyp) {   // explode.c:987
 /* A monster explodes in a way that produces a real explosion (e.g. a sphere
  * or gas spore, not a yellow light or similar).
  * This is some common code between explmu() and explmm().
+ */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @returns {Promise<void>}
  */
 export async function mon_explodes(mon, mattk) {   // explode.c:1019
     let dmg = 0, type = 0;

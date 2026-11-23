@@ -37,6 +37,10 @@ import { luaL_argerror, luaL_checkany, luaL_checkinteger, luaL_checknumber, luaL
 const randfuncs = $h.data(48, 8);
 /* }================================================================== */
 const mathlib = $h.data(576, 8);
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function math_abs(L) {   // lmathlib.c:29
     let n = 0;
     if (lua_isinteger(L, 1)) {
@@ -50,26 +54,50 @@ async function math_abs(L) {   // lmathlib.c:29
     }
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function math_sin(L) {   // lmathlib.c:40
     lua_pushnumber(L, $hl.sin(await luaL_checknumber(L, 1)));
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function math_cos(L) {   // lmathlib.c:45
     lua_pushnumber(L, $hl.cos(await luaL_checknumber(L, 1)));
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function math_tan(L) {   // lmathlib.c:50
     lua_pushnumber(L, $hl.tan(await luaL_checknumber(L, 1)));
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function math_asin(L) {   // lmathlib.c:55
     lua_pushnumber(L, $hl.asin(await luaL_checknumber(L, 1)));
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function math_acos(L) {   // lmathlib.c:60
     lua_pushnumber(L, $hl.acos(await luaL_checknumber(L, 1)));
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function math_atan(L) {   // lmathlib.c:65
     let y = 0, x = 0;
     y = await luaL_checknumber(L, 1);
@@ -77,6 +105,10 @@ async function math_atan(L) {   // lmathlib.c:65
     lua_pushnumber(L, $hl.atan2(y, x));
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function math_toint(L) {   // lmathlib.c:73
     let n = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(4);
@@ -91,6 +123,10 @@ async function math_toint(L) {   // lmathlib.c:73
         return 1;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} d lua_Number
+ */
 function pushnumint(L, d) {   // lmathlib.c:86
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
     try {
@@ -101,6 +137,10 @@ function pushnumint(L, d) {   // lmathlib.c:86
         }
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function math_floor(L) {   // lmathlib.c:95
     let d = 0;
     if (lua_isinteger(L, 1)) {
@@ -111,6 +151,10 @@ async function math_floor(L) {   // lmathlib.c:95
     }
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function math_ceil(L) {   // lmathlib.c:106
     let d = 0;
     if (lua_isinteger(L, 1)) {
@@ -121,6 +165,10 @@ async function math_ceil(L) {   // lmathlib.c:106
     }
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function math_fmod(L) {   // lmathlib.c:117
     let d = 0;
     if (lua_isinteger(L, 1) && lua_isinteger(L, 2)) {
@@ -142,6 +190,10 @@ async function math_fmod(L) {   // lmathlib.c:117
 ** (which is not compatible with 'float*') when lua_Number is not
 ** 'double'.
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function math_modf(L) {   // lmathlib.c:139
     let n = 0, ip = 0;
     if (lua_isinteger(L, 1)) {
@@ -157,10 +209,18 @@ async function math_modf(L) {   // lmathlib.c:139
     }
     return 2;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function math_sqrt(L) {   // lmathlib.c:156
     lua_pushnumber(L, $hl.sqrt(await luaL_checknumber(L, 1)));
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function math_ult(L) {   // lmathlib.c:162
     let a = 0, b = 0;
     a = await luaL_checkinteger(L, 1);
@@ -168,6 +228,10 @@ async function math_ult(L) {   // lmathlib.c:162
     lua_pushboolean(L, $c.u64(a) < $c.u64(b) ? 1 : 0);
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function math_log(L) {   // lmathlib.c:169
     let x = 0, res = 0, base = 0;
     x = await luaL_checknumber(L, 1);
@@ -186,18 +250,34 @@ async function math_log(L) {   // lmathlib.c:169
     lua_pushnumber(L, res);
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function math_exp(L) {   // lmathlib.c:190
     lua_pushnumber(L, $hl.exp(await luaL_checknumber(L, 1)));
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function math_deg(L) {   // lmathlib.c:195
     lua_pushnumber(L, await luaL_checknumber(L, 1) * (180.0 / 3.141592653589793));
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function math_rad(L) {   // lmathlib.c:200
     lua_pushnumber(L, await luaL_checknumber(L, 1) * (3.141592653589793 / 180.0));
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function math_min(L) {   // lmathlib.c:206
     let n = 0, imin = 0, i = 0;
     n = lua_gettop(L);   /* number of arguments */
@@ -211,6 +291,10 @@ async function math_min(L) {   // lmathlib.c:206
     lua_pushvalue(L, imin);
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function math_max(L) {   // lmathlib.c:220
     let n = 0, imax = 0, i = 0;
     n = lua_gettop(L);   /* number of arguments */
@@ -224,6 +308,10 @@ async function math_max(L) {   // lmathlib.c:220
     lua_pushvalue(L, imax);
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function math_type(L) {   // lmathlib.c:234
     if (lua_type(L, 1) === 3) {
         await lua_pushstring(L, lua_isinteger(L, 1) ? $h.lit("integer") : $h.lit("float"));
@@ -264,9 +352,18 @@ async function math_type(L) {   // lmathlib.c:234
 */
 /* avoid using extra bits when needed */
 /* rotate left 'x' by 'n' bits */
+/**
+ * @param {number | bigint} x unsigned long
+ * @param {number} n int
+ * @returns {number | bigint} unsigned long
+ */
 function rotl(x, n) {   // lmathlib.c:316
     return $c.oru64($c.shlu64(x, n), $c.shru64($c.andu64(x, 18446744073709551615n), 64 - n | 0));
 }
+/**
+ * @param {number} state unsigned long *
+ * @returns {number | bigint} unsigned long
+ */
 function nextrand(state) {   // lmathlib.c:320
     let state0 = 0, state1 = 0, state2 = 0, state3 = 0, res = 0, $t1;
     state0 = $h.ldu64(state);
@@ -292,6 +389,10 @@ function nextrand(state) {   // lmathlib.c:320
 */
 /* must throw out the extra (64 - FIGS) bits */
 /* 2^(-FIGS) == 2^-1 / 2^(FIGS-1) */
+/**
+ * @param {number | bigint} x unsigned long
+ * @returns {number} lua_Number
+ */
 function I2d(x) {   // lmathlib.c:351
     let sx = 0, res = 0;
     sx = $c.i64($c.shru64($c.andu64(x, 18446744073709551615n), 11));
@@ -312,6 +413,12 @@ function I2d(x) {   // lmathlib.c:351
 ** is inside [0, n], we are done. Otherwise, we try with another 'ran',
 ** until we have a result inside the interval.
 */
+/**
+ * @param {number | bigint} ran lua_Unsigned
+ * @param {number | bigint} n lua_Unsigned
+ * @param {number} state RanState *
+ * @returns {number | bigint} lua_Unsigned
+ */
 function project(ran, n, state) {   // lmathlib.c:549
     let lim = 0;
     if ($c.andu64(n, $c.addu64(n, 1)) === 0) {   /* is 'n + 1' a power of 2? */
@@ -335,6 +442,10 @@ function project(ran, n, state) {   // lmathlib.c:549
         return ran;
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function math_random(L) {   // lmathlib.c:574
     let low = 0, up = 0, p = 0, state = 0, rv = 0;
     state = lua_touserdata(L, -1001001);
@@ -376,6 +487,12 @@ async function math_random(L) {   // lmathlib.c:574
     lua_pushinteger(L, $c.i64($c.addu64(p, $c.u64(low))));
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} state unsigned long *
+ * @param {number | bigint} n1 lua_Unsigned
+ * @param {number | bigint} n2 lua_Unsigned
+ */
 function setseed(L, state, n1, n2) {   // lmathlib.c:609
     let i = 0;
     $h.st64(state, n1);
@@ -393,12 +510,20 @@ function setseed(L, state, n1, n2) {   // lmathlib.c:609
 ** and the address of 'L' (in case the machine does address space layout
 ** randomization).
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} state RanState *
+ */
 function randseed(L, state) {   // lmathlib.c:628
     let seed1 = 0, seed2 = 0;
     seed1 = $c.u64($c.time($h.PI64(0)));
     seed2 = L;
     setseed(L, state, seed1, seed2);
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function math_randomseed(L) {   // lmathlib.c:635
     let state = 0, n1 = 0, n2 = 0;
     state = lua_touserdata(L, -1001001);
@@ -414,6 +539,10 @@ async function math_randomseed(L) {   // lmathlib.c:635
 /*
 ** Register the random functions and initialize their state.
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<void>}
+ */
 async function setrandfunc(L) {   // lmathlib.c:659
     let state = 0;
     state = await lua_newuserdatauv(L, 32, 0);
@@ -427,18 +556,34 @@ async function setrandfunc(L) {   // lmathlib.c:659
 ** Deprecated functions (for compatibility only)
 ** ===================================================================
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function math_cosh(L) {   // lmathlib.c:676
     lua_pushnumber(L, $hl.cosh(await luaL_checknumber(L, 1)));
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function math_sinh(L) {   // lmathlib.c:681
     lua_pushnumber(L, $hl.sinh(await luaL_checknumber(L, 1)));
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function math_tanh(L) {   // lmathlib.c:686
     lua_pushnumber(L, $hl.tanh(await luaL_checknumber(L, 1)));
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function math_pow(L) {   // lmathlib.c:691
     let x = 0, y = 0;
     x = await luaL_checknumber(L, 1);
@@ -446,6 +591,10 @@ async function math_pow(L) {   // lmathlib.c:691
     lua_pushnumber(L, $hl.pow(x, y));
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function math_frexp(L) {   // lmathlib.c:698
     const $sp0 = $h.st.sp, $fp = $h.enter(4);
     try {
@@ -454,6 +603,10 @@ async function math_frexp(L) {   // lmathlib.c:698
         return 2;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function math_ldexp(L) {   // lmathlib.c:705
     let x = 0, ep = 0;
     x = await luaL_checknumber(L, 1);
@@ -461,6 +614,10 @@ async function math_ldexp(L) {   // lmathlib.c:705
     lua_pushnumber(L, $hl.ldexp(x, ep));
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function math_log10(L) {   // lmathlib.c:712
     lua_pushnumber(L, $hl.log10(await luaL_checknumber(L, 1)));
     return 1;
@@ -468,6 +625,10 @@ async function math_log10(L) {   // lmathlib.c:712
 /*
 ** Open math library
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 export async function luaopen_math(L) {   // lmathlib.c:768
     await luaL_checkversion_(L, 504, 136), await lua_createtable(L, 0, 35), await luaL_setfuncs(L, mathlib, 0);
     lua_pushnumber(L, 3.141592653589793);

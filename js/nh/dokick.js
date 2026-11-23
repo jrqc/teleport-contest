@@ -93,6 +93,11 @@ const DELIVER_PM = 8702;
 const really_kick_object$flyingcoinmsg = $c.nulls(3);   // static in really_kick_object()
 const kick_passes_thru = new Int8Array(31);
 /* kicking damage when not poly'd into a form with a kick attack */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} clumsy boolean
+ * @returns {Promise<void>}
+ */
 async function kickdmg(mon, clumsy) {   // dokick.c:34
     let mdx = 0, mdy = 0, dmg = 0, specialdmg = 0, kick_skill = 0, trapkilled = 0;
     dmg = $c.div32((ACURRSTR() + ACURR(A.DEX) | 0) + ACURR(A.CON) | 0, 15);
@@ -181,6 +186,12 @@ async function kickdmg(mon, clumsy) {   // dokick.c:34
         await use_skill(kick_skill, 1);
     }
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} boolean
+ */
 async function maybe_kick_monster(mon, x, y) {   // dokick.c:126
     let save_forcefight = 0;
     if (mon) {
@@ -200,6 +211,12 @@ async function maybe_kick_monster(mon, x, y) {   // dokick.c:126
     }
     return $c.i8(mon !== null ? 1 : 0);
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 async function kick_monster(mon, x, y) {   // dokick.c:146
     let clumsy = 0, i = 0, j = 0, uattk = null, sum = 0, kickdieroll = 0, armorpenalty = Int32Array.of(0), specialdmg = 0, attknum = Int32Array.of(0), tmp = 0;
     clumsy = FALSE;
@@ -321,6 +338,11 @@ async function kick_monster(mon, x, y) {   // dokick.c:146
  *  Return TRUE if caught (the gold taken care of), FALSE otherwise.
  *  The gold object is *not* attached to the fobj chain!
  */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.obj | null} gold struct obj *
+ * @returns {Promise<number>} boolean
+ */
 export async function ghitm(mtmp, gold) {   // dokick.c:295
     let msg_given = 0, was_sleeping = 0, umoney = 0, value = 0, robbed = 0, was_angry = 0, goldreqd = 0;
     msg_given = FALSE;
@@ -424,6 +446,12 @@ export async function ghitm(mtmp, gold) {   // dokick.c:295
 }
 /* container is kicked, dropped, thrown or otherwise impacted by player.
  * Assumes container is on floor.  Checks contents for possible damage. */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function container_impact_dmg(obj, x, y) {   // dokick.c:412
     let shkp = null, otmp = null, otmp2 = null, loss = 0, costly = 0, insider = 0, frominv = 0, wchange = 0, result = null, $t1;
     /* coordinates where object was */
@@ -489,6 +517,12 @@ export async function container_impact_dmg(obj, x, y) {   // dokick.c:412
     }
 }
 /* jacket around really_kick_object */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$c.Ptr | null} kickobjnam char *
+ * @returns {Promise<number>} int
+ */
 async function kick_object(x, y, kickobjnam) {   // dokick.c:489
     let res = 0;
     res = 0;
@@ -505,6 +539,11 @@ async function kick_object(x, y, kickobjnam) {   // dokick.c:489
     return res;
 }
 /* guts of kick_object */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} int
+ */
 async function really_kick_object(x, y) {   // dokick.c:508
     let range = 0, mon = null, shkp = null, trap = null, bhitroom = 0, costly = 0, isgold = 0, slide = 0, k_owt = 0, save_quan = 0, otrp = 0, gtg = 0, $t1;
     shkp = null;
@@ -752,6 +791,11 @@ async function really_kick_object(x, y) {   // dokick.c:508
     return 1;
 }
 /* cause of death if kicking kills kicker */
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @param {$c.Ptr | null} kickobjnam const char *
+ * @returns {$c.Ptr | null} char *
+ */
 function kickstr(buf, kickobjnam) {   // dokick.c:794
     let what = null;
     if (kickobjnam.get(0)) {
@@ -789,6 +833,10 @@ function kickstr(buf, kickobjnam) {   // dokick.c:794
     }
     return $c.strcat($c.strcpy(buf, $c.lit("kicking ")), what);
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} boolean
+ */
 async function watchman_thief_arrest(mtmp) {   // dokick.c:834
     if (is_watch(mtmp.data) && couldsee(mtmp.mx, mtmp.my) && mtmp.mpeaceful | 0) {
         await mon_yells(mtmp, $c.lit("Halt, thief!  You're under arrest!"));
@@ -797,6 +845,12 @@ async function watchman_thief_arrest(mtmp) {   // dokick.c:834
     }
     return FALSE;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} boolean
+ */
 async function watchman_door_damage(mtmp, x, y) {   // dokick.c:846
     if (is_watch(mtmp.data) && mtmp.mpeaceful | 0 && couldsee(mtmp.mx, mtmp.my)) {
         if ((svl.level.locations[x][y].flags | 0) & D_WARNED) {
@@ -810,6 +864,11 @@ async function watchman_door_damage(mtmp, x, y) {   // dokick.c:846
     }
     return FALSE;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 async function kick_dumb(x, y) {   // dokick.c:864
     await exercise(A.DEX, FALSE);
     if (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || $c.peq(gy.youmonst.data, $c.relem(mons, PM.SASQUATCH)) || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS || ACURR(A.DEX) >= 16 || rn2(3)) {
@@ -826,6 +885,12 @@ async function kick_dumb(x, y) {   // dokick.c:864
         await hurtle(-u.dx | 0, -u.dy | 0, 1, TRUE);
     }
 }
+/**
+ * @param {number} x$in coordxy
+ * @param {number} y$in coordxy
+ * @param {$c.Ptr | null} kickobjnam const char *
+ * @returns {Promise<void>}
+ */
 async function kick_ouch(x$in, y$in, kickobjnam) {   // dokick.c:881
     const x = Int16Array.of(x$in);
     const y = Int16Array.of(y$in);
@@ -855,6 +920,12 @@ async function kick_ouch(x$in, y$in, kickobjnam) {   // dokick.c:881
     }
 }
 /* kick a door */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} avrg_attrib int
+ * @returns {Promise<void>}
+ */
 async function kick_door(x, y, avrg_attrib) {   // dokick.c:910
     let doorbuster = 0, shopdoor = 0;
     if ((gm.maploc.flags | 0) === D.ISOPEN || (gm.maploc.flags | 0) === D.BROKEN || (gm.maploc.flags | 0) === D.NODOOR) {
@@ -912,6 +983,12 @@ async function kick_door(x, y, avrg_attrib) {   // dokick.c:910
     }
 }
 /* kick non-door terrain */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} avrg_attrib int
+ * @returns {Promise<number>} int
+ */
 async function kick_nondoor(x, y, avrg_attrib) {   // dokick.c:974
     let i = 0, treefruit = null, nfruit = 0, nfall = 0, frtype = 0, cnt = 0, made = 0, mm = new $T.nhcoord(), gend = 0, $t1, $t2, $t3;
     if (gm.maploc.typ === SDOOR) {
@@ -1177,6 +1254,9 @@ async function kick_nondoor(x, y, avrg_attrib) {   // dokick.c:974
     return ECMD.TIME;
 }
 /* the #kick command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dokick() {   // dokick.c:1257
     let x = 0, y = 0, avrg_attrib = 0, glyph = 0, oldglyph = 0, mtmp = null, no_kick = 0, xx = 0, yy = 0, mdat = null, range = 0, kickobjnam = new Int8Array(256);
     oldglyph = -1;
@@ -1369,6 +1449,12 @@ export async function dokick() {   // dokick.c:1257
     }
     return ECMD.TIME;
 }
+/**
+ * @param {$T.nhcoord | null} cc coord *
+ * @param {number} loc schar
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ */
 function drop_to(cc, loc, x, y) {   // dokick.c:1473
     let stway = null, $t1, $t2;
     stway = stairway_at(x, y);
@@ -1404,6 +1490,13 @@ function drop_to(cc, loc, x, y) {   // dokick.c:1473
     }
 }
 /* player or missile impacts location, causing objects to fall down */
+/**
+ * @param {$T.obj | null} missile struct obj *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} dlev xint16
+ * @returns {Promise<void>}
+ */
 export async function impact_drop(missile, x, y, dlev) {   // dokick.c:1511
     let toloc = 0, obj = null, obj2 = null, shkp = null, oct = 0, dct = 0, price = 0, debit = 0, robbed = 0, angry = 0, costly = 0, isrock = 0, cc = new $T.nhcoord(), what = null, amt = 0;
     /* caused impact, won't drop itself */
@@ -1514,6 +1607,13 @@ export async function impact_drop(missile, x, y, dlev) {   // dokick.c:1511
 /* NOTE: ship_object assumes otmp was FREED from fobj or invent.
  * <x,y> is the point of drop.  otmp is _not_ an <x,y> resident:
  * otmp is either a kicked, dropped, or thrown object.
+ */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} shop_floor_obj boolean
+ * @returns {Promise<number>} boolean
  */
 export async function ship_object(otmp, x, y, shop_floor_obj) {   // dokick.c:1639
     let toloc = 0, ox = 0, oy = 0, cc = new $T.nhcoord(), obj = null, t = null, nodrop = 0, unpaid = 0, container = 0, impact = 0, chainthere = 0, n = 0, result = null;
@@ -1629,6 +1729,10 @@ export async function ship_object(otmp, x, y, shop_floor_obj) {   // dokick.c:16
     }
     return TRUE;
 }
+/**
+ * @param {number} near_hero boolean
+ * @returns {Promise<void>}
+ */
 export async function obj_delivery(near_hero) {   // dokick.c:1769
     let otmp = null, otmp2 = null, nx = 0, ny = 0, where = 0, nobreak = 0, noscatter = 0, stway = null, fromdlev = new $T.d_level(), isladder = 0, $t1;
     nx = 0;
@@ -1705,6 +1809,12 @@ export async function obj_delivery(near_hero) {   // dokick.c:1769
         }
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} cnt int
+ * @param {number | bigint} deliverflags unsigned long
+ * @returns {Promise<void>}
+ */
 export async function deliver_obj_to_mon(mtmp, cnt, deliverflags) {   // dokick.c:1854
     let otmp = null, otmp2 = null, where = 0, maxobj = 0, at_crime_scene = 0, $t1;
     maxobj = 1;
@@ -1749,6 +1859,13 @@ export async function deliver_obj_to_mon(mtmp, cnt, deliverflags) {   // dokick.
         }
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} nodrop boolean
+ * @param {number} chainthere boolean
+ * @param {number | bigint} num long
+ * @returns {Promise<void>}
+ */
 async function otransit_msg(otmp, nodrop, chainthere, num) {   // dokick.c:1909
     let optr = null, obuf = new Int8Array(256), xbuf = new Int8Array(256);
     optr = null;
@@ -1781,6 +1898,11 @@ async function otransit_msg(otmp, nodrop, chainthere, num) {   // dokick.c:1909
     }
 }
 /* migration destination for objects which fall down to next level */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} schar
+ */
 export async function down_gate(x, y) {   // dokick.c:1943
     let ttmp = null, stway = null;
     stway = stairway_at(x, y);

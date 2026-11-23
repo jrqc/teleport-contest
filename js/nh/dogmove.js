@@ -85,6 +85,10 @@ const droppables$dummy = new $T.obj();   // static in droppables()
 const nofetch = new Int8Array(4);
 const qm = $c.recArray($T.qmchoices, 9);
 /* pick a carried item for pet to drop */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function droppables(mon) {   // dogmove.c:28
     let obj = null, wep = null, pickaxe = null, unihorn = null, key = null;
     /*
@@ -191,6 +195,11 @@ export async function droppables(mon) {   // dogmove.c:28
     }
     return null;   /* don't drop anything */
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 export function cursed_object_at(x, y) {   // dogmove.c:145
     let otmp = null;
     for (otmp = svl.level.objects[x][y]; otmp; otmp = otmp.v.v_nexthere) {
@@ -200,6 +209,11 @@ export function cursed_object_at(x, y) {   // dogmove.c:145
     }
     return FALSE;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function dog_nutrition(mtmp, obj) {   // dogmove.c:156
     let nutrit = 0, $t1;
     /*
@@ -260,6 +274,14 @@ export async function dog_nutrition(mtmp, obj) {   // dogmove.c:156
     return nutrit;
 }
 /* returns 2 if pet dies, otherwise 1 */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} devour boolean
+ * @returns {Promise<number>} int
+ */
 export async function dog_eat(mtmp, obj, x, y, devour) {   // dogmove.c:218
     let edog = null, nutrit = 0, res = 0, oprice = 0, objnambuf = new Int8Array(256), obj_name = null, seeobj = 0, sawpet = 0, prior_apport = 0;
     /* if unpaid, then thrown or kicked by hero */
@@ -379,6 +401,10 @@ export async function dog_eat(mtmp, obj, x, y, devour) {   // dogmove.c:218
     }
     return DEADMONSTER(mtmp) ? 2 : 1;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 async function dog_starve(mtmp) {   // dogmove.c:348
     if (mtmp.mleashed | 0 && !$c.peq(mtmp, u.usteed)) {
         await Your($c.lit("leash goes slack."));
@@ -390,6 +416,11 @@ async function dog_starve(mtmp) {   // dogmove.c:348
     await mondied(mtmp);
 }
 /* hunger effects -- returns TRUE on starvation */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.edog | null} edog struct edog *
+ * @returns {Promise<number>} boolean
+ */
 async function dog_hunger(mtmp, edog) {   // dogmove.c:362
     let newmhpmax = 0;
     if (svm.moves > $c.add64(edog.hungrytime, DOG_WEAK)) {
@@ -426,6 +457,12 @@ async function dog_hunger(mtmp, edog) {   // dogmove.c:362
 }
 /* do something with object (drop, pick up, eat) at current position
  * returns 1 if object eaten (since that counts as dog's move), 2 if died
+ */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.edog | null} edog struct edog *
+ * @param {number} udist int
+ * @returns {Promise<number>} int
  */
 async function dog_invent(mtmp, edog, udist) {   // dogmove.c:400
     let omx = 0, omy = 0, carryamt = 0, obj = null, otmp = null, edible = 0, otmpname = null;
@@ -496,6 +533,14 @@ async function dog_invent(mtmp, edog, udist) {   // dogmove.c:400
 }
 /* set dog's goal -- gtyp, gx, gy;
    returns -1/0/1 (dog's desire to approach player) or -2 (abort move) */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.edog | null} edog struct edog *
+ * @param {number} after int
+ * @param {number} udist int
+ * @param {number} whappr int
+ * @returns {Promise<number>} int
+ */
 async function dog_goal(mtmp, edog, after, udist, whappr) {   // dogmove.c:483
     let omx = 0, omy = 0, in_masters_sight = 0, dog_has_minvent = 0, obj = null, otyp = 0, appr = 0, min_x = 0, max_x = 0, min_y = 0, max_y = 0, nx = 0, ny = 0, t = null, cp = null, fardist = Int32Array.of(0), $t1, $t2;
     /* Steeds don't move on their own will */
@@ -639,6 +684,13 @@ async function dog_goal(mtmp, edog, after, udist, whappr) {   // dogmove.c:483
     }
     return appr;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} dx int
+ * @param {number} dy int
+ * @param {number} maxdist int
+ * @returns {$T.monst | null} struct monst *
+ */
 function find_targ(mtmp, dx, dy, maxdist) {   // dogmove.c:650
     let targ = null, curx = 0, cury = 0, dist = 0;
     targ = null;
@@ -677,6 +729,12 @@ function find_targ(mtmp, dx, dy, maxdist) {   // dogmove.c:650
     }
     return targ;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.monst | null} mtarg struct monst *
+ * @param {number} maxdist int
+ * @returns {number} int
+ */
 function find_friends(mtmp, mtarg, maxdist) {   // dogmove.c:694
     let pal = null, dx = 0, dy = 0, curx = 0, cury = 0, dist = 0;
     dx = sgn(mtarg.mx - mtmp.mx | 0);
@@ -717,6 +775,11 @@ function find_friends(mtmp, mtarg, maxdist) {   // dogmove.c:694
     }
     return 0;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.monst | null} mtarg struct monst *
+ * @returns {number | bigint} long
+ */
 function score_targ(mtmp, mtarg) {   // dogmove.c:738
     let score = 0, mtmp_lev = 0, align1 = 0, align2 = 0, faith1 = 0, faith2 = 0;
     score = 0;
@@ -819,6 +882,11 @@ function score_targ(mtmp, mtarg) {   // dogmove.c:738
     }
     return score;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} forced boolean
+ * @returns {$T.monst | null} struct monst *
+ */
 function best_target(mtmp, forced) {   // dogmove.c:838
     let dx = 0, dy = 0, bestscore = 0, currscore = 0, best_targ = null, temp_targ = null;
     /* Pet */
@@ -866,6 +934,11 @@ function best_target(mtmp, forced) {   // dogmove.c:838
     return best_targ;
 }
 /* Pet considers and maybe executes a ranged attack */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} forced boolean
+ * @returns {Promise<number>} int
+ */
 export async function pet_ranged_attk(mtmp, forced) {   // dogmove.c:889
     let mtarg = null, hungry = 0, dog = null, mstatus = 0, mresp = 0;
     hungry = 0;
@@ -944,6 +1017,11 @@ export async function pet_ranged_attk(mtmp, forced) {   // dogmove.c:889
  * 2: monster died.
  * 3: did not move, and can't do anything else either.
  *    (may have attacked something)
+ */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} after int
+ * @returns {Promise<number>} int
  */
 export async function dog_move(mtmp, after) {   // dogmove.c:977
     let omx = 0, omy = 0, appr = 0, whappr = 0, udist = 0, i = 0, j = 0, k = 0, edog = null, obj = null, otyp = 0, cursemsg = new Int8Array(9), do_eat = 0, better_with_displacing = 0, ranged_only = 0, nix = 0, niy = 0, nx = 0, ny = 0, cnt = 0, uncursedcnt = 0, chcnt = 0, chi = 0, nidist = 0, ndist = 0, allowflags = 0, mfp = new $T.mfndposdata(), mstatus = 0, mtmp2 = null, balk = 0, mstatus$2 = 0, mtmp2$2 = null, trap = null, can_reach_food = 0, wasseen = 0, o = null, what = null, cc = new $T.nhcoord();
@@ -1277,6 +1355,12 @@ export async function dog_move(mtmp, after) {   // dogmove.c:977
     return MMOVE.MOVED;
 }
 /* check if a monster could pick up objects from a location */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} nx coordxy
+ * @param {number} ny coordxy
+ * @returns {number} boolean
+ */
 export function could_reach_item(mon, nx, ny) {   // dogmove.c:1362
     if ((!is_pool(nx, ny) || is_swimmer(mon.data)) && (!is_lava(nx, ny) || likes_lava(mon.data)) && (!sobj_at(BOULDER, nx, ny) || throws_rocks(mon.data))) {
         return TRUE;
@@ -1289,6 +1373,14 @@ export function could_reach_item(mon, nx, ny) {   // dogmove.c:1362
  * a little smarter; a full check would probably be useful in m_move() too.
  * Since the maximum food distance is 5, this should never be more than 5
  * calls deep.
+ */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} mx coordxy
+ * @param {number} my coordxy
+ * @param {number} fx coordxy
+ * @param {number} fy coordxy
+ * @returns {number} boolean
  */
 function can_reach_location(mon, mx, my, fx, fy) {   // dogmove.c:1379
     let i = 0, j = 0, dist = 0;
@@ -1325,6 +1417,11 @@ function can_reach_location(mon, mx, my, fx, fy) {   // dogmove.c:1379
     return FALSE;
 }
 /* do_clear_area client */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {*} distance genericptr_t
+ */
 function wantdoor(x, y, distance) {   // dogmove.c:1418
     let ndist = 0, dist_ptr = null;
     dist_ptr = $c.asArr(distance, Int32Array);
@@ -1334,6 +1431,10 @@ function wantdoor(x, y, distance) {   // dogmove.c:1418
         dist_ptr.set(0, ndist);
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function finish_meating(mtmp) {   // dogmove.c:1448
     mtmp.meating = 0;
     if (M_AP_TYPE(mtmp) !== M_AP.NOTHING && mtmp.data.mlet !== S.MIMIC) {
@@ -1345,9 +1446,17 @@ export async function finish_meating(mtmp) {   // dogmove.c:1448
 }
 /*
  * variation of leashable() that takes a PM_ index */
+/**
+ * @param {number} mnum int
+ * @returns {number} boolean
+ */
 function mnum_leashable(mnum) {   // dogmove.c:1462
     return $c.i8(mnum >= LOW_PM && mnum <= HIGH_PM && mnum !== PM.LONG_WORM && !unsolid($c.relem(mons, mnum)) && (!nolimbs($c.relem(mons, mnum)) || has_head($c.relem(mons, mnum))) ? TRUE : FALSE);
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function quickmimic(mtmp) {   // dogmove.c:1472
     let idx = 0, trycnt = 0, spotted = 0, seeloc = 0, was_leashed = 0, buf = new Int8Array(256), prev_glyph = 0, what = null;
     idx = 0;

@@ -65,6 +65,11 @@ import { drain_item, resist } from './zap.js';
 
 const mon_poly$freaky = new Int8Array(36);   // static in mon_poly()
 const brief_feeling = new Int8Array(48);
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @returns {Promise<void>}
+ */
 async function noises(magr, mattk) {   // mhitm.c:27
     let farq = 0;
     farq = $c.i8(dist2(magr.mx, magr.my, u.ux, u.uy) > 15 ? 1 : 0);
@@ -74,6 +79,11 @@ async function noises(magr, mattk) {   // mhitm.c:27
         await You_hear($c.lit("%s%s."), mattk.aatyp === AT.EXPL ? $c.lit("an explosion") : $c.lit("some noises"), farq ? $c.lit(" in the distance") : $c.lit(""));
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.monst | null} mdef struct monst *
+ * @returns {Promise<void>}
+ */
 async function pre_mm_attack(magr, mdef) {   // mhitm.c:41
     let showit = 0;
     showit = FALSE;
@@ -107,6 +117,12 @@ async function pre_mm_attack(magr, mdef) {   // mhitm.c:41
     }
 }
 /* feedback for when a monster-vs-monster attack misses */
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @returns {Promise<void>}
+ */
 async function missmm(magr, mdef, mattk) {   // mhitm.c:76
     /* attacker */
     /* defender */
@@ -130,6 +146,10 @@ async function missmm(magr, mdef, mattk) {   // mhitm.c:76
  *  digest the hero.
  */
 /* have monsters fight each other */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} int
+ */
 export async function fightm(mtmp) {   // mhitm.c:106
     let mon = null, nmon = null, result = 0, has_u_swallowed = 0;
     /* perhaps the monster will resist Conflict */
@@ -198,6 +218,12 @@ export async function fightm(mtmp) {   // mhitm.c:106
 /*
  * mdisplacem() -- attacker moves defender out of the way;
  *                 returns same results as mattackm().
+ */
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {number} quietly boolean
+ * @returns {Promise<number>} int
  */
 export async function mdisplacem(magr, mdef, quietly) {   // mhitm.c:179
     let pa = null, pd = null, tx = 0, ty = 0, fx = 0, fy = 0, $t1;
@@ -303,6 +329,11 @@ export async function mdisplacem(magr, mdef, quietly) {   // mhitm.c:179
  * <mdef->mx,mdef->my>; matters for long worms.
  *
  * In the case of exploding monsters, the monster dies as well.
+ */
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.monst | null} mdef struct monst *
+ * @returns {Promise<number>} int
  */
 export async function mattackm(magr, mdef) {   // mhitm.c:293
     let i = 0, tmp = 0, strike = 0, attk = 0, struck = 0, res = new Int32Array(6), dieroll = 0, mattk = null, alt_attk = new $T.attack(), mwep = null, pa = null, pd = null, justone = 0, montype = null, mclone = null, mmtmp = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
@@ -595,6 +626,12 @@ export async function mattackm(magr, mdef) {   // mhitm.c:293
 }
 /* can't hold an unsolid target (ghosts, lights, vortices, most elementals)
    or a long worm tail */
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @returns {Promise<number>} boolean
+ */
 export async function failed_grab(magr, mdef, mattk) {   // mhitm.c:597
     let magrnam = new Int8Array(256), mdefnam = new Int8Array(256), tailmiss = 0, verb = null;
     /* hug attack: most holders (owlbear, python, pit fiend, &c);
@@ -627,6 +664,14 @@ export async function failed_grab(magr, mdef, mattk) {   // mhitm.c:597
     return FALSE;
 }
 /* Returns the result of mdamagem(). */
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.obj | null} mwep struct obj *
+ * @param {number} dieroll int
+ * @returns {Promise<number>} int
+ */
 async function hitmm(magr, mdef, mattk, mwep, dieroll) {   // mhitm.c:644
     let compat = 0, weaponhit = 0, silverhit = 0, buf = new Int8Array(256), magr_name = new Int8Array(256), mdef_name = null;
     weaponhit = $c.i8(mattk.aatyp === AT.WEAP || mattk.aatyp === AT.CLAW && mwep ? 1 : 0);
@@ -700,6 +745,12 @@ async function hitmm(magr, mdef, mattk, mwep, dieroll) {   // mhitm.c:644
     return await mdamagem(magr, mdef, mattk, mwep, dieroll);
 }
 /* Returns the same values as mdamagem(). */
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @returns {Promise<number>} int
+ */
 async function gazemm(magr, mdef, mattk) {   // mhitm.c:736
     let buf = new Int8Array(256), archon = 0, altmesg = 0;
     /* an Archon's gaze affects target even if Archon itself is blinded */
@@ -762,6 +813,11 @@ async function gazemm(magr, mdef, mattk) {   // mhitm.c:736
     return await mdamagem(magr, mdef, mattk, null, 0);
 }
 /* return True if magr is allowed to swallow mdef, False otherwise */
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.monst | null} mdef struct monst *
+ * @returns {number} boolean
+ */
 export function engulf_target(magr, mdef) {   // mhitm.c:807
     let lev = null, ax = 0, ay = 0, dx = 0, dy = 0, uatk = 0, udef = 0;
     uatk = $c.i8($c.peq(magr, gy.youmonst) ? 1 : 0);
@@ -795,6 +851,12 @@ export function engulf_target(magr, mdef) {   // mhitm.c:807
     return TRUE;
 }
 /* Returns the same values as mattackm(). */
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @returns {Promise<number>} int
+ */
 async function gulpmm(magr, mdef, mattk) {   // mhitm.c:849
     let ax = 0, ay = 0, dx = 0, dy = 0, status = 0, obj = null;
     if (!engulf_target(magr, mdef)) {
@@ -891,6 +953,12 @@ async function gulpmm(magr, mdef, mattk) {   // mhitm.c:849
     }
     return status;
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @returns {Promise<number>} int
+ */
 async function explmm(magr, mdef, mattk) {   // mhitm.c:970
     let result = 0, was_leashed = 0;
     if (magr.mcan) {
@@ -930,6 +998,14 @@ async function explmm(magr, mdef, mattk) {   // mhitm.c:970
 }
 /*
  *  See comment at top of mattackm(), for return values.
+ */
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.obj | null} mwep struct obj *
+ * @param {number} dieroll int
+ * @returns {Promise<number>} int
  */
 async function mdamagem(magr, mdef, mattk, mwep, dieroll) {   // mhitm.c:1016
     let pa = null, pd = null, mhm = new $T.mhitm_data(), protector = 0, wornitems = 0, $t1, $t2;
@@ -1018,6 +1094,12 @@ async function mdamagem(magr, mdef, mattk, mwep, dieroll) {   // mhitm.c:1016
     }
     return mhm.hitflags === M_ATTK.AGR_DIED ? M_ATTK.AGR_DIED : M_ATTK.HIT;
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {number} dmg int
+ * @returns {Promise<number>} int
+ */
 export async function mon_poly(magr, mdef, dmg) {   // mhitm.c:1122
     let oldform = null, Before = new Int8Array(256), was_seen = 0, verbosely = 0, $t1;
     oldform = mdef.data;
@@ -1097,6 +1179,10 @@ export async function mon_poly(magr, mdef, dmg) {   // mhitm.c:1122
     }
     return dmg;
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} amt int
+ */
 export function paralyze_monst(mon, amt) {   // mhitm.c:1210
     if (amt > 127) {
         amt = 127;
@@ -1107,6 +1193,12 @@ export function paralyze_monst(mon, amt) {   // mhitm.c:1210
     mon.mstrategy = $c.andu64(mon.mstrategy, 18446744073172680703n);
 }
 /* `mon' is hit by a sleep attack; return 1 if it's affected, 0 otherwise */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} amt int
+ * @param {number} how int
+ * @returns {Promise<number>} int
+ */
 export async function sleep_monst(mon, amt, how) {   // mhitm.c:1223
     /* reveal mimic unless already asleep or paralyzed (won't be 'busy') */
     if (how >= 0 && !mon.msleeping && !mon.mfrozen && mon.data.mlet === S.MIMIC && (M_AP_TYPE(mon) === M_AP.FURNITURE || M_AP_TYPE(mon) === M_AP.OBJECT)) {
@@ -1130,12 +1222,21 @@ export async function sleep_monst(mon, amt, how) {   // mhitm.c:1223
     return 0;
 }
 /* sleeping grabber releases, engulfer doesn't; don't use for paralysis! */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<void>}
+ */
 export async function slept_monst(mon) {   // mhitm.c:1250
     if (helpless(mon) && $c.peq(mon, u.ustuck) && !sticks(gy.youmonst.data) && !u.uswallow) {
         await pline_mon(mon, $c.lit("%s grip relaxes."), s_suffix(await Monnam(mon)));
         await unstuck(mon);
     }
 }
+/**
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function rustm(mdef, obj) {   // mhitm.c:1260
     let dmgtyp = 0, chance = 0;
     dmgtyp = ERODE.NONE;
@@ -1157,6 +1258,12 @@ export async function rustm(mdef, obj) {   // mhitm.c:1260
         await erode_obj(obj, null, dmgtyp, EF.GREASE | EF.VERBOSE);
     }
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.obj | null} otemp struct obj *
+ * @returns {Promise<void>}
+ */
 async function mswingsm(magr, mdef, otemp) {   // mhitm.c:1283
     let bash = 0;
     /* attacker */
@@ -1170,6 +1277,14 @@ async function mswingsm(magr, mdef, otemp) {   // mhitm.c:1283
 /*
  * Passive responses by defenders.  Does not replicate responses already
  * handled above.  Returns same values as mattackm.
+ */
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {number} mhitb boolean
+ * @param {number} mdead int
+ * @param {$T.obj | null} mwep struct obj *
+ * @returns {Promise<number>} int
  */
 async function passivemm(magr, mdef, mhitb, mdead, mwep) {   // mhitm.c:1304
     let mddat = null, madat = null, buf = new Int8Array(256), i = 0, tmp = 0, mhit = 0;
@@ -1333,6 +1448,11 @@ async function passivemm(magr, mdef, mhitb, mdead, mwep) {   // mhitm.c:1304
     return mdead | mhit;
 }
 /* hero or monster has successfully hit target mon with drain energy attack */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} givemsg boolean
+ * @returns {Promise<void>}
+ */
 export async function xdrainenergym(mon, givemsg) {   // mhitm.c:1461
     let $t1;
     /* limit draining */
@@ -1345,6 +1465,10 @@ export async function xdrainenergym(mon, givemsg) {   // mhitm.c:1461
 }
 /* "aggressive defense"; what type of armor prevents specified attack
    from touching its target? */
+/**
+ * @param {number} aatyp int
+ * @returns {number | bigint} long
+ */
 export function attk_protection(aatyp) {   // mhitm.c:1475
     let w_mask = 0;
     w_mask = 0;

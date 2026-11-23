@@ -16,6 +16,10 @@ import { decode_glyph } from './windows.js';
 
 /* symbols.c */
 /* hexdd[] is defined in decl.c */
+/**
+ * @param {$c.Ptr | null} cp const char *
+ * @returns {number} int
+ */
 export function unicode_val(cp) {   // utf8map.c:18
     let dp = null, cval = 0, dcount = 0;
     cval = 0;
@@ -30,6 +34,12 @@ export function unicode_val(cp) {   // utf8map.c:18
     }
     return cval;
 }
+/**
+ * @param {$T.glyph_map_entry | null} gmap glyph_map *
+ * @param {number} utf32ch uint32
+ * @param {$c.Ptr | null} utf8str const uint8 *
+ * @returns {Promise<number>} int
+ */
 export async function set_map_u(gmap, utf32ch, utf8str) {   // utf8map.c:37
     let tmpgm = null, $t1, $t2;
     tmpgm = gmap;
@@ -70,6 +80,13 @@ export function free_all_glyphmap_u() {   // utf8map.c:59
 /* helper routine if a window port wants to embed any UTF-8 sequences
    for the glyph representation in the string in place of the \GNNNNNNNN
    reference */
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @param {number | bigint} bufsz size_t
+ * @param {$c.Ptr | null} str const char *
+ * @param {*} retflags int *
+ * @returns {$c.Ptr | null} char *
+ */
 export function mixed_to_utf8(buf, bufsz, str, retflags) {   // utf8map.c:86
     let put = null, glyphinfo = new $T.glyphinfo(), dcount = 0, so = 0, ggv = Int32Array.of(0), save_str = null, ucp = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10;
     put = buf;
@@ -130,6 +147,14 @@ export function mixed_to_utf8(buf, bufsz, str, retflags) {   // utf8map.c:86
     put.set(0, 0);
     return buf;
 }
+/**
+ * @param {$c.Ptr | null} customization_name const char *
+ * @param {number} glyphidx int
+ * @param {number} utf32ch uint32
+ * @param {$c.Ptr | null} utf8str const uint8 *
+ * @param {number} which_set enum graphics_sets
+ * @returns {Promise<number>} int
+ */
 export async function add_custom_urep_entry(customization_name, glyphidx, utf32ch, utf8str, which_set) {   // utf8map.c:148
     let gdc = null, details = null, newdetails = null, $t1, $t2, $t3;
     gdc = $c.relem(gs.sym_customizations[which_set], custom_ureps);
@@ -179,6 +204,9 @@ export async function add_custom_urep_entry(customization_name, glyphidx, utf32c
     return 1;
 }
 /* ENHANCED_SYMBOLS */
+/**
+ * @returns {Promise<void>}
+ */
 export async function reset_customsymbols() {   // utf8map.c:211
     free_all_glyphmap_u();
     await apply_customizations(gc.currentgraphics >>> 0, do_custom_symbols);

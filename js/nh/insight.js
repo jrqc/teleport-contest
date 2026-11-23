@@ -123,6 +123,10 @@ const achieve_msg = $c.recArray($T.ll_achieve_msg, 33);
 export const vanqorders = $c.arrayOf(8, () => $c.nulls(3));
 /* macros to simplify output of enlightenment messages; also used by
    conduct and achievements */
+/**
+ * @param {$c.Ptr | null} buf const char *
+ * @returns {Promise<void>}
+ */
 async function enlght_out(buf) {   // insight.c:118
     if (ge.en_via_menu) {
         await add_menu_str(ge.en_win, buf);
@@ -130,6 +134,13 @@ async function enlght_out(buf) {   // insight.c:118
         await putstr()(ge.en_win, 0, buf);
     }
 }
+/**
+ * @param {$c.Ptr | null} start const char *
+ * @param {$c.Ptr | null} middle const char *
+ * @param {$c.Ptr | null} end const char *
+ * @param {$c.Ptr | null} ps const char *
+ * @returns {Promise<void>}
+ */
 async function enlght_line(start, middle, end, ps) {   // insight.c:127
     let i = 0, buf = new Int8Array(256);
     $c.sprintf(new $c.Ptr(buf, 0), $c.lit(" %s%s%s%s."), start, middle, end, ps);
@@ -142,6 +153,13 @@ async function enlght_line(start, middle, end, ps) {   // insight.c:127
     await enlght_out(new $c.Ptr(buf, 0));
 }
 /* format increased chance to hit or damage or defense (Protection) */
+/**
+ * @param {$c.Ptr | null} inctyp const char *
+ * @param {number} incamt int
+ * @param {number} final int
+ * @param {$c.Ptr | null} outbuf char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 async function enlght_combatinc(inctyp, incamt, final, outbuf) {   // insight.c:160
     let modif = null, bonus = null, invrt = 0, absamt = 0;
     /* "to hit" or "damage" or "defense" */
@@ -174,6 +192,11 @@ async function enlght_combatinc(inctyp, incamt, final, outbuf) {   // insight.c:
     return outbuf;
 }
 /* report half physical or half spell damage */
+/**
+ * @param {number} category int
+ * @param {number} final int
+ * @returns {Promise<void>}
+ */
 async function enlght_halfdmg(category, final) {   // insight.c:201
     let category_name = null, buf = new Int8Array(256);
     switch (category) {
@@ -191,6 +214,9 @@ async function enlght_halfdmg(category, final) {   // insight.c:201
     await enlght_line(new $c.Ptr(You_, 0), final ? $c.lit("took") : $c.lit("take"), new $c.Ptr(buf, 0), await from_what(category));
 }
 /* is hero actively using water walking capability on water (or lava)? */
+/**
+ * @returns {number} boolean
+ */
 function walking_on_water() {   // insight.c:224
     if (u.uinwater | 0 || Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) {
         return FALSE;
@@ -198,6 +224,12 @@ function walking_on_water() {   // insight.c:224
     return $c.i8((u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && is_pool_or_lava(u.ux, u.uy) ? 1 : 0);
 }
 /* describe u.utraptype; used by status_enlightenment() and self_lookat() */
+/**
+ * @param {$c.Ptr | null} outbuf char *
+ * @param {number} final int
+ * @param {number} wizxtra boolean
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function trap_predicament(outbuf, final, wizxtra) {   // insight.c:233
     let t = null;
     /* caller has verified u.utrap */
@@ -231,6 +263,10 @@ export async function trap_predicament(outbuf, final, wizxtra) {   // insight.c:
 /* check whether hero is wearing something that player definitely knows
    confers the target property; item must have been seen and its type
    discovered but it doesn't necessarily have to be fully identified */
+/**
+ * @param {number} propindx int
+ * @returns {number} boolean
+ */
 function cause_known(propindx) {   // insight.c:267
     let o = null, mask = 0;
     /* index of a property which can be conveyed by worn item */
@@ -248,6 +284,12 @@ function cause_known(propindx) {   // insight.c:267
     return FALSE;
 }
 /* format a characteristic value, accommodating Strength's strangeness */
+/**
+ * @param {number} attrindx int
+ * @param {number} attrvalue int
+ * @param {$c.Ptr | null} resultbuf char *
+ * @returns {$c.Ptr | null} char *
+ */
 function attrval(attrindx, attrvalue, resultbuf) {   // insight.c:287
     /* should be at least [7] to hold "18/100\0" */
     if (attrindx !== A.STR || attrvalue <= 18) {
@@ -271,6 +313,11 @@ function attrval(attrindx, attrvalue, resultbuf) {   // insight.c:287
       3-00:25:40 => " 3 days, 25 minutes and 40 seconds"
    (note: for a list of more than two entries, nethack usually includes the
    [style-wise] optional comma before "and" but in this instance it does not)
+ */
+/**
+ * @param {$c.Ptr | null} outbuf char *
+ * @param {number} final int
+ * @returns {$c.Ptr | null} char *
  */
 function fmt_elapsed_time(outbuf, final) {   // insight.c:314
     let fieldcnt = 0, edays = 0, ehours = 0, eminutes = 0, eseconds = 0, etim = 0;
@@ -319,6 +366,11 @@ function fmt_elapsed_time(outbuf, final) {   // insight.c:314
     return outbuf;
 }
 /* "once" vs "twice" vs "17 times", used in several places */
+/**
+ * @param {number | bigint} n long
+ * @param {$c.Ptr | null} outbuf char *
+ * @returns {$c.Ptr | null} char *
+ */
 function N_times(n, outbuf) {   // insight.c:362
     switch (n) {
         case 0:
@@ -337,6 +389,11 @@ function N_times(n, outbuf) {   // insight.c:362
     }
     return outbuf;
 }
+/**
+ * @param {number} mode int
+ * @param {number} final int
+ * @returns {Promise<void>}
+ */
 export async function enlightenment(mode, final) {   // insight.c:383
     let buf = new Int8Array(256), tmpbuf = new Int8Array(256), selected = [null], $t1, $t2;
     /* BASICENLIGHTENMENT | MAGICENLIGHTENMENT (| both) */
@@ -408,6 +465,11 @@ export async function enlightenment(mode, final) {   // insight.c:383
 }
 /*ARGSUSED*/
 /* display role, race, alignment and such to en_win */
+/**
+ * @param {number} unused_mode int
+ * @param {number} final int
+ * @returns {Promise<void>}
+ */
 async function background_enlightenment(unused_mode, final) {   // insight.c:468
     let role_titl = null, rank_titl = null, innategend = 0, difgend = 0, difalgn = 0, buf = new Int8Array(256), tmpbuf = new Int8Array(256), anbuf = new Int8Array(20), uasmon = null, altphrasing = 0, egdepth = 0, dgnbuf = new Int8Array(128), ulvl = 0, nxtlvl = 0, delta = 0, $t1, $t2;
     /* note that if poly'd, we need to use u.mfemale instead of flags.female
@@ -606,6 +668,11 @@ async function background_enlightenment(unused_mode, final) {   // insight.c:468
 /* hit points, energy points, armor class -- essential information which
    doesn't fit very well in other categories */
 /*ARGSUSED*/
+/**
+ * @param {number} mode int
+ * @param {number} final int
+ * @returns {Promise<void>}
+ */
 async function basics_enlightenment(mode, final) {   // insight.c:728
     let buf = new Int8Array(256), pw = 0, hp = 0, pwmax = 0, hpmax = 0, umoney = 0, hmoney = 0, ocl = new Int8Array(19);
     pw = u.uen;
@@ -696,6 +763,11 @@ async function basics_enlightenment(mode, final) {   // insight.c:728
     await enlght_line($c.lit("Autopickup "), final ? $c.lit("was ") : $c.lit("is "), new $c.Ptr(buf, 0), $c.lit(""));
 }
 /* characteristics: expanded version of bottom line strength, dexterity, &c */
+/**
+ * @param {number} mode int
+ * @param {number} final int
+ * @returns {Promise<void>}
+ */
 async function characteristics_enlightenment(mode, final) {   // insight.c:827
     let buf = new Int8Array(256);
     await enlght_out($c.lit(""));
@@ -710,6 +782,12 @@ async function characteristics_enlightenment(mode, final) {   // insight.c:827
     await one_characteristic(mode, final, A.CHA);   /* charisma */
 }
 /* display one attribute value for characteristics_enlightenment() */
+/**
+ * @param {number} mode int
+ * @param {number} final int
+ * @param {number} attrindx int
+ * @returns {Promise<void>}
+ */
 async function one_characteristic(mode, final, attrindx) {   // insight.c:846
     let hide_innate_value = 0, interesting_alimit = 0, acurrent = 0, abase = 0, apeak = 0, alimit = 0, paren_pfx = null, subjbuf = new Int8Array(256), valubuf = new Int8Array(256), valstring = new Int8Array(32);
     /* attrib.c */
@@ -797,6 +875,11 @@ async function one_characteristic(mode, final, attrindx) {   // insight.c:846
     await enlght_line(new $c.Ptr(subjbuf, 0), final ? $c.lit("was ") : $c.lit("is "), new $c.Ptr(valubuf, 0), $c.lit(""));
 }
 /* status: selected obvious capabilities, assorted troubles */
+/**
+ * @param {number} mode int
+ * @param {number} final int
+ * @returns {Promise<void>}
+ */
 async function status_enlightenment(mode, final) {   // insight.c:940
     let magic = 0, cap = 0, buf = new Int8Array(256), youtoo = new Int8Array(256), heldmon = new Int8Array(256), Riding = 0, steedname = null, predicament = new Int8Array(256), anchored = 0, ustick = 0, dx = 0, dy = 0, saddle = null, whichleg = 0, bp = null, article = null, leftright = null, steednambuf = new Int8Array(256), adj = null, $t1, $t2, $t3, $t4;
     magic = $c.i8(mode & MAGICENLIGHTENMENT ? TRUE : FALSE);
@@ -1120,6 +1203,10 @@ async function status_enlightenment(mode, final) {   // insight.c:940
     }
 }
 /* extracted from status_enlightenment() to reduce clutter there */
+/**
+ * @param {number} final int
+ * @returns {Promise<void>}
+ */
 async function weapon_insight(final) {   // insight.c:1270
     let buf = new Int8Array(256), wtype = 0, what = null, sklvlbuf = new Int8Array(20), sklvl = 0, hav = 0, pfx = new Int8Array(128), sfx = new Int8Array(128), sknambuf2 = new Int8Array(20), sklvlbuf2 = new Int8Array(20), twobuf = new Int8Array(20), also = null, also2 = null, also3 = null, verb_present = null, verb_past = null, wtype2 = 0, sklvl2 = 0, twoskl = 0, a1 = 0, a2 = 0, ab = 0, hav2 = 0, $t1, $t2, $t3;
     /* report being weaponless; distinguish whether gloves are worn
@@ -1292,6 +1379,12 @@ async function weapon_insight(final) {   // insight.c:1270
         }   /* two-weapon */
     }   /* skill applies */
 }
+/**
+ * @param {number} adtyp int
+ * @param {$c.Ptr | null} prot_message const char *
+ * @param {number} final int
+ * @returns {Promise<void>}
+ */
 async function item_resistance_message(adtyp, prot_message, final) {   // insight.c:1468
     let protection = 0, somewhat = 0;
     protection = u_adtyp_resistance_obj(adtyp);
@@ -1301,6 +1394,11 @@ async function item_resistance_message(adtyp, prot_message, final) {   // insigh
     }
 }
 /* attributes: intrinsics and the like, other non-obvious capabilities */
+/**
+ * @param {number} unused_mode int
+ * @param {number} final int
+ * @returns {Promise<void>}
+ */
 async function attributes_enlightenment(unused_mode, final) {   // insight.c:1487
     let ltmp = 0, armpro = 0, warnspecies = 0, buf = new Int8Array(256), detectmon_timeout = 0, adorn = 0, save_BLev = 0, trapped = 0, terrain = 0, save_BFly = 0, has_lid = 0, prot = 0, cast_adj = new Int8Array(128), suit = 0, robe = 0, what = null, f = null, p = null;
     /*\
@@ -1796,6 +1894,9 @@ async function attributes_enlightenment(unused_mode, final) {   // insight.c:148
     }
 }
 /* ^X command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doattributes() {   // insight.c:2009
     let mode = 0;
     mode = BASICENLIGHTENMENT;
@@ -1806,6 +1907,11 @@ export async function doattributes() {   // insight.c:2009
     await enlightenment(mode, ENL.GAMEINPROGRESS);
     return ECMD.OK;
 }
+/**
+ * @param {number} via_enlghtmt boolean
+ * @param {number} msgflag int
+ * @returns {Promise<void>}
+ */
 export async function youhiding(via_enlghtmt, msgflag) {   // insight.c:2022
     let bp = null, buf = new Int8Array(256), o = null, t = null, final = 0;
     /* enlightenment line vs topl message */
@@ -1860,11 +1966,18 @@ export async function youhiding(via_enlghtmt, msgflag) {   // insight.c:2022
     }
 }
 /* #conduct command [KMH]; shares enlightenment's tense handling */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doconduct() {   // insight.c:2081
     await show_conduct(ENL.GAMEINPROGRESS);
     return ECMD.OK;
 }
 /* display conducts; for doconduct(), also disclose() and dump_everything() */
+/**
+ * @param {number} final int
+ * @returns {Promise<void>}
+ */
 export async function show_conduct(final) {   // insight.c:2089
     let buf = new Int8Array(256), bufN = new Int8Array(40), ngenocided = 0, presentverb = null, pastverb = null, $t1;
     /* Create the conduct window */
@@ -1994,6 +2107,10 @@ export async function show_conduct(final) {   // insight.c:2089
 }
 /*
  *      Achievements (see 'enum achievements' in you.h).
+ */
+/**
+ * @param {number} final int
+ * @returns {Promise<void>}
  */
 async function show_achievements(final) {   // insight.c:2243
     let i = 0, achidx = 0, absidx = 0, acnt = 0, title = new Int8Array(128), buf = new Int8Array(128), awin = 0;
@@ -2141,6 +2258,10 @@ async function show_achievements(final) {   // insight.c:2243
     }
 }
 /* record an achievement (add at end of list unless already present) */
+/**
+ * @param {number} achidx schar
+ * @returns {Promise<void>}
+ */
 export async function record_achievement(achidx) {   // insight.c:2407
     let i = 0, absidx = 0, repeat_achievement = 0, otyp = 0;
     repeat_achievement = 0;
@@ -2192,6 +2313,10 @@ export async function record_achievement(achidx) {   // insight.c:2407
     }
 }
 /* discard a recorded achievement; return True if removed, False otherwise */
+/**
+ * @param {number} achidx schar
+ * @returns {number} boolean
+ */
 export function remove_achievement(achidx) {   // insight.c:2476
     let i = 0;
     for (i = 0; u.uachieved[i]; i = i + 1 | 0) {
@@ -2209,6 +2334,9 @@ export function remove_achievement(achidx) {   // insight.c:2476
     return TRUE;
 }
 /* used to decide whether there are any achievements to display */
+/**
+ * @returns {number} int
+ */
 export function count_achievements() {   // insight.c:2494
     let i = 0, acnt = 0;
     acnt = 0;
@@ -2219,6 +2347,10 @@ export function count_achievements() {   // insight.c:2494
 }
 /* convert a rank index to an achievement number; encode it when female
    in order to subsequently report gender-specific ranks accurately */
+/**
+ * @param {number} rank int
+ * @returns {number} schar
+ */
 export function achieve_rank(rank) {   // insight.c:2506
     let achidx = 0;
     /* 1..8 */
@@ -2229,6 +2361,9 @@ export function achieve_rank(rank) {   // insight.c:2506
     return achidx;
 }
 /* return True if sokoban branch has been entered, False otherwise */
+/**
+ * @returns {number} boolean
+ */
 export function sokoban_in_play() {   // insight.c:2517
     let achidx = 0;
     /* TODO? move this to dungeon.c and test furthest level reached of the
@@ -2241,6 +2376,9 @@ export function sokoban_in_play() {   // insight.c:2517
     return FALSE;
 }
 /* #chronicle command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function do_gamelog() {   // insight.c:2532
     if (gg.gamelog) {
         await show_gamelog(ENL.GAMEINPROGRESS);
@@ -2253,6 +2391,10 @@ export async function do_gamelog() {   // insight.c:2532
 /* 'major' events for dumplog; inclusion or exclusion here may need tuning */
 /* explicitly for dumplog */
 /* #chronicle details */
+/**
+ * @param {number} final int
+ * @returns {Promise<void>}
+ */
 export async function show_gamelog(final) {   // insight.c:2561
     let llmsg = null, win = 0, buf = new Int8Array(256), eventcnt = 0, $t1;
     eventcnt = 0;
@@ -2282,6 +2424,11 @@ export async function show_gamelog(final) {   // insight.c:2561
     /* !CHRONICLE */
     return;
 }
+/**
+ * @param {*} vptr1 const void *
+ * @param {*} vptr2 const void *
+ * @returns {number} int
+ */
 function vanqsort_cmp(vptr1, vptr2) {   // insight.c:2621
     let indx1 = 0, indx2 = 0, mlev1 = 0, mlev2 = 0, mstr1 = 0, mstr2 = 0, uniq1 = 0, uniq2 = 0, died1 = 0, died2 = 0, res = 0, name1 = null, name2 = null, punct = null, mcls1 = 0, mcls2 = 0;
     indx1 = $c.asArr(vptr1, Int16Array).get(0);
@@ -2374,6 +2521,10 @@ function vanqsort_cmp(vptr1, vptr2) {   // insight.c:2621
     return res;
 }
 /* returns -1 if cancelled via ESC */
+/**
+ * @param {number} for_vanq boolean
+ * @returns {Promise<number>} int
+ */
 export async function set_vanq_order(for_vanq) {   // insight.c:2718
     let tmpwin = 0, selected = [null], any = new $T.any(), buf = new Int8Array(256), desc = null, i = 0, n = 0, choice = 0, clr = 0;
     clr = NO_COLOR;
@@ -2414,6 +2565,9 @@ export async function set_vanq_order(for_vanq) {   // insight.c:2718
     return n < 0 ? -1 : flags.vanq_sortmode;
 }
 /* #vanquished command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dovanquished() {   // insight.c:2769
     await list_vanquished($c.i8(iflags.menu_requested ? 65 : 121), FALSE);
     iflags.menu_requested = FALSE;
@@ -2421,6 +2575,11 @@ export async function dovanquished() {   // insight.c:2769
 }
 /* high priests aren't unique but are flagged as such to simplify something */
 /* used for #vanquished and end of game disclosure and end of game dumplog */
+/**
+ * @param {number} defquery char
+ * @param {number} ask boolean
+ * @returns {Promise<void>}
+ */
 export async function list_vanquished(defquery, ask) {   // insight.c:2784
     let i = 0, pfx = 0, nkilled = 0, ntypes = 0, ni = 0, total_killed = 0, klwin = 0, mindx = new Int16Array(383), c = 0, buf = new Int8Array(256), buftoo = new Int8Array(256), force_sort = 0, dumping = 0, mlet = 0, prev_mlet = 0, class_header = 0, uniq_header = 0, Rider = 0, was_uniq = 0, special_hdr = 0, allow_yn = new Int8Array(10), $t1;
     total_killed = 0;
@@ -2568,6 +2727,9 @@ export async function list_vanquished(defquery, ask) {   // insight.c:2784
     }
 }
 /* number of monster species which have been genocided */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function num_genocides() {   // insight.c:2953
     let i = 0, n = 0;
     n = 0;
@@ -2582,6 +2744,9 @@ export async function num_genocides() {   // insight.c:2953
     return n;
 }
 /* return a count of the number of extinct species */
+/**
+ * @returns {number} int
+ */
 function num_extinct() {   // insight.c:2970
     let i = 0, n = 0;
     n = 0;
@@ -2596,6 +2761,11 @@ function num_extinct() {   // insight.c:2970
     return n;
 }
 /* collect both genocides and extinctions, skipping uniques */
+/**
+ * @param {number} mvflags int
+ * @param {*} mindx int *
+ * @returns {number} int
+ */
 function num_gone(mvflags, mindx) {   // insight.c:2985
     let mflg = 0, i = 0, n = 0, $t1;
     mflg = $c.u8(mvflags);
@@ -2615,6 +2785,11 @@ function num_gone(mvflags, mindx) {   // insight.c:2985
 }
 /* show genocided and extinct monster types for final disclosure/dumplog
    or for the #genocided command */
+/**
+ * @param {number} defquery char
+ * @param {number} ask boolean
+ * @returns {Promise<void>}
+ */
 export async function list_genocided(defquery, ask) {   // insight.c:3007
     let i = 0, mndx = 0, ngenocided = 0, nextinct = 0, ngone = 0, mvflags = 0, mindx = new Int32Array(383), c = 0, klwin = 0, buf = new Int8Array(256), genoing = 0, dumping = 0, both = 0, save_sortmode = 0, mlet = 0, prev_mlet = 0, class_header = 0;
     /* prompting for genocide or class genocide */
@@ -2722,11 +2897,17 @@ export async function list_genocided(defquery, ask) {   // insight.c:3007
     }
 }
 /* M-g - #genocided command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dogenocided() {   // insight.c:3135
     await list_genocided($c.i8(iflags.menu_requested ? 97 : 121), FALSE);
     return ECMD.OK;
 }
 /* #wizborn extended command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doborn() {   // insight.c:3145
     let i = 0, datawin = 0, buf = new Int8Array(256), nborn = 0, ndied = 0;
     datawin = await create_nhwindow()(NHW.TEXT);
@@ -2752,6 +2933,10 @@ export async function doborn() {   // insight.c:3145
  * in pline.c, then got moved to priest.c just to be out of there.  They
  * fit better here.
  */
+/**
+ * @param {number} alignment aligntyp
+ * @returns {$c.Ptr | null} const char *
+ */
 export function align_str(alignment) {   // insight.c:3187
     switch (alignment) {
         case A.CHAOTIC:
@@ -2765,6 +2950,10 @@ export function align_str(alignment) {   // insight.c:3187
     }
     return $c.lit("unknown");
 }
+/**
+ * @param {number} msize int
+ * @returns {$c.Ptr | null} char *
+ */
 function size_str(msize) {   // insight.c:3203
     switch (msize) {
         case MZ.TINY:
@@ -2792,6 +2981,11 @@ function size_str(msize) {   // insight.c:3203
     return new $c.Ptr(size_str$outbuf, 0);
 }
 /* used for self-probing */
+/**
+ * @param {number} showneg boolean
+ * @param {$c.Ptr | null} suffix const char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function piousness(showneg, suffix) {   // insight.c:3235
     let pio = null;
     /* bigger than "insufficiently neutral" */
@@ -2829,6 +3023,10 @@ export function piousness(showneg, suffix) {   // insight.c:3235
     return new $c.Ptr(piousness$buf, 0);
 }
 /* stethoscope or probing applied to monster -- one-line feedback */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function mstatusline(mtmp) {   // insight.c:3275
     let alignment = 0, info = new Int8Array(256), monnambuf = new Int8Array(256), segndx = 0, nsegs = 0, pm = null, legs = 0, what = null;
     alignment = mon_aligntyp(mtmp);
@@ -2942,6 +3140,9 @@ export async function mstatusline(mtmp) {   // insight.c:3275
     await pline($c.lit("Status of %s (%s, %s):  Level %d  HP %d(%d)  AC %d%s."), new $c.Ptr(monnambuf, 0), align_str(alignment), size_str(mtmp.data.msize), mtmp.m_lev, mtmp.mhp, mtmp.mhpmax, find_mac(mtmp), new $c.Ptr(info, 0));
 }
 /* stethoscope or probing applied to hero -- one-line feedback */
+/**
+ * @returns {Promise<void>}
+ */
 export async function ustatusline() {   // insight.c:3402
     let reg = null, info = new Int8Array(256), ln = 0, legs = 0, what = null;
     info[0] = 0;

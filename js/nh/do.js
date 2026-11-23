@@ -122,6 +122,9 @@ const familiar_level_msg$halu_fam_msgs = $c.nulls(4);   // static in familiar_le
 const dowipe$buf = new Int8Array(39);   // static in dowipe()
 /* static boolean badspot(coordxy,coordxy); */
 /* the #drop command: drop one inventory item */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dodrop() {   // do.c:29
     let result = 0;
     if (new $c.Ptr(u.ushops, 0).get(0)) {
@@ -139,6 +142,13 @@ export async function dodrop() {   // do.c:29
 /* Called when a boulder is dropped, thrown, or pushed.  If it ends up
  * in a pool, it either fills the pool up or sinks away.  In either case,
  * it's gone for good...  If the destination is not a pool, returns FALSE.
+ */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} rx coordxy
+ * @param {number} ry coordxy
+ * @param {number} pushing boolean
+ * @returns {Promise<number>} boolean
  */
 export async function boulder_hits_pool(otmp, rx, ry, pushing) {   // do.c:50
     let lava = 0, fills_up = 0, what = null, ltyp = 0, chance = 0, mtmp = null, ttmp = null, whobuf = new Int8Array(256), dmg = 0;
@@ -233,6 +243,13 @@ export async function boulder_hits_pool(otmp, rx, ry, pushing) {   // do.c:50
 /* Used for objects which sometimes do special things when dropped; must be
  * called with the object not in any chain.  Returns TRUE if the object goes
  * away.
+ */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$c.Ptr | null} verb const char *
+ * @returns {Promise<number>} boolean
  */
 export async function flooreffects(obj, x, y, verb) {   // do.c:162
     let t = null, mtmp = null, otmp = [null], save_bhitpos = new $T.nhcoord(), tseen = 0, ttyp = 0, res = 0, damage = 0, dieroll = 0, globbyobj = [null], survival_chance = 0, $t1;
@@ -407,6 +424,10 @@ export async function flooreffects(obj, x, y, verb) {   // do.c:162
     return $c.i8(res);
 }
 /* obj is an object dropped on an altar */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function doaltarobj(obj) {   // do.c:363
     let $t1, $t2;
     if (Blind()) {
@@ -435,6 +456,10 @@ export async function doaltarobj(obj) {   // do.c:363
 }
 /* If obj is neither formally identified nor informally called something
  * already, prompt the player to call its object type. */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function trycall(obj) {   // do.c:395
     if (!objects[obj.otyp].oc_name_known && !objects[obj.otyp].oc_uname) {
         await docall(obj);
@@ -442,6 +467,9 @@ export async function trycall(obj) {   // do.c:395
 }
 /* Transforms the sink at the player's position into
    a fountain, throne, altar or grave. */
+/**
+ * @returns {Promise<void>}
+ */
 export async function polymorph_sink() {   // do.c:404
     let sym = 0, sinklooted = 0, algn = 0, $t1;
     sym = S.sink;
@@ -496,6 +524,9 @@ export async function polymorph_sink() {   // do.c:404
 }
 /* Teleports the sink at the player's position;
    return True if sink teleported. */
+/**
+ * @returns {Promise<number>} boolean
+ */
 async function teleport_sink() {   // do.c:460
     let cx = 0, cy = 0, alreadylooted = 0, trycnt = 0;
     trycnt = 0;
@@ -525,6 +556,10 @@ async function teleport_sink() {   // do.c:460
     return FALSE;
 }
 /* obj is a ring being dropped over a kitchen sink */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function dosinkring(obj) {   // do.c:498
     let otmp = null, otmp2 = null, ideed = 0, nosink = 0, $goto = null;
     ideed = TRUE;
@@ -680,6 +715,11 @@ async function dosinkring(obj) {   // do.c:498
     }
 }
 /* some common tests when trying to drop or throw items */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$c.Ptr | null} word const char *
+ * @returns {Promise<number>} boolean
+ */
 export async function canletgo(obj, word) {   // do.c:665
     let hand = null;
     if ($c.and64(obj.owornmask, W_ARMOR | W_ACCESSORY)) {
@@ -729,6 +769,10 @@ export async function canletgo(obj, word) {   // do.c:665
     }
     return TRUE;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function drop(obj) {   // do.c:714
     let onam_p = null, mnam_p = null, monbuf = new Int8Array(256), levhack = 0;
     if (!obj) {
@@ -799,6 +843,10 @@ async function drop(obj) {   // do.c:714
 /* dropx - take dropped item out of inventory;
    called in several places - may produce output
    (eg ship_object() and dropy() -> sellobj() both produce output) */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function dropx(obj) {   // do.c:786
     await freeinv(obj);
     if (!u.uswallow) {
@@ -812,10 +860,19 @@ export async function dropx(obj) {   // do.c:786
     await dropy(obj);
 }
 /* dropy - put dropped object at destination; called from lots of places */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function dropy(obj) {   // do.c:800
     await dropz(obj, FALSE);
 }
 /* dropz - really put dropped object at its destination... */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} with_impact boolean
+ * @returns {Promise<void>}
+ */
 export async function dropz(obj, with_impact) {   // do.c:807
     if ($c.peq(obj, $G.uwep)) {
         await setuwep(null);
@@ -864,6 +921,10 @@ export async function dropz(obj, with_impact) {   // do.c:807
 /* when swallowed, move dropped object from OBJ_FREE to u.ustuck's inventory;
    for purple worm, immediately eat any corpse, glob, or special meat item
    from object polymorph; return True if object is used up, False otherwise */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} boolean
+ */
 async function engulfer_digests_food(obj) {   // do.c:849
     let could_petrify = 0, could_poly = 0, could_slime = 0, could_grow = 0, could_heal = 0;
     /* animal swallower (purple worn) eats any
@@ -902,6 +963,10 @@ async function engulfer_digests_food(obj) {   // do.c:849
 }
 /* things that must change when not held; recurse into containers.
    Called for both player and monsters */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function obj_no_longer_held(obj) {   // do.c:893
     let contents = null;
     if (!obj) {
@@ -931,6 +996,9 @@ export async function obj_no_longer_held(obj) {   // do.c:893
     }
 }
 /* the #droptype command: drop several things */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doddrop() {   // do.c:924
     let result = 0;
     result = ECMD.OK;
@@ -953,6 +1021,10 @@ export async function doddrop() {   // do.c:924
     }
     return result;
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} boolean
+ */
 async function better_not_try_to_drop_that(otmp) {   // do.c:947
     let buf = new Int8Array(256);
     /* u_safe_from_fatal_corpse() with st_all checks for gloves and stoning
@@ -964,6 +1036,11 @@ async function better_not_try_to_drop_that(otmp) {   // do.c:947
     }
     return FALSE;
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number | bigint} cnt long
+ * @returns {Promise<number>} int
+ */
 async function menudrop_split(otmp, cnt) {   // do.c:964
     /* check callers */
     if (cnt && cnt < otmp.quan) {
@@ -979,6 +1056,10 @@ async function menudrop_split(otmp, cnt) {   // do.c:964
     return await drop(otmp);
 }
 /* Drop things from the hero's inventory, using a menu. */
+/**
+ * @param {number} retry int
+ * @returns {Promise<number>} int
+ */
 async function menu_drop(retry) {   // do.c:981
     let n = 0, i = 0, n_dropped = 0, otmp = null, otmp2 = null, pick_list = [null], all_categories = 0, drop_everything = 0, autopick = 0, drop_justpicked = 0, justpicked_quan = 0, ggoresults = Uint32Array.of(0);
     n_dropped = 0;
@@ -1100,6 +1181,10 @@ async function menu_drop(retry) {   // do.c:981
     }
     return n_dropped ? ECMD.TIME : ECMD.OK;
 }
+/**
+ * @param {$c.Ptr | null} updn const char *
+ * @returns {Promise<number>} boolean
+ */
 async function u_stuck_cannot_go(updn) {   // do.c:1110
     let mtmp = null;
     if (u.ustuck) {
@@ -1115,6 +1200,9 @@ async function u_stuck_cannot_go(updn) {   // do.c:1110
     return FALSE;
 }
 /* the #down command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dodown() {   // do.c:1131
     let trap = null, stway = null, stairs_down = 0, ladder_down = 0, obj = null, glyph_at_uxuy = 0, down_or_thru = null, actn = null, qbuf = new Int8Array(128), tdst = new $T.d_level(), $t1;
     trap = null;
@@ -1260,6 +1348,9 @@ export async function dodown() {   // do.c:1131
     return ECMD.TIME;
 }
 /* the #up command - move up a staircase */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doup() {   // do.c:1298
     let stway = null;
     stway = stairway_at(u.ux, u.uy);
@@ -1305,6 +1396,9 @@ export async function doup() {   // do.c:1298
     return ECMD.TIME;
 }
 /* check that we can write out the current level */
+/**
+ * @returns {Promise<$T.nh_file | null>} NHFILE *
+ */
 async function currentlevel_rewrite() {   // do.c:1348
     let nhfp = null, whynot = new Int8Array(256);
     /* since level change might be a bit slow, flush any buffered screen
@@ -1324,6 +1418,9 @@ async function currentlevel_rewrite() {   // do.c:1348
     }
     return nhfp;
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function save_currentstate() {   // do.c:1375
     let nhfp = null;
     program_state.in_checkpoint = program_state.in_checkpoint + 1 | 0;
@@ -1356,6 +1453,10 @@ badspot(coordxy x, coordxy y)
 */
 /* when arriving on a level, if hero and a monster are trying to share same
    spot, move one; extracted from goto_level(); also used by wiz_makemap() */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function u_collide_m(mtmp) {   // do.c:1412
     let cc = new $T.nhcoord();
     if (!mtmp || $c.peq(mtmp, u.usteed) || !$c.peq(mtmp, svl.level.monsters[u.ux][u.uy])) {
@@ -1384,6 +1485,9 @@ export async function u_collide_m(mtmp) {   // do.c:1412
         }
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function familiar_level_msg() {   // do.c:1448
     let mesg = null, buf = new Int8Array(256), which = 0;
     which = rn2(4);
@@ -1400,6 +1504,13 @@ async function familiar_level_msg() {   // do.c:1448
         await pline1(mesg);
     }
 }
+/**
+ * @param {$T.d_level | null} newlevel d_level *
+ * @param {number} at_stairs boolean
+ * @param {number} falling boolean
+ * @param {number} portal boolean
+ * @returns {Promise<void>}
+ */
 export async function goto_level(newlevel, at_stairs, falling, portal) {   // do.c:1479
     let l_idx = 0, save_mode = 0, nhfp = null, new_ledger = 0, cant_go_back = 0, great_effort = 0, up = 0, newdungeon = 0, leaving_tutorial = 0, was_in_W_tower = 0, familiar = 0, new_ = 0, mtmp = null, whynot = new Int8Array(256), dist = 0, do_fall_dmg = 0, prev_temperature = 0, odds = 0, diff = 0, ttrap = null, stway = null, stway$2 = null, dloc = new Int8Array(128), major = 0, dmg = 0, $t1, $t2, $t3, $t4, $t5;
     /* destination */
@@ -1906,6 +2017,9 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
 }
 /* give a message when entering a Gehennom level other than the Valley;
    also given if restoring a game in that situation */
+/**
+ * @returns {Promise<void>}
+ */
 export async function hellish_smoke_mesg() {   // do.c:2003
     if (svl.level.flags.temperature) {
         await pline($c.lit("It is %s here."), svl.level.flags.temperature > 0 ? $c.lit("hot") : $c.lit("cold"));
@@ -1915,6 +2029,10 @@ export async function hellish_smoke_mesg() {   // do.c:2003
     }
 }
 /* give a message when the level temperature is different from previous */
+/**
+ * @param {number} prev_temperature schar
+ * @returns {Promise<void>}
+ */
 async function temperature_change_msg(prev_temperature) {   // do.c:2016
     if (prev_temperature !== svl.level.flags.temperature) {
         if (svl.level.flags.temperature) {
@@ -1927,6 +2045,9 @@ async function temperature_change_msg(prev_temperature) {   // do.c:2016
     }
 }
 /* usually called from goto_level(); might be called from Sting_effects() */
+/**
+ * @returns {Promise<void>}
+ */
 export async function maybe_lvltport_feedback() {   // do.c:2032
     if (gd.dfr_post_msg && !strncmpi(gd.dfr_post_msg, $c.lit("You materialize"), 15)) {
         /* "You materialize on a different level." */
@@ -1934,6 +2055,9 @@ export async function maybe_lvltport_feedback() {   // do.c:2032
         $c.free(gd.dfr_post_msg), gd.dfr_post_msg = null;
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function final_level() {   // do.c:2043
     /* reset monster hostility relative to player */
     await iter_mons(reset_hostility);
@@ -1943,6 +2067,13 @@ async function final_level() {   // do.c:2043
     await gain_guardian_angel();
 }
 /* change levels at the end of this turn, after monsters finish moving */
+/**
+ * @param {$T.d_level | null} tolev d_level *
+ * @param {number} utotype_flags int
+ * @param {$c.Ptr | null} pre_msg const char *
+ * @param {$c.Ptr | null} post_msg const char *
+ * @returns {Promise<void>}
+ */
 export async function schedule_goto(tolev, utotype_flags, pre_msg, post_msg) {   // do.c:2057
     let $t1, $t2;
     /* UTOTYPE_DEFERRED is used, so UTOTYPE_NONE can trigger deferred_goto() */
@@ -1957,6 +2088,9 @@ export async function schedule_goto(tolev, utotype_flags, pre_msg, post_msg) {  
     }
 }
 /* handle something like portal ejection */
+/**
+ * @returns {Promise<void>}
+ */
 export async function deferred_goto() {   // do.c:2075
     let dest = new $T.d_level(), oldlev = new $T.d_level(), typmask = 0, t = null;
     if (!on_level(u.uz, u.utolev)) {
@@ -1990,6 +2124,10 @@ export async function deferred_goto() {   // do.c:2075
 /*
  * Return TRUE if we created a monster for the corpse.  If successful, the
  * corpse is gone.
+ */
+/**
+ * @param {$T.obj | null} corpse struct obj *
+ * @returns {Promise<number>} boolean
  */
 export async function revive_corpse(corpse) {   // do.c:2111
     let mtmp = null, mcarry = null, is_uwep = 0, chewed = 0, where = 0, cname = new Int8Array(256), container = null, container_where = Int32Array.of(0), montype = 0, is_zomb = 0, corpsex = Int16Array.of(0), corpsey = Int16Array.of(0), mtmp2 = null, effect = null, sackname = new Int8Array(256), mnam = null, ttmp = null;
@@ -2098,6 +2236,11 @@ export async function revive_corpse(corpse) {   // do.c:2111
 }
 /* Revive the corpse via a timeout. */
 /*ARGSUSED*/
+/**
+ * @param {$T.any | null} arg anything *
+ * @param {number | bigint} timeout long
+ * @returns {Promise<void>}
+ */
 export async function revive_mon(arg, timeout) {   // do.c:2251
     let body = null, mptr = null, mtmp = null, x = Int16Array.of(0), y = Int16Array.of(0), notice_it = 0, monname = null, when = 0, action = 0;
     body = arg.a_obj;
@@ -2140,6 +2283,11 @@ export async function revive_mon(arg, timeout) {   // do.c:2251
     }
 }
 /* Timeout callback. Revive the corpse as a zombie. */
+/**
+ * @param {$T.any | null} arg anything *
+ * @param {number | bigint} timeout long
+ * @returns {Promise<void>}
+ */
 export async function zombify_mon(arg, timeout) {   // do.c:2299
     let body = null, zmon = 0;
     body = arg.a_obj;
@@ -2158,9 +2306,19 @@ export async function zombify_mon(arg, timeout) {   // do.c:2299
     }
 }
 /* return TRUE if hero properties are dangerous to hero */
+/**
+ * @returns {number} boolean
+ */
 function danger_uprops() {   // do.c:2319
     return $c.i8(Stoned() || Slimed() || Strangled() || Sick() ? 1 : 0);
 }
+/**
+ * @param {$c.Ptr | null} ucverb const char *
+ * @param {$c.Ptr | null} cmddesc const char *
+ * @param {$c.Ptr | null} act const char *
+ * @param {*} flagcounter int *
+ * @returns {Promise<number>} boolean
+ */
 export async function cmd_safety_prevention(ucverb, cmddesc, act, flagcounter) {   // do.c:2325
     let buf = new Int8Array(128), $t1;
     if (flags.safe_wait && !iflags.menu_requested && !gm.multi) {
@@ -2181,12 +2339,18 @@ export async function cmd_safety_prevention(ucverb, cmddesc, act, flagcounter) {
 }
 /* '.' command: do nothing == rest; also the
    ' ' command iff 'rest_on_space' option is On */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function donull() {   // do.c:2351
     if (await cmd_safety_prevention($c.lit("Waiting"), $c.lit("a no-op (to rest)"), $c.lit("Are you waiting to get hit?"), new $c.FieldRef(gd, "did_nothing_flag", "i32"))) {
         return ECMD.OK;
     }
     return ECMD.TIME;   /* Do nothing, but let other things happen */
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function wipeoff() {   // do.c:2361
     let udelta = 0, ldelta = 0;
     udelta = u.ucreamed;
@@ -2214,6 +2378,9 @@ async function wipeoff() {   // do.c:2361
     return 1;   /* still busy */
 }
 /* the #wipe command - wipe off your face */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dowipe() {   // do.c:2390
     if (u.ucreamed) {
         $c.sprintf(new $c.Ptr(dowipe$buf, 0), $c.lit("wiping off your %s"), await body_part(FACE));
@@ -2227,6 +2394,11 @@ export async function dowipe() {   // do.c:2390
     return ECMD.TIME;
 }
 /* common wounded legs feedback */
+/**
+ * @param {$c.Ptr | null} for_what const char *
+ * @param {number} by_steed boolean
+ * @returns {Promise<void>}
+ */
 export async function legs_in_no_shape(for_what, by_steed) {   // do.c:2408
     let wl = 0, bp = null;
     /* jumping, kicking, riding */
@@ -2241,6 +2413,11 @@ export async function legs_in_no_shape(for_what, by_steed) {   // do.c:2408
         await Your($c.lit("%s%s %s in no shape for %s."), wl === W.RINGL ? $c.lit("left ") : wl === W.RINGR ? $c.lit("right ") : $c.lit(""), bp, wl === BOTH_SIDES ? $c.lit("are") : $c.lit("is"), for_what);
     }
 }
+/**
+ * @param {number | bigint} side long
+ * @param {number} timex int
+ * @returns {Promise<void>}
+ */
 export async function set_wounded_legs(side, timex) {   // do.c:2426
     /* KMH -- STEED
      * If you are riding, your steed gets the wounded legs instead.
@@ -2262,6 +2439,10 @@ export async function set_wounded_legs(side, timex) {   // do.c:2426
     u.uprops[WOUNDED_LEGS].extrinsic = $c.or64(u.uprops[WOUNDED_LEGS].extrinsic, side);
     await encumber_msg();
 }
+/**
+ * @param {number} how int
+ * @returns {Promise<void>}
+ */
 export async function heal_legs(how) {   // do.c:2449
     let legs = null, $t1;
     /* 0: ordinary, 1: dismounting steed, 2: limbs turn to stone */

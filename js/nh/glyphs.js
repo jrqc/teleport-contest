@@ -53,6 +53,11 @@ const glyphcache_find = new $T.find_struct();
 const to_custom_symbol_find = new $T.find_struct();
 let nonzero_black = 0;
 /* staticfn void purge_custom_entries(enum graphics_sets which_set); */
+/**
+ * @param {number} glyph int
+ * @param {$T.find_struct | null} findwhat struct find_struct *
+ * @returns {Promise<void>}
+ */
 async function to_custom_symset_entry_callback(glyph, findwhat) {   // glyphs.c:53
     let idx = 0, utf8str = new Uint8Array(6), uval = 0, $t1, $t2;
     idx = gs.symset_which_set;
@@ -103,6 +108,11 @@ async function to_custom_symset_entry_callback(glyph, findwhat) {   // glyphs.c:
  * Return value:
  *               1 = success
  *               0 = failure
+ */
+/**
+ * @param {$c.Ptr | null} op const char *
+ * @param {*} glyphptr int *
+ * @returns {Promise<number>} int
  */
 export async function glyphrep_to_custom_map_entries(op, glyphptr) {   // glyphs.c:112
     let buf = new Int8Array(256), c_glyphid = null, c_unicode = null, c_colorval = null, cp = null, reslt = 0, rgb = 0, slash = 0, colon = 0;
@@ -171,6 +181,10 @@ export async function glyphrep_to_custom_map_entries(op, glyphptr) {   // glyphs
     reslt = await glyph_find_core(c_glyphid, to_custom_symbol_find);
     return reslt;
 }
+/**
+ * @param {$c.Ptr | null} str char *
+ * @returns {$c.Ptr | null} char *
+ */
 function fix_glyphname(str) {   // glyphs.c:184
     let c = null;
     for (c = str; c.get(0); c = c.add(1)) {
@@ -183,6 +197,10 @@ function fix_glyphname(str) {   // glyphs.c:184
     }
     return str;
 }
+/**
+ * @param {number} glyph int
+ * @returns {number} int
+ */
 export function glyph_to_cmap(glyph) {   // glyphs.c:200
     if (glyph === GLYPH.CMAP_STONE_OFF) {
         return S.stone;
@@ -216,6 +234,11 @@ export function glyph_to_cmap(glyph) {   // glyphs.c:200
     /* MAXPCHARS is legal array index because
      * of trailing fencepost entry */
 }
+/**
+ * @param {$c.Ptr | null} id const char *
+ * @param {$T.find_struct | null} findwhat struct find_struct *
+ * @returns {Promise<number>} int
+ */
 async function glyph_find_core(id, findwhat) {   // glyphs.c:234
     let glyph = 0, do_callback = 0, end_find = 0;
     end_find = FALSE;
@@ -279,6 +302,9 @@ async function glyph_find_core(id, findwhat) {   // glyphs.c:234
  all the memory those names consumed once the bulk parsing is
  over with.
 */
+/**
+ * @returns {Promise<void>}
+ */
 export async function fill_glyphid_cache() {   // glyphs.c:303
     let reslt = 0;
     reslt = 0;
@@ -305,6 +331,9 @@ export async function fill_glyphid_cache() {   // glyphs.c:303
  * a match or an empty bucket is found.
  * The second hash is an odd number, which is necessary and sufficient
  * to traverse the entire table.
+ */
+/**
+ * @returns {Promise<void>}
  */
 async function init_glyph_cache() {   // glyphs.c:334
     let glyph = 0;
@@ -335,6 +364,11 @@ export function free_glyphid_cache() {   // glyphs.c:355
     $c.free(glyphid_cache);
     glyphid_cache = null;
 }
+/**
+ * @param {number} glyphnum int
+ * @param {$c.Ptr | null} id const char *
+ * @returns {Promise<void>}
+ */
 async function add_glyph_to_cache(glyphnum, id) {   // glyphs.c:372
     let hash = 0, hash1 = 0, hash2 = 0, i = 0, $t1;
     hash = glyph_hash(id);
@@ -354,6 +388,10 @@ async function add_glyph_to_cache(glyphnum, id) {   // glyphs.c:372
     /* This should never happen */
     await panic($c.lit("glyphid_cache full"));
 }
+/**
+ * @param {$c.Ptr | null} id const char *
+ * @returns {number} int
+ */
 function find_glyph_in_cache(id) {   // glyphs.c:395
     let hash = 0, hash1 = 0, hash2 = 0, i = 0;
     hash = glyph_hash(id);
@@ -373,6 +411,10 @@ function find_glyph_in_cache(id) {   // glyphs.c:395
     } while (i !== hash1);
     return -1;
 }
+/**
+ * @param {number} glyphnum int
+ * @returns {$c.Ptr | null} char *
+ */
 function find_glyphid_in_cache_by_glyphnum(glyphnum) {   // glyphs.c:418
     let idx = 0;
     if (!glyphid_cache) {
@@ -386,6 +428,10 @@ function find_glyphid_in_cache_by_glyphnum(glyphnum) {   // glyphs.c:418
     }
     return null;
 }
+/**
+ * @param {$c.Ptr | null} id const char *
+ * @returns {number} uint32
+ */
 function glyph_hash(id) {   // glyphs.c:435
     let hash = 0, i = 0, ch = 0;
     hash = 0;
@@ -399,9 +445,16 @@ function glyph_hash(id) {   // glyphs.c:435
     }
     return hash;
 }
+/**
+ * @returns {number} boolean
+ */
 export function glyphid_cache_status() {   // glyphs.c:452
     return $c.i8(glyphid_cache !== null ? 1 : 0);
 }
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @returns {Promise<number>} int
+ */
 export async function match_glyph(buf) {   // glyphs.c:458
     let workbuf = new Int8Array(256);
     /* buf contains a G_ glyph reference, not an S_ symbol.
@@ -410,6 +463,10 @@ export async function match_glyph(buf) {   // glyphs.c:458
     nh_snprintf($c.lit("match_glyph"), 465, new $c.Ptr(workbuf, 0), 256, $c.lit("%s"), buf);   /* get a copy */
     return await glyphrep(new $c.Ptr(workbuf, 0));
 }
+/**
+ * @param {$c.Ptr | null} op const char *
+ * @returns {Promise<number>} int
+ */
 export async function glyphrep(op) {   // glyphs.c:470
     let reslt = 0, glyph = Int32Array.of(0);
     reslt = 0;
@@ -424,6 +481,13 @@ export async function glyphrep(op) {   // glyphs.c:470
     }
     return 0;
 }
+/**
+ * @param {$c.Ptr | null} customization_name const char *
+ * @param {number} glyphidx int
+ * @param {number} nhcolor uint32
+ * @param {number} which_set enum graphics_sets
+ * @returns {Promise<number>} int
+ */
 export async function add_custom_nhcolor_entry(customization_name, glyphidx, nhcolor, which_set) {   // glyphs.c:484
     let gdc = null, details = null, newdetails = null, $t1;
     gdc = $c.relem(gs.sym_customizations[which_set], custom_nhcolor);
@@ -458,6 +522,11 @@ export async function add_custom_nhcolor_entry(customization_name, glyphidx, nhc
     gdc.count = gdc.count + 1 | 0;
     return 1;
 }
+/**
+ * @param {number} which_set enum graphics_sets
+ * @param {number} docustomize enum do_customizations
+ * @returns {Promise<void>}
+ */
 export async function apply_customizations(which_set, docustomize) {   // glyphs.c:531
     let gmap = null, details = null, sc = null, at_least_one = 0, do_colors = 0, do_symbols = 0, custs = 0;
     at_least_one = FALSE;
@@ -494,6 +563,9 @@ export async function apply_customizations(which_set, docustomize) {   // glyphs
 /* Shuffle the customizations to match shuffled object descriptions,
  * so a red potion isn't displayed with a blue customization, and so on.
  */
+/**
+ * @returns {Promise<void>}
+ */
 export async function maybe_shuffle_customizations() {   // glyphs.c:581
     if (iflags.pending_customizations) {
         await shuffle_customizations();
@@ -507,6 +579,9 @@ export async function maybe_shuffle_customizations() {   // glyphs.c:581
  */
 /* Current structure already appears in tmp_u */
 /* Some glyphmaps may not have been transferred */
+/**
+ * @returns {Promise<void>}
+ */
 async function shuffle_customizations() {   // glyphs.c:646
     let j = 0, obj_glyphs = null, i = 0, tmp_u = $c.nulls(481), tmp_customcolor = new Uint32Array(481), tmp_color256idx = new Uint16Array(481), duplicate = new Int32Array(481), idx = 0, other = null, other_customcolor = 0, other_color256idx = 0, $t1, $t2;
     for (j = 0; j < 2; j = j + 1 | 0) {
@@ -562,6 +637,12 @@ async function shuffle_customizations() {   // glyphs.c:646
         }
     }
 }
+/**
+ * @param {$c.Ptr | null} customization_name const char *
+ * @param {number} custtype enum customization_types
+ * @param {number} which_set enum graphics_sets
+ * @returns {$T.customization_detail | null} struct customization_detail *
+ */
 export function find_matching_customization(customization_name, custtype, which_set) {   // glyphs.c:736
     let gdc = null;
     gdc = $c.relem(gs.sym_customizations[which_set], custtype);
@@ -576,6 +657,9 @@ export function purge_all_custom_entries() {   // glyphs.c:751
         purge_custom_entries(i >>> 0);
     }
 }
+/**
+ * @param {number} which_set enum graphics_sets
+ */
 export function purge_custom_entries(which_set) {   // glyphs.c:761
     let custtype = 0, gdc = null, details = null, next = null;
     for (custtype = custom_none; custtype < custom_count; custtype = custtype + 1 >>> 0) {
@@ -607,6 +691,10 @@ export function purge_custom_entries(which_set) {   // glyphs.c:761
         gdc.count = 0;
     }
 }
+/**
+ * @param {$T.__sFILE | null} fp FILE *
+ * @returns {Promise<void>}
+ */
 export async function dump_all_glyphids(fp) {   // glyphs.c:797
     let dump_glyphid_find = new $T.find_struct();
     dump_glyphid_find.$copyFrom(zero_find);
@@ -615,6 +703,10 @@ export async function dump_all_glyphids(fp) {   // glyphs.c:797
     dump_glyphid_find.restype = res_dump_glyphids;
     await parse_id(null, dump_glyphid_find);
 }
+/**
+ * @param {number} win winid
+ * @returns {Promise<void>}
+ */
 export async function wizcustom_glyphids(win) {   // glyphs.c:808
     let glyphnum = 0, id = null;
     if (!glyphid_cache) {
@@ -627,6 +719,11 @@ export async function wizcustom_glyphids(win) {   // glyphs.c:808
         }
     }
 }
+/**
+ * @param {$c.Ptr | null} id const char *
+ * @param {$T.find_struct | null} findwhat struct find_struct *
+ * @returns {Promise<number>} int
+ */
 async function parse_id(id, findwhat) {   // glyphs.c:824
     let fp = null, i = 0, j = 0, mnum = 0, glyph = 0, pm_offset = 0, oc_offset = 0, cmap_offset = 0, pm_count = 0, oc_count = 0, cmap_count = 0, skip_base = 0, skip_this_one = 0, dump_ids = 0, filling_cache = 0, is_S = 0, is_G = 0, buf = $c.matrix(Int8Array, [4, 128]), val = 0, buf2 = null, buf3 = null, buf4 = null, cmap = 0, expl = 0, $t1, $t2, $t3;
     fp = null;
@@ -932,6 +1029,9 @@ export function clear_all_glyphmap_colors() {   // glyphs.c:1167
         glyphmap[glyph].color256idx = 0;
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function reset_customcolors() {   // glyphs.c:1179
     clear_all_glyphmap_colors();
     await apply_customizations(gc.currentgraphics >>> 0, do_custom_colors);

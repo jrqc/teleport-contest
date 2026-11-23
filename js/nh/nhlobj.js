@@ -37,6 +37,11 @@ import { timer_is_obj } from './timeout.macros.js';
 
 const l_obj_methods = $c.recArray($T.luaL_Reg, 16);
 const l_obj_meta = $c.recArray($T.luaL_Reg, 2);
+/**
+ * @param {*} L lua_State *
+ * @param {number} indx int
+ * @returns {Promise<$T._lua_obj | null>} struct _lua_obj *
+ */
 async function l_obj_check(L, indx) {   // nhlobj.c:35
     let lo = null;
     await luaL_checktype(L, indx, LUA.TUSERDATA);
@@ -46,6 +51,10 @@ async function l_obj_check(L, indx) {   // nhlobj.c:35
     }
     return lo;
 }
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_obj_gc(L) {   // nhlobj.c:47
     let obj = null, otmp = null, lo = null;
     lo = await l_obj_check(L, 1);
@@ -68,6 +77,11 @@ async function l_obj_gc(L) {   // nhlobj.c:47
     }
     return 0;
 }
+/**
+ * @param {*} L lua_State *
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<$T._lua_obj | null>} struct _lua_obj *
+ */
 async function l_obj_push(L, otmp) {   // nhlobj.c:73
     let lo = null;
     lo = $c.asRec(await lua_newuserdata(L, 16), $T._lua_obj, 16);
@@ -80,11 +94,20 @@ async function l_obj_push(L, otmp) {   // nhlobj.c:73
     }
     return lo;
 }
+/**
+ * @param {*} L lua_State *
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 export async function nhl_push_obj(L, otmp) {   // nhlobj.c:89
     await l_obj_push(L, otmp);
 }
 /* local o = obj.new("large chest");
    local cobj = o:contents(); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_obj_getcontents(L) {   // nhlobj.c:97
     let lo = null, obj = null;
     lo = await l_obj_check(L, 1);
@@ -99,6 +122,10 @@ async function l_obj_getcontents(L) {   // nhlobj.c:97
 /* local box = obj.new("large chest");
    box:addcontent(obj.new("rock"));
 */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_obj_add_to_container(L) {   // nhlobj.c:114
     let lobox = null, lo = null, otmp = null, refs = 0, $t1;
     lobox = await l_obj_check(L, 1);
@@ -119,6 +146,10 @@ async function l_obj_add_to_container(L) {   // nhlobj.c:114
 }
 /* Put object into player's inventory */
 /* u.giveobj(obj.new("rock")); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 export async function nhl_obj_u_giveobj(L) {   // nhlobj.c:142
     let lo = null, otmp = null, refs = 0;
     lo = await l_obj_check(L, 1);
@@ -138,6 +169,10 @@ export async function nhl_obj_u_giveobj(L) {   // nhlobj.c:142
 /* local odata = obj.class(otbl.otyp); */
 /* local odata = obj.class(obj.new("rock")); */
 /* local odata = o:class(); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_obj_objects_to_table(L) {   // nhlobj.c:171
     let argc = 0, otyp = 0, o = null, lo = null;
     argc = lua_gettop(L);
@@ -203,6 +238,10 @@ async function l_obj_objects_to_table(L) {   // nhlobj.c:171
    object fields.
    local o = obj.new("rock");
    local otbl = o:totable(); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_obj_to_table(L) {   // nhlobj.c:247
     let lo = null, obj = null;
     lo = await l_obj_check(L, 1);
@@ -295,6 +334,10 @@ async function l_obj_to_table(L) {   // nhlobj.c:247
 /* create a new object via wishing routine */
 /* local o = obj.new("rock"); */
 /* local o = obj.new({ id = "food ration", class = "%" }); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_obj_new_readobjnam(L) {   // nhlobj.c:350
     let argc = 0, buf = new Int8Array(256), otmp = null, id = 0, class_ = 0, otmp$2 = null;
     argc = lua_gettop(L);
@@ -329,6 +372,10 @@ async function l_obj_new_readobjnam(L) {   // nhlobj.c:350
 }
 /* Get the topmost object on the map at x,y */
 /* local o = obj.at(x, y); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_obj_at(L) {   // nhlobj.c:389
     let argc = 0, x = Int16Array.of(0), y = Int16Array.of(0);
     argc = lua_gettop(L);
@@ -348,6 +395,10 @@ async function l_obj_at(L) {   // nhlobj.c:389
 /* Place an object on the map at (x,y).
    local o = obj.new("rock");
    o:placeobj(u.ux, u.uy); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_obj_placeobj(L) {   // nhlobj.c:413
     let argc = 0, lo = null, x = Int16Array.of(0), y = Int16Array.of(0);
     argc = lua_gettop(L);
@@ -371,6 +422,10 @@ async function l_obj_placeobj(L) {   // nhlobj.c:413
    local o2 = o:next(true);
    local firstobj = obj.next();
 */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_obj_nextobj(L) {   // nhlobj.c:445
     let argc = 0, lo = null, use_nexthere = 0;
     argc = lua_gettop(L);
@@ -390,6 +445,10 @@ async function l_obj_nextobj(L) {   // nhlobj.c:445
 }
 /* Get the container object is in */
 /* local box = o:container(); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_obj_container(L) {   // nhlobj.c:469
     let lo = null;
     lo = await l_obj_check(L, 1);
@@ -402,6 +461,10 @@ async function l_obj_container(L) {   // nhlobj.c:469
 }
 /* Is the object a null? */
 /* local badobj = o:isnull(); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_obj_isnull(L) {   // nhlobj.c:483
     let lo = null;
     lo = await l_obj_check(L, 1);
@@ -410,6 +473,10 @@ async function l_obj_isnull(L) {   // nhlobj.c:483
 }
 /* does object have a timer of certain type? */
 /* local hastimer = o:has_timer("rot-organic"); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_obj_timer_has(L) {   // nhlobj.c:496
     let argc = 0, lo = null, timertype = 0;
     argc = lua_gettop(L);
@@ -431,6 +498,10 @@ async function l_obj_timer_has(L) {   // nhlobj.c:496
 /* peek at an object timer. return the turn when timer triggers.
    returns 0 if no such timer attached to the object. */
 /* local timeout = o:peek_timer("hatch-egg"); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_obj_timer_peek(L) {   // nhlobj.c:520
     let argc = 0, lo = null, timertype = 0;
     argc = lua_gettop(L);
@@ -455,6 +526,10 @@ async function l_obj_timer_peek(L) {   // nhlobj.c:520
    without a timer type parameter, stops all timers for the object. */
 /* local timeout = o:stop_timer("rot-organic"); */
 /* o:stop_timer(); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_obj_timer_stop(L) {   // nhlobj.c:547
     let argc = 0, lo = null, lo$2 = null, timertype = 0;
     argc = lua_gettop(L);
@@ -481,6 +556,10 @@ async function l_obj_timer_stop(L) {   // nhlobj.c:547
 }
 /* start an object timer. */
 /* o:start_timer("hatch-egg", 10); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_obj_timer_start(L) {   // nhlobj.c:579
     let argc = 0, lo = null, timertype = 0, when = 0;
     argc = lua_gettop(L);
@@ -503,6 +582,10 @@ async function l_obj_timer_start(L) {   // nhlobj.c:579
    false otherwise. */
 /* local ogone = o:bury(); */
 /* local ogone = o:bury(5,5); */
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function l_obj_bury(L) {   // nhlobj.c:603
     let argc = 0, dealloced = Int8Array.of(0), lo = null, x = Int16Array.of(0), y = Int16Array.of(0);
     argc = lua_gettop(L);
@@ -528,6 +611,10 @@ async function l_obj_bury(L) {   // nhlobj.c:603
     lua_pushboolean(L, dealloced[0]);
     return 1;
 }
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 export async function l_obj_register(L) {   // nhlobj.c:654
     /* Table of instance methods (e.g. an_object:isnull())
        and static methods (e.g. obj.new("dagger")). */

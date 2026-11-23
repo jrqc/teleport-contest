@@ -25,6 +25,11 @@ let nh_qsort_base = null;
 let nh_qsort_size = 0;
 let nh_qsort_cmp_fn = null;
 const dm = $c.recArray($T.datamodel_information, 5);
+/**
+ * @param {*} va const void *
+ * @param {*} vb const void *
+ * @returns {Promise<number>} int
+ */
 async function nh_qsort_idx_cmp(va, vb) {   // hacklib.c:19
     let a = null, b = null, c = 0;
     a = $c.asRec(va, $T.nh_qsort_index, 8);
@@ -89,22 +94,42 @@ async function nh_qsort_idx_cmp(va, vb) {   // hacklib.c:19
                                          const char *, ...)
 =*/
 /* is 'c' a digit? */
+/**
+ * @param {number} c char
+ * @returns {number} boolean
+ */
 export function digit(c) {   // hacklib.c:126
     return $c.i8(48 <= c && c <= 57 ? 1 : 0);
 }
 /* is 'c' a letter?  note: '@' classed as letter */
+/**
+ * @param {number} c char
+ * @returns {number} boolean
+ */
 export function letter(c) {   // hacklib.c:133
     return $c.i8($c.i8(64 <= c && c <= 90 ? 1 : 0) || 97 <= c && c <= 122 ? 1 : 0);
 }
 /* force 'c' into uppercase */
+/**
+ * @param {number} c char
+ * @returns {number} char
+ */
 export function highc(c) {   // hacklib.c:140
     return $c.i8(97 <= c && c <= 122 ? c & -33 : c);
 }
 /* force 'c' into lowercase */
+/**
+ * @param {number} c char
+ * @returns {number} char
+ */
 export function lowc(c) {   // hacklib.c:147
     return $c.i8(65 <= c && c <= 90 ? c | 32 : c);
 }
 /* convert a string into all lowercase */
+/**
+ * @param {$c.Ptr | null} s char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function lcase(s) {   // hacklib.c:154
     let p = null;
     for (p = s; p.get(0); p = p.add(1)) {
@@ -115,6 +140,10 @@ export function lcase(s) {   // hacklib.c:154
     return s;
 }
 /* convert a string into all uppercase */
+/**
+ * @param {$c.Ptr | null} s char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function ucase(s) {   // hacklib.c:166
     let p = null;
     for (p = s; p.get(0); p = p.add(1)) {
@@ -125,6 +154,10 @@ export function ucase(s) {   // hacklib.c:166
     return s;
 }
 /* convert first character of a string to uppercase */
+/**
+ * @param {$c.Ptr | null} s char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function upstart(s) {   // hacklib.c:178
     let $t1;
     if (s) {
@@ -133,6 +166,10 @@ export function upstart(s) {   // hacklib.c:178
     return s;
 }
 /* capitalize first letter of every word in a string (in place) */
+/**
+ * @param {$c.Ptr | null} s char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function upwords(s) {   // hacklib.c:187
     let p = null, space = 0, $t1;
     space = TRUE;
@@ -149,6 +186,10 @@ export function upwords(s) {   // hacklib.c:187
     return s;
 }
 /* remove excess whitespace from a string buffer (in place) */
+/**
+ * @param {$c.Ptr | null} bp char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function mungspaces(bp) {   // hacklib.c:206
     let c = 0, p = null, p2 = null, was_space = 0, $t1;
     was_space = TRUE;
@@ -171,6 +212,10 @@ export function mungspaces(bp) {   // hacklib.c:206
     return bp;
 }
 /* skip leading whitespace; remove trailing whitespace, in place */
+/**
+ * @param {$c.Ptr | null} txt char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function trimspaces(txt) {   // hacklib.c:228
     let end = null;
     /* leading whitespace will remain in the buffer */
@@ -184,6 +229,10 @@ export function trimspaces(txt) {   // hacklib.c:228
     return txt;
 }
 /* remove \n from end of line; remove \r too if one is there */
+/**
+ * @param {$c.Ptr | null} str char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function strip_newline(str) {   // hacklib.c:244
     let p = null;
     p = $c.strrchr(str, 10);
@@ -196,6 +245,10 @@ export function strip_newline(str) {   // hacklib.c:244
     return str;
 }
 /* return the end of a string (pointing at '\0') */
+/**
+ * @param {$c.Ptr | null} s char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function eos(s) {   // hacklib.c:258
     while (s.get(0)) {
         s = s.add(1);   /* s += strlen(s); */
@@ -203,6 +256,10 @@ export function eos(s) {   // hacklib.c:258
     return s;
 }
 /* version of eos() which takes a const* arg and returns that result */
+/**
+ * @param {$c.Ptr | null} s const char *
+ * @returns {$c.Ptr | null} const char *
+ */
 export function c_eos(s) {   // hacklib.c:267
     while (s.get(0)) {
         s = s.add(1);   /* s += strlen(s); */
@@ -211,6 +268,12 @@ export function c_eos(s) {   // hacklib.c:267
 }
 /* determine whether 'str' starts with 'chkstr', possibly ignoring case;
  * panics on huge strings */
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @param {$c.Ptr | null} chkstr const char *
+ * @param {number} caseblind boolean
+ * @returns {number} boolean
+ */
 export function str_start_is(str, chkstr, caseblind) {   // hacklib.c:277
     let t1 = 0, t2 = 0, n = 0;
     n = LARGEST_INT;
@@ -230,6 +293,11 @@ export function str_start_is(str, chkstr, caseblind) {   // hacklib.c:277
     return TRUE;
 }
 /* determine whether 'str' ends in 'chkstr' */
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @param {$c.Ptr | null} chkstr const char *
+ * @returns {number} boolean
+ */
 export function str_end_is(str, chkstr) {   // hacklib.c:305
     let clen = 0;
     clen = $c.i32($c.strlen(chkstr));
@@ -239,6 +307,10 @@ export function str_end_is(str, chkstr) {   // hacklib.c:305
     return FALSE;
 }
 /* return max line length from buffer comprising newline-separated strings */
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @returns {number} int
+ */
 export function str_lines_maxlen(str) {   // hacklib.c:316
     let s1 = null, s2 = null, len = 0, max_len = 0;
     max_len = 0;
@@ -259,6 +331,11 @@ export function str_lines_maxlen(str) {   // hacklib.c:316
     return max_len;
 }
 /* append a character to a string (in place): strcat(s, {c,'\0'}); */
+/**
+ * @param {$c.Ptr | null} s char *
+ * @param {number} c char
+ * @returns {$c.Ptr | null} char *
+ */
 export function strkitten(s, c) {   // hacklib.c:340
     let p = null, $t1;
     p = eos(s);
@@ -267,6 +344,11 @@ export function strkitten(s, c) {   // hacklib.c:340
     return s;
 }
 /* truncating string copy */
+/**
+ * @param {$c.Ptr | null} dst char *
+ * @param {$c.Ptr | null} src const char *
+ * @param {number} n int
+ */
 export function copynchars(dst, src, n) {   // hacklib.c:351
     let $t1, $t2, $t3, $t4;
     /* copies at most n characters, stopping sooner if terminator reached;
@@ -279,6 +361,11 @@ export function copynchars(dst, src, n) {   // hacklib.c:351
     dst.set(0, 0);
 }
 /* convert char nc into oc's case; mostly used by strcasecpy */
+/**
+ * @param {number} oc int
+ * @param {number} nc int
+ * @returns {number} char
+ */
 export function chrcasecpy(oc, nc) {   // hacklib.c:365
     /* this will be necessary if we switch to <ctype.h> */
     if (97 <= oc && oc <= 122) {
@@ -297,6 +384,11 @@ export function chrcasecpy(oc, nc) {   // hacklib.c:365
 /* overwrite string, preserving old chars' case;
    for case-insensitive editions of makeplural() and makesingular();
    src might be shorter, same length, or longer than dst */
+/**
+ * @param {$c.Ptr | null} dst char *
+ * @param {$c.Ptr | null} src const char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function strcasecpy(dst, src) {   // hacklib.c:387
     let result = null, ic = 0, oc = 0, dst_exhausted = 0, $t1, $t2, $t3, $t4;
     result = dst;
@@ -317,6 +409,10 @@ export function strcasecpy(dst, src) {   // hacklib.c:387
     return result;
 }
 /* return a name converted to possessive */
+/**
+ * @param {$c.Ptr | null} s const char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function s_suffix(s) {   // hacklib.c:409
     $c.strcpy(new $c.Ptr(s_suffix$buf, 0), s);
     if (!strncmpi(new $c.Ptr(s_suffix$buf, 0), $c.lit("it"), -1)) {   /* it -> its */
@@ -332,6 +428,10 @@ export function s_suffix(s) {   // hacklib.c:409
     return new $c.Ptr(s_suffix$buf, 0);
 }
 /* construct a gerund (a verb formed by appending "ing" to a noun) */
+/**
+ * @param {$c.Ptr | null} s const char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function ing_suffix(s) {   // hacklib.c:427
     let onoff = new Int8Array(10), p = null, $t1, $t2;
     $c.strcpy(new $c.Ptr(ing_suffix$buf, 0), s);
@@ -363,6 +463,11 @@ export function ing_suffix(s) {   // hacklib.c:427
     return new $c.Ptr(ing_suffix$buf, 0);
 }
 /* trivial text encryption routine (see makedefs) */
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @param {$c.Ptr | null} buf char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function xcrypt(str, buf) {   // hacklib.c:464
     let p = null, q = null, bitmask = 0, $t1, $t2;
     for (bitmask = 1, p = str, q = buf; p.get(0); q = q.add(1)) {
@@ -378,6 +483,10 @@ export function xcrypt(str, buf) {   // hacklib.c:464
     return buf;
 }
 /* is a string entirely whitespace? */
+/**
+ * @param {$c.Ptr | null} s const char *
+ * @returns {number} boolean
+ */
 export function onlyspace(s) {   // hacklib.c:483
     for (; s.get(0); s = s.add(1)) {
         if (s.get(0) !== 32 && s.get(0) !== 9) {
@@ -387,6 +496,10 @@ export function onlyspace(s) {   // hacklib.c:483
     return TRUE;
 }
 /* expand tabs into proper number of spaces (in place) */
+/**
+ * @param {$c.Ptr | null} sbuf char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function tabexpand(sbuf) {   // hacklib.c:493
     let buf = new Int8Array(266), bp = null, s = null, idx = 0, $t1, $t2;
     /* assumed to be [BUFSZ] but can be smaller provided that
@@ -422,6 +535,10 @@ export function tabexpand(sbuf) {   // hacklib.c:493
     return $c.strcpy(sbuf, new $c.Ptr(buf, 0));
 }
 /* make a displayable string from a character */
+/**
+ * @param {number} c char
+ * @returns {$c.Ptr | null} char *
+ */
 export function visctrl(c) {   // hacklib.c:533
     let i = 0, ccc = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
     i = 0;
@@ -447,6 +564,12 @@ export function visctrl(c) {   // hacklib.c:533
 /* strip all the chars in stuff_to_strip from orig */
 /* caller is responsible for ensuring that bp is a
    valid pointer to a BUFSZ buffer */
+/**
+ * @param {$c.Ptr | null} bp char *
+ * @param {$c.Ptr | null} stuff_to_strip const char *
+ * @param {$c.Ptr | null} orig const char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function stripchars(bp, stuff_to_strip, orig) {   // hacklib.c:563
     let i = 0, s = null, $t1;
     i = 0;
@@ -462,6 +585,10 @@ export function stripchars(bp, stuff_to_strip, orig) {   // hacklib.c:563
     return bp;
 }
 /* remove digits from string */
+/**
+ * @param {$c.Ptr | null} s char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function stripdigits(s) {   // hacklib.c:585
     let s1 = null, s2 = null, $t1;
     for (s1 = s2 = s; s1.get(0); s1 = s1.add(1)) {
@@ -474,6 +601,12 @@ export function stripdigits(s) {   // hacklib.c:585
 }
 /* substitute a word or phrase in a string (in place);
    caller is responsible for ensuring that bp points to big enough buffer */
+/**
+ * @param {$c.Ptr | null} bp char *
+ * @param {$c.Ptr | null} orig const char *
+ * @param {$c.Ptr | null} replacement const char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function strsubst(bp, orig, replacement) {   // hacklib.c:600
     let found = null, buf = new Int8Array(256);
     /* [this could be replaced by strNsubst(bp, orig, replacement, 1)] */
@@ -488,6 +621,13 @@ export function strsubst(bp, orig, replacement) {   // hacklib.c:600
 /* substitute the Nth occurrence of a substring within a string (in place);
    if N is 0, substitute all occurrences; returns the number of substitutions;
    maximum output length is BUFSZ (BUFSZ-1 chars + terminating '\0') */
+/**
+ * @param {$c.Ptr | null} inoutbuf char *
+ * @param {$c.Ptr | null} orig const char *
+ * @param {$c.Ptr | null} replacement const char *
+ * @param {number} n int
+ * @returns {number} int
+ */
 export function strNsubst(inoutbuf, orig, replacement, n) {   // hacklib.c:621
     let bp = null, op = null, workbuf = new Int8Array(256), rp = null, len = 0, ocount = 0, rcount = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12;
     /* current string, and result buffer */
@@ -530,6 +670,13 @@ export function strNsubst(inoutbuf, orig, replacement, n) {   // hacklib.c:621
     return rcount;
 }
 /* search for a word in a space-separated list; returns non-Null if found */
+/**
+ * @param {$c.Ptr | null} list const char *
+ * @param {$c.Ptr | null} word const char *
+ * @param {number} wordlen int
+ * @param {number} ignorecase boolean
+ * @returns {$c.Ptr | null} const char *
+ */
 export function findword(list, word, wordlen, ignorecase) {   // hacklib.c:665
     let p = null;
     /* string of space-separated words */
@@ -552,6 +699,10 @@ export function findword(list, word, wordlen, ignorecase) {   // hacklib.c:665
     return null;
 }
 /* return the ordinal suffix of a number */
+/**
+ * @param {number} n int
+ * @returns {$c.Ptr | null} const char *
+ */
 export function ordin(n) {   // hacklib.c:689
     let dd = 0;
     /* note: should be non-negative */
@@ -561,15 +712,30 @@ export function ordin(n) {   // hacklib.c:689
 /* one compiler complains about
    result of ?: for format string */
 /* make a signed digit string from a number */
+/**
+ * @param {number} n int
+ * @returns {$c.Ptr | null} char *
+ */
 export function sitoa(n) {   // hacklib.c:702
     $c.sprintf(new $c.Ptr(sitoa$buf, 0), n < 0 ? $c.lit("%d") : $c.lit("+%d"), n);
     return new $c.Ptr(sitoa$buf, 0);
 }
 /* return the sign of a number: -1, 0, or 1 */
+/**
+ * @param {number} n int
+ * @returns {number} int
+ */
 export function sgn(n) {   // hacklib.c:714
     return n < 0 ? -1 : n !== 0 ? 1 : 0;
 }
 /* distance between two points, in moves */
+/**
+ * @param {number} x0 coordxy
+ * @param {number} y0 coordxy
+ * @param {number} x1 coordxy
+ * @param {number} y1 coordxy
+ * @returns {number} int
+ */
 export function distmin(x0, y0, x1, y1) {   // hacklib.c:721
     let dx = 0, dy = 0;
     dx = $c.i16(x0 - x1 | 0);
@@ -586,6 +752,13 @@ export function distmin(x0, y0, x1, y1) {   // hacklib.c:721
     return dx < dy ? dy : dx;
 }
 /* square of Euclidean distance between pair of pts */
+/**
+ * @param {number} x0 coordxy
+ * @param {number} y0 coordxy
+ * @param {number} x1 coordxy
+ * @param {number} y1 coordxy
+ * @returns {number} int
+ */
 export function dist2(x0, y0, x1, y1) {   // hacklib.c:737
     let dx = 0, dy = 0;
     dx = $c.i16(x0 - x1 | 0);
@@ -593,6 +766,10 @@ export function dist2(x0, y0, x1, y1) {   // hacklib.c:737
     return Math.imul(dx, dx) + Math.imul(dy, dy) | 0;
 }
 /* integer square root function without using floating point */
+/**
+ * @param {number} val int
+ * @returns {number} int
+ */
 export function isqrt(val) {   // hacklib.c:746
     let rt = 0, odd = 0;
     rt = 0;
@@ -613,6 +790,13 @@ export function isqrt(val) {   // hacklib.c:746
     return rt;
 }
 /* are two points lined up (on a straight line)? */
+/**
+ * @param {number} x0 coordxy
+ * @param {number} y0 coordxy
+ * @param {number} x1 coordxy
+ * @param {number} y1 coordxy
+ * @returns {number} boolean
+ */
 export function online2(x0, y0, x1, y1) {   // hacklib.c:768
     let dx = 0, dy = 0;
     dx = x0 - x1 | 0;
@@ -624,6 +808,12 @@ export function online2(x0, y0, x1, y1) {   // hacklib.c:768
 }
 /* case-insensitive counted string comparison */
 /*{ aka strncasecmp }*/
+/**
+ * @param {$c.Ptr | null} s1 const char *
+ * @param {$c.Ptr | null} s2 const char *
+ * @param {number} n int
+ * @returns {number} int
+ */
 export function strncmpi(s1, s2, n) {   // hacklib.c:781
     let t1 = 0, t2 = 0, $t1, $t2, $t3;
     /*(should probably be size_t, which is unsigned)*/
@@ -643,6 +833,11 @@ export function strncmpi(s1, s2, n) {   // hacklib.c:781
 }
 /* STRNCMPI */
 /* case-insensitive substring search */
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @param {$c.Ptr | null} sub const char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function strstri(str, sub) {   // hacklib.c:804
     let s1 = null, s2 = null, i = 0, k = 0, tstr = new Int8Array(32), tsub = new Int8Array(32), $t1, $t2, $t3, $t4, $t5, $t6, $t7;
     /* 0x40 would be case-sensitive */
@@ -687,6 +882,13 @@ export function strstri(str, sub) {   // hacklib.c:804
 /* STRSTRI */
 /* compare two strings for equality, ignoring the presence of specified
    characters (typically whitespace) and possibly ignoring case */
+/**
+ * @param {$c.Ptr | null} s1 const char *
+ * @param {$c.Ptr | null} s2 const char *
+ * @param {$c.Ptr | null} ignore_chars const char *
+ * @param {number} caseblind boolean
+ * @returns {number} boolean
+ */
 export function fuzzymatch(s1, s2, ignore_chars, caseblind) {   // hacklib.c:849
     let c1 = 0, c2 = 0, $t1, $t2;
     do {
@@ -720,6 +922,12 @@ export function fuzzymatch(s1, s2, ignore_chars, caseblind) {   // hacklib.c:849
 /* TIME_type: type of the argument to time(); we actually use &(time_t);
    you might need to define either or both of these to 'long *' in *conf.h */
 /* swapbits(val, bita, bitb) swaps bit a with bit b in val */
+/**
+ * @param {number} val int
+ * @param {number} bita int
+ * @param {number} bitb int
+ * @returns {number} int
+ */
 export function swapbits(val, bita, bitb) {   // hacklib.c:896
     let tmp = 0;
     tmp = val >> bita & 1 ^ val >> bitb & 1;
@@ -737,6 +945,14 @@ export function swapbits(val, bita, bitb) {   // hacklib.c:896
  *      Annoyingly, explicitly casting to void does not remove the error.
  *      So, use the result - see reason #2.
  */
+/**
+ * @param {$c.Ptr | null} func const char *
+ * @param {number} line int
+ * @param {$c.Ptr | null} str char *
+ * @param {number | bigint} size size_t
+ * @param {$c.Ptr | null} fmt const char *
+ * @param {...*} $va the C variable arguments (...)
+ */
 export function nh_snprintf(func, line, str, size, fmt, ...$va) {   // hacklib.c:918
     let ap = null, n = 0;
     ap = new $c.VaList($va);
@@ -748,6 +964,12 @@ export function nh_snprintf(func, line, str, size, fmt, ...$va) {   // hacklib.c
     }
 }
 /* Unicode routines */
+/**
+ * @param {number} uval int
+ * @param {$c.Ptr | null} buffer uint8 *
+ * @param {number | bigint} bufsz size_t
+ * @returns {number} int
+ */
 export function unicodeval_to_utf8str(uval, buffer, bufsz) {   // hacklib.c:946
     let b = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10;
     //    static uint8 buffer[7];
@@ -786,6 +1008,11 @@ export function unicodeval_to_utf8str(uval, buffer, bufsz) {   // hacklib.c:946
     b.set(0, 0);   /* NUL terminate */
     return 1;
 }
+/**
+ * @param {$c.Ptr | null} s1 const char *
+ * @param {$c.Ptr | null} s2 const char *
+ * @returns {number} int
+ */
 export function case_insensitive_comp(s1, s2) {   // hacklib.c:986
     let u1 = 0, u2 = 0;
     for (; ; s1 = s1.add(1), s2 = s2.add(1)) {
@@ -803,6 +1030,11 @@ export function case_insensitive_comp(s1, s2) {   // hacklib.c:986
     }
     return u1 - u2 | 0;
 }
+/**
+ * @param {number} ifd int
+ * @param {number} ofd int
+ * @returns {number} boolean
+ */
 export function copy_bytes(ifd, ofd) {   // hacklib.c:1010
     let buf = new Int8Array(1024), nfrom = 0, nto = 0;
     do {
@@ -818,6 +1050,10 @@ export function copy_bytes(ifd, ofd) {   // hacklib.c:1010
     } while (nfrom === 1024);
     return TRUE;
 }
+/**
+ * @param {number} retidx int
+ * @returns {$c.Ptr | null} const char *
+ */
 export function datamodel(retidx) {   // hacklib.c:1046
     let i = 0, j = 0, matchcount = 0;
     for (i = 1; i < 5; i = i + 1 | 0) {
@@ -833,6 +1069,15 @@ export function datamodel(retidx) {   // hacklib.c:1046
     }
     return datamodel$unknown;
 }
+/**
+ * @param {number} retidx int
+ * @param {number} szshort int
+ * @param {number} szint int
+ * @param {number} szlong int
+ * @param {number} szll int
+ * @param {number} szptr int
+ * @returns {$c.Ptr | null} const char *
+ */
 export function what_datamodel_is_this(retidx, szshort, szint, szlong, szll, szptr) {   // hacklib.c:1064
     let i = 0;
     for (i = 1; i < 5; i = i + 1 | 0) {

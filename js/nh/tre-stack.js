@@ -45,6 +45,10 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { __global_locale, _c_locale } from './c_locale.js';
 
+/**
+ * @param {number} val void *
+ * @returns {number} void *
+ */
 function xlocale_retain(val) {   // xlocale_private.h:96
     let obj = 0;
     obj = val;
@@ -54,6 +58,9 @@ function xlocale_retain(val) {   // xlocale_private.h:96
     $h.i32[obj >>> 2] = $h.i32[obj >>> 2] + 1 | 0;
     return val;
 }
+/**
+ * @param {number} val void *
+ */
 function xlocale_release(val) {   // xlocale_private.h:107
     let obj = 0;
     obj = val;
@@ -66,9 +73,16 @@ function xlocale_release(val) {   // xlocale_private.h:107
         }
     }
 }
+/**
+ * @returns {number} locale_t
+ */
 function __current_locale() {   // xlocale_private.h:122
     return __global_locale;
 }
+/**
+ * @param {number} __loc locale_t
+ * @returns {number} locale_t
+ */
 function __locale_ptr(__loc) {   // xlocale_private.h:128
     if (__loc === 0) {
         __loc = $h.u32[_c_locale >>> 2];
@@ -77,6 +91,11 @@ function __locale_ptr(__loc) {   // xlocale_private.h:128
     }
     return __loc;
 }
+/**
+ * @param {number | bigint} size size_t
+ * @param {number | bigint} max_size size_t
+ * @returns {number} tre_stack_t *
+ */
 export function tre_stack_new(size, max_size) {   // tre-stack.c:33
     let s = 0, $t1;
     s = $hl.malloc(32);
@@ -92,13 +111,25 @@ export function tre_stack_new(size, max_size) {   // tre-stack.c:33
     }
     return s;
 }
+/**
+ * @param {number} s tre_stack_t *
+ */
 export function tre_stack_destroy(s) {   // tre-stack.c:54
     $hl.free($h.u32[(s + 24) >>> 2]);
     $hl.free(s);
 }
+/**
+ * @param {number} s tre_stack_t *
+ * @returns {number | bigint} size_t
+ */
 export function tre_stack_num_items(s) {   // tre-stack.c:61
     return $h.ldu64(s + 16);
 }
+/**
+ * @param {number} s tre_stack_t *
+ * @param {number} value$in union tre_stack_item
+ * @returns {number} reg_errcode_t
+ */
 function tre_stack_push(s, value$in) {   // tre-stack.c:67
     let new_buffer = 0, new_size = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
@@ -136,6 +167,11 @@ function tre_stack_push(s, value$in) {   // tre-stack.c:67
         return 0;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} s tre_stack_t *
+ * @param {number} value int
+ * @returns {number} reg_errcode_t
+ */
 export function tre_stack_push_int(s, value) {   // tre-stack.c:112
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
     try {
@@ -143,6 +179,11 @@ export function tre_stack_push_int(s, value) {   // tre-stack.c:112
         return tre_stack_push(s, $fp);
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} s tre_stack_t *
+ * @param {number} value void *
+ * @returns {number} reg_errcode_t
+ */
 export function tre_stack_push_voidptr(s, value) {   // tre-stack.c:113
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
     try {
@@ -150,9 +191,17 @@ export function tre_stack_push_voidptr(s, value) {   // tre-stack.c:113
         return tre_stack_push(s, $fp);
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} s tre_stack_t *
+ * @returns {number} int
+ */
 export function tre_stack_pop_int(s) {   // tre-stack.c:120
     return $h.i32[($h.u32[(s + 24) >>> 2] + $c.idx($h.st64(s + 16, $c.subu64($h.ldu64(s + 16), 1))) * 8) >>> 2];
 }
+/**
+ * @param {number} s tre_stack_t *
+ * @returns {number} void *
+ */
 export function tre_stack_pop_voidptr(s) {   // tre-stack.c:121
     return $h.u32[($h.u32[(s + 24) >>> 2] + $c.idx($h.st64(s + 16, $c.subu64($h.ldu64(s + 16), 1))) * 8) >>> 2];
 }

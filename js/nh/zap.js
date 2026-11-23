@@ -179,6 +179,10 @@ export const destroy_strings = $c.arrayOf(7, () => $c.nulls(3));
 const wish_history = $c.nulls(20);
 let wish_history_idx = 0;
 /* convert monster zap/spell/breath value to hero zap/spell/breath value */
+/**
+ * @param {number} type int
+ * @returns {number} int
+ */
 function zaptype(type) {   // zap.c:89
     if (type <= -30 && -39 <= type) {   /* monster wand zap */
         type = type + 30 | 0;
@@ -211,6 +215,10 @@ function zaptype(type) {   // zap.c:89
  * and other items of the same type would become known as such.
  */
 /* wand discovery gets special handling when hero is blinded */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function learnwand(obj) {   // zap.c:123
     /* For a wand (or wand-like tool) zapped by the player, if the
        effect was observable (determined by caller; usually seen, but
@@ -245,6 +253,11 @@ export async function learnwand(obj) {   // zap.c:123
  * Also RAY or NODIR for wands that are being broken rather than zapped.
  */
 /* bhitm: monster mtmp was hit by the effect of wand or spell otmp */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function bhitm(mtmp, otmp) {   // zap.c:160
     let ret = 0, wake = 0, reveal_invis = 0, learn_it = Int8Array.of(0), dbldam = 0, skilled_spell = 0, helpful_gesture = 0, dmg = 0, otyp = 0, zap_type_text = null, obj = null, disguised_mimic = 0, polyspot = 0, give_msg = 0, ncflags = 0, oldinvis = 0, couldsee = 0, nambuf = new Int8Array(256), buf = new Int8Array(256), healamt = 0, delta = 0, mesg = null, name = null;
     ret = 0;
@@ -663,6 +676,9 @@ export async function bhitm(mtmp, otmp) {   // zap.c:160
 }
 /* hero is held by a monster or engulfed or holding a monster and has zapped
    opening/unlocking magic at holder/engulfer/holdee or at self */
+/**
+ * @returns {Promise<void>}
+ */
 export async function release_hold() {   // zap.c:578
     let mtmp = null, relbuf = new Int8Array(256);
     mtmp = u.ustuck;
@@ -696,6 +712,10 @@ export async function release_hold() {   // zap.c:578
         await You($c.lit("are released %s."), new $c.Ptr(relbuf, 0));
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function probe_objchain(otmp) {   // zap.c:612
     for (; otmp; otmp = otmp.nobj) {
         await observe_object(otmp);   /* treat as "seen" */
@@ -709,6 +729,10 @@ async function probe_objchain(otmp) {   // zap.c:612
         }
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function probe_monster(mtmp) {   // zap.c:626
     await mstatusline(mtmp);
     if (gn.notonhead) {
@@ -731,6 +755,13 @@ export async function probe_monster(mtmp) {   // zap.c:626
  * object is carried by a monster, its reported position may change
  * from turn to turn.  This function returns FALSE if the position
  * is not available or subject to the constraints above.
+ */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {*} xp coordxy *
+ * @param {*} yp coordxy *
+ * @param {number} locflags int
+ * @returns {number} boolean
  */
 export function get_obj_location(obj, xp, yp, locflags) {   // zap.c:654
     let $t1;
@@ -766,6 +797,13 @@ export function get_obj_location(obj, xp, yp, locflags) {   // zap.c:654
     $t1 = yp.set(0, 0), xp.set(0, $t1);
     return FALSE;
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {*} xp coordxy *
+ * @param {*} yp coordxy *
+ * @param {number} locflags int
+ * @returns {number} boolean
+ */
 export function get_mon_location(mon, xp, yp, locflags) {   // zap.c:692
     let $t1;
     /* non-zero means get location even if monster is buried */
@@ -784,6 +822,12 @@ export function get_mon_location(mon, xp, yp, locflags) {   // zap.c:692
     }
 }
 /* used by revive() and animate_statue() */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$T.nhcoord | null} cc coord *
+ * @param {number} adjacentok boolean
+ * @returns {Promise<$T.monst | null>} struct monst *
+ */
 export async function montraits(obj, cc, adjacentok) {   // zap.c:713
     let mtmp = null, mtmp2 = null, ltmp = 0, $t1;
     /* False: at obj's spot only,
@@ -901,6 +945,12 @@ export async function montraits(obj, cc, adjacentok) {   // zap.c:713
  * container_nesting is updated with the nesting depth of the containers
  * if applicable.
  */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {*} loc int *
+ * @param {*} container_nesting int *
+ * @returns {$T.monst | null} struct monst *
+ */
 export function get_container_location(obj, loc, container_nesting) {   // zap.c:841
     if (container_nesting) {
         container_nesting.set(0, 0);
@@ -920,6 +970,11 @@ export function get_container_location(obj, loc, container_nesting) {   // zap.c
     return null;
 }
 /* can zombie dig the location at x,y */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 function zombie_can_dig(x, y) {   // zap.c:863
     let typ = 0, ttmp = null;
     if (isok(x, y)) {
@@ -938,6 +993,11 @@ function zombie_can_dig(x, y) {   // zap.c:863
  * successful.  Note: this does NOT use up the corpse if it fails.
  * If corpse->quan is more than 1, only one corpse will be affected
  * and only one monster will be resurrected.
+ */
+/**
+ * @param {$T.obj | null} corpse struct obj *
+ * @param {number} by_hero boolean
+ * @returns {Promise<$T.monst | null>} struct monst *
  */
 export async function revive(corpse, by_hero) {   // zap.c:884
     let mtmp = null, mptr = null, container = null, xy = new $T.nhcoord(), x = Int16Array.of(0), y = Int16Array.of(0), one_of = 0, mmflags = 0, montype = Int32Array.of(0), cgend = 0, container_nesting = Int32Array.of(0), is_zomb = 0, locflags = 0, carrier = null, holder = Int32Array.of(0), shkp = null, buf = new Int8Array(256), m_id = 0, ghost = null, otmp = null, $t1, $t2;
@@ -1169,6 +1229,10 @@ export async function revive(corpse, by_hero) {   // zap.c:884
     }
     return mtmp;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function revive_egg(obj) {   // zap.c:1143
     /* nonnull */
     /*
@@ -1182,6 +1246,10 @@ async function revive_egg(obj) {   // zap.c:1143
     }
 }
 /* try to revive all corpses and eggs carried by `mon' */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<number>} int
+ */
 export async function unturn_dead(mon) {   // zap.c:1156
     let otmp = null, otmp2 = null, mtmp2 = null, owner = new Int8Array(256), corpse = new Int8Array(256), save_norevive = 0, youseeit = 0, different_type = 0, is_u = 0, corpsenm = 0, res = 0, $t1;
     is_u = $c.i8($c.peq(mon, gy.youmonst) ? 1 : 0);
@@ -1243,6 +1311,9 @@ export async function unturn_dead(mon) {   // zap.c:1156
     }
     return res;
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function unturn_you() {   // zap.c:1225
     await unturn_dead(gy.youmonst);   /* hit carried corpses and eggs */
     if (is_undead(gy.youmonst.data)) {
@@ -1253,6 +1324,10 @@ export async function unturn_you() {   // zap.c:1225
     }
 }
 /* cancel obj, possibly carried by you or a monster */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function cancel_item(obj) {   // zap.c:1239
     let otyp = 0, cancelled_spe = 0, a = new $T.any(), timout = 0;
     otyp = obj.otyp;
@@ -1370,6 +1445,10 @@ export async function cancel_item(obj) {   // zap.c:1239
 }
 /* soaking or cancelling a novel converts it into a blank spellbook but
    needs more than just changing its otyp (caller is responsible for that) */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function blank_novel(obj) {   // zap.c:1367
     (!(obj.otyp === SPE_BLANK_PAPER) ? 1 : 0) ? $c.__assert_rtn($c.lit("blank_novel"), $c.lit("zap.c"), 1369, $c.lit("obj->otyp == SPE_BLANK_PAPER")) : 0;
     /* novelidx overloads corpsenm, not used for spellbooks */
@@ -1381,6 +1460,11 @@ export async function blank_novel(obj) {   // zap.c:1367
 }
 /* Remove a positive enchantment or charge from obj,
  * possibly carried by you or a monster
+ */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} by_you boolean
+ * @returns {Promise<number>} boolean
  */
 export async function drain_item(obj, by_you) {   // zap.c:1382
     let u_ring = 0;
@@ -1456,6 +1540,12 @@ export async function drain_item(obj, by_you) {   // zap.c:1382
     }
     return TRUE;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} ochance int
+ * @param {number} achance int
+ * @returns {number} boolean
+ */
 export function obj_resists(obj, ochance, achance) {   // zap.c:1458
     let chance = 0;
     /* percent chance for ordinary objects */
@@ -1467,6 +1557,10 @@ export function obj_resists(obj, ochance, achance) {   // zap.c:1458
         return $c.i8(chance < (obj.oartifact ? achance : ochance) ? 1 : 0);
     }
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 export function obj_shudders(obj) {   // zap.c:1476
     let zap_odds = 0;
     if (svc.context.bypasses && obj.bypass | 0) {
@@ -1491,6 +1585,12 @@ export function obj_shudders(obj) {   // zap.c:1476
  * There's also a chance that other stuff will be used up.  Finally,
  * there's a random factor here to keep from always using the stuff
  * at the top of the pile.
+ */
+/**
+ * @param {$T.obj | null} objhdr struct obj *
+ * @param {number} mat int
+ * @param {number} minwt int
+ * @returns {Promise<void>}
  */
 async function polyuse(objhdr, mat, minwt) {   // zap.c:1505
     let otmp = null, otmp2 = null;
@@ -1529,6 +1629,11 @@ async function polyuse(objhdr, mat, minwt) {   // zap.c:1505
 /*
  * Polymorph some of the stuff in this pile into a monster, preferably
  * a golem of the kind okind.
+ */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} okind int
+ * @returns {Promise<void>}
  */
 async function create_polymon(obj, okind) {   // zap.c:1546
     let mdat = null, mtmp = null, material = null, pm_index = 0;
@@ -1612,6 +1717,10 @@ async function create_polymon(obj, okind) {   // zap.c:1546
     }
 }
 /* Assumes obj is on the floor. */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function do_osshock(obj) {   // zap.c:1637
     let i = 0;
     if (obj.otyp === SCR_MAIL) {
@@ -1647,6 +1756,10 @@ export async function do_osshock(obj) {   // zap.c:1637
     await delobj(obj);
 }
 /* Returns TRUE if obj resists polymorphing */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 export function obj_unpolyable(obj) {   // zap.c:1678
     return $c.i8(unpolyable(obj) || $c.peq(obj, $G.uball) || $c.peq(obj, $G.uskin) || obj_resists(obj, 5, 95) ? 1 : 0);
 }
@@ -1660,6 +1773,11 @@ export function obj_unpolyable(obj) {   // zap.c:1678
  * the new object.
  *
  * This should be safe to call for an object anywhere.
+ */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} id int
+ * @returns {Promise<$T.obj | null>} struct obj *
  */
 export async function poly_obj(obj, id) {   // zap.c:1702
     let otmp = null, ox = Int16Array.of(0), oy = Int16Array.of(0), old_wornmask = 0, new_wornmask = 0, can_merge = 0, obj_location = 0, try_limit = 0, magic_obj = 0, mnum = 0, tryct = 0, was_twohanded = 0, was_twoweap = 0, shkp = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
@@ -1937,6 +2055,10 @@ export async function poly_obj(obj, id) {   // zap.c:1702
     return otmp;
 }
 /* stone-to-flesh spell hits and maybe transforms or animates obj */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function stone_to_flesh_obj(obj) {   // zap.c:1993
     let ptr = null, mon = null, shkp = null, item = null, oox = Int16Array.of(0), ooy = Int16Array.of(0), smell = 0, golem_xform = 0, res = 0;
     /* nonnull */
@@ -2064,6 +2186,11 @@ async function stone_to_flesh_obj(obj) {   // zap.c:1993
 /*
  * Object obj was hit by the effect of the wand/spell otmp.  Return
  * non-zero if the wand/spell had any effect.
+ */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} int
  */
 export async function bhito(obj, otmp) {   // zap.c:2119
     let res = 0, learn_it = 0, maybelearnit = 0, save_plnmsg = 0, cover = 0, o = null, oox = 0, ooy = 0, ox = 0, oy = 0, mtmp = null, ox$2 = Int16Array.of(0), oy$2 = Int16Array.of(0), save_norevive = 0, by_u = 0, corpsenm = 0, corpsname = null, $t1, $t2;
@@ -2381,6 +2508,14 @@ export async function bhito(obj, otmp) {   // zap.c:2119
     return res;
 }
 /* returns nonzero if something was hit */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {Function | null} fhito int (*)(struct obj *, struct obj *)
+ * @param {number} tx coordxy
+ * @param {number} ty coordxy
+ * @param {number} zz schar
+ * @returns {Promise<number>} int
+ */
 export async function bhitpile(obj, fhito, tx, ty, zz) {   // zap.c:2428
     let otmp = null, next_obj = null, hidingunder = 0, first = 0, prevotyp = 0, hitanything = 0, t = null, topofpile = null;
     /* wand or fake spellbook for type of zap */
@@ -2460,6 +2595,10 @@ export async function bhitpile(obj, fhito, tx, ty, zz) {   // zap.c:2428
  *            it removes a charge from the wand if zappable.
  * added by GAN 11/03/86
  */
+/**
+ * @param {$T.obj | null} wand struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function zappable(wand) {   // zap.c:2514
     if (wand.spe < 0 || wand.spe === 0 && rn2(WAND.WREST_CHANCE)) {
         return 0;
@@ -2470,6 +2609,9 @@ export async function zappable(wand) {   // zap.c:2514
     wand.spe = $c.i8(wand.spe - 1);
     return 1;
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function do_enlightenment_effect() {   // zap.c:2525
     await You_feel($c.lit("self-knowledgeable..."));
     await display_nhwindow()($G.WIN_MESSAGE, FALSE);
@@ -2480,6 +2622,10 @@ export async function do_enlightenment_effect() {   // zap.c:2525
 /*
  * zapnodir - zaps a NODIR wand/spell.
  * Won't get here if wand has no charges (unless wresting 1 last charge).
+ */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
  */
 export async function zapnodir(obj) {   // zap.c:2539
     let known = 0, tmp_until = 0;
@@ -2545,6 +2691,10 @@ export async function zapnodir(obj) {   // zap.c:2539
         await learnwand(obj);
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function backfire(otmp) {   // zap.c:2605
     let dmg = 0;
     otmp.in_use = (TRUE) & 1;   /* in case losehp() is fatal */
@@ -2554,6 +2704,10 @@ async function backfire(otmp) {   // zap.c:2605
     await useupall(otmp);
 }
 /* getobj callback for object to zap */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 function zap_ok(obj) {   // zap.c:2618
     if (obj && obj.oclass === WAND_CLASS) {
         return GETOBJ.SUGGEST;
@@ -2561,6 +2715,9 @@ function zap_ok(obj) {   // zap.c:2618
     return GETOBJ.EXCLUDE;
 }
 /* #zap command, 'z' (or 'y' if numbed_pad==-1) */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dozap() {   // zap.c:2627
     let obj = null, damage = 0, need_dir = 0, buf = new Int8Array(256);
     if (nohands(gy.youmonst.data)) {
@@ -2615,6 +2772,10 @@ export async function dozap() {   // zap.c:2627
     return ECMD.TIME;
 }
 /* Lock or unlock all boxes in inventory */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function boxlock_invent(obj) {   // zap.c:2687
     let otmp = null, nextobj = null, boxing = 0;
     boxing = FALSE;
@@ -2630,6 +2791,11 @@ async function boxlock_invent(obj) {   // zap.c:2687
         await update_inventory();   /* in case any box->lknown has changed */
     }
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} ordinary boolean
+ * @returns {Promise<number>} int
+ */
 export async function zapyourself(obj, ordinary) {   // zap.c:2705
     let learn_it = Int8Array.of(0), damage = 0, orig_dmg = 0, msg = 0, otmp = [null], onxt = [null], didmerge = 0;
     learn_it[0] = FALSE;
@@ -2929,12 +3095,22 @@ export async function zapyourself(obj, ordinary) {   // zap.c:2705
     return damage;
 }
 /* called when poly'd hero uses breath attack against self */
+/**
+ * @param {$T.attack | null} mattk struct attack *
+ * @returns {Promise<void>}
+ */
 export async function ubreatheu(mattk) {   // zap.c:3017
     let dtyp = 0;
     dtyp = (20 + mattk.adtyp | 0) - 1 | 0;   /* breath by hero */
     await zhitu(dtyp, mattk.damn, flash_str(dtyp, TRUE), u.ux, u.uy);
 }
 /* light damages hero in gremlin form */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} ordinary boolean
+ * @param {number} amt int
+ * @returns {Promise<number>} int
+ */
 export async function lightdamage(obj, ordinary, amt) {   // zap.c:3026
     let buf = new Int8Array(256), how = null, dmg = 0;
     /* item making light (fake book if spell) */
@@ -2964,6 +3140,11 @@ export async function lightdamage(obj, ordinary, amt) {   // zap.c:3026
     return dmg;
 }
 /* light[ning] causes blindness */
+/**
+ * @param {number | bigint} duration long
+ * @param {number} via_lightning boolean
+ * @returns {Promise<number>} boolean
+ */
 export async function flashburn(duration, via_lightning) {   // zap.c:3060
     if (!await resists_blnd(gy.youmonst)) {
         await You(new $c.Ptr(are_blinded_by_the_flash, 0));
@@ -2988,6 +3169,10 @@ export async function flashburn(duration, via_lightning) {   // zap.c:3060
 /* you've zapped a wand downwards while riding
  * Return TRUE if the steed was hit by the wand.
  * Return FALSE if the steed was not hit by the wand.
+ */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} boolean
  */
 async function zap_steed(obj) {   // zap.c:3087
     let steedhit = 0;
@@ -3047,6 +3232,14 @@ async function zap_steed(obj) {   // zap.c:3087
  * if the monster is zapping itself directly, since otherwise the
  * effect is too strong.  currently non-hero monsters do not zap
  * themselves with cancellation.
+ */
+/**
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} youattack boolean
+ * @param {number} allow_cancel_kill boolean
+ * @param {number} self_cancel boolean
+ * @returns {Promise<number>} boolean
  */
 export async function cancel_monst(mdef, obj, youattack, allow_cancel_kill, self_cancel) {   // zap.c:3150
     let youdefend = 0, otmp = null;
@@ -3112,6 +3305,10 @@ export async function cancel_monst(mdef, obj, youattack, allow_cancel_kill, self
     return TRUE;
 }
 /* you've zapped an immediate type wand up or down */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} boolean
+ */
 async function zap_updown(obj) {   // zap.c:3219
     let striking = 0, disclose = Int8Array.of(0), map_zapped = 0, x = 0, y = 0, xx = Int16Array.of(0), yy = Int16Array.of(0), ptmp = 0, otmp = null, e = null, ttmp = null, stway = null, surf = null, ltyp = 0, rememberedltyp = 0, dmg = 0, hitit = 0;
     /* wand or spell, nonnull */
@@ -3292,6 +3489,9 @@ async function zap_updown(obj) {   // zap.c:3219
 export function zapsetup() {   // zap.c:3415
     go.obj_zapped = FALSE;
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function zapwrapup() {   // zap.c:3421
     /* if do_osshock() set obj_zapped while polying, give a message now */
     if (go.obj_zapped) {
@@ -3300,6 +3500,10 @@ export async function zapwrapup() {   // zap.c:3421
     go.obj_zapped = FALSE;
 }
 /* called for various wand and spell effects - M. Stephenson */
+/**
+ * @param {$T.obj | null} obj$in struct obj *
+ * @returns {Promise<void>}
+ */
 export async function weffects(obj$in) {   // zap.c:3431
     const obj = [obj$in];
     let otyp = 0, disclose = 0, was_unkn = 0;
@@ -3344,6 +3548,10 @@ export async function weffects(obj$in) {   // zap.c:3431
     return;
 }
 /* augment damage for a spell based on the hero's intelligence (and level) */
+/**
+ * @param {number} dmg int
+ * @returns {number} int
+ */
 export function spell_damage_bonus(dmg) {   // zap.c:3480
     let intell = 0;
     /* base amount to be adjusted by bonus or penalty */
@@ -3370,6 +3578,10 @@ export function spell_damage_bonus(dmg) {   // zap.c:3480
 /*
  * Generate the to-hit bonus for a spell.  Based on the hero's skill in
  * spell class and dexterity.
+ */
+/**
+ * @param {number} skill int
+ * @returns {number} int
  */
 function spell_hit_bonus(skill) {   // zap.c:3509
     let hit_bon = 0, dex = 0;
@@ -3404,12 +3616,22 @@ function spell_hit_bonus(skill) {   // zap.c:3509
     }
     return hit_bon;
 }
+/**
+ * @param {number} force int
+ * @returns {$c.Ptr | null} const char *
+ */
 export function exclam(force) {   // zap.c:3547
     /* force == 0 occurs e.g. with sleep ray */
     /* note that large force is usual with wands so that !! would
             require information about hand/weapon/wand */
     return force < 0 ? $c.lit("?") : force <= 4 ? $c.lit(".") : $c.lit("!");
 }
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$c.Ptr | null} force const char *
+ * @returns {Promise<void>}
+ */
 export async function hit(str, mtmp, force) {   // zap.c:3556
     let verbosely = 0;
     /* zap text or missile name */
@@ -3418,9 +3640,19 @@ export async function hit(str, mtmp, force) {   // zap.c:3556
     verbosely = $c.i8($c.peq(mtmp, gy.youmonst) || flags.verbose && (cansee(gb.bhitpos.x, gb.bhitpos.y) || canspotmon(mtmp) || engulfing_u(mtmp)) ? 1 : 0);
     await pline($c.lit("%s %s %s%s"), await The(str), await vtense(str, $c.lit("hit")), verbosely ? await mon_nam(mtmp) : $c.lit("it"), force);
 }
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function miss(str, mtmp) {   // zap.c:3571
     await pline($c.lit("%s %s %s."), await The(str), await vtense(str, $c.lit("miss")), (cansee(gb.bhitpos.x, gb.bhitpos.y) || canspotmon(mtmp)) && flags.verbose ? await mon_nam(mtmp) : $c.lit("it"));
 }
+/**
+ * @param {number} range int
+ * @param {*} skipstart int *
+ * @param {*} skipend int *
+ */
 function skiprange(range, skipstart, skipend) {   // zap.c:3579
     let tr = 0, tmp = 0, $t1;
     tr = $c.div32(range, 4);
@@ -3434,6 +3666,12 @@ function skiprange(range, skipstart, skipend) {   // zap.c:3579
 /* Maybe explode a trap hit by object otmp's effect;
    cancellation beam hitting a magical trap causes an explosion.
    Might delete the trap; won't destroy otmp. */
+/**
+ * @param {$T.trap | null} ttmp struct trap *
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {$c.Ptr | null} learn_it boolean *
+ * @returns {Promise<void>}
+ */
 async function maybe_explode_trap(ttmp, otmp, learn_it) {   // zap.c:3594
     let x = 0, y = 0, seeit = 0;
     if (!ttmp || !otmp) {
@@ -3463,6 +3701,12 @@ async function maybe_explode_trap(ttmp, otmp, learn_it) {   // zap.c:3594
 }
 /* zap_map() occurs before hitting monsters or objects and handles wands or
    spells that don't dish out 'elemental' damage */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function zap_map(x, y, obj) {   // zap.c:3628
     let ttmp = null, dbx = Int16Array.of(0), dby = Int16Array.of(0), learn_it = Int8Array.of(0), ebuf = new Int8Array(256), pristinebuf = new Int8Array(256), etxt = null, e = null, ltyp = 0, ltyp$2 = 0, oldtyp = 0, oldglyph = 0, ttmpname = null, t_already_seen = 0, use_the = 0, hallu = 0;
     /* zapped wand, or book for cast spell */
@@ -3641,6 +3885,16 @@ async function zap_map(x, y, obj) {   // zap.c:3628
  *  one is revealed for a weapon, but if not a weapon is left up to fhitm().
  *
  *  If fhitm returns non-zero value, stops the beam and returns the monster
+ */
+/**
+ * @param {number} ddx int
+ * @param {number} ddy int
+ * @param {number} range int
+ * @param {number} weapon enum bhit_call_types
+ * @param {Function | null} fhitm int (*)(struct monst *, struct obj *)
+ * @param {Function | null} fhito int (*)(struct obj *, struct obj *)
+ * @param {*} pobj struct obj **
+ * @returns {Promise<$T.monst | null>} struct monst *
  */
 export async function bhit(ddx, ddy, range, weapon, fhitm, fhito, pobj) {   // zap.c:3827
     let mtmp = null, result = null, obj = null, ttmp = null, typ = 0, shopdoor = 0, point_blank = 0, in_skip = 0, allow_skip = 0, tethered_weapon = 0, skiprange_start = Int32Array.of(0), skiprange_end = Int32Array.of(0), skipcount = 0, was_returning = null, x = 0, y = 0, xyglyph = 0, bobj = null, t = null, $t1, $t2, $t3;
@@ -3933,6 +4187,12 @@ export async function bhit(ddx, ddy, range, weapon, fhitm, fhito, pobj) {   // z
  * early on a failed catch since continuing to throw after being hit
  * is too obviously silly.
  */
+/**
+ * @param {$T.obj | null} obj$in struct obj *
+ * @param {number} dx int
+ * @param {number} dy int
+ * @returns {Promise<$T.monst | null>} struct monst *
+ */
 export async function boomhit(obj$in, dx, dy) {   // zap.c:4148
     const obj = [obj$in];
     let i = 0, ct = 0, boom = 0, mtmp = null, counterclockwise = 0, nhits = 0, dam = 0, $t1;
@@ -4018,6 +4278,13 @@ export async function boomhit(obj$in, dx, dy) {   // zap.c:4148
 }
 /* used by buzz(); also used by munslime(muse.c); returns damage applied
    to mon; note: caller is responsible for killing mon if damage is fatal */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} type int
+ * @param {number} nd int
+ * @param {*} ootmp struct obj **
+ * @returns {Promise<number>} int
+ */
 export async function zhitm(mon, type, nd, ootmp) {   // zap.c:4238
     let tmp = 0, orig_dmg = 0, damgtype = 0, sho_shieldeff = 0, spellcaster = 0, otmp2 = null, rnd_tmp = 0, save_plnmsg = 0, $t1, $t2;
     /* monster being hit */
@@ -4198,6 +4465,14 @@ export async function zhitm(mon, type, nd, ootmp) {   // zap.c:4238
     mon.mhp = mon.mhp - tmp | 0;
     return tmp;
 }
+/**
+ * @param {number} type int
+ * @param {number} nd int
+ * @param {$c.Ptr | null} fltxt const char *
+ * @param {number} sx coordxy
+ * @param {number} sy coordxy
+ * @returns {Promise<void>}
+ */
 async function zhitu(type, nd, fltxt, sx, sy) {   // zap.c:4401
     let dam = 0, abstyp = 0, orig_dam = 0, disn_prot = 0, kbuf = new Int8Array(256), otmp = null, verb = null;
     dam = 0;
@@ -4395,6 +4670,13 @@ async function zhitu(type, nd, fltxt, sx, sy) {   // zap.c:4401
  * burn objects (such as scrolls and spellbooks) on floor
  * at position x,y; return the number of objects burned
  */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} give_feedback boolean
+ * @param {number} u_caused boolean
+ * @returns {Promise<number>} int
+ */
 export async function burn_floor_objects(x, y, give_feedback, u_caused) {   // zap.c:4598
     let obj = null, obj2 = null, i = 0, scrquan = 0, delquan = 0, buf1 = new Int8Array(256), buf2 = new Int8Array(256), cnt = 0, $t1;
     /* caller needs to decide about visibility checks */
@@ -4451,6 +4733,13 @@ export async function burn_floor_objects(x, y, give_feedback, u_caused) {   // z
    bounceback is 1/n chance of bouncing back.
    caller must ensure sx,sy is a bouncing location: !ZAP_POS or closed_door
  */
+/**
+ * @param {number} sx coordxy
+ * @param {number} sy coordxy
+ * @param {*} ddx int *
+ * @param {*} ddy int *
+ * @param {number} bounceback int
+ */
 function bounce_dir(sx, sy, ddx, ddy, bounceback) {   // zap.c:4664
     let rmn = 0, bounce = 0, lsy = 0, lsx = 0;
     if (!ddx.get(0) || !ddy.get(0) || bounceback > 0 && !rn2(bounceback)) {
@@ -4482,6 +4771,11 @@ function bounce_dir(sx, sy, ddx, ddy, bounceback) {   // zap.c:4664
     }
 }
 /* will zap/spell/breath attack score a hit against armor class `ac'? */
+/**
+ * @param {number} ac int
+ * @param {number} type int
+ * @returns {number} int
+ */
 function zap_hit(ac, type) {   // zap.c:4705
     let chance = 0, spell_bonus = 0;
     /* either hero cast spell type or 0 */
@@ -4495,6 +4789,12 @@ function zap_hit(ac, type) {   // zap.c:4705
     ac = ac >= 0 ? ac : -rnd(-ac | 0) | 0;
     return (3 - chance | 0) < (ac + spell_bonus | 0) ? 1 : 0;
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} type int
+ * @param {$c.Ptr | null} fltxt const char *
+ * @returns {Promise<void>}
+ */
 async function disintegrate_mon(mon, type, fltxt) {   // zap.c:4723
     let otmp = null, otmp2 = null, m_amulet = null;
     /* hero vs other */
@@ -4520,9 +4820,23 @@ async function disintegrate_mon(mon, type, fltxt) {   // zap.c:4723
         await xkilled(mon, XKILL.NOMSG | XKILL.NOCORPSE);
     }
 }
+/**
+ * @param {number} type int
+ * @param {number} nd int
+ * @returns {Promise<void>}
+ */
 export async function ubuzz(type, nd) {   // zap.c:4759
     await dobuzz(type, nd, u.ux, u.uy, u.dx, u.dy, TRUE, FALSE, FALSE);
 }
+/**
+ * @param {number} type int
+ * @param {number} nd int
+ * @param {number} sx coordxy
+ * @param {number} sy coordxy
+ * @param {number} dx int
+ * @param {number} dy int
+ * @returns {Promise<void>}
+ */
 export async function buzz(type, nd, sx, sy, dx, dy) {   // zap.c:4765
     await dobuzz(type, nd, sx, sy, dx, dy, TRUE, FALSE, FALSE);
 }
@@ -4534,6 +4848,18 @@ export async function buzz(type, nd, sx, sy, dx, dy) {   // zap.c:4765
  * type == -20 to -29 : monster breathing at you
  * type == -30 to -39 : monster zapping a wand
  * called with dx = dy = 0 for vertical bolts
+ */
+/**
+ * @param {number} type int
+ * @param {number} nd int
+ * @param {number} sx coordxy
+ * @param {number} sy coordxy
+ * @param {number} dx$in int
+ * @param {number} dy$in int
+ * @param {number} sayhit boolean
+ * @param {number} saymiss boolean
+ * @param {number} forcemiss boolean
+ * @returns {Promise<void>}
  */
 export async function dobuzz(type, nd, sx, sy, dx$in, dy$in, sayhit, saymiss, forcemiss) {   // zap.c:4780
     const dx = Int32Array.of(dx$in);
@@ -4797,6 +5123,12 @@ export async function dobuzz(type, nd, sx, sy, dx$in, dy$in, sayhit, saymiss, fo
     }
     gb.bhitpos.$copyFrom(save_bhitpos);
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$c.Ptr | null} msg const char *
+ * @returns {Promise<void>}
+ */
 export async function melt_ice(x, y, msg) {   // zap.c:5040
     let lev = null, otmp = null, mtmp = null;
     lev = $c.relem(svl.level.locations[x], y);
@@ -4846,6 +5178,12 @@ export async function melt_ice(x, y, msg) {   // zap.c:5040
  * Usually start a melt_ice timer; sometimes the ice will become
  * permanent instead.
  */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number | bigint} min_time long
+ * @returns {Promise<void>}
+ */
 export async function start_melt_ice_timeout(x, y, min_time) {   // zap.c:5088
     let when = 0, where = 0;
     /* <x,y>'s old melt timeout (deleted by time we get here) */
@@ -4869,6 +5207,11 @@ export async function start_melt_ice_timeout(x, y, min_time) {   // zap.c:5088
 /*
  * Called when ice has melted completely away.
  */
+/**
+ * @param {$T.any | null} arg anything *
+ * @param {number | bigint} timeout long
+ * @returns {Promise<void>}
+ */
 export async function melt_ice_away(arg, timeout) {   // zap.c:5119
     let x = 0, y = 0, where = 0, save_mon_moving = 0;
     where = arg.a_long;
@@ -4886,6 +5229,15 @@ export async function melt_ice_away(arg, timeout) {   // zap.c:5119
  * Sets shopdamage to TRUE if a shop door is destroyed, and returns the
  * amount by which range is reduced (value is negative and will be added
  * to remaining range by caller; ignored by fireballs and poison gas).
+ */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} type int
+ * @param {$c.Ptr | null} shopdamage boolean *
+ * @param {number} ignoremon boolean
+ * @param {number} exploding_wand_typ short
+ * @returns {Promise<number>} int
  */
 export async function zap_over_floor(x, y, type, shopdamage, ignoremon, exploding_wand_typ) {   // zap.c:5141
     let zapverb = null, mon = null, t = null, lev = null, see_it = 0, yourzap = 0, rangemod = 0, damgtype = 0, lavawall = 0, on_water_level = 0, msggiven = 0, msgtxt = null, lava = 0, moat = 0, chance = 0, buf = new Int8Array(256), melt_time = 0, ztype = 0, new_doormask = 0, see_txt = null, sense_txt = null, hear_txt = null, $goto = null;
@@ -5241,6 +5593,13 @@ export async function zap_over_floor(x, y, type, shopdamage, ignoremon, explodin
     return rangemod;
 }
 /* monster has cast flames or frost at target on <x,y>; called by mcastu() */
+/**
+ * @param {$T.monst | null} caster struct monst *
+ * @param {number} adtyp int
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function mon_spell_hits_spot(caster, adtyp, x, y) {   // zap.c:5501
     let ep = null, etext = null, shopdummy = Int8Array.of(0), zt_typ = 0, zapdmgtyp = 0;
     /* canonical damage type */
@@ -5273,6 +5632,10 @@ export async function mon_spell_hits_spot(caster, adtyp, x, y) {   // zap.c:5501
     }
 }
 /* fractured by pick-axe or wand of striking or by vault guard or shopkeeper */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function fracture_rock(obj) {   // zap.c:5537
     let x = Int16Array.of(0), y = Int16Array.of(0), by_you = 0, shkp = [null], objroom = 0, $t1, $t2, $t3, $t4;
     /* no texts here! */
@@ -5314,6 +5677,10 @@ export async function fracture_rock(obj) {   // zap.c:5537
     }
 }
 /* handle statue hit by striking/force bolt/pick-axe */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} boolean
+ */
 export async function break_statue(obj) {   // zap.c:5582
     let trap = null, item = null, by_you = 0;
     /* [obj is assumed to be on floor, so no get_obj_location() needed] */
@@ -5340,6 +5707,11 @@ export async function break_statue(obj) {   // zap.c:5582
  * Note that things like the Book of the Dead are eligible even though they
  * won't get destroyed, because it will attempt to be destroyed but print a
  * special message instead. */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} adtyp int
+ * @returns {number} boolean
+ */
 function destroyable(obj, adtyp) {   // zap.c:5613
     if (obj.oartifact) {
         /* don't destroy artifacts */
@@ -5377,6 +5749,10 @@ function destroyable(obj, adtyp) {   // zap.c:5613
     return FALSE;
 }
 /* convert attack damage AD_foo to property resistance */
+/**
+ * @param {number} dmgtyp int
+ * @returns {number} int
+ */
 function adtyp_to_prop(dmgtyp) {   // zap.c:5654
     switch (dmgtyp) {
         case AD.COLD:
@@ -5396,6 +5772,10 @@ function adtyp_to_prop(dmgtyp) {   // zap.c:5654
 }
 /* Is hero wearing or wielding an object with resistance to attack
    damage type? Returns the percentage protection that the object gives. */
+/**
+ * @param {number} dmgtyp int
+ * @returns {number} int
+ */
 export function u_adtyp_resistance_obj(dmgtyp) {   // zap.c:5676
     let prop = 0;
     prop = adtyp_to_prop(dmgtyp);
@@ -5424,6 +5804,10 @@ export function u_adtyp_resistance_obj(dmgtyp) {   // zap.c:5676
    This function doesn't check for other reasons why an object might
    be protected; you will usually need to do an obj_resists() call
    too. */
+/**
+ * @param {number} dmgtyp int
+ * @returns {number} boolean
+ */
 export function inventory_resistance_check(dmgtyp) {   // zap.c:5710
     let prob = 0;
     prob = u_adtyp_resistance_obj(dmgtyp);
@@ -5433,6 +5817,10 @@ export function inventory_resistance_check(dmgtyp) {   // zap.c:5710
     return $c.i8(rn2(100) < prob ? 1 : 0);
 }
 /* for enlightenment; currently only useful in wizard mode; cf from_what() */
+/**
+ * @param {number} dmgtyp int
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function item_what(dmgtyp) {   // zap.c:5722
     let what = null, prop = 0, xtrinsic = 0;
     what = null;
@@ -5483,6 +5871,12 @@ export async function item_what(dmgtyp) {   // zap.c:5722
    whether it's the player or a monster having an item destroyed: players lose
    the HP and possibly die in this function, and the return value is unused,
    whereas monsters return the damage to their caller to be taken off later */
+/**
+ * @param {$T.monst | null} carrier struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} dmgtyp int
+ * @returns {Promise<number>} int
+ */
 async function maybe_destroy_item(carrier, obj, dmgtyp) {   // zap.c:5798
     let i = 0, cnt = 0, quan = 0, dmg = 0, xresist = 0, skip = 0, dindx = 0, mult = null, u_carry = 0, vis = 0, chargeit = 0, osym = 0, how = null, one = 0;
     u_carry = $c.i8($c.peq(carrier, gy.youmonst) ? 1 : 0);
@@ -5634,6 +6028,12 @@ async function maybe_destroy_item(carrier, obj, dmgtyp) {   // zap.c:5798
 /* target items of specified class in mon's inventory for possible destruction
    return total amount of damage inflicted, though this is unused if mon is
    the player */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} dmgtyp int
+ * @param {number} dmg_in int
+ * @returns {Promise<number>} int
+ */
 export async function destroy_items(mon, dmgtyp, dmg_in) {   // zap.c:5965
     let obj = null, i = 0, defer = 0, limit = 0, items_to_destroy = $c.recArray($T.anon_zap_5974, 20), elig_stacks = 0, u_carry = 0, objchn = null, dmg_out = 0, where = 0;
     /* monster whose invent is being subjected to
@@ -5749,6 +6149,13 @@ export async function destroy_items(mon, dmgtyp, dmg_in) {   // zap.c:5965
     bypass_objlist(objchn.get(0), FALSE);
     return dmg_out;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} oclass char
+ * @param {number} damage int
+ * @param {number} tell int
+ * @returns {Promise<number>} int
+ */
 export async function resist(mtmp, oclass, damage, tell) {   // zap.c:6100
     let resisted = 0, alev = 0, dlev = 0;
     /* fake players always pass resistance test against Conflict
@@ -5806,6 +6213,10 @@ export async function resist(mtmp, oclass, damage, tell) {   // zap.c:6100
     }
     return resisted;
 }
+/**
+ * @param {number} triesleft int
+ * @returns {Promise<void>}
+ */
 async function wishcmdassist(triesleft) {   // zap.c:6165
     let i = 0, win = 0, buf = new Int8Array(256);
     win = await create_nhwindow()(NHW.TEXT);
@@ -5830,6 +6241,10 @@ async function wishcmdassist(triesleft) {   // zap.c:6165
     await destroy_nhwindow()(win);
 }
 /* add string to wish history list */
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @returns {Promise<void>}
+ */
 export async function wish_history_add(buf) {   // zap.c:6227
     let i = 0, idx = 0, idx$2 = 0, $t1;
     if (!wizard()) {
@@ -5867,6 +6282,10 @@ export function wish_history_flush() {   // zap.c:6259
 }
 /* shows menu of previous wishes, copies selected into buf, max BUFSZ len.
    buf is not modified, if nothing was selected. */
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @returns {Promise<void>}
+ */
 async function wish_history_menu(buf) {   // zap.c:6275
     let win = 0, any = new $T.any(), i = 0, npick = 0, picks = [null], idx = 0;
     i = 0;
@@ -5894,6 +6313,9 @@ async function wish_history_menu(buf) {   // zap.c:6275
     }
     /* DEBUG */
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function makewish() {   // zap.c:6314
     let buf = new Int8Array(256), bufcpy = new Int8Array(256), wish = new Int8Array(256), promptbuf = new Int8Array(128), otmp = null, nothing = new $T.obj(), maybe_LL_arti = 0, tries = 0, oldwisharti = 0, verb = null, oops_msg = null, $t1, $t2;
     buf.fill(0);
@@ -5992,6 +6414,11 @@ export async function makewish() {   // zap.c:6314
  * In the hallucination case, insert "blast of <silly thing>".
  * Assumes that the caller will specify typ in the appropriate range for
  * wand/spell/breath weapon. */
+/**
+ * @param {number} typ int
+ * @param {number} nohallu boolean
+ * @returns {$c.Ptr | null} const char *
+ */
 export function flash_str(typ, nohallu) {   // zap.c:6429
     /* suppress hallucination (for death reasons) */
     typ = zaptype(typ);

@@ -47,9 +47,15 @@ const config_line_stmt = $c.recArray($T.match_config_line_stmt, 59);
 const disregarded_config_lines = new Int8Array(59);
 let config_error_data = null;
 let config_error_msg = null;
+/**
+ * @returns {$c.Ptr | null} char *
+ */
 export function get_configfile() {   // cfgfiles.c:143
     return new $c.Ptr(configfile, 0);
 }
+/**
+ * @returns {$c.Ptr | null} const char *
+ */
 export function get_default_configfile() {   // cfgfiles.c:149
     return default_configfile;
 }
@@ -61,6 +67,9 @@ export function get_default_configfile() {   // cfgfiles.c:149
  * is no defaults.nh.
  */
 /* #saveoptions - save config options into file */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function do_write_config_file() {   // cfgfiles.c:169
     let fp = null, tmp = new Int8Array(256), len = 0, wrote = 0, buf = new $T.strbuf();
     if (!configfile[0]) {
@@ -96,10 +105,18 @@ export async function do_write_config_file() {   // cfgfiles.c:169
 /* SFCTOOL */
 /* remember the name of the file we're accessing;
    if may be used in option reject messages */
+/**
+ * @param {$c.Ptr | null} fname const char *
+ */
 export function set_configfile_name(fname) {   // cfgfiles.c:216
     $c.strncpy(new $c.Ptr(configfile, 0), fname, 255);
     configfile[$c.idx(255)] = 0;
 }
+/**
+ * @param {$c.Ptr | null} filename const char *
+ * @param {number} src int
+ * @returns {Promise<$T.__sFILE | null>} FILE *
+ */
 async function fopen_config_file(filename, src) {   // cfgfiles.c:223
     let fp = null, tmp_config = new Int8Array(256), envp = null, alt_config = new Int8Array(256), details = null;
     if (src === set_in_sysconf) {
@@ -203,6 +220,14 @@ async function fopen_config_file(filename, src) {   // cfgfiles.c:223
  * NOTE: zeros are inserted unless modlist is TRUE, in which case the list
  *  location is unchanged.  Callers must handle zeros if modlist is FALSE.
  */
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @param {$c.Ptr | null} list uchar *
+ * @param {number} modlist boolean
+ * @param {number} size int
+ * @param {$c.Ptr | null} name const char *
+ * @returns {Promise<number>} int
+ */
 async function get_uchars(bufp, list, modlist, size, name) {   // cfgfiles.c:381
     let num = 0, count = 0, havenum = 0, $goto = null;
     /* current pointer */
@@ -265,6 +290,11 @@ async function get_uchars(bufp, list, modlist, size, name) {   // cfgfiles.c:381
 }
 /* Backward compatibility, ignore trailing ;n */
 /* Choose at random one of the sep separated parts from str. Mangles str. */
+/**
+ * @param {$c.Ptr | null} str char *
+ * @param {number} sep char
+ * @returns {$c.Ptr | null} char *
+ */
 function choose_random_part(str, sep) {   // cfgfiles.c:464
     let nsep = 0, csep = 0, len = 0, begin = null;
     nsep = 1;
@@ -316,6 +346,10 @@ function free_config_sections() {   // cfgfiles.c:507
 /* check for " [ anything-except-bracket-or-empty ] # arbitrary-comment"
    with spaces optional; returns pointer to "anything-except..." (with
    trailing " ] #..." stripped) if ok, otherwise Null */
+/**
+ * @param {$c.Ptr | null} str char *
+ * @returns {$c.Ptr | null} char *
+ */
 function is_config_section(str) {   // cfgfiles.c:523
     let a = null, c = null, z = null, $t1;
     /* trailing spaces are stripped, ']' too iff result is good */
@@ -345,6 +379,10 @@ function is_config_section(str) {   // cfgfiles.c:523
        spaces between '[' and choice-start and between choice-end and ']' */
     return trimspaces(a);
 }
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @returns {Promise<number>} boolean
+ */
 async function handle_config_section(buf) {   // cfgfiles.c:552
     let sect = null, save_plnmsg = 0, save_plnmsg$2 = 0, $t1;
     sect = is_config_section(buf);
@@ -391,6 +429,10 @@ async function handle_config_section(buf) {   // cfgfiles.c:552
     return FALSE;
 }
 /* find the '=' or ':' */
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @returns {$c.Ptr | null} char *
+ */
 function find_optparam(buf) {   // cfgfiles.c:588
     let bufp = null, altp = null;
     bufp = $c.strchr(buf, 61);
@@ -400,26 +442,50 @@ function find_optparam(buf) {   // cfgfiles.c:588
     }
     return bufp;
 }
+/**
+ * @param {$c.Ptr | null} origbuf char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_OPTIONS(origbuf) {   // cfgfiles.c:603
     let bufp = null;
     bufp = find_optparam(origbuf);
     bufp = bufp.add(1);   /* skip '='; parseoptions() handles spaces */
     return await parseoptions(bufp, TRUE, TRUE);
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_AUTOPICKUP_EXCEPTION(bufp) {   // cfgfiles.c:612
     await add_autopickup_exception(bufp);
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_BINDINGS(bufp) {   // cfgfiles.c:619
     return await parsebindings(bufp);
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_AUTOCOMPLETE(bufp) {   // cfgfiles.c:625
     await parseautocomplete(bufp, TRUE);
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_MSGTYPE(bufp) {   // cfgfiles.c:632
     return await msgtype_parse_add(bufp);
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {number} boolean
+ */
 function cnf_line_HACKDIR(bufp) {   // cfgfiles.c:638
     /*NOCWD_ASSUMPTIONS*/
     /* MICRO */
@@ -428,6 +494,10 @@ function cnf_line_HACKDIR(bufp) {   // cfgfiles.c:638
     /*NOCWD_ASSUMPTIONS*/
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {number} boolean
+ */
 function cnf_line_LEVELDIR(bufp) {   // cfgfiles.c:653
     /*NOCWD_ASSUMPTIONS*/
     /* MICRO */
@@ -436,6 +506,10 @@ function cnf_line_LEVELDIR(bufp) {   // cfgfiles.c:653
     /*NOCWD_ASSUMPTIONS*/
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {number} boolean
+ */
 function cnf_line_SAVEDIR(bufp) {   // cfgfiles.c:673
     /*NOCWD_ASSUMPTIONS*/
     /* MICRO */
@@ -444,34 +518,66 @@ function cnf_line_SAVEDIR(bufp) {   // cfgfiles.c:673
     /*NOCWD_ASSUMPTIONS*/
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {number} boolean
+ */
 function cnf_line_BONESDIR(bufp) {   // cfgfiles.c:695
     nhUse(bufp);
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {number} boolean
+ */
 function cnf_line_DATADIR(bufp) {   // cfgfiles.c:706
     nhUse(bufp);
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {number} boolean
+ */
 function cnf_line_SCOREDIR(bufp) {   // cfgfiles.c:717
     nhUse(bufp);
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {number} boolean
+ */
 function cnf_line_LOCKDIR(bufp) {   // cfgfiles.c:728
     nhUse(bufp);
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {number} boolean
+ */
 function cnf_line_CONFIGDIR(bufp) {   // cfgfiles.c:739
     nhUse(bufp);
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {number} boolean
+ */
 function cnf_line_TROUBLEDIR(bufp) {   // cfgfiles.c:750
     nhUse(bufp);
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {number} boolean
+ */
 function cnf_line_NAME(bufp) {   // cfgfiles.c:761
     $c.strncpy(new $c.Ptr(svp.plname, 0), bufp, PL.NSIZ - 1);
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_ROLE(bufp) {   // cfgfiles.c:768
     let len = 0;
     if ((len = await str2role(bufp)) >= 0) {
@@ -479,15 +585,27 @@ async function cnf_line_ROLE(bufp) {   // cfgfiles.c:768
     }
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {number} boolean
+ */
 function cnf_line_dogname(bufp) {   // cfgfiles.c:778
     $c.strncpy(new $c.Ptr(gd.dogname, 0), bufp, PL.PSIZ - 1);
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {number} boolean
+ */
 function cnf_line_catname(bufp) {   // cfgfiles.c:785
     $c.strncpy(new $c.Ptr(gc.catname, 0), bufp, PL.PSIZ - 1);
     return TRUE;
 }
 /* SFCTOOL */
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_WIZARDS(bufp) {   // cfgfiles.c:795
     let $t1, $t2;
     if (sysopt.wizards) {
@@ -505,6 +623,10 @@ async function cnf_line_WIZARDS(bufp) {   // cfgfiles.c:795
     }
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_SHELLERS(bufp) {   // cfgfiles.c:812
     let $t1;
     if (sysopt.shellers) {
@@ -513,6 +635,10 @@ async function cnf_line_SHELLERS(bufp) {   // cfgfiles.c:812
     $t1 = await dupstr(bufp), sysopt.shellers = $t1;
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_MSGHANDLER(bufp) {   // cfgfiles.c:821
     let $t1;
     if (sysopt.msghandler) {
@@ -521,6 +647,10 @@ async function cnf_line_MSGHANDLER(bufp) {   // cfgfiles.c:821
     $t1 = await dupstr(bufp), sysopt.msghandler = $t1;
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_EXPLORERS(bufp) {   // cfgfiles.c:830
     let $t1;
     if (sysopt.explorers) {
@@ -529,6 +659,10 @@ async function cnf_line_EXPLORERS(bufp) {   // cfgfiles.c:830
     $t1 = await dupstr(bufp), sysopt.explorers = $t1;
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_DEBUGFILES(bufp) {   // cfgfiles.c:839
     let $t1;
     /* might already have a vaule from getenv("DEBUGFILES");
@@ -541,11 +675,19 @@ async function cnf_line_DEBUGFILES(bufp) {   // cfgfiles.c:839
     }
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {number} boolean
+ */
 function cnf_line_DUMPLOGFILE(bufp) {   // cfgfiles.c:852
     nhUse(bufp);
     /*DUMPLOG*/
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_GENERICUSERS(bufp) {   // cfgfiles.c:865
     let $t1;
     if (sysopt.genericusers) {
@@ -554,6 +696,10 @@ async function cnf_line_GENERICUSERS(bufp) {   // cfgfiles.c:865
     $t1 = await dupstr(bufp), sysopt.genericusers = $t1;
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {number} boolean
+ */
 function cnf_line_BONES_POOLS(bufp) {   // cfgfiles.c:874
     let n = 0;
     /* max value of 10 guarantees (N % bones.pools) will be one digit
@@ -565,6 +711,10 @@ function cnf_line_BONES_POOLS(bufp) {   // cfgfiles.c:874
        indicator to suppress bones usage altogether */
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_SUPPORT(bufp) {   // cfgfiles.c:888
     let $t1;
     if (sysopt.support) {
@@ -573,6 +723,10 @@ async function cnf_line_SUPPORT(bufp) {   // cfgfiles.c:888
     $t1 = await dupstr(bufp), sysopt.support = $t1;
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_RECOVER(bufp) {   // cfgfiles.c:897
     let $t1;
     if (sysopt.recover) {
@@ -581,18 +735,30 @@ async function cnf_line_RECOVER(bufp) {   // cfgfiles.c:897
     $t1 = await dupstr(bufp), sysopt.recover = $t1;
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {number} boolean
+ */
 function cnf_line_CHECK_SAVE_UID(bufp) {   // cfgfiles.c:906
     let n = 0;
     n = $c.atoi(bufp);
     sysopt.check_save_uid = n;
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {number} boolean
+ */
 function cnf_line_CHECK_PLNAME(bufp) {   // cfgfiles.c:915
     let n = 0;
     n = $c.atoi(bufp);
     sysopt.check_plname = n;
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_SEDUCE(bufp) {   // cfgfiles.c:924
     let n = 0, src = 0, in_sysconf = 0;
     n = !!$c.atoi(bufp) ? 1 : 0;   /* XXX this could be tighter */
@@ -608,12 +774,20 @@ async function cnf_line_SEDUCE(bufp) {   // cfgfiles.c:924
     sysopt_seduce_set(sysopt.seduce);
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {number} boolean
+ */
 function cnf_line_HIDEUSAGE(bufp) {   // cfgfiles.c:946
     let n = 0;
     n = !!$c.atoi(bufp) ? 1 : 0;
     sysopt.hideusage = n;
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_MAXPLAYERS(bufp) {   // cfgfiles.c:955
     let n = 0;
     n = $c.atoi(bufp);
@@ -625,6 +799,10 @@ async function cnf_line_MAXPLAYERS(bufp) {   // cfgfiles.c:955
     sysopt.maxplayers = n;
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_PERSMAX(bufp) {   // cfgfiles.c:969
     let n = 0;
     n = $c.atoi(bufp);
@@ -635,6 +813,10 @@ async function cnf_line_PERSMAX(bufp) {   // cfgfiles.c:969
     sysopt.persmax = n;
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_PERS_IS_UID(bufp) {   // cfgfiles.c:982
     let n = 0;
     n = $c.atoi(bufp);
@@ -645,6 +827,10 @@ async function cnf_line_PERS_IS_UID(bufp) {   // cfgfiles.c:982
     sysopt.pers_is_uid = n;
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_ENTRYMAX(bufp) {   // cfgfiles.c:995
     let n = 0;
     n = $c.atoi(bufp);
@@ -655,6 +841,10 @@ async function cnf_line_ENTRYMAX(bufp) {   // cfgfiles.c:995
     sysopt.entrymax = n;
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_POINTSMIN(bufp) {   // cfgfiles.c:1008
     let n = 0;
     n = $c.atoi(bufp);
@@ -665,6 +855,10 @@ async function cnf_line_POINTSMIN(bufp) {   // cfgfiles.c:1008
     sysopt.pointsmin = n;
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_MAX_STATUENAME_RANK(bufp) {   // cfgfiles.c:1021
     let n = 0;
     n = $c.atoi(bufp);
@@ -675,6 +869,10 @@ async function cnf_line_MAX_STATUENAME_RANK(bufp) {   // cfgfiles.c:1021
     sysopt.tt_oname_maxrank = n;
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_LIVELOG(bufp) {   // cfgfiles.c:1035
     let L = 0;
     /* using 0 for base accepts "dddd" as decimal provided that first 'd'
@@ -688,6 +886,10 @@ async function cnf_line_LIVELOG(bufp) {   // cfgfiles.c:1035
     sysopt.livelog = L;
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_PANICTRACE_LIBC(bufp) {   // cfgfiles.c:1052
     let n = 0;
     n = $c.atoi(bufp);
@@ -698,6 +900,10 @@ async function cnf_line_PANICTRACE_LIBC(bufp) {   // cfgfiles.c:1052
     sysopt.panictrace_libc = n;
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_PANICTRACE_GDB(bufp) {   // cfgfiles.c:1067
     let n = 0;
     n = $c.atoi(bufp);
@@ -708,6 +914,10 @@ async function cnf_line_PANICTRACE_GDB(bufp) {   // cfgfiles.c:1067
     sysopt.panictrace_gdb = n;
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_GDBPATH(bufp) {   // cfgfiles.c:1082
     let $t1;
     if (!file_exists(bufp)) {
@@ -720,6 +930,10 @@ async function cnf_line_GDBPATH(bufp) {   // cfgfiles.c:1082
     $t1 = await dupstr(bufp), sysopt.gdbpath = $t1;
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_GREPPATH(bufp) {   // cfgfiles.c:1097
     let $t1;
     if (!file_exists(bufp)) {
@@ -732,6 +946,10 @@ async function cnf_line_GREPPATH(bufp) {   // cfgfiles.c:1097
     $t1 = await dupstr(bufp), sysopt.greppath = $t1;
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_CRASHREPORTURL(bufp) {   // cfgfiles.c:1112
     let $t1;
     if (sysopt.crashreporturl) {
@@ -740,6 +958,10 @@ async function cnf_line_CRASHREPORTURL(bufp) {   // cfgfiles.c:1112
     $t1 = await dupstr(bufp), sysopt.crashreporturl = $t1;
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_ACCESSIBILITY(bufp) {   // cfgfiles.c:1121
     let n = 0;
     n = $c.atoi(bufp);
@@ -750,6 +972,10 @@ async function cnf_line_ACCESSIBILITY(bufp) {   // cfgfiles.c:1121
     sysopt.accessibility = n;
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_PORTABLE_DEVICE_PATHS(bufp) {   // cfgfiles.c:1134
     /* Windows-only directive encountered by non-Windows config */
     nhUse(bufp);
@@ -757,22 +983,42 @@ async function cnf_line_PORTABLE_DEVICE_PATHS(bufp) {   // cfgfiles.c:1134
     return TRUE;
 }
 /* SYSCF */
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_BOULDER(bufp) {   // cfgfiles.c:1156
     await get_uchars(bufp, new $c.Ptr(go.ov_primary_syms, SYM.BOULDER + SYM_OFF_X), TRUE, 1, $c.lit("BOULDER"));
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_MENUCOLOR(bufp) {   // cfgfiles.c:1164
     return await add_menu_coloring(bufp);
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_HILITE_STATUS(bufp) {   // cfgfiles.c:1170
     return await parse_status_hl1(bufp, TRUE);
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_WARNINGS(bufp) {   // cfgfiles.c:1181
     let translate = new Uint8Array(105);
     await get_uchars(bufp, new $c.Ptr(translate, 0), FALSE, WARNCOUNT, $c.lit("WARNINGS"));
     assign_warnings(new $c.Ptr(translate, 0));
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_ROGUESYMBOLS(bufp) {   // cfgfiles.c:1191
     if (await parsesymbols(bufp, ROGUESET)) {
         await switch_symbols(TRUE);
@@ -781,6 +1027,10 @@ async function cnf_line_ROGUESYMBOLS(bufp) {   // cfgfiles.c:1191
     await config_error_add($c.lit("Error in ROGUESYMBOLS definition '%s'"), bufp);
     return FALSE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {Promise<number>} boolean
+ */
 async function cnf_line_SYMBOLS(bufp) {   // cfgfiles.c:1202
     if (await parsesymbols(bufp, PRIMARYSET)) {
         await switch_symbols(TRUE);
@@ -791,27 +1041,51 @@ async function cnf_line_SYMBOLS(bufp) {   // cfgfiles.c:1202
     }
     return FALSE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {number} boolean
+ */
 function cnf_line_WIZKIT(bufp) {   // cfgfiles.c:1214
     $c.strncpy(new $c.Ptr(gw.wizkit, 0), bufp, WIZKIT_MAX - 1);
     return TRUE;
 }
 /*USER_SOUNDS*/
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {number} boolean
+ */
 function cnf_line_QT_TILEWIDTH(bufp) {   // cfgfiles.c:1239
     nhUse(bufp);
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {number} boolean
+ */
 function cnf_line_QT_TILEHEIGHT(bufp) {   // cfgfiles.c:1253
     nhUse(bufp);
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {number} boolean
+ */
 function cnf_line_QT_FONTSIZE(bufp) {   // cfgfiles.c:1267
     nhUse(bufp);
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} bufp char *
+ * @returns {number} boolean
+ */
 function cnf_line_QT_COMPACT(bufp) {   // cfgfiles.c:1281
     nhUse(bufp);
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} origbuf char *
+ * @returns {Promise<number>} boolean
+ */
 export async function parse_config_line(origbuf) {   // cfgfiles.c:1389
     let src = 0, in_sysconf = 0, bufp = null, buf = new Int8Array(1024), i = 0, parm = null;
     src = iflags.parse_config_file_src;
@@ -854,6 +1128,12 @@ export async function parse_config_line(origbuf) {   // cfgfiles.c:1389
     }
     return FALSE;
 }
+/**
+ * @param {number} from_file boolean
+ * @param {$c.Ptr | null} sourcename const char *
+ * @param {number} secure boolean
+ * @returns {Promise<void>}
+ */
 export async function config_error_init(from_file, sourcename, secure) {   // cfgfiles.c:1470
     let tmp = null;
     tmp = $c.asRec(await alloc(1304), $T._config_error_frame, 1304);
@@ -873,6 +1153,10 @@ export async function config_error_init(from_file, sourcename, secure) {   // cf
     config_error_data = tmp;
     program_state.config_error_ready = TRUE;
 }
+/**
+ * @param {$c.Ptr | null} line const char *
+ * @returns {number} boolean
+ */
 function config_error_nextline(line) {   // cfgfiles.c:1493
     let ced = null;
     ced = config_error_data;
@@ -892,6 +1176,10 @@ function config_error_nextline(line) {   // cfgfiles.c:1493
     }
     return TRUE;
 }
+/**
+ * @param {*} L lua_State *
+ * @returns {Promise<number>} int
+ */
 export async function l_get_config_errors(L) {   // cfgfiles.c:1516
     let dat = null, tmp = null, idx = 0, $t1;
     dat = config_error_msg;
@@ -914,6 +1202,10 @@ export async function l_get_config_errors(L) {   // cfgfiles.c:1516
 }
 /* SFCTOOL */
 /* varargs 'config_error_add()' moved to pline.c */
+/**
+ * @param {$c.Ptr | null} buf const char *
+ * @returns {Promise<void>}
+ */
 export async function config_erradd(buf) {   // cfgfiles.c:1544
     let lineno = new Int8Array(128), punct = null, dat = null, $t1;
     if (!buf || !buf.get(0)) {
@@ -950,6 +1242,9 @@ export async function config_erradd(buf) {   // cfgfiles.c:1544
     }
     await pline($c.lit("%s %s%s%s"), config_error_data.secure ? $c.lit("Error:") : $c.lit(" *"), new $c.Ptr(lineno, 0), buf, punct);
 }
+/**
+ * @returns {Promise<number>} int
+ */
 export async function config_error_done() {   // cfgfiles.c:1592
     let n = 0, tmp = null, cmdline = 0;
     tmp = config_error_data;
@@ -974,6 +1269,11 @@ export async function config_error_done() {   // cfgfiles.c:1592
     program_state.config_error_ready = config_error_data !== null ? 1 : 0;
     return n;
 }
+/**
+ * @param {$c.Ptr | null} filename const char *
+ * @param {number} src int
+ * @returns {Promise<number>} boolean
+ */
 export async function read_config_file(filename, src) {   // cfgfiles.c:1624
     let fp = null, rv = 0;
     rv = TRUE;
@@ -994,6 +1294,10 @@ export async function read_config_file(filename, src) {   // cfgfiles.c:1624
     return rv;
 }
 /* Initialize config parser data */
+/**
+ * @param {$T._cnf_parser_state | null} parser struct _cnf_parser_state *
+ * @returns {Promise<void>}
+ */
 async function cnf_parser_init(parser) {   // cfgfiles.c:1662
     let $t1, $t2;
     parser.rv = TRUE;   /* assume successful parse */
@@ -1007,6 +1311,9 @@ async function cnf_parser_init(parser) {   // cfgfiles.c:1662
     $c.memset(parser.inbuf, 0, parser.inbufsz);
 }
 /* caller has finished with 'parser' (except for 'rv' so leave that intact) */
+/**
+ * @param {$T._cnf_parser_state | null} parser struct _cnf_parser_state *
+ */
 function cnf_parser_done(parser) {   // cfgfiles.c:1677
     parser.ep = null;   /* points into parser->inbuf, so becoming stale */
     if (parser.inbuf) {
@@ -1021,6 +1328,11 @@ function cnf_parser_done(parser) {   // cfgfiles.c:1677
  * CHOOSE, and line continuation, calling proc for every valid line.
  *
  * Continued lines are merged together with one space in between.
+ */
+/**
+ * @param {$T._cnf_parser_state | null} p struct _cnf_parser_state *
+ * @param {Function | null} proc boolean (*)(char *)
+ * @returns {Promise<void>}
  */
 async function parse_conf_buf(p, proc) {   // cfgfiles.c:1693
     let tmpbuf = null, len = 0, ignoreline = 0, oldline = 0, section = null, bufp = null, $t1, $t2, $t3, $t4, $t5, $t6;
@@ -1132,6 +1444,11 @@ async function parse_conf_buf(p, proc) {   // cfgfiles.c:1693
         }
     }
 }
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @param {Function | null} proc boolean (*)(char *)
+ * @returns {Promise<number>} boolean
+ */
 export async function parse_conf_str(str, proc) {   // cfgfiles.c:1810
     let len = 0, parser = new $T._cnf_parser_state();
     await cnf_parser_init(parser);
@@ -1162,6 +1479,11 @@ export async function parse_conf_str(str, proc) {   // cfgfiles.c:1810
  *
  * Read from file fp, calling parse_conf_buf for each line.
  */
+/**
+ * @param {$T.__sFILE | null} fp FILE *
+ * @param {Function | null} proc boolean (*)(char *)
+ * @returns {Promise<number>} boolean
+ */
 export async function parse_conf_file(fp, proc) {   // cfgfiles.c:1844
     let parser = new $T._cnf_parser_state();
     await cnf_parser_init(parser);
@@ -1176,12 +1498,22 @@ export async function parse_conf_file(fp, proc) {   // cfgfiles.c:1844
     free_config_sections();
     return $c.i8(parser.rv);
 }
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @param {...*} $va the C variable arguments (...)
+ * @returns {Promise<void>}
+ */
 export async function config_error_add(str, ...$va) {   // cfgfiles.c:1865
     let the_args = null;
     the_args = new $c.VaList($va);
     await vconfig_error_add(str, the_args);
     void 0;
 }
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @param {$c.Ptr | null} the_args va_list
+ * @returns {Promise<void>}
+ */
 async function vconfig_error_add(str, the_args) {   // cfgfiles.c:1875
     let vlen = 0, buf = new Int8Array(1280);
     /* start of vconf...() or of nested block in USE_OLDARG's conf...() */
@@ -1192,6 +1524,9 @@ async function vconfig_error_add(str, the_args) {   // cfgfiles.c:1875
     buf[BUFSZ - 1] = 0;
     await config_erradd(new $c.Ptr(buf, 0));
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function rcfile() {   // cfgfiles.c:1894
     let opts = null, xtraopts = null, envname = null, namesrc = null, nameval = null;
     opts = null;
@@ -1252,6 +1587,9 @@ export async function rcfile() {   // cfgfiles.c:1894
     }
     /*[end of nethackrc handling]*/
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function rcfile_interface_options() {   // cfgfiles.c:1960
     await allopt_array_init();
     disregard_all_options();
@@ -1280,11 +1618,17 @@ export function disregard_all_config_statements() {   // cfgfiles.c:1988
         disregarded_config_lines[i] = TRUE;
     }
 }
+/**
+ * @param {number} statement_idx int
+ */
 export function heed_this_config_statement(statement_idx) {   // cfgfiles.c:1997
     if (statement_idx >= 0 && statement_idx < 59) {
         disregarded_config_lines[statement_idx] = FALSE;
     }
 }
+/**
+ * @param {number} statement_idx int
+ */
 export function disregard_this_config_statement(statement_idx) {   // cfgfiles.c:2003
     if (statement_idx >= 0 && statement_idx < 59) {
         disregarded_config_lines[statement_idx] = TRUE;
@@ -1296,6 +1640,9 @@ export function clear_ignore_errors_on_unmatched() {   // cfgfiles.c:2010
 export function set_ignore_errors_on_unmatched() {   // cfgfiles.c:2015
     ignore_errors_on_unmatched = TRUE;
 }
+/**
+ * @returns {number} boolean
+ */
 export function config_unmatched_ignored() {   // cfgfiles.c:2020
     if (ignore_errors_on_unmatched) {
         return TRUE;
@@ -1303,6 +1650,9 @@ export function config_unmatched_ignored() {   // cfgfiles.c:2020
     return FALSE;
 }
 /* SFCTOOL */
+/**
+ * @returns {Promise<void>}
+ */
 export async function assure_syscf_file() {   // cfgfiles.c:2031
     let fd = 0;
     /* We are checking that the sysconf exists ... lock the path */

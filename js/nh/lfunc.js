@@ -37,6 +37,11 @@ import { luaC_barrier_, luaC_newobj } from './lgc.js';
 import { luaM_free_ } from './lmem.js';
 import { luaT_gettmbyobj } from './ltm.js';
 
+/**
+ * @param {number} L lua_State *
+ * @param {number} nupvals int
+ * @returns {Promise<number>} CClosure *
+ */
 export async function luaF_newCclosure(L, nupvals) {   // lfunc.c:27
     let o = 0, c = 0;
     o = await luaC_newobj(L, 38, $c.u64($c.i32(32) + Math.imul(16, nupvals) | 0));
@@ -44,6 +49,11 @@ export async function luaF_newCclosure(L, nupvals) {   // lfunc.c:27
     $h.u8[c + 10] = $c.u8(nupvals);
     return c;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} nupvals int
+ * @returns {Promise<number>} LClosure *
+ */
 export async function luaF_newLclosure(L, nupvals) {   // lfunc.c:35
     let o = 0, c = 0, $t1;
     o = await luaC_newobj(L, 6, $c.u64($c.i32(32) + Math.imul(8, nupvals) | 0));
@@ -58,6 +68,11 @@ export async function luaF_newLclosure(L, nupvals) {   // lfunc.c:35
 /*
 ** fill a closure with new closed upvalues
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} cl LClosure *
+ * @returns {Promise<void>}
+ */
 export async function luaF_initupvals(L, cl) {   // lfunc.c:48
     let i = 0, o = 0, uv = 0;
     for (i = 0; i < $h.u8[cl + 10]; i = i + 1 | 0) {
@@ -73,6 +88,12 @@ export async function luaF_initupvals(L, cl) {   // lfunc.c:48
 ** Create a new upvalue at the given level, and link it to the list of
 ** open upvalues of 'L' after entry 'prev'.
 **/
+/**
+ * @param {number} L lua_State *
+ * @param {number} level StkId
+ * @param {number} prev UpVal **
+ * @returns {Promise<number>} UpVal *
+ */
 async function newupval(L, level, prev) {   // lfunc.c:65
     let o = 0, uv = 0, next = 0;
     o = await luaC_newobj(L, 9, 40);
@@ -96,6 +117,11 @@ async function newupval(L, level, prev) {   // lfunc.c:65
 ** Find and reuse, or create if it does not exist, an upvalue
 ** at the given level.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} level StkId
+ * @returns {Promise<number>} UpVal *
+ */
 export async function luaF_findupval(L, level) {   // lfunc.c:87
     let pp = 0, p = 0;
     pp = L + 56;
@@ -116,6 +142,13 @@ export async function luaF_findupval(L, level) {   // lfunc.c:87
 ** boolean 'yy' controls whether the call is yieldable.
 ** (This function assumes EXTRA_STACK.)
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} obj TValue *
+ * @param {number} err TValue *
+ * @param {number} yy int
+ * @returns {Promise<void>}
+ */
 async function callclosemethod(L, obj, err, yy) {   // lfunc.c:107
     let top = 0, tm = 0, io1 = 0, io2 = 0, io1$2 = 0, io2$2 = 0, io1$3 = 0, io2$3 = 0;
     top = $h.u32[(L + 16) >>> 2];
@@ -155,6 +188,11 @@ async function callclosemethod(L, obj, err, yy) {   // lfunc.c:107
 ** Check whether object at given level has a close metamethod and raise
 ** an error if not.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} level StkId
+ * @returns {Promise<void>}
+ */
 async function checkclosemth(L, level) {   // lfunc.c:125
     let tm = 0, idx = 0, vname = 0;
     tm = luaT_gettmbyobj(L, level, 24);
@@ -175,6 +213,13 @@ async function checkclosemth(L, level) {   // lfunc.c:125
 ** the 'level' of the upvalue being closed, as everything after that
 ** won't be used again.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} level StkId
+ * @param {number} status int
+ * @param {number} yy int
+ * @returns {Promise<void>}
+ */
 async function prepcallclosemth(L, level, status, yy) {   // lfunc.c:143
     let uv = 0, errobj = 0;
     uv = level;   /* value being closed */
@@ -195,6 +240,11 @@ async function prepcallclosemth(L, level, status, yy) {   // lfunc.c:143
 /*
 ** Insert a variable in the list of to-be-closed variables.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} level StkId
+ * @returns {Promise<void>}
+ */
 export async function luaF_newtbcupval(L, level) {   // lfunc.c:168
     0;
     if ($h.u8[level + 8] === 1 || ($h.u8[level + 8] & 15) === 0) {
@@ -208,6 +258,9 @@ export async function luaF_newtbcupval(L, level) {   // lfunc.c:168
     $h.u16[(level + 10) >>> 1] = $c.u16((level - $h.u32[(L + 64) >>> 2]) / 16);
     $h.stp(L + 64, level);
 }
+/**
+ * @param {number} uv UpVal *
+ */
 export function luaF_unlinkupval(uv) {   // lfunc.c:182
     0;
     $h.stp($h.u32[(uv + 24 + 8) >>> 2], $h.u32[(uv + 24) >>> 2]);
@@ -218,6 +271,10 @@ export function luaF_unlinkupval(uv) {   // lfunc.c:182
 /*
 ** Close all upvalues up to the given stack level.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} level StkId
+ */
 export function luaF_closeupval(L, level) {   // lfunc.c:193
     let uv = 0, upl = 0, slot = 0, io1 = 0, io2 = 0;
     /* stack index pointed by 'uv' */
@@ -244,6 +301,9 @@ export function luaF_closeupval(L, level) {   // lfunc.c:193
 /*
 ** Remove first element from the tbclist plus its dummy nodes.
 */
+/**
+ * @param {number} L lua_State *
+ */
 function poptbclist(L) {   // lfunc.c:213
     let tbc = 0;
     tbc = $h.u32[(L + 64) >>> 2];
@@ -258,6 +318,13 @@ function poptbclist(L) {   // lfunc.c:213
 ** Close all upvalues and to-be-closed variables up to the given stack
 ** level. Return restored 'level'.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} level StkId
+ * @param {number} status int
+ * @param {number} yy int
+ * @returns {Promise<number>} StkId
+ */
 export async function luaF_close(L, level, status, yy) {   // lfunc.c:227
     let levelrel = 0, tbc = 0;
     levelrel = level - $h.u32[(L + 48) >>> 2];
@@ -271,6 +338,10 @@ export async function luaF_close(L, level, status, yy) {   // lfunc.c:227
     }
     return level;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} Proto *
+ */
 export async function luaF_newproto(L) {   // lfunc.c:240
     let o = 0, f = 0;
     o = await luaC_newobj(L, 10, 128);
@@ -297,6 +368,11 @@ export async function luaF_newproto(L) {   // lfunc.c:240
     $h.stp(f + 112, 0);
     return f;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} f Proto *
+ * @returns {Promise<void>}
+ */
 export async function luaF_freeproto(L, f) {   // lfunc.c:267
     await luaM_free_(L, $h.u32[(f + 64) >>> 2], $c.mulu64($c.u64($h.i32[(f + 24) >>> 2]), 4));
     await luaM_free_(L, $h.u32[(f + 72) >>> 2], $c.mulu64($c.u64($h.i32[(f + 32) >>> 2]), 8));
@@ -311,6 +387,12 @@ export async function luaF_freeproto(L, f) {   // lfunc.c:267
 ** Look for n-th local variable at line 'line' in function 'func'.
 ** Returns NULL if not found.
 */
+/**
+ * @param {number} f const Proto *
+ * @param {number} local_number int
+ * @param {number} pc int
+ * @returns {number} const char *
+ */
 export function luaF_getlocalname(f, local_number, pc) {   // lfunc.c:283
     let i = 0;
     for (i = 0; i < $h.i32[(f + 36) >>> 2] && $h.i32[($h.u32[(f + 104) >>> 2] + i * 16 + 8) >>> 2] <= pc; i = i + 1 | 0) {

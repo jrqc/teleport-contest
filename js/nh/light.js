@@ -40,10 +40,26 @@ const LSF_IS_PROBLEMATIC = 0x4;
 
 /* Create a new light source.  Caller (and extern.h) doesn't need to know
    anything about type 'light_source'. */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} range int
+ * @param {number} type int
+ * @param {$T.any | null} id anything *
+ * @returns {Promise<void>}
+ */
 export async function new_light_source(x, y, range, type, id) {   // light.c:62
     await new_light_core(x, y, range, type, id);
 }
 /* Create a new light source and return it.  Only used within this file. */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} range int
+ * @param {number} type int
+ * @param {$T.any | null} id anything *
+ * @returns {Promise<$T.ls_t | null>} light_source *
+ */
 async function new_light_core(x, y, range, type, id) {   // light.c:69
     let ls = null;
     /* camera flash uses radius 0 and passes Null object */
@@ -66,6 +82,11 @@ async function new_light_core(x, y, range, type, id) {   // light.c:69
 }
 /* Find and delete a light source.
    Assumes at most one light source is attached to an object at a time. */
+/**
+ * @param {number} type int
+ * @param {$T.any | null} id anything *
+ * @returns {Promise<void>}
+ */
 export async function del_light_source(type, id) {   // light.c:99
     let curr = null, tmp_id = new $T.any();
     tmp_id.$copyFrom(cg.zeroany);
@@ -103,6 +124,10 @@ export async function del_light_source(type, id) {   // light.c:99
     }
 }
 /* remove a light source from the light_base list and free it */
+/**
+ * @param {$T.ls_t | null} ls light_source *
+ * @returns {Promise<void>}
+ */
 async function delete_ls(ls) {   // light.c:142
     let curr = null, prev = null;
     for (prev = null, curr = gl.light_base; curr; prev = curr, curr = curr.next) {
@@ -126,6 +151,9 @@ async function delete_ls(ls) {   // light.c:142
     return;
 }
 /* Mark locations that are temporarily lit via mobile light sources. */
+/**
+ * @param {*} cs_rows seenV **
+ */
 export function do_light_sources(cs_rows) {   // light.c:169
     let x = 0, y = 0, min_x = 0, max_x = 0, max_y = 0, offset = 0, limits = null, at_hero_range = 0, ls = null, row = null;
     at_hero_range = 0;
@@ -212,6 +240,12 @@ export function do_light_sources(cs_rows) {   // light.c:169
    way to its destination; show its light so that hero has a chance to
    remember terrain, objects, and monsters being revealed;
    if 'obj' is Null, <x,y> is being hit by a camera's light flash */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function show_transient_light(obj, x, y) {   // light.c:257
     let ls = null, cameraflash = new $T.any(), mon = null, radius_squared = 0;
     ls = null;
@@ -279,6 +313,9 @@ export async function show_transient_light(obj, x, y) {   // light.c:257
 /* delete any camera flash light sources and draw "remembered, unseen
    monster" glyph at locations where a monster was flagged for being
    visible during transient light movement but can't be seen now */
+/**
+ * @returns {Promise<void>}
+ */
 export async function transient_light_cleanup() {   // light.c:330
     let mon = null, mtempcount = 0;
     /* in case we're cleaning up a camera flash, remove all object light
@@ -308,6 +345,9 @@ export async function transient_light_cleanup() {   // light.c:330
     }
 }
 /* camera flashes have Null object; caller wants to get rid of them now */
+/**
+ * @returns {Promise<void>}
+ */
 async function discard_flashes() {   // light.c:361
     let ls = null, nxt_ls = null;
     for (ls = gl.light_base; ls; ls = nxt_ls) {
@@ -318,6 +358,11 @@ async function discard_flashes() {   // light.c:361
     }
 }
 /* (mon->mx == 0) implies migrating */
+/**
+ * @param {number} nid unsigned int
+ * @param {number} fmflags unsigned int
+ * @returns {$T.monst | null} struct monst *
+ */
 export function find_mid(nid, fmflags) {   // light.c:376
     let mtmp = null;
     if ((fmflags & FM.YOU) >>> 0 && nid === 1) {
@@ -346,6 +391,11 @@ export function find_mid(nid, fmflags) {   // light.c:376
     }
     return null;
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} fmflags unsigned int
+ * @returns {number} unsigned int
+ */
 function whereis_mon(mon, fmflags) {   // light.c:398
     let mtmp = null;
     if ((fmflags & FM.YOU) >>> 0 && $c.peq(mon, gy.youmonst)) {
@@ -375,6 +425,11 @@ function whereis_mon(mon, fmflags) {   // light.c:398
     return 0;
 }
 /* Save all light sources of the given range. */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @param {number} range int
+ * @returns {Promise<void>}
+ */
 export async function save_light_sources(nhfp, range) {   // light.c:421
     let count = Int32Array.of(0), actual = 0, is_global = 0, prev = null, curr = null;
     /* camera flash light sources have Null object and would trigger
@@ -426,6 +481,10 @@ export async function save_light_sources(nhfp, range) {   // light.c:421
  * Pull in the structures from disk, but don't recalculate the object
  * pointers.
  */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 export async function restore_light_sources(nhfp) {   // light.c:479
     let count = Int32Array.of(0), ls = null, $t1;
     count[0] = 0;
@@ -439,6 +498,12 @@ export async function restore_light_sources(nhfp) {   // light.c:479
     }
 }
 /* to support '#stats' wizard-mode command */
+/**
+ * @param {$c.Ptr | null} hdrfmt const char *
+ * @param {$c.Ptr | null} hdrbuf char *
+ * @param {*} count long *
+ * @param {*} size long *
+ */
 export function light_stats(hdrfmt, hdrbuf, count, size) {   // light.c:501
     let ls = null, $t1;
     $c.sprintf(hdrbuf, hdrfmt, 32);
@@ -449,6 +514,10 @@ export function light_stats(hdrfmt, hdrbuf, count, size) {   // light.c:501
     }
 }
 /* Relink all lights that are so marked. */
+/**
+ * @param {number} ghostly boolean
+ * @returns {Promise<void>}
+ */
 export async function relink_light_sources(ghostly) {   // light.c:517
     let which = 0, nid = Uint32Array.of(0), ls = null, $t1, $t2;
     /*
@@ -498,6 +567,12 @@ export async function relink_light_sources(ghostly) {   // light.c:517
  * sources that would be written.  If write_it is true, actually write
  * the light source out.
  */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @param {number} range int
+ * @param {number} write_it boolean
+ * @returns {Promise<number>} int
+ */
 async function maybe_write_ls(nhfp, range, write_it) {   // light.c:571
     let count = 0, is_global = 0, ls = null;
     count = 0;
@@ -528,6 +603,9 @@ async function maybe_write_ls(nhfp, range, write_it) {   // light.c:571
     }
     return count;
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function light_sources_sanity_check() {   // light.c:606
     let ls = null, mtmp = null, otmp = null, auint = 0;
     for (ls = gl.light_base; ls; ls = ls.next) {
@@ -552,6 +630,11 @@ export async function light_sources_sanity_check() {   // light.c:606
     }
 }
 /* Write a light source structure to disk. */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @param {$T.ls_t | null} ls light_source *
+ * @returns {Promise<void>}
+ */
 async function write_ls(nhfp, ls) {   // light.c:634
     let arg_save = new $T.any(), otmp = null, mtmp = null, monloc = 0;
     if (ls.type === LS_OBJECT || ls.type === LS_MONSTER) {
@@ -611,6 +694,10 @@ async function write_ls(nhfp, ls) {   // light.c:634
     }
 }
 /* Change light source's ID from src to dest. */
+/**
+ * @param {$T.obj | null} src struct obj *
+ * @param {$T.obj | null} dest struct obj *
+ */
 export function obj_move_light_source(src, dest) {   // light.c:706
     let ls = null;
     for (ls = gl.light_base; ls; ls = ls.next) {
@@ -622,12 +709,20 @@ export function obj_move_light_source(src, dest) {   // light.c:706
     dest.lamplit = (1) & 1;
 }
 /* return true if there exist any light sources */
+/**
+ * @returns {number} boolean
+ */
 export function any_light_source() {   // light.c:719
     return $c.i8(gl.light_base !== null ? 1 : 0);
 }
 /*
  * Snuff an object light source if at (x,y).  This currently works
  * only for burning light sources.
+ */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
  */
 export async function snuff_light_source(x, y) {   // light.c:729
     let ls = null, obj = null;
@@ -660,15 +755,28 @@ export async function snuff_light_source(x, y) {   // light.c:729
     }
 }
 /* Return TRUE if object sheds any light at all. */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 export function obj_sheds_light(obj) {   // light.c:763
     /* so far, only burning objects shed light */
     return obj_is_burning(obj);
 }
 /* Return TRUE if sheds light AND will be snuffed by end_burn(). */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 export function obj_is_burning(obj) {   // light.c:771
     return $c.i8(obj.lamplit | 0 && (ignitable(obj) || artifact_light(obj)) ? 1 : 0);
 }
 /* copy the light source(s) attached to src, and attach it/them to dest */
+/**
+ * @param {$T.obj | null} src struct obj *
+ * @param {$T.obj | null} dest struct obj *
+ * @returns {Promise<void>}
+ */
 export async function obj_split_light_source(src, dest) {   // light.c:779
     let ls = null, new_ls = null, $t1, $t2;
     for (ls = gl.light_base; ls; ls = ls.next) {
@@ -695,6 +803,11 @@ export async function obj_split_light_source(src, dest) {   // light.c:779
 }
 /* light source `src' has been folded into light source `dest';
    used for merging lit candles and adding candle(s) to lit candelabrum */
+/**
+ * @param {$T.obj | null} src struct obj *
+ * @param {$T.obj | null} dest struct obj *
+ * @returns {Promise<void>}
+ */
 export async function obj_merge_light_sources(src, dest) {   // light.c:808
     let ls = null, $t1;
     /* src == dest implies adding to candelabrum */
@@ -710,6 +823,11 @@ export async function obj_merge_light_sources(src, dest) {   // light.c:808
     }
 }
 /* light source `obj' is being made brighter or dimmer */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} new_radius int
+ * @returns {Promise<void>}
+ */
 export async function obj_adjust_light_radius(obj, new_radius) {   // light.c:826
     let ls = null;
     for (ls = gl.light_base; ls; ls = ls.next) {
@@ -725,6 +843,10 @@ export async function obj_adjust_light_radius(obj, new_radius) {   // light.c:82
 }
 /* Candlelight is proportional to the number of candles;
    minimum range is 2 rather than 1 for playability. */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 export function candle_light_range(obj) {   // light.c:843
     let radius = 0, n = 0;
     if (obj.otyp === CANDELABRUM_OF_INVOCATION) {
@@ -758,6 +880,10 @@ export function candle_light_range(obj) {   // light.c:843
     return radius;
 }
 /* light emitting artifact's range depends upon its curse/bless state */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 export function arti_light_radius(obj) {   // light.c:881
     let res = 0;
     /*
@@ -787,6 +913,10 @@ export function arti_light_radius(obj) {   // light.c:881
 }
 /* adverb describing lit artifact's light; radius varies depending upon
    curse/bless state; also used for gold dragon scales/scale mail */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {$c.Ptr | null} const char *
+ */
 export function arti_light_description(obj) {   // light.c:916
     switch (arti_light_radius(obj)) {
         case 4:
@@ -803,6 +933,9 @@ export function arti_light_description(obj) {   // light.c:916
     return $c.lit("strangely");
 }
 /* the #lightsources command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_light_sources() {   // light.c:935
     let win = 0, buf = new Int8Array(256), ls = null;
     win = await create_nhwindow()(NHW.MENU);   /* corner text window */

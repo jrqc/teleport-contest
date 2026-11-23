@@ -43,6 +43,11 @@ import { luaV_equalobj, luaV_flttointeger, luaV_tointegerns } from './lvm.js';
 const previousinstruction$invalidinstruction = $h.data(4, 4);   // static in previousinstruction()
 const luaK_prefix$ef = $h.data(24, 8);   // static in luaK_prefix()
 /* semantic error */
+/**
+ * @param {number} ls LexState *
+ * @param {number} msg const char *
+ * @returns {Promise<void>}
+ */
 export async function luaK_semerror(ls, msg) {   // lcode.c:47
     $h.i32[(ls + 16) >>> 2] = 0;   /* remove "near <token>" from final message */
     await luaX_syntaxerror(ls, msg);
@@ -51,6 +56,11 @@ export async function luaK_semerror(ls, msg) {   // lcode.c:47
 ** If expression is a numeric constant, fills 'v' with its value
 ** and returns 1. Otherwise, returns 0.
 */
+/**
+ * @param {number} e const expdesc *
+ * @param {number} v TValue *
+ * @returns {number} int
+ */
 function tonumeral(e, v) {   // lcode.c:57
     let io = 0, io$2 = 0;
     if ($h.i32[(e + 16) >>> 2] !== $h.i32[(e + 20) >>> 2]) {
@@ -78,6 +88,11 @@ function tonumeral(e, v) {   // lcode.c:57
 /*
 ** Get the constant value from a constant expression
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} e const expdesc *
+ * @returns {number} TValue *
+ */
 function const2val(fs, e) {   // lcode.c:75
     0;
     return $h.u32[($h.u32[($h.u32[(fs + 16) >>> 2] + 88) >>> 2]) >>> 2] + $h.i32[(e + 8) >>> 2] * 24;
@@ -86,6 +101,12 @@ function const2val(fs, e) {   // lcode.c:75
 ** If expression is a constant, fills 'v' with its value
 ** and returns 1. Otherwise, returns 0.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} e const expdesc *
+ * @param {number} v TValue *
+ * @returns {number} int
+ */
 export function luaK_exp2const(fs, e, v) {   // lcode.c:85
     let io = 0, x_ = 0, io1 = 0, io2 = 0;
     if ($h.i32[(e + 16) >>> 2] !== $h.i32[(e + 20) >>> 2]) {
@@ -134,6 +155,10 @@ export function luaK_exp2const(fs, e, v) {   // lcode.c:85
 ** previous one, return an invalid instruction (to avoid wrong
 ** optimizations).
 */
+/**
+ * @param {number} fs FuncState *
+ * @returns {number} Instruction *
+ */
 function previousinstruction(fs) {   // lcode.c:117
     if ($h.i32[(fs + 32) >>> 2] > $h.i32[(fs + 36) >>> 2]) {
         return $h.u32[($h.u32[fs >>> 2] + 64) >>> 2] + ($h.i32[(fs + 32) >>> 2] - 1 | 0) * 4;   /* previous instruction */
@@ -147,6 +172,12 @@ function previousinstruction(fs) {   // lcode.c:117
 ** range of previous instruction instead of emitting a new one. (For
 ** instance, 'local a; local b' will generate a single opcode.)
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} from int
+ * @param {number} n int
+ * @returns {Promise<void>}
+ */
 export async function luaK_nil(fs, from, n) {   // lcode.c:132
     let l = 0, previous = 0, pfrom = 0, pl = 0;
     l = (from + n | 0) - 1 | 0;   /* last register to set nil */
@@ -174,6 +205,11 @@ export async function luaK_nil(fs, from, n) {   // lcode.c:132
 ** Gets the destination address of a jump instruction. Used to traverse
 ** a list of jumps.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} pc int
+ * @returns {number} int
+ */
 function getjump(fs, pc) {   // lcode.c:155
     let offset = 0;
     offset = (($h.u32[($h.u32[($h.u32[fs >>> 2] + 64) >>> 2] + pc * 4) >>> 2] >>> 7 & 33554431) >>> 0 | 0) - 16777215 | 0;
@@ -187,6 +223,12 @@ function getjump(fs, pc) {   // lcode.c:155
 ** Fix jump instruction at position 'pc' to jump to 'dest'.
 ** (Jump addresses are relative in Lua)
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} pc int
+ * @param {number} dest int
+ * @returns {Promise<void>}
+ */
 async function fixjump(fs, pc, dest) {   // lcode.c:168
     let jmp = 0, offset = 0;
     jmp = $h.u32[($h.u32[fs >>> 2] + 64) >>> 2] + pc * 4;
@@ -201,6 +243,12 @@ async function fixjump(fs, pc, dest) {   // lcode.c:168
 /*
 ** Concatenate jump-list 'l2' into jump-list 'l1'
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} l1 int *
+ * @param {number} l2 int
+ * @returns {Promise<void>}
+ */
 export async function luaK_concat(fs, l1, l2) {   // lcode.c:182
     let list = 0, next = 0;
     if (l2 === -1) {
@@ -219,12 +267,22 @@ export async function luaK_concat(fs, l1, l2) {   // lcode.c:182
 ** Create a jump instruction and return its position, so its destination
 ** can be fixed later (with 'fixjump').
 */
+/**
+ * @param {number} fs FuncState *
+ * @returns {Promise<number>} int
+ */
 export async function luaK_jump(fs) {   // lcode.c:200
     return await codesJ(fs, 56, -1, 0);
 }
 /*
 ** Code a 'return' instruction
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} first int
+ * @param {number} nret int
+ * @returns {Promise<void>}
+ */
 export async function luaK_ret(fs, first, nret) {   // lcode.c:208
     let op = 0;
     switch (nret) {
@@ -244,6 +302,15 @@ export async function luaK_ret(fs, first, nret) {   // lcode.c:208
 ** Code a "conditional jump", that is, a test or comparison opcode
 ** followed by a jump. Return jump position.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} op OpCode
+ * @param {number} A int
+ * @param {number} B int
+ * @param {number} C int
+ * @param {number} k int
+ * @returns {Promise<number>} int
+ */
 async function condjump(fs, op, A, B, C, k) {   // lcode.c:223
     await luaK_codeABCk(fs, op, A, B, C, k);
     return await luaK_jump(fs);
@@ -252,6 +319,10 @@ async function condjump(fs, op, A, B, C, k) {   // lcode.c:223
 ** returns current 'pc' and marks it as a jump target (to avoid wrong
 ** optimizations with consecutive instructions not in the same basic block).
 */
+/**
+ * @param {number} fs FuncState *
+ * @returns {number} int
+ */
 export function luaK_getlabel(fs) {   // lcode.c:233
     $h.i32[(fs + 36) >>> 2] = $h.i32[(fs + 32) >>> 2];
     return $h.i32[(fs + 32) >>> 2];
@@ -261,6 +332,11 @@ export function luaK_getlabel(fs) {   // lcode.c:233
 ** jump (that is, its condition), or the jump itself if it is
 ** unconditional.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} pc int
+ * @returns {number} Instruction *
+ */
 function getjumpcontrol(fs, pc) {   // lcode.c:244
     let pi = 0;
     pi = $h.u32[($h.u32[fs >>> 2] + 64) >>> 2] + pc * 4;
@@ -277,6 +353,12 @@ function getjumpcontrol(fs, pc) {   // lcode.c:244
 ** register. Otherwise, change instruction to a simple 'TEST' (produces
 ** no register value)
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} node int
+ * @param {number} reg int
+ * @returns {number} int
+ */
 function patchtestreg(fs, node, reg) {   // lcode.c:260
     let i = 0;
     i = getjumpcontrol(fs, node);
@@ -295,6 +377,10 @@ function patchtestreg(fs, node, reg) {   // lcode.c:260
 /*
 ** Traverse a list of tests ensuring no one produces a value
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} list int
+ */
 function removevalues(fs, list) {   // lcode.c:278
     for (; list !== -1; list = getjump(fs, list)) {
         patchtestreg(fs, list, 255);
@@ -305,6 +391,14 @@ function removevalues(fs, list) {   // lcode.c:278
 ** registers: tests producing values jump to 'vtarget' (and put their
 ** values in 'reg'), other tests jump to 'dtarget'.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} list int
+ * @param {number} vtarget int
+ * @param {number} reg int
+ * @param {number} dtarget int
+ * @returns {Promise<void>}
+ */
 async function patchlistaux(fs, list, vtarget, reg, dtarget) {   // lcode.c:289
     let next = 0;
     while (list !== -1) {
@@ -322,10 +416,21 @@ async function patchlistaux(fs, list, vtarget, reg, dtarget) {   // lcode.c:289
 ** (The assert means that we cannot fix a jump to a forward address
 ** because we only know addresses once code is generated.)
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} list int
+ * @param {number} target int
+ * @returns {Promise<void>}
+ */
 export async function luaK_patchlist(fs, list, target) {   // lcode.c:307
     0;
     await patchlistaux(fs, list, target, 255, target);
 }
+/**
+ * @param {number} fs FuncState *
+ * @param {number} list int
+ * @returns {Promise<void>}
+ */
 export async function luaK_patchtohere(fs, list) {   // lcode.c:313
     let hr = 0;
     hr = luaK_getlabel(fs);   /* mark "here" as a jump target */
@@ -339,6 +444,12 @@ export async function luaK_patchtohere(fs, list) {   // lcode.c:313
 ** in 'lineinfo' signals the existence of this absolute information.)
 ** Otherwise, store the difference from last line in 'lineinfo'.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} f Proto *
+ * @param {number} line int
+ * @returns {Promise<void>}
+ */
 async function savelineinfo(fs, f, line) {   // lcode.c:330
     let linedif = 0, pc = 0, $t1, $t2, $t3, $t4;
     linedif = line - $h.i32[(fs + 40) >>> 2] | 0;
@@ -360,6 +471,9 @@ async function savelineinfo(fs, f, line) {   // lcode.c:330
 ** above its max to force the new (replacing) instruction to have
 ** absolute line info, too.
 */
+/**
+ * @param {number} fs FuncState *
+ */
 function removelastlineinfo(fs) {   // lcode.c:354
     let f = 0, pc = 0;
     f = $h.u32[fs >>> 2];
@@ -379,6 +493,9 @@ function removelastlineinfo(fs) {   // lcode.c:354
 ** Remove the last instruction created, correcting line information
 ** accordingly.
 */
+/**
+ * @param {number} fs FuncState *
+ */
 function removelastinstruction(fs) {   // lcode.c:373
     removelastlineinfo(fs);
     $h.i32[(fs + 32) >>> 2] = $h.i32[(fs + 32) >>> 2] - 1 | 0;
@@ -387,6 +504,11 @@ function removelastinstruction(fs) {   // lcode.c:373
 ** Emit instruction 'i', checking for array sizes and saving also its
 ** line information. Return 'i' position.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} i Instruction
+ * @returns {Promise<number>} int
+ */
 export async function luaK_code(fs, i) {   // lcode.c:383
     let f = 0, $t1, $t2;
     f = $h.u32[fs >>> 2];
@@ -400,6 +522,15 @@ export async function luaK_code(fs, i) {   // lcode.c:383
 ** Format and emit an 'iABC' instruction. (Assertions check consistency
 ** of parameters versus opcode.)
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} o OpCode
+ * @param {number} a int
+ * @param {number} b int
+ * @param {number} c int
+ * @param {number} k int
+ * @returns {Promise<number>} int
+ */
 export async function luaK_codeABCk(fs, o, a, b, c, k) {   // lcode.c:398
     0;
     0;
@@ -408,6 +539,13 @@ export async function luaK_codeABCk(fs, o, a, b, c, k) {   // lcode.c:398
 /*
 ** Format and emit an 'iABx' instruction.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} o OpCode
+ * @param {number} a int
+ * @param {number} bc unsigned int
+ * @returns {Promise<number>} int
+ */
 export async function luaK_codeABx(fs, o, a, bc) {   // lcode.c:409
     0;
     0;
@@ -416,6 +554,13 @@ export async function luaK_codeABx(fs, o, a, bc) {   // lcode.c:409
 /*
 ** Format and emit an 'iAsBx' instruction.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} o OpCode
+ * @param {number} a int
+ * @param {number} bc int
+ * @returns {Promise<number>} int
+ */
 async function codeAsBx(fs, o, a, bc) {   // lcode.c:419
     let b = 0;
     b = (bc + 65535 | 0) >>> 0;
@@ -426,6 +571,13 @@ async function codeAsBx(fs, o, a, bc) {   // lcode.c:419
 /*
 ** Format and emit an 'isJ' instruction.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} o OpCode
+ * @param {number} sj int
+ * @param {number} k int
+ * @returns {Promise<number>} int
+ */
 async function codesJ(fs, o, sj, k) {   // lcode.c:430
     let j = 0;
     j = (sj + 16777215 | 0) >>> 0;
@@ -436,6 +588,11 @@ async function codesJ(fs, o, sj, k) {   // lcode.c:430
 /*
 ** Emit an "extra argument" instruction (format 'iAx')
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} a int
+ * @returns {Promise<number>} int
+ */
 async function codeextraarg(fs, a) {   // lcode.c:441
     0;
     return await luaK_code(fs, (82 | a >>> 0 << 7 >>> 0) >>> 0);
@@ -445,6 +602,12 @@ async function codeextraarg(fs, a) {   // lcode.c:441
 ** (if constant index 'k' fits in 18 bits) or an 'OP_LOADKX'
 ** instruction with "extra argument".
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} reg int
+ * @param {number} k int
+ * @returns {Promise<number>} int
+ */
 async function luaK_codek(fs, reg, k) {   // lcode.c:452
     let p = 0;
     if (k <= 131071) {
@@ -459,6 +622,11 @@ async function luaK_codek(fs, reg, k) {   // lcode.c:452
 ** Check register-stack level, keeping track of its maximum size
 ** in field 'maxstacksize'
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} n int
+ * @returns {Promise<void>}
+ */
 export async function luaK_checkstack(fs, n) {   // lcode.c:467
     let newstack = 0;
     newstack = $h.u8[fs + 68] + n | 0;
@@ -472,6 +640,11 @@ export async function luaK_checkstack(fs, n) {   // lcode.c:467
 /*
 ** Reserve 'n' registers in register stack
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} n int
+ * @returns {Promise<void>}
+ */
 export async function luaK_reserveregs(fs, n) {   // lcode.c:481
     await luaK_checkstack(fs, n);
     $h.u8[fs + 68] = $c.u8($h.u8[fs + 68] + n | 0);
@@ -481,6 +654,10 @@ export async function luaK_reserveregs(fs, n) {   // lcode.c:481
 ** a local variable.
 )
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} reg int
+ */
 function freereg(fs, reg) {   // lcode.c:492
     if (reg >= luaY_nvarstack(fs)) {
         $h.u8[fs + 68] = $c.u8($h.u8[fs + 68] - 1);
@@ -490,6 +667,11 @@ function freereg(fs, reg) {   // lcode.c:492
 /*
 ** Free two registers in proper order
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} r1 int
+ * @param {number} r2 int
+ */
 function freeregs(fs, r1, r2) {   // lcode.c:503
     if (r1 > r2) {
         freereg(fs, r1);
@@ -502,6 +684,10 @@ function freeregs(fs, r1, r2) {   // lcode.c:503
 /*
 ** Free register used by expression 'e' (if any)
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} e expdesc *
+ */
 function freeexp(fs, e) {   // lcode.c:518
     if ($h.u32[e >>> 2] === 8) {
         freereg(fs, $h.i32[(e + 8) >>> 2]);
@@ -511,6 +697,11 @@ function freeexp(fs, e) {   // lcode.c:518
 ** Free registers used by expressions 'e1' and 'e2' (if any) in proper
 ** order.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} e1 expdesc *
+ * @param {number} e2 expdesc *
+ */
 function freeexps(fs, e1, e2) {   // lcode.c:528
     let r1 = 0, r2 = 0;
     r1 = $h.u32[e1 >>> 2] === 8 ? $h.i32[(e1 + 8) >>> 2] : -1;
@@ -526,6 +717,12 @@ function freeexps(fs, e1, e2) {   // lcode.c:528
 ** Note that all functions share the same table, so entering or exiting
 ** a function can make some indices wrong.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} key TValue *
+ * @param {number} v TValue *
+ * @returns {Promise<number>} int
+ */
 async function addk(fs, key, v) {   // lcode.c:544
     let L = 0, f = 0, idx = 0, k = 0, oldsize = 0, io = 0, io1 = 0, io2 = 0, $t1, $t2;
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
@@ -572,6 +769,11 @@ async function addk(fs, key, v) {   // lcode.c:544
 /*
 ** Add a string to list of constants and return its index.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} s TString *
+ * @returns {Promise<number>} int
+ */
 async function stringK(fs, s) {   // lcode.c:576
     let io = 0, x_ = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
@@ -589,6 +791,11 @@ async function stringK(fs, s) {   // lcode.c:576
 /*
 ** Add an integer to list of constants and return its index.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number | bigint} n lua_Integer
+ * @returns {Promise<number>} int
+ */
 async function luaK_intK(fs, n) {   // lcode.c:586
     let io = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
@@ -612,6 +819,11 @@ async function luaK_intK(fs, n) {   // lcode.c:586
 ** still an integer. At worst, this only wastes an entry with
 ** a duplicate.)
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} r lua_Number
+ * @returns {Promise<number>} int
+ */
 async function luaK_numberK(fs, r) {   // lcode.c:603
     let io = 0, nbm = 0, q = 0, k = 0, io$2 = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(40);
@@ -642,6 +854,10 @@ async function luaK_numberK(fs, r) {   // lcode.c:603
 /*
 ** Add a false to list of constants and return its index.
 */
+/**
+ * @param {number} fs FuncState *
+ * @returns {Promise<number>} int
+ */
 async function boolF(fs) {   // lcode.c:626
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
     try {
@@ -652,6 +868,10 @@ async function boolF(fs) {   // lcode.c:626
 /*
 ** Add a true to list of constants and return its index.
 */
+/**
+ * @param {number} fs FuncState *
+ * @returns {Promise<number>} int
+ */
 async function boolT(fs) {   // lcode.c:636
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
     try {
@@ -662,6 +882,10 @@ async function boolT(fs) {   // lcode.c:636
 /*
 ** Add nil to list of constants and return its index.
 */
+/**
+ * @param {number} fs FuncState *
+ * @returns {Promise<number>} int
+ */
 async function nilK(fs) {   // lcode.c:646
     let io = 0, x_ = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(32);
@@ -683,15 +907,29 @@ async function nilK(fs) {   // lcode.c:646
 ** (0 <= int2sC(i) && int2sC(i) <= MAXARG_C) but without risk of
 ** overflows in the hidden addition inside 'int2sC'.
 */
+/**
+ * @param {number | bigint} i lua_Integer
+ * @returns {number} int
+ */
 function fitsC(i) {   // lcode.c:660
     return $c.addu64($c.u64(i), 127) <= 255 ? 1 : 0;
 }
 /*
 ** Check whether 'i' can be stored in an 'sBx' operand.
 */
+/**
+ * @param {number | bigint} i lua_Integer
+ * @returns {number} int
+ */
 function fitsBx(i) {   // lcode.c:668
     return -65535 <= i && i <= 65536 ? 1 : 0;
 }
+/**
+ * @param {number} fs FuncState *
+ * @param {number} reg int
+ * @param {number | bigint} i lua_Integer
+ * @returns {Promise<void>}
+ */
 export async function luaK_int(fs, reg, i) {   // lcode.c:673
     if (fitsBx(i)) {
         await codeAsBx(fs, 1, reg, $c.i32(i));
@@ -699,6 +937,12 @@ export async function luaK_int(fs, reg, i) {   // lcode.c:673
         await luaK_codek(fs, reg, await luaK_intK(fs, i));
     }
 }
+/**
+ * @param {number} fs FuncState *
+ * @param {number} reg int
+ * @param {number} f lua_Number
+ * @returns {Promise<void>}
+ */
 async function luaK_float(fs, reg, f) {   // lcode.c:681
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
     try {
@@ -712,6 +956,10 @@ async function luaK_float(fs, reg, f) {   // lcode.c:681
 /*
 ** Convert a constant in 'v' into an expression description 'e'
 */
+/**
+ * @param {number} v TValue *
+ * @param {number} e expdesc *
+ */
 function const2exp(v, e) {   // lcode.c:693
     switch ($h.u8[v + 8] & 63) {
         case 3:
@@ -744,6 +992,12 @@ function const2exp(v, e) {   // lcode.c:693
 ** Fix an expression to return the number of results 'nresults'.
 ** 'e' must be a multi-ret expression (function call or vararg).
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} e expdesc *
+ * @param {number} nresults int
+ * @returns {Promise<void>}
+ */
 export async function luaK_setreturns(fs, e, nresults) {   // lcode.c:722
     let pc = 0;
     pc = $h.u32[($h.u32[fs >>> 2] + 64) >>> 2] + $h.i32[(e + 8) >>> 2] * 4;
@@ -759,6 +1013,11 @@ export async function luaK_setreturns(fs, e, nresults) {   // lcode.c:722
 /*
 ** Convert a VKSTR to a VK
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} e expdesc *
+ * @returns {Promise<void>}
+ */
 async function str2K(fs, e) {   // lcode.c:738
     let $t1;
     0;
@@ -775,6 +1034,10 @@ async function str2K(fs, e) {   // lcode.c:738
 ** (Calls are created returning one result, so that does not need
 ** to be fixed.)
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} e expdesc *
+ */
 export function luaK_setoneret(fs, e) {   // lcode.c:755
     if ($h.u32[e >>> 2] === 18) {
         /* expression is an open function call? */
@@ -791,6 +1054,11 @@ export function luaK_setoneret(fs, e) {   // lcode.c:755
 ** Ensure that expression 'e' is not a variable (nor a <const>).
 ** (Expression still may have jump lists.)
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} e expdesc *
+ * @returns {Promise<void>}
+ */
 export async function luaK_dischargevars(fs, e) {   // lcode.c:773
     let temp = 0, $t1, $t2, $t3, $t4, $t5;
     switch ($h.u32[e >>> 2]) {
@@ -856,6 +1124,12 @@ export async function luaK_dischargevars(fs, e) {   // lcode.c:773
 ** non-relocatable expression.
 ** (Expression still may have jump lists.)
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} e expdesc *
+ * @param {number} reg int
+ * @returns {Promise<void>}
+ */
 async function discharge2reg(fs, e, reg) {   // lcode.c:827
     let pc = 0;
     await luaK_dischargevars(fs, e);
@@ -921,6 +1195,11 @@ async function discharge2reg(fs, e, reg) {   // lcode.c:827
 ** non-relocatable expression.
 ** (Expression still may have jump lists.)
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} e expdesc *
+ * @returns {Promise<void>}
+ */
 async function discharge2anyreg(fs, e) {   // lcode.c:882
     if ($h.u32[e >>> 2] !== 8) {
         /* no fixed register yet? */
@@ -928,6 +1207,12 @@ async function discharge2anyreg(fs, e) {   // lcode.c:882
         await discharge2reg(fs, e, $h.u8[fs + 68] - 1 | 0);   /* put value there */
     }
 }
+/**
+ * @param {number} fs FuncState *
+ * @param {number} A int
+ * @param {number} op OpCode
+ * @returns {Promise<number>} int
+ */
 async function code_loadbool(fs, A, op) {   // lcode.c:890
     luaK_getlabel(fs);   /* those instructions may be jump targets */
     return await luaK_codeABCk(fs, op, A, 0, 0, 0);
@@ -936,6 +1221,11 @@ async function code_loadbool(fs, A, op) {   // lcode.c:890
 ** check whether list has any jump that do not produce a value
 ** or produce an inverted value
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} list int
+ * @returns {number} int
+ */
 function need_value(fs, list) {   // lcode.c:900
     let i = 0;
     for (; list !== -1; list = getjump(fs, list)) {
@@ -953,6 +1243,12 @@ function need_value(fs, list) {   // lcode.c:900
 ** its final position or to "load" instructions (for those tests
 ** that do not produce values).
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} e expdesc *
+ * @param {number} reg int
+ * @returns {Promise<void>}
+ */
 async function exp2reg(fs, e, reg) {   // lcode.c:916
     let final = 0, p_f = 0, p_t = 0, fj = 0, $t1;
     await discharge2reg(fs, e, reg);
@@ -981,6 +1277,11 @@ async function exp2reg(fs, e, reg) {   // lcode.c:916
 /*
 ** Ensures final expression result is in next available register.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} e expdesc *
+ * @returns {Promise<void>}
+ */
 export async function luaK_exp2nextreg(fs, e) {   // lcode.c:944
     await luaK_dischargevars(fs, e);
     freeexp(fs, e);
@@ -991,6 +1292,11 @@ export async function luaK_exp2nextreg(fs, e) {   // lcode.c:944
 ** Ensures final expression result is in some (any) register
 ** and return that register.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} e expdesc *
+ * @returns {Promise<number>} int
+ */
 export async function luaK_exp2anyreg(fs, e) {   // lcode.c:956
     await luaK_dischargevars(fs, e);
     if ($h.u32[e >>> 2] === 8) {
@@ -1014,6 +1320,11 @@ export async function luaK_exp2anyreg(fs, e) {   // lcode.c:956
 ** Ensures final expression result is either in a register
 ** or in an upvalue.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} e expdesc *
+ * @returns {Promise<void>}
+ */
 export async function luaK_exp2anyregup(fs, e) {   // lcode.c:978
     if ($h.u32[e >>> 2] !== 10 || $h.i32[(e + 16) >>> 2] !== $h.i32[(e + 20) >>> 2]) {
         await luaK_exp2anyreg(fs, e);
@@ -1023,6 +1334,11 @@ export async function luaK_exp2anyregup(fs, e) {   // lcode.c:978
 ** Ensures final expression result is either in a register
 ** or it is a constant.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} e expdesc *
+ * @returns {Promise<void>}
+ */
 export async function luaK_exp2val(fs, e) {   // lcode.c:988
     if ($h.u32[e >>> 2] === 16 || $h.i32[(e + 16) >>> 2] !== $h.i32[(e + 20) >>> 2]) {
         await luaK_exp2anyreg(fs, e);
@@ -1034,6 +1350,11 @@ export async function luaK_exp2val(fs, e) {   // lcode.c:988
 ** Try to make 'e' a K expression with an index in the range of R/K
 ** indices. Return true iff succeeded.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} e expdesc *
+ * @returns {Promise<number>} int
+ */
 async function luaK_exp2K(fs, e) {   // lcode.c:1000
     let info = 0;
     if (!($h.i32[(e + 16) >>> 2] !== $h.i32[(e + 20) >>> 2])) {
@@ -1079,6 +1400,11 @@ async function luaK_exp2K(fs, e) {   // lcode.c:1000
 ** in the range of R/K indices).
 ** Returns 1 iff expression is K.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} e expdesc *
+ * @returns {Promise<number>} int
+ */
 async function exp2RK(fs, e) {   // lcode.c:1030
     if (await luaK_exp2K(fs, e)) {
         return 1;
@@ -1088,6 +1414,14 @@ async function exp2RK(fs, e) {   // lcode.c:1030
         return 0;
     }
 }
+/**
+ * @param {number} fs FuncState *
+ * @param {number} o OpCode
+ * @param {number} a int
+ * @param {number} b int
+ * @param {number} ec expdesc *
+ * @returns {Promise<void>}
+ */
 async function codeABRK(fs, o, a, b, ec) {   // lcode.c:1040
     let k = 0;
     k = await exp2RK(fs, ec);
@@ -1096,6 +1430,12 @@ async function codeABRK(fs, o, a, b, ec) {   // lcode.c:1040
 /*
 ** Generate code to store result of expression 'ex' into variable 'var'.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} var_ expdesc *
+ * @param {number} ex expdesc *
+ * @returns {Promise<void>}
+ */
 export async function luaK_storevar(fs, var_, ex) {   // lcode.c:1050
     let e = 0;
     switch ($h.u32[var_ >>> 2]) {
@@ -1139,6 +1479,12 @@ export async function luaK_storevar(fs, var_, ex) {   // lcode.c:1050
 /*
 ** Emit SELF instruction (convert expression 'e' into 'e:key(e,').
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} e expdesc *
+ * @param {number} key expdesc *
+ * @returns {Promise<void>}
+ */
 export async function luaK_self(fs, e, key) {   // lcode.c:1087
     let ereg = 0;
     await luaK_exp2anyreg(fs, e);
@@ -1153,6 +1499,10 @@ export async function luaK_self(fs, e, key) {   // lcode.c:1087
 /*
 ** Negate condition 'e' (where 'e' is a comparison).
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} e expdesc *
+ */
 function negatecondition(fs, e) {   // lcode.c:1103
     let pc = 0;
     pc = getjumpcontrol(fs, $h.i32[(e + 8) >>> 2]);
@@ -1165,6 +1515,12 @@ function negatecondition(fs, e) {   // lcode.c:1103
 ** Optimize when 'e' is 'not' something, inverting the condition
 ** and removing the 'not'.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} e expdesc *
+ * @param {number} cond int
+ * @returns {Promise<number>} int
+ */
 async function jumponcond(fs, e, cond) {   // lcode.c:1117
     let ie = 0;
     if ($h.u32[e >>> 2] === 17) {
@@ -1182,6 +1538,11 @@ async function jumponcond(fs, e, cond) {   // lcode.c:1117
 /*
 ** Emit code to go through if 'e' is true, jump otherwise.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} e expdesc *
+ * @returns {Promise<void>}
+ */
 export async function luaK_goiftrue(fs, e) {   // lcode.c:1135
     let pc = 0;
     /* pc of new jump */
@@ -1216,6 +1577,11 @@ export async function luaK_goiftrue(fs, e) {   // lcode.c:1135
 /*
 ** Emit code to go through if 'e' is false, jump otherwise.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} e expdesc *
+ * @returns {Promise<void>}
+ */
 export async function luaK_goiffalse(fs, e) {   // lcode.c:1162
     let pc = 0;
     /* pc of new jump */
@@ -1245,6 +1611,11 @@ export async function luaK_goiffalse(fs, e) {   // lcode.c:1162
 /*
 ** Code 'not e', doing constant folding.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} e expdesc *
+ * @returns {Promise<void>}
+ */
 async function codenot(fs, e) {   // lcode.c:1188
     let temp = 0, $t1;
     switch ($h.u32[e >>> 2]) {
@@ -1292,12 +1663,21 @@ async function codenot(fs, e) {   // lcode.c:1188
 /*
 ** Check whether expression 'e' is a short literal string
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} e expdesc *
+ * @returns {number} int
+ */
 function isKstr(fs, e) {   // lcode.c:1222
     return $h.u32[e >>> 2] === 4 && !($h.i32[(e + 16) >>> 2] !== $h.i32[(e + 20) >>> 2]) && $h.i32[(e + 8) >>> 2] <= 255 && $h.u8[$h.u32[($h.u32[fs >>> 2] + 56) >>> 2] + $h.i32[(e + 8) >>> 2] * 16 + 8] === 68 ? 1 : 0;
 }
 /*
 ** Check whether expression 'e' is a literal integer.
 */
+/**
+ * @param {number} e expdesc *
+ * @returns {number} int
+ */
 function isKint(e) {   // lcode.c:1230
     return $h.u32[e >>> 2] === 6 && !($h.i32[(e + 16) >>> 2] !== $h.i32[(e + 20) >>> 2]) ? 1 : 0;
 }
@@ -1305,6 +1685,10 @@ function isKint(e) {   // lcode.c:1230
 ** Check whether expression 'e' is a literal integer in
 ** proper range to fit in register C
 */
+/**
+ * @param {number} e expdesc *
+ * @returns {number} int
+ */
 function isCint(e) {   // lcode.c:1239
     return isKint(e) && $c.u64($h.ld64(e + 8)) <= 255 ? 1 : 0;
 }
@@ -1312,6 +1696,10 @@ function isCint(e) {   // lcode.c:1239
 ** Check whether expression 'e' is a literal integer in
 ** proper range to fit in register sC
 */
+/**
+ * @param {number} e expdesc *
+ * @returns {number} int
+ */
 function isSCint(e) {   // lcode.c:1248
     return isKint(e) && fitsC($h.ld64(e + 8)) ? 1 : 0;
 }
@@ -1319,6 +1707,12 @@ function isSCint(e) {   // lcode.c:1248
 ** Check whether expression 'e' is a literal integer or float in
 ** proper range to fit in a register (sB or sC).
 */
+/**
+ * @param {number} e expdesc *
+ * @param {number} pi int *
+ * @param {number} isfloat int *
+ * @returns {number} int
+ */
 function isSCnumber(e, pi, isfloat) {   // lcode.c:1257
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
     try {
@@ -1343,6 +1737,12 @@ function isSCnumber(e, pi, isfloat) {   // lcode.c:1257
 ** Keys can be literal strings in the constant table or arbitrary
 ** values in registers.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} t expdesc *
+ * @param {number} k expdesc *
+ * @returns {Promise<void>}
+ */
 export async function luaK_indexed(fs, t, k) {   // lcode.c:1280
     let temp = 0, $t1;
     if ($h.u32[k >>> 2] === 7) {
@@ -1378,6 +1778,12 @@ export async function luaK_indexed(fs, t, k) {   // lcode.c:1280
 ** Bitwise operations need operands convertible to integers; division
 ** operations cannot have 0 as divisor.
 */
+/**
+ * @param {number} op int
+ * @param {number} v1 TValue *
+ * @param {number} v2 TValue *
+ * @returns {number} int
+ */
 function validop(op, v1, v2) {   // lcode.c:1318
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
     try {
@@ -1406,6 +1812,13 @@ function validop(op, v1, v2) {   // lcode.c:1318
 ** Try to "constant-fold" an operation; return 1 iff successful.
 ** (In this case, 'e1' has the final result.)
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} op int
+ * @param {number} e1 expdesc *
+ * @param {number} e2 const expdesc *
+ * @returns {Promise<number>} int
+ */
 async function constfolding(fs, op, e1, e2) {   // lcode.c:1337
     let n = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(48);
@@ -1432,6 +1845,12 @@ async function constfolding(fs, op, e1, e2) {   // lcode.c:1337
 /*
 ** Convert a BinOpr to an OpCode  (ORDER OPR - ORDER OP)
 */
+/**
+ * @param {number} opr BinOpr
+ * @param {number} baser BinOpr
+ * @param {number} base OpCode
+ * @returns {number} OpCode
+ */
 function binopr2op(opr, baser, base) {   // lcode.c:1361
     0;
     return (((opr | 0) - (baser | 0) | 0) + (base | 0) | 0) >>> 0;
@@ -1439,12 +1858,20 @@ function binopr2op(opr, baser, base) {   // lcode.c:1361
 /*
 ** Convert a UnOpr to an OpCode  (ORDER OPR - ORDER OP)
 */
+/**
+ * @param {number} opr UnOpr
+ * @returns {number} OpCode
+ */
 function unopr2op(opr) {   // lcode.c:1372
     return (((opr | 0) - 0 | 0) + 49 | 0) >>> 0;
 }
 /*
 ** Convert a BinOpr to a tag method  (ORDER OPR - ORDER TM)
 */
+/**
+ * @param {number} opr BinOpr
+ * @returns {number} TMS
+ */
 function binopr2TM(opr) {   // lcode.c:1381
     0;
     return (((opr | 0) - 0 | 0) + 6 | 0) >>> 0;
@@ -1454,6 +1881,13 @@ function binopr2TM(opr) {   // lcode.c:1381
 ** (everything but 'not').
 ** Expression to produce final result will be encoded in 'e'.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} op OpCode
+ * @param {number} e expdesc *
+ * @param {number} line int
+ * @returns {Promise<void>}
+ */
 async function codeunexpval(fs, op, e, line) {   // lcode.c:1392
     let r = 0, $t1;
     r = await luaK_exp2anyreg(fs, e);   /* opcodes operate only on registers */
@@ -1468,6 +1902,18 @@ async function codeunexpval(fs, op, e, line) {   // lcode.c:1392
 ** operators).
 ** Expression to produce final result will be encoded in 'e1'.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} e1 expdesc *
+ * @param {number} e2 expdesc *
+ * @param {number} op OpCode
+ * @param {number} v2 int
+ * @param {number} flip int
+ * @param {number} line int
+ * @param {number} mmop OpCode
+ * @param {number} event TMS
+ * @returns {Promise<void>}
+ */
 async function finishbinexpval(fs, e1, e2, op, v2, flip, line, mmop, event) {   // lcode.c:1407
     let v1 = 0, pc = 0;
     v1 = await luaK_exp2anyreg(fs, e1);
@@ -1483,6 +1929,14 @@ async function finishbinexpval(fs, e1, e2, op, v2, flip, line, mmop, event) {   
 ** Emit code for binary expressions that "produce values" over
 ** two registers.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} opr BinOpr
+ * @param {number} e1 expdesc *
+ * @param {number} e2 expdesc *
+ * @param {number} line int
+ * @returns {Promise<void>}
+ */
 async function codebinexpval(fs, opr, e1, e2, line) {   // lcode.c:1425
     let op = 0, v2 = 0;
     op = binopr2op(opr, 0, 34);
@@ -1495,6 +1949,16 @@ async function codebinexpval(fs, opr, e1, e2, line) {   // lcode.c:1425
 /*
 ** Code binary operators with immediate operands.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} op OpCode
+ * @param {number} e1 expdesc *
+ * @param {number} e2 expdesc *
+ * @param {number} flip int
+ * @param {number} line int
+ * @param {number} event TMS
+ * @returns {Promise<void>}
+ */
 async function codebini(fs, op, e1, e2, flip, line, event) {   // lcode.c:1440
     let v2 = 0;
     v2 = $c.i32($h.ld64(e2 + 8)) + 127 | 0;   /* immediate operand */
@@ -1504,6 +1968,15 @@ async function codebini(fs, op, e1, e2, flip, line, event) {   // lcode.c:1440
 /*
 ** Code binary operators with K operand.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} opr BinOpr
+ * @param {number} e1 expdesc *
+ * @param {number} e2 expdesc *
+ * @param {number} flip int
+ * @param {number} line int
+ * @returns {Promise<void>}
+ */
 async function codebinK(fs, opr, e1, e2, flip, line) {   // lcode.c:1452
     let event = 0, v2 = 0, op = 0;
     event = binopr2TM(opr);
@@ -1514,6 +1987,15 @@ async function codebinK(fs, opr, e1, e2, flip, line) {   // lcode.c:1452
 /* Try to code a binary operator negating its second operand.
 ** For the metamethod, 2nd operand must keep its original value.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} e1 expdesc *
+ * @param {number} e2 expdesc *
+ * @param {number} op OpCode
+ * @param {number} line int
+ * @param {number} event TMS
+ * @returns {Promise<number>} int
+ */
 async function finishbinexpneg(fs, e1, e2, op, line, event) {   // lcode.c:1464
     let i2 = 0, v2 = 0;
     if (!isKint(e2)) {
@@ -1532,6 +2014,10 @@ async function finishbinexpneg(fs, e1, e2, op, line, event) {   // lcode.c:1464
         }
     }
 }
+/**
+ * @param {number} e1 expdesc *
+ * @param {number} e2 expdesc *
+ */
 function swapexps(e1, e2) {   // lcode.c:1483
     const $sp0 = $h.st.sp, $fp = $h.enter(24);
     try {
@@ -1543,6 +2029,15 @@ function swapexps(e1, e2) {   // lcode.c:1483
 /*
 ** Code binary operators with no constant operand.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} opr BinOpr
+ * @param {number} e1 expdesc *
+ * @param {number} e2 expdesc *
+ * @param {number} flip int
+ * @param {number} line int
+ * @returns {Promise<void>}
+ */
 async function codebinNoK(fs, opr, e1, e2, flip, line) {   // lcode.c:1491
     if (flip) {
         swapexps(e1, e2);   /* back to original order */
@@ -1553,6 +2048,15 @@ async function codebinNoK(fs, opr, e1, e2, flip, line) {   // lcode.c:1491
 ** Code arithmetic operators ('+', '-', ...). If second operand is a
 ** constant in the proper range, use variant opcodes with K operands.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} opr BinOpr
+ * @param {number} e1 expdesc *
+ * @param {number} e2 expdesc *
+ * @param {number} flip int
+ * @param {number} line int
+ * @returns {Promise<void>}
+ */
 async function codearith(fs, opr, e1, e2, flip, line) {   // lcode.c:1503
     if (tonumeral(e2, 0) && await luaK_exp2K(fs, e2)) {   /* K operand? */
         await codebinK(fs, opr, e1, e2, flip, line);
@@ -1566,6 +2070,14 @@ async function codearith(fs, opr, e1, e2, flip, line) {   // lcode.c:1503
 ** numeric constant, change order of operands to try to use an
 ** immediate or K operator.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} op BinOpr
+ * @param {number} e1 expdesc *
+ * @param {number} e2 expdesc *
+ * @param {number} line int
+ * @returns {Promise<void>}
+ */
 async function codecommutative(fs, op, e1, e2, line) {   // lcode.c:1517
     let flip = 0;
     flip = 0;
@@ -1584,6 +2096,14 @@ async function codecommutative(fs, op, e1, e2, line) {   // lcode.c:1517
 ** Code bitwise operations; they are all commutative, so the function
 ** tries to put an integer constant as the 2nd operand (a K operand).
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} opr BinOpr
+ * @param {number} e1 expdesc *
+ * @param {number} e2 expdesc *
+ * @param {number} line int
+ * @returns {Promise<void>}
+ */
 async function codebitwise(fs, opr, e1, e2, line) {   // lcode.c:1535
     let flip = 0;
     flip = 0;
@@ -1602,6 +2122,13 @@ async function codebitwise(fs, opr, e1, e2, line) {   // lcode.c:1535
 ** Emit code for order comparisons. When using an immediate operand,
 ** 'isfloat' tells whether the original value was a float.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} opr BinOpr
+ * @param {number} e1 expdesc *
+ * @param {number} e2 expdesc *
+ * @returns {Promise<void>}
+ */
 async function codeorder(fs, opr, e1, e2) {   // lcode.c:1553
     let r1 = 0, r2 = 0, op = 0, $t1;
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
@@ -1632,6 +2159,13 @@ async function codeorder(fs, opr, e1, e2) {   // lcode.c:1553
 ** Emit code for equality comparisons ('==', '~=').
 ** 'e1' was already put as RK by 'luaK_infix'.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} opr BinOpr
+ * @param {number} e1 expdesc *
+ * @param {number} e2 expdesc *
+ * @returns {Promise<void>}
+ */
 async function codeeq(fs, opr, e1, e2) {   // lcode.c:1585
     let r1 = 0, r2 = 0, op = 0, $t1;
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
@@ -1661,6 +2195,13 @@ async function codeeq(fs, opr, e1, e2) {   // lcode.c:1585
 /*
 ** Apply prefix operation 'op' to expression 'e'.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} opr UnOpr
+ * @param {number} e expdesc *
+ * @param {number} line int
+ * @returns {Promise<void>}
+ */
 export async function luaK_prefix(fs, opr, e, line) {   // lcode.c:1616
     await luaK_dischargevars(fs, e);
     switch (opr) {
@@ -1686,6 +2227,12 @@ export async function luaK_prefix(fs, opr, e, line) {   // lcode.c:1616
 ** Process 1st operand 'v' of binary operation 'op' before reading
 ** 2nd operand.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} op BinOpr
+ * @param {number} v expdesc *
+ * @returns {Promise<void>}
+ */
 export async function luaK_infix(fs, op, v) {   // lcode.c:1637
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
     try {
@@ -1756,6 +2303,13 @@ export async function luaK_infix(fs, op, v) {   // lcode.c:1637
 ** For '(e1 .. e2.1 .. e2.2)' (which is '(e1 .. (e2.1 .. e2.2))',
 ** because concatenation is right associative), merge both CONCATs.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} e1 expdesc *
+ * @param {number} e2 expdesc *
+ * @param {number} line int
+ * @returns {Promise<void>}
+ */
 async function codeconcat(fs, e1, e2, line) {   // lcode.c:1686
     let ie2 = 0, n = 0;
     ie2 = previousinstruction(fs);
@@ -1776,6 +2330,14 @@ async function codeconcat(fs, e1, e2, line) {   // lcode.c:1686
 /*
 ** Finalize code for binary operation, after reading 2nd operand.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} opr BinOpr
+ * @param {number} e1 expdesc *
+ * @param {number} e2 expdesc *
+ * @param {number} line int
+ * @returns {Promise<void>}
+ */
 export async function luaK_posfix(fs, opr, e1, e2, line) {   // lcode.c:1706
     await luaK_dischargevars(fs, e2);
     if (opr <= 11 && await constfolding(fs, opr + 0 >>> 0 | 0, e1, e2)) {
@@ -1881,10 +2443,22 @@ export async function luaK_posfix(fs, opr, e1, e2, line) {   // lcode.c:1706
 ** Change line information associated with current position, by removing
 ** previous info and adding it again with new line.
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} line int
+ * @returns {Promise<void>}
+ */
 export async function luaK_fixline(fs, line) {   // lcode.c:1787
     removelastlineinfo(fs);
     await savelineinfo(fs, $h.u32[fs >>> 2], line);
 }
+/**
+ * @param {number} fs FuncState *
+ * @param {number} pc int
+ * @param {number} ra int
+ * @param {number} asize int
+ * @param {number} hsize int
+ */
 export function luaK_settablesize(fs, pc, ra, asize, hsize) {   // lcode.c:1793
     let inst = 0, rb = 0, extra = 0, rc = 0, k = 0;
     inst = $h.u32[($h.u32[fs >>> 2] + 64) >>> 2] + pc * 4;
@@ -1902,6 +2476,13 @@ export function luaK_settablesize(fs, pc, ra, asize, hsize) {   // lcode.c:1793
 ** 'tostore' is number of values (in registers 'base + 1',...) to add to
 ** table (or LUA_MULTRET to add up to stack top).
 */
+/**
+ * @param {number} fs FuncState *
+ * @param {number} base int
+ * @param {number} nelems int
+ * @param {number} tostore int
+ * @returns {Promise<void>}
+ */
 export async function luaK_setlist(fs, base, nelems, tostore) {   // lcode.c:1811
     let extra = 0;
     0;
@@ -1921,6 +2502,11 @@ export async function luaK_setlist(fs, base, nelems, tostore) {   // lcode.c:181
 /*
 ** return the final target of a jump (skipping jumps to jumps)
 */
+/**
+ * @param {number} code Instruction *
+ * @param {number} i int
+ * @returns {number} int
+ */
 function finaltarget(code, i) {   // lcode.c:1830
     let count = 0, pc = 0;
     for (count = 0; count < 100; count = count + 1 | 0) {
@@ -1938,6 +2524,10 @@ function finaltarget(code, i) {   // lcode.c:1830
 ** Do a final pass over the code of a function, doing small peephole
 ** optimizations and adjustments.
 */
+/**
+ * @param {number} fs FuncState *
+ * @returns {Promise<void>}
+ */
 export async function luaK_finish(fs) {   // lcode.c:1847
     let i = 0, p = 0, pc = 0, target = 0;
     p = $h.u32[fs >>> 2];

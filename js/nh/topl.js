@@ -26,6 +26,9 @@ let tty_getmsghistory$nxtidx = 0;   // static in tty_getmsghistory()
 let tty_putmsghistory$initd = 0;   // static in tty_putmsghistory()
 /* shared by tty_getmsghistory() and tty_putmsghistory() */
 let snapshot_mesgs = null;
+/**
+ * @returns {Promise<number>} int
+ */
 export async function tty_doprev_message() {   // topl.c:20
     let cw = null, prevmsg_win = 0, i = 0;
     cw = wins[$G.WIN_MESSAGE];
@@ -137,6 +140,10 @@ export async function tty_doprev_message() {   // topl.c:20
     }
     return 0;
 }
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @returns {Promise<void>}
+ */
 async function redotoplin(str) {   // topl.c:122
     let otoplin = 0, $t1;
     otoplin = $G.ttyDisplay.toplin;
@@ -158,6 +165,10 @@ async function redotoplin(str) {   // topl.c:122
     }
 }
 /* for use by tty_putstr() */
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @returns {Promise<void>}
+ */
 export async function show_topl(str) {   // topl.c:145
     let cw = null, $t1;
     cw = wins[$G.WIN_MESSAGE];
@@ -179,6 +190,9 @@ export async function show_topl(str) {   // topl.c:145
     }
 }
 /* used by update_topl(); also by tty_putstr() */
+/**
+ * @returns {Promise<void>}
+ */
 export async function remember_topl() {   // topl.c:170
     let cw = null, idx = 0, len = 0, $t1, $t2;
     cw = wins[$G.WIN_MESSAGE];
@@ -201,6 +215,10 @@ export async function remember_topl() {   // topl.c:170
         $t2 = cw.maxrow = $c.rem64(idx + 1 | 0, cw.rows), cw.maxcol = $t2;
     }
 }
+/**
+ * @param {$c.Ptr | null} s const char *
+ * @returns {Promise<void>}
+ */
 export async function addtopl(s) {   // topl.c:194
     let cw = null;
     cw = wins[$G.WIN_MESSAGE];
@@ -209,6 +227,9 @@ export async function addtopl(s) {   // topl.c:194
     await cl_end();
     $G.ttyDisplay.toplin = TOPLINE.NEED_MORE;
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function more() {   // topl.c:205
     let cw = null, $t1, $t2;
     cw = wins[$G.WIN_MESSAGE];
@@ -251,6 +272,10 @@ export async function more() {   // topl.c:205
     $G.ttyDisplay.toplin = TOPLINE.EMPTY;
     $G.ttyDisplay.inmore = 0;
 }
+/**
+ * @param {$c.Ptr | null} bp const char *
+ * @returns {Promise<void>}
+ */
 export async function update_topl(bp) {   // topl.c:251
     let tl = null, otl = null, n0 = 0, notdied = 0, cw = null, skip = 0, $t1, $t2;
     notdied = 1;
@@ -304,6 +329,10 @@ export async function update_topl(bp) {   // topl.c:251
         await redotoplin(new $c.Ptr(gt.toplines, 0));
     }
 }
+/**
+ * @param {number} c char
+ * @returns {Promise<void>}
+ */
 async function topl_putsym(c) {   // topl.c:305
     let cw = null, svx = 0;
     cw = wins[$G.WIN_MESSAGE];
@@ -349,12 +378,20 @@ async function topl_putsym(c) {   // topl.c:305
         $G.ttyDisplay.curx = $c.i16(svx);
     }
 }
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @returns {Promise<void>}
+ */
 export async function putsyms(str) {   // topl.c:355
     let $t1;
     while (str.get(0)) {
         await topl_putsym(($t1 = str, str = $t1.add(1), $t1).get(0));
     }
 }
+/**
+ * @param {number} n int
+ * @returns {Promise<void>}
+ */
 async function removetopl(n) {   // topl.c:362
     let $t1;
     /* assume addtopl() has been done, so ttyDisplay->toplin is already set */
@@ -364,6 +401,12 @@ async function removetopl(n) {   // topl.c:362
 }
 /* from xxxtty.c; don't need kill_char */
 /* returns a single keystroke; also sets 'yn_number' */
+/**
+ * @param {$c.Ptr | null} query const char *
+ * @param {$c.Ptr | null} resp const char *
+ * @param {number} def char
+ * @returns {Promise<number>} char
+ */
 export async function tty_yn_function(query, resp, def) {   // topl.c:373
     let q = 0, rtmp = new Int8Array(40), digit_ok = 0, allow_num = 0, preserve_case = 0, cw = null, doprev = 0, prompt = new Int8Array(256), rb = null, respbuf = new Int8Array(128), sav = 0, z = 0, digit_string = new Int8Array(2), n_len = 0, value = 0, dgt = 0;
     /*
@@ -553,6 +596,10 @@ export async function tty_yn_function(query, resp, def) {   // topl.c:373
 }
 /* collect currently available message history data into a sequential array;
    optionally, purge that data from the active circular buffer set as we go */
+/**
+ * @param {number} purge boolean
+ * @returns {Promise<void>}
+ */
 async function msghistory_snapshot(purge) {   // topl.c:567
     let mesg = null, i = 0, inidx = 0, outidx = 0, cw = null, $t1, $t2;
     /* clear message history buffer as we copy it */
@@ -592,6 +639,9 @@ async function msghistory_snapshot(purge) {   // topl.c:567
     }
 }
 /* release memory allocated to message history snapshot */
+/**
+ * @param {number} purged boolean
+ */
 function free_msghistory_snapshot(purged) {   // topl.c:613
     let i = 0;
     /* True: took history's pointers,
@@ -619,6 +669,10 @@ function free_msghistory_snapshot(purged) {   // topl.c:613
  * History is collected at the time of the first call.
  * Any new messages issued after that point will not be
  * included among the output of the subsequent calls.
+ */
+/**
+ * @param {number} init boolean
+ * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function tty_getmsghistory(init) {   // topl.c:645
     let nextmesg = null, result = null, $t1;
@@ -653,6 +707,11 @@ export async function tty_getmsghistory(init) {   // topl.c:645
  * It's also called by the quest pager code when a block message
  * has a one-line summary specified.  We put that line directly
  * into message history for ^P recall without having displayed it.
+ */
+/**
+ * @param {$c.Ptr | null} msg const char *
+ * @param {number} restoring_msghist boolean
+ * @returns {Promise<void>}
  */
 export async function tty_putmsghistory(msg, restoring_msghist) {   // topl.c:685
     let idx = 0;

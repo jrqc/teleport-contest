@@ -26,6 +26,9 @@ let rect_cnt = 0;
  * Initialization of internal structures. Should be called for every
  * new level to be build...
  */
+/**
+ * @returns {Promise<void>}
+ */
 export async function init_rect() {   // rect.c:29
     let $t1;
     if (!rect) {
@@ -51,6 +54,10 @@ export function free_rect() {   // rect.c:45
  * Search Index of one precise NhRect.
  *
  */
+/**
+ * @param {$T.nhrect | null} r NhRect *
+ * @returns {number} int
+ */
 export function get_rect_ind(r) {   // rect.c:60
     let rectp = null, lx = 0, ly = 0, hx = 0, hy = 0, i = 0;
     lx = r.lx;
@@ -66,6 +73,10 @@ export function get_rect_ind(r) {   // rect.c:60
 }
 /*
  * Search a free rectangle that include the one given in arg
+ */
+/**
+ * @param {$T.nhrect | null} r NhRect *
+ * @returns {$T.nhrect | null} NhRect *
  */
 export function get_rect(r) {   // rect.c:82
     let rectp = null, lx = 0, ly = 0, hx = 0, hy = 0, i = 0;
@@ -83,6 +94,9 @@ export function get_rect(r) {   // rect.c:82
 /*
  * Get some random NhRect from the list.
  */
+/**
+ * @returns {$T.nhrect | null} NhRect *
+ */
 export function rnd_rect() {   // rect.c:104
     return rect_cnt > 0 ? $c.radd(rect, rn2(rect_cnt)) : null;
 }
@@ -90,6 +104,12 @@ export function rnd_rect() {   // rect.c:104
  * Search intersection between two rectangles (r1 & r2).
  * return TRUE if intersection exist and put it in r3.
  * otherwise returns FALSE
+ */
+/**
+ * @param {$T.nhrect | null} r1 NhRect *
+ * @param {$T.nhrect | null} r2 NhRect *
+ * @param {$T.nhrect | null} r3 NhRect *
+ * @returns {number} boolean
  */
 function intersect(r1, r2, r3) {   // rect.c:116
     if (r2.lx > r1.hx || r2.ly > r1.hy || r2.hx < r1.lx || r2.hy < r1.ly) {
@@ -105,6 +125,11 @@ function intersect(r1, r2, r3) {   // rect.c:116
     return TRUE;
 }
 /* Put the rectangle containing both r1 and r2 into r3 */
+/**
+ * @param {$T.nhrect} r1$in NhRect
+ * @param {$T.nhrect} r2$in NhRect
+ * @param {$T.nhrect | null} r3 NhRect *
+ */
 export function rect_bounds(r1$in, r2$in, r3) {   // rect.c:134
     const r1 = r1$in;   // passed by value: the caller copies
     const r2 = r2$in;   // passed by value: the caller copies
@@ -116,6 +141,9 @@ export function rect_bounds(r1$in, r2$in, r3) {   // rect.c:134
 /*
  * Remove a rectangle from the list of free NhRect.
  */
+/**
+ * @param {$T.nhrect | null} r NhRect *
+ */
 export function remove_rect(r) {   // rect.c:147
     let ind = 0;
     ind = get_rect_ind(r);
@@ -125,6 +153,10 @@ export function remove_rect(r) {   // rect.c:147
 }
 /*
  * Add a NhRect to the list.
+ */
+/**
+ * @param {$T.nhrect | null} r NhRect *
+ * @returns {Promise<void>}
  */
 export async function add_rect(r) {   // rect.c:161
     if (rect_cnt >= n_rects) {
@@ -143,6 +175,11 @@ export async function add_rect(r) {   // rect.c:161
  * r1 was already in the list and r2 is included in r1.
  * What we want is to allocate r2, that is split r1 into smaller rectangles
  * then remove it.
+ */
+/**
+ * @param {$T.nhrect | null} r1 NhRect *
+ * @param {$T.nhrect | null} r2 NhRect *
+ * @returns {Promise<void>}
  */
 export async function split_rects(r1, r2) {   // rect.c:182
     let r = new $T.nhrect(), old_r = new $T.nhrect(), i = 0;

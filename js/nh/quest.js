@@ -38,6 +38,9 @@ import { MAGIC_PORTAL } from './trap.h.js';
 import { UTOTYPE } from './you.h.js';
 import { Deaf } from './youprop.macros.js';
 
+/**
+ * @returns {Promise<void>}
+ */
 async function on_start() {   // quest.c:26
     if (!svq.quest_status.first_start) {
         await qt_pager($c.lit("firsttime"));
@@ -50,6 +53,9 @@ async function on_start() {   // quest.c:26
         }
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function on_locate() {   // quest.c:40
     let from_above = 0;
     /* the locate messages are phrased in a manner such that they only
@@ -71,6 +77,9 @@ async function on_locate() {   // quest.c:40
         }
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function on_goal() {   // quest.c:62
     let whichobjchains = 0, qarti = null;
     if (svq.quest_status.killed_nemesis) {
@@ -95,6 +104,9 @@ async function on_goal() {   // quest.c:62
         }
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function onquest() {   // quest.c:90
     if (u.uevent.qcompleted | 0 || Not_firsttime()) {
         return;
@@ -111,6 +123,9 @@ export async function onquest() {   // quest.c:90
     }
     return;
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function nemdead() {   // quest.c:107
     if (!svq.quest_status.killed_nemesis) {
         svq.quest_status.killed_nemesis = (TRUE) & 1;
@@ -123,6 +138,10 @@ export function leaddead() {   // quest.c:116
         /* TODO: qt_pager("killed_leader"); ? */
     }
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function artitouch(obj) {   // quest.c:125
     if (!svq.quest_status.touched_artifact) {
         /* in case we haven't seen the item yet (ie, currently blinded),
@@ -135,12 +154,22 @@ export async function artitouch(obj) {   // quest.c:125
     }
 }
 /* external hook for do.c (level change check) */
+/**
+ * @returns {Promise<number>} boolean
+ */
 export async function ok_to_quest() {   // quest.c:140
     return $c.i8((svq.quest_status.got_quest | 0 || svq.quest_status.got_thanks | 0) && await is_pure(FALSE) > 0 || svq.quest_status.killed_leader | 0 ? 1 : 0);
 }
+/**
+ * @returns {number} boolean
+ */
 function not_capable() {   // quest.c:147
     return $c.i8(u.ulevel < MIN_QUEST.LEVEL ? 1 : 0);
 }
+/**
+ * @param {number} talk boolean
+ * @returns {Promise<number>} int
+ */
 async function is_pure(talk) {   // quest.c:153
     let purity = 0, original_alignment = 0;
     original_alignment = u.ualignbase[A.ORIGINAL];
@@ -164,6 +193,10 @@ async function is_pure(talk) {   // quest.c:153
  *
  * This assumes that the hero is currently _in_ the quest dungeon and that
  * there is a single branch to and from it.
+ */
+/**
+ * @param {number} seal boolean
+ * @returns {Promise<void>}
  */
 async function expulsion(seal) {   // quest.c:186
     let br = null, dest = null, t = null, portal_flag = 0, reexpelled = 0;
@@ -203,6 +236,10 @@ async function expulsion(seal) {   // quest.c:186
    and using the magic portal to return to the dungeon.  Also called
    if hero throws or kicks an invocation item (probably the Bell)
    at the leader. */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function finish_quest(obj) {   // quest.c:226
     let otmp = null;
     /* quest artifact or thrown unique item or faux
@@ -255,6 +292,10 @@ export async function finish_quest(obj) {   // quest.c:226
         await update_inventory();
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 async function chat_with_leader(mtmp) {   // quest.c:282
     let otmp = null, purity = 0;
     if (!mtmp.mpeaceful || svq.quest_status.pissed_off | 0) {
@@ -332,6 +373,10 @@ async function chat_with_leader(mtmp) {   // quest.c:282
         }
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function leader_speaks(mtmp) {   // quest.c:371
     /* maybe you attacked leader? */
     if (!mtmp.mpeaceful) {
@@ -353,6 +398,9 @@ export async function leader_speaks(mtmp) {   // quest.c:371
         await chat_with_leader(mtmp);
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function chat_with_nemesis() {   // quest.c:394
     /*  The nemesis will do most of the talking, but... */
     await qt_pager($c.lit("discourage"));
@@ -360,6 +408,9 @@ async function chat_with_nemesis() {   // quest.c:394
         svq.quest_status.met_nemesis = (svq.quest_status.met_nemesis + 1 >>> 0) & 1;
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function nemesis_speaks() {   // quest.c:403
     if (!svq.quest_status.in_battle) {
         if (u.uhave.questart) {
@@ -383,6 +434,11 @@ export async function nemesis_speaks() {   // quest.c:403
     }
 }
 /* create cloud of stinking gas around dying nemesis */
+/**
+ * @param {number} mx coordxy
+ * @param {number} my coordxy
+ * @returns {Promise<void>}
+ */
 export async function nemesis_stinks(mx, my) {   // quest.c:426
     let save_mon_moving = 0;
     save_mon_moving = svc.context.mon_moving;
@@ -395,6 +451,9 @@ export async function nemesis_stinks(mx, my) {   // quest.c:426
     await create_gas_cloud(mx, my, 5, 8);
     svc.context.mon_moving = save_mon_moving;
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function chat_with_guardian() {   // quest.c:441
     /*  These guys/gals really don't have much to say... */
     if (u.uhave.questart | 0 && svq.quest_status.killed_nemesis | 0) {
@@ -403,6 +462,10 @@ async function chat_with_guardian() {   // quest.c:441
         await qt_pager($c.lit("guardtalk_before"));
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 async function prisoner_speaks(mtmp) {   // quest.c:451
     if ($c.peq(mtmp.data, $c.relem(mons, PM.PRISONER)) && $c.andu64(mtmp.mstrategy, STRAT_WAITMASK)) {
         /* Awaken the prisoner */
@@ -419,6 +482,10 @@ async function prisoner_speaks(mtmp) {   // quest.c:451
     }
     return;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function quest_chat(mtmp) {   // quest.c:473
     if (mtmp.m_id === svq.quest_status.leader_m_id) {
         await chat_with_leader(mtmp);
@@ -439,6 +506,10 @@ export async function quest_chat(mtmp) {   // quest.c:473
             await impossible($c.lit("quest_chat: Unknown quest character %s."), await mon_nam(mtmp));
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function quest_talk(mtmp) {   // quest.c:495
     if (mtmp.m_id === svq.quest_status.leader_m_id) {
         await leader_speaks(mtmp);
@@ -455,6 +526,9 @@ export async function quest_talk(mtmp) {   // quest.c:495
             break;
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ */
 export function quest_stat_check(mtmp) {   // quest.c:514
     let $t1;
     if (mtmp.data.msound === MS.NEMESIS) {

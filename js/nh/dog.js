@@ -89,6 +89,10 @@ const Wiz_arrive = -1;
 
 /* note: always reset when used so doesn't need to be part of struct 'g' */
 const failed_arrivals = [null];   // address taken
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function newedog(mtmp) {   // dog.c:23
     let $t1, $t2;
     if (!mtmp.mextra) {
@@ -100,6 +104,9 @@ export async function newedog(mtmp) {   // dog.c:23
         mtmp.mextra.edog.parentmid = mtmp.m_id;
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ */
 export function free_edog(mtmp) {   // dog.c:35
     if (mtmp.mextra && EDOG(mtmp)) {
         $c.free(mtmp.mextra.edog);
@@ -107,6 +114,11 @@ export function free_edog(mtmp) {   // dog.c:35
     }
     mtmp.mtame = 0;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} everything boolean
+ * @returns {Promise<void>}
+ */
 export async function initedog(mtmp, everything) {   // dog.c:45
     let edogp = null, minhungry = 0, minimumtame = 0, $t1;
     edogp = mtmp.mextra.edog;
@@ -151,6 +163,9 @@ export async function initedog(mtmp, everything) {   // dog.c:45
     }
     u.uconduct.pets = $c.add64(u.uconduct.pets, 1);
 }
+/**
+ * @returns {number} int
+ */
 function pet_type() {   // dog.c:91
     if (gu.urole.petnum !== NON_PM) {
         return gu.urole.petnum;
@@ -162,6 +177,11 @@ function pet_type() {   // dog.c:91
         return rn2(2) ? PM.KITTEN : PM.LITTLE_DOG;
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} quietly boolean
+ * @returns {Promise<$T.permonst | null>} struct permonst *
+ */
 async function pick_familiar_pm(otmp, quietly) {   // dog.c:104
     let pm = null, mndx = 0, skill = 0, max = 0;
     pm = null;
@@ -193,6 +213,13 @@ async function pick_familiar_pm(otmp, quietly) {   // dog.c:104
     }
     return pm;
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} quietly boolean
+ * @returns {Promise<$T.monst | null>} struct monst *
+ */
 export async function make_familiar(otmp, x, y, quietly) {   // dog.c:138
     let pm = null, mtmp = null, chance = 0, trycnt = 0, reallytame = 0, mmflags = 0, cgend = 0;
     mtmp = null;
@@ -270,6 +297,9 @@ export async function make_familiar(otmp, x, y, quietly) {   // dog.c:138
     return mtmp;
 }
 /* despite rather general name, used exclusively for hero's starting pet */
+/**
+ * @returns {Promise<$T.monst | null>} struct monst *
+ */
 export async function makedog() {   // dog.c:219
     let mtmp = null, petname = null, pettype = 0, $t1, $t2;
     if (gp.preferred_pet === 110) {
@@ -328,14 +358,23 @@ export async function makedog() {   // dog.c:219
     await initedog(mtmp, TRUE);
     return mtmp;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ */
 function set_mon_lastmove(mtmp) {   // dog.c:287
     mtmp.mlstmv = svm.moves;
 }
 /* record `last move time' for all monsters prior to level save so that
    mon_arrive() can catch up for lost time when they're restored later */
+/**
+ * @returns {Promise<void>}
+ */
 export async function update_mlstmv() {   // dog.c:295
     await iter_mons(set_mon_lastmove);
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function losedogs() {   // dog.c:304
     let mtmp = null, mprev = null, dismissKops = 0, xyloc = 0;
     dismissKops = 0;
@@ -444,6 +483,11 @@ export async function losedogs() {   // dog.c:304
     }
 }
 /* called from resurrect() in addition to losedogs() */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} when int
+ * @returns {Promise<void>}
+ */
 export async function mon_arrive(mtmp, when) {   // dog.c:420
     let t = null, xlocale = 0, ylocale = 0, xyloc = 0, xyflags = 0, wander = 0, num_segs = 0, failed_to_place = 0, stway = null, fromdlev = new $T.d_level(), nmv = 0, r = null, c = new $T.nhcoord(), i = 0, j = 0, $t1;
     failed_to_place = FALSE;
@@ -634,6 +678,11 @@ export async function mon_arrive(mtmp, when) {   // dog.c:420
     mtmp.mstate = $c.and64(mtmp.mstate, ~MON.STILL_ARRIVING);
 }
 /* heal monster for time spent elsewhere */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number | bigint} nmv long
+ * @returns {Promise<void>}
+ */
 export async function mon_catchup_elapsed_time(mtmp, nmv) {   // dog.c:627
     let imv = 0, wilder = 0, edog = null, $t1, $t2;
     /* number of moves */
@@ -732,6 +781,10 @@ export async function mon_catchup_elapsed_time(mtmp, nmv) {   // dog.c:627
 }
 /* bookkeeping when mtmp is about to leave the current level;
    common to keepdogs() and migrate_to_level() */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} int
+ */
 async function mon_leave(mtmp) {   // dog.c:729
     let obj = null, num_segs = 0, cnt = 0, mx = 0, my = 0;
     num_segs = 0;   /* return value */
@@ -768,6 +821,10 @@ async function mon_leave(mtmp) {   // dog.c:729
 }
 /* when hero leaves a level, some monsters should be placed on the
    migrating_mons list instead of being stashed inside the level's file */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {number} boolean
+ */
 function keep_mon_accessible(mon) {   // dog.c:768
     /* the Wizard is kept accessible so that his harassment can fetch
        him instead of creating a new instance but also so that he can
@@ -785,6 +842,10 @@ function keep_mon_accessible(mon) {   // dog.c:768
     return FALSE;
 }
 /* called when you move to another level */
+/**
+ * @param {number} pets_only boolean
+ * @returns {Promise<void>}
+ */
 export async function keepdogs(pets_only) {   // dog.c:789
     let mtmp = null, mtmp2 = null, num_segs = 0, stay_behind = 0, $t1;
     /* true for ascension or final escape */
@@ -871,6 +932,13 @@ export async function keepdogs(pets_only) {   // dog.c:789
         }
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} tolev xint16
+ * @param {number} xyloc xint16
+ * @param {$T.nhcoord | null} cc coord *
+ * @returns {Promise<void>}
+ */
 export async function migrate_to_level(mtmp, tolev, xyloc, cc) {   // dog.c:887
     let new_lev = new $T.d_level(), xyflags = 0, mx = 0, my = 0, num_segs = 0, $t1, $t2, $t3;
     /* destination level */
@@ -916,6 +984,9 @@ export async function migrate_to_level(mtmp, tolev, xyloc, cc) {   // dog.c:887
 /* when entering the endgame, levels from the dungeon and its branches are
    discarded because they can't be reached again; do the same for monsters
    and objects scheduled to migrate to those levels */
+/**
+ * @returns {Promise<void>}
+ */
 export async function discard_migrations() {   // dog.c:938
     let mtmp = null, mprev = null, otmp = null, oprev = null, dest = new $T.d_level();
     for (mprev = new $c.FieldRef(gm, "migrating_mons", "ptr"); (mtmp = mprev.get(0)) !== null; ) {
@@ -968,6 +1039,11 @@ export async function discard_migrations() {   // dog.c:938
 }
 /* returns the quality of an item of food; the lower the better;
    fungi and ghouls will eat even tainted food */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function dogfood(mon, obj) {   // dog.c:995
     let mptr = null, fptr = null, carni = 0, herbi = 0, starving = 0, mblind = 0, fx = 0, mtmp = null;
     mptr = mon.data;
@@ -1095,6 +1171,12 @@ export async function dogfood(mon, obj) {   // dog.c:995
  * if a new one was created in order to allocate the edog extension.
  * With the separate mextra structure added in 3.6.x it always operates
  * on the original mtmp.  It now returns TRUE if the taming succeeded.
+ */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} givemsg boolean
+ * @returns {Promise<number>} boolean
  */
 export async function tamedog(mtmp, obj, givemsg) {   // dog.c:1143
     let blessed_scroll = 0, tasty = 0, big_corpse = 0;
@@ -1226,6 +1308,11 @@ export async function tamedog(mtmp, obj, givemsg) {   // dog.c:1143
  * If you abused the pet at all while alive, it revives untame.
  * If the pet wasn't abused and was very tame, it might revive tame.
  */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} was_dead boolean
+ * @returns {Promise<void>}
+ */
 export async function wary_dog(mtmp, was_dead) {   // dog.c:1292
     let edog = null, quietly = 0, $t1, $t2, $t3, $t4;
     quietly = was_dead;
@@ -1293,6 +1380,10 @@ export async function wary_dog(mtmp, was_dead) {   // dog.c:1292
         }   /* else lifesaved, so retain current values */
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function abuse_dog(mtmp) {   // dog.c:1362
     if (!mtmp.mtame) {
         return;

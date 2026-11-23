@@ -32,6 +32,10 @@ const rip_txt = $c.nulls(16);
 /* *char[] line # for amount of gold */
 /* *char[] line # for death description */
 /* *char[] line # for year */
+/**
+ * @param {number} line int
+ * @param {$c.Ptr | null} text char *
+ */
 function center(line, text) {   // rip.c:76
     let ip = null, op = null, $t1, $t2, $t3, $t4;
     ip = text;
@@ -40,6 +44,12 @@ function center(line, text) {   // rip.c:76
         $t3 = ($t2 = ip, ip = $t2.add(1), $t2).get(0), $t4 = ($t1 = op, op = $t1.add(1), $t1), $t4.set(0, $t3);
     }
 }
+/**
+ * @param {number} tmpwin winid
+ * @param {number} how int
+ * @param {number | bigint} when time_t
+ * @returns {Promise<void>}
+ */
 export async function genl_outrip(tmpwin, how, when) {   // rip.c:86
     let dp = null, dpx = null, buf = new Int8Array(256), x = 0, line = 0, year = 0, cash = 0, tmpchar = 0, i = 0, i0 = 0, $t1, $t2;
     $t1 = dp = $c.asArr(await alloc(128), 'ptr'), gr.rip = $t1;

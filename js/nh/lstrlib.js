@@ -60,6 +60,10 @@ const strlib = $h.data(288, 8);
 ** Some sizes are better limited to fit in 'int', but must also fit in
 ** 'size_t'. (We assume that 'lua_Integer' cannot be smaller than 'int'.)
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function str_len(L) {   // lstrlib.c:55
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
     try {
@@ -76,6 +80,11 @@ async function str_len(L) {   // lstrlib.c:55
 ** The inverted comparison avoids a possible overflow
 ** computing '-pos'.
 */
+/**
+ * @param {number | bigint} pos lua_Integer
+ * @param {number | bigint} len size_t
+ * @returns {number | bigint} size_t
+ */
 function posrelatI(pos, len) {   // lstrlib.c:71
     if (pos > 0) {
         return $c.u64(pos);
@@ -92,6 +101,13 @@ function posrelatI(pos, len) {   // lstrlib.c:71
 ** with default value 'def'.
 ** Negative means back from end: clip result to [0, len]
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} arg int
+ * @param {number | bigint} def lua_Integer
+ * @param {number | bigint} len size_t
+ * @returns {Promise<number | bigint>} size_t
+ */
 async function getendpos(L, arg, def, len) {   // lstrlib.c:87
     let pos = 0;
     pos = await luaL_optinteger(L, arg, def);
@@ -105,6 +121,10 @@ async function getendpos(L, arg, def, len) {   // lstrlib.c:87
         return $c.addu64($c.addu64(len, $c.u64(pos)), 1);
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function str_sub(L) {   // lstrlib.c:100
     let s = 0, start = 0, end = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
@@ -120,6 +140,10 @@ async function str_sub(L) {   // lstrlib.c:100
         return 1;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function str_reverse(L) {   // lstrlib.c:112
     let i = 0, s = 0, p = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(1064);
@@ -133,6 +157,10 @@ async function str_reverse(L) {   // lstrlib.c:112
         return 1;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function str_lower(L) {   // lstrlib.c:124
     let i = 0, s = 0, p = 0, $t1;
     const $sp0 = $h.st.sp, $fp = $h.enter(1064);
@@ -146,6 +174,10 @@ async function str_lower(L) {   // lstrlib.c:124
         return 1;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function str_upper(L) {   // lstrlib.c:137
     let i = 0, s = 0, p = 0, $t1;
     const $sp0 = $h.st.sp, $fp = $h.enter(1064);
@@ -159,6 +191,10 @@ async function str_upper(L) {   // lstrlib.c:137
         return 1;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function str_rep(L) {   // lstrlib.c:150
     let s = 0, n = 0, sep = 0, totallen = 0, p = 0, $t1;
     const $sp0 = $h.st.sp, $fp = $h.enter(1072);
@@ -189,6 +225,10 @@ async function str_rep(L) {   // lstrlib.c:150
         return 1;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function str_byte(L) {   // lstrlib.c:177
     let s = 0, pi = 0, posi = 0, pose = 0, n = 0, i = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
@@ -211,6 +251,10 @@ async function str_byte(L) {   // lstrlib.c:177
         return n;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function str_char(L) {   // lstrlib.c:195
     let n = 0, i = 0, p = 0, c = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(1056);
@@ -226,6 +270,13 @@ async function str_char(L) {   // lstrlib.c:195
         return 1;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} b const void *
+ * @param {number | bigint} size size_t
+ * @param {number} ud void *
+ * @returns {Promise<number>} int
+ */
 async function writer(L, b, size, ud) {   // lstrlib.c:222
     let state = 0;
     state = ud;
@@ -236,6 +287,10 @@ async function writer(L, b, size, ud) {   // lstrlib.c:222
     await luaL_addlstring(state + 8, b, size);
     return 0;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function str_dump(L) {   // lstrlib.c:233
     let strip = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(1064);
@@ -260,6 +315,11 @@ async function str_dump(L) {   // lstrlib.c:233
 /* no coercion from strings to numbers */
 /* placeholder */
 /* }{ */
+/**
+ * @param {number} L lua_State *
+ * @param {number} arg int
+ * @returns {Promise<number>} int
+ */
 async function tonum(L, arg) {   // lstrlib.c:264
     let s = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
@@ -275,6 +335,11 @@ async function tonum(L, arg) {   // lstrlib.c:264
         }
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} mtname const char *
+ * @returns {Promise<void>}
+ */
 async function trymt(L, mtname) {   // lstrlib.c:277
     await lua_settop(L, 2);   /* back to the original arguments */
     if ((lua_type(L, 2) === 4 || !await luaL_getmetafield(L, 2, mtname) ? 1 : 0) !== 0 ? 1 : 0) {
@@ -283,6 +348,12 @@ async function trymt(L, mtname) {   // lstrlib.c:277
     lua_rotate(L, -3, 1);   /* put metamethod before arguments */
     await lua_callk(L, 2, 1, 0, 0);   /* call metamethod */
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} op int
+ * @param {number} mtname const char *
+ * @returns {Promise<number>} int
+ */
 async function arith(L, op, mtname) {   // lstrlib.c:288
     if (await tonum(L, 1) && await tonum(L, 2)) {
         await lua_arith(L, op);   /* result will be on the top */
@@ -291,31 +362,68 @@ async function arith(L, op, mtname) {   // lstrlib.c:288
     }
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function arith_add(L) {   // lstrlib.c:297
     return await arith(L, 0, $h.lit("__add"));
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function arith_sub(L) {   // lstrlib.c:301
     return await arith(L, 1, $h.lit("__sub"));
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function arith_mul(L) {   // lstrlib.c:305
     return await arith(L, 2, $h.lit("__mul"));
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function arith_mod(L) {   // lstrlib.c:309
     return await arith(L, 3, $h.lit("__mod"));
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function arith_pow(L) {   // lstrlib.c:313
     return await arith(L, 4, $h.lit("__pow"));
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function arith_div(L) {   // lstrlib.c:317
     return await arith(L, 5, $h.lit("__div"));
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function arith_idiv(L) {   // lstrlib.c:321
     return await arith(L, 6, $h.lit("__idiv"));
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function arith_unm(L) {   // lstrlib.c:325
     return await arith(L, 12, $h.lit("__unm"));
 }
 /* maximum recursion depth for 'match' */
+/**
+ * @param {number} ms MatchState *
+ * @param {number} l int
+ * @returns {Promise<number>} int
+ */
 async function check_capture(ms, l) {   // lstrlib.c:386
     l = l - 49 | 0;
     if ((l < 0 || l >= $h.u8[ms + 36] || $h.ld64(ms + 40 + l * 16 + 8) === -1 ? 1 : 0) !== 0 ? 1 : 0) {
@@ -323,6 +431,10 @@ async function check_capture(ms, l) {   // lstrlib.c:386
     }
     return l;
 }
+/**
+ * @param {number} ms MatchState *
+ * @returns {Promise<number>} int
+ */
 async function capture_to_close(ms) {   // lstrlib.c:395
     let level = 0;
     level = $h.u8[ms + 36];
@@ -333,6 +445,11 @@ async function capture_to_close(ms) {   // lstrlib.c:395
     }
     return await luaL_error($h.u32[(ms + 24) >>> 2], $h.lit("invalid pattern capture"));
 }
+/**
+ * @param {number} ms MatchState *
+ * @param {number} p const char *
+ * @returns {Promise<number>} const char *
+ */
 async function classend(ms, p) {   // lstrlib.c:403
     let $t1, $t2;
     switch ($h.i8[($t2 = p, p = $t2 + 1, $t2)]) {
@@ -365,6 +482,11 @@ async function classend(ms, p) {   // lstrlib.c:403
             }
     }
 }
+/**
+ * @param {number} c int
+ * @param {number} cl int
+ * @returns {number} int
+ */
 function match_class(c, cl) {   // lstrlib.c:427
     let res = 0;
     switch ($c.tolower(cl)) {
@@ -406,6 +528,12 @@ function match_class(c, cl) {   // lstrlib.c:427
     }
     return $c.islower(cl) ? res : !res ? 1 : 0;
 }
+/**
+ * @param {number} c int
+ * @param {number} p const char *
+ * @param {number} ec const char *
+ * @returns {number} int
+ */
 function matchbracketclass(c, p, ec) {   // lstrlib.c:447
     let sig = 0;
     sig = 1;
@@ -430,6 +558,13 @@ function matchbracketclass(c, p, ec) {   // lstrlib.c:447
     }
     return !sig ? 1 : 0;
 }
+/**
+ * @param {number} ms MatchState *
+ * @param {number} s const char *
+ * @param {number} p const char *
+ * @param {number} ep const char *
+ * @returns {number} int
+ */
 function singlematch(ms, s, p, ep) {   // lstrlib.c:470
     let c = 0;
     if (s >= $h.u32[(ms + 8) >>> 2]) {
@@ -448,6 +583,12 @@ function singlematch(ms, s, p, ep) {   // lstrlib.c:470
         }
     }
 }
+/**
+ * @param {number} ms MatchState *
+ * @param {number} s const char *
+ * @param {number} p const char *
+ * @returns {Promise<number>} const char *
+ */
 async function matchbalance(ms, s, p) {   // lstrlib.c:486
     let b = 0, e = 0, cont = 0;
     if ((p >= $h.u32[(ms + 16) >>> 2] - 1 ? 1 : 0) !== 0 ? 1 : 0) {
@@ -471,6 +612,13 @@ async function matchbalance(ms, s, p) {   // lstrlib.c:486
     }
     return 0;   /* string ends out of balance */
 }
+/**
+ * @param {number} ms MatchState *
+ * @param {number} s const char *
+ * @param {number} p const char *
+ * @param {number} ep const char *
+ * @returns {Promise<number>} const char *
+ */
 async function max_expand(ms, s, p, ep) {   // lstrlib.c:506
     let i = 0, res = 0;
     i = 0;   /* counts maximum expand for item */
@@ -487,6 +635,13 @@ async function max_expand(ms, s, p, ep) {   // lstrlib.c:506
     }
     return 0;
 }
+/**
+ * @param {number} ms MatchState *
+ * @param {number} s const char *
+ * @param {number} p const char *
+ * @param {number} ep const char *
+ * @returns {Promise<number>} const char *
+ */
 async function min_expand(ms, s, p, ep) {   // lstrlib.c:521
     let res = 0;
     for (; ; ) {
@@ -500,6 +655,13 @@ async function min_expand(ms, s, p, ep) {   // lstrlib.c:521
         }
     }
 }
+/**
+ * @param {number} ms MatchState *
+ * @param {number} s const char *
+ * @param {number} p const char *
+ * @param {number} what int
+ * @returns {Promise<number>} const char *
+ */
 async function start_capture(ms, s, p, what) {   // lstrlib.c:534
     let res = 0, level = 0;
     level = $h.u8[ms + 36];
@@ -514,6 +676,12 @@ async function start_capture(ms, s, p, what) {   // lstrlib.c:534
     }
     return res;
 }
+/**
+ * @param {number} ms MatchState *
+ * @param {number} s const char *
+ * @param {number} p const char *
+ * @returns {Promise<number>} const char *
+ */
 async function end_capture(ms, s, p) {   // lstrlib.c:548
     let l = 0, res = 0;
     l = await capture_to_close(ms);
@@ -523,6 +691,12 @@ async function end_capture(ms, s, p) {   // lstrlib.c:548
     }
     return res;
 }
+/**
+ * @param {number} ms MatchState *
+ * @param {number} s const char *
+ * @param {number} l int
+ * @returns {Promise<number>} const char *
+ */
 async function match_capture(ms, s, l) {   // lstrlib.c:559
     let len = 0;
     l = await check_capture(ms, l);
@@ -533,6 +707,12 @@ async function match_capture(ms, s, l) {   // lstrlib.c:559
         return 0;
     }
 }
+/**
+ * @param {number} ms MatchState *
+ * @param {number} s const char *
+ * @param {number} p const char *
+ * @returns {Promise<number>} const char *
+ */
 async function match(ms, s, p) {   // lstrlib.c:570
     let ep = 0, previous = 0, ep$2 = 0, res = 0, $goto = null, $t1;
     if ((($t1 = $h.i32[(ms + 32) >>> 2], $h.i32[(ms + 32) >>> 2] = $t1 - 1 | 0, $t1) === 0 ? 1 : 0) !== 0 ? 1 : 0) {
@@ -683,6 +863,13 @@ async function match(ms, s, p) {   // lstrlib.c:570
     $h.i32[(ms + 32) >>> 2] = $h.i32[(ms + 32) >>> 2] + 1 | 0;
     return s;
 }
+/**
+ * @param {number} s1 const char *
+ * @param {number | bigint} l1 size_t
+ * @param {number} s2 const char *
+ * @param {number | bigint} l2 size_t
+ * @returns {number} const char *
+ */
 function lmemfind(s1, l1, s2, l2) {   // lstrlib.c:673
     let init = 0;
     if (l2 === 0) {
@@ -713,6 +900,14 @@ function lmemfind(s1, l1, s2, l2) {   // lstrlib.c:673
 ** its length and put its address in '*cap'. If it is an integer
 ** (a position), push it on the stack and return CAP_POSITION.
 */
+/**
+ * @param {number} ms MatchState *
+ * @param {number} i int
+ * @param {number} s const char *
+ * @param {number} e const char *
+ * @param {number} cap const char **
+ * @returns {Promise<number | bigint>} size_t
+ */
 async function get_onecapture(ms, i, s, e, cap) {   // lstrlib.c:702
     let capl = 0;
     if (i >= $h.u8[ms + 36]) {
@@ -735,6 +930,13 @@ async function get_onecapture(ms, i, s, e, cap) {   // lstrlib.c:702
 /*
 ** Push the i-th capture on the stack.
 */
+/**
+ * @param {number} ms MatchState *
+ * @param {number} i int
+ * @param {number} s const char *
+ * @param {number} e const char *
+ * @returns {Promise<void>}
+ */
 async function push_onecapture(ms, i, s, e) {   // lstrlib.c:725
     let l = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
@@ -746,6 +948,12 @@ async function push_onecapture(ms, i, s, e) {   // lstrlib.c:725
         /* else position was already pushed */
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} ms MatchState *
+ * @param {number} s const char *
+ * @param {number} e const char *
+ * @returns {Promise<number>} int
+ */
 async function push_captures(ms, s, e) {   // lstrlib.c:735
     let i = 0, nlevels = 0;
     nlevels = $h.u8[ms + 36] === 0 && s ? 1 : $h.u8[ms + 36];
@@ -756,6 +964,11 @@ async function push_captures(ms, s, e) {   // lstrlib.c:735
     return nlevels;   /* number of strings pushed */
 }
 /* check whether pattern has no special characters */
+/**
+ * @param {number} p const char *
+ * @param {number | bigint} l size_t
+ * @returns {number} int
+ */
 function nospecials(p, l) {   // lstrlib.c:746
     let upto = 0;
     upto = 0;
@@ -767,6 +980,14 @@ function nospecials(p, l) {   // lstrlib.c:746
     } while (upto <= l);
     return 1;   /* no special chars found */
 }
+/**
+ * @param {number} ms MatchState *
+ * @param {number} L lua_State *
+ * @param {number} s const char *
+ * @param {number | bigint} ls size_t
+ * @param {number} p const char *
+ * @param {number | bigint} lp size_t
+ */
 function prepstate(ms, L, s, ls, p, lp) {   // lstrlib.c:757
     $h.stp(ms + 24, L);
     $h.i32[(ms + 32) >>> 2] = 200;
@@ -774,10 +995,18 @@ function prepstate(ms, L, s, ls, p, lp) {   // lstrlib.c:757
     $h.stp(ms + 8, s + $c.idx(ls));
     $h.stp(ms + 16, p + $c.idx(lp));
 }
+/**
+ * @param {number} ms MatchState *
+ */
 function reprepstate(ms) {   // lstrlib.c:767
     $h.u8[ms + 36] = 0;
     0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} find int
+ * @returns {Promise<number>} int
+ */
 async function str_find_aux(L, find) {   // lstrlib.c:773
     let s = 0, p = 0, init = 0, s2 = 0, s1 = 0, anchor = 0, res = 0, $t1;
     const $sp0 = $h.st.sp, $fp = $h.enter(568);
@@ -824,12 +1053,24 @@ async function str_find_aux(L, find) {   // lstrlib.c:773
         return 1;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function str_find(L) {   // lstrlib.c:819
     return await str_find_aux(L, 1);
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function str_match(L) {   // lstrlib.c:824
     return await str_find_aux(L, 0);
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function gmatch_aux(L) {   // lstrlib.c:838
     let gm = 0, src = 0, e = 0, $t1;
     gm = lua_touserdata(L, -1001003);
@@ -843,6 +1084,10 @@ async function gmatch_aux(L) {   // lstrlib.c:838
     }
     return 0;   /* not found */
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function gmatch(L) {   // lstrlib.c:854
     let s = 0, p = 0, init = 0, gm = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
@@ -863,6 +1108,13 @@ async function gmatch(L) {   // lstrlib.c:854
         return 1;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} ms MatchState *
+ * @param {number} b luaL_Buffer *
+ * @param {number} s const char *
+ * @param {number} e const char *
+ * @returns {Promise<void>}
+ */
 async function add_s(ms, b, s, e) {   // lstrlib.c:871
     let L = 0, news = 0, p = 0, resl = 0, $t1;
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
@@ -898,6 +1150,14 @@ async function add_s(ms, b, s, e) {   // lstrlib.c:871
 ** Return true if the original string was changed. (Function calls and
 ** table indexing resulting in nil or false do not change the subject.)
 */
+/**
+ * @param {number} ms MatchState *
+ * @param {number} b luaL_Buffer *
+ * @param {number} s const char *
+ * @param {number} e const char *
+ * @param {number} tr int
+ * @returns {Promise<number>} int
+ */
 async function add_value(ms, b, s, e, tr) {   // lstrlib.c:906
     let L = 0, n = 0;
     L = $h.u32[(ms + 24) >>> 2];
@@ -936,6 +1196,10 @@ async function add_value(ms, b, s, e, tr) {   // lstrlib.c:906
         return 1;   /* something changed */
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function str_gsub(L) {   // lstrlib.c:942
     let src = 0, p = 0, lastmatch = 0, tr = 0, max_s = 0, anchor = 0, n = 0, changed = 0, e = 0, $t1, $t2, $t3, $t4;
     const $sp0 = $h.st.sp, $fp = $h.enter(1624);
@@ -1046,6 +1310,12 @@ async function str_gsub(L) {   // lstrlib.c:942
 ** length modifier (8), conversion specifier, and final '\0', plus some
 ** extra.
 */
+/**
+ * @param {number} b luaL_Buffer *
+ * @param {number} s const char *
+ * @param {number | bigint} len size_t
+ * @returns {Promise<void>}
+ */
 async function addquoted(b, s, len) {   // lstrlib.c:1122
     let $t1, $t2, $t3, $t4, $t5, $t6;
     const $sp0 = $h.st.sp, $fp = $h.enter(10);
@@ -1076,6 +1346,12 @@ async function addquoted(b, s, len) {   // lstrlib.c:1122
 ** (to preserve precision); inf, -inf, and NaN are handled separately.
 ** (NaN cannot be expressed as a numeral, so we write '(0/0)' for it.)
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} buff char *
+ * @param {number} n lua_Number
+ * @returns {number} int
+ */
 function quotefloat(L, buff, n) {   // lstrlib.c:1151
     let s = 0, nb = 0, point = 0, ppoint = 0;
     /* for the fixed representations */
@@ -1102,6 +1378,12 @@ function quotefloat(L, buff, n) {   // lstrlib.c:1151
     /* for the fixed representations */
     return $c.snprintf($h.P(buff), 120, $h.P($h.lit("%s")), $h.P(s));
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} b luaL_Buffer *
+ * @param {number} arg int
+ * @returns {Promise<void>}
+ */
 async function addliteral(L, b, arg) {   // lstrlib.c:1175
     let s = 0, buff = 0, nb = 0, n = 0, format = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
@@ -1143,6 +1425,10 @@ async function addliteral(L, b, arg) {   // lstrlib.c:1175
         }
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} s const char *
+ * @returns {number} const char *
+ */
 function get2digits(s) {   // lstrlib.c:1210
     if ($c.isdigit($c.u8($h.i8[s]))) {
         s = s + 1;
@@ -1158,6 +1444,13 @@ function get2digits(s) {   // lstrlib.c:1210
 ** be a valid conversion specifier. 'flags' are the accepted flags;
 ** 'precision' signals whether to accept a precision.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} form const char *
+ * @param {number} flags const char *
+ * @param {number} precision int
+ * @returns {Promise<void>}
+ */
 async function checkformat(L, form, flags, precision) {   // lstrlib.c:1225
     let spec = 0;
     spec = form + 1;   /* skip '%' */
@@ -1178,6 +1471,12 @@ async function checkformat(L, form, flags, precision) {   // lstrlib.c:1225
 ** Get a conversion specification and copy it to 'form'.
 ** Return the address of its last character.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} strfrmt const char *
+ * @param {number} form char *
+ * @returns {Promise<number>} const char *
+ */
 async function getformat(L, strfrmt, form) {   // lstrlib.c:1245
     let len = 0, $t1;
     /* spans flags, width, and precision ('0' is included as a flag) */
@@ -1195,6 +1494,10 @@ async function getformat(L, strfrmt, form) {   // lstrlib.c:1245
 /*
 ** add length modifier into formats
 */
+/**
+ * @param {number} form char *
+ * @param {number} lenmod const char *
+ */
 function addlenmod(form, lenmod) {   // lstrlib.c:1263
     let l = 0, lm = 0, spec = 0;
     l = $hl.strlen(form);
@@ -1204,6 +1507,10 @@ function addlenmod(form, lenmod) {   // lstrlib.c:1263
     $h.i8[form + $c.idx($c.subu64($c.addu64(l, lm), 1))] = spec;
     $h.i8[form + $c.idx($c.addu64(l, lm))] = 0;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function str_format(L) {   // lstrlib.c:1273
     let top = 0, arg = 0, strfrmt = 0, strfrmt_end = 0, flags = 0, maxitem = 0, buff = 0, nb = 0, n = 0, n$2 = 0, p = 0, s = 0, $goto = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10;
     const $sp0 = $h.st.sp, $fp = $h.enter(1104);
@@ -1336,9 +1643,18 @@ async function str_format(L) {   // lstrlib.c:1273
 ** Read an integer numeral from string 'fmt' or return 'df' if
 ** there is no numeral
 */
+/**
+ * @param {number} c int
+ * @returns {number} int
+ */
 function digit(c) {   // lstrlib.c:1447
     return 48 <= c && c <= 57 ? 1 : 0;
 }
+/**
+ * @param {number} fmt const char **
+ * @param {number} df int
+ * @returns {number} int
+ */
 function getnum(fmt, df) {   // lstrlib.c:1449
     let a = 0, $t1;
     if (!digit($h.i8[$h.u32[fmt >>> 2]])) {   /* no number? */
@@ -1355,6 +1671,12 @@ function getnum(fmt, df) {   // lstrlib.c:1449
 ** Read an integer numeral and raises an error if it is larger
 ** than the maximum size for integers.
 */
+/**
+ * @param {number} h Header *
+ * @param {number} fmt const char **
+ * @param {number} df int
+ * @returns {Promise<number>} int
+ */
 async function getnumlimit(h, fmt, df) {   // lstrlib.c:1466
     let sz = 0;
     sz = getnum(fmt, df);
@@ -1366,6 +1688,10 @@ async function getnumlimit(h, fmt, df) {   // lstrlib.c:1466
 /*
 ** Initialize Header
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} h Header *
+ */
 function initheader(L, h) {   // lstrlib.c:1478
     $h.stp(h, L);
     $h.i32[(h + 8) >>> 2] = $h.i8[nativeendian];
@@ -1374,6 +1700,12 @@ function initheader(L, h) {   // lstrlib.c:1478
 /*
 ** Read and classify next option. 'size' is filled with option's size.
 */
+/**
+ * @param {number} h Header *
+ * @param {number} fmt const char **
+ * @param {number} size int *
+ * @returns {Promise<number>} KOption
+ */
 async function getoption(h, fmt, size) {   // lstrlib.c:1488
     let opt = 0, maxalign = 0, $t1, $t2, $t3, $t4, $t5, $t6;
     /* dummy structure to get native alignment requirements */
@@ -1469,6 +1801,14 @@ async function getoption(h, fmt, size) {   // lstrlib.c:1488
 ** the maximum alignment ('maxalign'). Kchar option needs no alignment
 ** despite its size.
 */
+/**
+ * @param {number} h Header *
+ * @param {number | bigint} totalsize size_t
+ * @param {number} fmt const char **
+ * @param {number} psize int *
+ * @param {number} ntoalign int *
+ * @returns {Promise<number>} KOption
+ */
 async function getdetails(h, totalsize, fmt, psize, ntoalign) {   // lstrlib.c:1541
     let opt = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(4);
@@ -1501,6 +1841,14 @@ async function getdetails(h, totalsize, fmt, psize, ntoalign) {   // lstrlib.c:1
 ** the size of a Lua integer, correcting the extra sign-extension
 ** bytes if necessary (by default they would be zeros).
 */
+/**
+ * @param {number} b luaL_Buffer *
+ * @param {number | bigint} n lua_Unsigned
+ * @param {number} islittle int
+ * @param {number} size int
+ * @param {number} neg int
+ * @returns {Promise<void>}
+ */
 async function packint(b, n, islittle, size, neg) {   // lstrlib.c:1568
     let buff = 0, i = 0;
     buff = await luaL_prepbuffsize(b, $c.u64(size));
@@ -1521,6 +1869,12 @@ async function packint(b, n, islittle, size, neg) {   // lstrlib.c:1568
 ** Copy 'size' bytes from 'src' to 'dest', correcting endianness if
 ** given 'islittle' is different from native endianness.
 */
+/**
+ * @param {number} dest char *
+ * @param {number} src const char *
+ * @param {number} size int
+ * @param {number} islittle int
+ */
 function copywithendian(dest, src, size, islittle) {   // lstrlib.c:1589
     let $t1, $t2, $t3, $t4, $t5;
     if (islittle === $h.i8[nativeendian]) {
@@ -1532,6 +1886,10 @@ function copywithendian(dest, src, size, islittle) {   // lstrlib.c:1589
         }
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function str_pack(L) {   // lstrlib.c:1601
     let arg = 0, totalsize = 0, opt = 0, n = 0, lim = 0, n$2 = 0, buff = 0, buff$2 = 0, buff$3 = 0, s = 0, s$2 = 0, s$3 = 0, $t1, $t2, $t3, $t4, $t5, $t6;
     const $sp0 = $h.st.sp, $fp = $h.enter(1136);
@@ -1645,6 +2003,10 @@ async function str_pack(L) {   // lstrlib.c:1601
         return 1;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function str_packsize(L) {   // lstrlib.c:1700
     let totalsize = 0, opt = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(32);
@@ -1671,6 +2033,14 @@ async function str_packsize(L) {   // lstrlib.c:1700
 ** it must check the unread bytes to see whether they do not cause an
 ** overflow.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} str const char *
+ * @param {number} islittle int
+ * @param {number} size int
+ * @param {number} issigned int
+ * @returns {Promise<number | bigint>} lua_Integer
+ */
 async function unpackint(L, str, islittle, size, issigned) {   // lstrlib.c:1728
     let res = 0, i = 0, limit = 0, mask = 0, mask$2 = 0;
     res = 0;
@@ -1697,6 +2067,10 @@ async function unpackint(L, str, islittle, size, issigned) {   // lstrlib.c:1728
     }
     return $c.i64(res);
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function str_unpack(L) {   // lstrlib.c:1754
     let data = 0, pos = 0, n = 0, opt = 0, res = 0, len = 0, len$2 = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(64);
@@ -1773,6 +2147,10 @@ async function str_unpack(L) {   // lstrlib.c:1754
         return n + 1 | 0;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<void>}
+ */
 async function createmetatable(L) {   // lstrlib.c:1852
     /* table to be metatable for strings */
     await lua_createtable(L, 0, 9);
@@ -1788,6 +2166,10 @@ async function createmetatable(L) {   // lstrlib.c:1852
 /*
 ** Open string library
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 export async function luaopen_string(L) {   // lstrlib.c:1869
     await luaL_checkversion_(L, 504, 136), await lua_createtable(L, 0, 17), await luaL_setfuncs(L, strlib, 0);
     await createmetatable(L);

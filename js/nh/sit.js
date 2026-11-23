@@ -73,6 +73,9 @@ import { makewish } from './zap.js';
 const dosit$sit_message = new Int8Array(15);   // static in dosit()
 const rndcurse$mal_aura = new Int8Array(35);   // static in rndcurse()
 /* take away the hero's money */
+/**
+ * @returns {Promise<void>}
+ */
 export async function take_gold() {   // sit.c:14
     let otmp = null, nobj = null, lost_money = 0;
     lost_money = 0;
@@ -92,6 +95,9 @@ export async function take_gold() {   // sit.c:14
     }
 }
 /* maybe do something when hero sits on a throne */
+/**
+ * @returns {Promise<void>}
+ */
 async function throne_sit_effect() {   // sit.c:39
     let tx = 0, ty = 0, special_throne = 0, effect = 0, buf = new Int8Array(256), which = 0, cnt = 0, num_of_eyes = 0, eye = null, $t1;
     tx = u.ux;
@@ -277,6 +283,10 @@ async function throne_sit_effect() {   // sit.c:39
     }
 }
 /* special throne in Vlad's tower: effect is 1 to 13 inclusive */
+/**
+ * @param {number} effect int
+ * @returns {Promise<void>}
+ */
 async function special_throne_effect(effect) {   // sit.c:238
     let tx = 0, ty = 0, otmp = null, vs_level = new $T.d_level(), fake_spellbook = new $T.obj(), save_confusion = 0, ability = 0;
     tx = u.ux;
@@ -391,6 +401,9 @@ async function special_throne_effect(effect) {   // sit.c:238
     }
 }
 /* hero lays an egg */
+/**
+ * @returns {Promise<number>} int
+ */
 async function lay_an_egg() {   // sit.c:358
     let uegg = null, $t1;
     if (!flags.female) {
@@ -424,6 +437,9 @@ async function lay_an_egg() {   // sit.c:358
     return ECMD.TIME;
 }
 /* #sit command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dosit() {   // sit.c:400
     let trap = null, typ = 0, obj = null, $goto = null, $t1, $t2, $t3;
     D1: for (;;) {
@@ -592,6 +608,9 @@ export async function dosit() {   // sit.c:400
     }
 }
 /* curse a few inventory items at random! */
+/**
+ * @returns {Promise<void>}
+ */
 export async function rndcurse() {   // sit.c:569
     let nobj = 0, cnt = 0, onum = 0, otmp = null;
     nobj = 0;
@@ -659,6 +678,9 @@ export async function rndcurse() {   // sit.c:569
 /* remove a random INTRINSIC ability from hero.
    returns the intrinsic property which was removed,
    or 0 if nothing was removed. */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function attrcurse() {   // sit.c:644
     let ret = 0;
     ret = 0;

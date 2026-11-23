@@ -40,6 +40,12 @@ import { $G } from './globals.js';
  * Copy src to dst, truncating or null-padding to always copy n bytes.
  * Return dst.
  */
+/**
+ * @param {number} dst wchar_t *restrict
+ * @param {number} src const wchar_t *restrict
+ * @param {number | bigint} n size_t
+ * @returns {number} wchar_t *
+ */
 export function wcsncpy(dst, src, n) {   // wcsncpy.c:48
     let d = 0, s = 0, $t1, $t2, $t3, $t4, $t5;
     if (n !== 0) {

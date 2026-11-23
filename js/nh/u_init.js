@@ -99,6 +99,11 @@ const Skill_S = $c.recArray($T.def_skill, 21);
 const Skill_T = $c.recArray($T.def_skill, 33);
 const Skill_V = $c.recArray($T.def_skill, 21);
 const Skill_W = $c.recArray($T.def_skill, 23);
+/**
+ * @param {number} obj int
+ * @param {number} override_pauper boolean
+ * @returns {Promise<void>}
+ */
 async function knows_object(obj, override_pauper) {   // u_init.c:575
     if (u.uroleplay.pauper && !override_pauper) {
         return;
@@ -108,6 +113,10 @@ async function knows_object(obj, override_pauper) {   // u_init.c:575
 }
 /* Know ordinary (non-magical) objects of a certain class,
    like all gems except the loadstone and luckstone. */
+/**
+ * @param {number} sym char
+ * @returns {Promise<void>}
+ */
 async function knows_class(sym) {   // u_init.c:586
     let odummy = new $T.obj(), o = null, ct = 0;
     if (u.uroleplay.pauper) {
@@ -155,6 +164,9 @@ async function knows_class(sym) {   // u_init.c:586
    other things may be initialised here, but the function might run more than
    once, so any non-inventory initialisations should be nonrandom and
    idempotent (i.e. doing them twice is OK) */
+/**
+ * @returns {Promise<void>}
+ */
 async function u_init_role() {   // u_init.c:637
     let i = 0, $t1, $t2;
     /* the program used to check moves<=1 && invent==NULL do decide whether
@@ -317,6 +329,9 @@ async function u_init_role() {   // u_init.c:637
     gn.nocreate4 = STRANGE_OBJECT;
 }
 /* race-specific initializations, same restrictions as u_init_role */
+/**
+ * @returns {Promise<void>}
+ */
 async function u_init_race() {   // u_init.c:792
     let Instrument = $c.recArray($T.trobj, 2);
     switch (gu.urace.mnum) {
@@ -398,6 +413,9 @@ async function u_init_race() {   // u_init.c:792
 /* for 'pauper' aka 'unprepared'; take away any skills (bare-handed combat,
    riding) that are better than unskilled; learn the book (without carrying
    it or knowing its spell yet) for some key spells */
+/**
+ * @returns {Promise<void>}
+ */
 async function pauper_reinit() {   // u_init.c:870
     let skill = 0, preknown = 0;
     preknown = STRANGE_OBJECT;
@@ -455,6 +473,9 @@ async function pauper_reinit() {   // u_init.c:870
     }
 }
 /* boost STR and CON until hero can carry inventory */
+/**
+ * @returns {Promise<void>}
+ */
 async function u_init_carry_attr_boost() {   // u_init.c:929
     /* make sure you can carry all you have - especially for Tourists */
     while (inv_weight() > 0) {
@@ -469,6 +490,9 @@ async function u_init_carry_attr_boost() {   // u_init.c:929
     }
 }
 /* initialise u, except inventory, attributes, skills and discoveries */
+/**
+ * @returns {Promise<void>}
+ */
 export async function u_init_misc() {   // u_init.c:944
     let i = 0, tmpuroleplay = new $T.u_roleplay(), $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11;
     tmpuroleplay.$copyFrom(u.uroleplay);   /* set by rcfile options */
@@ -531,6 +555,9 @@ export async function u_init_misc() {   // u_init.c:944
     return;
 }
 /* the appropriate set of skills for the role */
+/**
+ * @returns {Promise<$T.def_skill | null>} const struct def_skill *
+ */
 async function skills_for_role() {   // u_init.c:1037
     let skills = null;
     switch (gu.urole.mnum) {
@@ -580,6 +607,10 @@ async function skills_for_role() {   // u_init.c:1037
     return skills;
 }
 /* skills aren't initialized, so we use the role-specific skill lists */
+/**
+ * @param {number} otyp int
+ * @returns {Promise<number>} boolean
+ */
 async function restricted_spell_discipline(otyp) {   // u_init.c:1091
     let skills = null, this_skill = 0;
     skills = await skills_for_role();
@@ -593,6 +624,10 @@ async function restricted_spell_discipline(otyp) {   // u_init.c:1091
     return TRUE;
 }
 /* randomizes the quantity given a trobj description */
+/**
+ * @param {$T.trobj | null} trop const struct trobj *
+ * @returns {number | bigint} long
+ */
 function trquan(trop) {   // u_init.c:1106
     if (!trop.trquan_min) {
         return 1;
@@ -600,6 +635,11 @@ function trquan(trop) {   // u_init.c:1106
     return trop.trquan_min + rn2((trop.trquan_max - trop.trquan_min | 0) + 1 | 0) | 0;
 }
 /* create random object of certain class, filtering out too powerful items */
+/**
+ * @param {number} oclass int
+ * @param {number} got_level1_spellbook boolean
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 async function ini_inv_mkobj_filter(oclass, got_level1_spellbook) {   // u_init.c:1115
     let obj = null, otyp = 0, trycnt = 0;
     trycnt = 0;
@@ -641,6 +681,11 @@ async function ini_inv_mkobj_filter(oclass, got_level1_spellbook) {   // u_init.
 }
 /* substitute object with something else based on race.
    only changes otyp, and returns it. */
+/**
+ * @param {$T.trobj | null} trop const struct trobj *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} short
+ */
 async function ini_inv_obj_substitution(trop, obj) {   // u_init.c:1179
     let i = 0, save_plnmsg = 0;
     if (gu.urace.mnum !== PM.HUMAN) {
@@ -666,6 +711,11 @@ async function ini_inv_obj_substitution(trop, obj) {   // u_init.c:1179
 }
 /* returns: TRUE to stop generating items from this trobj,
    FALSE for normal behaviour */
+/**
+ * @param {$T.trobj | null} trop const struct trobj *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} boolean
+ */
 async function ini_inv_adjust_obj(trop, obj) {   // u_init.c:1205
     let stop = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
     stop = FALSE;
@@ -712,6 +762,10 @@ async function ini_inv_adjust_obj(trop, obj) {   // u_init.c:1205
     return stop;
 }
 /* initial inventory: wear, wield, learn the spell/obj */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function ini_inv_use_obj(obj) {   // u_init.c:1251
     /* Make the type known if necessary */
     if (obj_descr[objects[obj.otyp].oc_descr_idx].oc_descr && obj.known | 0) {
@@ -757,6 +811,10 @@ async function ini_inv_use_obj(obj) {   // u_init.c:1251
         await initialspell(obj);
     }
 }
+/**
+ * @param {$T.trobj | null} trop const struct trobj *
+ * @returns {Promise<void>}
+ */
 async function ini_inv(trop) {   // u_init.c:1298
     let obj = null, otyp = 0, got_sp1 = 0, quan = 0;
     got_sp1 = FALSE;   /* got a level 1 spellbook? */
@@ -823,6 +881,9 @@ async function ini_inv(trop) {   // u_init.c:1298
 
    this function can be run multiple times and will overwrite the effects of
    previous runs */
+/**
+ * @returns {Promise<void>}
+ */
 export async function u_init_inventory_attrs() {   // u_init.c:1370
     let $t1;
     gl.lastinvnr = 51;
@@ -845,6 +906,9 @@ export async function u_init_inventory_attrs() {   // u_init.c:1370
 }
 /* side effects of starting inventory (e.g. discovering it) and skills (both
    those based on role and those based on starting inventory) */
+/**
+ * @returns {Promise<void>}
+ */
 export async function u_init_skills_discoveries() {   // u_init.c:1395
     let otmp = null, $t1, $t2, $t3;
     for (otmp = gi.invent; otmp; otmp = otmp.nobj) {

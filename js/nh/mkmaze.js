@@ -99,6 +99,11 @@ const orcfruit = $c.nulls(2);
 let hero_bubble = null;
 /* adjust a coordinate one step in the specified direction */
 /* used to determine if wall spines can join this location */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} int
+ */
 function iswall(x, y) {   // mkmaze.c:45
     let type = 0;
     if (!isok(x, y)) {
@@ -108,6 +113,11 @@ function iswall(x, y) {   // mkmaze.c:45
     return IS_WALL(type) || IS_DOOR(type) || type === LAVAWALL || type === WATER || type === SDOOR || type === IRONBARS ? 1 : 0;
 }
 /* used to determine if wall spines can join this location */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} int
+ */
 function iswall_or_stone(x, y) {   // mkmaze.c:59
     /* out of bounds = stone */
     if (!isok(x, y)) {
@@ -116,10 +126,21 @@ function iswall_or_stone(x, y) {   // mkmaze.c:59
     return svl.level.locations[x][y].typ === STONE || iswall(x, y) ? 1 : 0;
 }
 /* return TRUE if out of bounds, wall or rock */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 function is_solid(x, y) {   // mkmaze.c:70
     return $c.i8(!isok(x, y) || svl.level.locations[x][y].typ <= DBWALL ? 1 : 0);
 }
 /* set map terrain type, handling lava lit, ice melt timers, etc */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} newtyp schar
+ * @returns {Promise<number>} boolean
+ */
 export async function set_levltyp(x, y, newtyp) {   // mkmaze.c:77
     let oldtyp = 0, was_ice = 0;
     if (isok(x, y) && newtyp >= STONE && newtyp < MAX_TYPE) {
@@ -156,6 +177,13 @@ export async function set_levltyp(x, y, newtyp) {   // mkmaze.c:77
     return FALSE;
 }
 /* set map terrain type and light state */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} typ schar
+ * @param {number} lit schar
+ * @returns {Promise<number>} boolean
+ */
 export async function set_levltyp_lit(x, y, typ, lit) {   // mkmaze.c:125
     let ret = 0;
     ret = await set_levltyp(x, y, typ);
@@ -190,6 +218,13 @@ export async function set_levltyp_lit(x, y, typ, lit) {   // mkmaze.c:125
  *              W x W           This would extend a spine from x down.
  *              . W W
  */
+/**
+ * @param {*} locale int (*)[3]
+ * @param {number} wall_there int
+ * @param {number} dx int
+ * @param {number} dy int
+ * @returns {number} int
+ */
 function extend_spine(locale, wall_there, dx, dy) {   // mkmaze.c:166
     let spine = 0, nx = 0, ny = 0;
     nx = 1 + dx | 0;
@@ -220,6 +255,13 @@ function extend_spine(locale, wall_there, dx, dy) {   // mkmaze.c:166
     return spine;
 }
 /* Remove walls totally surrounded by stone */
+/**
+ * @param {number} x1 coordxy
+ * @param {number} y1 coordxy
+ * @param {number} x2 coordxy
+ * @param {number} y2 coordxy
+ * @returns {Promise<void>}
+ */
 async function wall_cleanup(x1, y1, x2, y2) {   // mkmaze.c:198
     let type = 0, x = 0, y = 0, lev = null;
     /* sanity check on incoming variables */
@@ -243,6 +285,13 @@ async function wall_cleanup(x1, y1, x2, y2) {   // mkmaze.c:198
     }
 }
 /* Correct wall types so they extend and connect to each other */
+/**
+ * @param {number} x1 coordxy
+ * @param {number} y1 coordxy
+ * @param {number} x2 coordxy
+ * @param {number} y2 coordxy
+ * @returns {Promise<void>}
+ */
 export async function fix_wall_spines(x1, y1, x2, y2) {   // mkmaze.c:229
     let type = 0, x = 0, y = 0, lev = null, loc_f = null, bits = 0, locale = $c.matrix(Int32Array, [3, 3]), $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8;
     /* rock or wall status surrounding positions */
@@ -283,10 +332,23 @@ export async function fix_wall_spines(x1, y1, x2, y2) {   // mkmaze.c:229
         }
     }
 }
+/**
+ * @param {number} x1 coordxy
+ * @param {number} y1 coordxy
+ * @param {number} x2 coordxy
+ * @param {number} y2 coordxy
+ * @returns {Promise<void>}
+ */
 export async function wallification(x1, y1, x2, y2) {   // mkmaze.c:290
     await wall_cleanup(x1, y1, x2, y2);
     await fix_wall_spines(x1, y1, x2, y2);
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} dir coordxy
+ * @returns {Promise<number>} boolean
+ */
 async function okay(x, y, dir) {   // mkmaze.c:297
     do {
         switch (dir) {
@@ -330,12 +392,21 @@ async function okay(x, y, dir) {   // mkmaze.c:297
     return TRUE;
 }
 /* find random starting point for maze generation */
+/**
+ * @param {$T.nhcoord | null} cc coord *
+ */
 function maze0xy(cc) {   // mkmaze.c:309
     let $t1, $t2;
     $t1 = $c.i16(3 + Math.imul(2, rn2((gx.x_maze_max >> 1) - 1 | 0)) | 0), cc.x = $t1;
     $t2 = $c.i16(3 + Math.imul(2, rn2((gy.y_maze_max >> 1) - 1 | 0)) | 0), cc.y = $t2;
     return;
 }
+/**
+ * @param {number} type xint16
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 export function is_exclusion_zone(type, x, y) {   // mkmaze.c:317
     let ez = null;
     ez = sve.exclusion_zones;
@@ -353,11 +424,33 @@ export function is_exclusion_zone(type, x, y) {   // mkmaze.c:317
  *      pos is inside restricted region (nlx,nly,nhx,nhy) OR
  *      NOT (pos is corridor and a maze level OR pos is a room OR pos is air)
  */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} nlx coordxy
+ * @param {number} nly coordxy
+ * @param {number} nhx coordxy
+ * @param {number} nhy coordxy
+ * @returns {number} boolean
+ */
 export function bad_location(x, y, nlx, nly, nhx, nhy) {   // mkmaze.c:341
     return $c.i8(occupied(x, y) || within_bounded_area(x, y, nlx, nly, nhx, nhy) || !(svl.level.locations[x][y].typ === CORR && svl.level.flags.is_maze_lev | 0 || svl.level.locations[x][y].typ === ROOM || svl.level.locations[x][y].typ === AIR) ? 1 : 0);
 }
 /* pick a location in area (lx, ly, hx, hy) but not in (nlx, nly, nhx, nhy)
    and place something (based on rtype) in that region */
+/**
+ * @param {number} lx coordxy
+ * @param {number} ly coordxy
+ * @param {number} hx coordxy
+ * @param {number} hy coordxy
+ * @param {number} nlx coordxy
+ * @param {number} nly coordxy
+ * @param {number} nhx coordxy
+ * @param {number} nhy coordxy
+ * @param {number} rtype xint16
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {Promise<void>}
+ */
 export async function place_lregion(lx, ly, hx, hy, nlx, nly, nhx, nhy, rtype, lev) {   // mkmaze.c:356
     let trycnt = 0, oneshot = 0, x = 0, y = 0;
     if (!lx) {
@@ -407,6 +500,18 @@ export async function place_lregion(lx, ly, hx, hy, nlx, nly, nhx, nhy, rtype, l
     }
     await impossible($c.lit("Couldn't place lregion type %d!"), rtype);
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} nlx coordxy
+ * @param {number} nly coordxy
+ * @param {number} nhx coordxy
+ * @param {number} nhy coordxy
+ * @param {number} rtype xint16
+ * @param {number} oneshot boolean
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {Promise<number>} boolean
+ */
 async function put_lregion_here(x, y, nlx, nly, nhx, nhy, rtype, oneshot, lev) {   // mkmaze.c:413
     let mtmp = null, t = null;
     if (bad_location(x, y, nlx, nly, nhx, nhy) || is_exclusion_zone(rtype, x, y)) {
@@ -461,6 +566,9 @@ async function put_lregion_here(x, y, nlx, nly, nhx, nhy, rtype, oneshot, lev) {
 /* fix up Baalzebub's lair, which depicts a level-sized beetle;
    its legs are walls within solid rock--regular wallification
    classifies them as superfluous and gets rid of them */
+/**
+ * @returns {Promise<void>}
+ */
 async function baalz_fixup() {   // mkmaze.c:475
     let mtmp = null, x = 0, y = 0, lastx = 0, lasty = 0, $t1, $t2, $t3, $t4;
     /*
@@ -550,6 +658,9 @@ async function baalz_fixup() {   // mkmaze.c:475
     $t4 = gb.bughack.delarea.y2 = 0, gb.bughack.inarea.y2 = $t4;
 }
 /* this is special stuff that the level compiler cannot (yet) handle */
+/**
+ * @returns {Promise<void>}
+ */
 export async function fixup_special() {   // mkmaze.c:570
     let r = null, sp = null, lev = new $T.d_level(), x = 0, y = 0, croom = null, added_branch = 0, otmp = null, tryct = 0, tryct2 = 0, $goto = null, $t1;
     r = gl.lregions;
@@ -666,11 +777,19 @@ export async function fixup_special() {   // mkmaze.c:570
     }
     gn.num_lregions = 0;
 }
+/**
+ * @param {$c.Ptr | null} s const char *
+ */
 function check_ransacked(s) {   // mkmaze.c:707
     let $t1;
     /* this kludge only works as long as orctown is minetn-1 */
     $t1 = $c.i8(u.uz.dnum === svd.dungeon_topology.d_mines_dnum && !$c.strcmp(s, $c.lit("minetn-1")) ? 1 : 0), gr.ransacked = $t1;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number | bigint} mflags unsigned long
+ * @returns {Promise<void>}
+ */
 async function migrate_orc(mtmp, mflags) {   // mkmaze.c:717
     let nlev = 0, max_depth = 0, cur_depth = 0, dest = new $T.d_level();
     cur_depth = depth(u.uz);
@@ -699,6 +818,10 @@ async function migrate_orc(mtmp, mflags) {   // mkmaze.c:717
     await get_level(dest, nlev);
     await migrate_to_level(mtmp, ledger_no(dest), MIGR.RANDOM, null);
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 async function shiny_orc_stuff(mtmp) {   // mkmaze.c:748
     let gemprob = 0, goldprob = 0, otyp = 0, otmp = null, is_captain = 0, $t1, $t2;
     is_captain = $c.i8($c.peq(mtmp.data, $c.relem(mons, PM.ORC_CAPTAIN)) ? 1 : 0);
@@ -728,6 +851,11 @@ async function shiny_orc_stuff(mtmp) {   // mkmaze.c:748
         }
     }
 }
+/**
+ * @param {number} otyp int
+ * @param {$c.Ptr | null} gang const char *
+ * @returns {Promise<void>}
+ */
 async function migr_booty_item(otyp, gang) {   // mkmaze.c:780
     let otmp = null, $t1, $t2, $t3;
     otmp = await mksobj_migr_to_species(otyp, M2.ORC, TRUE, FALSE);
@@ -743,6 +871,9 @@ async function migr_booty_item(otyp, gang) {   // mkmaze.c:780
         }
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function stolen_booty() {   // mkmaze.c:799
     let gang = null, gang_name = new Int8Array(256), mtmp = null, cnt = 0, i = 0, otyp = 0, mtyp = 0;
     /*
@@ -828,11 +959,20 @@ async function stolen_booty() {   // mkmaze.c:799
     }
     gr.ransacked = 0;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 function maze_inbounds(x, y) {   // mkmaze.c:894
     /* isok() test is superfluous here (unless something has
        clobbered the static *_maze_max variables) */
     return $c.i8(x >= 2 && y >= 2 && x < gx.x_maze_max && y < gy.y_maze_max && isok(x, y) ? 1 : 0);
 }
+/**
+ * @param {number} typ xint16
+ * @returns {Promise<void>}
+ */
 async function maze_remove_deadends(typ) {   // mkmaze.c:904
     let dirok = new Int8Array(4), x = 0, y = 0, dir = 0, idx = 0, idx2 = 0, dx = 0, dy = 0, dx2 = 0, dy2 = 0, $t1;
     dirok[0] = 0;   /* lint suppression */
@@ -943,6 +1083,12 @@ async function maze_remove_deadends(typ) {   // mkmaze.c:904
 /* Create a maze with specified corridor width and wall thickness
  * TODO: rewrite walkfrom so it works on temp space, not levl
  */
+/**
+ * @param {number} corrwid int
+ * @param {number} wallthick int
+ * @param {number} rmdeadends boolean
+ * @returns {Promise<void>}
+ */
 export async function create_maze(corrwid, wallthick, rmdeadends) {   // mkmaze.c:950
     let x = 0, y = 0, mm = new $T.nhcoord(), tmp_xmax = 0, tmp_ymax = 0, rdx = 0, rdy = 0, scale = 0, tmpmap = $c.matrix(Int8Array, [80, 21]), mx = 0, my = 0, dx = 0, dy = 0, rx = 0, ry = 0;
     tmp_xmax = gx.x_maze_max;
@@ -1026,6 +1172,9 @@ export async function create_maze(corrwid, wallthick, rmdeadends) {   // mkmaze.
         }
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function pick_vibrasquare_location() {   // mkmaze.c:1042
     let x = 0, y = 0, stway = null, trycnt = 0, x_range = 0, y_range = 0, save_plnmsg = 0, $t1;
     trycnt = 0;
@@ -1067,6 +1216,9 @@ export async function pick_vibrasquare_location() {   // mkmaze.c:1042
     svi.inv_pos.y = y;
 }
 /* add objects and monsters to random maze */
+/**
+ * @returns {Promise<void>}
+ */
 async function populate_maze() {   // mkmaze.c:1097
     let i = 0, mm = new $T.nhcoord();
     for (i = rn2(8) + 11 | 0; i; i = i - 1 | 0) {
@@ -1093,6 +1245,10 @@ async function populate_maze() {   // mkmaze.c:1097
         await mktrap(0, MKTRAP.MAZEFLAG, null, null);
     }
 }
+/**
+ * @param {$c.Ptr | null} s const char *
+ * @returns {Promise<void>}
+ */
 export async function makemaz(s) {   // mkmaze.c:1127
     let protofile = new Int8Array(20), sp = null, mm = new $T.nhcoord(), ep = null, len = 0, pick = 0, $t1;
     sp = Is_special(u.uz);
@@ -1185,6 +1341,12 @@ export async function makemaz(s) {   // mkmaze.c:1127
 /* char's are OK */
 /* might still be on edge of MAP, so don't overwrite */
 /* !MICRO */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} typ schar
+ * @returns {Promise<void>}
+ */
 export async function walkfrom(x, y, typ) {   // mkmaze.c:1279
     let q = 0, a = 0, dir = 0, dirs = new Int32Array(4), $t1;
     if (!typ) {
@@ -1253,6 +1415,10 @@ export async function walkfrom(x, y, typ) {   // mkmaze.c:1279
 /* ?MICRO */
 /* find random point in generated corridors,
    so we don't create items in moats, bunkers, or walls */
+/**
+ * @param {$T.nhcoord | null} cc coord *
+ * @returns {Promise<void>}
+ */
 export async function mazexy(cc) {   // mkmaze.c:1316
     let x = 0, y = 0, allowedtyp = 0, cpt = 0;
     allowedtyp = svl.level.flags.corrmaze | 0 ? CORR : ROOM;
@@ -1288,6 +1454,12 @@ export async function mazexy(cc) {   // mkmaze.c:1316
     /*NOTREACHED*/
     return;
 }
+/**
+ * @param {*} left coordxy *
+ * @param {*} top coordxy *
+ * @param {*} right coordxy *
+ * @param {*} bottom coordxy *
+ */
 export function get_level_extends(left, top, right, bottom) {   // mkmaze.c:1353
     let x = 0, y = 0, typ = 0, lev = null, found = 0, nonwall = 0, xmin = 0, xmax = 0, ymin = 0, ymax = 0;
     found = nonwall = FALSE;
@@ -1389,6 +1561,13 @@ export function bound_digging() {   // mkmaze.c:1441
         }
     }
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} todnum xint16
+ * @param {number} todlevel xint16
+ * @returns {Promise<void>}
+ */
 export async function mkportal(x, y, todnum, todlevel) {   // mkmaze.c:1464
     let ttmp = null, save_plnmsg = 0;
     /* a portal "trap" must be matched by a
@@ -1411,6 +1590,9 @@ export async function mkportal(x, y, todnum, todlevel) {   // mkmaze.c:1464
 }
 /* augment the Plane of Fire; called from goto_level() when arriving and
    moveloop_core() when on the level */
+/**
+ * @returns {Promise<void>}
+ */
 export async function fumaroles() {   // mkmaze.c:1484
     let n = 0, nmax = 0, sizemin = 0, snd = 0, loud = 0, x = 0, y = 0, r = null;
     nmax = $c.i16(rn2(3));
@@ -1443,6 +1625,9 @@ export async function fumaroles() {   // mkmaze.c:1484
 }
 /* augment the Planes of Water (for bubbles) and Air (for clouds); called
    from goto_level() when arriving and moveloop_core() when on the level */
+/**
+ * @returns {Promise<void>}
+ */
 export async function movebubbles() {   // mkmaze.c:1539
     let b = null, cons = null, btrap = null, x = 0, y = 0, i = 0, j = 0, bcpin = 0, olist = null, otmp = null, mon = null, xedge = 0, yedge = 0, rx = 0, ry = 0, $t1, $t2;
     bcpin = 0;
@@ -1568,6 +1753,9 @@ export async function movebubbles() {   // mkmaze.c:1539
     gv.vision_full_recalc = 1;
 }
 /* when moving in water, possibly (1 in 3) alter the intended destination */
+/**
+ * @returns {Promise<void>}
+ */
 export async function water_friction() {   // mkmaze.c:1689
     let x = 0, y = 0, dx = 0, dy = 0, eff = 0;
     eff = FALSE;
@@ -1601,6 +1789,10 @@ export async function water_friction() {   // mkmaze.c:1689
         await pline($c.lit("Water turbulence affects your movements."));
     }
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 export async function save_waterlevel(nhfp) {   // mkmaze.c:1723
     let b = null, n = Int32Array.of(0);
     if (!svb.bbubbles) {
@@ -1626,6 +1818,10 @@ export async function save_waterlevel(nhfp) {   // mkmaze.c:1723
 }
 /* !SFCTOOL */
 /* restoring air bubbles on Plane of Water or clouds on Plane of Air */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 export async function restore_waterlevel(nhfp) {   // mkmaze.c:1750
     let b = null, btmp = null, i = 0, n = Int32Array.of(0);
     b = null;
@@ -1661,6 +1857,9 @@ export async function restore_waterlevel(nhfp) {   // mkmaze.c:1750
         program_state.something_worth_saving = 1;
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function set_wportal() {   // mkmaze.c:1802
     /* there better be only one magic portal on water level... */
     for (gw.wportal = gf.ftrap; gw.wportal; gw.wportal = gw.wportal.ntrap) {
@@ -1670,6 +1869,9 @@ async function set_wportal() {   // mkmaze.c:1802
     }
     await impossible($c.lit("set_wportal(): no portal!"));
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function setup_waterlevel() {   // mkmaze.c:1812
     let typ = 0, glyph = 0, x = 0, y = 0, xskip = 0, yskip = 0;
     if (!((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && !((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level))) {
@@ -1721,6 +1923,12 @@ function unsetup_waterlevel() {   // mkmaze.c:1860
     }
     $t1 = ge.ebubbles = null, svb.bbubbles = $t1;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} n int
+ * @returns {Promise<void>}
+ */
 async function mk_bubble(x, y, n) {   // mkmaze.c:1873
     let b = null, $t1, $t2;
     /*
@@ -1787,6 +1995,13 @@ export function maybe_adjust_hero_bubble() {   // mkmaze.c:1929
  * the process.  Bubbles are "sticky", meaning that if the player is
  * in the immediate neighborhood of one, he/she may get sucked inside.
  * This property also makes leaving a bubble slightly difficult.
+ */
+/**
+ * @param {$T.bubble | null} b struct bubble *
+ * @param {number} dx coordxy
+ * @param {number} dy coordxy
+ * @param {number} ini boolean
+ * @returns {Promise<void>}
  */
 async function mv_bubble(b, dx, dy, ini) {   // mkmaze.c:1952
     let i = 0, j = 0, colli = 0, x = 0, y = 0, cons = null, ctemp = null, olist = null, otmp = null, mon = null, mtmp = null, ux0 = 0, uy0 = 0, btrap = null, $t1, $t2;

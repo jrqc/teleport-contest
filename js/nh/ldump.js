@@ -36,6 +36,12 @@ import { $G } from './globals.js';
 ** All high-level dumps go through dumpVector; you can change it to
 ** change the endianness of the result
 */
+/**
+ * @param {number} D DumpState *
+ * @param {number} b const void *
+ * @param {number | bigint} size size_t
+ * @returns {Promise<void>}
+ */
 async function dumpBlock(D, b, size) {   // ldump.c:41
     let $t1;
     if ($h.i32[(D + 28) >>> 2] === 0 && size > 0) {
@@ -44,6 +50,11 @@ async function dumpBlock(D, b, size) {   // ldump.c:41
         0;
     }
 }
+/**
+ * @param {number} D DumpState *
+ * @param {number} y int
+ * @returns {Promise<void>}
+ */
 async function dumpByte(D, y) {   // ldump.c:53
     const $sp0 = $h.st.sp, $fp = $h.enter(1);
     try {
@@ -55,6 +66,11 @@ async function dumpByte(D, y) {   // ldump.c:53
 ** 'dumpSize' buffer size: each byte can store up to 7 bits. (The "+6"
 ** rounds up the division.)
 */
+/**
+ * @param {number} D DumpState *
+ * @param {number | bigint} x size_t
+ * @returns {Promise<void>}
+ */
 async function dumpSize(D, x) {   // ldump.c:65
     let n = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(10);
@@ -68,9 +84,19 @@ async function dumpSize(D, x) {   // ldump.c:65
         await dumpBlock(D, $fp + $c.idx(10) + -n, $c.mulu64($c.u64(n), 1));
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} D DumpState *
+ * @param {number} x int
+ * @returns {Promise<void>}
+ */
 async function dumpInt(D, x) {   // ldump.c:77
     await dumpSize(D, $c.u64(x));
 }
+/**
+ * @param {number} D DumpState *
+ * @param {number} x$in lua_Number
+ * @returns {Promise<void>}
+ */
 async function dumpNumber(D, x$in) {   // ldump.c:82
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
     try {
@@ -78,6 +104,11 @@ async function dumpNumber(D, x$in) {   // ldump.c:82
         await dumpBlock(D, $fp, 8);
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} D DumpState *
+ * @param {number | bigint} x$in lua_Integer
+ * @returns {Promise<void>}
+ */
 async function dumpInteger(D, x$in) {   // ldump.c:87
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
     try {
@@ -85,6 +116,11 @@ async function dumpInteger(D, x$in) {   // ldump.c:87
         await dumpBlock(D, $fp, 8);
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} D DumpState *
+ * @param {number} s const TString *
+ * @returns {Promise<void>}
+ */
 async function dumpString(D, s) {   // ldump.c:92
     let size = 0, str = 0;
     if (s === 0) {
@@ -96,10 +132,20 @@ async function dumpString(D, s) {   // ldump.c:92
         await dumpBlock(D, str, $c.mulu64(size, 1));
     }
 }
+/**
+ * @param {number} D DumpState *
+ * @param {number} f const Proto *
+ * @returns {Promise<void>}
+ */
 async function dumpCode(D, f) {   // ldump.c:104
     await dumpInt(D, $h.i32[(f + 24) >>> 2]);
     await dumpBlock(D, $h.u32[(f + 64) >>> 2], $c.mulu64($c.u64($h.i32[(f + 24) >>> 2]), 4));
 }
+/**
+ * @param {number} D DumpState *
+ * @param {number} f const Proto *
+ * @returns {Promise<void>}
+ */
 async function dumpConstants(D, f) {   // ldump.c:112
     let i = 0, n = 0, o = 0, tt = 0;
     n = $h.i32[(f + 20) >>> 2];
@@ -124,6 +170,11 @@ async function dumpConstants(D, f) {   // ldump.c:112
         }
     }
 }
+/**
+ * @param {number} D DumpState *
+ * @param {number} f const Proto *
+ * @returns {Promise<void>}
+ */
 async function dumpProtos(D, f) {   // ldump.c:138
     let i = 0, n = 0;
     n = $h.i32[(f + 32) >>> 2];
@@ -132,6 +183,11 @@ async function dumpProtos(D, f) {   // ldump.c:138
         await dumpFunction(D, $h.u32[($h.u32[(f + 72) >>> 2] + i * 8) >>> 2], $h.u32[(f + 112) >>> 2]);
     }
 }
+/**
+ * @param {number} D DumpState *
+ * @param {number} f const Proto *
+ * @returns {Promise<void>}
+ */
 async function dumpUpvalues(D, f) {   // ldump.c:147
     let i = 0, n = 0;
     n = $h.i32[(f + 16) >>> 2];
@@ -142,6 +198,11 @@ async function dumpUpvalues(D, f) {   // ldump.c:147
         await dumpByte(D, $h.u8[$h.u32[(f + 80) >>> 2] + i * 16 + 10]);
     }
 }
+/**
+ * @param {number} D DumpState *
+ * @param {number} f const Proto *
+ * @returns {Promise<void>}
+ */
 async function dumpDebug(D, f) {   // ldump.c:158
     let i = 0, n = 0;
     n = $h.i32[(D + 24) >>> 2] ? 0 : $h.i32[(f + 28) >>> 2];
@@ -166,6 +227,12 @@ async function dumpDebug(D, f) {   // ldump.c:158
         await dumpString(D, $h.u32[($h.u32[(f + 80) >>> 2] + i * 16) >>> 2]);
     }
 }
+/**
+ * @param {number} D DumpState *
+ * @param {number} f const Proto *
+ * @param {number} psource TString *
+ * @returns {Promise<void>}
+ */
 async function dumpFunction(D, f, psource) {   // ldump.c:183
     if ($h.i32[(D + 24) >>> 2] || $h.u32[(f + 112) >>> 2] === psource) {
         await dumpString(D, 0);   /* no debug info or same source as its parent */
@@ -183,6 +250,10 @@ async function dumpFunction(D, f, psource) {   // ldump.c:183
     await dumpProtos(D, f);
     await dumpDebug(D, f);
 }
+/**
+ * @param {number} D DumpState *
+ * @returns {Promise<void>}
+ */
 async function dumpHeader(D) {   // ldump.c:201
     await dumpBlock(D, $h.lit("\x1bLua"), 4);
     await dumpByte(D, 84);
@@ -197,6 +268,14 @@ async function dumpHeader(D) {   // ldump.c:201
 /*
 ** dump Lua function as precompiled chunk
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} f const Proto *
+ * @param {number} w lua_Writer
+ * @param {number} data void *
+ * @param {number} strip int
+ * @returns {Promise<number>} int
+ */
 export async function luaU_dump(L, f, w, data, strip) {   // ldump.c:217
     const $sp0 = $h.st.sp, $fp = $h.enter(32);
     try {

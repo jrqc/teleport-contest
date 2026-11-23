@@ -54,6 +54,9 @@ export function free_maildata() {   // mail.c:90
         $c.free(mailbox), mailbox = null;
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function getmailstatus() {   // mail.c:97
     let pw_name = null, save_plnmsg = 0;
     if (mailbox) {
@@ -86,6 +89,10 @@ export async function getmailstatus() {   // mail.c:97
 /*
  * Pick coordinates for a starting position for the mail daemon.  Called
  * from newmail() and newphone().
+ */
+/**
+ * @param {$T.nhcoord | null} startp coord *
+ * @returns {Promise<number>} boolean
  */
 async function md_start(startp) {   // mail.c:149
     let testcc = new $T.nhcoord(), row = 0, lax = 0, dd = 0, max_distance = 0, stway = null;
@@ -173,6 +180,11 @@ async function md_start(startp) {   // mail.c:149
  * enexto().  Use enexto() as a last resort because enexto() chooses
  * its point randomly, which is not what we want.
  */
+/**
+ * @param {$T.nhcoord | null} stopp coord *
+ * @param {$T.nhcoord | null} startp coord *
+ * @returns {Promise<number>} boolean
+ */
 async function md_stop(stopp, startp) {   // mail.c:248
     let x = 0, y = 0, distance = 0, min_distance = 0;
     /* stopping position (we fill it in) */
@@ -204,6 +216,12 @@ async function md_stop(stopp, startp) {   // mail.c:248
  * any monsters that are in its path, but will replace them later.  Return
  * FALSE if the md gets stuck in a position where there is a monster.  Return
  * TRUE otherwise.
+ */
+/**
+ * @param {$T.monst | null} md struct monst *
+ * @param {number} tx int
+ * @param {number} ty int
+ * @returns {Promise<number>} boolean
  */
 async function md_rush(md, tx, ty) {   // mail.c:288
     let mon = null, dx = 0, dy = 0, fx = 0, fy = 0, nfx = 0, nfy = 0, d1 = 0, d2 = 0;
@@ -308,6 +326,10 @@ async function md_rush(md, tx, ty) {   // mail.c:288
 }
 /* Deliver a scroll of mail. */
 /*ARGSUSED*/
+/**
+ * @param {$T.mail_info | null} info struct mail_info *
+ * @returns {Promise<void>}
+ */
 async function newmail(info) {   // mail.c:399
     let md = null, start = new $T.nhcoord(), stop = new $T.nhcoord(), message_seen = 0, obj = null, $t1;
     message_seen = FALSE;
@@ -374,6 +396,9 @@ async function newmail(info) {   // mail.c:399
    (unfortunately that is still followed by a closing quote--in
    the pline below, not the data here) */
 /* !UNIX && !VMS */
+/**
+ * @returns {Promise<void>}
+ */
 export async function ckmailstatus() {   // mail.c:550
     ck_server_admin_msg();
     if (!mailbox || u.uswallow | 0 || !flags.biff || svm.moves < $c.add64(laststattime, MAILCKFREQ)) {
@@ -400,6 +425,10 @@ export function ck_server_admin_msg() {   // mail.c:685
     /* SERVER_ADMIN_MSG */
 }
 /*ARGSUSED*/
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 export async function readmail(otmp) {   // mail.c:704
     let mr = null;
     /* This implies that UNIX is defined */

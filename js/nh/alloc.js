@@ -21,6 +21,10 @@ const PTRBUFCNT = 4;
  */
 const ptrbuf = $c.matrix(Int8Array, [4, 32]);
 let ptrbufidx = 0;
+/**
+ * @param {number} lth unsigned int
+ * @returns {Promise<*>} long *
+ */
 export async function alloc(lth) {   // alloc.c:68
     let ptr = null;
     do {
@@ -36,6 +40,11 @@ export async function alloc(lth) {   // alloc.c:68
     return ptr;
 }
 /* realloc() call that might get substituted by nhrealloc(p,n,file,line) */
+/**
+ * @param {*} oldptr long *
+ * @param {number} newlth unsigned int
+ * @returns {Promise<*>} long *
+ */
 export async function re_alloc(oldptr, newlth) {   // alloc.c:85
     let newptr = null;
     do {
@@ -52,6 +61,10 @@ export async function re_alloc(oldptr, newlth) {   // alloc.c:85
     return newptr;
 }
 /* format a pointer for display purposes; returns a static buffer */
+/**
+ * @param {*} ptr const void *
+ * @returns {$c.Ptr | null} char *
+ */
 export function fmt_ptr(ptr) {   // alloc.c:125
     let buf = null;
     buf = new $c.Ptr(ptrbuf[ptrbufidx], 0);
@@ -80,6 +93,10 @@ export function fmt_ptr(ptr) {   // alloc.c:125
 /* strdup() which uses our alloc() rather than libc's malloc();
    not used when MONITOR_HEAP is enabled, but included unconditionally
    in case utility programs get built using a different setting for that */
+/**
+ * @param {$c.Ptr | null} string const char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function dupstr(string) {   // alloc.c:238
     let len = 0;
     len = $c.strlen(string);
@@ -92,6 +109,12 @@ export async function dupstr(string) {   // alloc.c:238
 /* suppress this; if included, it will need a MONITOR_HEAP edition */
 /* similar for reasonable size strings, but return length of input as well */
 /* cast to int or panic on overflow; use via macro */
+/**
+ * @param {number | bigint} i long long
+ * @param {$c.Ptr | null} file const char *
+ * @param {number} line int
+ * @returns {Promise<number>} int
+ */
 export async function FITSint_(i, file, line) {   // alloc.c:266
     let iret = 0;
     iret = $c.i32(i);
@@ -100,6 +123,12 @@ export async function FITSint_(i, file, line) {   // alloc.c:266
     }
     return iret;
 }
+/**
+ * @param {number | bigint} ull unsigned long long
+ * @param {$c.Ptr | null} file const char *
+ * @param {number} line int
+ * @returns {Promise<number>} unsigned int
+ */
 export async function FITSuint_(ull, file, line) {   // alloc.c:276
     let uret = 0;
     uret = $c.u32(ull);

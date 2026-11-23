@@ -142,6 +142,11 @@ const Izchak_speaks = $c.nulls(9);
  *  Returns the amount actually paid, so we can know
  *  if the monster kept the change.
  */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number | bigint} amount long
+ * @returns {Promise<number | bigint>} long
+ */
 export async function money2mon(mon, amount) {   // shk.c:157
     let ygold = null;
     ygold = findgold(gi.invent);
@@ -168,6 +173,11 @@ export async function money2mon(mon, amount) {   // shk.c:157
  *  Used when the shopkeeper pay for items, and when
  *  the priest gives you money for an ale.
  */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number | bigint} amount long
+ * @returns {Promise<void>}
+ */
 export async function money2u(mon, amount) {   // shk.c:186
     let mongold = null;
     mongold = findgold(mon.minvent);
@@ -191,6 +201,11 @@ export async function money2u(mon, amount) {   // shk.c:186
         disp.botl = TRUE;
     }
 }
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {number} withbill boolean
+ * @returns {$T.monst | null} struct monst *
+ */
 function next_shkp(shkp, withbill) {   // shk.c:215
     for (; shkp; shkp = shkp.nmon) {
         if (DEADMONSTER(shkp)) {
@@ -210,6 +225,10 @@ function next_shkp(shkp, withbill) {   // shk.c:215
     return shkp;
 }
 /* called in mon.c */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function shkgone(mtmp) {   // shk.c:235
     let eshk = null, sroom = null, otmp = null, p = null, sx = 0, sy = 0;
     eshk = mtmp.mextra.eshk;
@@ -242,11 +261,19 @@ export async function shkgone(mtmp) {   // shk.c:235
         }
     }
 }
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {number} zero_out boolean
+ */
 export function set_residency(shkp, zero_out) {   // shk.c:272
     if (on_level(shkp.mextra.eshk.shoplevel, u.uz)) {
         svr.rooms[shkp.mextra.eshk.shoproom - ROOMOFFSET | 0].resident = zero_out ? null : shkp;
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.monst | null} mtmp2 struct monst *
+ */
 export function replshk(mtmp, mtmp2) {   // shk.c:280
     svr.rooms[mtmp2.mextra.eshk.shoproom - ROOMOFFSET | 0].resident = mtmp2;
     if (inhishop(mtmp) && new $c.Ptr(u.ushops, 0).get(0) === mtmp.mextra.eshk.shoproom) {
@@ -254,6 +281,10 @@ export function replshk(mtmp, mtmp2) {   // shk.c:280
     }
 }
 /* do shopkeeper specific structure munging -dlc */
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {number} ghostly boolean
+ */
 export function restshk(shkp, ghostly) {   // shk.c:290
     let eshkp = null;
     if (u.uz.dlevel) {
@@ -272,6 +303,11 @@ export function restshk(shkp, ghostly) {   // shk.c:290
     }
 }
 /* clear the unpaid bit on a single object and its contents */
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function clear_unpaid_obj(shkp, otmp) {   // shk.c:309
     if (Has_contents(otmp)) {
         await clear_unpaid(shkp, otmp.cobj);
@@ -281,6 +317,11 @@ async function clear_unpaid_obj(shkp, otmp) {   // shk.c:309
     }
 }
 /* clear the unpaid bit on all of the objects in the list */
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {$T.obj | null} list struct obj *
+ * @returns {Promise<void>}
+ */
 async function clear_unpaid(shkp, list) {   // shk.c:319
     while (list) {
         await clear_unpaid_obj(shkp, list);
@@ -288,6 +329,10 @@ async function clear_unpaid(shkp, list) {   // shk.c:319
     }
 }
 /* clear the no_charge bit on a single object and its contents */
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {$T.obj | null} otmp struct obj *
+ */
 function clear_no_charge_obj(shkp, otmp) {   // shk.c:329
     let rm_shkp = null, rno = 0, x = Int16Array.of(0), y = Int16Array.of(0);
     /* if null, clear regardless of shop */
@@ -322,6 +367,10 @@ function clear_no_charge_obj(shkp, otmp) {   // shk.c:329
     }
 }
 /* clear the no_charge bit on all of the objects in the list */
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {$T.obj | null} list struct obj *
+ */
 function clear_no_charge(shkp, list) {   // shk.c:377
     while (list) {
         /* handle first element of list and any contents it may have */
@@ -331,6 +380,9 @@ function clear_no_charge(shkp, list) {   // shk.c:377
     }
 }
 /* clear no_charge from objects in pets' inventories belonging to shkp */
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ */
 function clear_no_charge_pets(shkp) {   // shk.c:389
     let mtmp = null;
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
@@ -340,6 +392,10 @@ function clear_no_charge_pets(shkp) {   // shk.c:389
     }
 }
 /* either you paid or left the shop or the shopkeeper died */
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function setpaid(shkp) {   // shk.c:400
     let obj = null, mtmp = null;
     await clear_unpaid(shkp, gi.invent);
@@ -379,6 +435,11 @@ export async function setpaid(shkp) {   // shk.c:400
 }
 /* Remembers that a shopkeeper has quoted a particular price for a
    particular type of object. */
+/**
+ * @param {number} otyp int
+ * @param {number | bigint} price unsigned long
+ * @param {number} buyprice boolean
+ */
 export function record_price_quote(otyp, price, buyprice) {   // shk.c:439
     let oc = null;
     oc = $c.relem(objects, otyp);
@@ -401,6 +462,11 @@ export function record_price_quote(otyp, price, buyprice) {   // shk.c:439
 /* Appends price-quote information to the given buffer, updating the
    given end of string position. *eos mut be buf + strlen(buf). If the
    update would make bug longer than BUFSZ, instead does nothing. */
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @param {*} eos char **
+ * @param {number} otyp int
+ */
 export function append_price_quote(buf, eos, otyp) {   // shk.c:454
     let buf2 = new Int8Array(256), eos2 = null, sep = null, len = 0, len2 = 0;
     eos2 = new $c.Ptr(buf2, 0);
@@ -429,6 +495,10 @@ export function append_price_quote(buf, eos, otyp) {   // shk.c:454
         eos.set(0, eos.get(0).add($c.idx(len2)));
     }
 }
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @returns {number | bigint} long
+ */
 function addupbill(shkp) {   // shk.c:496
     let ct = 0, bp = null, total = 0, $t1;
     ct = shkp.mextra.eshk.billct;
@@ -440,6 +510,11 @@ function addupbill(shkp) {   // shk.c:496
     }
     return total;
 }
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {number} nearshop boolean
+ * @returns {Promise<void>}
+ */
 async function call_kops(shkp, nearshop) {   // shk.c:510
     let nokops = 0, mm = new $T.nhcoord(), sx = Int16Array.of(0), sy = Int16Array.of(0);
     /* Keystone Kops srt@ucla */
@@ -489,6 +564,11 @@ async function call_kops(shkp, nearshop) {   // shk.c:510
     }
 }
 /* x,y is strictly inside shop */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} char
+ */
 export function inside_shop(x, y) {   // shk.c:568
     let rno = 0;
     rno = $c.i8(svl.level.locations[x][y].roomno);
@@ -497,6 +577,11 @@ export function inside_shop(x, y) {   // shk.c:568
     }
     return rno;
 }
+/**
+ * @param {$c.Ptr | null} leavestring char *
+ * @param {number} newlev boolean
+ * @returns {Promise<void>}
+ */
 export async function u_left_shop(leavestring, newlev) {   // shk.c:579
     let shkp = null, eshkp = null, not_upset = 0;
     /*
@@ -534,6 +619,12 @@ export async function u_left_shop(leavestring, newlev) {   // shk.c:579
         await call_kops(shkp, $c.i8(!newlev && svl.level.locations[u.ux0][u.uy0].edge | 0 ? 1 : 0));
     }
 }
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {number} idx int
+ * @param {number} silent boolean
+ * @returns {Promise<void>}
+ */
 export async function credit_report(shkp, idx, silent) {   // shk.c:628
     let eshkp = null, amt = 0, msg = null, $t1, $t2, $t3;
     eshkp = shkp.mextra.eshk;
@@ -564,6 +655,11 @@ export async function credit_report(shkp, idx, silent) {   // shk.c:628
     }
 }
 /* robbery from outside the shop via telekinesis or grappling hook */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function remote_burglary(x, y) {   // shk.c:665
     let shkp = null, eshkp = null;
     shkp = await shop_keeper(in_rooms(x, y, SHOPBASE).get(0));
@@ -581,6 +677,10 @@ export async function remote_burglary(x, y) {   // shk.c:665
 }
 /* shop merchandise has been taken; pay for it with any credit available;
    return false if the debt is fully covered by credit, true otherwise */
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @returns {Promise<number>} boolean
+ */
 async function rob_shop(shkp) {   // shk.c:687
     let eshkp = null, total = 0;
     eshkp = shkp.mextra.eshk;
@@ -608,6 +708,10 @@ async function rob_shop(shkp) {   // shk.c:687
     return TRUE;
 }
 /* give a message when entering an untended shop (caller has verified that) */
+/**
+ * @param {$c.Ptr | null} enterstring char *
+ * @returns {Promise<void>}
+ */
 async function deserted_shop(enterstring) {   // shk.c:723
     let mtmp = null, r = null, x = 0, y = 0, m = 0, n = 0;
     /*const*/
@@ -633,6 +737,10 @@ async function deserted_shop(enterstring) {   // shk.c:723
     await pline($c.lit("This shop %s %s."), m < n ? $c.lit("seems to be") : $c.lit("is"), !n ? $c.lit("deserted") : $c.lit("untended"));
 }
 /* called from check_special_room(hack.c) */
+/**
+ * @param {$c.Ptr | null} enterstring char *
+ * @returns {Promise<void>}
+ */
 export async function u_entered_shop(enterstring) {   // shk.c:751
     let shkp = null, eshkp = null, rt = 0, should_block = 0, not_upset = 0, cnt = 0, tool = null, pick = null, mattock = null, $t1, $t2;
     if (!enterstring.get(0)) {
@@ -761,6 +869,10 @@ export async function u_entered_shop(enterstring) {   // shk.c:751
     return;
 }
 /* called when removing a pick-axe or mattock from a container */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function pick_pick(obj) {   // shk.c:921
     let shkp = null;
     if (obj.unpaid | 0 || !is_pick(obj)) {
@@ -784,6 +896,11 @@ export async function pick_pick(obj) {   // shk.c:921
    Decide whether two unpaid items are mergeable; caller is responsible for
    making sure they're unpaid and the same type of object; we check the price
    quoted by the shopkeeper and also that they both belong to the same shk.
+ */
+/**
+ * @param {$T.obj | null} obj1 struct obj *
+ * @param {$T.obj | null} obj2 struct obj *
+ * @returns {Promise<number>} boolean
  */
 export async function same_price(obj1, obj2) {   // shk.c:955
     let shkp1 = null, shkp2 = null, bp1 = null, bp2 = null, are_mergable = 0;
@@ -819,6 +936,10 @@ export async function same_price(obj1, obj2) {   // shk.c:955
  * turning the `$' command into a way to discover that the current
  * level is bones data which has a shk on the warpath.
  */
+/**
+ * @param {$T.eshk | null} eshkp struct eshk *
+ * @returns {number | bigint} long
+ */
 function shop_debt(eshkp) {   // shk.c:990
     let bp = null, ct = 0, debt = 0;
     debt = eshkp.debit;
@@ -828,6 +949,9 @@ function shop_debt(eshkp) {   // shk.c:990
     return debt;
 }
 /* called in response to the `$' command */
+/**
+ * @returns {Promise<void>}
+ */
 export async function shopper_financial_report() {   // shk.c:1003
     let shkp = null, this_shkp = null, eshkp = null, amt = 0, pass = 0;
     this_shkp = await shop_keeper(inside_shop(u.ux, u.uy));
@@ -858,6 +982,10 @@ export async function shopper_financial_report() {   // shk.c:1003
     }
 }
 /* 1: shopkeeper is currently in her shop or its boundary; 0: not */
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @returns {number} int
+ */
 export function inhishop(shkp) {   // shk.c:1039
     let shkrooms = null, eshkp = null;
     eshkp = shkp.mextra.eshk;
@@ -868,6 +996,10 @@ export function inhishop(shkp) {   // shk.c:1039
     return $c.strchr(shkrooms, eshkp.shoproom) !== null ? 1 : 0;
 }
 /* return the shopkeeper for rooms[rmno-2]; returns Null if there isn't one */
+/**
+ * @param {number} rmno char
+ * @returns {Promise<$T.monst | null>} struct monst *
+ */
 export async function shop_keeper(rmno) {   // shk.c:1052
     let shkp = null;
     shkp = rmno >= ROOMOFFSET ? svr.rooms[rmno - ROOMOFFSET | 0].resident : null;
@@ -891,6 +1023,12 @@ export async function shop_keeper(rmno) {   // shk.c:1052
     return shkp;
 }
 /* find the shopkeeper who owns 'obj'; needed to handle shared shop walls */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<$T.monst | null>} struct monst *
+ */
 export async function find_objowner(obj, x, y) {   // shk.c:1084
     let shkp = null, deflt_shkp = null, roomindx = null, where = null;
     /* caller passes obj's location since obj->ox,oy
@@ -924,11 +1062,19 @@ export async function find_objowner(obj, x, y) {   // shk.c:1084
     }
     return deflt_shkp;
 }
+/**
+ * @param {$T.mkroom | null} sroom struct mkroom *
+ * @returns {number} boolean
+ */
 export function tended_shop(sroom) {   // shk.c:1118
     let mtmp = null;
     mtmp = sroom.resident;
     return $c.i8(!mtmp ? FALSE : $c.i8(inhishop(mtmp)));
 }
+/**
+ * @param {$T.mkroom | null} sroom struct mkroom *
+ * @returns {Promise<void>}
+ */
 export async function noisy_shop(sroom) {   // shk.c:1126
     let mtmp = null;
     mtmp = sroom.resident;
@@ -936,6 +1082,12 @@ export async function noisy_shop(sroom) {   // shk.c:1126
         await wake_nearto(mtmp.mx, mtmp.my, 121);
     }
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {number} silent boolean
+ * @returns {Promise<$T.bill_x | null>} struct bill_x *
+ */
 async function onbill(obj, shkp, silent) {   // shk.c:1136
     let bp = null, ct = 0;
     if (shkp) {
@@ -955,14 +1107,28 @@ async function onbill(obj, shkp, silent) {   // shk.c:1136
 }
 /* used outside of shk.c when caller wants to know whether item is on bill
    but doesn't need to know any details about the bill itself */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {number} silent boolean
+ * @returns {Promise<number>} boolean
+ */
 export async function onshopbill(obj, shkp, silent) {   // shk.c:1160
     return $c.i8(await onbill(obj, shkp, silent) ? TRUE : FALSE);
 }
 /* check whether an object or any of its contents belongs to a shop */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 export function is_unpaid(obj) {   // shk.c:1167
     return $c.i8(obj.unpaid | 0 || Has_contents(obj) && count_unpaid(obj.cobj) ? 1 : 0);
 }
 /* Delete the contents of the given object. */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function delete_contents(obj) {   // shk.c:1175
     let curr = null;
     while ((curr = obj.cobj) !== null) {
@@ -971,6 +1137,11 @@ export async function delete_contents(obj) {   // shk.c:1175
     }
 }
 /* called with two args on merge */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$T.obj | null} merge struct obj *
+ * @returns {Promise<void>}
+ */
 export async function obfree(obj, merge) {   // shk.c:1187
     let bp = null, bpm = null, shkp = null, eshkp = null;
     if (obj.otyp === LEASH && obj.corpsenm) {
@@ -1056,6 +1227,11 @@ export async function obfree(obj, merge) {   // shk.c:1187
     }
     await dealloc_obj(obj);
 }
+/**
+ * @param {number | bigint} tmp long
+ * @param {$T.monst | null} shkp struct monst *
+ * @returns {Promise<number | bigint>} long
+ */
 async function check_credit(tmp, shkp) {   // shk.c:1278
     let credit = 0;
     credit = shkp.mextra.eshk.credit;
@@ -1072,6 +1248,11 @@ async function check_credit(tmp, shkp) {   // shk.c:1278
     }
     return tmp;
 }
+/**
+ * @param {number | bigint} tmp long
+ * @param {$T.monst | null} shkp struct monst *
+ * @returns {Promise<void>}
+ */
 async function pay(tmp, shkp) {   // shk.c:1297
     let robbed = 0, balance = 0;
     robbed = shkp.mextra.eshk.robbed;
@@ -1091,6 +1272,11 @@ async function pay(tmp, shkp) {   // shk.c:1297
     }
 }
 /* return shkp to home position */
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {number} killkops boolean
+ * @returns {Promise<void>}
+ */
 async function home_shk(shkp, killkops) {   // shk.c:1317
     let x = 0, y = 0;
     x = shkp.mextra.eshk.shk.x;
@@ -1103,6 +1289,9 @@ async function home_shk(shkp, killkops) {   // shk.c:1317
     }
     await after_shk_move(shkp);
 }
+/**
+ * @returns {number} boolean
+ */
 function angry_shk_exists() {   // shk.c:1331
     let shkp = null;
     for (shkp = next_shkp(svl.level.monlist, FALSE); shkp; shkp = next_shkp(shkp.nmon, FALSE)) {
@@ -1113,6 +1302,10 @@ function angry_shk_exists() {   // shk.c:1331
     return FALSE;
 }
 /* remove previously applied surcharge from all billed items */
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {number} clear_surcharge boolean
+ */
 function pacify_shk(shkp, clear_surcharge) {   // shk.c:1344
     let bp = null, ct = 0, reduction = 0, $t1;
     shkp.mpeaceful = (TRUE) & 1;   /* make peaceful */
@@ -1128,6 +1321,9 @@ function pacify_shk(shkp, clear_surcharge) {   // shk.c:1344
     }
 }
 /* add aggravation surcharge to all billed items */
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ */
 function rile_shk(shkp) {   // shk.c:1362
     let surcharge = 0, bp = null, ct = 0, $t1;
     shkp.mpeaceful = (FALSE) & 1;   /* make angry */
@@ -1143,6 +1339,11 @@ function rile_shk(shkp) {   // shk.c:1362
     }
 }
 /* wakeup and/or unparalyze shopkeeper */
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {number} verbosely boolean
+ * @returns {Promise<void>}
+ */
 async function rouse_shk(shkp, verbosely) {   // shk.c:1381
     if (helpless(shkp)) {
         /* greed induced recovery... */
@@ -1154,6 +1355,11 @@ async function rouse_shk(shkp, verbosely) {   // shk.c:1381
         shkp.mcanmove = (1) & 1;
     }
 }
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {number} silentkops boolean
+ * @returns {Promise<void>}
+ */
 export async function make_happy_shk(shkp, silentkops) {   // shk.c:1395
     let wasmad = 0, eshkp = null, shk_nam = new Int8Array(256), vanished = 0;
     wasmad = $c.i8(ANGRY(shkp));
@@ -1195,12 +1401,19 @@ export async function make_happy_shk(shkp, silentkops) {   // shk.c:1395
     await make_happy_shoppers(silentkops);
 }
 /* called by make_happy_shk() and also by losedogs() for migrating shk */
+/**
+ * @param {number} silentkops boolean
+ * @returns {Promise<void>}
+ */
 export async function make_happy_shoppers(silentkops) {   // shk.c:1440
     if (!angry_shk_exists()) {
         await kops_gone(silentkops);
         await pacify_guards();
     }
 }
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ */
 export function hot_pursuit(shkp) {   // shk.c:1449
     if (!shkp.isshk) {
         return;
@@ -1218,6 +1431,12 @@ export function hot_pursuit(shkp) {   // shk.c:1449
    when the player is not on a costly_spot and he damages something inside
    the shop.  These conditions must be checked by the calling function. */
 /*ARGSUSED*/
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {number} ox coordxy
+ * @param {number} oy coordxy
+ * @returns {Promise<void>}
+ */
 export async function make_angry_shk(shkp, ox, oy) {   // shk.c:1470
     let eshkp = null, $t1;
     /* <ox,oy> predate 'noit_Monnam()', let alone Shknam() */
@@ -1238,6 +1457,11 @@ export async function make_angry_shk(shkp, ox, oy) {   // shk.c:1470
 /* if one item is used-up and the other isn't, the used-up one comes first;
    otherwise, if their costs differ, the more expensive one comes first;
    if costs are the same, use internal index as tie-breaker for stable sort */
+/**
+ * @param {*} vptr1 const void *
+ * @param {*} vptr2 const void *
+ * @returns {number} int
+ */
 function sortbill_cmp(vptr1, vptr2) {   // shk.c:1499
     let sbi1 = null, sbi2 = null, cost1 = 0, cost2 = 0, bidx1 = 0, bidx2 = 0, used1 = 0, used2 = 0;
     sbi1 = $c.asRec(vptr1, $T.sortbill_item, 32);
@@ -1263,6 +1487,11 @@ function sortbill_cmp(vptr1, vptr2) {   // shk.c:1499
     return bidx1 - bidx2 | 0;
 }
 /* delivers the cheapest item on the list */
+/**
+ * @param {number} ibillct int
+ * @param {$T.sortbill_item | null} ibill Bill *
+ * @returns {number | bigint} long
+ */
 function cheapest_item(ibillct, ibill) {   // shk.c:1522
     let i = 0, gmin = 0;
     gmin = $c.radd(ibill, 0).cost;
@@ -1282,6 +1511,11 @@ function cheapest_item(ibillct, ibill) {   // shk.c:1522
 }
 /* for itemized purchasing, create an alternate shop bill that hides
    container contents */
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {*} ibill_p Bill **
+ * @returns {Promise<number>} int
+ */
 async function make_itemized_bill(shkp, ibill_p) {   // shk.c:1545
     let ibill = null, bp = null, otmp = null, eshkp = null, i = 0, n = 0, bidx = 0, ebillct = 0, used = 0, quan = 0, cost = 0, j = 0, item = null, cknown = 0, $t1;
     /* returns number of entries */
@@ -1394,6 +1628,11 @@ async function make_itemized_bill(shkp, ibill_p) {   // shk.c:1545
 }
 /* show items on your bill in a menu, and ask which to pay.
    returns the number of entries selected. */
+/**
+ * @param {number} ibillct int
+ * @param {$T.sortbill_item | null} ibill Bill *
+ * @returns {Promise<number>} int
+ */
 async function menu_pick_pay_items(ibillct, ibill) {   // shk.c:1668
     let otmp = null, win = 0, any = new $T.any(), pick_list = [null], p = null, buf = new Int8Array(256), amt = 0, largest_amt = 0, save_quan = 0, i = 0, j = 0, n = 0, amt_width = 0;
     /* number of entries in ibill[] */
@@ -1455,6 +1694,9 @@ async function menu_pick_pay_items(ibillct, ibill) {   // shk.c:1668
     return n > 0 ? n : 0;
 }
 /* the #pay command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dopay() {   // shk.c:1743
     let eshkp = null, shkp = null, nxtm = null, resident = null, ibill = [null], ltmp = 0, umoney = 0, sk = 0, seensk = 0, nexttosk = 0, paid = Int8Array.of(0), stashed_gold = 0, pay_done = 0, mtmp = null, cc = new $T.nhcoord(), cx = 0, cy = 0, save_plnmsg = 0, dtmp = 0, loan = 0, sbuf = new Int8Array(256), ibillct = 0;
     ibill[0] = $c.asRec(null, $T.sortbill_item, 32);
@@ -1731,6 +1973,14 @@ export async function dopay() {   // shk.c:1743
    player can use 'm' prefix before 'p' command to invert those behaviors;
    once the method is chosen, actually pay for the selected items, item by
    item for as long as hero has enough credit+cash */
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {number} ibillct int
+ * @param {$T.sortbill_item | null} ibill Bill *
+ * @param {number} stashed_gold boolean
+ * @param {$c.Ptr | null} paid_p boolean *
+ * @returns {Promise<number>} boolean
+ */
 async function pay_billed_items(shkp, ibillct, ibill, stashed_gold, paid_p) {   // shk.c:2045
     let bp = null, otmp = null, umoney = 0, itemize = 0, more_than_one = 0, queuedpay = 0, via_menu = 0, buy = 0, indx = 0, bidx = 0, pass = 0, iprompt = 0, ebillct = 0, eshkp = null, boxbag_result = 0;
     /* output */
@@ -1841,6 +2091,15 @@ async function pay_billed_items(shkp, ibillct, ibill, stashed_gold, paid_p) {   
     return TRUE;
 }
 /* update shk's bill and augmented bill after an item has been purchased */
+/**
+ * @param {number} indx int
+ * @param {number} ibillct int
+ * @param {$T.sortbill_item | null} ibill Bill *
+ * @param {$T.eshk | null} eshkp struct eshk *
+ * @param {$T.bill_x | null} bp struct bill_x *
+ * @param {$T.obj | null} paiditem struct obj *
+ * @returns {Promise<void>}
+ */
 async function update_bill(indx, ibillct, ibill, eshkp, bp, paiditem) {   // shk.c:2171
     let j = 0, newebillct = 0;
     /* index into ibill[]; -1 for unpaid contained item */
@@ -1883,6 +2142,15 @@ async function update_bill(indx, ibillct, ibill, eshkp, bp, paiditem) {   // shk
  *        0 if not enough money
  *       -1 if skip this object
  *       -2 if no money/credit left
+ */
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {$T.bill_x | null} bp struct bill_x *
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} which int
+ * @param {number} itemize boolean
+ * @param {number} unseen boolean
+ * @returns {Promise<number>} int
  */
 async function dopayobj(shkp, bp, obj, which, itemize, unseen) {   // shk.c:2220
     let ltmp = 0, quan = 0, save_quan = 0, buy = 0, consumed = 0, qbuf = new Int8Array(256), qsfx = new Int8Array(256);
@@ -1950,6 +2218,13 @@ async function dopayobj(shkp, bp, obj, which, itemize, unseen) {   // shk.c:2220
    and for the container itself if it is unpaid too;
    returns 0==successfully bought; 1==rejected, message given here;
    2=rejected, caller should issue message */
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {number} indx int
+ * @param {number} ibillct int
+ * @param {$T.sortbill_item | null} ibill Bill *
+ * @returns {Promise<number>} int
+ */
 async function buy_container(shkp, indx, ibillct, ibill) {   // shk.c:2309
     let boid = 0, boids = new Uint32Array(200), i = 0, j = 0, buy = 0, buycount = 0, boidsct = 0, eshkp = null, ebillct = 0, bp = null, otmp = null, otop = null, container = null, unpaidcontainer = 0, totalcost = 0, sightunseen = 0, $t1, $t2, $t3, $t4;
     buycount = 0;
@@ -2047,6 +2322,12 @@ async function buy_container(shkp, indx, ibillct, ibill) {   // shk.c:2309
    (not actually very effective since player can just drop the unpaid
    portion then pick it back up to have it get its own distinct bill entry;
    the former partly used up portion becomes a fully used up separate item) */
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number | bigint} billed_quan long
+ * @returns {Promise<void>}
+ */
 async function reject_purchase(shkp, obj, billed_quan) {   // shk.c:2419
     let intact_quan = 0, which = new Int8Array(256);
     intact_quan = obj.quan;
@@ -2067,6 +2348,12 @@ async function reject_purchase(shkp, obj, billed_quan) {   // shk.c:2419
     obj.quan = intact_quan;
 }
 /* gold+credit checking+feedback common to dopayobj() and buy_container() */
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {$T.obj | null} item struct obj *
+ * @param {number | bigint} cost long
+ * @returns {Promise<number>} boolean
+ */
 async function insufficient_funds(shkp, item, cost) {   // shk.c:2455
     let stashed_gold = 0, umoney = 0, ecredit = 0;
     /* 0: check for no-gold; >0: check for specified amount */
@@ -2087,6 +2374,11 @@ async function insufficient_funds(shkp, item, cost) {   // shk.c:2455
     return FALSE;
 }
 /* routine called after dying (or quitting) */
+/**
+ * @param {number} croaked int
+ * @param {number} silently boolean
+ * @returns {Promise<number>} boolean
+ */
 export async function paybill(croaked, silently) {   // shk.c:2485
     let mtmp = null, mtmp2 = null, firstshk = null, resident = null, creditor = null, hostile = null, localshk = null, eshkp = null, taken = 0, local = 0, numsk = 0, $t1;
     /* -1: escaped dungeon; 0: quit; 1: died */
@@ -2170,6 +2462,13 @@ export async function paybill(croaked, silently) {   // shk.c:2485
    when this returns True, it should call set_repo_loc() before returning;
    when it returns False, it should not do such because that might have
    already been called for some shopkeeper */
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {number} numsk int
+ * @param {number} croaked int
+ * @param {number} silently boolean
+ * @returns {Promise<number>} boolean
+ */
 async function inherits(shkp, numsk, croaked, silently) {   // shk.c:2577
     let loss = 0, umoney = 0, eshkp = null, take = 0, taken = 0, uinshop = 0, takes = new Int8Array(256), $goto = null, $t1;
     D1: for (;;) {
@@ -2279,6 +2578,9 @@ async function inherits(shkp, numsk, croaked, silently) {   // shk.c:2577
         break;
     }
 }
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ */
 function set_repo_loc(shkp) {   // shk.c:2682
     let ox = 0, oy = 0, eshkp = null;
     eshkp = shkp.mextra.eshk;
@@ -2315,6 +2617,9 @@ function set_repo_loc(shkp) {   // shk.c:2682
 }
 /* called at game exit, after inventory disclosure but before making bones;
    shouldn't issue any messages */
+/**
+ * @returns {Promise<void>}
+ */
 export async function finish_paybill() {   // shk.c:2723
     let shkp = null, ox = 0, oy = 0, umoney = 0;
     shkp = gr.repo.shopkeeper;
@@ -2350,6 +2655,10 @@ export async function finish_paybill() {   // shk.c:2723
     await drop_upon_death(null, null, $c.i16(ox), $c.i16(oy));
 }
 /* find obj on one of the lists */
+/**
+ * @param {$T.bill_x | null} bp struct bill_x *
+ * @returns {$T.obj | null} struct obj *
+ */
 function bp_to_obj(bp) {   // shk.c:2759
     let obj = null, id = 0;
     id = bp.bo_id;
@@ -2364,6 +2673,10 @@ function bp_to_obj(bp) {   // shk.c:2759
  * Look for o_id on all lists but billobj.  Return obj or NULL if not found.
  * Its OK for restore_timers() to call this function, there should not
  * be any timeouts on the gb.billobjs chain.
+ */
+/**
+ * @param {number} id unsigned int
+ * @returns {$T.obj | null} struct obj *
  */
 export function find_oid(id) {   // shk.c:2777
     let obj = null, mon = null, mmtmp = $c.nulls(3), i = 0;
@@ -2396,6 +2709,11 @@ export function find_oid(id) {   // shk.c:2777
 }
 /* Returns the price of an arbitrary item in the shop,
    0 if the item doesn't belong to a shopkeeper or hero is not in the shop. */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {*} nochrg int *
+ * @returns {Promise<number | bigint>} long
+ */
 export async function get_cost_of_shop_item(obj, nochrg) {   // shk.c:2809
     let shkp = null, top = null, x = Int16Array.of(0), y = Int16Array.of(0), freespot = 0, cost = 0, per_unit_cost = 0;
     /* alternate return value: 1: no charge, 0: shop owned,
@@ -2420,6 +2738,10 @@ export async function get_cost_of_shop_item(obj, nochrg) {   // shk.c:2809
     }
     return cost;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number | bigint>} long
+ */
 async function get_pricing_units(obj) {   // shk.c:2846
     let units = 0, unit_weight = 0, wt = 0;
     units = obj.quan;
@@ -2435,6 +2757,11 @@ async function get_pricing_units(obj) {   // shk.c:2846
 }
 /* decide whether to apply a surcharge (or hypothetically, a discount) to obj
    if it had ID number 'oid'; returns 1: increase, 0: normal, -1: decrease */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} oid unsigned int
+ * @returns {number} int
+ */
 export function oid_price_adjustment(obj, oid) {   // shk.c:2864
     let res = 0, otyp = 0;
     res = 0;
@@ -2445,6 +2772,11 @@ export function oid_price_adjustment(obj, oid) {   // shk.c:2864
     return res;
 }
 /* calculate the value that the shk will charge for [one of] an object */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$T.monst | null} shkp struct monst *
+ * @returns {Promise<number | bigint>} long
+ */
 async function get_cost(obj, shkp) {   // shk.c:2877
     let tmp = 0, multiplier = 0, divisor = 0, i = 0, pseudorand = 0;
     /* if angry, impose a surcharge */
@@ -2566,6 +2898,14 @@ async function get_cost(obj, shkp) {   // shk.c:2877
  * of the "top" container is added in the calling functions.
  * a different price quoted for selling as vs. buying.
  */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {number | bigint} price long
+ * @param {number} usell boolean
+ * @param {number} unpaid_only boolean
+ * @returns {Promise<number | bigint>} long
+ */
 export async function contained_cost(obj, shkp, price, usell, unpaid_only) {   // shk.c:2995
     let otmp = null, top = null, x = Int16Array.of(0), y = Int16Array.of(0), on_floor = 0, freespot = 0;
     for (top = obj; top.where === OBJ.CONTAINED; top = top.v.v_ocontainer) {
@@ -2603,6 +2943,11 @@ export async function contained_cost(obj, shkp, price, usell, unpaid_only) {   /
     return price;
 }
 /* count amount of gold inside container 'obj' and any nested containers */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} even_if_unknown boolean
+ * @returns {number | bigint} long
+ */
 export function contained_gold(obj, even_if_unknown) {   // shk.c:3046
     let otmp = null, value = 0;
     /* T: all gold; F: limit to known contents */
@@ -2617,6 +2962,11 @@ export function contained_gold(obj, even_if_unknown) {   // shk.c:3046
     }
     return value;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {number} sale boolean
+ */
 function dropped_container(obj, shkp, sale) {   // shk.c:3064
     let otmp = null;
     /* the "top" container is treated in the calling fn */
@@ -2632,6 +2982,9 @@ function dropped_container(obj, shkp, sale) {   // shk.c:3064
         }
     }
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ */
 export function picked_container(obj) {   // shk.c:3085
     let otmp = null;
     /* the "top" container is treated in the calling fn */
@@ -2647,6 +3000,12 @@ export function picked_container(obj) {   // shk.c:3085
         }
     }
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {number} quietly boolean
+ * @returns {Promise<number>} boolean
+ */
 async function special_stock(obj, shkp, quietly) {   // shk.c:3103
     /* for unique situations */
     if (shkp.mextra.eshk.shoptype === CANDLESHOP && obj.otyp === CANDELABRUM_OF_INVOCATION) {
@@ -2675,6 +3034,11 @@ async function special_stock(obj, shkp, quietly) {   // shk.c:3103
     return FALSE;
 }
 /* calculate how much the shk will pay when buying [all of] an object */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$T.monst | null} shkp struct monst *
+ * @returns {Promise<number | bigint>} long
+ */
 async function set_cost(obj, shkp) {   // shk.c:3148
     let tmp = 0, unit_price = 0, multiplier = 0, divisor = 0;
     unit_price = await getprice(obj, TRUE);
@@ -2721,6 +3085,10 @@ async function set_cost(obj, shkp) {   // shk.c:3148
 }
 /* unlike alter_cost() which operates on a specific item, identifying or
    forgetting a gem causes all unpaid gems of its type to change value */
+/**
+ * @param {number} oindx int
+ * @returns {Promise<void>}
+ */
 export async function gem_learned(oindx) {   // shk.c:3198
     let obj = null, shkp = null, bp = null, ct = 0, $t1;
     /*
@@ -2753,6 +3121,11 @@ export async function gem_learned(oindx) {   // shk.c:3198
 /* called when an item's value has been enhanced; if it happens to be
    on any shop bill, update that bill to reflect the new higher price
    [if the new price drops for some reason, keep the old one in place] */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number | bigint} amt long
+ * @returns {Promise<void>}
+ */
 export async function alter_cost(obj, amt) {   // shk.c:3237
     let bp = null, shkp = null, new_price = 0;
     /* if 0, use regular shop pricing, otherwise force amount;
@@ -2771,6 +3144,11 @@ export async function alter_cost(obj, amt) {   // shk.c:3237
     return;
 }
 /* called from doinv(invent.c) for inventory of unpaid objects */
+/**
+ * @param {$T.obj | null} unp_obj struct obj *
+ * @param {number} cost_type uchar
+ * @returns {Promise<number | bigint>} long
+ */
 export async function unpaid_cost(unp_obj, cost_type) {   // shk.c:3260
     let bp = null, shkp = null, shop = null, amt = 0;
     /* known to be unpaid or contain unpaid */
@@ -2806,6 +3184,12 @@ export async function unpaid_cost(unp_obj, cost_type) {   // shk.c:3260
     return amt;
 }
 /* add 'obj' to 'shkp's bill */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} dummy boolean
+ * @param {$T.monst | null} shkp$in struct monst *
+ * @returns {Promise<void>}
+ */
 async function add_one_tobill(obj, dummy, shkp$in) {   // shk.c:3309
     const shkp = [shkp$in];
     let eshkp = null, bp = null, bct = 0, unbilled = 0, $t1, $t2;
@@ -2858,6 +3242,10 @@ async function add_one_tobill(obj, dummy, shkp$in) {   // shk.c:3309
     obj.unpaid = (1) & 1;
     record_price_quote(obj.otyp, $c.u64(bp.price), TRUE);
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function add_to_billobjs(obj) {   // shk.c:3366
     if (obj.where !== OBJ.FREE) {
         await panic($c.lit("add_to_billobjs: obj not free"));
@@ -2876,6 +3264,13 @@ async function add_to_billobjs(obj) {   // shk.c:3366
     obj.bypass = (0) & 1;
 }
 /* recursive billing of objects within containers. */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} ininv boolean
+ * @param {number} dummy boolean
+ * @param {$T.monst | null} shkp struct monst *
+ * @returns {Promise<void>}
+ */
 async function bill_box_content(obj, ininv, dummy, shkp) {   // shk.c:3387
     let otmp = null;
     if (SchroedingersBox(obj)) {
@@ -2895,6 +3290,14 @@ async function bill_box_content(obj, ininv, dummy, shkp) {   // shk.c:3387
     }
 }
 /* shopkeeper tells you what you bought or sold, sometimes partly IDing it */
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$c.Ptr | null} fmt const char *
+ * @param {number | bigint} amt long
+ * @param {$c.Ptr | null} arg const char *
+ * @returns {Promise<void>}
+ */
 async function shk_names_obj(shkp, obj, fmt, amt, arg) {   // shk.c:3413
     let obj_name = null, fmtbuf = new Int8Array(256), was_unknown = 0, $t1;
     /* "%s %ld %s %s", doname(obj), amt, plur(amt), arg */
@@ -2919,6 +3322,13 @@ async function shk_names_obj(shkp, obj, fmt, amt, arg) {   // shk.c:3413
     }
 }
 /* decide whether a shopkeeper thinks an item belongs to her */
+/**
+ * @param {*} shkpp struct monst **
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} roomno char
+ * @param {number} reset_nocharge boolean
+ * @returns {Promise<number>} boolean
+ */
 export async function billable(shkpp, obj, roomno, reset_nocharge) {   // shk.c:3451
     let shkp = null;
     /* in: non-null if shk has been validated;
@@ -2954,6 +3364,13 @@ export async function billable(shkpp, obj, roomno, reset_nocharge) {   // shk.c:
     }
     return $c.i8(shkp ? TRUE : FALSE);
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} ininv boolean
+ * @param {number} dummy boolean
+ * @param {number} silent boolean
+ * @returns {Promise<void>}
+ */
 export async function addtobill(obj, ininv, dummy, silent) {   // shk.c:3490
     let shkp = [null], ltmp = 0, cltmp = 0, gltmp = 0, contentscount = 0, container = 0, buf = new Int8Array(256), save_quan = 0;
     shkp[0] = null;
@@ -3040,6 +3457,9 @@ export async function addtobill(obj, ininv, dummy, silent) {   // shk.c:3490
         }
     }
 }
+/**
+ * @param {$c.Ptr | null} buf char *
+ */
 function append_honorific(buf) {   // shk.c:3602
     /* (chooses among [0]..[3] normally; [1]..[4] after the
        Wizard has been killed or invocation ritual performed) */
@@ -3052,6 +3472,11 @@ function append_honorific(buf) {   // shk.c:3602
         $c.strcat(buf, !($c.andu64(gy.youmonst.data.mflags2, M2.HUMAN) !== 0) ? $c.lit(" creature") : flags.female ? $c.lit(" lady") : $c.lit(" sir"));
     }
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 export async function splitbill(obj, otmp) {   // shk.c:3623
     let bp = null, tmp = 0, shkp = null;
     /* otmp has been split off from obj */
@@ -3084,6 +3509,11 @@ export async function splitbill(obj, otmp) {   // shk.c:3623
         shkp.mextra.eshk.billct = shkp.mextra.eshk.billct + 1 | 0;
     }
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$T.monst | null} shkp struct monst *
+ * @returns {Promise<void>}
+ */
 async function sub_one_frombill(obj, shkp) {   // shk.c:3661
     let bp = null, eshkp = null, otmp = null, $t1, $t2, $t3;
     if ((bp = await onbill(obj, shkp, FALSE)) !== null) {
@@ -3110,6 +3540,11 @@ async function sub_one_frombill(obj, shkp) {   // shk.c:3661
     }
 }
 /* recursive check of unpaid objects within nested containers. */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$T.monst | null} shkp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function subfrombill(obj, shkp) {   // shk.c:3694
     let otmp = null;
     await sub_one_frombill(obj, shkp);
@@ -3126,6 +3561,13 @@ export async function subfrombill(obj, shkp) {   // shk.c:3694
         }
     }
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$T.monst | null} shkp$in struct monst *
+ * @param {number | bigint} price long
+ * @param {number} ininv boolean
+ * @returns {Promise<number | bigint>} long
+ */
 async function stolen_container(obj, shkp$in, price, ininv) {   // shk.c:3713
     const shkp = [shkp$in];
     let otmp = null, bp = null, billamt = 0;
@@ -3159,6 +3601,14 @@ async function stolen_container(obj, shkp$in, price, ininv) {   // shk.c:3713
     }
     return price;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} peaceful boolean
+ * @param {number} silent boolean
+ * @returns {Promise<number | bigint>} long
+ */
 export async function stolen_value(obj, x, y, peaceful, silent) {   // shk.c:3754
     let value = 0, gvalue = 0, billamt = 0, roomno = 0, bp = null, shkp = [null], was_unpaid = 0, c_count = 0, u_count = 0, ininv = 0, credit_use = 0, buf = new Int8Array(256), still = null;
     value = 0;
@@ -3258,6 +3708,12 @@ export async function stolen_value(obj, x, y, peaceful, silent) {   // shk.c:375
 }
 /* opposite of costly_gold(); hero has dropped gold in a shop;
    called from sellobj(); ought to be called from subfrombill() too */
+/**
+ * @param {number | bigint} gltmp long
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {number} selling boolean
+ * @returns {Promise<void>}
+ */
 export async function donate_gold(gltmp, shkp, selling) {   // shk.c:3877
     let eshkp = null, delta = 0;
     /* T: dropped in shop; F: kicked and landed in shop */
@@ -3288,6 +3744,9 @@ export async function donate_gold(gltmp, shkp, selling) {   // shk.c:3877
         }
     }
 }
+/**
+ * @param {number} deliberate int
+ */
 export function sellobj_state(deliberate) {   // shk.c:3913
     /* If we're deliberately dropping something, there's no automatic
        response to the shopkeeper's "want to sell" query; however, if we
@@ -3299,6 +3758,12 @@ export function sellobj_state(deliberate) {   // shk.c:3913
     gs.sell_how = deliberate;
     ga.auto_credit = FALSE;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function sellobj(obj, x, y) {   // shk.c:3927
     let shkp = null, eshkp = null, ltmp = 0, cltmp = 0, gltmp = 0, offer = 0, shkmoney = 0, saleitem = 0, cgold = 0, container = 0, isgold = 0, only_partially_your_contents = 0, unpaid = 0, c = 0, qbuf = new Int8Array(256), tmpcr = 0, qbuf$2 = new Int8Array(256), qsfx = new Int8Array(256), short_funds = 0, one = 0, yourc = 0, shksc = 0;
     ltmp = 0;
@@ -3534,6 +3999,10 @@ export async function sellobj(obj, x, y) {   // shk.c:3927
         }
     }
 }
+/**
+ * @param {number} mode int
+ * @returns {Promise<number>} int
+ */
 export async function doinvbill(mode) {   // shk.c:4197
     let shkp = null, eshkp = null, bp = null, end_bp = null, obj = null, totused = 0, buf_p = null, datawin = 0, cnt = 0, oquan = 0, uquan = 0, thisused = 0;
     /* 0: deliver count 1: paged */
@@ -3597,6 +4066,10 @@ export async function doinvbill(mode) {   // shk.c:4197
     return 0;
 }
 /* adjust tin, egg, or corpse price based on monster data */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number | bigint>} long
+ */
 async function corpsenm_price_adj(obj) {   // shk.c:4275
     let val = 0, i = 0, tmp = 0, ptr = null, icost = $c.recArray($T.anon_shk_4284, 11);
     val = 0;
@@ -3644,6 +4117,11 @@ async function corpsenm_price_adj(obj) {   // shk.c:4275
     }
     return val;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} shk_buying boolean
+ * @returns {Promise<number | bigint>} long
+ */
 async function getprice(obj, shk_buying) {   // shk.c:4319
     let tmp = 0;
     tmp = objects[obj.otyp].oc_cost;
@@ -3689,6 +4167,12 @@ async function getprice(obj, shk_buying) {   // shk.c:4319
     return tmp;
 }
 /* shk catches thrown pick-axe */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<$T.monst | null>} struct monst *
+ */
 export async function shkcatch(obj, x, y) {   // shk.c:4362
     let shkp = null;
     shkp = await shop_keeper(inside_shop(x, y));
@@ -3714,6 +4198,12 @@ export async function shkcatch(obj, x, y) {   // shk.c:4362
     }
     return null;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number | bigint} cost long
+ * @returns {Promise<void>}
+ */
 export async function add_damage(x, y, cost) {   // shk.c:4399
     let tmp_dam = null, shops = null, mtmp = null;
     if (svl.level.locations[x][y].typ === DOOR) {
@@ -3750,6 +4240,10 @@ export async function add_damage(x, y, cost) {   // shk.c:4399
     }
 }
 /* is shopkeeper impaired, so they cannot act? */
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @returns {number} boolean
+ */
 function shk_impaired(shkp) {   // shk.c:4441
     if (!shkp || !shkp.isshk || !inhishop(shkp)) {
         return TRUE;
@@ -3760,6 +4254,11 @@ function shk_impaired(shkp) {   // shk.c:4441
     return FALSE;
 }
 /* is damage dam repairable by shopkeeper shkp? */
+/**
+ * @param {$T.damage | null} dam struct damage *
+ * @param {$T.monst | null} shkp struct monst *
+ * @returns {number} boolean
+ */
 function repairable_damage(dam, shkp) {   // shk.c:4452
     let x = 0, y = 0, ttmp = null, mtmp = null;
     if (!dam || shk_impaired(shkp)) {
@@ -3794,6 +4293,10 @@ function repairable_damage(dam, shkp) {   // shk.c:4452
     return TRUE;
 }
 /* find any damage shopkeeper shkp could repair. returns NULL is none found */
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @returns {$T.damage | null} struct damage *
+ */
 function find_damage(shkp) {   // shk.c:4491
     let dam = null;
     dam = svl.level.damagelist;
@@ -3808,6 +4311,9 @@ function find_damage(shkp) {   // shk.c:4491
     }
     return null;
 }
+/**
+ * @param {$T.damage | null} dam struct damage *
+ */
 function discard_damage_struct(dam) {   // shk.c:4509
     let prev = null;
     if (!dam) {
@@ -3828,6 +4334,9 @@ function discard_damage_struct(dam) {   // shk.c:4509
     $c.free(dam);
 }
 /* discard all damage structs owned by shopkeeper */
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ */
 function discard_damage_owned_by(shkp) {   // shk.c:4530
     let dam = null, dam2 = null, prevdam = null, x = 0, y = 0;
     dam = svl.level.damagelist;
@@ -3853,6 +4362,10 @@ function discard_damage_owned_by(shkp) {   // shk.c:4530
     }
 }
 /* Shopkeeper tries to repair damage belonging to them */
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @returns {Promise<void>}
+ */
 async function shk_fixes_damage(shkp) {   // shk.c:4556
     let dam = null, shk_closeby = 0;
     dam = find_damage(shkp);
@@ -3873,6 +4386,13 @@ async function shk_fixes_damage(shkp) {   // shk.c:4556
    shop (possibly in the "free spot" or even in doorway or an adjacent
    wall gap), but if they are in a gap in a wall shared by two shops
    they might have started in the other shop */
+/**
+ * @param {$c.Ptr | null} litter uint8 *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$T.monst | null} shkp struct monst *
+ * @returns {number} uint8
+ */
 function litter_getpos(litter, x, y, shkp) {   // shk.c:4591
     let i = 0, ix = 0, iy = 0, k = 0;
     /* array of 9 uint8's */
@@ -3898,6 +4418,13 @@ function litter_getpos(litter, x, y, shkp) {   // shk.c:4591
    litter[] guarantees that items will end up inside shkp's shop, but
    if the wall being repaired is shared by two shops the items might
    have started in the other shop */
+/**
+ * @param {$c.Ptr | null} litter uint8 *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$T.monst | null} shkp struct monst *
+ * @returns {Promise<void>}
+ */
 async function litter_scatter(litter, x, y, shkp) {   // shk.c:4622
     let otmp = null, trylimit = 0, i = 0, ix = 0, iy = 0, oshk = null;
     /* placement below assumes there is always at least one adjacent spot
@@ -3972,6 +4499,12 @@ async function litter_scatter(litter, x, y, shkp) {   // shk.c:4622
         }   /* while level.objects[x][y] != 0 */
     }
 }
+/**
+ * @param {$c.Ptr | null} litter uint8 *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 async function litter_newsyms(litter, x, y) {   // shk.c:4712
     let i = 0;
     for (i = 0; i < 9; i = i + 1 | 0) {
@@ -3983,6 +4516,12 @@ async function litter_newsyms(litter, x, y) {   // shk.c:4712
 /*
  * 0: repair postponed, 1: silent repair (no messages), 2: normal repair
  * 3: untrap
+ */
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {$T.damage | null} tmp_dam struct damage *
+ * @param {number} catchup boolean
+ * @returns {Promise<number>} int
  */
 async function repair_damage(shkp, tmp_dam, catchup) {   // shk.c:4732
     let x = 0, y = 0, litter = new Uint8Array(9), otmp = null, ttmp = null, disposition = 0, seeit = 0, stop_picking = 0, $t1;
@@ -4093,6 +4632,9 @@ async function repair_damage(shkp, tmp_dam, catchup) {   // shk.c:4732
 }
 /* normally repair is done when a shopkeeper moves, but we also try to
    catch up for lost time when reloading a previously visited level */
+/**
+ * @returns {Promise<void>}
+ */
 export async function fix_shop_damage() {   // shk.c:4850
     let shkp = null, damg = null, nextdamg = null;
     /* if this level has no shop damage, there's nothing to do */
@@ -4118,6 +4660,10 @@ export async function fix_shop_damage() {   // shk.c:4850
 }
 /*
  * shk_move: return 1: moved  0: didn't  -1: let m_move do it  -2: died
+ */
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @returns {Promise<number>} int
  */
 export async function shk_move(shkp) {   // shk.c:4880
     let gtx = 0, gty = 0, omx = 0, omy = 0, udist = 0, appr = 0, eshkp = null, z = 0, uondoor = 0, satdoor = 0, avoid = 0, badinv = 0;
@@ -4218,6 +4764,10 @@ export async function shk_move(shkp) {   // shk.c:4880
     return z;
 }
 /* called after shopkeeper moves, in case move causes re-entry into shop */
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function after_shk_move(shkp) {   // shk.c:4997
     let eshkp = null;
     eshkp = shkp.mextra.eshk;
@@ -4231,10 +4781,18 @@ export async function after_shk_move(shkp) {   // shk.c:4997
     }
 }
 /* for use in levl_follower (mondata.c) */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number} boolean
+ */
 export function is_fshk(mtmp) {   // shk.c:5012
     return $c.i8(mtmp.isshk | 0 && mtmp.mextra.eshk.following ? 1 : 0);
 }
 /* You are digging in the shop. */
+/**
+ * @param {number} fall int
+ * @returns {Promise<void>}
+ */
 export async function shopdig(fall) {   // shk.c:5019
     let shkp = null, lang = 0, grabs = null, obj = null, obj2 = null;
     shkp = await shop_keeper(new $c.Ptr(u.ushops, 0).get(0));
@@ -4311,6 +4869,10 @@ export async function shopdig(fall) {   // shk.c:5019
         }
     }
 }
+/**
+ * @param {$T.nhcoord | null} mm coord *
+ * @returns {Promise<void>}
+ */
 async function makekops(mm) {   // shk.c:5113
     let k_cnt = new Int32Array(4), cnt = 0, mndx = 0, k = 0, $t1, $t2;
     $t1 = cnt = $c.abs(depth(u.uz)) + rnd(5) | 0, k_cnt[0] = $t1;
@@ -4332,6 +4894,16 @@ async function makekops(mm) {   // shk.c:5113
         }
     }
 }
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {$c.Ptr | null} dmgstr const char *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} uinshp boolean
+ * @param {number} animal boolean
+ * @param {number} pursue boolean
+ * @returns {Promise<void>}
+ */
 async function getcad(shkp, dmgstr, x, y, uinshp, animal, pursue) {   // shk.c:5138
     let dugwall = 0;
     /* wand */
@@ -4356,6 +4928,11 @@ async function getcad(shkp, dmgstr, x, y, uinshp, animal, pursue) {   // shk.c:5
     }
     hot_pursuit(shkp);
 }
+/**
+ * @param {$c.Ptr | null} dmgstr const char *
+ * @param {number} cant_mollify boolean
+ * @returns {Promise<void>}
+ */
 export async function pay_for_damage(dmgstr, cant_mollify) {   // shk.c:5174
     let shkp = null, shops_affected = new Int8Array(5), uinshp = 0, qbuf = new Int8Array(80), x = 0, y = 0, animal = 0, pursue = 0, tmp_dam = null, appear_here = null, cost_of_damage = 0, nearest_shk = 0, nearest_damage = 0, picks = 0, shp = null, tmp_shk = null, shk_distance = 0, damage_distance = 0, is_seen = 0, was_seen = 0, was_outside = 0, sx = 0, sy = 0;
     shkp = null;
@@ -4503,6 +5080,11 @@ export async function pay_for_damage(dmgstr, cant_mollify) {   // shk.c:5174
     }
 }
 /* called in dokick.c when we kick an object that might be in a store */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} boolean
+ */
 export async function costly_spot(x, y) {   // shk.c:5350
     let shkp = null, eshkp = null;
     if (!svl.level.flags.has_shop) {
@@ -4518,6 +5100,12 @@ export async function costly_spot(x, y) {   // shk.c:5350
 /* called by sanity checking when an unpaid or no_charge item is not at a
    costly_spot; it might still be within the boundary of the shop; if so,
    those flags are still valid */
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 export function costly_adjacent(shkp, x, y) {   // shk.c:5369
     let eshkp = null;
     if (!shkp || !inhishop(shkp) || !isok(x, y)) {
@@ -4530,6 +5118,11 @@ export function costly_adjacent(shkp, x, y) {   // shk.c:5369
 }
 /* called by dotalk(sounds.c) when #chatting; returns obj if location
    contains shop goods and shopkeeper is willing & able to speak */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function shop_object(x, y) {   // shk.c:5386
     let otmp = null, shkp = null;
     shkp = await shop_keeper(in_rooms(x, y, SHOPBASE).get(0));
@@ -4545,6 +5138,10 @@ export async function shop_object(x, y) {   // shk.c:5386
     return otmp && await costly_spot(x, y) && NOTANGRY(shkp) && !muteshk(shkp) ? otmp : null;
 }
 /* give price quotes for all objects linked to this one (ie, on this spot) */
+/**
+ * @param {$T.obj | null} first_obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function price_quote(first_obj) {   // shk.c:5406
     let otmp = null, buf = new Int8Array(256), price = new Int8Array(40), cost = 0, cnt = 0, contentsonly = 0, tmpwin = 0, shkp = null;
     cost = 0;
@@ -4595,6 +5192,11 @@ export async function price_quote(first_obj) {   // shk.c:5406
     }
     await destroy_nhwindow()(tmpwin);
 }
+/**
+ * @param {$T.obj | null} itm struct obj *
+ * @param {number | bigint} cost long
+ * @returns {$c.Ptr | null} const char *
+ */
 function shk_embellish(itm, cost) {   // shk.c:5468
     let o = 0, choice = 0;
     if (!rn2(3)) {
@@ -4630,6 +5232,10 @@ function shk_embellish(itm, cost) {   // shk.c:5468
     }
     return $c.lit(".");
 }
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function shk_chat(shkp) {   // shk.c:5521
     let eshk = null, shkmoney = 0, total = 0;
     if (!shkp.isshk) {
@@ -4684,6 +5290,10 @@ export async function shk_chat(shkp) {   // shk.c:5521
         }
     }
 }
+/**
+ * @param {number} silent boolean
+ * @returns {Promise<void>}
+ */
 async function kops_gone(silent) {   // shk.c:5606
     let cnt = 0, mtmp = null, mtmp2 = null;
     cnt = 0;
@@ -4703,6 +5313,12 @@ async function kops_gone(silent) {   // shk.c:5606
         await pline_The($c.lit("Kop%s (disappointed) vanish%s into thin air."), plur(cnt), cnt === 1 ? $c.lit("es") : $c.lit(""));
     }
 }
+/**
+ * @param {$T.monst | null} shkp struct monst *
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} altusage boolean
+ * @returns {Promise<number | bigint>} long
+ */
 async function cost_per_charge(shkp, otmp, altusage) {   // shk.c:5627
     let tmp = 0;
     /* some items have "alternate" use with different cost */
@@ -4760,6 +5376,11 @@ async function cost_per_charge(shkp, otmp, altusage) {   // shk.c:5627
  * Note that bill_dummy_object() should be used instead
  * when an object is completely used.
  */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} altusage boolean
+ * @returns {Promise<void>}
+ */
 export async function check_unpaid_usage(otmp, altusage) {   // shk.c:5688
     let shkp = null, fmt = null, arg1 = null, arg2 = null, buf = new Int8Array(256), tmp = 0;
     if (!otmp.unpaid || !new $c.Ptr(u.ushops, 0).get(0) || otmp.spe <= 0 && objects[otmp.otyp].oc_charged | 0) {
@@ -4804,9 +5425,20 @@ export async function check_unpaid_usage(otmp, altusage) {   // shk.c:5688
     shkp.mextra.eshk.debit = $c.add64(shkp.mextra.eshk.debit, tmp);
 }
 /* for using charges of unpaid objects "used in the normal manner" */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 export async function check_unpaid(otmp) {   // shk.c:5739
     await check_unpaid_usage(otmp, FALSE);   /* normal item use */
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number | bigint} amount long
+ * @param {number} silent boolean
+ * @returns {Promise<void>}
+ */
 export async function costly_gold(x, y, amount, silent) {   // shk.c:5745
     let delta = 0, shkp = null, eshkp = null;
     if (!await costly_spot(x, y)) {
@@ -4848,6 +5480,11 @@ export async function costly_gold(x, y, amount, silent) {   // shk.c:5745
 }
 /* used in domove to block diagonal shop-exit */
 /* x,y should always be a door */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} boolean
+ */
 export async function block_door(x, y) {   // shk.c:5791
     let roomno = 0, shkp = null;
     roomno = in_rooms(x, y, SHOPBASE).get(0);
@@ -4876,6 +5513,11 @@ export async function block_door(x, y) {   // shk.c:5791
 }
 /* used in domove to block diagonal shop-entry;
    u.ux, u.uy should always be a door */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} boolean
+ */
 export async function block_entry(x, y) {   // shk.c:5826
     let sx = 0, sy = 0, roomno = 0, shkp = null;
     if (!(svl.level.locations[u.ux][u.uy].typ === DOOR && (svl.level.locations[u.ux][u.uy].flags | 0) === D.BROKEN)) {
@@ -4901,6 +5543,11 @@ export async function block_entry(x, y) {   // shk.c:5826
     return FALSE;
 }
 /* "your " or "Foobar's " (note the trailing space) */
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function shk_your(buf, obj) {   // shk.c:5862
     let chk_pm = 0;
     chk_pm = $c.i8(obj.otyp === CORPSE && ismnum(obj.corpsenm) ? 1 : 0);
@@ -4914,12 +5561,22 @@ export async function shk_your(buf, obj) {   // shk.c:5862
     }
     return $c.strcat(buf, $c.lit(" "));
 }
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function Shk_Your(buf, obj) {   // shk.c:5877
     let $t1;
     await shk_your(buf, obj);
     $t1 = highc(buf.get(0)), buf.set(0, $t1);
     return buf;
 }
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 async function shk_owns(buf, obj) {   // shk.c:5885
     let shkp = null, x = Int16Array.of(0), y = Int16Array.of(0);
     if (get_obj_location(obj, new $c.Ptr(x, 0), new $c.Ptr(y, 0), 0) && (obj.unpaid | 0 || obj.where === OBJ.FLOOR && !obj.no_charge && await costly_spot(x[0], y[0]))) {
@@ -4928,12 +5585,21 @@ async function shk_owns(buf, obj) {   // shk.c:5885
     }
     return null;
 }
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 async function mon_owns(buf, obj) {   // shk.c:5900
     if (obj.where === OBJ.MINVENT) {
         return $c.strcpy(buf, s_suffix(await y_monnam(obj.v.v_ocarry)));
     }
     return null;
 }
+/**
+ * @param {number} altusage boolean
+ * @returns {Promise<$c.Ptr | null>} const char *
+ */
 async function cad(altusage) {   // shk.c:5908
     let res = null, cadbuf = null, $t1;
     /* used as a verbalized exclamation:  \"Cad! ...\" */
@@ -4989,6 +5655,11 @@ async function cad(altusage) {   // shk.c:5908
  *     2. player_owned glob merging into shop_owned glob
  *     3. shop_owned glob merging into player_owned glob
  *     4. player_owned glob merging into player_owned glob
+ */
+/**
+ * @param {$T.obj | null} obj_absorber struct obj *
+ * @param {$T.obj | null} obj_absorbed struct obj *
+ * @returns {Promise<void>}
  */
 export async function globby_bill_fixup(obj_absorber, obj_absorbed) {   // shk.c:5976
     let x = 0, y = 0, bp = null, bp_absorber = null, shkp = [null], eshkp = null, amount = 0, per_unit_cost = 0, floor_absorber = 0, delta = 0, $t1;
@@ -5097,6 +5768,12 @@ export async function globby_bill_fixup(obj_absorber, obj_absorbed) {   // shk.c
     return;
 }
 /* Shopkeeper bills for use of a land mine or bear trap they own */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function use_unpaid_trapobj(otmp, x, y) {   // shk.c:6101
     let shkp = null;
     if (otmp.unpaid) {

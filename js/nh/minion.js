@@ -57,6 +57,10 @@ import { Blind, Conflict, Deaf } from './youprop.macros.js';
    they've been reordered (difficulty reassessment?) or any new ones have
    been introduced (hybrid types added to 'E'-class?) */
 const elementals = new Int32Array(4);
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function newemin(mtmp) {   // minion.c:17
     let $t1, $t2;
     if (!mtmp.mextra) {
@@ -68,6 +72,9 @@ export async function newemin(mtmp) {   // minion.c:17
         mtmp.mextra.emin.parentmid = mtmp.m_id;
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ */
 export function free_emin(mtmp) {   // minion.c:29
     if (mtmp.mextra && EMIN(mtmp)) {
         $c.free(mtmp.mextra.emin);
@@ -76,6 +83,10 @@ export function free_emin(mtmp) {   // minion.c:29
     mtmp.isminion = (0) & 1;
 }
 /* count the number of monsters on the level */
+/**
+ * @param {number} spotted boolean
+ * @returns {number} int
+ */
 export function monster_census(spotted) {   // minion.c:40
     let mtmp = null, count = 0;
     /* seen|sensed vs all */
@@ -95,6 +106,10 @@ export function monster_census(spotted) {   // minion.c:40
     return count;
 }
 /* mon summons a monster */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<number>} int
+ */
 export async function msummon(mon) {   // minion.c:59
     let ptr = null, dtype = 0, cnt = 0, result = 0, census = 0, xlight = 0, atyp = 0, mtmp = null, cloud = [null], what = null;
     dtype = NON_PM;
@@ -208,6 +223,11 @@ export async function msummon(mon) {   // minion.c:59
     }
     return result;
 }
+/**
+ * @param {number} alignment aligntyp
+ * @param {number} talk boolean
+ * @returns {Promise<void>}
+ */
 export async function summon_minion(alignment, talk) {   // minion.c:198
     let mon = null, mnum = 0;
     switch (alignment) {
@@ -265,6 +285,10 @@ export async function summon_minion(alignment, talk) {   // minion.c:198
     }
 }
 /* returns 1 if it won't attack. */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} int
+ */
 export async function demon_talk(mtmp) {   // minion.c:263
     let cash = 0, demand = 0, offer = 0, wasunseen = 0, $t1, $t2;
     if (u_wield_art(ART.EXCALIBUR) || u_wield_art(ART.DEMONBANE)) {
@@ -351,6 +375,11 @@ export async function demon_talk(mtmp) {   // minion.c:263
     await mongone(mtmp);
     return 1;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$c.Ptr | null} prompt const char *
+ * @returns {Promise<number | bigint>} long
+ */
 export async function bribe(mtmp, prompt) {   // minion.c:361
     let buf = new Int8Array(256), offer = [0], umoney = 0;
     buf.fill(0);
@@ -378,6 +407,10 @@ export async function bribe(mtmp, prompt) {   // minion.c:361
     disp.botl = TRUE;
     return offer[0];
 }
+/**
+ * @param {number} atyp aligntyp
+ * @returns {Promise<number>} int
+ */
 export async function dprince(atyp) {   // minion.c:391
     let tryct = 0, pm = 0;
     for (tryct = !In_endgame(u.uz) ? 20 : 0; tryct > 0; tryct = tryct - 1 | 0) {
@@ -388,6 +421,10 @@ export async function dprince(atyp) {   // minion.c:391
     }
     return await dlord(atyp);   /* approximate */
 }
+/**
+ * @param {number} atyp aligntyp
+ * @returns {Promise<number>} int
+ */
 export async function dlord(atyp) {   // minion.c:405
     let tryct = 0, pm = 0;
     for (tryct = !In_endgame(u.uz) ? 20 : 0; tryct > 0; tryct = tryct - 1 | 0) {
@@ -399,12 +436,18 @@ export async function dlord(atyp) {   // minion.c:405
     return await ndemon(atyp);   /* approximate */
 }
 /* create lawful (good) lord */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function llord() {   // minion.c:420
     if (!(svm.mvitals[PM.ARCHON].mvflags & G_GONE)) {
         return PM.ARCHON;
     }
     return await lminion();   /* approximate */
 }
+/**
+ * @returns {Promise<number>} int
+ */
 export async function lminion() {   // minion.c:429
     let tryct = 0, ptr = null;
     for (tryct = 0; tryct < 20; tryct = tryct + 1 | 0) {
@@ -415,6 +458,10 @@ export async function lminion() {   // minion.c:429
     }
     return NON_PM;
 }
+/**
+ * @param {number} atyp aligntyp
+ * @returns {Promise<number>} int
+ */
 export async function ndemon(atyp) {   // minion.c:444
     let ptr = null;
     /* A_NONE is used for 'any alignment' */
@@ -432,6 +479,10 @@ export async function ndemon(atyp) {   // minion.c:444
     return ptr && is_ndemon(ptr) ? ptr.pmidx : NON_PM;
 }
 /* guardian angel has been affected by conflict so is abandoning hero */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<void>}
+ */
 export async function lose_guardian_angel(mon) {   // minion.c:468
     let mm = new $T.nhcoord(), i = 0;
     /* if Null, angel hasn't been created yet */
@@ -456,6 +507,9 @@ export async function lose_guardian_angel(mon) {   // minion.c:468
     }
 }
 /* just entered the Astral Plane; receive tame guardian angel if worthy */
+/**
+ * @returns {Promise<void>}
+ */
 export async function gain_guardian_angel() {   // minion.c:498
     let mtmp = null, otmp = null, mm = new $T.nhcoord(), $t1, $t2, $t3, $t4;
     await Hear_again();

@@ -32,6 +32,10 @@ import { Goodbye } from './role.js';
 import { find_mac } from './worn.js';
 import { Upolyd } from './you.macros.js';
 
+/**
+ * @param {number} lev int
+ * @returns {number | bigint} long
+ */
 export function newuexp(lev) {   // exper.c:14
     if (lev < 1) {   /* for newuexp(u.ulevel - 1) when u.ulevel is 1 */
         return 0;
@@ -44,6 +48,10 @@ export function newuexp(lev) {   // exper.c:14
     }
     return $c.mul64(10000000, lev - 19 | 0);
 }
+/**
+ * @param {number} en int
+ * @returns {number} int
+ */
 function enermod(en) {   // exper.c:26
     switch (gu.urole.mnum) {
         case PM.CLERIC:
@@ -60,6 +68,9 @@ function enermod(en) {   // exper.c:26
     }
 }
 /* calculate spell power/energy points for new level */
+/**
+ * @returns {number} int
+ */
 export function newpw() {   // exper.c:45
     let en = 0, enrnd = 0, enfix = 0, lim = 0;
     en = 0;
@@ -100,6 +111,11 @@ export function newpw() {   // exper.c:45
     return en;
 }
 /* return # of exp points for mtmp after nk killed */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} nk int
+ * @returns {number} int
+ */
 export function experience(mtmp, nk) {   // exper.c:85
     let ptr = null, i = 0, tmp = 0, tmp2 = 0;
     ptr = mtmp.data;
@@ -179,6 +195,11 @@ export function experience(mtmp, nk) {   // exper.c:85
     }
     return tmp;
 }
+/**
+ * @param {number} exper int
+ * @param {number} rexp int
+ * @returns {Promise<void>}
+ */
 export async function more_experienced(exper, rexp) {   // exper.c:169
     let oldexp = 0, oldrexp = 0, newexp = 0, rexpincr = 0, newrexp = 0;
     oldexp = u.uexp;
@@ -214,6 +235,10 @@ export async function more_experienced(exper, rexp) {   // exper.c:169
     }
 }
 /* e.g., hit by drain life attack */
+/**
+ * @param {$c.Ptr | null} drainer const char *
+ * @returns {Promise<void>}
+ */
 export async function losexp(drainer) {   // exper.c:207
     let num = 0, uhpmin = 0, olduhpmax = 0, $t1;
     /* cause of death, if drain should be fatal */
@@ -306,11 +331,18 @@ export async function losexp(drainer) {   // exper.c:207
  * After all, how much real experience does one get shooting a wand of death
  * at a dragon created with a wand of polymorph??
  */
+/**
+ * @returns {Promise<void>}
+ */
 export async function newexplevel() {   // exper.c:300
     if (u.ulevel < MAXULEV && u.uexp >= newuexp(u.ulevel)) {
         await pluslvl(TRUE);
     }
 }
+/**
+ * @param {number} incr boolean
+ * @returns {Promise<void>}
+ */
 export async function pluslvl(incr) {   // exper.c:307
     let hpinc = 0, eninc = 0, old_ach_cnt = 0, newrank = 0, oldrank = 0, tmp = 0, $t1;
     /* True: incremental experience growth;
@@ -377,6 +409,10 @@ export async function pluslvl(incr) {   // exper.c:307
 /* compute a random amount of experience points suitable for the hero's
    experience level:  base number of points needed to reach the current
    level plus a random portion of what it takes to get to the next level */
+/**
+ * @param {number} gaining boolean
+ * @returns {number | bigint} long
+ */
 export function rndexp(gaining) {   // exper.c:378
     let minexp = 0, maxexp = 0, diff = 0, factor = 0, result = 0;
     /* gaining XP via potion vs setting XP for polyself */

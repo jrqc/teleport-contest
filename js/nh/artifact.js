@@ -160,6 +160,10 @@ export function init_artifacts() {   // artifact.c:111
     $c.memset(new $c.Ptr(artidisco, 0), 0, 66);
     hack_artifacts();
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 export async function save_artifacts(nhfp) {   // artifact.c:119
     let i = 0;
     for (i = 0; i < NROFARTIFACTS + 1; i = i + 1 | 0) {
@@ -170,6 +174,10 @@ export async function save_artifacts(nhfp) {   // artifact.c:119
     }
 }
 /* SFCTOOL */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 export async function restore_artifacts(nhfp) {   // artifact.c:133
     let i = 0;
     for (i = 0; i < NROFARTIFACTS + 1; i = i + 1 | 0) {
@@ -180,6 +188,10 @@ export async function restore_artifacts(nhfp) {   // artifact.c:133
     }
     hack_artifacts();   /* redo non-saved special cases */
 }
+/**
+ * @param {number} artinum int
+ * @returns {$c.Ptr | null} const char *
+ */
 export function artiname(artinum) {   // artifact.c:151
     if (artinum <= 0 || artinum > NROFARTIFACTS) {
         return $c.lit("");
@@ -198,6 +210,13 @@ export function artiname(artinum) {   // artifact.c:151
    For the 1st, ``obj = mk_artifact((struct obj *) 0, some_alignment, ...);''.
    The max_giftvalue is the value of the sacrifice, for an artifact obtained
    by sacrificing, or 99 otherwise.
+ */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} alignment aligntyp
+ * @param {number} max_giftvalue uchar
+ * @param {number} adjust_spe boolean
+ * @returns {Promise<$T.obj | null>} struct obj *
  */
 export async function mk_artifact(otmp, alignment, max_giftvalue, adjust_spe) {   // artifact.c:172
     let a = null, m = 0, n = 0, altn = 0, by_align = 0, o_typ = 0, unique = 0, eligible = new Int16Array(33), skill_compatibility = 0, skill = 0, artiobj = null, new_spe = 0, $t1, $t2, $t3, $t4;
@@ -329,6 +348,10 @@ export async function mk_artifact(otmp, alignment, max_giftvalue, adjust_spe) { 
     }
     return otmp;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function dispose_of_orig_obj(obj) {   // artifact.c:312
     if (!obj) {
         return;
@@ -342,6 +365,12 @@ async function dispose_of_orig_obj(obj) {   // artifact.c:312
  * The given name must be rather close to the real name for it to match.
  * The object type of the artifact is returned in otyp if the return value
  * is non-NULL.
+ */
+/**
+ * @param {$c.Ptr | null} name const char *
+ * @param {*} otyp_p short *
+ * @param {number} fuzzy boolean
+ * @returns {$c.Ptr | null} const char *
  */
 export function artifact_name(name, otyp_p, fuzzy) {   // artifact.c:329
     let a = null, aname = null;
@@ -365,6 +394,11 @@ export function artifact_name(name, otyp_p, fuzzy) {   // artifact.c:329
     }
     return null;
 }
+/**
+ * @param {number} otyp int
+ * @param {$c.Ptr | null} name const char *
+ * @returns {number} boolean
+ */
 export function exist_artifact(otyp, name) {   // artifact.c:356
     let a = null, arex = null;
     if (otyp && name.get(0)) {
@@ -378,6 +412,13 @@ export function exist_artifact(otyp, name) {   // artifact.c:356
 }
 /* an artifact has just been created or is being "un-created" for a chance
    to be created again later */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {$c.Ptr | null} name const char *
+ * @param {number} mod boolean
+ * @param {number} flgs unsigned int
+ * @returns {Promise<void>}
+ */
 export async function artifact_exists(otmp, name, mod, flgs) {   // artifact.c:371
     let a = null, m = 0;
     /* True: exists, False: being un-created */
@@ -413,6 +454,10 @@ export async function artifact_exists(otmp, name, mod, flgs) {   // artifact.c:3
     return;
 }
 /* mark an artifact as 'found' */
+/**
+ * @param {number} a int
+ * @returns {Promise<void>}
+ */
 export async function found_artifact(a) {   // artifact.c:409
     if (a < 1 || a > NROFARTIFACTS) {
         await impossible($c.lit("found_artifact: invalid artifact index! (%d)"), a);
@@ -424,6 +469,10 @@ export async function found_artifact(a) {   // artifact.c:409
 }
 /* if an artifact hasn't already been designated 'found', do that now
    and generate a livelog event about finding it */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 export async function find_artifact(otmp) {   // artifact.c:422
     let a = 0, where = null;
     a = otmp.oartifact;
@@ -452,6 +501,9 @@ export async function find_artifact(otmp) {   // artifact.c:422
         await livelog_printf(LL.ARTIFACT, $c.lit("found %s%s"), await bare_artifactname(otmp), where);
     }
 }
+/**
+ * @returns {number} int
+ */
 export function nartifact_exist() {   // artifact.c:462
     let i = 0, a = 0;
     a = 0;
@@ -466,6 +518,11 @@ export function nartifact_exist() {   // artifact.c:462
    calling sequence: oname() -> artifact_exists() -> artifact_origin() or
    mksobj(),others -> mk_artifact() -> artifact_origin(random) possibly
    followed by mksobj(),others -> artifact_origin(non-random origin) */
+/**
+ * @param {$T.obj | null} arti struct obj *
+ * @param {number} aflags unsigned int
+ * @returns {Promise<void>}
+ */
 export async function artifact_origin(arti, aflags) {   // artifact.c:478
     let ct = 0, a = 0;
     /* new artifact */
@@ -510,12 +567,21 @@ export async function artifact_origin(arti, aflags) {   // artifact.c:478
         }
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number | bigint} abil unsigned long
+ * @returns {number} boolean
+ */
 export function spec_ability(otmp, abil) {   // artifact.c:516
     let arti = null;
     arti = get_artifact(otmp);
     return $c.i8(!$c.peq(arti, $c.relem(artilist, ART.NONARTIFACT)) && $c.andu64(arti.spfx, abil) !== 0 ? 1 : 0);
 }
 /* used so that callers don't need to known about SPFX_ codes */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 export function confers_luck(obj) {   // artifact.c:526
     /* might as well check for this too */
     if (obj.otyp === LUCKSTONE) {
@@ -524,6 +590,10 @@ export function confers_luck(obj) {   // artifact.c:526
     return $c.i8(obj.oartifact && spec_ability(obj, SPFX.LUCK) ? 1 : 0);
 }
 /* used to check whether a monster is getting reflection from an artifact */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 export function arti_reflects(obj) {   // artifact.c:537
     let arti = null;
     arti = get_artifact(obj);
@@ -541,6 +611,10 @@ export function arti_reflects(obj) {   // artifact.c:537
 }
 /* decide whether this obj is effective when attacking against shades;
    does not consider the bonus for blessed objects versus undead */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 export function shade_glare(obj) {   // artifact.c:555
     let arti = null;
     /* any silver object is effective */
@@ -558,6 +632,11 @@ export function shade_glare(obj) {   // artifact.c:555
     return FALSE;
 }
 /* returns 1 if name is restricted for otmp->otyp */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {$c.Ptr | null} name const char *
+ * @returns {number} boolean
+ */
 export function restrict_name(otmp, name) {   // artifact.c:575
     let a = null, aname = null, odesc = null, other = null, sametype = new Int8Array(481), i = 0, lo = Int32Array.of(0), hi = Int32Array.of(0), otyp = 0, ocls = 0;
     otyp = otmp.otyp;
@@ -604,6 +683,11 @@ export function restrict_name(otmp, name) {   // artifact.c:575
     }
     return FALSE;
 }
+/**
+ * @param {number} adtyp int
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {number} boolean
+ */
 export function attacks(adtyp, otmp) {   // artifact.c:626
     let weap = null;
     if (!$c.peq(weap = get_artifact(otmp), $c.relem(artilist, ART.NONARTIFACT))) {
@@ -611,6 +695,11 @@ export function attacks(adtyp, otmp) {   // artifact.c:626
     }
     return FALSE;
 }
+/**
+ * @param {number} adtyp int
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {number} boolean
+ */
 export function defends(adtyp, otmp) {   // artifact.c:636
     let weap = null, otyp = 0;
     if (!otmp) {
@@ -670,6 +759,11 @@ export function defends(adtyp, otmp) {   // artifact.c:636
     return FALSE;
 }
 /* used for monsters */
+/**
+ * @param {number} adtyp int
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {number} boolean
+ */
 export function defends_when_carried(adtyp, otmp) {   // artifact.c:687
     let weap = null;
     if (!$c.peq(weap = get_artifact(otmp), $c.relem(artilist, ART.NONARTIFACT))) {
@@ -678,6 +772,11 @@ export function defends_when_carried(adtyp, otmp) {   // artifact.c:687
     return FALSE;
 }
 /* determine whether an item confers Protection */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} being_worn boolean
+ * @returns {number} boolean
+ */
 export function protects(otmp, being_worn) {   // artifact.c:698
     let arti = null;
     if (being_worn && objects[otmp.otyp].oc_oprop === PROTECTION) {
@@ -692,6 +791,12 @@ export function protects(otmp, being_worn) {   // artifact.c:698
 /*
  * a potential artifact has just been worn/wielded/picked-up or
  * unworn/unwielded/dropped.  Pickup/drop only set/reset the W_ART mask.
+ */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} on boolean
+ * @param {number | bigint} wp_mask long
+ * @returns {Promise<void>}
  */
 export async function set_artifact_intrinsic(otmp, on, wp_mask) {   // artifact.c:716
     let mask = null, art = null, oart = null, obj = null, dtyp = 0, spfx = 0, $t1, $t2;
@@ -879,6 +984,11 @@ export async function set_artifact_intrinsic(otmp, on, wp_mask) {   // artifact.
  * Ignores such things as gauntlets, assuming the artifact is not
  * fooled by such trappings.
  */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<number>} int
+ */
 export async function touch_artifact(obj, mon) {   // artifact.c:908
     let oart = null, badclass = 0, badalign = 0, self_willed = 0, yours = 0, dmg = 0, tmp = 0, buf = new Int8Array(256);
     oart = get_artifact(obj);
@@ -937,6 +1047,11 @@ export async function touch_artifact(obj, mon) {   // artifact.c:908
 }
 /* decide whether an artifact itself is vulnerable to a particular type
    of erosion damage, independent of the properties of its bearer */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} dtyp int
+ * @returns {number} boolean
+ */
 export function arti_immune(obj, dtyp) {   // artifact.c:979
     let weap = null;
     weap = get_artifact(obj);
@@ -948,6 +1063,11 @@ export function arti_immune(obj, dtyp) {   // artifact.c:979
     }
     return $c.i8(weap.attk.adtyp === dtyp || weap.defn.adtyp === dtyp || weap.cary.adtyp === dtyp ? 1 : 0);
 }
+/**
+ * @param {$T.artifact | null} oart const struct artifact *
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<number>} boolean
+ */
 async function bane_applies(oart, mon) {   // artifact.c:993
     let atmp = new $T.artifact();
     if (!$c.peq(oart, $c.relem(artilist, ART.NONARTIFACT)) && $c.andu64(oart.spfx, SPFX.DBONUS) !== 0) {
@@ -960,6 +1080,11 @@ async function bane_applies(oart, mon) {   // artifact.c:993
     return FALSE;
 }
 /* decide whether an artifact's special attacks apply against mtmp */
+/**
+ * @param {$T.artifact | null} weap const struct artifact *
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} int
+ */
 async function spec_applies(weap, mtmp) {   // artifact.c:1009
     let ptr = null, yours = 0;
     if (!$c.andu64(weap.spfx, SPFX.DBONUS | SPFX.ATTK)) {
@@ -1005,6 +1130,10 @@ async function spec_applies(weap, mtmp) {   // artifact.c:1009
 }
 /* return the M2 flags of monster that an artifact's special attacks apply
  * against */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {number | bigint} long
+ */
 export function spec_m2(otmp) {   // artifact.c:1065
     let artifact = null;
     artifact = get_artifact(otmp);
@@ -1014,6 +1143,11 @@ export function spec_m2(otmp) {   // artifact.c:1065
     return 0;
 }
 /* special attack bonus */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<number>} int
+ */
 export async function spec_abon(otmp, mon) {   // artifact.c:1076
     let weap = null;
     weap = get_artifact(otmp);
@@ -1025,6 +1159,12 @@ export async function spec_abon(otmp, mon) {   // artifact.c:1076
     return 0;
 }
 /* special damage bonus */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} tmp int
+ * @returns {Promise<number>} int
+ */
 export async function spec_dbon(otmp, mon, tmp) {   // artifact.c:1091
     let weap = null, $t1;
     weap = get_artifact(otmp);
@@ -1044,6 +1184,10 @@ export async function spec_dbon(otmp, mon, tmp) {   // artifact.c:1091
     return 0;
 }
 /* add identified artifact to discoveries list */
+/**
+ * @param {number} m xint16
+ * @returns {Promise<void>}
+ */
 export async function discover_artifact(m) {   // artifact.c:1113
     let i = 0;
     /* look for this artifact in the discoveries list;
@@ -1059,6 +1203,10 @@ export async function discover_artifact(m) {   // artifact.c:1113
     await impossible($c.lit("couldn't discover artifact (%d)"), m);
 }
 /* used to decide whether an artifact has been fully identified */
+/**
+ * @param {number} m xint16
+ * @returns {number} boolean
+ */
 export function undiscovered_artifact(m) {   // artifact.c:1131
     let i = 0;
     /* look for this artifact in the discoveries list;
@@ -1073,6 +1221,10 @@ export function undiscovered_artifact(m) {   // artifact.c:1131
     return TRUE;
 }
 /* display a list of discovered artifacts; return their count */
+/**
+ * @param {number} tmpwin winid
+ * @returns {Promise<number>} int
+ */
 export async function disp_artifact_discoveries(tmpwin) {   // artifact.c:1147
     let i = 0, m = 0, otyp = 0, algnstr = null, buf = new Int8Array(256);
     /* supplied by dodiscover(); type is NHW_TEXT */
@@ -1098,6 +1250,10 @@ export async function disp_artifact_discoveries(tmpwin) {   // artifact.c:1147
     return i;
 }
 /* (wizard mode only) show all artifacts and their flags */
+/**
+ * @param {number} tmpwin winid
+ * @returns {Promise<void>}
+ */
 export async function dump_artifact_info(tmpwin) {   // artifact.c:1177
     let m = 0, buf = new Int8Array(256), buf2 = new Int8Array(256);
     /* not a menu, but header uses same bold or whatever attribute as such */
@@ -1115,6 +1271,16 @@ export async function dump_artifact_info(tmpwin) {   // artifact.c:1177
     return;
 }
 /* called when someone is being hit by Magicbane */
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.obj | null} mb struct obj *
+ * @param {*} dmgptr int *
+ * @param {number} dieroll int
+ * @param {number} vis boolean
+ * @param {$c.Ptr | null} hittee char *
+ * @returns {Promise<number>} boolean
+ */
 async function Mb_hit(magr, mdef, mb, dmgptr, dieroll, vis, hittee) {   // artifact.c:1249
     let old_mdat = null, verb = null, youattack = 0, youdefend = 0, resisted = 0, do_stun = 0, do_confuse = 0, result = 0, attack_indx = 0, fakeidx = 0, scare_dieroll = 0, buf = new Int8Array(256), $t1, $t2, $t3, $t4;
     /* attacker */
@@ -1308,6 +1474,14 @@ async function Mb_hit(magr, mdef, mb, dmgptr, dieroll, vis, hittee) {   // artif
  * dmgval() no longer takes artifact bonuses into account.  Possible
  * extension: change the killer so that when an orc kills you with
  * Stormbringer it's "killed by Stormbringer" instead of "killed by an orc".
+ */
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {*} dmgptr int *
+ * @param {number} dieroll int
+ * @returns {Promise<number>} boolean
  */
 export async function artifact_hit(magr, mdef, otmp, dmgptr, dieroll) {   // artifact.c:1447
     let youattack = 0, youdefend = 0, vis = 0, realizes_damage = 0, wepdesc = null, hittee = new Int8Array(256), itemdmg = 0, itemdmg$2 = 0, itemdmg$3 = 0, life = null, m_lev = 0, mhpmax = 0, drain = 0, otmpname = null, oldhpmax = 0, otmpname$2 = null, $t1;
@@ -1548,6 +1722,10 @@ export async function artifact_hit(magr, mdef, otmp, dmgptr, dieroll) {   // art
     return FALSE;
 }
 /* getobj callback for object to be invoked */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 function invoke_ok(obj) {   // artifact.c:1727
     if (!obj) {
         return GETOBJ.EXCLUDE;
@@ -1566,6 +1744,9 @@ function invoke_ok(obj) {   // artifact.c:1727
     return GETOBJ.EXCLUDE;
 }
 /* the #invoke command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doinvoke() {   // artifact.c:1749
     let obj = [null];
     obj[0] = await getobj($c.lit("invoke"), invoke_ok, GETOBJ_PROMPT);
@@ -1577,11 +1758,19 @@ export async function doinvoke() {   // artifact.c:1749
     }
     return await arti_invoke(obj[0]);
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function nothing_special(obj) {   // artifact.c:1762
     if (carried(obj)) {
         await You_feel($c.lit("a surge of power, but nothing seems to happen."));
     }
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function invoke_taming(obj) {   // artifact.c:1769
     let pseudo = new $T.obj();
     pseudo.$copyFrom(cg.zeroobj);   /* neither cursed nor blessed, zero oextra too */
@@ -1589,6 +1778,10 @@ async function invoke_taming(obj) {   // artifact.c:1769
     await seffects(pseudo);
     return ECMD.TIME;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function invoke_healing(obj) {   // artifact.c:1780
     let healamt = 0, creamed = 0;
     healamt = $c.div32((u.uhpmax + 1 | 0) - u.uhp | 0, 2);
@@ -1628,6 +1821,10 @@ async function invoke_healing(obj) {   // artifact.c:1780
     disp.botl = TRUE;
     return ECMD.TIME;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function invoke_energy_boost(obj) {   // artifact.c:1818
     let epboost = 0;
     epboost = $c.div32((u.uenmax + 1 | 0) - u.uen | 0, 2);
@@ -1646,6 +1843,10 @@ async function invoke_energy_boost(obj) {   // artifact.c:1818
     }
     return ECMD.TIME;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function invoke_untrap(obj) {   // artifact.c:1838
     if (!await untrap(TRUE, 0, 0, null)) {
         obj.age = 0;   /* don't charge for changing their mind */
@@ -1653,6 +1854,10 @@ async function invoke_untrap(obj) {   // artifact.c:1838
     }
     return ECMD.TIME;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function invoke_charge_obj(obj) {   // artifact.c:1848
     let oart = null, otmp = null, b_effect = 0;
     oart = get_artifact(obj);
@@ -1666,6 +1871,10 @@ async function invoke_charge_obj(obj) {   // artifact.c:1848
     await update_inventory();
     return ECMD.TIME;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function invoke_create_portal(obj) {   // artifact.c:1867
     let i = 0, num_ok_dungeons = 0, last_ok_dungeon = 0, newlev = new $T.d_level(), tmpwin = 0, any = new $T.any(), clr = 0, selected = [null], n = 0;
     last_ok_dungeon = 0;
@@ -1725,6 +1934,10 @@ async function invoke_create_portal(obj) {   // artifact.c:1867
     }
     return ECMD.TIME;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function invoke_create_ammo(obj) {   // artifact.c:1934
     let otmp = null, $t1, $t2, $t3, $t4;
     otmp = await mksobj(ARROW, TRUE, FALSE);
@@ -1753,6 +1966,10 @@ async function invoke_create_ammo(obj) {   // artifact.c:1934
     nhUse(otmp);
     return ECMD.TIME;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function invoke_banish(obj) {   // artifact.c:1963
     let nvanished = 0, nstayed = 0, mtmp = null, mtmp2 = null, dest = new $T.d_level(), chance = 0, subject = new Int8Array(7), $t1, $t2, $t3;
     nvanished = 0;
@@ -1806,6 +2023,10 @@ async function invoke_banish(obj) {   // artifact.c:1963
     }
     return ECMD.TIME;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function invoke_fling_poison(obj) {   // artifact.c:2022
     let venom = 0, otmp = null;
     if (await getdir(null)) {
@@ -1821,6 +2042,10 @@ async function invoke_fling_poison(obj) {   // artifact.c:2022
     }
     return ECMD.TIME;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function invoke_storm_spell(obj) {   // artifact.c:2040
     let oart = null, storm = 0, skill = 0, expertise = 0;
     oart = get_artifact(obj);
@@ -1832,6 +2057,10 @@ async function invoke_storm_spell(obj) {   // artifact.c:2040
     u.weapon_skills[skill].skill = $c.i16(expertise);
     return ECMD.TIME;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function invoke_blinding_ray(obj) {   // artifact.c:2054
     let vulnerable = 0, damg = 0;
     if (await getdir(null)) {
@@ -1864,6 +2093,10 @@ async function invoke_blinding_ray(obj) {   // artifact.c:2054
 }
 /* return the amount of Pw invoking an object costs.
    return a negative value, if obj invoking cannot be paid with Pw */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 function arti_invoke_cost_pw(obj) {   // artifact.c:2091
     let oart = null;
     oart = get_artifact(obj);
@@ -1874,6 +2107,10 @@ function arti_invoke_cost_pw(obj) {   // artifact.c:2091
     return -1;
 }
 /* return TRUE if artifact object's invoke cost can be paid (and pay it) */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} boolean
+ */
 async function arti_invoke_cost(obj) {   // artifact.c:2106
     let pw_cost = 0, $t1, $t2;
     if (obj.age > svm.moves) {
@@ -1895,6 +2132,10 @@ async function arti_invoke_cost(obj) {   // artifact.c:2106
     }
     return TRUE;
 }
+/**
+ * @param {$T.obj | null} obj$in struct obj *
+ * @returns {Promise<number>} int
+ */
 async function arti_invoke(obj$in) {   // artifact.c:2131
     const obj = [obj$in];
     let oart = null, res = 0, eprop = 0, iprop = 0, on = 0, $t1, $t2;
@@ -2020,6 +2261,10 @@ async function arti_invoke(obj$in) {   // artifact.c:2131
     return ECMD.TIME;
 }
 /* will freeing this object from inventory cause levitation to end? */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 export function finesse_ahriman(obj) {   // artifact.c:2236
     let oart = null, save_Lev = new $T.prop(), result = 0;
     /* if we aren't levitating or this isn't an artifact which confers
@@ -2040,6 +2285,10 @@ export function finesse_ahriman(obj) {   // artifact.c:2236
     return result;
 }
 /* WAC return TRUE if artifact is always lit */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 export function artifact_light(obj) {   // artifact.c:2264
     /* not artifacts but treat them as if they were because they emit
        light without burning */
@@ -2049,6 +2298,10 @@ export function artifact_light(obj) {   // artifact.c:2264
     return $c.i8(!$c.peq(get_artifact(obj), $c.relem(artilist, ART.NONARTIFACT)) && is_art(obj, ART.SUNSWORD) ? 1 : 0);
 }
 /* KMH -- Talking artifacts are finally implemented */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function arti_speak(obj) {   // artifact.c:2279
     let oart = null, line = null, buf = new Int8Array(256);
     oart = get_artifact(obj);
@@ -2064,12 +2317,21 @@ export async function arti_speak(obj) {   // artifact.c:2279
     await verbalize1(line);
     return ECMD.TIME;
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} inv_prop uchar
+ * @returns {number} boolean
+ */
 export function artifact_has_invprop(otmp, inv_prop) {   // artifact.c:2299
     let arti = null;
     arti = get_artifact(otmp);
     return $c.i8(!$c.peq(arti, $c.relem(artilist, ART.NONARTIFACT)) && arti.inv_prop === inv_prop ? 1 : 0);
 }
 /* Return the price sold to the hero of a given artifact or unique item */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {number | bigint} long
+ */
 export function arti_cost(otmp) {   // artifact.c:2309
     if (!otmp.oartifact) {
         return objects[otmp.otyp].oc_cost;
@@ -2079,6 +2341,10 @@ export function arti_cost(otmp) {   // artifact.c:2309
         return $c.mul64(100, objects[otmp.otyp].oc_cost);
     }
 }
+/**
+ * @param {*} abil long *
+ * @returns {number} uchar
+ */
 function abil_to_adtyp(abil) {   // artifact.c:2320
     let abil2adtyp = $c.recArray($T.abil2adtyp_tag, 7), k = 0;
     for (let $i4 = 0; $i4 < 7; $i4++) {
@@ -2105,6 +2371,10 @@ function abil_to_adtyp(abil) {   // artifact.c:2320
     }
     return 0;
 }
+/**
+ * @param {*} abil long *
+ * @returns {number | bigint} unsigned long
+ */
 function abil_to_spfx(abil) {   // artifact.c:2344
     let k = 0;
     for (k = 0; k < 12; k = k + 1 | 0) {
@@ -2116,6 +2386,10 @@ function abil_to_spfx(abil) {   // artifact.c:2344
 }
 /*
  * Return the first item that is conveying a particular intrinsic.
+ */
+/**
+ * @param {*} abil long *
+ * @returns {$T.obj | null} struct obj *
  */
 export function what_gives(abil) {   // artifact.c:2376
     let obj = null, dtyp = 0, spfx = 0, wornbits = 0, wornmask = 0, art = null;
@@ -2159,6 +2433,10 @@ export function what_gives(abil) {   // artifact.c:2376
     }
     return null;
 }
+/**
+ * @param {number} arti_indx int
+ * @returns {$c.Ptr | null} const char *
+ */
 export function glow_color(arti_indx) {   // artifact.c:2427
     let colornum = 0, colorstr = null;
     colornum = artilist[arti_indx].acolor;
@@ -2166,12 +2444,21 @@ export function glow_color(arti_indx) {   // artifact.c:2427
     return hcolor(colorstr);
 }
 /* relative strength that Sting is glowing (0..3), to select verb */
+/**
+ * @param {number} count int
+ * @returns {number} int
+ */
 function glow_strength(count) {   // artifact.c:2442
     /* glow strength should also be proportional to proximity and
        probably difficulty, but we don't have that information and
        gathering it is more trouble than this would be worth */
     return count > 12 ? 3 : count > 4 ? 2 : count > 0 ? 1 : 0;
 }
+/**
+ * @param {number} count int
+ * @param {number} ingsfx boolean
+ * @returns {$c.Ptr | null} const char *
+ */
 export function glow_verb(count, ingsfx) {   // artifact.c:2451
     /* 0 means blind rather than no applicable creatures */
     $c.strcpy(new $c.Ptr(glow_verb$resbuf, 0), glow_verbs[glow_strength(count)]);
@@ -2183,6 +2470,10 @@ export function glow_verb(count, ingsfx) {   // artifact.c:2451
     return new $c.Ptr(glow_verb$resbuf, 0);
 }
 /* use for warning "glow" for Sting, Orcrist, and Grimtooth */
+/**
+ * @param {number} orc_count int
+ * @returns {Promise<void>}
+ */
 export async function Sting_effects(orc_count) {   // artifact.c:2466
     let oldstr = 0, newstr = 0;
     /* new count (warn_obj_cnt is old count);
@@ -2214,6 +2505,11 @@ export async function Sting_effects(orc_count) {   // artifact.c:2466
 /* called when hero is wielding/applying/invoking a carried item, or
    after undergoing a transformation (alignment change, lycanthropy,
    polymorph) which might affect item access */
+/**
+ * @param {*} objp struct obj **
+ * @param {number} loseit boolean
+ * @returns {Promise<number>} int
+ */
 export async function retouch_object(objp, loseit) {   // artifact.c:2508
     let obj = null, buf = new Int8Array(256), dmg = 0, tmp = 0, ag = 0, bane = 0, what = null, otmp = null, $t1, $t2;
     /* might be destroyed or unintentionally dropped */
@@ -2297,6 +2593,11 @@ export async function retouch_object(objp, loseit) {   // artifact.c:2508
    or an artifact which conveys something via being carried or which
    has an #invoke effect currently in operation undergoes a touch test;
    if it fails, it will be unworn/unwielded and maybe dropped */
+/**
+ * @param {$T.obj | null} obj$in struct obj *
+ * @param {number} drop_untouchable boolean
+ * @returns {Promise<number>} boolean
+ */
 async function untouchable(obj$in, drop_untouchable) {   // artifact.c:2598
     const obj = [obj$in];
     let art = null, beingworn = 0, carryeffect = 0, invoked = 0, wearmask = 0;
@@ -2329,6 +2630,10 @@ async function untouchable(obj$in, drop_untouchable) {   // artifact.c:2598
     return FALSE;
 }
 /* check all items currently in use (mostly worn) for touchability */
+/**
+ * @param {number} dropflag int
+ * @returns {Promise<void>}
+ */
 export async function retouch_equipment(dropflag) {   // artifact.c:2640
     let obj = null, dropit = 0, had_gloves = 0, had_rings = 0, $t1;
     /* 0==don't drop, 1==drop all, 2==drop weapon */
@@ -2394,6 +2699,11 @@ export async function retouch_equipment(dropflag) {   // artifact.c:2640
         clear_bypasses();   /* reset upon final exit */
     }
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} int
+ */
 function count_surround_traps(x, y) {   // artifact.c:2708
     let levp = null, o = null, dx = 0, dy = 0, glyph = 0, ret = 0;
     ret = 0;
@@ -2437,6 +2747,9 @@ function count_surround_traps(x, y) {   // artifact.c:2708
     return ret;
 }
 /* sense adjacent traps if wielding MKoT without wearing gloves */
+/**
+ * @returns {Promise<void>}
+ */
 export async function mkot_trap_warn() {   // artifact.c:2753
     let idx = 0, ntraps = 0;
     if (!$G.uarmg && u_wield_art(ART.MASTER_KEY_OF_THIEVERY)) {
@@ -2452,6 +2765,11 @@ export async function mkot_trap_warn() {   // artifact.c:2753
 }
 /* Master Key is magic key if its bless/curse state meets our criteria:
    not cursed for rogues or blessed for non-rogues */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 export function is_magic_key(mon, obj) {   // artifact.c:2775
     /* if null, non-rogue is assumed */
     if (is_art(obj, ART.MASTER_KEY_OF_THIEVERY)) {
@@ -2464,6 +2782,10 @@ export function is_magic_key(mon, obj) {   // artifact.c:2775
     return FALSE;
 }
 /* figure out whether 'mon' (usually youmonst) is carrying the magic key */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {$T.obj | null} struct obj *
+ */
 export function has_magic_key(mon) {   // artifact.c:2790
     let o = null, key = 0;
     /* if null, hero assumed */
@@ -2479,6 +2801,11 @@ export function has_magic_key(mon) {   // artifact.c:2790
     return null;
 }
 /* #define is_art(o,art) ((o) && (o)->oartifact == (art)) */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} art int
+ * @returns {number} boolean
+ */
 export function is_art(obj, art) {   // artifact.c:2808
     if (obj && obj.oartifact === art) {
         return TRUE;
@@ -2489,6 +2816,10 @@ export function is_art(obj, art) {   // artifact.c:2808
     (((o) && ((o)->artifact > 0 && (o)->artifact < AFTER_LAST_ARTIFACT)) \
                              ? &artilist[(int) (o)->oartifact] \
                              : &artilist[ART_NONARTIFACT]) */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {$T.artifact | null} struct artifact *
+ */
 function get_artifact(obj) {   // artifact.c:2821
     let artidx = 0;
     if (obj) {
@@ -2503,6 +2834,10 @@ function get_artifact(obj) {   // artifact.c:2821
     return $c.relem(artilist, ART.NONARTIFACT);
 }
 /* is object permanently poisoned? (currently only Grimtooth) */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 export function permapoisoned(obj) {   // artifact.c:2837
     return $c.i8(obj && is_art(obj, ART.GRIMTOOTH) ? 1 : 0);
 }

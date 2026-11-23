@@ -61,6 +61,11 @@ const mcast_data = $c.recArray($T._mcast_data, 20);
 const mon_cleric_spells = new Int32Array(10);
 const mon_wizard_spells = new Int32Array(12);
 /* feedback when frustrated monster couldn't cast a spell */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} undirected boolean
+ * @returns {Promise<void>}
+ */
 async function cursetxt(mtmp, undirected) {   // mcastu.c:63
     let point_msg = null;
     if (canseemon(mtmp) && couldsee(mtmp.mx, mtmp.my)) {
@@ -82,6 +87,11 @@ async function cursetxt(mtmp, undirected) {   // mcastu.c:63
     }
 }
 /* choose a spell for monster to cast */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} adtyp int
+ * @returns {Promise<number>} int
+ */
 async function choose_monster_spell(mtmp, adtyp) {   // mcastu.c:89
     let list = null, i = 0, spellval = 0, len = 0, maxlev = 0;
     list = null;
@@ -116,6 +126,13 @@ async function choose_monster_spell(mtmp, adtyp) {   // mcastu.c:89
 /* return values:
  * 1: successful spell
  * 0: unsuccessful spell
+ */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {number} thinks_it_foundyou boolean
+ * @param {number} foundyou boolean
+ * @returns {Promise<number>} int
  */
 export async function castmu(mtmp, mattk, thinks_it_foundyou, foundyou) {   // mcastu.c:130
     let dmg = 0, ml = 0, ret = 0, spellnum = 0, cnt = 0, save_plnmsg = 0;
@@ -278,6 +295,11 @@ export async function castmu(mtmp, mattk, thinks_it_foundyou, foundyou) {   // m
     }
     return ret;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} dmg int
+ * @returns {Promise<number>} int
+ */
 async function m_cure_self(mtmp, dmg) {   // mcastu.c:308
     if (mtmp.mhp < mtmp.mhpmax) {
         if (canseemon(mtmp)) {
@@ -291,6 +313,10 @@ async function m_cure_self(mtmp, dmg) {   // mcastu.c:308
 }
 /* unlike the finger of death spell which behaves like a wand of death,
    this monster spell only attacks the hero */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function touch_of_death(mtmp) {   // mcastu.c:323
     let kbuf = new Int8Array(256), dmg = 0, drain = 0, olduhp = 0, uhpmin = 0, newuhpmax = 0;
     dmg = 50 + d(8, 6) | 0;
@@ -321,6 +347,12 @@ export async function touch_of_death(mtmp) {   // mcastu.c:323
     svk.killer.name[0] = 0;   /* not killed if we get here... */
 }
 /* give a reason for death by some monster spells */
+/**
+ * @param {$c.Ptr | null} outbuf char *
+ * @param {$c.Ptr | null} deathreason const char *
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function death_inflicted_by(outbuf, deathreason, mtmp) {   // mcastu.c:358
     let mptr = null, champtr = null, realnm = null, fakenm = null;
     /* assumed big enough; pm_names are short */
@@ -349,6 +381,10 @@ export async function death_inflicted_by(outbuf, deathreason, mtmp) {   // mcast
 /*
  * Monster wizard and cleric spellcasting functions.
  */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 async function mcast_death_touch(mtmp) {   // mcastu.c:389
     await pline($c.lit("Oh no, %s's using the touch of death!"), genders[pronoun_gender(mtmp, PRONOUN.HALLU)].he);
     if (nonliving(gy.youmonst.data) || is_demon(gy.youmonst.data)) {
@@ -368,6 +404,10 @@ async function mcast_death_touch(mtmp) {   // mcastu.c:389
         await pline($c.lit("Lucky for you, it didn't work!"));
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 async function mcast_clone_wiz(mtmp) {   // mcastu.c:411
     if (mtmp.iswiz | 0 && svc.context.no_of_wizards === 1) {
         await pline($c.lit("Double Trouble..."));
@@ -376,6 +416,10 @@ async function mcast_clone_wiz(mtmp) {   // mcastu.c:411
         await impossible($c.lit("bad wizard cloning?"));
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 async function mcast_summon_mons(mtmp) {   // mcastu.c:421
     let count = 0, one = 0, mappear = null;
     count = await nasty(mtmp);
@@ -397,6 +441,9 @@ async function mcast_summon_mons(mtmp) {   // mcastu.c:421
         }
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function mcast_destroy_armor() {   // mcastu.c:450
     if (Antimagic()) {
         await shieldeff(u.ux, u.uy);
@@ -410,6 +457,11 @@ async function mcast_destroy_armor() {   // mcastu.c:450
         monstunseesu(M_SEEN.MAGR);
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} dmg int
+ * @returns {Promise<void>}
+ */
 async function mcast_weaken_you(mtmp, dmg) {   // mcastu.c:466
     let kbuf = new Int8Array(256);
     if (Antimagic()) {
@@ -430,6 +482,10 @@ async function mcast_weaken_you(mtmp, dmg) {   // mcastu.c:466
         monstunseesu(M_SEEN.MAGR);
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 async function mcast_disappear(mtmp) {   // mcastu.c:490
     if (!mtmp.minvis && !mtmp.invis_blkd) {
         if (canseemon(mtmp)) {
@@ -443,6 +499,10 @@ async function mcast_disappear(mtmp) {   // mcastu.c:490
         await impossible($c.lit("no reason for monster to cast disappear spell?"));
     }
 }
+/**
+ * @param {number} dmg int
+ * @returns {Promise<void>}
+ */
 async function mcast_stun_you(dmg) {   // mcastu.c:504
     if (Antimagic() || Free_action()) {
         await shieldeff(u.ux, u.uy);
@@ -461,6 +521,10 @@ async function mcast_stun_you(dmg) {   // mcastu.c:504
         monstunseesu(M_SEEN.MAGR);
     }
 }
+/**
+ * @param {number} dmg int
+ * @returns {Promise<number>} int
+ */
 async function mcast_geyser(dmg) {   // mcastu.c:523
     /* this is physical damage (force not heat),
      * not magical damage or fire damage
@@ -474,6 +538,11 @@ async function mcast_geyser(dmg) {   // mcastu.c:523
     /* make floor items wet */
     return dmg;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} dmg int
+ * @returns {Promise<number>} int
+ */
 async function mcast_fire_pillar(mtmp, dmg) {   // mcastu.c:540
     let orig_dmg = 0;
     await pline($c.lit("A pillar of fire strikes all around you!"));
@@ -497,6 +566,11 @@ async function mcast_fire_pillar(mtmp, dmg) {   // mcastu.c:540
     await mon_spell_hits_spot(mtmp, AD.FIRE, u.ux, u.uy);
     return dmg;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} dmg int
+ * @returns {Promise<number>} int
+ */
 async function mcast_lightning(mtmp, dmg) {   // mcastu.c:566
     let orig_dmg = 0, reflects = 0;
     await pline($c.lit("A bolt of lightning strikes down at you from above!"));
@@ -527,6 +601,10 @@ async function mcast_lightning(mtmp, dmg) {   // mcastu.c:566
     await flashburn(rnd(100), TRUE);
     return dmg;
 }
+/**
+ * @param {number} dmg int
+ * @returns {Promise<number>} int
+ */
 async function mcast_psi_bolt(dmg) {   // mcastu.c:601
     /* prior to 3.4.0 Antimagic was setting the damage to 1--this
        made the spell virtually harmless to players with magic res. */
@@ -548,6 +626,10 @@ async function mcast_psi_bolt(dmg) {   // mcastu.c:601
     }
     return dmg;
 }
+/**
+ * @param {number} dmg int
+ * @returns {Promise<number>} int
+ */
 async function mcast_open_wounds(dmg) {   // mcastu.c:624
     if (Antimagic()) {
         await shieldeff(u.ux, u.uy);
@@ -567,6 +649,10 @@ async function mcast_open_wounds(dmg) {   // mcastu.c:624
     }
     return dmg;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 async function mcast_insects(mtmp) {   // mcastu.c:645
     let pm = null, mtmp2 = null, whatbuf = new Int8Array(128), let_ = 0, success = 0, seecaster = 0, i = 0, quan = 0, oldseen = 0, newseen = 0, bypos = new $T.nhcoord(), fmt = null, what = null, arg = null, $t1, $t2;
     /* Try for insects, and if there are none
@@ -636,6 +722,9 @@ async function mcast_insects(mtmp) {   // mcastu.c:645
         await pline_mon(mtmp, fmt, await Monnam(mtmp), what);
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function mcast_blind_you() {   // mcastu.c:729
     let num_eyes = 0;
     /* note: resists_blnd() doesn't apply here */
@@ -650,6 +739,10 @@ async function mcast_blind_you() {   // mcastu.c:729
         await impossible($c.lit("no reason for monster to cast blindness spell?"));
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} int
+ */
 async function mcast_paralyze(mtmp) {   // mcastu.c:746
     let dmg = 0;
     dmg = 0;
@@ -675,6 +768,10 @@ async function mcast_paralyze(mtmp) {   // mcastu.c:746
     gn.nomovemsg = null;
     return dmg;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 async function mcast_confuse_you(mtmp) {   // mcastu.c:771
     let oldprop = 0, dmg = 0;
     if (Antimagic()) {
@@ -703,6 +800,12 @@ async function mcast_confuse_you(mtmp) {   // mcastu.c:771
    undirected spell.
    If you modify either of these, be sure to change is_undirected_spell()
    and spell_would_be_useless().
+ */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} dmg int
+ * @param {number} spellnum int
+ * @returns {Promise<void>}
  */
 async function mcast_spell(mtmp, dmg, spellnum) {   // mcastu.c:801
     if (dmg < 0) {
@@ -800,6 +903,10 @@ async function mcast_spell(mtmp, dmg, spellnum) {   // mcastu.c:801
         await mdamageu(mtmp, dmg);
     }
 }
+/**
+ * @param {number} spellnum int
+ * @returns {number} boolean
+ */
 function is_undirected_spell(spellnum) {   // mcastu.c:900
     if ((mcast_data[spellnum].flags & MCF.INDIRECT) !== 0) {
         return TRUE;
@@ -807,6 +914,11 @@ function is_undirected_spell(spellnum) {   // mcastu.c:900
     return FALSE;
 }
 /* Some spells are useless under some circumstances. */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} spellnum int
+ * @returns {Promise<number>} boolean
+ */
 async function spell_would_be_useless(mtmp, spellnum) {   // mcastu.c:909
     let mcouldseeu = 0;
     /* Some spells don't require the player to really be there and can be cast
@@ -892,6 +1004,11 @@ async function spell_would_be_useless(mtmp, spellnum) {   // mcastu.c:909
     return FALSE;
 }
 /* monster uses spell (ranged) */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @returns {Promise<number>} int
+ */
 export async function buzzmu(mtmp, mattk) {   // mcastu.c:989
     /* don't print constant stream of curse messages for 'normal'
        spellcasting monsters at range */

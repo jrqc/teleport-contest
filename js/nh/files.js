@@ -97,6 +97,11 @@ let lockfd = 0;   /* for lock_file() to pass to unlock_file() */
 const sflock = new $T.flock();   /* for unlocking, same as above */
 /* !SFCTOOL */
 /* return a file's name without its path and optionally trailing 'type' */
+/**
+ * @param {$c.Ptr | null} fname const char *
+ * @param {number} keep_suffix boolean
+ * @returns {$c.Ptr | null} const char *
+ */
 export function nh_basename(fname, keep_suffix) {   // files.c:199
     let p = null, ln = 0;
     if ((p = $c.strrchr(fname, 47)) !== null) {
@@ -141,6 +146,14 @@ export function nh_basename(fname, keep_suffix) {   // files.c:199
  *      results in this encoding:
  *          "This%20is%20a%20%25%20test%21"
  */
+/**
+ * @param {$c.Ptr | null} legal const char *
+ * @param {number} quotechar char
+ * @param {$c.Ptr | null} s char *
+ * @param {$c.Ptr | null} callerbuf char *
+ * @param {number} bufsz int
+ * @returns {$c.Ptr | null} char *
+ */
 export function fname_encode(legal, quotechar, s, callerbuf, bufsz) {   // files.c:255
     let sp = null, op = null, cnt = 0, $t1;
     cnt = 0;
@@ -178,6 +191,13 @@ export function fname_encode(legal, quotechar, s, callerbuf, bufsz) {   // files
  *      s           string to decode
  *      callerbuf   buffer to house result
  *      bufsz       size of callerbuf
+ */
+/**
+ * @param {number} quotechar char
+ * @param {$c.Ptr | null} s char *
+ * @param {$c.Ptr | null} callerbuf char *
+ * @param {number} bufsz int
+ * @returns {$c.Ptr | null} char *
  */
 export function fname_decode(quotechar, s, callerbuf, bufsz) {   // files.c:305
     let sp = null, op = null, k = 0, calc = 0, cnt = 0, $t1, $t2, $t3, $t4, $t5;
@@ -224,12 +244,22 @@ export function fname_decode(quotechar, s, callerbuf, bufsz) {   // files.c:305
 }
 /*empty*/
 /*ARGSUSED*/
+/**
+ * @param {$c.Ptr | null} basenam const char *
+ * @param {number} whichprefix int
+ * @param {number} buffnum int
+ * @returns {$c.Ptr | null} const char *
+ */
 export function fqname(basenam, whichprefix, buffnum) {   // files.c:354
     return basenam;
     /* XXX */
     /* !PREFIXES_IN_USE */
 }
 /* reasonbuf must be at least BUFSZ, supplied by caller */
+/**
+ * @param {$c.Ptr | null} reasonbuf char *
+ * @returns {number} int
+ */
 export function validate_prefix_locations(reasonbuf) {   // files.c:394
     if (reasonbuf) {
         reasonbuf.set(0, 0);
@@ -240,12 +270,22 @@ export function validate_prefix_locations(reasonbuf) {   // files.c:394
 }
 /* fopen a file, with OS-dependent bells and whistles */
 /* NOTE: a simpler version of this routine also exists in util/dlb_main.c */
+/**
+ * @param {$c.Ptr | null} filename const char *
+ * @param {$c.Ptr | null} mode const char *
+ * @param {number} prefix int
+ * @returns {$T.__sFILE | null} FILE *
+ */
 export function fopen_datafile(filename, mode, prefix) {   // files.c:444
     let fp = null;
     filename = fqname(filename, prefix, prefix === TROUBLEPREFIX ? 3 : 0);
     fp = $c.fopen(filename, mode);
     return fp;
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 export async function init_nhfile(nhfp) {   // files.c:461
     let $t1;
     if (nhfp.structlevel) {
@@ -275,6 +315,9 @@ export async function init_nhfile(nhfp) {   // files.c:461
     nhfp.style.binary = 1;
     nhfp.nhfpconvert = null;
 }
+/**
+ * @returns {Promise<$T.nh_file | null>} NHFILE *
+ */
 async function new_nhfile() {   // files.c:496
     let nhfp = null;
     nhfp = $c.asRec(await alloc(88), $T.nh_file, 88);
@@ -282,12 +325,20 @@ async function new_nhfile() {   // files.c:496
     await init_nhfile(nhfp);
     return nhfp;
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 async function free_nhfile(nhfp) {   // files.c:509
     if (nhfp) {
         await init_nhfile(nhfp);
         $c.free(nhfp);
     }
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 export async function close_nhfile(nhfp) {   // files.c:518
     if (nhfp.structlevel && nhfp.fd !== -1) {
         await nhclose(nhfp.fd), nhfp.fd = -1;
@@ -305,6 +356,9 @@ export async function close_nhfile(nhfp) {   // files.c:518
     }
     await free_nhfile(nhfp);
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ */
 export function rewind_nhfile(nhfp) {   // files.c:534
     if (nhfp.structlevel) {
         $c.lseek(nhfp.fd, 0, 0);
@@ -312,6 +366,10 @@ export function rewind_nhfile(nhfp) {   // files.c:534
         $c.rewind(nhfp.fpdef);
     }
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<$T.nh_file | null>} NHFILE *
+ */
 async function viable_nhfile(nhfp) {   // files.c:549
     /* perform some sanity checks before returning
        the pointer to the nethack file descriptor */
@@ -342,6 +400,10 @@ async function viable_nhfile(nhfp) {   // files.c:549
     return nhfp;
 }
 /* !SFCTOOL */
+/**
+ * @param {number} fd int
+ * @returns {Promise<number>} int
+ */
 export async function nhclose(fd) {   // files.c:583
     let retval = 0;
     retval = 0;
@@ -361,6 +423,10 @@ export async function nhclose(fd) {   // files.c:583
  * a two digit number.  This is true for 'level'
  * but be careful if you use it for other things -dgk
  */
+/**
+ * @param {$c.Ptr | null} file char *
+ * @param {number} lev int
+ */
 export function set_levelfile_name(file, lev) {   // files.c:606
     let tf = null;
     tf = $c.strrchr(file, 46);
@@ -370,6 +436,11 @@ export function set_levelfile_name(file, lev) {   // files.c:606
     $c.sprintf(tf, $c.lit(".%d"), lev);
     return;
 }
+/**
+ * @param {number} lev int
+ * @param {$c.Ptr | null} errbuf char *
+ * @returns {Promise<$T.nh_file | null>} NHFILE *
+ */
 export async function create_levelfile(lev, errbuf) {   // files.c:621
     let fq_lock = null, nhfp = null, $t1;
     nhfp = null;
@@ -404,6 +475,11 @@ export async function create_levelfile(lev, errbuf) {   // files.c:621
     nhfp = await viable_nhfile(nhfp);
     return nhfp;
 }
+/**
+ * @param {number} lev int
+ * @param {$c.Ptr | null} errbuf char *
+ * @returns {Promise<$T.nh_file | null>} NHFILE *
+ */
 export async function open_levelfile(lev, errbuf) {   // files.c:673
     let fq_lock = null, nhfp = null, $t1;
     nhfp = null;
@@ -437,6 +513,9 @@ export async function open_levelfile(lev, errbuf) {   // files.c:673
     nhfp = await viable_nhfile(nhfp);
     return nhfp;
 }
+/**
+ * @param {number} lev int
+ */
 export function delete_levelfile(lev) {   // files.c:719
     /*
      * Level 0 might be created by port specific code that doesn't
@@ -448,6 +527,9 @@ export function delete_levelfile(lev) {   // files.c:719
         svl.level_info[lev].flags = $c.u8(svl.level_info[lev].flags & ~LFILE_EXISTS);
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function clearlocks() {   // files.c:733
     let x = 0;
     if (program_state.preserve_locks) {
@@ -462,6 +544,11 @@ export async function clearlocks() {   // files.c:733
     }
 }
 /* qsort comparison routine */
+/**
+ * @param {*} p const void *
+ * @param {*} q const void *
+ * @returns {number} int
+ */
 function strcmp_wrap(p, q) {   // files.c:755
     return $c.strcmp($c.asArr(p, 'ptr').get(0), $c.asArr(q, 'ptr').get(0));
 }
@@ -469,6 +556,11 @@ function strcmp_wrap(p, q) {   // files.c:755
 /* ----------  BEGIN BONES FILE HANDLING ----------- */
 /* set up "file" to be file name for retrieving bones, and return a
  * bonesid to be read/written in the bones file.
+ */
+/**
+ * @param {$c.Ptr | null} file char *
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {$c.Ptr | null} char *
  */
 function set_bonesfile_name(file, lev) {   // files.c:769
     let sptr = null, dptr = null, poolnum = 0;
@@ -508,6 +600,9 @@ function set_bonesfile_name(file, lev) {   // files.c:769
  * (we are not reading or writing level files while writing bones files, so
  * the same array may be used instead of copying.)
  */
+/**
+ * @returns {$c.Ptr | null} char *
+ */
 function set_bonestemp_name() {   // files.c:818
     let tf = null;
     tf = $c.strrchr(new $c.Ptr(gl.lock, 0), 46);
@@ -517,6 +612,12 @@ function set_bonestemp_name() {   // files.c:818
     $c.sprintf(tf, $c.lit(".bn"));
     return new $c.Ptr(gl.lock, 0);
 }
+/**
+ * @param {$T.d_level | null} lev d_level *
+ * @param {*} bonesid char **
+ * @param {$c.Ptr | null} errbuf char *
+ * @returns {Promise<$T.nh_file | null>} NHFILE *
+ */
 export async function create_bonesfile(lev, bonesid, errbuf) {   // files.c:833
     let file = null, nhfp = null, failed = 0, $t1, $t2;
     nhfp = null;
@@ -574,6 +675,10 @@ export async function create_bonesfile(lev, bonesid, errbuf) {   // files.c:833
     return nhfp;
 }
 /* move completed bones file to proper name */
+/**
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {Promise<void>}
+ */
 export async function commit_bonesfile(lev) {   // files.c:915
     let fq_bones = null, tempname = null, ret = 0;
     set_bonesfile_name(new $c.Ptr(gb.bones, 0), lev);
@@ -588,6 +693,11 @@ export async function commit_bonesfile(lev) {   // files.c:915
         await pline($c.lit("couldn't rename %s to %s."), tempname, fq_bones);
     }
 }
+/**
+ * @param {$T.d_level | null} lev d_level *
+ * @param {*} bonesid char **
+ * @returns {Promise<$T.nh_file | null>} NHFILE *
+ */
 export async function open_bonesfile(lev, bonesid) {   // files.c:940
     let fq_bones = null, nhfp = null, $t1, $t2;
     nhfp = null;
@@ -615,6 +725,10 @@ export async function open_bonesfile(lev, bonesid) {   // files.c:940
     nhfp = await viable_nhfile(nhfp);
     return nhfp;
 }
+/**
+ * @param {$T.d_level | null} lev d_level *
+ * @returns {Promise<number>} int
+ */
 export async function delete_bonesfile(lev) {   // files.c:993
     let reslt = 0;
     set_bonesfile_name(new $c.Ptr(gb.bones, 0), lev);
@@ -624,6 +738,9 @@ export async function delete_bonesfile(lev) {   // files.c:993
 }
 /* assume we're compressing the recently read or created bonesfile, so the
  * file name is already set properly */
+/**
+ * @returns {Promise<void>}
+ */
 export async function compress_bonesfile() {   // files.c:1006
     nh_sfconvert(fqname(new $c.Ptr(gb.bones, 0), BONESPREFIX, 0));
     await nh_compress(fqname(new $c.Ptr(gb.bones, 0), BONESPREFIX, 0));
@@ -633,6 +750,9 @@ export async function compress_bonesfile() {   // files.c:1006
 /* ----------  BEGIN SAVE FILE HANDLING ----------- */
 /* set savefile name in OS-dependent manner from pre-existing svp.plname,
  * avoiding troublesome characters */
+/**
+ * @param {number} regularize_it boolean
+ */
 export function set_savefile_name(regularize_it) {   // files.c:1020
     let regoffset = 0, overflow = 0, indicator_spot = 0, postappend = null, sfindicator = null;
     regoffset = 0;
@@ -681,6 +801,10 @@ export function set_savefile_name(regularize_it) {   // files.c:1020
         }
     }
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 export async function save_savefile_name(nhfp) {   // files.c:1128
     await sfo_char(nhfp, new $c.Ptr(gs.SAVEF, 0), $c.lit("savefile_name"), 54);
 }
@@ -689,6 +813,9 @@ export function set_error_savefile() {   // files.c:1137
     $c.strcat(new $c.Ptr(gs.SAVEF, 0), $c.lit(".e"));
 }
 /* create save file, overwriting one if it already exists */
+/**
+ * @returns {Promise<$T.nh_file | null>} NHFILE *
+ */
 export async function create_savefile() {   // files.c:1159
     let fq_save = null, nhfp = null, do_historical = 0, $t1;
     nhfp = null;
@@ -724,6 +851,9 @@ export async function create_savefile() {   // files.c:1159
     return nhfp;
 }
 /* open savefile for reading */
+/**
+ * @returns {Promise<$T.nh_file | null>} NHFILE *
+ */
 export async function open_savefile() {   // files.c:1217
     let fq_save = null, nhfp = null, do_historical = 0, $t1;
     nhfp = null;
@@ -751,6 +881,9 @@ export async function open_savefile() {   // files.c:1217
     return nhfp;
 }
 /* delete savefile */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function delete_savefile() {   // files.c:1259
     let sfname = null;
     sfname = fqname(new $c.Ptr(gs.SAVEF, 0), SAVEPREFIX, 0);
@@ -759,6 +892,9 @@ export async function delete_savefile() {   // files.c:1259
     return 0;   /* for restore_saved_game() (ex-xxxmain.c) test */
 }
 /* try to open up a save file and prepare to restore it */
+/**
+ * @returns {Promise<$T.nh_file | null>} NHFILE *
+ */
 export async function restore_saved_game() {   // files.c:1270
     let fq_save = null, nhfp = null, sfstatus = 0;
     nhfp = null;
@@ -782,6 +918,9 @@ export async function restore_saved_game() {   // files.c:1270
  * close_nhfile() can, and should, be called on the returned
  * (NHFILE *), and it will handle it correctly.
  */
+/**
+ * @returns {Promise<$T.nh_file | null>} NHFILE *
+ */
 export async function get_freeing_nhfile() {   // files.c:1299
     let nhfp = null;
     nhfp = null;
@@ -792,6 +931,9 @@ export async function get_freeing_nhfile() {   // files.c:1299
     return nhfp;
 }
 /* called if there is no save file for current character */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function check_panic_save() {   // files.c:1312
     let result = 0, cf = null, savef = null, ln = 0, cfn = null;
     result = 0;
@@ -823,6 +965,11 @@ export async function check_panic_save() {   // files.c:1312
     /* CHECK_PANIC_SAVE */
     return result;
 }
+/**
+ * @param {$c.Ptr | null} filename const char *
+ * @param {number} without_wait_synch_per_file boolean
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function plname_from_file(filename, without_wait_synch_per_file) {   // files.c:1357
     let nhfp = null, ln = 0, result = null, sfstatus = 0, sln = 0, xln = 0;
     result = null;
@@ -852,6 +999,9 @@ export async function plname_from_file(filename, without_wait_synch_per_file) { 
 }
 /* defined(SELECTSAVED) */
 /* get list of saved games owned by current user */
+/**
+ * @returns {Promise<*>} char **
+ */
 export async function get_saved_games() {   // files.c:1399
     let result = null, n = 0, j = 0, myuid = 0, dir = null, i = 0, uid = Int32Array.of(0), name = new Int8Array(64), entry = null, filename = new Int8Array(256), r = null, $t1;
     result = null;
@@ -911,6 +1061,9 @@ export async function get_saved_games() {   // files.c:1399
     /* SELECTSAVED */
     return result;
 }
+/**
+ * @param {*} saved char **
+ */
 export function free_saved_games(saved) {   // files.c:1543
     let i = 0;
     if (saved) {
@@ -924,6 +1077,13 @@ export function free_saved_games(saved) {   // files.c:1543
 /* ----------  END SAVE FILE HANDLING ----------- */
 /* ----------  BEGIN FILE COMPRESSION HANDLING ----------- */
 /* external compression */
+/**
+ * @param {$c.Ptr | null} filename const char *
+ * @param {$c.Ptr | null} mode const char *
+ * @param {$T.__sFILE | null} stream FILE *
+ * @param {number} uncomp boolean
+ * @returns {Promise<void>}
+ */
 async function redirect(filename, mode, stream, uncomp) {   // files.c:1563
     let details = null;
     if ($c.freopen(filename, mode, stream) === null) {
@@ -937,13 +1097,26 @@ async function redirect(filename, mode, stream, uncomp) {   // files.c:1563
 /* COMPRESS : external compression */
 /*empty*/
 /* compress file */
+/**
+ * @param {$c.Ptr | null} filename const char *
+ * @returns {Promise<void>}
+ */
 export async function nh_compress(filename) {   // files.c:1787
     await docompress_file(filename, 0);
 }
 /* uncompress file if it exists */
+/**
+ * @param {$c.Ptr | null} filename const char *
+ * @returns {Promise<void>}
+ */
 export async function nh_uncompress(filename) {   // files.c:1796
     await docompress_file(filename, 1);
 }
+/**
+ * @param {number} sfstatus int
+ * @param {$c.Ptr | null} savefilenm const char *
+ * @returns {Promise<$T.nh_file | null>} NHFILE *
+ */
 async function problematic_savefile(sfstatus, savefilenm) {   // files.c:2015
     let i = 0, nhfp = null;
     nhfp = null;
@@ -973,6 +1146,12 @@ async function problematic_savefile(sfstatus, savefilenm) {   // files.c:2015
 /*
  * Returns non-zero if unconvert was successful
  */
+/**
+ * @param {$c.Ptr | null} filename const char *
+ * @param {number} sfstatus int
+ * @param {number} unconvert boolean
+ * @returns {number} int
+ */
 function doconvert_file(filename, sfstatus, unconvert) {   // files.c:2062
     nhUse(filename);
     nhUse(sfstatus);
@@ -980,16 +1159,26 @@ function doconvert_file(filename, sfstatus, unconvert) {   // files.c:2062
     return 1;
 }
 /* convert file */
+/**
+ * @param {$c.Ptr | null} filename const char *
+ */
 export function nh_sfconvert(filename) {   // files.c:2072
     doconvert_file(filename, 0, 0);
 }
 /* unconvert file if it exists */
+/**
+ * @param {$c.Ptr | null} filename const char *
+ */
 export function nh_sfunconvert(filename) {   // files.c:2079
     doconvert_file(filename, 0, 1);
 }
 /* !SFCTOOL */
 /* in sfctool, these are in sfctool.c, not in here */
 /* !SFCTOOL */
+/**
+ * @param {$c.Ptr | null} filename const char *
+ * @returns {Promise<number>} boolean
+ */
 async function make_converted_name(filename) {   // files.c:2090
     let ln = 0, xtra = null, finaldirchar = null, dir = null, needsep = 0;
     dir = null;
@@ -1035,6 +1224,10 @@ async function make_converted_name(filename) {   // files.c:2090
     return 1;
 }
 /* delete converted savefile as a normal course of action */
+/**
+ * @param {$c.Ptr | null} basefilename const char *
+ * @returns {Promise<number>} int
+ */
 export async function delete_convertedfile(basefilename) {   // files.c:2157
     if (!converted_filename) {
         await make_converted_name(basefilename);
@@ -1054,6 +1247,10 @@ export function free_convert_filenames() {   // files.c:2168
     cvtinit = 0;
 }
 /* return TRUE if s contains a directory, not just a filespec */
+/**
+ * @param {$c.Ptr | null} s const char *
+ * @returns {number} boolean
+ */
 export function contains_directory(s) {   // files.c:2179
     let i = 0, slen = 0, cp = null;
     slen = $c.i32($c.strlen(s));
@@ -1070,6 +1267,12 @@ export function contains_directory(s) {   // files.c:2179
 /* !(UNIX || VMS || AMIGA || WIN32 || MSDOS) */
 /* !USE_FCNTL */
 /* lock a file */
+/**
+ * @param {$c.Ptr | null} filename const char *
+ * @param {number} whichprefix int
+ * @param {number} retryct int
+ * @returns {Promise<number>} boolean
+ */
 export async function lock_file(filename, whichprefix, retryct) {   // files.c:2255
     let $t1;
     gn.nesting = gn.nesting + 1 | 0;
@@ -1120,6 +1323,10 @@ export async function lock_file(filename, whichprefix, retryct) {   // files.c:2
 }
 /* for unlock_file, use the unlink() routine in vmsunix.c */
 /* unlock file, which must be currently locked by lock_file */
+/**
+ * @param {$c.Ptr | null} filename const char *
+ * @returns {Promise<void>}
+ */
 export async function unlock_file(filename) {   // files.c:2416
     if (gn.nesting === 1) {
         sflock.l_type = 2;
@@ -1140,6 +1347,9 @@ export async function unlock_file(filename) {   // files.c:2416
 }
 /* ----------  END FILE LOCKING HANDLING ----------- */
 /* ----------  BEGIN WIZKIT FILE HANDLING ----------- */
+/**
+ * @returns {Promise<$T.__sFILE | null>} FILE *
+ */
 async function fopen_wizkit_file() {   // files.c:2465
     let fp = null, tmp_wizkit = new Int8Array(256), envp = null;
     envp = nh_getenv($c.lit("WIZKIT"));
@@ -1184,6 +1394,10 @@ async function fopen_wizkit_file() {   // files.c:2465
     return null;
 }
 /* add to hero's inventory if there's room, otherwise put item on floor */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function wizkit_addinv(obj) {   // files.c:2537
     if (!obj || $c.peq(obj, hands_obj)) {
         return;
@@ -1205,6 +1419,10 @@ async function wizkit_addinv(obj) {   // files.c:2537
         await addinv(obj);
     }
 }
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @returns {Promise<number>} boolean
+ */
 export async function proc_wizkit_line(buf) {   // files.c:2562
     let otmp = null;
     if ($c.strlen(buf) >= BUFSZ) {
@@ -1223,6 +1441,9 @@ export async function proc_wizkit_line(buf) {   // files.c:2562
     }
     return 1;
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function read_wizkit() {   // files.c:2584
     let fp = null;
     if (!wizard() || !(fp = await fopen_wizkit_file())) {
@@ -1237,6 +1458,9 @@ export async function read_wizkit() {   // files.c:2584
     return;
 }
 /* symbols.c */
+/**
+ * @returns {$T.__sFILE | null} FILE *
+ */
 function fopen_sym_file() {   // files.c:2611
     let fp = null;
     fp = fopen_datafile($c.lit("symbols"), $c.lit("r"), HACKPREFIX);
@@ -1245,6 +1469,10 @@ function fopen_sym_file() {   // files.c:2611
 /*
  * Returns 1 if the chosen symset was found and loaded.
  *         0 if it wasn't found in the sym file or other problem.
+ */
+/**
+ * @param {number} which_set int
+ * @returns {Promise<number>} int
  */
 export async function read_sym_file(which_set) {   // files.c:2631
     let fp = null, $t1;
@@ -1285,6 +1513,10 @@ export async function read_sym_file(which_set) {   // files.c:2631
 /*empty*/
 /* verify that we can write to scoreboard file; if not, try to create one */
 /*ARGUSED*/
+/**
+ * @param {$c.Ptr | null} dir const char *
+ * @returns {Promise<void>}
+ */
 export async function check_recordfile(dir) {   // files.c:2689
     let fq_record = null, fd = 0;
     fq_record = fqname($c.lit("record"), SCOREPREFIX, 0);
@@ -1319,6 +1551,10 @@ export async function check_recordfile(dir) {   // files.c:2689
 /* ----------  END SCOREBOARD CREATION ----------- */
 /* ----------  BEGIN PANIC/IMPOSSIBLE/TESTING LOG ----------- */
 /*ARGSUSED*/
+/**
+ * @param {$c.Ptr | null} type const char *
+ * @param {$c.Ptr | null} reason const char *
+ */
 export function paniclog(type, reason) {   // files.c:2801
     let lfile = null, buf = new Int8Array(256), now = 0, uid = 0, playmode = 0;
     /* panic, impossible, trickery, [lua] */
@@ -1339,6 +1575,11 @@ export function paniclog(type, reason) {   // files.c:2801
     /* PANICLOG */
     return;
 }
+/**
+ * @param {$c.Ptr | null} filenm const char *
+ * @param {$c.Ptr | null} type const char *
+ * @param {$c.Ptr | null} reason const char *
+ */
 export function testinglog(filenm, type, reason) {   // files.c:2836
     let lfile = null, fnbuf = new Int8Array(256);
     /* ad hoc file name */
@@ -1405,6 +1646,10 @@ export function testinglog(filenm, type, reason) {   // files.c:2836
 /* ----------  END INTERNAL RECOVER ----------- */
 /*SELF_RECOVER*/
 /* ----------  OTHER ----------- */
+/**
+ * @param {number} code int
+ * @returns {Promise<void>}
+ */
 export async function do_deferred_showpaths(code) {   // files.c:3090
     gd.deferred_showpaths = 0;
     await reveal_paths(code);
@@ -1421,6 +1666,11 @@ export async function do_deferred_showpaths(code) {   // files.c:3090
  * pass FALSE to override wildcard matching; useful for files
  * like dungeon.c and questpgr.c, which generate a ridiculous amount of
  * output if DEBUG is defined and effectively block the use of a wildcard */
+/**
+ * @param {$c.Ptr | null} filename const char *
+ * @param {number} wildcards boolean
+ * @returns {number} boolean
+ */
 export function debugcore(filename, wildcards) {   // files.c:3126
     let debugfiles = null, p = null, l = 0;
     /* debugpline() messages might disclose information that the player
@@ -1459,6 +1709,10 @@ export function debugcore(filename, wildcards) {   // files.c:3126
     return 0;
 }
 /*DEBUG*/
+/**
+ * @param {number} code int
+ * @returns {Promise<void>}
+ */
 export async function reveal_paths(code) {   // files.c:3175
     let skip_sysopt = 0, fqn = null, nodumpreason = null, buf = new Int8Array(256), filep = null, gamename = null, endp = null, envp = null, cwdbuf = new Int8Array(1024);
     skip_sysopt = 0;
@@ -1549,6 +1803,11 @@ export async function reveal_paths(code) {   // files.c:3175
 }
 /* choose a random passage that hasn't been chosen yet; once all have
    been chosen, reset the tracking to make all passages available again */
+/**
+ * @param {number} passagecnt int
+ * @param {number} oid unsigned int
+ * @returns {number} int
+ */
 function choose_passage(passagecnt, oid) {   // files.c:3431
     let idx = 0, res = 0, i = 0, range = 0, limit = 0, $t1, $t2;
     /* total of available passages */
@@ -1588,6 +1847,15 @@ function choose_passage(passagecnt, oid) {   // files.c:3431
     return res;
 }
 /* Returns True if you were able to read something. */
+/**
+ * @param {$c.Ptr | null} tribsection const char *
+ * @param {$c.Ptr | null} tribtitle const char *
+ * @param {number} tribpassage int
+ * @param {$c.Ptr | null} nowin_buf char *
+ * @param {number} bufsz int
+ * @param {number} oid unsigned int
+ * @returns {Promise<number>} boolean
+ */
 export async function read_tribute(tribsection, tribtitle, tribpassage, nowin_buf, bufsz, oid) {   // files.c:3474
     let fp = null, line = new Int8Array(256), lastline = new Int8Array(256), scope = 0, linect = 0, passagecnt = 0, targetpassage = 0, badtranslation = null, matchedsection = 0, matchedtitle = 0, tribwin = 0, grasped = 0, foundpassage = 0, save_plnmsg = 0, st = null, st$2 = null, p1 = null, p2 = null, passagenum = 0, st$3 = null, save_plnmsg$2 = 0, p = null, $t1, $t2;
     /* book identifier */
@@ -1766,6 +2034,11 @@ export async function read_tribute(tribsection, tribtitle, tribpassage, nowin_bu
     }
     return grasped;
 }
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @param {number} bufsz int
+ * @returns {Promise<number>} boolean
+ */
 export async function Death_quote(buf, bufsz) {   // files.c:3648
     let death_oid = 0;
     death_oid = 1;   /* chance of oid #1 being a novel is negligible */
@@ -1778,6 +2051,11 @@ export async function Death_quote(buf, bufsz) {   // files.c:3648
 /* Locks the live log file and writes 'buffer'
  * iff the ll_type matches sysopt.livelog mask.
  * lltype is included in LL entry for post-process filtering also.
+ */
+/**
+ * @param {number | bigint} ll_type long
+ * @param {$c.Ptr | null} str const char *
+ * @returns {Promise<void>}
  */
 export async function livelog_add(ll_type, str) {   // files.c:3667
     let livelogfile = null, now = 0, gindx = 0, aindx = 0;

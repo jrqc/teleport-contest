@@ -90,9 +90,16 @@ const breathwep = $c.nulls(10);
 /* hallucinatory ray types */
 const hallublasts = $c.nulls(96);
 /* Return a random hallucinatory blast. */
+/**
+ * @returns {$c.Ptr | null} const char *
+ */
 export function rnd_hallublast() {   // mthrowu.c:52
     return hallublasts[rn2(96)];
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number} boolean
+ */
 export function m_has_launcher_and_ammo(mtmp) {   // mthrowu.c:58
     let mwep = null, otmp = null;
     mwep = mtmp.mw;
@@ -107,6 +114,13 @@ export function m_has_launcher_and_ammo(mtmp) {   // mthrowu.c:58
 }
 /* hero is hit by something other than a monster (though it could be a
    missile thrown or shot by a monster) */
+/**
+ * @param {number} tlev int
+ * @param {number} dam int
+ * @param {*} objp struct obj **
+ * @param {$c.Ptr | null} name const char *
+ * @returns {Promise<number>} int
+ */
 export async function thitu(tlev, dam, objp, name) {   // mthrowu.c:75
     let obj = null, onm = null, knm = null, is_acid = 0, named = 0, kprefix = 0, dieroll = 0, onmbuf = new Int8Array(256), knmbuf = new Int8Array(256), $t1;
     /* pseudo-level used when deciding whether to hit hero's AC */
@@ -183,6 +197,13 @@ export async function thitu(tlev, dam, objp, name) {   // mthrowu.c:75
  * dothrow.c (for consistency). --KAA
  * Returns FALSE if object still exists (not destroyed).
  */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} ohit boolean
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} boolean
+ */
 async function drop_throw(obj, ohit, x, y) {   // mthrowu.c:162
     let broken = 0, mtmp = null;
     if (obj.otyp === CREAM_PIE || obj.oclass === VENOM_CLASS || ohit && obj.otyp === EGG) {
@@ -215,6 +236,12 @@ async function drop_throw(obj, ohit, x, y) {   // mthrowu.c:162
 }
 /* calculate multishot volley count for mtmp throwing otmp (if not ammo) or
    shooting otmp with mwep (if otmp is ammo and mwep appropriate launcher) */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {$T.obj | null} mwep struct obj *
+ * @returns {Promise<number>} int
+ */
 async function monmulti(mtmp, otmp, mwep) {   // mthrowu.c:201
     let multishot = 0;
     multishot = 1;
@@ -265,6 +292,12 @@ async function monmulti(mtmp, otmp, mwep) {   // mthrowu.c:201
     return multishot;
 }
 /* mtmp throws otmp, or shoots otmp with mwep, at hero or at monster mtarg */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {$T.obj | null} mwep struct obj *
+ * @returns {Promise<void>}
+ */
 async function monshoot(mtmp, otmp, mwep) {   // mthrowu.c:262
     let mtarg = null, dm = 0, multishot = 0, onm = null, onmbuf = new Int8Array(256), trgbuf = new Int8Array(256), $t1;
     mtarg = gm.mtarget;
@@ -314,6 +347,13 @@ async function monshoot(mtmp, otmp, mwep) {   // mthrowu.c:262
    return 1 if the object has stopped moving (hit or its range used up);
    can anger the monster, if this happened due to hero (eg. exploding
    bag of holding throwing the items) */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} range int
+ * @param {number} verbose boolean
+ * @returns {Promise<number>} boolean
+ */
 export async function ohitmon(mtmp, otmp, range, verbose) {   // mthrowu.c:321
     let damage = 0, tmp = 0, vis = 0, ismimic = 0, objgone = 0, mon_launcher = null, material = 0, harmless = 0, how = new Int8Array(256), flesh = 0, m_name = null;
     /* accidental target, located at <gb.bhitpos.x,.y> */
@@ -486,6 +526,11 @@ export async function ohitmon(mtmp, otmp, range, verbose) {   // mthrowu.c:321
     return FALSE;
 }
 /* hero catches gem thrown by mon iff poly'd into unicorn; might drop it */
+/**
+ * @param {$T.obj | null} gem struct obj *
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<number>} boolean
+ */
 async function ucatchgem(gem, mon) {   // mthrowu.c:506
     let gem_xname = null, mon_s_name = null;
     /* caller has verified gem->oclass */
@@ -507,6 +552,10 @@ async function ucatchgem(gem, mon) {   // mthrowu.c:506
     return FALSE;
 }
 /* hero may catch thrown obj. it is added to inventory, if possible */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} boolean
+ */
 async function u_catch_thrown_obj(otmp) {   // mthrowu.c:533
     let catch_chance = 0, buf = new Int8Array(256);
     catch_chance = (100 - ACURR(A.DEX) | 0) - (gu.urole.mnum === PM.MONK || gu.urole.mnum === PM.ROGUE ? 20 : 0) | 0;
@@ -524,6 +573,16 @@ async function u_catch_thrown_obj(otmp) {   // mthrowu.c:533
 /* the random chance for small objects hitting bars is */
 /* skipped when reaching them at point blank range */
 /* Thrown objects "sink" */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} dx coordxy
+ * @param {number} dy coordxy
+ * @param {number} range int
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function m_throw(mon, x, y, dx, dy, range, obj) {   // mthrowu.c:572
     let mtmp = null, singleobj = [null], forcehit = 0, sym = 0, hitu = 0, oldumort = 0, blindinc = 0, arw = null, tethered_weapon = 0, return_flightpath = 0, dam = 0, hitv = 0, onmbuf = new Int8Array(256), knmbuf = new Int8Array(256), eyes = null, $t1, $t2, $t3, $t4, $t5;
     /* launching monster */
@@ -779,6 +838,12 @@ export async function m_throw(mon, x, y, dx, dy, range, obj) {   // mthrowu.c:57
     gt.thrownobj = null;
     return;
 }
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} tethered_weapon boolean
+ * @returns {Promise<void>}
+ */
 async function return_from_mtoss(magr, otmp, tethered_weapon) {   // mthrowu.c:850
     let impaired = 0, notcaught = 0, hits_thrower = 0, x = 0, y = 0, made_it_back = 0, dmg = Int32Array.of(0), dx = 0, dy = 0, mlevitating = 0, $t1;
     impaired = $c.i8(magr.mconf | 0 || magr.mstun | 0 || magr.mblinded | 0 ? 1 : 0);
@@ -890,6 +955,11 @@ async function return_from_mtoss(magr, otmp, tethered_weapon) {   // mthrowu.c:8
     }
 }
 /* Monster throws item at another monster */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.monst | null} mtarg struct monst *
+ * @returns {Promise<number>} int
+ */
 export async function thrwmm(mtmp, mtarg) {   // mthrowu.c:969
     let otmp = null, mwep = null, x = 0, y = 0, ispole = 0, chance = 0, $t1;
     /* Polearms won't be applied by monsters against other monsters */
@@ -927,6 +997,12 @@ export async function thrwmm(mtmp, mtarg) {   // mthrowu.c:969
     return M_ATTK.MISS;
 }
 /* monster spits substance at monster */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mtarg struct monst *
+ * @returns {Promise<number>} int
+ */
 export async function spitmm(mtmp, mattk, mtarg) {   // mthrowu.c:1016
     let otmp = null, utarg = 0, tx = 0, ty = 0, dog = null;
     if (mtmp.mcan) {
@@ -985,6 +1061,10 @@ export async function spitmm(mtmp, mattk, mtarg) {   // mthrowu.c:1016
 /* Return the name of a breath weapon. If the player is hallucinating, return
  * a silly name instead.
  * typ is AD_MAGM, AD_FIRE, etc */
+/**
+ * @param {number} typ int
+ * @returns {$c.Ptr | null} const char *
+ */
 function breathwep_name(typ) {   // mthrowu.c:1083
     if (Hallucination()) {
         return rnd_hallublast();
@@ -992,6 +1072,12 @@ function breathwep_name(typ) {   // mthrowu.c:1083
     return breathwep[BZ_OFS_AD(typ)];
 }
 /* monster breathes at monster (ranged) */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @param {$T.monst | null} mtarg struct monst *
+ * @returns {Promise<number>} int
+ */
 export async function breamm(mtmp, mattk, mtarg) {   // mthrowu.c:1093
     let typ = 0, utarget = 0, dog = null, $t1, $t2;
     typ = get_atkdam_type(mattk.adtyp);
@@ -1049,11 +1135,21 @@ export async function breamm(mtmp, mattk, mtarg) {   // mthrowu.c:1093
     return M_ATTK.HIT;
 }
 /* remove an entire item from a monster's inventory; destroy that item */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function m_useupall(mon, obj) {   // mthrowu.c:1154
     await extract_from_minvent(mon, obj, TRUE, FALSE);
     await obfree(obj, null);
 }
 /* remove one instance of an item from a monster's inventory */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function m_useup(mon, obj) {   // mthrowu.c:1162
     let $t1;
     if (obj.quan > 1) {
@@ -1064,6 +1160,10 @@ export async function m_useup(mon, obj) {   // mthrowu.c:1162
     }
 }
 /* monster attempts ranged weapon attack against player */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function thrwmu(mtmp) {   // mthrowu.c:1174
     let otmp = [null], mwep = null, x = 0, y = 0, onm = null, rang = 0, arw = null, always_toss = 0, dam = 0, hitv = 0;
     always_toss = FALSE;
@@ -1144,14 +1244,29 @@ export async function thrwmu(mtmp) {   // mthrowu.c:1174
     nomul(0);
 }
 /* monster spits substance at you */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @returns {Promise<number>} int
+ */
 export async function spitmu(mtmp, mattk) {   // mthrowu.c:1268
     return await spitmm(mtmp, mattk, gy.youmonst);
 }
 /* monster breathes at you (ranged) */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {$T.attack | null} mattk struct attack *
+ * @returns {Promise<number>} int
+ */
 export async function breamu(mtmp, mattk) {   // mthrowu.c:1275
     return await breamm(mtmp, mattk, gy.youmonst);
 }
 /* return TRUE if terrain at x,y blocks linedup checks */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 function blocking_terrain(x, y) {   // mthrowu.c:1282
     if (!isok(x, y) || svl.level.locations[x][y].typ < POOL || closed_door(x, y) || is_waterwall(x, y) || svl.level.locations[x][y].typ === LAVAWALL) {
         return TRUE;
@@ -1162,6 +1277,14 @@ function blocking_terrain(x, y) {   // mthrowu.c:1282
    and only in straight line or diagonal, calling fnc for each step.
    Stops if fnc return TRUE, or if step was blocked by wall or closed door.
    Returns TRUE if fnc returned TRUE. */
+/**
+ * @param {number} ax coordxy
+ * @param {number} ay coordxy
+ * @param {number} bx coordxy
+ * @param {number} by coordxy
+ * @param {Function | null} fnc boolean (*)(coordxy, coordxy)
+ * @returns {Promise<number>} boolean
+ */
 export async function linedup_callback(ax, ay, bx, by, fnc) {   // mthrowu.c:1295
     let dx = 0, dy = 0;
     /* These two values are set for use after successful return. */
@@ -1188,6 +1311,14 @@ export async function linedup_callback(ax, ay, bx, by, fnc) {   // mthrowu.c:129
     }
     return FALSE;
 }
+/**
+ * @param {number} ax coordxy
+ * @param {number} ay coordxy
+ * @param {number} bx coordxy
+ * @param {number} by coordxy
+ * @param {number} boulderhandling int
+ * @returns {number} boolean
+ */
 export function linedup(ax, ay, bx, by, boulderhandling) {   // mthrowu.c:1330
     let dx = 0, dy = 0, boulderspots = 0;
     /* 0=block, 1=ignore, 2=conditionally block */
@@ -1228,6 +1359,11 @@ export function linedup(ax, ay, bx, by, boulderhandling) {   // mthrowu.c:1330
     }
     return FALSE;
 }
+/**
+ * @param {$T.monst | null} mtarg struct monst *
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number} int
+ */
 function m_lined_up(mtarg, mtmp) {   // mthrowu.c:1376
     let utarget = 0, tx = 0, ty = 0, ignore_boulders = 0;
     utarget = $c.i8($c.peq(mtarg, gy.youmonst) ? 1 : 0);
@@ -1242,10 +1378,19 @@ function m_lined_up(mtarg, mtmp) {   // mthrowu.c:1376
     return linedup(tx, ty, mtmp.mx, mtmp.my, utarget ? ignore_boulders ? 1 : 2 : 0);
 }
 /* is mtmp in position to use ranged attack on hero? */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number} boolean
+ */
 export function lined_up(mtmp) {   // mthrowu.c:1398
     return $c.i8(m_lined_up(gy.youmonst, mtmp) ? TRUE : FALSE);
 }
 /* check if a monster is carrying an item of a particular type */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} type int
+ * @returns {$T.obj | null} struct obj *
+ */
 export function m_carrying(mtmp, type) {   // mthrowu.c:1405
     let otmp = null;
     for (otmp = $c.peq(mtmp, gy.youmonst) ? gi.invent : mtmp.minvent; otmp; otmp = otmp.nobj) {
@@ -1255,6 +1400,15 @@ export function m_carrying(mtmp, type) {   // mthrowu.c:1405
     }
     return otmp;
 }
+/**
+ * @param {*} objp struct obj **
+ * @param {number} objx coordxy
+ * @param {number} objy coordxy
+ * @param {number} barsx coordxy
+ * @param {number} barsy coordxy
+ * @param {number} breakflags unsigned int
+ * @returns {Promise<void>}
+ */
 export async function hit_bars(objp, objx, objy, barsx, barsy, breakflags) {   // mthrowu.c:1417
     let otmp = null, obj_type = 0, nodissolve = 0, your_fault = 0, melee_attk = 0, noise = 0, bsindx = 0, spe = 0, chance = 0;
     /* *objp will be set to NULL if object breaks */
@@ -1310,6 +1464,16 @@ export async function hit_bars(objp, objx, objy, barsx, barsy, breakflags) {   /
     }
 }
 /* TRUE iff thrown/kicked/rolled object doesn't pass through iron bars */
+/**
+ * @param {*} obj_p struct obj **
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} barsx coordxy
+ * @param {number} barsy coordxy
+ * @param {number} always_hit int
+ * @param {number} whodidit int
+ * @returns {Promise<number>} boolean
+ */
 export async function hits_bars(obj_p, x, y, barsx, barsy, always_hit, whodidit) {   // mthrowu.c:1499
     let otmp = null, obj_type = 0, hits = 0, oskill = 0;
     /* *obj_p will be set to NULL if object breaks */

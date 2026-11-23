@@ -31,6 +31,10 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { __global_locale, _c_locale } from './c_locale.js';
 
+/**
+ * @param {number} val void *
+ * @returns {number} void *
+ */
 function xlocale_retain(val) {   // xlocale_private.h:96
     let obj = 0;
     obj = val;
@@ -40,6 +44,9 @@ function xlocale_retain(val) {   // xlocale_private.h:96
     $h.i32[obj >>> 2] = $h.i32[obj >>> 2] + 1 | 0;
     return val;
 }
+/**
+ * @param {number} val void *
+ */
 function xlocale_release(val) {   // xlocale_private.h:107
     let obj = 0;
     obj = val;
@@ -52,9 +59,16 @@ function xlocale_release(val) {   // xlocale_private.h:107
         }
     }
 }
+/**
+ * @returns {number} locale_t
+ */
 function __current_locale() {   // xlocale_private.h:122
     return __global_locale;
 }
+/**
+ * @param {number} __loc locale_t
+ * @returns {number} locale_t
+ */
 function __locale_ptr(__loc) {   // xlocale_private.h:128
     if (__loc === 0) {
         __loc = $h.u32[_c_locale >>> 2];
@@ -63,6 +77,14 @@ function __locale_ptr(__loc) {   // xlocale_private.h:128
     }
     return __loc;
 }
+/**
+ * @param {number} pwc wchar_t *restrict
+ * @param {number} s const char *restrict
+ * @param {number | bigint} n size_t
+ * @param {number} ps mbstate_t *restrict
+ * @param {number} loc locale_t
+ * @returns {number | bigint} size_t
+ */
 export function mbrtowc_l(pwc, s, n, ps, loc) {   // mbrtowc.c:36
     if (loc === 0) {
         loc = $h.u32[_c_locale >>> 2];
@@ -74,6 +96,13 @@ export function mbrtowc_l(pwc, s, n, ps, loc) {   // mbrtowc.c:36
     }
     return $h.fnAt($h.u32[($h.u32[(loc + 1304 + 1 /* XLC_CTYPE */ * 8) >>> 2] + 72) >>> 2])(pwc, s, n, ps, loc);
 }
+/**
+ * @param {number} pwc wchar_t *restrict
+ * @param {number} s const char *restrict
+ * @param {number | bigint} n size_t
+ * @param {number} ps mbstate_t *restrict
+ * @returns {number | bigint} size_t
+ */
 export function mbrtowc(pwc, s, n, ps) {   // mbrtowc.c:46
     return mbrtowc_l(pwc, s, n, ps, __current_locale());
 }

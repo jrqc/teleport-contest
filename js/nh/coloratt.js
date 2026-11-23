@@ -30,6 +30,10 @@ const attrnames = $c.recArray($T.attr_names, 11);
 /* { colortyp, tableindex, rgbindx, name, r, g, b }, */
 export const colortable = $c.recArray($T.nethack_color, 155);
 const color_256_definitions = $c.recArray($T.anon_coloratt_885, 240);
+/**
+ * @param {$T.nethack_color | null} cte const struct nethack_color *
+ * @returns {number} int32
+ */
 export function colortable_to_int32(cte) {   // coloratt.c:237
     let clr = 0;
     clr = NO_COLOR | NH_BASIC_COLOR;
@@ -40,11 +44,20 @@ export function colortable_to_int32(cte) {   // coloratt.c:237
     }
     return clr;
 }
+/**
+ * @param {$T.color_and_attr | null} ca color_attr *
+ * @returns {$c.Ptr | null} char *
+ */
 export function color_attr_to_str(ca) {   // coloratt.c:249
     $c.sprintf(new $c.Ptr(color_attr_to_str$buf, 0), $c.lit("%s&%s"), clr2colorname(ca.color), attr2attrname(ca.attr));
     return new $c.Ptr(color_attr_to_str$buf, 0);
 }
 /* parse string like "color&attr" into color_attr */
+/**
+ * @param {$T.color_and_attr | null} ca color_attr *
+ * @param {$c.Ptr | null} str char *
+ * @returns {Promise<number>} boolean
+ */
 export async function color_attr_parse_str(ca, str) {   // coloratt.c:261
     let buf = new Int8Array(256), amp = null, tmp = 0, c = 0, a = 0;
     amp = null;
@@ -86,6 +99,11 @@ export async function color_attr_parse_str(ca, str) {   // coloratt.c:261
     ca.color = c;
     return TRUE;
 }
+/**
+ * @param {$T.color_and_attr | null} ca color_attr *
+ * @param {$c.Ptr | null} prompt const char *
+ * @returns {Promise<number>} boolean
+ */
 export async function query_color_attr(ca, prompt) {   // coloratt.c:304
     let c = 0, a = 0;
     c = await query_color(prompt, ca.color);
@@ -100,6 +118,10 @@ export async function query_color_attr(ca, prompt) {   // coloratt.c:304
     ca.attr = a;
     return TRUE;
 }
+/**
+ * @param {number} attr int
+ * @returns {$c.Ptr | null} const char *
+ */
 export function attr2attrname(attr) {   // coloratt.c:320
     let i = 0;
     for (i = 0; i < 11; i = i + 1 | 0) {
@@ -115,6 +137,10 @@ export function attr2attrname(attr) {   // coloratt.c:320
  * Used by: optfn_()
  *
  */
+/**
+ * @param {number} clr int
+ * @returns {$c.Ptr | null} const char *
+ */
 export function clr2colorname(clr) {   // coloratt.c:338
     let i = 0;
     for (i = 0; i < 27; i = i + 1 | 0) {
@@ -124,6 +150,11 @@ export function clr2colorname(clr) {   // coloratt.c:338
     }
     return null;
 }
+/**
+ * @param {$c.Ptr | null} str char *
+ * @param {number} suppress_msg boolean
+ * @returns {Promise<number>} int
+ */
 export async function match_str2clr(str, suppress_msg) {   // coloratt.c:349
     let i = 0, c = 0;
     c = CLR.MAX;
@@ -147,6 +178,11 @@ export async function match_str2clr(str, suppress_msg) {   // coloratt.c:349
     }
     return c;
 }
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @param {number} complain boolean
+ * @returns {Promise<number>} int
+ */
 export async function match_str2attr(str, complain) {   // coloratt.c:374
     let i = 0, a = 0;
     a = -1;
@@ -165,6 +201,11 @@ export async function match_str2attr(str, complain) {   // coloratt.c:374
    coloring patterns, only one attribute at a time is allowed;
    for status highlighting, multiple attributes are allowed [overkill;
    life would be much simpler if that were restricted to one also...] */
+/**
+ * @param {$c.Ptr | null} prompt const char *
+ * @param {number} dflt_attr int
+ * @returns {Promise<number>} int
+ */
 export async function query_attr(prompt, dflt_attr) {   // coloratt.c:396
     let tmpwin = 0, any = new $T.any(), i = 0, pick_cnt = 0, picks = [null], allow_many = 0, clr = 0, j = 0, k = 0;
     picks[0] = null;
@@ -236,6 +277,11 @@ export async function query_attr(prompt, dflt_attr) {   // coloratt.c:396
        PICK_ANY with preselected entry toggled off and nothing chosen */
     return -1;
 }
+/**
+ * @param {$c.Ptr | null} prompt const char *
+ * @param {number} dflt_color int
+ * @returns {Promise<number>} int
+ */
 export async function query_color(prompt, dflt_color) {   // coloratt.c:475
     let tmpwin = 0, any = new $T.any(), i = 0, pick_cnt = 0, picks = [null];
     picks[0] = null;
@@ -278,6 +324,10 @@ export async function query_color(prompt, dflt_color) {   // coloratt.c:475
    so forth; suppresses color for black and white because one of those will
    likely be invisible due to matching the background; the alternate set of
    MENUCOLORS is kept around for potential re-use */
+/**
+ * @param {number} load_colors boolean
+ * @returns {Promise<void>}
+ */
 export async function basic_menu_colors(load_colors) {   // coloratt.c:530
     let cnm = new Int8Array(128), i = 0, c = 0, pmatchregex = 0, patternfmt = null;
     /* True: temporarily replace menu color entries with
@@ -325,6 +375,12 @@ export async function basic_menu_colors(load_colors) {   // coloratt.c:530
         gm.menu_colorings = gs.save_colorings;
     }
 }
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @param {number} c int
+ * @param {number} a int
+ * @returns {Promise<number>} boolean
+ */
 export async function add_menu_coloring_parsed(str, c, a) {   // coloratt.c:585
     let tmp = null, errbuf = new Int8Array(256), re_error_desc = null, $t1, $t2;
     if (!str) {
@@ -351,6 +407,10 @@ export async function add_menu_coloring_parsed(str, c, a) {   // coloratt.c:585
     return TRUE;
 }
 /* parse '"regex_string"=color&attr' and add it to menucoloring */
+/**
+ * @param {$c.Ptr | null} tmpstr char *
+ * @returns {Promise<number>} boolean
+ */
 export async function add_menu_coloring(tmpstr) {   // coloratt.c:617
     let c = 0, a = 0, tmps = null, cs = null, amp = null, str = new Int8Array(256);
     /* never Null but could be empty */
@@ -410,6 +470,9 @@ export function free_menu_coloring() {   // coloratt.c:664
     } while (gm.menu_colorings);
 }
 /* release a specific menu color pattern; not used for color_colorings */
+/**
+ * @param {number} idx int
+ */
 export function free_one_menu_coloring(idx) {   // coloratt.c:684
     let tmp = null, prev = null, next = null;
     /* 0 .. */
@@ -433,6 +496,9 @@ export function free_one_menu_coloring(idx) {   // coloratt.c:684
         tmp = tmp.next;
     }
 }
+/**
+ * @returns {number} int
+ */
 export function count_menucolors() {   // coloratt.c:709
     let tmp = null, count = 0;
     count = 0;
@@ -443,6 +509,10 @@ export function count_menucolors() {   // coloratt.c:709
 }
 /* returns -1 on no-match.
  * buf is NONNULLARG1
+ */
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @returns {Promise<number>} int32
  */
 export async function check_enhanced_colors(buf) {   // coloratt.c:723
     let xtra = Int8Array.of(0), r = Uint32Array.of(0), g = Uint32Array.of(0), b = Uint32Array.of(0), retcolor = 0, color = 0, altbuf = null, grey = null, greyoffset = 0;
@@ -480,6 +550,10 @@ export async function check_enhanced_colors(buf) {   // coloratt.c:723
     return retcolor;
 }
 /* return the canonical name of a particular color */
+/**
+ * @param {number} colorindx int32
+ * @returns {$c.Ptr | null} const char *
+ */
 export function wc_color_name(colorindx) {   // coloratt.c:764
     let result = null, basicindx = 0, indx = 0, r = 0, g = 0, b = 0;
     /* includes room for '\0' */
@@ -511,6 +585,10 @@ export function wc_color_name(colorindx) {   // coloratt.c:764
     return result;
 }
 /* hexdd[] is defined in decl.c */
+/**
+ * @param {$c.Ptr | null} buf const char *
+ * @returns {number} boolean
+ */
 export function onlyhexdigits(buf) {   // coloratt.c:801
     let dp = null;
     dp = buf;
@@ -521,6 +599,10 @@ export function onlyhexdigits(buf) {   // coloratt.c:801
     }
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} rgbstr const char *
+ * @returns {Promise<number>} int32_t
+ */
 export async function rgbstr_to_int32(rgbstr) {   // coloratt.c:813
     let r = 0, g = 0, b = 0, milestone = 0, cp = null, c_r = null, c_g = null, c_b = null, rgb = 0, buf = new Int8Array(256), dash = 0;
     milestone = 0;
@@ -566,6 +648,11 @@ export async function rgbstr_to_int32(rgbstr) {   // coloratt.c:813
     }
     return -1;
 }
+/**
+ * @param {$T.glyph_map_entry | null} gmap glyph_map *
+ * @param {number} nhcolor uint32
+ * @returns {number} int
+ */
 export function set_map_customcolor(gmap, nhcolor) {   // coloratt.c:868
     let tmpgm = null, closecolor = Uint32Array.of(0), clridx = Uint16Array.of(0);
     tmpgm = gmap;
@@ -587,6 +674,11 @@ export function set_map_customcolor(gmap, nhcolor) {   // coloratt.c:868
  * Algorithm taken from UnNetHack which took it from
  * https://www.compuphase.com/cmetric.htm
  **/
+/**
+ * @param {number} rgb1 uint32_t
+ * @param {number} rgb2 uint32_t
+ * @returns {number} int
+ */
 export function color_distance(rgb1, rgb2) {   // coloratt.c:979
     let r1 = 0, g1 = 0, b1 = 0, r2 = 0, g2 = 0, b2 = 0, rmean = 0, r = 0, g = 0, b = 0;
     r1 = (rgb1 >>> 16 & 255) >>> 0 | 0;
@@ -601,6 +693,12 @@ export function color_distance(rgb1, rgb2) {   // coloratt.c:979
     b = b1 - b2 | 0;
     return ((Math.imul(Math.imul(512 + rmean | 0, r), r) >> 8) + Math.imul(Math.imul(4, g), g) | 0) + (Math.imul(Math.imul(767 - rmean | 0, b), b) >> 8) | 0;
 }
+/**
+ * @param {number} lcolor uint32
+ * @param {*} closecolor uint32 *
+ * @param {*} clridx uint16 *
+ * @returns {number} boolean
+ */
 export function closest_color(lcolor, closecolor, clridx) {   // coloratt.c:997
     let i = 0, color_index = 0, similar = 0, current = 0, retbool = 0;
     color_index = -1;
@@ -626,6 +724,10 @@ export function closest_color(lcolor, closecolor, clridx) {   // coloratt.c:997
     }
     return retbool;
 }
+/**
+ * @param {number} idx int
+ * @returns {number} uint32
+ */
 export function get_nhcolor_from_256_index(idx) {   // coloratt.c:1024
     let retcolor = 0;
     retcolor = NO_COLOR | NH_BASIC_COLOR;

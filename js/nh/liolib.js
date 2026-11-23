@@ -56,11 +56,19 @@ const metameth = $h.data(80, 8);
 */
 /* accepted extensions to 'mode' in 'fopen' */
 /* Check whether 'mode' matches '[rwa]%+?[L_MODEEXT]*' */
+/**
+ * @param {number} mode const char *
+ * @returns {number} int
+ */
 function l_checkmode(mode) {   // liolib.c:40
     let $t1;
     /* skip if char is '+' */
     return $h.i8[mode] !== 0 && $hl.strchr($h.lit("rwa"), $h.i8[($t1 = mode, mode = $t1 + 1, $t1)]) !== 0 && ($h.i8[mode] !== 43 || (mode = mode + 1, 1)) && $hl.strspn(mode, $h.lit("b")) === $hl.strlen(mode) ? 1 : 0;   /* check extensions */
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function io_type(L) {   // liolib.c:163
     let p = 0;
     await luaL_checkany(L, 1);
@@ -74,6 +82,10 @@ async function io_type(L) {   // liolib.c:163
     }
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function f_tostring(L) {   // liolib.c:177
     let p = 0;
     p = await luaL_checkudata(L, 1, $h.lit("FILE*"));
@@ -84,6 +96,10 @@ async function f_tostring(L) {   // liolib.c:177
     }
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} FILE *
+ */
 async function tofile(L) {   // liolib.c:187
     let p = 0;
     p = await luaL_checkudata(L, 1, $h.lit("FILE*"));
@@ -98,6 +114,10 @@ async function tofile(L) {   // liolib.c:187
 ** before opening the actual file; so, if there is a memory error, the
 ** handle is in a consistent state.
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} LStream *
+ */
 async function newprefile(L) {   // liolib.c:201
     let p = 0;
     p = await lua_newuserdatauv(L, 16, 0);
@@ -110,6 +130,10 @@ async function newprefile(L) {   // liolib.c:201
 ** a bug in some versions of the Clang compiler (e.g., clang 3.0 for
 ** 32 bits).
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function aux_close(L) {   // liolib.c:214
     let p = 0, cf = 0;
     p = await luaL_checkudata(L, 1, $h.lit("FILE*"));
@@ -117,16 +141,28 @@ async function aux_close(L) {   // liolib.c:214
     $h.stp(p + 8, 0);   /* mark stream as closed */
     return await $h.fnAt(cf)(L);   /* close it */
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function f_close(L) {   // liolib.c:222
     await tofile(L);   /* make sure argument is an open stream */
     return await aux_close(L);
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function io_close(L) {   // liolib.c:228
     if (lua_type(L, 1) === -1) {   /* no argument? */
         await lua_getfield(L, -1001000, $h.lit("_IO_output"));   /* use default output */
     }
     return await f_close(L);
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function f_gc(L) {   // liolib.c:235
     let p = 0;
     p = await luaL_checkudata(L, 1, $h.lit("FILE*"));
@@ -138,12 +174,20 @@ async function f_gc(L) {   // liolib.c:235
 /*
 ** function to close regular files
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function io_fclose(L) {   // liolib.c:246
     let p = 0;
     p = await luaL_checkudata(L, 1, $h.lit("FILE*"));
     $h.i32[($hl.__error()) >>> 2] = 0;
     return await luaL_fileresult(L, $c.fclose($h.deref($h.u32[p >>> 2])) === 0 ? 1 : 0, 0);
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} LStream *
+ */
 async function newfile(L) {   // liolib.c:253
     let p = 0;
     p = await newprefile(L);
@@ -151,6 +195,12 @@ async function newfile(L) {   // liolib.c:253
     $h.stp(p + 8, $h.fn(io_fclose));
     return p;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} fname const char *
+ * @param {number} mode const char *
+ * @returns {Promise<void>}
+ */
 async function opencheck(L, fname, mode) {   // liolib.c:261
     let p = 0, $t1;
     p = await newfile(L);
@@ -159,6 +209,10 @@ async function opencheck(L, fname, mode) {   // liolib.c:261
         await luaL_error(L, $h.lit("cannot open file '%s' (%s)"), fname, $hl.strerror($h.i32[($hl.__error()) >>> 2]));
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function io_open(L) {   // liolib.c:269
     let filename = 0, mode = 0, p = 0, md = 0, $t1;
     filename = await luaL_checklstring(L, 1, 0);
@@ -173,12 +227,20 @@ async function io_open(L) {   // liolib.c:269
 /*
 ** function to close 'popen' files
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function io_pclose(L) {   // liolib.c:284
     let p = 0;
     p = await luaL_checkudata(L, 1, $h.lit("FILE*"));
     $h.i32[($hl.__error()) >>> 2] = 0;
     return await luaL_execresult(L, $c.pclose($h.deref($h.u32[p >>> 2])));
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function io_popen(L) {   // liolib.c:291
     let filename = 0, mode = 0, p = 0, $t1;
     filename = await luaL_checklstring(L, 1, 0);
@@ -190,6 +252,10 @@ async function io_popen(L) {   // liolib.c:291
     $h.stp(p + 8, $h.fn(io_pclose));
     return $h.u32[p >>> 2] === 0 ? await luaL_fileresult(L, 0, filename) : 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function io_tmpfile(L) {   // liolib.c:303
     let p = 0, $t1;
     p = await newfile(L);
@@ -197,6 +263,11 @@ async function io_tmpfile(L) {   // liolib.c:303
     $t1 = $c.missing("tmpfile")(), $h.stp(p, $t1);
     return $h.u32[p >>> 2] === 0 ? await luaL_fileresult(L, 0, 0) : 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} findex const char *
+ * @returns {Promise<number>} FILE *
+ */
 async function getiofile(L, findex) {   // liolib.c:311
     let p = 0;
     await lua_getfield(L, -1001000, findex);
@@ -206,6 +277,12 @@ async function getiofile(L, findex) {   // liolib.c:311
     }
     return $h.u32[p >>> 2];
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} f const char *
+ * @param {number} mode const char *
+ * @returns {Promise<number>} int
+ */
 async function g_iofile(L, f, mode) {   // liolib.c:321
     let filename = 0;
     if (!(lua_type(L, 1) <= 0)) {
@@ -222,9 +299,17 @@ async function g_iofile(L, f, mode) {   // liolib.c:321
     await lua_getfield(L, -1001000, f);
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function io_input(L) {   // liolib.c:338
     return await g_iofile(L, $h.lit("_IO_input"), $h.lit("r"));
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function io_output(L) {   // liolib.c:343
     return await g_iofile(L, $h.lit("_IO_output"), $h.lit("w"));
 }
@@ -241,6 +326,11 @@ async function io_output(L) {   // liolib.c:343
 ** 3) a boolean, true iff file has to be closed when finished ('toclose')
 ** *) a variable number of format arguments (rest of the stack)
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} toclose int
+ * @returns {Promise<void>}
+ */
 async function aux_lines(L, toclose) {   // liolib.c:366
     let n = 0;
     n = lua_gettop(L) - 1 | 0;   /* number of arguments to read */
@@ -251,6 +341,10 @@ async function aux_lines(L, toclose) {   // liolib.c:366
     lua_rotate(L, 2, 3);   /* move the three values to their positions */
     await lua_pushcclosure(L, $h.fn(io_readline), 3 + n | 0);
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function f_lines(L) {   // liolib.c:377
     await tofile(L);   /* check that it's a valid file handle */
     await aux_lines(L, 0);
@@ -261,6 +355,10 @@ async function f_lines(L) {   // liolib.c:377
 ** closed, also returns the file itself as a second result (to be
 ** closed as the state at the exit of a generic for).
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function io_lines(L) {   // liolib.c:389
     let toclose = 0, filename = 0;
     if (lua_type(L, 1) === -1) {
@@ -292,6 +390,10 @@ async function io_lines(L) {   // liolib.c:389
 /*
 ** Add current char to buffer (if not out of space) and read next one
 */
+/**
+ * @param {number} rn RN *
+ * @returns {number} int
+ */
 function nextc(rn) {   // liolib.c:441
     let $t1, $t2, $t3;
     if (($h.i32[(rn + 12) >>> 2] >= 200 ? 1 : 0) !== 0 ? 1 : 0) {
@@ -307,6 +409,11 @@ function nextc(rn) {   // liolib.c:441
 /*
 ** Accept current char if it is in 'set' (of size 2)
 */
+/**
+ * @param {number} rn RN *
+ * @param {number} set const char *
+ * @returns {number} int
+ */
 function test2(rn, set) {   // liolib.c:457
     if ($h.i32[(rn + 8) >>> 2] === $h.i8[set] || $h.i32[(rn + 8) >>> 2] === $h.i8[set + 1]) {
         return nextc(rn);
@@ -317,6 +424,11 @@ function test2(rn, set) {   // liolib.c:457
 /*
 ** Read a sequence of (hex)digits
 */
+/**
+ * @param {number} rn RN *
+ * @param {number} hex int
+ * @returns {number} int
+ */
 function readdigits(rn, hex) {   // liolib.c:467
     let count = 0;
     count = 0;
@@ -330,6 +442,11 @@ function readdigits(rn, hex) {   // liolib.c:467
 ** Then it calls 'lua_stringtonumber' to check whether the format is
 ** correct and to convert it to a Lua number.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} f FILE *
+ * @returns {number} int
+ */
 function read_number(L, f) {   // liolib.c:480
     let count = 0, hex = 0, $t1, $t2, $t3;
     const $sp0 = $h.st.sp, $fp = $h.enter(226);
@@ -373,6 +490,11 @@ function read_number(L, f) {   // liolib.c:480
         }
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} f FILE *
+ * @returns {Promise<number>} int
+ */
 async function test_eof(L, f) {   // liolib.c:514
     let c = 0;
     c = $c.getc($h.deref(f));
@@ -380,6 +502,12 @@ async function test_eof(L, f) {   // liolib.c:514
     await lua_pushstring(L, $h.lit(""));
     return c !== -1 ? 1 : 0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} f FILE *
+ * @param {number} chop int
+ * @returns {Promise<number>} int
+ */
 async function read_line(L, f, chop) {   // liolib.c:522
     let c = 0, buff = 0, i = 0, $t1, $t2, $t3;
     const $sp0 = $h.st.sp, $fp = $h.enter(1056);
@@ -404,6 +532,11 @@ async function read_line(L, f, chop) {   // liolib.c:522
         return c === 10 || lua_rawlen(L, -1) > 0 ? 1 : 0;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} f FILE *
+ * @returns {Promise<void>}
+ */
 async function read_all(L, f) {   // liolib.c:543
     let nr = 0, p = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(1056);
@@ -418,6 +551,12 @@ async function read_all(L, f) {   // liolib.c:543
         await luaL_pushresult($fp);   /* close buffer */
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} f FILE *
+ * @param {number | bigint} n size_t
+ * @returns {Promise<number>} int
+ */
 async function read_chars(L, f, n) {   // liolib.c:556
     let nr = 0, p = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(1056);
@@ -431,6 +570,12 @@ async function read_chars(L, f, n) {   // liolib.c:556
         return nr > 0 ? 1 : 0;   /* true iff read something */
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} f FILE *
+ * @param {number} first int
+ * @returns {Promise<number>} int
+ */
 async function g_read(L, f, first) {   // liolib.c:569
     let nargs = 0, n = 0, success = 0, l = 0, p = 0, $t1;
     nargs = lua_gettop(L) - 1 | 0;
@@ -486,15 +631,27 @@ async function g_read(L, f, first) {   // liolib.c:569
     }
     return n - first | 0;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function io_read(L) {   // liolib.c:620
     return await g_read(L, await getiofile(L, $h.lit("_IO_input")), 1);
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function f_read(L) {   // liolib.c:625
     return await g_read(L, await tofile(L), 2);
 }
 /*
 ** Iteration function for 'lines'.
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function io_readline(L) {   // liolib.c:633
     let p = 0, i = 0, n = 0;
     p = lua_touserdata(L, -1001001);
@@ -528,6 +685,12 @@ async function io_readline(L) {   // liolib.c:633
     }
 }
 /* }====================================================== */
+/**
+ * @param {number} L lua_State *
+ * @param {number} f FILE *
+ * @param {number} arg int
+ * @returns {Promise<number>} int
+ */
 async function g_write(L, f, arg) {   // liolib.c:664
     let nargs = 0, status = 0, len = 0, s = 0, $t1;
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
@@ -552,15 +715,27 @@ async function g_write(L, f, arg) {   // liolib.c:664
         }
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function io_write(L) {   // liolib.c:691
     return await g_write(L, await getiofile(L, $h.lit("_IO_output")), 1);
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function f_write(L) {   // liolib.c:696
     let f = 0;
     f = await tofile(L);
     lua_pushvalue(L, 1);   /* push file at the stack top (to be returned) */
     return await g_write(L, f, 2);
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function f_seek(L) {   // liolib.c:703
     let f = 0, op = 0, p3 = 0, offset = 0;
     f = await tofile(L);
@@ -577,6 +752,10 @@ async function f_seek(L) {   // liolib.c:703
         return 1;
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function f_setvbuf(L) {   // liolib.c:723
     let f = 0, op = 0, sz = 0, res = 0;
     f = await tofile(L);
@@ -586,18 +765,30 @@ async function f_setvbuf(L) {   // liolib.c:723
     res = $c.setvbuf($h.deref(f), $h.P(0), $h.i32[(f_setvbuf$mode + op * 4) >>> 2], $c.u64(sz));
     return await luaL_fileresult(L, res === 0 ? 1 : 0, 0);
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function io_flush(L) {   // liolib.c:737
     let f = 0;
     f = await getiofile(L, $h.lit("_IO_output"));
     $h.i32[($hl.__error()) >>> 2] = 0;
     return await luaL_fileresult(L, $c.fflush($h.deref(f)) === 0 ? 1 : 0, 0);
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function f_flush(L) {   // liolib.c:744
     let f = 0;
     f = await tofile(L);
     $h.i32[($hl.__error()) >>> 2] = 0;
     return await luaL_fileresult(L, $c.fflush($h.deref(f)) === 0 ? 1 : 0, 0);
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<void>}
+ */
 async function createmeta(L) {   // liolib.c:797
     await luaL_newmetatable(L, $h.lit("FILE*"));   /* metatable for file handles */
     await luaL_setfuncs(L, metameth, 0);   /* add metamethods to new metatable */
@@ -609,6 +800,10 @@ async function createmeta(L) {   // liolib.c:797
 /*
 ** function to (not) close the standard files stdin, stdout, and stderr
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function io_noclose(L) {   // liolib.c:810
     let p = 0;
     p = await luaL_checkudata(L, 1, $h.lit("FILE*"));
@@ -617,6 +812,13 @@ async function io_noclose(L) {   // liolib.c:810
     await lua_pushstring(L, $h.lit("cannot close standard file"));
     return 2;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} f FILE *
+ * @param {number} k const char *
+ * @param {number} fname const char *
+ * @returns {Promise<void>}
+ */
 async function createstdfile(L, f, k, fname) {   // liolib.c:819
     let p = 0;
     p = await newprefile(L);
@@ -628,6 +830,10 @@ async function createstdfile(L, f, k, fname) {   // liolib.c:819
     }
     await lua_setfield(L, -2, fname);   /* add file to module */
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 export async function luaopen_io(L) {   // liolib.c:832
     await luaL_checkversion_(L, 504, 136), await lua_createtable(L, 0, 11), await luaL_setfuncs(L, iolib, 0);   /* new module */
     await createmeta(L);

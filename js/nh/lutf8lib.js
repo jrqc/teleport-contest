@@ -39,6 +39,11 @@ const utf8_decode$limits = $h.data(24, 4);   // static in utf8_decode()
 const funcs = $h.data(112, 8);
 /* from strlib */
 /* translate a relative string position: negative means back from end */
+/**
+ * @param {number | bigint} pos lua_Integer
+ * @param {number | bigint} len size_t
+ * @returns {number | bigint} lua_Integer
+ */
 function u_posrelat(pos, len) {   // lutf8lib.c:47
     if (pos >= 0) {
         return pos;
@@ -55,6 +60,12 @@ function u_posrelat(pos, len) {   // lutf8lib.c:47
 ** entry forces an error for non-ascii bytes with no continuation
 ** bytes (count == 0).
 */
+/**
+ * @param {number} s const char *
+ * @param {number} val utfint *
+ * @param {number} strict int
+ * @returns {number} const char *
+ */
 function utf8_decode(s, val, strict) {   // lutf8lib.c:61
     let c = 0, res = 0, count = 0, cc = 0;
     c = $c.u8($h.i8[s]);
@@ -93,6 +104,10 @@ function utf8_decode(s, val, strict) {   // lutf8lib.c:61
 ** start in the range [i,j], or nil + current position if 's' is not
 ** well formed in that interval
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function utflen(L) {   // lutf8lib.c:96
     let n = 0, s = 0, posi = 0, posj = 0, lax = 0, s1 = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
@@ -124,6 +139,10 @@ async function utflen(L) {   // lutf8lib.c:96
 ** codepoint(s, [i, [j [, lax]]]) -> returns codepoints for all
 ** characters that start in the range [i,j]
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function codepoint(L) {   // lutf8lib.c:126
     let s = 0, posi = 0, pose = 0, lax = 0, n = 0, se = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(12);
@@ -155,6 +174,11 @@ async function codepoint(L) {   // lutf8lib.c:126
         return n;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} arg int
+ * @returns {Promise<void>}
+ */
 async function pushutfchar(L, arg) {   // lutf8lib.c:155
     let code = 0;
     code = $c.u64(await luaL_checkinteger(L, arg));
@@ -164,6 +188,10 @@ async function pushutfchar(L, arg) {   // lutf8lib.c:155
 /*
 ** utfchar(n1, n2, ...)  -> char(n1)..char(n2)...
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function utfchar(L) {   // lutf8lib.c:165
     let n = 0, i = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(1056);
@@ -186,6 +214,10 @@ async function utfchar(L) {   // lutf8lib.c:165
 ** offset(s, n, [i])  -> index where n-th character counting from
 **   position 'i' starts; 0 means character at 'i'.
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function byteoffset(L) {   // lutf8lib.c:187
     let s = 0, n = 0, posi = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
@@ -233,6 +265,11 @@ async function byteoffset(L) {   // lutf8lib.c:187
         return 1;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} strict int
+ * @returns {Promise<number>} int
+ */
 async function iter_aux(L, strict) {   // lutf8lib.c:228
     let s = 0, n = 0, next = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(12);
@@ -257,12 +294,24 @@ async function iter_aux(L, strict) {   // lutf8lib.c:228
         }
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function iter_auxstrict(L) {   // lutf8lib.c:249
     return await iter_aux(L, 1);
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function iter_auxlax(L) {   // lutf8lib.c:253
     return await iter_aux(L, 0);
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function iter_codes(L) {   // lutf8lib.c:258
     let lax = 0, s = 0;
     lax = lua_toboolean(L, 2);
@@ -273,6 +322,10 @@ async function iter_codes(L) {   // lutf8lib.c:258
     lua_pushinteger(L, 0);
     return 3;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 export async function luaopen_utf8(L) {   // lutf8lib.c:285
     await luaL_checkversion_(L, 504, 136), await lua_createtable(L, 0, 6), await luaL_setfuncs(L, funcs, 0);
     await lua_pushlstring(L, $h.lit("[\x00-\x7f\xc2-\xfd][\x80-\xbf]*"), 14);

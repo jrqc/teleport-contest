@@ -104,6 +104,9 @@ const STRIDENT = 4;
 const dig$d_target = $c.nulls(6);   // static in dig()
 const use_pick_axe2$d_action = $c.nulls(6);   // static in use_pick_axe2()
 const draft_message$draft_reaction = $c.nulls(4);   // static in draft_message()
+/**
+ * @returns {number} boolean
+ */
 function rm_waslit() {   // dig.c:30
     let x = 0, y = 0;
     if (svl.level.locations[u.ux][u.uy].typ === ROOM && svl.level.locations[u.ux][u.uy].waslit | 0) {
@@ -121,6 +124,14 @@ function rm_waslit() {   // dig.c:30
 /* Change level topology.  Messes with vision tables and ignores things like
  * boulders in the name of a nice effect.  Vision will get fixed up again
  * immediately after the effect is complete.
+ */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} dist int
+ * @param {number} waslit boolean
+ * @param {number} rockit boolean
+ * @returns {Promise<void>}
  */
 async function mkcavepos(x, y, dist, waslit, rockit) {   // dig.c:48
     let lev = null, mtmp = null;
@@ -162,6 +173,10 @@ async function mkcavepos(x, y, dist, waslit, rockit) {   // dig.c:48
     }
     await feel_newsym(x, y);
 }
+/**
+ * @param {number} rockit boolean
+ * @returns {Promise<void>}
+ */
 async function mkcavearea(rockit) {   // dig.c:88
     let dist = 0, xmin = 0, xmax = 0, ymin = 0, ymax = 0, i = 0, waslit = 0;
     xmin = u.ux;
@@ -206,6 +221,12 @@ async function mkcavearea(rockit) {   // dig.c:88
     gv.vision_full_recalc = 1;   /* everything changed */
 }
 /* called when attempting to break a statue or boulder with a pick */
+/**
+ * @param {$T.obj | null} pick struct obj *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 function pick_can_reach(pick, x, y) {   // dig.c:141
     let t = null, target_in_pit = 0;
     t = t_at(x, y);
@@ -232,6 +253,12 @@ function pick_can_reach(pick, x, y) {   // dig.c:141
     return FALSE;
 }
 /* When digging into location <x,y>, what are you actually digging into? */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} int
+ */
 export function dig_typ(otmp, x, y) {   // dig.c:169
     let ltyp = 0;
     if (!isok(x, y) || !otmp || !is_pick(otmp) && !is_axe(otmp)) {
@@ -246,12 +273,21 @@ export function dig_typ(otmp, x, y) {   // dig.c:169
     /* pick vs tree */
     return sobj_at(STATUE, x, y) && pick_can_reach(otmp, x, y) ? DIGTYP.STATUE : sobj_at(BOULDER, x, y) && pick_can_reach(otmp, x, y) ? DIGTYP.BOULDER : closed_door(x, y) ? DIGTYP.DOOR : IS_TREE(ltyp) ? DIGTYP.UNDIGGABLE : IS_OBSTRUCTED(ltyp) && (!svl.level.flags.arboreal || IS_WALL(ltyp)) ? DIGTYP.ROCK : DIGTYP.UNDIGGABLE;
 }
+/**
+ * @returns {number} boolean
+ */
 export function is_digging() {   // dig.c:195
     if (go.occupation === dig) {
         return TRUE;
     }
     return FALSE;
 }
+/**
+ * @param {$T.monst | null} madeby struct monst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} enum digcheck_result
+ */
 export function dig_check(madeby, x, y) {   // dig.c:207
     let ttmp = null, stway = null;
     ttmp = t_at(x, y);
@@ -294,6 +330,13 @@ export function dig_check(madeby, x, y) {   // dig.c:207
     }
     return DIGCHECK.PASSED;
 }
+/**
+ * @param {number} digresult enum digcheck_result
+ * @param {$T.monst | null} madeby struct monst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function digcheck_fail_message(digresult, madeby, x, y) {   // dig.c:255
     let verb = null;
     verb = $c.peq(madeby, BY_YOU()) && $G.uwep && is_axe($G.uwep) ? $c.lit("chop") : $c.lit("dig in");
@@ -334,6 +377,9 @@ export async function digcheck_fail_message(digresult, madeby, x, y) {   // dig.
             break;
     }
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function dig() {   // dig.c:300
     let lev = null, dpx = 0, dpy = 0, ispick = 0, verb = null, dcresult = 0, ttmp = null, kbuf = new Int8Array(256), dmg = 0, ttmpname = null, digbuf = new Int8Array(256), digtxt = null, dmgtxt = null, obj = null, bobj = null, shopedge = 0, digtyp = 0, mndx = 0, dig_target = 0, $t1;
     dpx = svc.context.digging.pos.x;
@@ -573,6 +619,12 @@ async function dig() {   // dig.c:300
     }
     return 1;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} madeby_u boolean
+ * @returns {Promise<number>} boolean
+ */
 async function furniture_handled(x, y, madeby_u) {   // dig.c:571
     let lev = null, bx = Int16Array.of(0), by = Int16Array.of(0);
     lev = $c.relem(svl.level.locations[x], y);
@@ -594,6 +646,9 @@ async function furniture_handled(x, y, madeby_u) {   // dig.c:571
     return TRUE;
 }
 /* When will hole be finished? Very rough indication used by shopkeeper. */
+/**
+ * @returns {number} int
+ */
 export function holetime() {   // dig.c:597
     if (go.occupation !== dig || !new $c.Ptr(u.ushops, 0).get(0)) {
         return -1;
@@ -601,6 +656,12 @@ export function holetime() {   // dig.c:597
     return $c.div32(250 - svc.context.digging.effort | 0, 20);
 }
 /* Return typ of liquid to fill a hole with, or ROOM, if no liquid nearby */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} fill_if_any boolean
+ * @returns {number} schar
+ */
 export function fillholetyp(x, y, fill_if_any) {   // dig.c:606
     let x1 = 0, y1 = 0, lo_x = 0, hi_x = 0, lo_y = 0, hi_y = 0, pool_cnt = 0, moat_cnt = 0, lava_cnt = 0;
     /* force filling if it exists at all */
@@ -637,6 +698,13 @@ export function fillholetyp(x, y, fill_if_any) {   // dig.c:606
         return ROOM;
     }
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$T.monst | null} madeby struct monst *
+ * @param {number} ttyp int
+ * @returns {Promise<void>}
+ */
 export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
     let oldobjs = null, newobjs = null, ttmp = null, surface_type = null, tname = null, in_thru = null, furniture = new Int8Array(256), lev = null, mtmp = null, madeby_u = 0, madeby_obj = 0, heros_fault = 0, shopdoor = 0, at_u = 0, wont_fall = 0, old_typ = 0, old_aligntyp = 0, newlevel = new $T.d_level(), tolevel = new $T.d_level();
     lev = $c.relem(svl.level.locations[x], y);
@@ -835,6 +903,14 @@ export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
  * Called from dighole(); also from do_break_wand() in apply.c
  * and do_earthquake() in music.c.
  */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} typ schar
+ * @param {$T.trap | null} ttmp struct trap *
+ * @param {$c.Ptr | null} fillmsg const char *
+ * @returns {Promise<void>}
+ */
 export async function liquid_flow(x, y, typ, ttmp, fillmsg) {   // dig.c:838
     let objchain = null, mon = null, u_spot = 0;
     u_spot = $c.i8(u_at(x, y));
@@ -870,6 +946,12 @@ export async function liquid_flow(x, y, typ, ttmp, fillmsg) {   // dig.c:838
     }
 }
 /* return TRUE if digging succeeded, FALSE otherwise */
+/**
+ * @param {number} pit_only boolean
+ * @param {number} by_magic boolean
+ * @param {$T.nhcoord | null} cc coord *
+ * @returns {Promise<number>} boolean
+ */
 export async function dighole(pit_only, by_magic, cc) {   // dig.c:885
     let ttmp = null, lev = null, boulder_here = null, typ = 0, old_typ = 0, dig_x = 0, dig_y = 0, nohole = 0, retval = 0, dig_check_result = 0, x = Int16Array.of(0), y = Int16Array.of(0), otyp = 0;
     retval = FALSE;
@@ -979,6 +1061,10 @@ export async function dighole(pit_only, by_magic, cc) {   // dig.c:885
     await spot_checks(dig_x, dig_y, old_typ);
     return retval;
 }
+/**
+ * @param {$T.nhcoord | null} cc coord *
+ * @returns {Promise<void>}
+ */
 async function dig_up_grave(cc) {   // dig.c:1027
     let otmp = null, what_happens = 0, dig_x = 0, dig_y = 0;
     if (!cc) {
@@ -1039,6 +1125,10 @@ async function dig_up_grave(cc) {   // dig.c:1027
     await newsym(dig_x, dig_y);
     return;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function use_pick_axe(obj) {   // dig.c:1092
     let verb = null, dsp = null, dirsyms = new Int8Array(12), qbuf = new Int8Array(256), ispick = 0, rx = 0, ry = 0, downok = 0, res = 0, dir = 0, dirch = 0, $t1;
     res = ECMD.OK;
@@ -1101,6 +1191,10 @@ export async function use_pick_axe(obj) {   // dig.c:1092
 /* MRKR: use_pick_axe() is split in two to allow autodig to bypass */
 /*       the "In what direction do you want to dig?" query.        */
 /*       use_pick_axe2() uses the existing u.dx, u.dy and u.dz    */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function use_pick_axe2(obj) {   // dig.c:1162
     let rx = 0, ry = 0, lev = null, trap = null, trap_with_u = null, dig_target = 0, ispick = 0, verbing = null, buf = new Int8Array(256), dam = 0, boulder = null, what = null, vibrate = 0, idx = 0, adjidx = 0, $t1;
     ispick = $c.i8(is_pick(obj));
@@ -1259,6 +1353,10 @@ export async function use_pick_axe2(obj) {   // dig.c:1162
     }
     return ECMD.TIME;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number} boolean
+ */
 function watchman_canseeu(mtmp) {   // dig.c:1362
     if (is_watch(mtmp.data) && mtmp.mcansee | 0 && ((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(mtmp.data.mflags1, M1.SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0) && mtmp.mpeaceful | 0) {
         return TRUE;
@@ -1270,6 +1368,13 @@ function watchman_canseeu(mtmp) {   // dig.c:1362
  * It's OK to dig holes in the ground, however.
  * If mtmp is assumed to be a watchman, a watchman is found if mtmp == 0
  * zap == TRUE if wand/spell of digging, FALSE otherwise (chewing)
+ */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} zap boolean
+ * @returns {Promise<void>}
  */
 export async function watch_dig(mtmp, x, y, zap) {   // dig.c:1377
     let lev = null, str = null;
@@ -1302,6 +1407,10 @@ export async function watch_dig(mtmp, x, y, zap) {   // dig.c:1377
     }
 }
 /* Return TRUE if monster died, FALSE otherwise.  Called from m_move(). */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} boolean
+ */
 export async function mdig_tunnel(mtmp) {   // dig.c:1414
     let here = null, sawit = 0, seeit = 0, trapped = 0, pile = 0;
     pile = rnd(12);
@@ -1385,6 +1494,10 @@ export async function mdig_tunnel(mtmp) {   // dig.c:1414
 /* from pray.c */
 /* draft refers to air currents, but can be a pun on "draft" as conscription
    for military service (probably not a good pun if it has to be explained) */
+/**
+ * @param {number} unexpected boolean
+ * @returns {Promise<void>}
+ */
 export async function draft_message(unexpected) {   // dig.c:1504
     let dridx = 0;
     /*
@@ -1418,6 +1531,9 @@ export async function draft_message(unexpected) {   // dig.c:1504
     }
 }
 /* digging via wand zap or spell cast */
+/**
+ * @returns {Promise<void>}
+ */
 export async function zap_dig() {   // dig.c:1548
     let room = null, mtmp = null, otmp = null, trap_with_u = null, zx = 0, zy = 0, flow_x = 0, flow_y = 0, diridx = 0, digdepth = 0, shopdoor = 0, shopwall = 0, maze_dig = 0, pitdig = 0, pitflow = 0, dmg = 0, stway = null, cc = new $T.nhcoord(), adjpit = null, buf = new Int8Array(256), adjidx = 0, ttmp = null, filltyp = 0;
     trap_with_u = null;
@@ -1624,6 +1740,11 @@ export async function zap_dig() {   // dig.c:1548
  * you're zapping a wand of digging laterally while
  * down in the pit.
  */
+/**
+ * @param {$T.nhcoord | null} cc coord *
+ * @param {$c.Ptr | null} msg char *
+ * @returns {number} int
+ */
 function adj_pit_checks(cc, msg) {   // dig.c:1763
     let ltyp = 0, room = null, foundation_msg = null, supporting = null;
     foundation_msg = $c.lit("The foundation is too hard to dig through from this angle.");
@@ -1692,6 +1813,11 @@ function adj_pit_checks(cc, msg) {   // dig.c:1763
 /*
  * Ensure that all conjoined pits fill up.
  */
+/**
+ * @param {$T.trap | null} trap struct trap *
+ * @param {number} filltyp schar
+ * @returns {Promise<void>}
+ */
 async function pit_flow(trap, filltyp) {   // dig.c:1844
     let t = new $T.trap(), idx = 0, x = 0, y = 0, t2 = null;
     /*
@@ -1719,6 +1845,10 @@ async function pit_flow(trap, filltyp) {   // dig.c:1844
         }
     }
 }
+/**
+ * @param {$T.nhcoord | null} cc coord *
+ * @returns {$T.obj | null} struct obj *
+ */
 export function buried_ball(cc) {   // dig.c:1885
     let odist = 0, bdist = 0, otmp = null, ball = null;
     bdist = COLNO;
@@ -1767,6 +1897,9 @@ export function buried_ball(cc) {   // dig.c:1885
     }
     return ball;
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function buried_ball_to_punishment() {   // dig.c:1935
     let cc = new $T.nhcoord(), ball = null;
     cc.x = u.ux;
@@ -1781,6 +1914,9 @@ export async function buried_ball_to_punishment() {   // dig.c:1935
         await newsym(cc.x, cc.y);
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function buried_ball_to_freedom() {   // dig.c:1958
     let cc = new $T.nhcoord(), ball = null;
     cc.x = u.ux;
@@ -1798,6 +1934,11 @@ export async function buried_ball_to_freedom() {   // dig.c:1958
 }
 /* move objects from fobj/nexthere lists to buriedobjlist, keeping position
    information */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {$c.Ptr | null} dealloced boolean *
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function bury_an_obj(otmp, dealloced) {   // dig.c:1984
     let otmp2 = null, under_ice = 0, save_plnmsg = 0;
     do {
@@ -1857,6 +1998,11 @@ export async function bury_an_obj(otmp, dealloced) {   // dig.c:1984
     await add_to_buried(otmp);
     return otmp2;
 }
+/**
+ * @param {number} x int
+ * @param {number} y int
+ * @returns {Promise<void>}
+ */
 export async function bury_objs(x, y) {   // dig.c:2050
     let otmp = null, otmp2 = null, shkp = null, loss = 0, costly = 0, save_plnmsg = 0;
     loss = 0;
@@ -1889,6 +2035,11 @@ export async function bury_objs(x, y) {   // dig.c:2050
 }
 /* move objects from buriedobjlist to fobj/nexthere lists; if caller
    converts terrain from ice to something, it should call obj_ice_effects() */
+/**
+ * @param {number} x int
+ * @param {number} y int
+ * @returns {Promise<void>}
+ */
 export async function unearth_objs(x, y) {   // dig.c:2086
     let otmp = null, otmp2 = null, bball = null, cc = new $T.nhcoord(), save_plnmsg = 0;
     do {
@@ -1929,6 +2080,11 @@ export async function unearth_objs(x, y) {   // dig.c:2086
  * away, any contents become newly buried objects.
  */
 /* ARGSUSED */
+/**
+ * @param {$T.any | null} arg anything *
+ * @param {number | bigint} timeout long
+ * @returns {Promise<void>}
+ */
 export async function rot_organic(arg, timeout) {   // dig.c:2125
     let obj = null;
     obj = arg.a_obj;
@@ -1946,6 +2102,11 @@ export async function rot_organic(arg, timeout) {   // dig.c:2125
 }
 /*
  * Called when a corpse has rotted completely away.
+ */
+/**
+ * @param {$T.any | null} arg anything *
+ * @param {number | bigint} timeout long
+ * @returns {Promise<void>}
  */
 export async function rot_corpse(arg, timeout) {   // dig.c:2146
     let x = 0, y = 0, obj = null, on_floor = 0, in_invent = 0, cname = null, mtmp = null;
@@ -1994,6 +2155,9 @@ export async function rot_corpse(arg, timeout) {   // dig.c:2146
 /* still buried after 'port attempt */
 /*0*/
 /* the #wizbury command - bury everything at your loc and around */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function wiz_debug_cmd_bury() {   // dig.c:2288
     let otmp = null, x = 0, y = 0, before = 0, after = 0, diff = 0;
     before = 0;

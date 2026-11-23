@@ -44,6 +44,12 @@ const tab_funcs = $h.data(128, 8);
 /* write */
 /* length */
 /* read/write */
+/**
+ * @param {number} L lua_State *
+ * @param {number} key const char *
+ * @param {number} n int
+ * @returns {Promise<number>} int
+ */
 async function checkfield(L, key, n) {   // ltablib.c:36
     await lua_pushstring(L, key);
     return lua_rawget(L, -n | 0) !== 0 ? 1 : 0;
@@ -52,6 +58,12 @@ async function checkfield(L, key, n) {   // ltablib.c:36
 ** Check that 'arg' either is a table or can behave like one (that is,
 ** has a metatable with the required metamethods)
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} arg int
+ * @param {number} what int
+ * @returns {Promise<void>}
+ */
 async function checktab(L, arg, what) {   // ltablib.c:46
     let n = 0;
     if (lua_type(L, arg) !== 5) {
@@ -65,6 +77,10 @@ async function checktab(L, arg, what) {   // ltablib.c:46
         }
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function tinsert(L) {   // ltablib.c:61
     let pos = 0, e = 0, i = 0;
     /* where to insert new element */
@@ -97,6 +113,10 @@ async function tinsert(L) {   // ltablib.c:61
     await lua_seti(L, 1, pos);   /* t[pos] = v */
     return 0;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function tremove(L) {   // ltablib.c:91
     let size = 0, pos = 0;
     size = (await checktab(L, 1, 7), await luaL_len(L, 1));
@@ -121,6 +141,10 @@ async function tremove(L) {   // ltablib.c:91
 ** "possible" means destination after original range, or smaller
 ** than origin, or copying to another table.
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function tmove(L) {   // ltablib.c:115
     let f = 0, e = 0, t = 0, tt = 0, n = 0, i = 0;
     f = await luaL_checkinteger(L, 2);
@@ -149,6 +173,12 @@ async function tmove(L) {   // ltablib.c:115
     lua_pushvalue(L, tt);   /* return destination table */
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} b luaL_Buffer *
+ * @param {number | bigint} i lua_Integer
+ * @returns {Promise<void>}
+ */
 async function addfield(L, b, i) {   // ltablib.c:147
     await lua_geti(L, 1, i);
     if ((!lua_isstring(L, -1) ? 1 : 0) !== 0 ? 1 : 0) {
@@ -156,6 +186,10 @@ async function addfield(L, b, i) {   // ltablib.c:147
     }
     await luaL_addvalue(b);
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function tconcat(L) {   // ltablib.c:156
     let last = 0, sep = 0, i = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(1064);
@@ -181,6 +215,10 @@ async function tconcat(L) {   // ltablib.c:156
 ** Pack/unpack
 ** =======================================================
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function tpack(L) {   // ltablib.c:181
     let i = 0, n = 0;
     n = lua_gettop(L);   /* number of elements to pack */
@@ -193,6 +231,10 @@ async function tpack(L) {   // ltablib.c:181
     await lua_setfield(L, 1, $h.lit("n"));   /* t.n = number of elements */
     return 1;   /* return table */
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function tunpack(L) {   // ltablib.c:194
     let n = 0, i = 0, e = 0;
     i = await luaL_optinteger(L, 2, 1);
@@ -225,6 +267,9 @@ async function tunpack(L) {   // ltablib.c:194
 ** anything without risking overflows. A safe way to use their values
 ** is to copy them to an array of a known type and use the array values.
 */
+/**
+ * @returns {number} unsigned int
+ */
 function l_randomizePivot() {   // ltablib.c:246
     let i = 0, rnd = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(32);
@@ -242,6 +287,12 @@ function l_randomizePivot() {   // ltablib.c:246
 }
 /* } */
 /* arrays larger than 'RANLIMIT' may use randomized pivots */
+/**
+ * @param {number} L lua_State *
+ * @param {number} i IdxT
+ * @param {number} j IdxT
+ * @returns {Promise<void>}
+ */
 async function set2(L, i, j) {   // ltablib.c:265
     await lua_seti(L, 1, i);
     await lua_seti(L, 1, j);
@@ -250,6 +301,12 @@ async function set2(L, i, j) {   // ltablib.c:265
 ** Return true iff value at stack index 'a' is less than the value at
 ** index 'b' (according to the order of the sort).
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} a int
+ * @param {number} b int
+ * @returns {Promise<number>} int
+ */
 async function sort_comp(L, a, b) {   // ltablib.c:275
     let res = 0;
     if (lua_type(L, 2) === 0) {   /* no function? */
@@ -272,6 +329,12 @@ async function sort_comp(L, a, b) {   // ltablib.c:275
 ** Pos-condition: a[lo .. i - 1] <= a[i] == P <= a[i + 1 .. up]
 ** returns 'i'.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} lo IdxT
+ * @param {number} up IdxT
+ * @returns {Promise<number>} IdxT
+ */
 async function partition(L, lo, up) {   // ltablib.c:298
     let i = 0, j = 0;
     i = lo;   /* will be incremented before first use */
@@ -310,6 +373,12 @@ async function partition(L, lo, up) {   // ltablib.c:298
 ** Choose an element in the middle (2nd-3th quarters) of [lo,up]
 ** "randomized" by 'rnd'
 */
+/**
+ * @param {number} lo IdxT
+ * @param {number} up IdxT
+ * @param {number} rnd unsigned int
+ * @returns {number} IdxT
+ */
 function choosePivot(lo, up, rnd) {   // ltablib.c:334
     let r4 = 0, p = 0;
     r4 = $c.divu32(up - lo >>> 0, 4);   /* range/4 */
@@ -320,6 +389,13 @@ function choosePivot(lo, up, rnd) {   // ltablib.c:334
 /*
 ** Quicksort algorithm (recursive function)
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} lo IdxT
+ * @param {number} up IdxT
+ * @param {number} rnd unsigned int
+ * @returns {Promise<void>}
+ */
 async function auxsort(L, lo, up, rnd) {   // ltablib.c:345
     let p = 0, n = 0;
     while (lo < up) {
@@ -380,6 +456,10 @@ async function auxsort(L, lo, up, rnd) {   // ltablib.c:345
         }
     }   /* tail call auxsort(L, lo, up, rnd) */
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function sort(L) {   // ltablib.c:399
     let n = 0;
     n = (await checktab(L, 1, 7), await luaL_len(L, 1));
@@ -394,6 +474,10 @@ async function sort(L) {   // ltablib.c:399
     }
     return 0;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 export async function luaopen_table(L) {   // ltablib.c:426
     await luaL_checkversion_(L, 504, 136), await lua_createtable(L, 0, 7), await luaL_setfuncs(L, tab_funcs, 0);
     return 1;

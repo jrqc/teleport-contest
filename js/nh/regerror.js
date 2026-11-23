@@ -68,6 +68,13 @@ const rerrs = $h.data(456, 8);
  = extern size_t regerror(int, const regex_t *, char *, size_t);
  */
 /* ARGSUSED */
+/**
+ * @param {number} errcode int
+ * @param {number} preg const regex_t *restrict
+ * @param {number} errbuf char *restrict
+ * @param {number | bigint} errbuf_size size_t
+ * @returns {number | bigint} size_t
+ */
 export function regerror(errcode, preg, errbuf, errbuf_size) {   // regerror.c:120
     let r = 0, len = 0, target = 0, s = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(50);
@@ -108,6 +115,11 @@ export function regerror(errcode, preg, errbuf, errbuf_size) {   // regerror.c:1
 /*
  - regatoi - internal routine to implement REG_ATOI
  == static char *regatoi(const regex_t *preg, char *localbuf);
+ */
+/**
+ * @param {number} preg const regex_t *
+ * @param {number} localbuf char *
+ * @returns {number} char *
  */
 function regatoi(preg, localbuf) {   // regerror.c:167
     let r = 0;

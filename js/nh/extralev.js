@@ -31,6 +31,13 @@ const XL_DOWN = 2;
 const XL_LEFT = 4;
 const XL_RIGHT = 8;
 
+/**
+ * @param {number} x1 coordxy
+ * @param {number} y1 coordxy
+ * @param {number} x2 coordxy
+ * @param {number} y2 coordxy
+ * @param {number} horiz int
+ */
 function roguejoin(x1, y1, x2, y2, horiz) {   // extralev.c:21
     let x = 0, y = 0, middle = 0;
     if (horiz) {
@@ -57,6 +64,12 @@ function roguejoin(x1, y1, x2, y2, horiz) {   // extralev.c:21
         }
     }
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} dir int
+ * @returns {Promise<void>}
+ */
 async function roguecorr(x, y, dir) {   // extralev.c:45
     let fromx = 0, fromy = 0, tox = 0, toy = 0;
     if (dir === XL_DOWN) {
@@ -152,6 +165,10 @@ async function roguecorr(x, y, dir) {   // extralev.c:45
     }
 }
 /* Modified walkfrom() from mkmaze.c */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ */
 function miniwalk(x, y) {   // extralev.c:139
     let q = 0, dir = 0, dirs = new Int32Array(4), $t1, $t2, $t3, $t4;
     while (1) {
@@ -201,6 +218,9 @@ function miniwalk(x, y) {   // extralev.c:139
         miniwalk(x, y);
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function makeroguerooms() {   // extralev.c:193
     let x = 0, y = 0, lowx = 0, lowy = 0, hix = 0, hiy = 0, $t1, $t2, $t3, $t4, $t5, $t6;
     /* Rogue levels are structured 3 by 3, with each section containing
@@ -282,6 +302,10 @@ export async function makeroguerooms() {   // extralev.c:193
         }
     }
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ */
 export function corr(x, y) {   // extralev.c:278
     if (rn2(50)) {
         svl.level.locations[x][y].typ = CORR;
@@ -289,6 +313,9 @@ export function corr(x, y) {   // extralev.c:278
         svl.level.locations[x][y].typ = SCORR;
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function makerogueghost() {   // extralev.c:288
     let ghost = null, ghostobj = null, croom = null, x = 0, y = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8;
     if (!svn.nroom) {

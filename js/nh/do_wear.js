@@ -90,16 +90,28 @@ const takeoff_order = $c.zeros(15);
 let Narmorpieces = 0;
 let Naccessories = 0;
 /* plural "fingers" or optionally "gloves" */
+/**
+ * @param {number} check_gloves boolean
+ * @returns {Promise<$c.Ptr | null>} const char *
+ */
 export async function fingers_or_gloves(check_gloves) {   // do_wear.c:60
     /* "gloves" or "gauntlets" */
     return check_gloves && $G.uarmg ? gloves_simple_name($G.uarmg) : await makeplural(await body_part(FINGER));   /* "fingers" */
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 export async function off_msg(otmp) {   // do_wear.c:68
     if (flags.verbose) {
         await You($c.lit("were wearing %s."), await doname(otmp));
     }
 }
 /* for items that involve no delay */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function on_msg(otmp) {   // do_wear.c:76
     let how = new Int8Array(256), otmp_name = null;
     /* on_msg() for rings and amulets just shows add-to-invent feedback
@@ -124,6 +136,12 @@ async function on_msg(otmp) {   // do_wear.c:76
    give feedback and discover it iff stealth state is changing;
    stealth is blocked by riding unless hero+steed fly (handled with
    BStealth by mount and dismount routines) */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number | bigint} oldprop long
+ * @param {number} on boolean
+ * @returns {Promise<void>}
+ */
 async function toggle_stealth(obj, oldprop, on) {   // do_wear.c:107
     let riding = 0;
     /* prop[].extrinsic, with obj->owornmask pre-stripped */
@@ -159,6 +177,12 @@ async function toggle_stealth(obj, oldprop, on) {   // do_wear.c:107
    give feedback and discover it iff displacement state is changing *and*
    hero is able to see self (or sense monsters); for timed, 'obj' is Null
    and this is only called for the message */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number | bigint} oldprop long
+ * @param {number} on boolean
+ * @returns {Promise<void>}
+ */
 export async function toggle_displacement(obj, oldprop, on) {   // do_wear.c:148
     /* prop[].extrinsic, with obj->owornmask
        stripped by caller */
@@ -188,6 +212,9 @@ export async function toggle_displacement(obj, oldprop, on) {   // do_wear.c:148
  * The Type_on() functions should be called *after* setworn().
  * The Type_off() functions call setworn() themselves.
  * [Blindf_on() is an exception and calls setworn() itself.]
+ */
+/**
+ * @returns {Promise<number>} int
  */
 export async function Boots_on() {   // do_wear.c:187
     let oldprop = 0;
@@ -263,6 +290,9 @@ export async function Boots_on() {   // do_wear.c:187
     }
     return 0;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 export async function Boots_off() {   // do_wear.c:262
     let otmp = null, otyp = 0, oldprop = 0, $t1;
     otmp = $G.uarmf;
@@ -321,6 +351,9 @@ export async function Boots_off() {   // do_wear.c:262
     svc.context.takeoff.cancelled_don = FALSE;
     return 0;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function Cloak_on() {   // do_wear.c:326
     let oldprop = 0;
     oldprop = $c.and64(u.uprops[objects[$G.uarmc.otyp].oc_oprop].extrinsic, ~W.ARMC);
@@ -373,6 +406,9 @@ async function Cloak_on() {   // do_wear.c:326
     }
     return 0;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 export async function Cloak_off() {   // do_wear.c:383
     let otmp = null, otyp = 0, oldprop = 0;
     otmp = $G.uarmc;
@@ -418,6 +454,9 @@ export async function Cloak_off() {   // do_wear.c:383
     }
     return 0;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function Helmet_on() {   // do_wear.c:434
     switch ($G.uarmh.otyp) {
         case FEDORA:
@@ -494,6 +533,9 @@ async function Helmet_on() {   // do_wear.c:434
     }
     return 0;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 export async function Helmet_off() {   // do_wear.c:518
     svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W.ARMH);
     switch ($G.uarmh.otyp) {
@@ -542,12 +584,19 @@ export async function Helmet_off() {   // do_wear.c:518
     return 0;
 }
 /* hard helms provide better protection against falling rocks */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 export function hard_helmet(obj) {   // do_wear.c:568
     if (!obj || !is_helmet(obj)) {
         return FALSE;
     }
     return $c.i8(is_metallic(obj) || is_crackable(obj) ? TRUE : FALSE);
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function Gloves_on() {   // do_wear.c:576
     let oldprop = 0;
     oldprop = $c.and64(u.uprops[objects[$G.uarmg.otyp].oc_oprop].extrinsic, ~W.ARMG);
@@ -577,6 +626,12 @@ async function Gloves_on() {   // do_wear.c:576
 }
 /* check for wielding cockatrice corpse after taking off gloves or yellow
    dragon scales/mail or having temporary stoning resistance time out */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$T.obj | null} how struct obj *
+ * @param {number} voluntary boolean
+ * @returns {Promise<void>}
+ */
 export async function wielding_corpse(obj, how, voluntary) {   // do_wear.c:608
     let kbuf = new Int8Array(256), hbuf = new Int8Array(256);
     /* uwep, potentially a wielded cockatrice corpse */
@@ -608,6 +663,9 @@ export async function wielding_corpse(obj, how, voluntary) {   // do_wear.c:608
         }
     }
 }
+/**
+ * @returns {Promise<number>} int
+ */
 export async function Gloves_off() {   // do_wear.c:646
     let gloves = null, oldprop = 0, on_purpose = 0, $t1;
     gloves = $G.uarmg;   /* needed after uarmg has been set to Null */
@@ -664,6 +722,9 @@ export async function Gloves_off() {   // do_wear.c:646
     }
     return 0;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function Shield_on() {   // do_wear.c:705
     /* no shield currently requires special handling when put on, but we
        keep this uncommented in case somebody adds a new one which does
@@ -689,6 +750,9 @@ async function Shield_on() {   // do_wear.c:705
     }
     return 0;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 export async function Shield_off() {   // do_wear.c:733
     svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W.ARMS);
     /* no shield currently requires special handling when taken off, but we
@@ -710,6 +774,9 @@ export async function Shield_off() {   // do_wear.c:733
     await setworn(null, W.ARMS);
     return 0;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function Shirt_on() {   // do_wear.c:759
     /* no shirt currently requires special handling when put on, but we
        keep this uncommented in case somebody adds a new one which does */
@@ -726,6 +793,9 @@ async function Shirt_on() {   // do_wear.c:759
     }
     return 0;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 export async function Shirt_off() {   // do_wear.c:778
     svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W.ARMU);
     /* no shirt currently requires special handling when taken off, but we
@@ -741,6 +811,12 @@ export async function Shirt_off() {   // do_wear.c:778
     return 0;
 }
 /* handle extra abilities for hero wearing dragon scale armor */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} puton boolean
+ * @param {number} on_purpose boolean
+ * @returns {Promise<void>}
+ */
 async function dragon_armor_handling(otmp, puton, on_purpose) {   // do_wear.c:798
     /* armor being put on or taken off */
     /* True: on, False: off */
@@ -826,6 +902,9 @@ async function dragon_armor_handling(otmp, puton, on_purpose) {   // do_wear.c:7
             break;
     }
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function Armor_on() {   // do_wear.c:887
     if (!$G.uarm) {   /* no known instances of !uarm here but play it safe */
         return 0;
@@ -845,6 +924,9 @@ async function Armor_on() {   // do_wear.c:887
     }
     return 0;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 export async function Armor_off() {   // do_wear.c:909
     let otmp = null, was_arti_light = 0;
     otmp = $G.uarm;
@@ -871,6 +953,9 @@ export async function Armor_off() {   // do_wear.c:909
  * saving putting a removed item back on to prevent that from immediately
  * repeating.]
  */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function Armor_gone() {   // do_wear.c:939
     let otmp = null, was_arti_light = 0;
     otmp = $G.uarm;
@@ -891,6 +976,10 @@ export async function Armor_gone() {   // do_wear.c:939
     await dragon_armor_handling(otmp, FALSE, FALSE);
     return 0;
 }
+/**
+ * @param {$T.obj | null} amul struct obj *
+ * @returns {Promise<void>}
+ */
 async function Amulet_on(amul) {   // do_wear.c:963
     let on_msg_done = 0, was_in_poison_gas = 0, call_it = 0, new_sex = 0, orig_sex = 0, newnap = 0, oldnap = 0, already_flying = 0;
     on_msg_done = FALSE;
@@ -1013,6 +1102,9 @@ async function Amulet_on(amul) {   // do_wear.c:963
         await on_msg($G.uamul);
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function Amulet_off() {   // do_wear.c:1090
     let amul = null, mkn = 0, early_off_msg = 0, was_flying = 0;
     amul = $G.uamul;   /* for off_msg() after setworn(NULL,W_AMUL) */
@@ -1108,6 +1200,11 @@ export async function Amulet_off() {   // do_wear.c:1090
     return;
 }
 /* handle ring discovery; comparable to learnwand() */
+/**
+ * @param {$T.obj | null} ring struct obj *
+ * @param {number} observed boolean
+ * @returns {Promise<void>}
+ */
 async function learnring(ring, observed) {   // do_wear.c:1193
     let ringtype = 0;
     ringtype = ring.otyp;
@@ -1133,6 +1230,12 @@ async function learnring(ring, observed) {   // do_wear.c:1193
         await update_inventory();
     }
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} which int
+ * @param {number} val int
+ * @returns {Promise<void>}
+ */
 async function adjust_attrib(obj, which, val) {   // do_wear.c:1223
     let old_attrib = 0, observable = 0;
     old_attrib = ACURR(which);
@@ -1148,6 +1251,10 @@ async function adjust_attrib(obj, which, val) {   // do_wear.c:1223
     }
     disp.botl = TRUE;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function Ring_on(obj) {   // do_wear.c:1242
     let oldprop = 0, observable = 0;
     oldprop = u.uprops[objects[obj.otyp].oc_oprop].extrinsic;
@@ -1251,6 +1358,11 @@ export async function Ring_on(obj) {   // do_wear.c:1242
             break;
     }
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} gone boolean
+ * @returns {Promise<void>}
+ */
 async function Ring_off_or_gone(obj, gone) {   // do_wear.c:1347
     let mask = 0, observable = 0;
     mask = $c.and64(obj.owornmask, W_RING);
@@ -1352,12 +1464,24 @@ async function Ring_off_or_gone(obj, gone) {   // do_wear.c:1347
             break;
     }
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function Ring_off(obj) {   // do_wear.c:1449
     await Ring_off_or_gone(obj, FALSE);
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function Ring_gone(obj) {   // do_wear.c:1455
     await Ring_off_or_gone(obj, TRUE);
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 export async function Blindf_on(otmp) {   // do_wear.c:1461
     let already_blind = 0, changed = 0;
     already_blind = $c.i8(Blind());
@@ -1392,6 +1516,10 @@ export async function Blindf_on(otmp) {   // do_wear.c:1461
         await toggle_blindness();   /* potion.c */
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 export async function Blindf_off(otmp) {   // do_wear.c:1495
     let was_blind = 0, changed = 0, nooffmsg = 0;
     was_blind = $c.i8(Blind());
@@ -1437,6 +1565,10 @@ export async function Blindf_off(otmp) {   // do_wear.c:1495
 }
 /* called in moveloop()'s prologue to set side-effects of worn start-up items;
    also used by poly_obj() when a worn item gets transformed */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function set_wear(obj) {   // do_wear.c:1539
     /* if Null, do all worn items; otherwise just obj */
     gi.initial_don = $c.i8(!obj ? 1 : 0);
@@ -1477,6 +1609,10 @@ export async function set_wear(obj) {   // do_wear.c:1539
 }
 /* check whether the target object is currently being put on (or taken off--
    also checks for doffing--[why?]) */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {number} boolean
+ */
 export function donning(otmp) {   // do_wear.c:1574
     let result = 0;
     result = FALSE;
@@ -1503,6 +1639,10 @@ export function donning(otmp) {   // do_wear.c:1574
 /* check whether the target object is currently being taken off,
    so that stop_donning() and steal() can vary messages and doname()
    can vary "(being worn)" suffix */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {number} boolean
+ */
 export function doffing(otmp) {   // do_wear.c:1603
     let what = 0, result = 0;
     what = svc.context.takeoff.what;
@@ -1542,6 +1682,10 @@ export function doffing(otmp) {   // do_wear.c:1603
 }
 /* despite their names, cancel_don() and cancel_doff() both apply to both
    donning and doffing... */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number | bigint} slotmask long
+ */
 export function cancel_doff(obj, slotmask) {   // do_wear.c:1645
     /* Called by setworn() for old item in specified slot or by setnotworn()
      * for specified item.  We don't want to call cancel_don() if we got
@@ -1574,6 +1718,10 @@ export function cancel_don() {   // do_wear.c:1664
     svc.context.takeoff.what = 0;
 }
 /* called by steal() during theft from hero; interrupt donning/doffing */
+/**
+ * @param {$T.obj | null} stolenobj struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function stop_donning(stolenobj) {   // do_wear.c:1688
     let buf = new Int8Array(256), otmp = null, putting_on = 0, result = 0;
     /* no mesg if stolenobj is already being doffed */
@@ -1611,6 +1759,10 @@ export async function stop_donning(stolenobj) {   // do_wear.c:1688
     return result;
 }
 /* assign values to Narmorpieces and Naccessories */
+/**
+ * @param {*} which struct obj **
+ * @param {number} accessorizing boolean
+ */
 function count_worn_stuff(which, accessorizing) {   // do_wear.c:1733
     let otmp = null;
     /* caller wants this when count is 1 */
@@ -1698,6 +1850,10 @@ function count_worn_stuff(which, accessorizing) {   // do_wear.c:1733
 }
 /* take off one piece or armor or one accessory;
    shared by dotakeoff('T') and doremring('R') */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function armor_or_accessory_off(obj) {   // do_wear.c:1771
     let why = new Int8Array(128), what = new Int8Array(128), $t1;
     if (!$c.and64(obj.owornmask, W_ARMOR | W_ACCESSORY)) {
@@ -1754,6 +1910,9 @@ async function armor_or_accessory_off(obj) {   // do_wear.c:1771
     return ECMD.TIME;
 }
 /* the #takeoff command - remove worn armor */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dotakeoff() {   // do_wear.c:1833
     let otmp = [null];
     otmp[0] = null;
@@ -1779,6 +1938,9 @@ export async function dotakeoff() {   // do_wear.c:1833
    plain dotakeoff() would not give any feedback when picking suit
    covered by cloak, or shirt covered by suit and/or cloak, due to the
    default behavior of equip_ok() (skipping inaccessible items) */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function ia_dotakeoff() {   // do_wear.c:1862
     let res = 0;
     gi.item_action_in_progress = TRUE;
@@ -1787,6 +1949,9 @@ export async function ia_dotakeoff() {   // do_wear.c:1862
     return res;
 }
 /* the #remove command - take off ring or other accessory */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doremring() {   // do_wear.c:1874
     let otmp = [null];
     otmp[0] = null;
@@ -1804,6 +1969,10 @@ export async function doremring() {   // do_wear.c:1874
     return await armor_or_accessory_off(otmp[0]);
 }
 /* Check if something worn is cursed _and_ unremovable. */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function cursed(otmp) {   // do_wear.c:1893
     let use_plural = 0;
     if (!otmp) {
@@ -1825,6 +1994,10 @@ export async function cursed(otmp) {   // do_wear.c:1893
     }
     return 0;
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function armoroff(otmp) {   // do_wear.c:1920
     let delay = 0, what = null, $t1;
     delay = -objects[otmp.otyp].oc_delay | 0;
@@ -1910,9 +2083,18 @@ export async function armoroff(otmp) {   // do_wear.c:1920
     $t1 = svc.context.takeoff.what = 0, svc.context.takeoff.mask = $t1;
     return 1;
 }
+/**
+ * @param {$c.Ptr | null} cc const char *
+ * @returns {Promise<void>}
+ */
 async function already_wearing(cc) {   // do_wear.c:2011
     await You($c.lit("are already wearing %s%c"), cc, $c.peq(cc, new $c.Ptr(c_that_, 0)) ? 33 : 46);
 }
+/**
+ * @param {$c.Ptr | null} cc1 const char *
+ * @param {$c.Ptr | null} cc2 const char *
+ * @returns {Promise<void>}
+ */
 async function already_wearing2(cc1, cc2) {   // do_wear.c:2017
     await You_cant($c.lit("wear %s because you're wearing %s there already."), cc1, cc2);
 }
@@ -1922,6 +2104,12 @@ async function already_wearing2(cc1, cc2) {   // do_wear.c:2017
  * inputs: otmp (the piece of armor)
  *         noisy (if TRUE give error messages, otherwise be quiet about it)
  * output: mask (otmp's armor type)
+ */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {*} mask long *
+ * @param {number} noisy boolean
+ * @returns {Promise<number>} int
  */
 export async function canwearobj(otmp, mask, noisy) {   // do_wear.c:2030
     let err = 0, which = null;
@@ -2104,6 +2292,10 @@ export async function canwearobj(otmp, mask, noisy) {   // do_wear.c:2030
      */
     return !err ? 1 : 0;
 }
+/**
+ * @param {$T.obj | null} obj$in struct obj *
+ * @returns {Promise<number>} int
+ */
 async function accessory_or_armor_on(obj$in) {   // do_wear.c:2209
     const obj = [obj$in];
     let mask = [0], armor = 0, ring = 0, amulet = 0, eyewear = 0, answer = 0, qbuf = new Int8Array(128), res = 0, hand = null, delay = 0, $t1;
@@ -2312,6 +2504,9 @@ async function accessory_or_armor_on(obj$in) {   // do_wear.c:2209
     return ECMD.TIME;
 }
 /* the #wear command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dowear() {   // do_wear.c:2432
     let otmp = null;
     /* cantweararm() checks for suits of armor, not what we want here;
@@ -2329,6 +2524,9 @@ export async function dowear() {   // do_wear.c:2432
     return otmp ? await accessory_or_armor_on(otmp) : ECMD.CANCEL;
 }
 /* the #puton command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doputon() {   // do_wear.c:2454
     let otmp = null;
     if ($G.uleft && $G.uright && $G.uamul && $G.ublindf && $G.uarm && $G.uarmu && $G.uarmc && $G.uarmh && $G.uarms && $G.uarmg && $G.uarmf) {
@@ -2393,6 +2591,9 @@ export function find_ac() {   // do_wear.c:2473
            record_achievement() attempts and rejects for duplication */
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function glibr() {   // do_wear.c:2528
     let otmp = null, xfl = 0, leftfall = 0, rightfall = 0, wastwoweap = 0, otherwep = null, thiswep = null, which = null, hand = null, savequan = 0;
     xfl = 0;
@@ -2482,6 +2683,10 @@ export async function glibr() {   // do_wear.c:2528
         }
     }
 }
+/**
+ * @param {$T.monst | null} victim struct monst *
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function some_armor(victim) {   // do_wear.c:2630
     let otmph = null, otmp = null;
     otmph = $c.peq(victim, gy.youmonst) ? $G.uarmc : await which_armor(victim, W.ARMC);
@@ -2510,6 +2715,11 @@ export async function some_armor(victim) {   // do_wear.c:2630
     return otmph;
 }
 /* used for praying to check and fix levitation trouble */
+/**
+ * @param {$T.obj | null} ring struct obj *
+ * @param {number} otyp int
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function stuck_ring(ring, otyp) {   // do_wear.c:2657
     if (!$c.peq(ring, $G.uleft) && !$c.peq(ring, $G.uright)) {
         await impossible($c.lit("stuck_ring: neither left nor right?"));
@@ -2540,12 +2750,19 @@ export async function stuck_ring(ring, otyp) {   // do_wear.c:2657
     return null;
 }
 /* also for praying; find worn item that confers "Unchanging" attribute */
+/**
+ * @returns {$T.obj | null} struct obj *
+ */
 export function unchanger() {   // do_wear.c:2687
     if ($G.uamul && $G.uamul.otyp === AMULET_OF_UNCHANGING) {
         return $G.uamul;
     }
     return null;
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} int
+ */
 async function select_off(otmp) {   // do_wear.c:2696
     let why = null, buf = new Int8Array(256), glibdummy = new $T.obj();
     if (!otmp) {
@@ -2659,6 +2876,9 @@ async function select_off(otmp) {   // do_wear.c:2696
     }
     return 0;
 }
+/**
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 async function do_takeoff() {   // do_wear.c:2824
     let otmp = null, was_twoweap = 0, doff = null;
     otmp = null;
@@ -2741,6 +2961,9 @@ async function do_takeoff() {   // do_wear.c:2824
     return otmp;
 }
 /* occupation callback for 'A' */
+/**
+ * @returns {Promise<number>} int
+ */
 async function take_off() {   // do_wear.c:2900
     let i = 0, otmp = null, doff = null;
     doff = svc.context.takeoff;
@@ -2827,6 +3050,10 @@ async function take_off() {   // do_wear.c:2900
     set_occupation(take_off, new $c.Ptr(doff.disrobing, 0), 0);
     return 1;   /* get busy */
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} boolean
+ */
 async function better_not_take_that_off(otmp) {   // do_wear.c:2990
     let corpse = null, buf = new Int8Array(256);
     corpse = carrying_stoning_corpse();
@@ -2850,6 +3077,9 @@ export function reset_remarm() {   // do_wear.c:3014
     svc.context.takeoff.disrobing[0] = 0;
 }
 /* the #takeoffall command -- remove multiple worn items */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doddoremarm() {   // do_wear.c:3022
     let result = 0;
     result = 0;
@@ -2880,6 +3110,9 @@ export async function doddoremarm() {   // do_wear.c:3022
 }
 /* #altunwield - just unwield alternate weapon, item-action '-' when picking
    uswapwep from context-sensitive inventory */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function remarm_swapwep() {   // do_wear.c:3062
     let cq = new $T._cmd_queue(), cmdq = null, oldbknown = 0, $t1;
     if ((cmdq = cmdq_pop()) !== null) {
@@ -2904,6 +3137,10 @@ export async function remarm_swapwep() {   // do_wear.c:3062
     await do_takeoff();
     return !$G.uswapwep || $G.uswapwep.bknown !== oldbknown ? ECMD.TIME : ECMD.OK;
 }
+/**
+ * @param {number} retry int
+ * @returns {Promise<number>} int
+ */
 async function menu_remarm(retry) {   // do_wear.c:3090
     let n = 0, i = 0, pick_list = [null], all_worn_categories = 0, ggofeedback = Uint32Array.of(0);
     i = 0;
@@ -2949,6 +3186,10 @@ async function menu_remarm(retry) {   // do_wear.c:3090
 /* take off the specific worn object and if it still exists after that,
    destroy it (taking off the item might already destroy it by dunking
    hero into lava) */
+/**
+ * @param {$T.obj | null} wornarm struct obj *
+ * @returns {Promise<void>}
+ */
 async function wornarm_destroyed(wornarm) {   // do_wear.c:3144
     let invobj = null, nextobj = null, wornoid = 0;
     wornoid = wornarm.o_id;
@@ -2990,6 +3231,12 @@ async function wornarm_destroyed(wornarm) {   // do_wear.c:3144
  * returns impacted armor with its in_use bit set,
  * or Null. *resisted is updated to reflect whether
  * it resisted or not */
+/**
+ * @param {$T.obj | null} armor struct obj *
+ * @param {$T.obj | null} atmp struct obj *
+ * @param {$c.Ptr | null} resisted boolean *
+ * @returns {$T.obj | null} struct obj *
+ */
 function maybe_destroy_armor(armor, atmp, resisted) {   // do_wear.c:3189
     let $t1;
     if (armor !== null && (!atmp || $c.peq(atmp, armor)) && ($t1 = obj_resists(armor, 0, 90), resisted.set(0, $t1)) === FALSE) {
@@ -2999,6 +3246,10 @@ function maybe_destroy_armor(armor, atmp, resisted) {   // do_wear.c:3189
     return null;
 }
 /* hit by destroy armor scroll/black dragon breath */
+/**
+ * @param {$T.obj | null} atmp struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function disintegrate_arm(atmp) {   // do_wear.c:3201
     let otmp = null, losing_gloves = 0, resisted = Int8Array.of(0), resistedc = Int8Array.of(0), resistedsuit = Int8Array.of(0), suit = null;
     otmp = null;
@@ -3049,6 +3300,10 @@ export async function disintegrate_arm(atmp) {   // do_wear.c:3201
     return 1;
 }
 /* return ERODE_foo erosion type which can apply to object */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {number} int
+ */
 function obj_erode_type(otmp) {   // do_wear.c:3260
     if (is_flammable(otmp)) {
         return ERODE.BURN;
@@ -3065,6 +3320,9 @@ function obj_erode_type(otmp) {   // do_wear.c:3260
 }
 /* erode a number of worn armor(s).
    if the armor is hit when max eroded, destroys it. */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function destroy_arm() {   // do_wear.c:3278
     let armors = $c.nulls(7), otmp = null, i = 0, idx = 0, hits = 0, ret = 0, erosion = 0, r = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
     armors.fill(null);
@@ -3117,6 +3375,11 @@ export async function destroy_arm() {   // do_wear.c:3278
     }
     return ret;
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} delta schar
+ * @returns {Promise<void>}
+ */
 export async function adj_abon(otmp, delta) {   // do_wear.c:3319
     if ($G.uarmg && $c.peq($G.uarmg, otmp) && otmp.otyp === GAUNTLETS_OF_DEXTERITY) {
         if (delta) {
@@ -3137,6 +3400,12 @@ export async function adj_abon(otmp, delta) {   // do_wear.c:3319
 /* decide whether a worn item is covered up by some other worn item,
    used for dipping into liquid and applying grease and takeoff_ok();
    some criteria are different than select_off()'s */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$c.Ptr | null} verb const char *
+ * @param {number} only_if_known_cursed boolean
+ * @returns {Promise<number>} boolean
+ */
 export async function inaccessible_equipment(obj, verb, only_if_known_cursed) {   // do_wear.c:3342
     let buf = new Int8Array(256), anycovering = 0, cloaktmp = new Int8Array(128), suittmp = new Int8Array(128), sameprefix = 0;
     /* "dip" or "grease", or null to avoid messages */
@@ -3187,6 +3456,12 @@ export async function inaccessible_equipment(obj, verb, only_if_known_cursed) { 
     return FALSE;
 }
 /* not a getobj callback - unifies code among the other 4 getobj callbacks */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} removing boolean
+ * @param {number} accessory boolean
+ * @returns {Promise<number>} int
+ */
 async function equip_ok(obj, removing, accessory) {   // do_wear.c:3404
     let is_worn = 0, dummymask = [0];
     dummymask[0] = 0;
@@ -3225,23 +3500,43 @@ async function equip_ok(obj, removing, accessory) {   // do_wear.c:3404
     return GETOBJ.SUGGEST;
 }
 /* getobj callback for P command */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function puton_ok(obj) {   // do_wear.c:3451
     return await equip_ok(obj, FALSE, TRUE);
 }
 /* getobj callback for R command */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function remove_ok(obj) {   // do_wear.c:3458
     return await equip_ok(obj, TRUE, TRUE);
 }
 /* getobj callback for W command */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function wear_ok(obj) {   // do_wear.c:3465
     return await equip_ok(obj, FALSE, FALSE);
 }
 /* getobj callback for T command */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function takeoff_ok(obj) {   // do_wear.c:3472
     return await equip_ok(obj, TRUE, FALSE);
 }
 /* getobj callback for blessed destroy armor.
    suggest any worn armor, even if covered by other armor */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 export function any_worn_armor_ok(obj) {   // do_wear.c:3480
     if (obj && $c.and64(obj.owornmask, W_ARMOR)) {
         return GETOBJ.SUGGEST;
@@ -3249,6 +3544,9 @@ export function any_worn_armor_ok(obj) {   // do_wear.c:3480
     return GETOBJ.EXCLUDE;
 }
 /* number of armor pieces worn by hero */
+/**
+ * @returns {number} int
+ */
 export function count_worn_armor() {   // do_wear.c:3489
     let ret = 0;
     ret = 0;

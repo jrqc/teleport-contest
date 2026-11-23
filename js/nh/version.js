@@ -39,6 +39,11 @@ export const critical_sizes = $c.recArray($T.critical_sizes_with_names, 80);
 export const cscbuf = new Uint8Array(80);
 /* fill buffer with short version (so caller can avoid including date.h)
  * buf cannot be NULL */
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @param {number | bigint} bufsz size_t
+ * @returns {$c.Ptr | null} char *
+ */
 export function version_string(buf, bufsz) {   // version.c:22
     nh_snprintf($c.lit("version_string"), 29, buf, bufsz, $c.lit("%s"), nomakedefs.version_string && nomakedefs.version_string.get(0) ? nomakedefs.version_string : mdlib_version_string(buf, $c.lit(".")));
     /* in case we try to write a paniclog entry after releasing
@@ -46,6 +51,11 @@ export function version_string(buf, bufsz) {   // version.c:22
     return buf;
 }
 /* fill and return the given buffer with the long nethack version string */
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @param {number | bigint} bufsz size_t
+ * @returns {$c.Ptr | null} char *
+ */
 export function getversionstring(buf, bufsz) {   // version.c:35
     let c = 0, p = null, dotoff = 0, $t1, $t2;
     $c.strcpy(buf, nomakedefs.version_id);
@@ -82,6 +92,12 @@ export function getversionstring(buf, bufsz) {   // version.c:35
    after release--or if branch info is unavailable--it will be
      "<game name> <x.y.z version number>";
    game name or branch name or both can be requested via flags */
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @param {number | bigint} bufsz size_t
+ * @param {number} indent boolean
+ * @returns {$c.Ptr | null} char *
+ */
 export function status_version(buf, bufsz, indent) {   // version.c:89
     let name = null, altname = null, indentation = null, vflags = 0, shownum = 0, showname = 0, showbranch = 0;
     name = null;
@@ -138,6 +154,9 @@ export function status_version(buf, bufsz, indent) {   // version.c:89
     return buf;
 }
 /* the #versionshort command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doversion() {   // version.c:156
     let buf = new Int8Array(256);
     if (iflags.menu_requested) {
@@ -147,6 +166,9 @@ export async function doversion() {   // version.c:156
     return ECMD.OK;
 }
 /* the '#version' command; also a choice for '?' */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doextversion() {   // version.c:169
     let rtcontext = Int32Array.of(0), rtbuf = null, f = null, buf = new Int8Array(256), p = null, win = 0, use_dlb = 0, done_rt = 0, done_dlb = 0, prolog = 0;
     rtcontext[0] = 0;
@@ -249,6 +271,10 @@ export async function doextversion() {   // version.c:169
     await destroy_nhwindow()(win);
     return ECMD.OK;
 }
+/**
+ * @param {number} pastebuf boolean
+ * @returns {Promise<void>}
+ */
 export async function early_version_info(pastebuf) {   // version.c:280
     let buf1 = new Int8Array(256), buf2 = new Int8Array(256), buf = null, tmp = null, $t1;
     nh_snprintf($c.lit("early_version_info"), 285, new $c.Ptr(buf1, 0), 256, $c.lit("test"));
@@ -279,6 +305,10 @@ export async function early_version_info(pastebuf) {   // version.c:280
  * it depends which of several object files got linked into the
  * game image, so we insert those options here.
  */
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @returns {Promise<void>}
+ */
 async function insert_rtoption(buf) {   // version.c:339
     let i = 0;
     if (!gl.lua_ver[0]) {
@@ -296,6 +326,13 @@ async function insert_rtoption(buf) {   // version.c:339
    'filetime' is historically signed but ought to have been unsigned */
 /* !SFCTOOL */
 /* SFCTOOL */
+/**
+ * @param {$T.version_info | null} version_data struct version_info *
+ * @param {$c.Ptr | null} filename const char *
+ * @param {number} complain boolean
+ * @param {number | bigint} utdflags unsigned long
+ * @returns {Promise<number>} boolean
+ */
 export async function check_version(version_data, filename, complain, utdflags) {   // version.c:374
     if (!filename) {
         complain = FALSE;   /* 'complain' requires 'filename' for pline("%s") */
@@ -322,6 +359,10 @@ export async function check_version(version_data, filename, complain, utdflags) 
     }
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} str char *
+ * @returns {number | bigint} unsigned long
+ */
 export function get_feature_notice_ver(str) {   // version.c:431
     let buf = new Int8Array(256), ver_maj = 0, ver_min = 0, patch = 0, istr = $c.nulls(3), j = 0, $t1;
     j = 0;
@@ -353,10 +394,17 @@ export function get_feature_notice_ver(str) {   // version.c:431
     return FEATURE_NOTICE_VER(ver_maj, ver_min, patch);
     /* macro from hack.h */
 }
+/**
+ * @returns {number | bigint} unsigned long
+ */
 export function get_current_feature_ver() {   // version.c:464
     return VERSION.MAJOR << 24 | VERSION.MINOR << 16 | PATCHLEVEL << 8 | 0;
 }
 /*ARGUSED*/
+/**
+ * @param {number} indx int
+ * @returns {$c.Ptr | null} const char *
+ */
 export function copyright_banner_line(indx) {   // version.c:471
     if (indx === 1) {
         return $c.lit("NetHack, Copyright 1985-2026");
@@ -373,6 +421,9 @@ export function copyright_banner_line(indx) {   // version.c:471
     return $c.lit("");
 }
 /* called by argcheck(allmain.c) from early_options(sys/xxx/xxxmain.c) */
+/**
+ * @returns {Promise<void>}
+ */
 export async function dump_version_info() {   // version.c:494
     let buf = new Int8Array(256), hname = null;
     hname = gh.hname ? gh.hname : $c.lit("nethack");
@@ -385,6 +436,10 @@ export async function dump_version_info() {   // version.c:494
     release_runtime_info();
     return;
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 export async function store_version(nhfp) {   // version.c:512
     let version_data = new $T.version_info();
     version_data.$copyFrom(new $T.version_info());
@@ -408,9 +463,16 @@ export async function store_version(nhfp) {   // version.c:512
     }
     return;
 }
+/**
+ * @returns {number} int
+ */
 export function get_critical_size_count() {   // version.c:669
     return 80;
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 export async function store_critical_bytes(nhfp) {   // version.c:676
     let i = 0, cnt = 0, indicate = Int8Array.of(0), csc_count = Int8Array.of(0);
     indicate[0] = 117;
@@ -441,6 +503,12 @@ export async function store_critical_bytes(nhfp) {   // version.c:676
  *   SF_DM_I32LP64_ON_IL32LLP64      (7) Unix 64 savefile on Windows x64
  *   SF_DM_IL32LLP64_ON_I32LP64      (8) Windows x64 savefile on Unix 64
  *   SF_DM_MISMATCH                  (9) some other mismatch
+ */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @param {$c.Ptr | null} name const char *
+ * @param {number | bigint} utdflags unsigned long
+ * @returns {Promise<number>} int
  */
 export async function uptodate(nhfp, name, utdflags) {   // version.c:713
     let vers_info = new $T.version_info(), indicator = Int8Array.of(0), sfstatus = 0, idx_1st_mismatch = Int32Array.of(0), quietly = 0, verbose = 0;
@@ -480,6 +548,12 @@ export async function uptodate(nhfp, name, utdflags) {   // version.c:713
  *   SF_DM_I32LP64_ON_IL32LLP64      (7) Unix 64 savefile on Windows x64
  *   SF_DM_IL32LLP64_ON_I32LP64      (8) Windows x64 savefile on Unix 64
  *   SF_DM_MISMATCH                  (9) some other mismatch
+ */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @param {*} idx_1st_mismatch int *
+ * @param {number | bigint} utdflags unsigned long
+ * @returns {Promise<number>} int
  */
 export async function compare_critical_bytes(nhfp, idx_1st_mismatch, utdflags) {   // version.c:763
     let active_csc_count = 0, file_csc_count = Int8Array.of(0), i = 0, cnt = 0, dmmismatch = 0, quietly = 0, dm = null, dmfile = null;
@@ -545,6 +619,12 @@ export async function compare_critical_bytes(nhfp, idx_1st_mismatch, utdflags) {
  *   SF_DM_I32LP64_ON_IL32LLP64      (7) Unix 64 savefile on Windows x64
  *   SF_DM_IL32LLP64_ON_I32LP64      (8) Windows x64 savefile on Unix 64
  *   SF_DM_MISMATCH                  (9) some other mismatch
+ */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @param {$c.Ptr | null} name const char *
+ * @param {number} without_waitsynch_perfile boolean
+ * @returns {Promise<number>} int
  */
 export async function validate(nhfp, name, without_waitsynch_perfile) {   // version.c:840
     let utdflags = 0, validsf = 0;

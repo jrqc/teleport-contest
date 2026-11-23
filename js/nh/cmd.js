@@ -206,11 +206,17 @@ const misc_keys = $c.recArray($T.anon_cmd_2086, 3);
 let extcmdlist_length = 0;
 const spkeys_binds = $c.recArray($T.anon_cmd_3157, 29);
 /* the #prevmsg command */
+/**
+ * @returns {Promise<number>} int
+ */
 async function doprev_message() {   // cmd.c:164
     await nh_doprev_message()();
     return ECMD.OK;
 }
 /* Count down by decrementing multi */
+/**
+ * @returns {Promise<number>} int
+ */
 async function timed_occupation() {   // cmd.c:172
     await timed_occ_fn();
     if (gm.multi > 0) {
@@ -239,6 +245,11 @@ export function reset_occupations() {   // cmd.c:195
 }
 /* If a time is given, use it to timeout this function, otherwise the
  * function times out by its own means.
+ */
+/**
+ * @param {Function | null} fn int (*)(void)
+ * @param {$c.Ptr | null} txt const char *
+ * @param {number | bigint} xtime cmdcount_nht
  */
 export function set_occupation(fn, txt, xtime) {   // cmd.c:206
     if (xtime) {
@@ -285,6 +296,11 @@ cmdq_print(int q)
 }
 */
 /* add extended command function to the command queue */
+/**
+ * @param {number} q int
+ * @param {Function | null} fn int (*)(void)
+ * @returns {Promise<void>}
+ */
 export async function cmdq_add_ec(q, fn) {   // cmd.c:254
     let tmp = null, cq = null, $t1;
     tmp = $c.asRec(await alloc(32), $T._cmd_queue, 32);
@@ -302,6 +318,11 @@ export async function cmdq_add_ec(q, fn) {   // cmd.c:254
     }
 }
 /* add a key to the command queue */
+/**
+ * @param {number} q int
+ * @param {number} key char
+ * @returns {Promise<void>}
+ */
 export async function cmdq_add_key(q, key) {   // cmd.c:274
     let tmp = null, cq = null;
     tmp = $c.asRec(await alloc(32), $T._cmd_queue, 32);
@@ -319,6 +340,13 @@ export async function cmdq_add_key(q, key) {   // cmd.c:274
     }
 }
 /* add a direction to the command queue */
+/**
+ * @param {number} q int
+ * @param {number} dx schar
+ * @param {number} dy schar
+ * @param {number} dz schar
+ * @returns {Promise<void>}
+ */
 export async function cmdq_add_dir(q, dx, dy, dz) {   // cmd.c:294
     let tmp = null, cq = null;
     tmp = $c.asRec(await alloc(32), $T._cmd_queue, 32);
@@ -338,6 +366,10 @@ export async function cmdq_add_dir(q, dx, dy, dz) {   // cmd.c:294
     }
 }
 /* add placeholder to the command queue, allows user input there */
+/**
+ * @param {number} q int
+ * @returns {Promise<void>}
+ */
 export async function cmdq_add_userinput(q) {   // cmd.c:316
     let tmp = null, cq = null;
     tmp = $c.asRec(await alloc(32), $T._cmd_queue, 32);
@@ -354,6 +386,11 @@ export async function cmdq_add_userinput(q) {   // cmd.c:316
     }
 }
 /* add integer to the command queue */
+/**
+ * @param {number} q int
+ * @param {number} val int
+ * @returns {Promise<void>}
+ */
 export async function cmdq_add_int(q, val) {   // cmd.c:335
     let tmp = null, cq = null;
     tmp = $c.asRec(await alloc(32), $T._cmd_queue, 32);
@@ -371,6 +408,9 @@ export async function cmdq_add_int(q, val) {   // cmd.c:335
     }
 }
 /* shift the last entry in command queue to first */
+/**
+ * @param {number} q int
+ */
 export function cmdq_shift(q) {   // cmd.c:355
     let tmp = null, cq = null;
     tmp = null;
@@ -387,6 +427,10 @@ export function cmdq_shift(q) {   // cmd.c:355
         cq.next = null;
     }
 }
+/**
+ * @param {$T._cmd_queue | null} head struct _cmd_queue *
+ * @returns {$T._cmd_queue | null} struct _cmd_queue *
+ */
 export function cmdq_reverse(head) {   // cmd.c:373
     let prev = null, curr = null, next = null;
     prev = null;
@@ -399,6 +443,10 @@ export function cmdq_reverse(head) {   // cmd.c:373
     }
     return prev;
 }
+/**
+ * @param {number} q int
+ * @returns {Promise<$T._cmd_queue | null>} struct _cmd_queue *
+ */
 export async function cmdq_copy(q) {   // cmd.c:387
     let tmp = null, cq = null, tmp2 = null;
     tmp = null;
@@ -416,6 +464,9 @@ export async function cmdq_copy(q) {   // cmd.c:387
 /* pop off the topmost command from the command queue.
  * caller is responsible for freeing the returned _cmd_queue.
  */
+/**
+ * @returns {$T._cmd_queue | null} struct _cmd_queue *
+ */
 export function cmdq_pop() {   // cmd.c:410
     let q = 0, tmp = null;
     q = gi.in_doagain ? CQ_REPEAT : CQ_CANNED;
@@ -427,10 +478,17 @@ export function cmdq_pop() {   // cmd.c:410
     return tmp;
 }
 /* get the top entry without popping it */
+/**
+ * @param {number} q int
+ * @returns {$T._cmd_queue | null} struct _cmd_queue *
+ */
 export function cmdq_peek(q) {   // cmd.c:424
     return gc.command_queue[q];
 }
 /* clear all commands from the command queue */
+/**
+ * @param {number} q int
+ */
 export function cmdq_clear(q) {   // cmd.c:431
     let tmp = null, tmp2 = null;
     tmp = gc.command_queue[q];
@@ -441,6 +499,9 @@ export function cmdq_clear(q) {   // cmd.c:431
     }
     gc.command_queue[q] = null;
 }
+/**
+ * @returns {Promise<number>} char
+ */
 export async function pgetchar() {   // cmd.c:445
     let ch = 0;
     /* courtesy of aeb@cwi.nl */
@@ -452,9 +513,16 @@ export async function pgetchar() {   // cmd.c:445
     return $c.i8(ch);
 }
 /* '#' or whatever has been bound to doextcmd() in its place */
+/**
+ * @returns {number} char
+ */
 export function extcmd_initiator() {   // cmd.c:457
     return gc.Cmd.extcmd_char;
 }
+/**
+ * @param {$T.ext_func_tab | null} extcmd const struct ext_func_tab *
+ * @returns {Promise<number>} boolean
+ */
 async function can_do_extcmd(extcmd) {   // cmd.c:463
     let ecflags = 0;
     ecflags = extcmd.flags | 0;
@@ -481,6 +549,9 @@ async function can_do_extcmd(extcmd) {   // cmd.c:463
     return TRUE;
 }
 /* here after # - now read a full-word command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doextcmd() {   // cmd.c:493
     let idx = 0, retval = 0, func = null;
     /* keep repeating until we don't run help or quit */
@@ -504,6 +575,11 @@ export async function doextcmd() {   // cmd.c:493
     return retval;
 }
 /* format extended command flags for display */
+/**
+ * @param {number} menuwin winid
+ * @param {$T.ext_func_tab | null} efp const struct ext_func_tab *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 async function doc_extcmd_flagstr(menuwin, efp) {   // cmd.c:524
     let qbuf = new Int8Array(128), mprefix = 0, autocomplete = 0, p = null, $t1, $t2, $t3, $t4;
     /* if Null, add a footnote to the menu */
@@ -536,6 +612,9 @@ async function doc_extcmd_flagstr(menuwin, efp) {   // cmd.c:524
 }
 /* here after #? - now list all full-word commands and provide
    some navigation capability through the long list */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doextlist() {   // cmd.c:562
     let efp = null, buf = new Int8Array(256), searchbuf = new Int8Array(256), descbuf = new Int8Array(256), promptbuf = new Int8Array(128), cmd_desc = null, menuwin = 0, any = new $T.any(), selected = [null], n = 0, pass = 0, menumode = 0, menushown = new Int32Array(2), onelist = 0, redisplay = 0, search = 0, clr = 0, wizc = 0, $t1;
     efp = null;
@@ -706,6 +785,9 @@ export async function doextlist() {   // cmd.c:562
  *
  * Here after # - now show pick-list of possible commands.
  */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function extcmd_via_menu() {   // cmd.c:752
     let efp = null, pick_list = [null], win = 0, any = new $T.any(), choices = $c.nulls(201), buf = new Int8Array(256), cbuf = new Int8Array(128), prompt = new Int8Array(128), fmtstr = new Int8Array(20), i = 0, n = 0, nchoices = 0, acount = 0, ret = 0, len = 0, biggest = 0, accelerator = 0, prevaccelerator = 0, matchlevel = 0, wastoolong = 0, one_per_line = 0, clr = 0, $t1;
     pick_list[0] = null;
@@ -816,6 +898,9 @@ export async function extcmd_via_menu() {   // cmd.c:752
 }
 /* TTY_GRAPHICS */
 /* #monster command - use special monster ability while polymorphed */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function domonability() {   // cmd.c:890
     let uptr = null, might_hide = 0, c = 0;
     uptr = gy.youmonst.data;
@@ -877,6 +962,9 @@ export async function domonability() {   // cmd.c:890
     }
     return ECMD.OK;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 export async function enter_explore_mode() {   // cmd.c:952
     let oldmode = null;
     if (discover()) {
@@ -905,6 +993,11 @@ export async function enter_explore_mode() {   // cmd.c:952
     }
     return ECMD.OK;
 }
+/**
+ * @param {number} pre boolean
+ * @param {number} wiztower boolean
+ * @returns {Promise<void>}
+ */
 export async function makemap_prepost(pre, wiztower) {   // cmd.c:986
     let tmpnhfp = null, mtmp = null, $t1, $t2;
     if (pre) {
@@ -982,6 +1075,10 @@ export async function makemap_prepost(pre, wiztower) {   // cmd.c:986
         await save_currentstate();
     }
 }
+/**
+ * @param {number} typ int
+ * @returns {$c.Ptr | null} const char *
+ */
 export function levltyp_to_name(typ) {   // cmd.c:1089
     if (typ >= 0 && typ < MAX_TYPE) {
         return levltyp[typ];
@@ -989,6 +1086,9 @@ export function levltyp_to_name(typ) {   // cmd.c:1089
     return null;
 }
 /* #terrain command -- show known map, inspired by crawl's '|' command */
+/**
+ * @returns {Promise<number>} int
+ */
 async function doterrain() {   // cmd.c:1098
     let men = 0, sel = [null], any = new $T.any(), n = 0, which = 0, clr = 0;
     clr = NO_COLOR;
@@ -1071,6 +1171,10 @@ async function doterrain() {   // cmd.c:1098
     return ECMD.OK;   /* no time elapses */
 }
 /* has hero seen all locations in selection? */
+/**
+ * @param {$T.selectionvar | null} sel struct selectionvar *
+ * @returns {number} boolean
+ */
 function u_have_seen_whole_selection(sel) {   // cmd.c:1195
     let x = 0, y = 0, rect = new $T.nhrect();
     rect.$copyFrom(cg.zeroNhRect);
@@ -1085,6 +1189,10 @@ function u_have_seen_whole_selection(sel) {   // cmd.c:1195
     return TRUE;
 }
 /* has hero seen all location of the rectangular outline in the selection */
+/**
+ * @param {$T.selectionvar | null} sel struct selectionvar *
+ * @returns {number} boolean
+ */
 function u_have_seen_bounds_selection(sel) {   // cmd.c:1213
     let x = 0, y = 0, rect = new $T.nhrect();
     rect.$copyFrom(cg.zeroNhRect);
@@ -1112,6 +1220,10 @@ function u_have_seen_bounds_selection(sel) {   // cmd.c:1213
     return TRUE;
 }
 /* can hero currently see all locations in the selection */
+/**
+ * @param {$T.selectionvar | null} sel struct selectionvar *
+ * @returns {number} boolean
+ */
 function u_can_see_whole_selection(sel) {   // cmd.c:1246
     let x = 0, y = 0, rect = new $T.nhrect();
     rect.$copyFrom(cg.zeroNhRect);
@@ -1126,6 +1238,11 @@ function u_can_see_whole_selection(sel) {   // cmd.c:1246
     return TRUE;
 }
 /* selection_floofill callback to get all locations in a room */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} int
+ */
 function dolookaround_floodfill_findroom(x, y) {   // cmd.c:1263
     let typ = 0;
     typ = svl.level.locations[x][y].typ;
@@ -1135,6 +1252,11 @@ function dolookaround_floodfill_findroom(x, y) {   // cmd.c:1263
     return TRUE;
 }
 /* describe the room at x,y */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 async function lookaround_known_room(x, y) {   // cmd.c:1276
     let sel = null, rmno = 0, qbuf = new Int8Array(128), u_in = 0;
     sel = await selection_new();
@@ -1155,6 +1277,9 @@ async function lookaround_known_room(x, y) {   // cmd.c:1276
     selection_free(sel, TRUE);
 }
 /* #lookaround - describe what the hero can see, in text */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dolookaround() {   // cmd.c:1310
     let x = 0, y = 0, tmp_getloc_filter = 0, tmp_accessiblemsg = 0, corr_next2u = 0, i = 0, glyph = 0, mapsym = 0, iscorr = 0, buf = new Int8Array(256), cc = new $T.nhcoord(), sym = 0, firstmatch = [null];
     tmp_getloc_filter = iflags.getloc_filter;
@@ -1202,6 +1327,9 @@ export async function dolookaround() {   // cmd.c:1310
 
    BIND=':toggle(price_quotes)
    BIND=@:toggle(autopickup) */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dotoggleoption() {   // cmd.c:1376
     if (gc.cmd_bind && gc.cmd_bind.param) {
         return await toggle_bool_option(gc.cmd_bind.param);
@@ -1210,6 +1338,10 @@ export async function dotoggleoption() {   // cmd.c:1376
         return ECMD.OK;
     }
 }
+/**
+ * @param {number} dir int
+ * @param {number} run int
+ */
 export function set_move_cmd(dir, run) {   // cmd.c:1387
     let $t1;
     u.dz = zdir[dir];
@@ -1226,105 +1358,180 @@ export function set_move_cmd(dir, run) {   // cmd.c:1387
     }
 }
 /* move or attack */
+/**
+ * @returns {number} int
+ */
 export function do_move_west() {   // cmd.c:1404
     set_move_cmd(DIR.W, 0);
     return ECMD.TIME;
 }
+/**
+ * @returns {number} int
+ */
 export function do_move_northwest() {   // cmd.c:1411
     set_move_cmd(DIR.NW, 0);
     return ECMD.TIME;
 }
+/**
+ * @returns {number} int
+ */
 export function do_move_north() {   // cmd.c:1418
     set_move_cmd(DIR.N, 0);
     return ECMD.TIME;
 }
+/**
+ * @returns {number} int
+ */
 export function do_move_northeast() {   // cmd.c:1425
     set_move_cmd(DIR.NE, 0);
     return ECMD.TIME;
 }
+/**
+ * @returns {number} int
+ */
 export function do_move_east() {   // cmd.c:1432
     set_move_cmd(DIR.E, 0);
     return ECMD.TIME;
 }
+/**
+ * @returns {number} int
+ */
 export function do_move_southeast() {   // cmd.c:1439
     set_move_cmd(DIR.SE, 0);
     return ECMD.TIME;
 }
+/**
+ * @returns {number} int
+ */
 export function do_move_south() {   // cmd.c:1446
     set_move_cmd(DIR.S, 0);
     return ECMD.TIME;
 }
+/**
+ * @returns {number} int
+ */
 export function do_move_southwest() {   // cmd.c:1453
     set_move_cmd(DIR.SW, 0);
     return ECMD.TIME;
 }
 /* rush */
+/**
+ * @returns {number} int
+ */
 export function do_rush_west() {   // cmd.c:1461
     set_move_cmd(DIR.W, 3);
     return ECMD.TIME;
 }
+/**
+ * @returns {number} int
+ */
 export function do_rush_northwest() {   // cmd.c:1468
     set_move_cmd(DIR.NW, 3);
     return ECMD.TIME;
 }
+/**
+ * @returns {number} int
+ */
 export function do_rush_north() {   // cmd.c:1475
     set_move_cmd(DIR.N, 3);
     return ECMD.TIME;
 }
+/**
+ * @returns {number} int
+ */
 export function do_rush_northeast() {   // cmd.c:1482
     set_move_cmd(DIR.NE, 3);
     return ECMD.TIME;
 }
+/**
+ * @returns {number} int
+ */
 export function do_rush_east() {   // cmd.c:1489
     set_move_cmd(DIR.E, 3);
     return ECMD.TIME;
 }
+/**
+ * @returns {number} int
+ */
 export function do_rush_southeast() {   // cmd.c:1496
     set_move_cmd(DIR.SE, 3);
     return ECMD.TIME;
 }
+/**
+ * @returns {number} int
+ */
 export function do_rush_south() {   // cmd.c:1503
     set_move_cmd(DIR.S, 3);
     return ECMD.TIME;
 }
+/**
+ * @returns {number} int
+ */
 export function do_rush_southwest() {   // cmd.c:1510
     set_move_cmd(DIR.SW, 3);
     return ECMD.TIME;
 }
 /* run */
+/**
+ * @returns {number} int
+ */
 export function do_run_west() {   // cmd.c:1518
     set_move_cmd(DIR.W, 1);
     return ECMD.TIME;
 }
+/**
+ * @returns {number} int
+ */
 export function do_run_northwest() {   // cmd.c:1525
     set_move_cmd(DIR.NW, 1);
     return ECMD.TIME;
 }
+/**
+ * @returns {number} int
+ */
 export function do_run_north() {   // cmd.c:1532
     set_move_cmd(DIR.N, 1);
     return ECMD.TIME;
 }
+/**
+ * @returns {number} int
+ */
 export function do_run_northeast() {   // cmd.c:1539
     set_move_cmd(DIR.NE, 1);
     return ECMD.TIME;
 }
+/**
+ * @returns {number} int
+ */
 export function do_run_east() {   // cmd.c:1546
     set_move_cmd(DIR.E, 1);
     return ECMD.TIME;
 }
+/**
+ * @returns {number} int
+ */
 export function do_run_southeast() {   // cmd.c:1553
     set_move_cmd(DIR.SE, 1);
     return ECMD.TIME;
 }
+/**
+ * @returns {number} int
+ */
 export function do_run_south() {   // cmd.c:1560
     set_move_cmd(DIR.S, 1);
     return ECMD.TIME;
 }
+/**
+ * @returns {number} int
+ */
 export function do_run_southwest() {   // cmd.c:1567
     set_move_cmd(DIR.SW, 1);
     return ECMD.TIME;
 }
 /* #reqmenu, prefix command to modify some others */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function do_reqmenu() {   // cmd.c:1575
     if (iflags.menu_requested) {
         await Norep($c.lit("Double %s prefix, canceled."), visctrl(cmd_from_func(do_reqmenu)));
@@ -1335,6 +1542,9 @@ export async function do_reqmenu() {   // cmd.c:1575
     return ECMD.OK;
 }
 /* #rush */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function do_rush() {   // cmd.c:1590
     if ($c.and64(gd.domove_attempting, DOMOVE.RUSH)) {
         await Norep($c.lit("Double rush prefix, canceled."));
@@ -1347,6 +1557,9 @@ export async function do_rush() {   // cmd.c:1590
     return ECMD.OK;
 }
 /* #run */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function do_run() {   // cmd.c:1606
     if ($c.and64(gd.domove_attempting, DOMOVE.RUSH)) {
         await Norep($c.lit("Double run prefix, canceled."));
@@ -1359,6 +1572,9 @@ export async function do_run() {   // cmd.c:1606
     return ECMD.OK;
 }
 /* #fight */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function do_fight() {   // cmd.c:1622
     if (svc.context.forcefight) {
         await Norep($c.lit("Double fight prefix, canceled."));
@@ -1371,6 +1587,9 @@ export async function do_fight() {   // cmd.c:1622
     return ECMD.OK;
 }
 /* #repeat */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function do_repeat() {   // cmd.c:1638
     let res = 0, repeat_copy = null;
     res = ECMD.OK;
@@ -1393,6 +1612,10 @@ export async function do_repeat() {   // cmd.c:1638
     return res;
 }
 /* get entry i in the extended commands list. for windowport use. */
+/**
+ * @param {number} i int
+ * @returns {$T.ext_func_tab | null} struct ext_func_tab *
+ */
 export function extcmds_getentry(i) {   // cmd.c:2101
     if (i < 0 || i > extcmdlist_length) {
         return null;
@@ -1400,6 +1623,10 @@ export function extcmds_getentry(i) {   // cmd.c:2101
     return $c.relem(extcmdlist, i);
 }
 /* get the command bound to a key */
+/**
+ * @param {number} key uchar
+ * @returns {$T.Cmd_bind | null} struct Cmd_bind *
+ */
 function cmdbind_get(key) {   // cmd.c:2110
     let bind = null;
     bind = gc.Cmd.cmdbinds;
@@ -1414,6 +1641,12 @@ function cmdbind_get(key) {   // cmd.c:2110
     }
     return bind;
 }
+/**
+ * @param {number} key uchar
+ * @param {$T.ext_func_tab | null} extcmd const struct ext_func_tab *
+ * @param {number} user boolean
+ * @returns {Promise<void>}
+ */
 async function cmdbind_add(key, extcmd, user) {   // cmd.c:2126
     let bind = null;
     bind = cmdbind_get(key);
@@ -1443,6 +1676,9 @@ async function cmdbind_add(key, extcmd, user) {   // cmd.c:2126
         gc.Cmd.cmdbinds = bind;
     }
 }
+/**
+ * @param {number} key uchar
+ */
 function cmdbind_remove(key) {   // cmd.c:2158
     let bind = null, prev = null;
     bind = gc.Cmd.cmdbinds;
@@ -1476,6 +1712,10 @@ export function cmdbind_freeall() {   // cmd.c:2180
     }
 }
 /* swap key bindings for key1 and key2. both bindings must exist. */
+/**
+ * @param {number} key1 uchar
+ * @param {number} key2 uchar
+ */
 function cmdbind_swapkeys(key1, key2) {   // cmd.c:2195
     let bind1 = null, bind2 = null;
     bind1 = cmdbind_get(key1);
@@ -1486,6 +1726,9 @@ function cmdbind_swapkeys(key1, key2) {   // cmd.c:2195
     }
 }
 /* return number of extended commands bound to a non-default key */
+/**
+ * @returns {number} int
+ */
 export function count_bind_keys() {   // cmd.c:2208
     let bind = null, i = 0, nbinds = 0, keys = new Uint8Array(256);
     bind = gc.Cmd.cmdbinds;
@@ -1508,6 +1751,10 @@ export function count_bind_keys() {   // cmd.c:2208
     return nbinds;
 }
 /* show changed key bindings in text, or if sbuf is non-null, append to it */
+/**
+ * @param {$T.strbuf | null} sbuf strbuf_t *
+ * @returns {Promise<void>}
+ */
 export async function get_changed_key_binds(sbuf) {   // cmd.c:2235
     let win = 0, i = 0, buf = new Int8Array(256), buf2 = new Int8Array(128), bind = null, keys = new Uint8Array(256), ec = null;
     win = WIN_ERR;
@@ -1551,6 +1798,10 @@ export async function get_changed_key_binds(sbuf) {   // cmd.c:2235
     }
 }
 /* interactive key binding */
+/**
+ * @param {number} keyfirst boolean
+ * @returns {Promise<void>}
+ */
 async function handler_rebind_keys_add(keyfirst) {   // cmd.c:2291
     let ec = null, win = 0, any = new $T.any(), i = 0, npick = 0, picks = [null], buf = new Int8Array(256), buf2 = new Int8Array(128), key = 0, clr = 0, bind = null, prevcmd = null, cmdstr = new Int8Array(256), parambuf = new Int8Array(256), querybuf = new Int8Array(256);
     picks[0] = null;
@@ -1637,6 +1888,9 @@ async function handler_rebind_keys_add(keyfirst) {   // cmd.c:2291
         }
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function handler_rebind_keys() {   // cmd.c:2408
     let win = 0, any = new $T.any(), i = 0, npick = 0, picks = [null], clr = 0;
     picks[0] = null;
@@ -1669,6 +1923,9 @@ export async function handler_rebind_keys() {   // cmd.c:2408
         break;
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function handler_change_autocompletions() {   // cmd.c:2449
     let win = 0, any = new $T.any(), i = 0, n = 0, picks = [null], clr = 0, ec = null, buf = new Int8Array(256), j = 0, setit = 0;
     picks[0] = null;
@@ -1723,6 +1980,12 @@ export async function handler_change_autocompletions() {   // cmd.c:2449
    returns: number of matching extended commands,
             and the entry indexes in matchlist.
    for windowport use. */
+/**
+ * @param {$c.Ptr | null} findstr const char *
+ * @param {number} ecmflags int
+ * @param {*} matchlist int **
+ * @returns {Promise<number>} int
+ */
 export async function extcmds_match(findstr, ecmflags, matchlist) {   // cmd.c:2523
     let i = 0, mi = 0, fslen = 0, ignoreac = 0, exactmatch = 0, no1charcmd = 0, $t1, $t2, $t3;
     mi = 0;
@@ -1760,6 +2023,10 @@ export async function extcmds_match(findstr, ecmflags, matchlist) {   // cmd.c:2
     }
     return mi;
 }
+/**
+ * @param {number} key uchar
+ * @returns {$c.Ptr | null} const char *
+ */
 export function key2extcmddesc(key) {   // cmd.c:2561
     let txt = null, k = 0, i = 0, j = 0, M_5 = 0, M_0 = 0, cmdbind = null;
     M_5 = 181;
@@ -1814,6 +2081,11 @@ export function key2extcmddesc(key) {   // cmd.c:2561
     }
     return null;
 }
+/**
+ * @param {number} btn int
+ * @param {$c.Ptr | null} command const char *
+ * @returns {Promise<number>} boolean
+ */
 export async function bind_mousebtn(btn, command) {   // cmd.c:2624
     let extcmd = null;
     if (btn < 1 || btn > NUM_MOUSE_BUTTONS) {
@@ -1839,6 +2111,12 @@ export async function bind_mousebtn(btn, command) {   // cmd.c:2624
     }
     return FALSE;
 }
+/**
+ * @param {number} key uchar
+ * @param {$c.Ptr | null} command const char *
+ * @param {number} user boolean
+ * @returns {Promise<number>} boolean
+ */
 export async function bind_key(key, command, user) {   // cmd.c:2662
     let extcmd = null, len = 0, buf = null, p = null, lastp = null, bind = null, maxlen = 0, $t1;
     p = null;
@@ -1892,6 +2170,11 @@ export async function bind_key(key, command, user) {   // cmd.c:2662
     return FALSE;
 }
 /* bind key by ext cmd function */
+/**
+ * @param {number} key uchar
+ * @param {Function | null} fn int (*)(void)
+ * @returns {Promise<number>} boolean
+ */
 async function bind_key_fn(key, fn) {   // cmd.c:2732
     let extcmd = null;
     for (extcmd = $c.relem(extcmdlist, 0); extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
@@ -1907,6 +2190,9 @@ async function bind_key_fn(key, fn) {   // cmd.c:2732
     return FALSE;
 }
 /* initialize all keyboard commands */
+/**
+ * @returns {Promise<void>}
+ */
 async function commands_init() {   // cmd.c:2750
     let extcmd = null;
     for (extcmd = $c.relem(extcmdlist, 0); extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
@@ -1934,6 +2220,11 @@ async function commands_init() {   // cmd.c:2750
     await bind_key(206, $c.lit("name"), FALSE);
     /* don't do this until the rest_on_space option is set or cleared */
 }
+/**
+ * @param {$T.ext_func_tab | null} extcmd const struct ext_func_tab *
+ * @param {$c.Ptr | null} skip_keys_used boolean *
+ * @returns {number} boolean
+ */
 function keylist_func_has_key(extcmd, skip_keys_used) {   // cmd.c:2785
     let i = 0, bind = null;
     /* boolean keys_used[256] */
@@ -1947,6 +2238,14 @@ function keylist_func_has_key(extcmd, skip_keys_used) {   // cmd.c:2785
     }
     return FALSE;
 }
+/**
+ * @param {number} datawin winid
+ * @param {number} docount boolean
+ * @param {number} incl_flags int
+ * @param {number} excl_flags int
+ * @param {$c.Ptr | null} keys_used boolean *
+ * @returns {Promise<number>} int
+ */
 async function keylist_putcmds(datawin, docount, incl_flags, excl_flags, keys_used) {   // cmd.c:2802
     let extcmd = null, i = 0, buf = new Int8Array(256), buf2 = new Int8Array(128), keys_already_used = new Int8Array(256), count = 0, bind = null, key = 0;
     /* boolean keys_used[256] */
@@ -2004,6 +2303,9 @@ async function keylist_putcmds(datawin, docount, incl_flags, excl_flags, keys_us
     return count;
 }
 /* list all keys and their bindings, like dat/hh but dynamic */
+/**
+ * @returns {Promise<void>}
+ */
 export async function dokeylist() {   // cmd.c:2867
     let extcmd = null, datawin = 0, buf = new Int8Array(256), buf2 = new Int8Array(256), key = 0, spkey_gap = 0, keys_used = new Int8Array(256), mov_seen = new Int8Array(256), i = 0, j = 0, pfx_seen = new Int32Array(256);
     $c.memset(new $c.Ptr(keys_used, 0), 0, 256);
@@ -2116,6 +2418,10 @@ export async function dokeylist() {   // cmd.c:2867
     await display_nhwindow()(datawin, FALSE);
     await destroy_nhwindow()(datawin);
 }
+/**
+ * @param {Function | null} fn int (*)(void)
+ * @returns {$T.ext_func_tab | null} const struct ext_func_tab *
+ */
 export function ext_func_tab_from_func(fn) {   // cmd.c:3016
     let extcmd = null;
     for (extcmd = $c.relem(extcmdlist, 0); extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
@@ -2126,10 +2432,19 @@ export function ext_func_tab_from_func(fn) {   // cmd.c:3016
     return null;
 }
 /* returns the key bound to a movement command for given DIR_ and MV_ mode */
+/**
+ * @param {number} dir int
+ * @param {number} mode int
+ * @returns {Promise<number>} char
+ */
 export async function cmd_from_dir(dir, mode) {   // cmd.c:3029
     return cmd_from_func(move_funcs[dir][mode]);
 }
 /* return the key bound to extended command */
+/**
+ * @param {Function | null} fn int (*)(void)
+ * @returns {number} char
+ */
 export function cmd_from_func(fn) {   // cmd.c:3036
     let i = 0, ret = 0, bind = null;
     ret = 0;
@@ -2160,6 +2475,10 @@ export function cmd_from_func(fn) {   // cmd.c:3036
 }
 /* return visual interpretation of the key bound to extended command,
    or the ext cmd name if not bound to any key. */
+/**
+ * @param {$c.Ptr | null} ecname const char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function cmd_from_ecname(ecname) {   // cmd.c:3071
     let extcmd = null, key = 0;
     for (extcmd = $c.relem(extcmdlist, 0); extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
@@ -2176,6 +2495,10 @@ export async function cmd_from_ecname(ecname) {   // cmd.c:3071
     cmd_from_ecname$cmdnamebuf[0] = 0;
     return new $c.Ptr(cmd_from_ecname$cmdnamebuf, 0);
 }
+/**
+ * @param {Function | null} fn int (*)(void)
+ * @returns {$c.Ptr | null} const char *
+ */
 export function ecname_from_fn(fn) {   // cmd.c:3092
     let extcmd = null, cmdptr = null;
     cmdptr = null;
@@ -2188,6 +2511,12 @@ export function ecname_from_fn(fn) {   // cmd.c:3092
     return null;
 }
 /* return extended command name (without leading '#') for command (*fn)() */
+/**
+ * @param {Function | null} fn int (*)(void)
+ * @param {$c.Ptr | null} outbuf char *
+ * @param {number} fullname boolean
+ * @returns {Promise<$c.Ptr | null>} const char *
+ */
 export async function cmdname_from_func(fn, outbuf, fullname) {   // cmd.c:3106
     let extcmd = null, cmdptr = null, res = null, matchcmd = null, len = 0, maxlen = 0, save_plnmsg = 0;
     /* function whose command name is wanted */
@@ -2245,6 +2574,11 @@ export async function cmdname_from_func(fn, outbuf, fullname) {   // cmd.c:3106
     }
     return res;
 }
+/**
+ * @param {number} key uchar
+ * @param {$c.Ptr | null} command const char *
+ * @returns {number} boolean
+ */
 export function bind_specialkey(key, command) {   // cmd.c:3194
     let i = 0;
     for (i = 0; i < 29; i = i + 1 | 0) {
@@ -2256,6 +2590,10 @@ export function bind_specialkey(key, command) {   // cmd.c:3194
     }
     return FALSE;
 }
+/**
+ * @param {number} nhkf int
+ * @returns {$c.Ptr | null} const char *
+ */
 function spkey_name(nhkf) {   // cmd.c:3208
     let name = null, i = 0;
     name = null;
@@ -2269,6 +2607,11 @@ function spkey_name(nhkf) {   // cmd.c:3208
 }
 /* returns the text for a one-byte encoding;
  * must be shorter than a tab for proper formatting */
+/**
+ * @param {number} c uchar
+ * @param {$c.Ptr | null} txt char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function key2txt(c, txt) {   // cmd.c:3225
     /* sufficiently long buffer */
     /* should probably switch to "SPC", "ESC", "RET"
@@ -2286,6 +2629,11 @@ export function key2txt(c, txt) {   // cmd.c:3225
     }
     return txt;
 }
+/**
+ * @param {$c.Ptr | null} autocomplete char *
+ * @param {number} condition boolean
+ * @returns {Promise<void>}
+ */
 export async function parseautocomplete(autocomplete, condition) {   // cmd.c:3244
     let efp = null, autoc = null, $t1;
     /* break off first autocomplete from the rest; parse the rest */
@@ -2329,6 +2677,10 @@ export async function parseautocomplete(autocomplete, condition) {   // cmd.c:32
     await wait_synch()();
 }
 /* add changed autocompletions to the string buffer in config file format */
+/**
+ * @param {$T.strbuf | null} sbuf strbuf_t *
+ * @returns {Promise<void>}
+ */
 export async function all_options_autocomplete(sbuf) {   // cmd.c:3296
     let efp = null, buf = new Int8Array(256);
     for (efp = $c.relem(extcmdlist, 0); efp.ef_txt; efp = $c.radd(efp, 1)) {
@@ -2339,6 +2691,9 @@ export async function all_options_autocomplete(sbuf) {   // cmd.c:3296
     }
 }
 /* return the number of changed autocompletions */
+/**
+ * @returns {number} int
+ */
 export function count_autocompletions() {   // cmd.c:3312
     let efp = null, n = 0;
     n = 0;
@@ -2350,6 +2705,9 @@ export function count_autocompletions() {   // cmd.c:3312
     return n;
 }
 /* save&clear the mouse button actions, or restore the saved ones */
+/**
+ * @param {number} savebtns boolean
+ */
 export function lock_mouse_buttons(savebtns) {   // cmd.c:3326
     let i = 0;
     if (savebtns) {
@@ -2364,6 +2722,10 @@ export function lock_mouse_buttons(savebtns) {   // cmd.c:3326
     }
 }
 /* called at startup and after number_pad is twiddled */
+/**
+ * @param {number} initial boolean
+ * @returns {Promise<void>}
+ */
 export async function reset_commands(initial) {   // cmd.c:3344
     let flagtemp = 0, c = 0, i = 0, updated = 0, dir = 0, mode = 0, di = 0, bind = null, $t1, $t2, $t3;
     updated = 0;
@@ -2483,6 +2845,9 @@ export async function reset_commands(initial) {   // cmd.c:3344
    from initoptions_init() which takes place before key bindings have been
    processed, and by initoptions_finish() after key bindings so that we
    can remember anything bound to <space> in 'unrestonspace' */
+/**
+ * @returns {Promise<void>}
+ */
 export async function update_rest_on_space() {   // cmd.c:3483
     let bind = null;
     /* cloned from extcmdlist['.'], then slightly modified to be distinct;
@@ -2502,11 +2867,18 @@ export async function update_rest_on_space() {   // cmd.c:3483
 /* commands which accept 'm' prefix to request menu operation or other
    alternate behavior; it's also overloaded for move-without-autopickup;
    there is no overlap between the two groups of commands */
+/**
+ * @param {$T.ext_func_tab | null} ec const struct ext_func_tab *
+ * @returns {number} boolean
+ */
 function accept_menu_prefix(ec) {   // cmd.c:3509
     return $c.i8(ec && (ec.flags & CMD.M_PREFIX) >>> 0 !== 0 ? 1 : 0);
 }
 /* choose a random character, biased towards movement commands, primarily
    for debug-fuzzer testing */
+/**
+ * @returns {Promise<number>} char
+ */
 export async function randomkey() {   // cmd.c:3517
     let c = 0, d = 0, m = 0, $t1;
     /* give ^A and ^P a high probability of being repeated */
@@ -2563,6 +2935,11 @@ export async function randomkey() {   // cmd.c:3517
     }
     return c;
 }
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @param {number} sz int
+ * @returns {Promise<void>}
+ */
 export async function random_response(buf, sz) {   // cmd.c:3581
     let c = 0, count = 0, $t1;
     count = 0;
@@ -2581,9 +2958,15 @@ export async function random_response(buf, sz) {   // cmd.c:3581
     }
     buf.set(count, 0);
 }
+/**
+ * @returns {number} int
+ */
 export function rnd_extcmd_idx() {   // cmd.c:3601
     return rn2(extcmdlist_length + 1 | 0) - 1 | 0;
 }
+/**
+ * @param {number} reset_cmdq boolean
+ */
 function reset_cmd_vars(reset_cmdq) {   // cmd.c:3607
     let $t1, $t2, $t3;
     svc.context.run = 0;
@@ -2602,6 +2985,10 @@ function reset_cmd_vars(reset_cmdq) {   // cmd.c:3607
         cmdq_clear(CQ_REPEAT);
     }
 }
+/**
+ * @param {number} key int
+ * @returns {Promise<void>}
+ */
 export async function rhack(key) {   // cmd.c:3627
     let bad_command = 0, firsttime = 0, cq = new $T._cmd_queue(), cmdq = null, cmdq_ec = null, prefix_seen = null, was_m_prefix = 0, func = null, tlist = null, res = 0, pfxidx = 0, which = null, ch = 0, up = 0, down = 0, $goto = null, $t1, $t2;
     D1: for (;;) {
@@ -2815,6 +3202,11 @@ export async function rhack(key) {   // cmd.c:3627
     }
 }
 /* convert an x,y pair into a direction code */
+/**
+ * @param {number} x int
+ * @param {number} y int
+ * @returns {number} int
+ */
 export function xytodir(x, y) {   // cmd.c:3847
     let dd = 0;
     for (dd = 0; dd < N_DIRS; dd = dd + 1 | 0) {
@@ -2825,6 +3217,10 @@ export function xytodir(x, y) {   // cmd.c:3847
     return DIR.ERR;
 }
 /* convert a direction code into an x,y pair */
+/**
+ * @param {$T.nhcoord | null} cc coord *
+ * @param {number} dd int
+ */
 export function dirtocoord(cc, dd) {   // cmd.c:3859
     if (dd > DIR.ERR && dd < N_DIRS_Z) {
         cc.x = $c.i16(xdir[dd]);
@@ -2832,6 +3228,11 @@ export function dirtocoord(cc, dd) {   // cmd.c:3859
     }
 }
 /* also sets u.dz, but returns false for <> */
+/**
+ * @param {number} sym char
+ * @param {number} mode int
+ * @returns {number} int
+ */
 export function movecmd(sym, mode) {   // cmd.c:3869
     let d = 0, bind = null, fnc = null;
     d = DIR.ERR;
@@ -2862,6 +3263,9 @@ export function movecmd(sym, mode) {   // cmd.c:3869
     return 0;
 }
 /* grid bug handling */
+/**
+ * @returns {number} int
+ */
 export function dxdy_moveok() {   // cmd.c:3902
     let $t1;
     if (u.dx && u.dy && NODIAG(u.umonnum)) {
@@ -2870,6 +3274,10 @@ export function dxdy_moveok() {   // cmd.c:3902
     return u.dx || u.dy ? 1 : 0;
 }
 /* decide whether character (user input keystroke) requests screen repaint */
+/**
+ * @param {number} c char
+ * @returns {number} boolean
+ */
 export function redraw_cmd(c) {   // cmd.c:3911
     let uc = 0, bind = null;
     uc = $c.u8(c);
@@ -2885,6 +3293,14 @@ export function redraw_cmd(c) {   // cmd.c:3911
  * If the resulting coordinates are not okay, emsg is displayed.
  *
  * Returns non-zero if coordinates in cc are valid.
+ */
+/**
+ * @param {$c.Ptr | null} prompt const char *
+ * @param {$c.Ptr | null} emsg const char *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$T.nhcoord | null} cc coord *
+ * @returns {Promise<number>} int
  */
 export async function get_adjacent_loc(prompt, emsg, x, y, cc) {   // cmd.c:3931
     let new_x = 0, new_y = 0;
@@ -2907,6 +3323,10 @@ export async function get_adjacent_loc(prompt, emsg, x, y, cc) {   // cmd.c:3931
 }
 /* prompt for a direction (specified via movement keystroke) and return it
    in u.dx, u.dy, and u.dz; function return value is 1 for ok, 0 otherwise */
+/**
+ * @param {$c.Ptr | null} s const char *
+ * @returns {Promise<number>} int
+ */
 export async function getdir(s) {   // cmd.c:3958
     let dirsym = 0, is_mov = 0, cmdq = null, qbuf = new Int8Array(128), cc = new $T.nhcoord(), pos = 0, mod = 0, did_help = 0, help_requested = 0, $goto = null, $t1, $t2, $t3, $t4, $t5, $t6;
     D1: for (;;) {
@@ -3065,6 +3485,12 @@ export async function getdir(s) {   // cmd.c:3958
         break;
     }
 }
+/**
+ * @param {number} win winid
+ * @param {number} centerchar char
+ * @param {number} nodiag boolean
+ * @returns {Promise<void>}
+ */
 async function show_direction_keys(win, centerchar, nodiag) {   // cmd.c:4122
     let buf = new Int8Array(256);
     /* should specify a window which is using a fixed-width font */
@@ -3095,6 +3521,12 @@ async function show_direction_keys(win, centerchar, nodiag) {   // cmd.c:4122
 /* explain choices if player has asked for getdir() help or has given
    an invalid direction after a prefix key ('F', 'g', 'm', &c), which
    might be bogus but could be up, down, or self when not applicable */
+/**
+ * @param {number} sym char
+ * @param {number} spkey uchar
+ * @param {$c.Ptr | null} msg const char *
+ * @returns {Promise<number>} boolean
+ */
 async function help_dir(sym, spkey, msg) {   // cmd.c:4171
     let ctrl = 0, win = 0, buf = new Int8Array(256), buf2 = new Int8Array(256), explain = null, dothat = null, prefixhandling = 0, selfi = 0;
     /* actual key; either prefix or ESC */
@@ -3180,6 +3612,9 @@ async function help_dir(sym, spkey, msg) {   // cmd.c:4171
     return TRUE;
 }
 /* if hero is impaired, pick random movement direction */
+/**
+ * @param {number} force_impairment boolean
+ */
 export function confdir(force_impairment) {   // cmd.c:4300
     let kmax = 0, k = 0;
     if (force_impairment || u_maybe_impaired()) {
@@ -3190,23 +3625,38 @@ export function confdir(force_impairment) {   // cmd.c:4300
     }
     return;
 }
+/**
+ * @param {number} dir int
+ * @returns {$c.Ptr | null} const char *
+ */
 export function directionname(dir) {   // cmd.c:4313
     if (dir < 0 || dir >= N_DIRS_Z) {
         return $c.lit("invalid");
     }
     return directionname$dirnames[dir];
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} int
+ */
 export function isok(x, y) {   // cmd.c:4326
     /* x corresponds to curx, so x==1 is the first column. Ach. %% */
     return x >= 1 && x <= COLNO - 1 && y >= 0 && y <= ROWNO - 1 ? 1 : 0;
 }
 /* #herecmdmenu command */
+/**
+ * @returns {Promise<number>} int
+ */
 async function doherecmdmenu() {   // cmd.c:4334
     let ch = 0;
     ch = await here_cmd_menu();
     return ch && ch !== 27 ? ECMD.TIME : ECMD.OK;
 }
 /* #therecmdmenu command, a way to test there_cmd_menu without mouse */
+/**
+ * @returns {Promise<number>} int
+ */
 async function dotherecmdmenu() {   // cmd.c:4343
     let ch = 0, dir = 0, click = 0, x = 0, y = 0, $t1;
     x = gc.clicklook_cc.x;
@@ -3235,6 +3685,12 @@ async function dotherecmdmenu() {   // cmd.c:4343
     }
     return ch && ch !== 27 ? ECMD.TIME : ECMD.OK;
 }
+/**
+ * @param {number} win winid
+ * @param {number} act int
+ * @param {$c.Ptr | null} txt const char *
+ * @returns {Promise<void>}
+ */
 async function mcmd_addmenu(win, act, txt) {   // cmd.c:4421
     let any = new $T.any(), clr = 0;
     clr = NO_COLOR;
@@ -3244,6 +3700,13 @@ async function mcmd_addmenu(win, act, txt) {   // cmd.c:4421
     await add_menu(win, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, txt, MENU.ITEMFLAGS_NONE);
 }
 /* command menu entries when targeting self */
+/**
+ * @param {number} win winid
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {*} act int *
+ * @returns {Promise<number>} int
+ */
 async function there_cmd_menu_self(win, x, y, act) {   // cmd.c:4435
     let K = 0, buf = new Int8Array(256), typ = 0, stway = null, ttmp = null, otmp = null;
     K = 0;
@@ -3312,6 +3775,14 @@ async function there_cmd_menu_self(win, x, y, act) {   // cmd.c:4435
     return K;
 }
 /* add entries to there_cmd_menu, when x,y is next to hero */
+/**
+ * @param {number} win winid
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} mod int
+ * @param {*} act int *
+ * @returns {Promise<number>} int
+ */
 async function there_cmd_menu_next2u(win, x, y, mod, act) {   // cmd.c:4524
     let K = 0, buf = new Int8Array(256), typ = 0, ttmp = null, mtmp = null, key_or_pick = 0, card = 0, dm = 0, mnam = null;
     K = 0;
@@ -3388,6 +3859,13 @@ async function there_cmd_menu_next2u(win, x, y, mod, act) {   // cmd.c:4524
     }
     return K;
 }
+/**
+ * @param {number} win winid
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} mod int
+ * @returns {Promise<number>} int
+ */
 async function there_cmd_menu_far(win, x, y, mod) {   // cmd.c:4624
     let K = 0;
     K = 0;
@@ -3399,6 +3877,14 @@ async function there_cmd_menu_far(win, x, y, mod) {   // cmd.c:4624
     }
     return K;
 }
+/**
+ * @param {number} win winid
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} mod int
+ * @param {*} act int *
+ * @returns {Promise<number>} int
+ */
 async function there_cmd_menu_common(win, x, y, mod, act) {   // cmd.c:4639
     let K = 0;
     K = 0;
@@ -3413,6 +3899,12 @@ async function there_cmd_menu_common(win, x, y, mod, act) {   // cmd.c:4639
     return K;
 }
 /* queue up command(s) to perform #therecmdmenu action */
+/**
+ * @param {number} act int
+ * @param {number} dx coordxy
+ * @param {number} dy coordxy
+ * @returns {Promise<void>}
+ */
 async function act_on_act(act, dx, dy) {   // cmd.c:4658
     let otmp = null, dir = 0, $t1, $t2;
     /* action */
@@ -3594,6 +4086,12 @@ async function act_on_act(act, dx, dy) {   // cmd.c:4658
 }
 /* offer choice of actions to perform at adjacent location <x,y>;
    a few choices can be farther away */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} mod int
+ * @returns {Promise<number>} char
+ */
 async function there_cmd_menu(x, y, mod) {   // cmd.c:4843
     let win = 0, ch = 0, npick = 0, K = 0, picks = [null], dx = 0, dy = 0, act = Int32Array.of(0), dir = 0, $t1, $t2;
     ch = 0;
@@ -3644,10 +4142,19 @@ async function there_cmd_menu(x, y, mod) {   // cmd.c:4843
     }
     return ch;
 }
+/**
+ * @returns {Promise<number>} char
+ */
 async function here_cmd_menu() {   // cmd.c:4899
     await there_cmd_menu(u.ux, u.uy, CLICK_1);
     return 0;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} mod int
+ * @returns {Promise<void>}
+ */
 export async function click_to_cmd(x, y, mod) {   // cmd.c:4906
     gc.clicklook_cc.x = x;
     gc.clicklook_cc.y = y;
@@ -3655,6 +4162,9 @@ export async function click_to_cmd(x, y, mod) {   // cmd.c:4906
         await cmdq_add_ec(CQ_CANNED, gc.Cmd.mousebtn[mod - 1 | 0].ef_funct);
     }
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function domouseaction() {   // cmd.c:4916
     let x = 0, y = 0, o = null, dir = 0, $t1, $t2;
     x = $c.i16(gc.clicklook_cc.x - u.ux | 0);
@@ -3736,6 +4246,14 @@ async function domouseaction() {   // cmd.c:4916
     return ECMD.OK;
 }
 /* gather typed digits into a number in *count; return the next non-digit */
+/**
+ * @param {$c.Ptr | null} allowchars const char *
+ * @param {number} inkey char
+ * @param {number | bigint} maxcount long
+ * @param {*} count cmdcount_nht *
+ * @param {number} gc_flags unsigned int
+ * @returns {Promise<number>} char
+ */
 export async function get_count(allowchars, inkey, maxcount, count, gc_flags) {   // cmd.c:5010
     let qbuf = new Int8Array(128), key = 0, save_input_state = 0, cnt = 0, first = 0, backspaced = 0, showzero = 0, historicmsg = 0, conditionalmsg = 0, echoalways = 0, dgt = 0;
     /* what comes after digits; if Null, anything */
@@ -3817,6 +4335,9 @@ export async function get_count(allowchars, inkey, maxcount, count, gc_flags) { 
 /* main command input routine when not repeating and not executing canned
    commands; input comes via get_count() which collects repeat count if one
    is present and returns next non-digit to us */
+/**
+ * @returns {Promise<number>} int
+ */
 async function parse() {   // cmd.c:5096
     let foo = 0, bind = null;
     iflags.in_parse = TRUE;
@@ -3864,6 +4385,10 @@ async function parse() {   // cmd.c:5096
    handlers to have return type `int', but they don't actually inspect
    the return value so we should be safe using `void' unconditionally */
 /*ARGUSED*/
+/**
+ * @param {number} sig_unused int
+ * @returns {Promise<void>}
+ */
 export async function hangup(sig_unused) {   // cmd.c:5159
     /* called as signal() handler, so sent
      * at least one arg */
@@ -3885,6 +4410,9 @@ export async function hangup(sig_unused) {   // cmd.c:5159
     /* SAFERHANGUP */
     await end_of_input();
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function end_of_input() {   // cmd.c:5183
     /* keep files for recovery */
     /* don't save */
@@ -3907,6 +4435,12 @@ export async function end_of_input() {   // cmd.c:5183
     return;
 }
 /* HANGUPHANDLING */
+/**
+ * @param {*} x coordxy *
+ * @param {*} y coordxy *
+ * @param {*} mod int *
+ * @returns {Promise<number>} char
+ */
 async function readchar_core(x, y, mod) {   // cmd.c:5213
     let sym = 0, cnt = 0, $t1, $t2, $t3;
     readchar_done$: {
@@ -3961,6 +4495,9 @@ async function readchar_core(x, y, mod) {   // cmd.c:5213
     return $c.i8(sym);
 }
 /* get a character */
+/**
+ * @returns {Promise<number>} char
+ */
 export async function readchar() {   // cmd.c:5276
     let ch = 0, x = Int16Array.of(0), y = Int16Array.of(0), mod = Int32Array.of(0);
     x[0] = u.ux;
@@ -3970,6 +4507,12 @@ export async function readchar() {   // cmd.c:5276
     return ch;
 }
 /* used by getpos() to accept mouse input as well as keyboard input */
+/**
+ * @param {*} x coordxy *
+ * @param {*} y coordxy *
+ * @param {*} mod int *
+ * @returns {Promise<number>} char
+ */
 export async function readchar_poskey(x, y, mod) {   // cmd.c:5288
     let ch = 0;
     program_state.input_state = getposInp;
@@ -3977,6 +4520,9 @@ export async function readchar_poskey(x, y, mod) {   // cmd.c:5288
     return ch;
 }
 /* '_' command, #travel, via keyboard rather than mouse click */
+/**
+ * @returns {Promise<number>} int
+ */
 async function dotravel() {   // cmd.c:5299
     let cc = new $T.nhcoord(), gfilt = 0, $t1, $t2;
     /*
@@ -4019,6 +4565,9 @@ async function dotravel() {   // cmd.c:5299
     return await dotravel_target();
 }
 /* #retravel, travel to iflags.travelcc, which must be set */
+/**
+ * @returns {Promise<number>} int
+ */
 async function dotravel_target() {   // cmd.c:5348
     let $t1;
     if (!isok(iflags.travelcc.x, iflags.travelcc.y)) {
@@ -4047,6 +4596,9 @@ async function dotravel_target() {   // cmd.c:5348
     return ECMD.TIME;
 }
 /* mouse click look command */
+/**
+ * @returns {Promise<number>} int
+ */
 async function doclicklook() {   // cmd.c:5381
     if (!isok(gc.clicklook_cc.x, gc.clicklook_cc.y)) {
         return ECMD.OK;
@@ -4056,9 +4608,20 @@ async function doclicklook() {   // cmd.c:5381
     return ECMD.OK;
 }
 /* can we use menu entries to respond to a query? */
+/**
+ * @param {$c.Ptr | null} resp const char *
+ * @returns {number} boolean
+ */
 function yn_menuable_resp(resp) {   // cmd.c:5394
     return $c.i8(iflags.query_menu && iflags.window_inited && ($c.peq(resp, new $c.Ptr(ynchars, 0)) || $c.peq(resp, new $c.Ptr(ynqchars, 0)) || $c.peq(resp, new $c.Ptr(ynaqchars, 0)) || $c.peq(resp, new $c.Ptr(rightleftchars, 0)) || $c.peq(resp, new $c.Ptr(hidespinchars, 0))) ? 1 : 0);
 }
+/**
+ * @param {number} win winid
+ * @param {number} key char
+ * @param {$c.Ptr | null} text const char *
+ * @param {number} def char
+ * @returns {Promise<void>}
+ */
 async function yn_func_menu_opt(win, key, text, def) {   // cmd.c:5402
     let any = new $T.any();
     any.$copyFrom(cg.zeroany);
@@ -4068,6 +4631,13 @@ async function yn_func_menu_opt(win, key, text, def) {   // cmd.c:5402
 /* use a menu to ask a specific response to a query.
    returns TRUE if the menu was shown to the user.
    puts the response char into res. */
+/**
+ * @param {$c.Ptr | null} query const char *
+ * @param {$c.Ptr | null} resp const char *
+ * @param {number} def char
+ * @param {$c.Ptr | null} res char *
+ * @returns {Promise<number>} boolean
+ */
 async function yn_function_menu(query, resp, def, res) {   // cmd.c:5419
     let win = 0, sel = [null], n = 0, keybuf = new Int8Array(128);
     if (yn_menuable_resp(resp)) {
@@ -4112,6 +4682,13 @@ async function yn_function_menu(query, resp, def, res) {   // cmd.c:5419
  *   Parameter validator for generic yes/no function to prevent
  *   the core from sending too long a prompt string to the
  *   window port causing a buffer overflow there.
+ */
+/**
+ * @param {$c.Ptr | null} query const char *
+ * @param {$c.Ptr | null} resp const char *
+ * @param {number} def char
+ * @param {number} addcmdq boolean
+ * @returns {Promise<number>} char
  */
 export async function yn_function(query, resp, def, addcmdq) {   // cmd.c:5471
     let res = Int8Array.of(0), qbuf = new Int8Array(128), cq = new $T._cmd_queue(), cmdq = null, idx = 0, dumplog_buf = new Int8Array(144), ln = 0, ridx = 0, altres = 0, fuzzing = 0, dbg_buf = new Int8Array(256);
@@ -4207,6 +4784,12 @@ export async function yn_function(query, resp, def, addcmdq) {   // cmd.c:5471
 }
 /* for paranoid_confirm:quit,die,attack,&c prompting; allows yes, n|no,
    or q|quit; result is one of 'y' or 'n' or 'q'; ESC yields 'q' */
+/**
+ * @param {number} be_paranoid boolean
+ * @param {$c.Ptr | null} prompt const char *
+ * @param {number} accept_q boolean
+ * @returns {Promise<number>} char
+ */
 export async function paranoid_ynq(be_paranoid, prompt, accept_q) {   // cmd.c:5588
     let c = 0, pbuf = new Int8Array(256), qbuf = new Int8Array(128), ans = new Int8Array(256), promptprefix = null, responsetype = null, k = 0, trylimit = 0;
     c = 110;   /* default result */
@@ -4263,10 +4846,18 @@ export async function paranoid_ynq(be_paranoid, prompt, accept_q) {   // cmd.c:5
 }
 /* for paranoid_confirm:quit,die,attack,&c prompting; allows yes or n|no;
    result is True for yes; n|no and ESC yield False */
+/**
+ * @param {number} be_paranoid boolean
+ * @param {$c.Ptr | null} prompt const char *
+ * @returns {Promise<number>} boolean
+ */
 export async function paranoid_query(be_paranoid, prompt) {   // cmd.c:5655
     return $c.i8(await paranoid_ynq(be_paranoid, prompt, FALSE) === 121 ? 1 : 0);
 }
 /* ^Z command, #suspend */
+/**
+ * @returns {Promise<number>} int
+ */
 async function dosuspend_core() {   // cmd.c:5662
     let now = 0, $t1, $t2;
     /* Does current window system support suspend? */
@@ -4283,6 +4874,9 @@ async function dosuspend_core() {   // cmd.c:5662
     return ECMD.OK;
 }
 /* '!' command, #shell */
+/**
+ * @returns {Promise<number>} int
+ */
 async function dosh_core() {   // cmd.c:5682
     let now = 0, $t1, $t2;
     now = getnow();
@@ -4293,6 +4887,9 @@ async function dosh_core() {   // cmd.c:5682
     $t2 = getnow(), urealtime.start_timing = $t2;
     return ECMD.OK;
 }
+/**
+ * @returns {number} int
+ */
 function dummyfunction() {   // cmd.c:5699
     return ECMD.CANCEL;
 }

@@ -37,6 +37,10 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { __global_locale, _c_locale } from './c_locale.js';
 
+/**
+ * @param {number} val void *
+ * @returns {number} void *
+ */
 function xlocale_retain(val) {   // xlocale_private.h:96
     let obj = 0;
     obj = val;
@@ -46,6 +50,9 @@ function xlocale_retain(val) {   // xlocale_private.h:96
     $h.i32[obj >>> 2] = $h.i32[obj >>> 2] + 1 | 0;
     return val;
 }
+/**
+ * @param {number} val void *
+ */
 function xlocale_release(val) {   // xlocale_private.h:107
     let obj = 0;
     obj = val;
@@ -58,9 +65,16 @@ function xlocale_release(val) {   // xlocale_private.h:107
         }
     }
 }
+/**
+ * @returns {number} locale_t
+ */
 function __current_locale() {   // xlocale_private.h:122
     return __global_locale;
 }
+/**
+ * @param {number} __loc locale_t
+ * @returns {number} locale_t
+ */
 function __locale_ptr(__loc) {   // xlocale_private.h:128
     if (__loc === 0) {
         __loc = $h.u32[_c_locale >>> 2];
@@ -69,6 +83,11 @@ function __locale_ptr(__loc) {   // xlocale_private.h:128
     }
     return __loc;
 }
+/**
+ * @param {number} c __ct_rune_t
+ * @param {number} loc locale_t
+ * @returns {number} __ct_rune_t
+ */
 export function ___tolower_l(c, loc) {   // tolower.c:43
     let lim = 0, rr = 0, base = 0, re = 0;
     if (c < 0 || c === -1) {
@@ -101,6 +120,10 @@ export function ___tolower_l(c, loc) {   // tolower.c:43
     }
     return c;
 }
+/**
+ * @param {number} c __ct_rune_t
+ * @returns {number} __ct_rune_t
+ */
 export function ___tolower(c) {   // tolower.c:77
     return ___tolower_l(c, __current_locale());
 }

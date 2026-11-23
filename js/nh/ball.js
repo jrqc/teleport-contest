@@ -53,6 +53,10 @@ const BCPOS_BALL = 2;
 
 const drop_ball$pullmsg = new Int8Array(31);   // static in drop_ball()
 let bcrestriction = 0;
+/**
+ * @param {number} showmsg boolean
+ * @returns {Promise<void>}
+ */
 export async function ballrelease(showmsg) {   // ball.c:23
     if (carried($G.uball) && !await welded($G.uball)) {
         if (showmsg) {
@@ -74,6 +78,9 @@ export async function ballrelease(showmsg) {   // ball.c:23
     }
 }
 /* ball&chain might hit hero when falling through a trap door */
+/**
+ * @returns {Promise<void>}
+ */
 export async function ballfall() {   // ball.c:43
     let gets_hit = 0, dmg = 0;
     if (!$G.uball || $G.uball && carried($G.uball) && await welded($G.uball)) {
@@ -142,6 +149,9 @@ export async function ballfall() {   // ball.c:43
  *
  *  Should not be called while swallowed except on waterlevel.
  */
+/**
+ * @returns {Promise<void>}
+ */
 async function placebc_core() {   // ball.c:120
     let $t1;
     if (!$G.uchain || !$G.uball) {
@@ -163,6 +173,9 @@ async function placebc_core() {   // ball.c:120
     await newsym(u.ux, u.uy);
     bcrestriction = 0;
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function unplacebc_core() {   // ball.c:147
     if (u.uswallow) {
         if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
@@ -194,6 +207,10 @@ async function unplacebc_core() {   // ball.c:147
     await newsym($G.uchain.ox, $G.uchain.oy);
     u.bc_felt = 0;   /* feel nothing */
 }
+/**
+ * @param {number} restriction int
+ * @returns {number} boolean
+ */
 function check_restriction(restriction) {   // ball.c:180
     let ret = 0;
     ret = FALSE;
@@ -204,6 +221,9 @@ function check_restriction(restriction) {   // ball.c:180
     }
     return ret;
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function placebc() {   // ball.c:193
     if (!check_restriction(0)) {
         return;
@@ -214,6 +234,9 @@ export async function placebc() {   // ball.c:193
     }
     await placebc_core();
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function unplacebc() {   // ball.c:212
     if (bcrestriction) {
         await impossible($c.lit("unplacebc denied, restriction in place"));
@@ -221,6 +244,9 @@ export async function unplacebc() {   // ball.c:212
     }
     await unplacebc_core();
 }
+/**
+ * @returns {Promise<number>} int
+ */
 export async function unplacebc_and_covet_placebc() {   // ball.c:222
     let restriction = 0;
     restriction = 0;
@@ -232,6 +258,10 @@ export async function unplacebc_and_covet_placebc() {   // ball.c:222
     }
     return restriction;
 }
+/**
+ * @param {number} pin int
+ * @returns {Promise<void>}
+ */
 export async function lift_covet_and_placebc(pin) {   // ball.c:236
     if (!check_restriction(pin)) {
         return;
@@ -247,6 +277,9 @@ export async function lift_covet_and_placebc(pin) {   // ball.c:236
 /*
  *  Return the stacking of the hero's ball & chain.  This assumes that the
  *  hero is being punished.
+ */
+/**
+ * @returns {Promise<number>} int
  */
 async function bc_order() {   // ball.c:354
     let obj = null;
@@ -269,6 +302,10 @@ async function bc_order() {   // ball.c:354
  *
  *  The hero is either about to go blind or already blind and just punished.
  *  Set up the ball and chain variables so that the ball and chain are "felt".
+ */
+/**
+ * @param {number} already_blind int
+ * @returns {Promise<void>}
  */
 export async function set_bc(already_blind) {   // ball.c:380
     let ball_on_floor = 0, $t1, $t2;
@@ -321,6 +358,15 @@ export async function set_bc(already_blind) {   // ball.c:380
  *  function should never have BC_BALL as part of its control.
  *
  *  Should not be called while swallowed.
+ */
+/**
+ * @param {number} before int
+ * @param {number} control int
+ * @param {number} ballx coordxy
+ * @param {number} bally coordxy
+ * @param {number} chainx coordxy
+ * @param {number} chainy coordxy
+ * @returns {Promise<void>}
  */
 export async function move_bc(before, control, ballx, bally, chainx, chainy) {   // ball.c:437
     let on_floor = 0, $t1, $t2;
@@ -435,6 +481,18 @@ export async function move_bc(before, control, ballx, bally, chainx, chainy) {  
     }
 }
 /* return TRUE if the caller needs to place the ball and chain down again */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {*} bc_control int *
+ * @param {*} ballx coordxy *
+ * @param {*} bally coordxy *
+ * @param {*} chainx coordxy *
+ * @param {*} chainy coordxy *
+ * @param {$c.Ptr | null} cause_delay boolean *
+ * @param {number} allow_drag boolean
+ * @returns {Promise<number>} boolean
+ */
 export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, cause_delay, allow_drag) {   // ball.c:560
     let t = null, already_in_rock = 0, oldchainx = 0, oldchainy = 0, tempx = 0, tempy = 0, tempx2 = 0, tempy2 = 0, victim = null, tmp = 0, dieroll = 0, newchainx = 0, newchainy = 0, $t1, $t2;
     t = null;
@@ -744,6 +802,11 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
  *
  *  Should not be called while swallowed.
  */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function drop_ball(x, y) {   // ball.c:882
     let t = null, side = 0, $t1, $t2;
     if (Blind()) {
@@ -809,6 +872,9 @@ export async function drop_ball(x, y) {   // ball.c:882
     }
 }
 /* ball&chain cause hero to randomly lose stuff from inventory */
+/**
+ * @returns {Promise<void>}
+ */
 async function litter() {   // ball.c:965
     let otmp = null, nextobj = null, capacity = 0;
     nextobj = null;
@@ -825,6 +891,9 @@ async function litter() {   // ball.c:965
         }
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function drag_down() {   // ball.c:986
     let forward = 0, dragchance = 0;
     dragchance = 3;
@@ -864,6 +933,9 @@ export async function drag_down() {   // ball.c:986
         }
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function bc_sanity_check() {   // ball.c:1034
     let otyp = 0, freeball = 0, freechain = 0, onam = null, bx = 0, by = 0, cx = 0, cy = 0, bdx = 0, bdy = 0, cdx = 0, cdy = 0;
     if (Punished() && (!$G.uball || !$G.uchain)) {

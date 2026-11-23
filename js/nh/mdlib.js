@@ -56,6 +56,9 @@ const soundlib_opts = $c.recArray($T.soundlib_information, 2);
 const save_bones_compat_buf = new Int8Array(256);
 const build_opts = $c.nulls(26);
 /* !MAKEDEFS_C */
+/**
+ * @returns {number | bigint} unsigned long
+ */
 export function md_ignored_features() {   // mdlib.c:236
     /* SCORE_ON_BOTL */
     /* stored by SFCTOOL, not NetHack itself */
@@ -95,10 +98,21 @@ function make_version() {   // mdlib.c:248
     /* free bits in here */
     return;
 }
+/**
+ * @param {$c.Ptr | null} outbuf char *
+ * @param {$c.Ptr | null} delim const char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function mdlib_version_string(outbuf, delim) {   // mdlib.c:300
     $c.sprintf(outbuf, $c.lit("%d%s%d%s%d"), VERSION.MAJOR, delim, VERSION.MINOR, delim, PATCHLEVEL);
     return outbuf;
 }
+/**
+ * @param {$c.Ptr | null} outbuf char *
+ * @param {number | bigint} bufsz size_t
+ * @param {$c.Ptr | null} build_date const char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function version_id_string(outbuf, bufsz, build_date) {   // mdlib.c:316
     let subbuf = new Int8Array(64), versbuf = new Int8Array(64), statusbuf = new Int8Array(64);
     statusbuf[0] = 0;
@@ -107,6 +121,12 @@ export function version_id_string(outbuf, bufsz, build_date) {   // mdlib.c:316
     return outbuf;
 }
 /* still within #if MAKDEFS_C || FOR_RUNTIME */
+/**
+ * @param {$c.Ptr | null} outbuf char *
+ * @param {number | bigint} bufsz size_t
+ * @param {$c.Ptr | null} build_date const char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function bannerc_string(outbuf, bufsz, build_date) {   // mdlib.c:349
     let subbuf = new Int8Array(64), versbuf = new Int8Array(64);
     subbuf[0] = 0;
@@ -117,6 +137,9 @@ function build_savebones_compat_string() {   // mdlib.c:393
     $c.strcpy(new $c.Ptr(save_bones_compat_buf, 0), $c.lit("save and bones files accepted from version"));
     $c.sprintf(eos(new $c.Ptr(save_bones_compat_buf, 0)), $c.lit(" %d.%d.%d only"), VERSION.MAJOR, VERSION.MINOR, PATCHLEVEL);
 }
+/**
+ * @returns {number} int
+ */
 function count_and_validate_winopts() {   // mdlib.c:602
     let i = 0, cnt = 0;
     cnt = 0;
@@ -128,6 +151,9 @@ function count_and_validate_winopts() {   // mdlib.c:602
     }
     return cnt;
 }
+/**
+ * @returns {number} int
+ */
 function count_and_validate_soundlibopts() {   // mdlib.c:627
     let i = 0, cnt = 0;
     cnt = 0;
@@ -138,6 +164,11 @@ function count_and_validate_soundlibopts() {   // mdlib.c:627
     }
     return cnt;
 }
+/**
+ * @param {$c.Ptr | null} str char *
+ * @param {*} length_p int *
+ * @returns {Promise<void>}
+ */
 async function opt_out_words(str, length_p) {   // mdlib.c:641
     let word = null, $t1, $t2, $t3, $t4, $t5;
     /* input, but modified during processing */
@@ -158,6 +189,9 @@ async function opt_out_words(str, length_p) {   // mdlib.c:641
         str = str.add($c.idx($c.addu64($c.strlen(str), $c.u64(word ? 1 : 0))));
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function build_options() {   // mdlib.c:669
     let buf = new Int8Array(256), i = 0, length = Int32Array.of(0), winsyscnt = 0, cnt = 0, defwinsys = null, soundlibcnt = 0, soundlib = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13, $t14, $t15, $t16, $t17, $t18, $t19, $t20, $t21, $t22, $t23, $t24, $t25, $t26, $t27, $t28, $t29, $t30, $t31, $t32, $t33, $t34, $t35, $t36;
     cnt = 0;
@@ -256,6 +290,9 @@ async function build_options() {   // mdlib.c:669
     idxopttext < MAXOPT ? ($t35 = await dupstr($c.lit("")), $t36 = new $c.Ptr(opttext, ($t34 = idxopttext, idxopttext = $t34 + 1 | 0, $t34)), $t36.set(0, $t35)) : null;
     return;
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function runtime_info_init() {   // mdlib.c:835
     if (!done_runtime_opt_init_once) {
         done_runtime_opt_init_once = 1;
@@ -267,6 +304,10 @@ export async function runtime_info_init() {   // mdlib.c:835
         await build_options();
     }
 }
+/**
+ * @param {*} rtcontext int *
+ * @returns {Promise<$c.Ptr | null>} const char *
+ */
 export async function do_runtime_info(rtcontext) {   // mdlib.c:849
     let retval = null;
     retval = null;

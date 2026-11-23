@@ -68,6 +68,10 @@ const ALGN_SINNED = (-4);
 const ALGN_DEVOUT = 14;
 
 const priest_talk$cranky_msg = $c.nulls(3);   // static in priest_talk()
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function newepri(mtmp) {   // priest.c:16
     let $t1, $t2;
     if (!mtmp.mextra) {
@@ -79,6 +83,9 @@ export async function newepri(mtmp) {   // priest.c:16
         mtmp.mextra.epri.parentmid = mtmp.m_id;
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ */
 export function free_epri(mtmp) {   // priest.c:28
     if (mtmp.mextra && EPRI(mtmp)) {
         $c.free(mtmp.mextra.epri);
@@ -89,6 +96,18 @@ export function free_epri(mtmp) {   // priest.c:28
 /*
  * Move for priests and shopkeepers.  Called from shk_move() and pri_move().
  * Valid returns are  1: moved  0: didn't  -1: let m_move do it  -2: died.
+ */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} in_his_shop boolean
+ * @param {number} appr schar
+ * @param {number} uondoor boolean
+ * @param {number} avoid boolean
+ * @param {number} omx coordxy
+ * @param {number} omy coordxy
+ * @param {number} ggx coordxy
+ * @param {number} ggy coordxy
+ * @returns {Promise<number>} int
  */
 export async function move_special(mtmp, in_his_shop, appr, uondoor, avoid, omx, omy, ggx, ggy) {   // priest.c:42
     let nx = 0, ny = 0, nix = 0, niy = 0, i = 0, chcnt = 0, cnt = 0, mfp = new $T.mfndposdata(), ninfo = 0, allowflags = 0, $goto = null;
@@ -172,6 +191,10 @@ export async function move_special(mtmp, in_his_shop, appr, uondoor, avoid, omx,
         break;
     }
 }
+/**
+ * @param {$c.Ptr | null} array char *
+ * @returns {number} char
+ */
 export function temple_occupied(array) {   // priest.c:142
     let ptr = null;
     for (ptr = array; ptr.get(0); ptr = ptr.add(1)) {
@@ -181,9 +204,19 @@ export function temple_occupied(array) {   // priest.c:142
     }
     return 0;
 }
+/**
+ * @param {$T.monst | null} priest struct monst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 function histemple_at(priest, x, y) {   // priest.c:153
     return $c.i8(priest && priest.ispriest | 0 && priest.mextra.epri.shroom === in_rooms(x, y, TEMPLE).get(0) && on_level(priest.mextra.epri.shrlevel, u.uz) ? 1 : 0);
 }
+/**
+ * @param {$T.monst | null} priest struct monst *
+ * @returns {number} boolean
+ */
 export function inhistemple(priest) {   // priest.c:161
     /* make sure we have a priest */
     if (!priest || !priest.ispriest) {
@@ -198,6 +231,10 @@ export function inhistemple(priest) {   // priest.c:161
 }
 /*
  * pri_move: return 1: moved  0: didn't  -1: let m_move do it  -2: died
+ */
+/**
+ * @param {$T.monst | null} priest struct monst *
+ * @returns {Promise<number>} int
  */
 export async function pri_move(priest) {   // priest.c:177
     let ggx = 0, ggy = 0, omx = 0, omy = 0, temple = 0, avoid = 0;
@@ -233,6 +270,14 @@ export async function pri_move(priest) {   // priest.c:177
     return await move_special(priest, FALSE, TRUE, FALSE, avoid, omx, omy, ggx, ggy);
 }
 /* exclusively for mktemple() */
+/**
+ * @param {$T.d_level | null} lvl d_level *
+ * @param {$T.mkroom | null} sroom struct mkroom *
+ * @param {number} sx int
+ * @param {number} sy int
+ * @param {number} sanctum boolean
+ * @returns {Promise<void>}
+ */
 export async function priestini(lvl, sroom, sx, sy, sanctum) {   // priest.c:220
     let priest = null, otmp = null, cnt = 0, px = 0, py = 0, i = 0, si = 0, prim = null;
     /* is it the seat of the high priest? */
@@ -285,6 +330,10 @@ export async function priestini(lvl, sroom, sx, sy, sanctum) {   // priest.c:220
     }
 }
 /* get a monster's alignment type without caller needing EPRI & EMIN */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {number} aligntyp
+ */
 export function mon_aligntyp(mon) {   // priest.c:280
     let algn = 0;
     algn = $c.i8(mon.ispriest | 0 ? mon.mextra.epri.shralign : mon.isminion | 0 ? mon.mextra.emin.min_align : mon.data.maligntyp);
@@ -302,6 +351,13 @@ export function mon_aligntyp(mon) {   // priest.c:280
  *      - minions do not have ispriest but have isminion and emin
  *      - caller needs to inhibit Hallucination if it wants to force
  *              the true name even when under that influence
+ */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} article int
+ * @param {number} reveal_high_priest boolean
+ * @param {$c.Ptr | null} pname char *
+ * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function priestname(mon, article, reveal_high_priest, pname) {   // priest.c:302
     let do_hallu = 0, aligned_priest = 0, high_priest = 0, whatcode = Int8Array.of(0), what = null;
@@ -366,9 +422,17 @@ export async function priestname(mon, article, reveal_high_priest, pname) {   //
     }
     return pname;
 }
+/**
+ * @param {$T.monst | null} priest struct monst *
+ * @returns {number} boolean
+ */
 export function p_coaligned(priest) {   // priest.c:370
     return $c.i8(u.ualign.type === mon_aligntyp(priest) ? 1 : 0);
 }
+/**
+ * @param {$T.monst | null} pri struct monst *
+ * @returns {number} boolean
+ */
 function has_shrine(pri) {   // priest.c:376
     let lev = null, epri_p = null;
     if (!pri || !pri.ispriest) {
@@ -381,6 +445,10 @@ function has_shrine(pri) {   // priest.c:376
     }
     return $c.i8(epri_p.shralign === $c.i8(((lev.flags | 0) & ~AM.SHRINE & AM.MASK) === 0 ? A.NONE : ((lev.flags | 0) & ~AM.SHRINE & AM.MASK) === AM.LAWFUL ? A.LAWFUL : ((lev.flags | 0) & ~AM.SHRINE & AM.MASK) - 2 | 0) ? 1 : 0);
 }
+/**
+ * @param {number} roomno char
+ * @returns {$T.monst | null} struct monst *
+ */
 export function findpriest(roomno) {   // priest.c:392
     let mtmp = null;
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
@@ -394,6 +462,10 @@ export function findpriest(roomno) {   // priest.c:392
     return null;
 }
 /* called from check_special_room() when the player enters the temple room */
+/**
+ * @param {number} roomno int
+ * @returns {Promise<void>}
+ */
 export async function intemple(roomno) {   // priest.c:410
     let priest = null, mtmp = null, epri_p = null, shrined = 0, sanctum = 0, can_speak = 0, this_time = null, other_time = null, msg1 = null, msg2 = null, buf = new Int8Array(256), save_priest = 0, ngen = 0, $t1, $t2, $t3;
     /* don't do anything if hero is already in the room */
@@ -512,6 +584,10 @@ export async function intemple(roomno) {   // priest.c:410
 }
 /* reset the move counters used to limit temple entry feedback;
    leaving the level and then returning yields a fresh start */
+/**
+ * @param {$T.monst | null} priest struct monst *
+ * @returns {Promise<void>}
+ */
 export async function forget_temple_entry(priest) {   // priest.c:545
     let epri_p = null, $t1, $t2, $t3;
     epri_p = priest.ispriest | 0 ? priest.mextra.epri : null;
@@ -521,6 +597,10 @@ export async function forget_temple_entry(priest) {   // priest.c:545
     }
     $t3 = ($t2 = ($t1 = epri_p.hostile_time = 0, epri_p.peaceful_time = $t1), epri_p.enter_time = $t2), epri_p.intone_time = $t3;
 }
+/**
+ * @param {$T.monst | null} priest struct monst *
+ * @returns {Promise<void>}
+ */
 export async function priest_talk(priest) {   // priest.c:558
     let coaligned = 0, strayed = 0, cheapskate = null, pmoney = 0, bits = null, offer = 0, suggested = 0, quan = 0, buf = new Int8Array(256), orig_ublessed = 0, $t1, $t2, $t3;
     coaligned = p_coaligned(priest);
@@ -659,6 +739,14 @@ export async function priest_talk(priest) {   // priest.c:558
         }
     }
 }
+/**
+ * @param {$T.permonst | null} ptr struct permonst *
+ * @param {number} alignment aligntyp
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} peaceful boolean
+ * @returns {Promise<$T.monst | null>} struct monst *
+ */
 export async function mk_roamer(ptr, alignment, x, y, peaceful) {   // priest.c:724
     let roamer = null, coaligned = 0;
     coaligned = $c.i8(u.ualign.type === alignment ? 1 : 0);
@@ -680,6 +768,10 @@ export async function mk_roamer(ptr, alignment, x, y, peaceful) {   // priest.c:
     /* MORE TO COME */
     return roamer;
 }
+/**
+ * @param {$T.monst | null} roamer struct monst *
+ * @returns {Promise<void>}
+ */
 export async function reset_hostility(roamer) {   // priest.c:755
     let $t1;
     if (!roamer.isminion) {
@@ -694,6 +786,12 @@ export async function reset_hostility(roamer) {   // priest.c:755
     }
     await newsym(roamer.mx, roamer.my);
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 export function in_your_sanctuary(mon, x, y) {   // priest.c:771
     let roomno = 0, priest = null;
     /* if non-null, <mx,my> overrides <x,y> */
@@ -715,6 +813,10 @@ export function in_your_sanctuary(mon, x, y) {   // priest.c:771
     return $c.i8(has_shrine(priest) && p_coaligned(priest) && priest.mpeaceful | 0 ? 1 : 0);
 }
 /* when attacking "priest" in his temple */
+/**
+ * @param {$T.monst | null} priest struct monst *
+ * @returns {Promise<void>}
+ */
 export async function ghod_hitsu(priest) {   // priest.c:796
     let troom = null, oldbuzzer = null, oldcurrwand = null, x = 0, y = 0, ax = 0, ay = 0, roomno = 0;
     roomno = temple_occupied(new $c.Ptr(u.urooms, 0));
@@ -784,6 +886,9 @@ export async function ghod_hitsu(priest) {   // priest.c:796
     gc.current_wand = oldcurrwand;
     await exercise(A.WIS, FALSE);
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function angry_priest() {   // priest.c:877
     let priest = null, lev = null, eprip = null;
     if ((priest = findpriest(temple_occupied(new $c.Ptr(u.urooms, 0)))) !== null) {
@@ -819,6 +924,9 @@ export async function angry_priest() {   // priest.c:877
  * and remove them.  This avoids big problems when restoring bones.
  * [Perhaps we should convert them into roamers instead?]
  */
+/**
+ * @returns {Promise<void>}
+ */
 export async function clearpriests() {   // priest.c:919
     let mtmp = null;
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
@@ -831,6 +939,10 @@ export async function clearpriests() {   // priest.c:919
     }
 }
 /* munge priest-specific structure when restoring -dlc */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} ghostly boolean
+ */
 export function restpriest(mtmp, ghostly) {   // priest.c:933
     if (u.uz.dlevel) {
         if (ghostly) {

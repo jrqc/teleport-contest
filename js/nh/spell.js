@@ -169,6 +169,10 @@ const tport_spell$save_tport = new $T.tport_hideaway();   // static in tport_spe
 const explodes = new Int8Array(26);
 const spl_sortchoices = $c.nulls(9);
 /* convert a letter into a number in the range 0..51, or -1 if not a letter */
+/**
+ * @param {number} ilet char
+ * @returns {number} int
+ */
 function spell_let_to_idx(ilet) {   // spell.c:115
     let indx = 0;
     indx = ilet - 97 | 0;
@@ -182,6 +186,10 @@ function spell_let_to_idx(ilet) {   // spell.c:115
     return -1;
 }
 /* TRUE: book should be destroyed by caller */
+/**
+ * @param {$T.obj | null} bp struct obj *
+ * @returns {Promise<number>} boolean
+ */
 async function cursed_book(bp) {   // spell.c:130
     let was_in_use = 0, lev = 0, dmg = 0;
     lev = objects[bp.otyp].oc_oc2;
@@ -234,6 +242,10 @@ async function cursed_book(bp) {   // spell.c:130
     return FALSE;
 }
 /* study while confused: returns TRUE if the book is destroyed */
+/**
+ * @param {$T.obj | null} spellbook struct obj *
+ * @returns {Promise<number>} boolean
+ */
 async function confused_book(spellbook) {   // spell.c:189
     let gone = 0;
     gone = FALSE;
@@ -251,6 +263,10 @@ async function confused_book(spellbook) {   // spell.c:189
     return gone;
 }
 /* pacify or tame an undead monster */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 async function deadbook_pacify_undead(mtmp) {   // spell.c:211
     if ((is_undead(mtmp.data) || is_vampshifter(mtmp)) && cansee(mtmp.mx, mtmp.my)) {
         mtmp.mpeaceful = (TRUE) & 1;
@@ -269,6 +285,10 @@ async function deadbook_pacify_undead(mtmp) {   // spell.c:211
 }
 /* special effects for the Book of the Dead; reading it while blind is
    allowed so that needs to be taken into account too */
+/**
+ * @param {$T.obj | null} book2 struct obj *
+ * @returns {Promise<void>}
+ */
 async function deadbook(book2) {   // spell.c:231
     let mtmp = null, mm = new $T.nhcoord(), otmp = null, arti1_primed = 0, arti2_primed = 0, arti_cursed = 0, soon = 0, $goto = null;
     D1: for (;;) {
@@ -374,6 +394,10 @@ async function deadbook(book2) {   // spell.c:231
     }
 }
 /* 'book' has just become cursed; if we're reading it, interrupt */
+/**
+ * @param {$T.obj | null} book struct obj *
+ * @returns {Promise<void>}
+ */
 export async function book_cursed(book) {   // spell.c:343
     if (book.cursed | 0 && gm.multi >= 0 && go.occupation === learn && $c.peq(svc.context.spbook.book, book)) {
         await pline($c.lit("%s shut!"), await Tobjnam(book, $c.lit("slam")));
@@ -381,6 +405,9 @@ export async function book_cursed(book) {   // spell.c:343
         await stop_occupation();
     }
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function learn() {   // spell.c:356
     let i = 0, booktype = 0, splname = new Int8Array(256), costly = 0, faded_to_blank = 0, book = null, $t1, $t2, $t3, $t4;
     costly = TRUE;
@@ -486,6 +513,10 @@ async function learn() {   // spell.c:356
     svc.context.spbook.o_id = 0;
     return 0;
 }
+/**
+ * @param {$T.obj | null} spellbook struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function study_book(spellbook) {   // spell.c:468
     let booktype = 0, i = 0, confused = 0, too_hard = 0, eyes = null, dullbook = 0, tribtitle = null, read_ability = 0, qbuf = new Int8Array(128), gone = 0, $t1;
     booktype = spellbook.otyp;
@@ -635,6 +666,9 @@ export async function study_book(spellbook) {   // spell.c:468
 }
 /* a spellbook has been destroyed or the character has changed levels;
    the stored address for the current book is no longer valid */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ */
 export function book_disappears(obj) {   // spell.c:646
     if ($c.peq(obj, svc.context.spbook.book)) {
         svc.context.spbook.book = null;
@@ -644,6 +678,10 @@ export function book_disappears(obj) {   // spell.c:646
 /* renaming an object usually results in it having a different address;
    so the sequence start reading, get interrupted, name the book, resume
    reading would read the "new" book from scratch */
+/**
+ * @param {$T.obj | null} old_obj struct obj *
+ * @param {$T.obj | null} new_obj struct obj *
+ */
 export function book_substitution(old_obj, new_obj) {   // spell.c:658
     if ($c.peq(old_obj, svc.context.spbook.book)) {
         svc.context.spbook.book = new_obj;
@@ -670,6 +708,9 @@ export function age_spells() {   // spell.c:669
 }
 /* return True if spellcasting is inhibited;
    only covers a small subset of reasons why casting won't work */
+/**
+ * @returns {Promise<number>} boolean
+ */
 async function rejectcasting() {   // spell.c:687
     /* rejections which take place before selecting a particular spell */
     if (u.uprops[STUNNED].intrinsic) {
@@ -694,6 +735,10 @@ async function rejectcasting() {   // spell.c:687
 /*
  * Return TRUE if a spell was picked, with the spell index in the return
  * parameter.  Otherwise return FALSE.
+ */
+/**
+ * @param {*} spell_no int *
+ * @returns {Promise<number>} boolean
  */
 async function getspell(spell_no) {   // spell.c:715
     let nspells = 0, idx = 0, retry_limit = 0, ilet = 0, lets = new Int8Array(256), qbuf = new Int8Array(128), cq = new $T._cmd_queue(), cmdq = null;
@@ -760,6 +805,9 @@ async function getspell(spell_no) {   // spell.c:715
     return await dospellmenu($c.lit("Choose which spell to cast"), SPELLMENU_CAST, spell_no);
 }
 /* #wizcast - cast any spell even without knowing it */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dowizcast() {   // spell.c:787
     let win = 0, selected = [null], any = new $T.any(), i = 0, n = 0;
     win = await create_nhwindow()(NHW.MENU);
@@ -784,6 +832,9 @@ export async function dowizcast() {   // spell.c:787
     return ECMD.OK;
 }
 /* the #cast command -- cast a spell */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function docast() {   // spell.c:820
     let spell_no = Int32Array.of(0);
     if (await getspell(new $c.Ptr(spell_no, 0))) {
@@ -792,6 +843,10 @@ export async function docast() {   // spell.c:820
     }
     return ECMD.FAIL;
 }
+/**
+ * @param {number} skill int
+ * @returns {Promise<$c.Ptr | null>} const char *
+ */
 async function spelltypemnemonic(skill) {   // spell.c:832
     switch (skill) {
         case P.ATTACK_SPELL:
@@ -813,11 +868,18 @@ async function spelltypemnemonic(skill) {   // spell.c:832
             return $c.lit("");
     }
 }
+/**
+ * @param {number} booktype int
+ * @returns {number} int
+ */
 export function spell_skilltype(booktype) {   // spell.c:856
     return objects[booktype].oc_subtyp;
 }
 /* Wizards learn what spellbooks look like based on their skill in the
    spell's school */
+/**
+ * @returns {Promise<void>}
+ */
 export async function skill_based_spellbook_id() {   // spell.c:864
     let booktype = 0, spbook_class = 0, known_up_to_level = 0, skill = 0;
     if (!(gu.urole.mnum === PM.WIZARD)) {
@@ -861,6 +923,11 @@ export async function skill_based_spellbook_id() {   // spell.c:864
 
    zap is passed by value, so the move-forward doesn't change the passed
    argument. */
+/**
+ * @param {$T.chain_lightning_queue | null} clq struct chain_lightning_queue *
+ * @param {$T.chain_lightning_zap} zap$in struct chain_lightning_zap
+ * @returns {Promise<void>}
+ */
 async function propagate_chain_lightning(clq, zap$in) {   // spell.c:952
     const zap = zap$in;   // passed by value: the caller copies
     let mon = null, i = 0, $t1;
@@ -905,6 +972,9 @@ async function propagate_chain_lightning(clq, zap$in) {   // spell.c:952
     await tmp_at(DISP_CHANGE, $c.i16(await zapdir_to_glyph(xdir[zap.dir], ydir[zap.dir], clq.displayed_beam)));
     await tmp_at(zap.x, zap.y);
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function cast_chain_lightning() {   // spell.c:1003
     let clq = new $T.chain_lightning_queue(), dir = 0, zap = new $T.chain_lightning_zap(), delay_tail = 0, zap$2 = new $T.chain_lightning_zap(), mon = null, unused = [null], dmg = 0, $t1;
     clq.$copyFrom(new $T.chain_lightning_queue());
@@ -996,6 +1066,9 @@ async function cast_chain_lightning() {   // spell.c:1003
     await nh_delay_output()();
     await tmp_at(DISP_END, 0);
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function cast_protection() {   // spell.c:1104
     let l = 0, loglev = 0, gain = 0, natac = 0, rmtyp = 0, hgolden = null, atmosphere = null, pm = null, $t1;
     l = u.ulevel;
@@ -1055,6 +1128,10 @@ async function cast_protection() {   // spell.c:1104
     }
 }
 /* attempting to cast a forgotten spell will cause disorientation */
+/**
+ * @param {number} spell int
+ * @returns {Promise<void>}
+ */
 async function spell_backfire(spell) {   // spell.c:1181
     let duration = 0, old_stun = 0, old_conf = 0;
     /* 6..24 */
@@ -1093,6 +1170,12 @@ async function spell_backfire(spell) {   // spell.c:1181
     }
     return;
 }
+/**
+ * @param {number} spell int
+ * @param {*} res int *
+ * @param {*} energy int *
+ * @returns {Promise<number>} boolean
+ */
 async function spelleffects_check(spell, res, energy) {   // spell.c:1220
     let chance = 0, confused = 0, hungr = 0, intell = 0, $t1, $t2;
     confused = $c.i8(u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0);
@@ -1252,6 +1335,12 @@ async function spelleffects_check(spell, res, energy) {   // spell.c:1220
 }
 /* hero casts a spell of type spell_otyp, eg. SPE_SLEEP.
    hero must know the spell (unless force is TRUE). */
+/**
+ * @param {number} spell_otyp int
+ * @param {number} atme boolean
+ * @param {number} force boolean
+ * @returns {Promise<number>} int
+ */
 export async function spelleffects(spell_otyp, atme, force) {   // spell.c:1385
     let spell = 0, energy = Int32Array.of(0), damage = 0, n = 0, otyp = 0, skill = 0, role_skill = 0, res = Int32Array.of(0), physical_damage = 0, pseudo = null, cc = new $T.nhcoord(), buf = new Int8Array(256), buf$2 = new Int8Array(256), was_sick = 0, was_slimed = 0, $t1, $t2, $t3, $t4, $t5, $t6;
     spell = force ? spell_otyp : spell_idx($c.i16(spell_otyp));
@@ -1461,6 +1550,12 @@ export async function spelleffects(spell_otyp, atme, force) {   // spell.c:1385
     return ECMD.TIME;
 }
 /*ARGSUSED*/
+/**
+ * @param {*} arg genericptr_t
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 function spell_aim_step(arg, x, y) {   // spell.c:1607
     if (!isok(x, y)) {
         return FALSE;
@@ -1471,12 +1566,21 @@ function spell_aim_step(arg, x, y) {   // spell.c:1607
     return TRUE;
 }
 /* not quite the same as throwspell limits, but close enough */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 function can_center_spell_location(x, y) {   // spell.c:1619
     if (distmin(u.ux, u.uy, x, y) > 10) {
         return FALSE;
     }
     return $c.i8(isok(x, y) && cansee(x, y) && !(svl.level.locations[x][y].typ <= DBWALL) ? 1 : 0);
 }
+/**
+ * @param {number} on_off boolean
+ * @returns {Promise<void>}
+ */
 async function display_spell_target_positions(on_off) {   // spell.c:1627
     let x = 0, y = 0, dx = 0, dy = 0, dist = 0;
     dist = 10;
@@ -1504,6 +1608,9 @@ async function display_spell_target_positions(on_off) {   // spell.c:1627
     }
 }
 /* Choose location where spell takes effect. */
+/**
+ * @returns {Promise<number>} int
+ */
 async function throwspell() {   // spell.c:1655
     let cc = new $T.nhcoord(), uc = new $T.nhcoord(), mtmp = null;
     if (u.uinwater) {
@@ -1544,6 +1651,10 @@ async function throwspell() {   // spell.c:1655
 }
 /* add/hide/remove/unhide teleport-away on behalf of dotelecmd() to give
    more control to behavior of ^T when used in wizard mode */
+/**
+ * @param {number} what int
+ * @returns {Promise<number>} int
+ */
 export async function tport_spell(what) {   // spell.c:1707
     let i = 0;
     /* also defined in teleport.c */
@@ -1590,6 +1701,9 @@ export async function tport_spell(what) {   // spell.c:1707
 /* forget a random selection of known spells due to amnesia;
    they used to be lost entirely, as if never learned, but now we
    just set the memory retention to zero so that they can't be cast */
+/**
+ * @returns {Promise<void>}
+ */
 export async function losespells() {   // spell.c:1763
     let n = 0, nzap = 0, i = 0;
     /* in case reading has been interrupted earlier, discard context */
@@ -1653,6 +1767,11 @@ export async function losespells() {   // spell.c:1763
     }
 }
 /* qsort callback routine */
+/**
+ * @param {*} vptr1 const void *
+ * @param {*} vptr2 const void *
+ * @returns {number} int
+ */
 function spell_cmp(vptr1, vptr2) {   // spell.c:1870
     let indx1 = 0, indx2 = 0, otyp1 = 0, otyp2 = 0, levl1 = 0, levl2 = 0, skil1 = 0, skil2 = 0;
     /*
@@ -1717,6 +1836,9 @@ function spell_cmp(vptr1, vptr2) {   // spell.c:1870
 /* sort the index used for display order of the "view known spells"
    list (sortmode == SORTBY_xxx), or sort the spellbook itself to make
    the current display order stick (sortmode == SORTRETAINORDER) */
+/**
+ * @returns {Promise<void>}
+ */
 async function sortspells() {   // spell.c:1927
     let i = 0, n = 0, tmp_book = $c.recArray($T.spell, 42), $t1;
     if (gs.spl_sortmode === SORTBY.CURRENT) {
@@ -1758,6 +1880,9 @@ async function sortspells() {   // spell.c:1927
     return;
 }
 /* called if the [sort spells] entry in the view spells menu gets chosen */
+/**
+ * @returns {Promise<number>} boolean
+ */
 async function spellsortmenu() {   // spell.c:1976
     let tmpwin = 0, selected = [null], any = new $T.any(), let_ = 0, i = 0, n = 0, choice = 0, clr = 0;
     clr = NO_COLOR;
@@ -1791,6 +1916,9 @@ async function spellsortmenu() {   // spell.c:1976
     return FALSE;
 }
 /* the #showspells command -- view known spells */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dovspell() {   // spell.c:2021
     let qbuf = new Int8Array(128), splnum = Int32Array.of(0), othnum = Int32Array.of(0), spl_tmp = new $T.spell();
     if (svs.spl_book[0].sp_id === NO_SPELL) {
@@ -1820,6 +1948,9 @@ export async function dovspell() {   // spell.c:2021
     return ECMD.OK;
 }
 /* lists spells for endgame dumplog purposes */
+/**
+ * @returns {Promise<void>}
+ */
 export async function show_spells() {   // spell.c:2059
     let unused = Int32Array.of(0);
     unused[0] = SPELLMENU_DUMP;
@@ -1834,6 +1965,12 @@ export async function show_spells() {   // spell.c:2059
 /* shows menu of known spells, with options to sort them.
    return FALSE on cancel, TRUE otherwise.
    spell_no is set to the internal spl_book index, if any selected */
+/**
+ * @param {$c.Ptr | null} prompt const char *
+ * @param {number} splaction int
+ * @param {*} spell_no int *
+ * @returns {Promise<number>} boolean
+ */
 async function dospellmenu(prompt, splaction, spell_no) {   // spell.c:2075
     let tmpwin = 0, i = 0, n = 0, how = 0, splnum = 0, buf = new Int8Array(256), retentionbuf = new Int8Array(24), sep = 0, fmt = null, selected = [null], any = new $T.any(), clr = 0;
     /* SPELLMENU_CAST, SPELLMENU_VIEW, SPELLMENU_DUMP or
@@ -1909,6 +2046,10 @@ async function dospellmenu(prompt, splaction, spell_no) {   // spell.c:2075
     }
     return FALSE;
 }
+/**
+ * @param {number} spell int
+ * @returns {Promise<number>} int
+ */
 async function percent_success(spell) {   // spell.c:2173
     let chance = 0, splcaster = 0, special = 0, statused = 0, difficulty = 0, skill = 0, skilltype = 0, paladin_bonus = 0, learning = 0;
     /* Intrinsic and learned ability are combined to calculate
@@ -2016,6 +2157,11 @@ async function percent_success(spell) {   // spell.c:2173
     }
     return chance;
 }
+/**
+ * @param {number} idx int
+ * @param {$c.Ptr | null} outbuf char *
+ * @returns {$c.Ptr | null} char *
+ */
 function spellretention(idx, outbuf) {   // spell.c:2295
     let turnsleft = 0, percent = 0, accuracy = 0, skill = 0;
     skill = u.weapon_skills[spell_skilltype(svs.spl_book[idx].sp_id)].skill;
@@ -2052,6 +2198,10 @@ function spellretention(idx, outbuf) {   // spell.c:2295
     return outbuf;
 }
 /* Learn a spell during creation of the initial inventory */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function initialspell(obj) {   // spell.c:2340
     let i = 0, otyp = 0;
     otyp = obj.otyp;
@@ -2073,6 +2223,10 @@ export async function initialspell(obj) {   // spell.c:2340
     return;
 }
 /* returns one of spe_Unknown, spe_Fresh, spe_GoingStale, spe_Forgotten */
+/**
+ * @param {number} otyp short
+ * @returns {number} int
+ */
 export function known_spell(otyp) {   // spell.c:2363
     let i = 0, k = 0;
     for (i = 0; i < MAXSPELL && svs.spl_book[i].sp_id !== NO_SPELL; i = i + 1 | 0) {
@@ -2084,6 +2238,10 @@ export function known_spell(otyp) {   // spell.c:2363
     return spe_Unknown;
 }
 /* return index for spell otyp, or UNKNOWN_SPELL if not found */
+/**
+ * @param {number} otyp short
+ * @returns {number} int
+ */
 export function spell_idx(otyp) {   // spell.c:2379
     let i = 0;
     for (i = 0; i < MAXSPELL && svs.spl_book[i].sp_id !== NO_SPELL; i = i + 1 | 0) {
@@ -2094,6 +2252,10 @@ export function spell_idx(otyp) {   // spell.c:2379
     return UNKNOWN_SPELL;
 }
 /* learn or refresh spell otyp, if feasible; return casting letter or '\0' */
+/**
+ * @param {number} otyp short
+ * @returns {Promise<number>} char
+ */
 export async function force_learn_spell(otyp) {   // spell.c:2391
     let i = 0;
     if (otyp === SPE_BLANK_PAPER || otyp === SPE_BOOK_OF_THE_DEAD || known_spell(otyp) === spe_Fresh) {
@@ -2118,6 +2280,9 @@ export async function force_learn_spell(otyp) {   // spell.c:2391
     return spellet(i);
 }
 /* number of spells hero knows */
+/**
+ * @returns {number} int
+ */
 export function num_spells() {   // spell.c:2417
     let i = 0;
     for (i = 0; i < MAXSPELL; i = i + 1 | 0) {

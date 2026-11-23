@@ -121,6 +121,10 @@ const foodwords = $c.nulls(22);
  * Decide whether a particular object can be eaten by the possibly
  * polymorphed character.  Not used for monster checks.
  */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 export function is_edible(obj) {   // eat.c:91
     /* protect invocation tools but not Rider corpses (handled elsewhere)*/
     /* if (obj->oclass != FOOD_CLASS && obj_resists(obj, 0, 0)) */
@@ -148,6 +152,9 @@ export function is_edible(obj) {   // eat.c:91
 }
 /* used for hero init, life saving (if choking), and prayer results of fix
    starving, fix weak from hunger, or golden glow boon (if u.uhunger < 900) */
+/**
+ * @returns {Promise<void>}
+ */
 export async function init_uhunger() {   // eat.c:126
     disp.botl = $c.i8(u.uhs !== NOT_HUNGRY || u.atemp.a[A.STR] < 0 ? 1 : 0);
     u.uhunger = 900;
@@ -158,6 +165,9 @@ export async function init_uhunger() {   // eat.c:126
     }
 }
 /* called after mimicking is over */
+/**
+ * @returns {Promise<number>} int
+ */
 async function eatmdone() {   // eat.c:163
     /* release `eatmbuf' */
     if (ge.eatmbuf) {
@@ -174,6 +184,9 @@ async function eatmdone() {   // eat.c:163
     return 0;
 }
 /* called when hallucination is toggled */
+/**
+ * @returns {Promise<void>}
+ */
 export async function eatmupdate() {   // eat.c:181
     let altmsg = null, altapp = 0, amlen = 0, $t1, $t2;
     altmsg = null;
@@ -206,6 +219,11 @@ export async function eatmupdate() {   // eat.c:181
     }
 }
 /* ``[the(] singular(food, xname) [)]'' */
+/**
+ * @param {$T.obj | null} food struct obj *
+ * @param {number} the_pfx boolean
+ * @returns {Promise<$c.Ptr | null>} const char *
+ */
 async function food_xname(food, the_pfx) {   // eat.c:217
     let result = null;
     if (food.otyp === CORPSE) {
@@ -230,6 +248,10 @@ async function food_xname(food, the_pfx) {   // eat.c:217
  *                11/10/89: if hard, rarely vomit anyway, for slim chance.
  *
  * To a full belly all food is bad. (It.)
+ */
+/**
+ * @param {$T.obj | null} food struct obj *
+ * @returns {Promise<void>}
  */
 async function choke(food) {   // eat.c:245
     /* only happens if you were satiated */
@@ -274,6 +296,9 @@ async function choke(food) {   // eat.c:245
     }
 }
 /* modify victual.piece->owt depending on time spent consuming it */
+/**
+ * @returns {Promise<void>}
+ */
 async function recalc_wt() {   // eat.c:292
     let piece = null, save_plnmsg = 0, save_plnmsg$2 = 0, save_plnmsg$3 = 0, $t1;
     piece = svc.context.victual.piece;
@@ -305,6 +330,9 @@ async function recalc_wt() {   // eat.c:292
     } while (0);
 }
 /* called when eating interrupted by an event */
+/**
+ * @returns {Promise<void>}
+ */
 export async function reset_eat() {   // eat.c:309
     let save_plnmsg = 0;
     /* we only set a flag here - the actual reset process is done after
@@ -325,6 +353,10 @@ export async function reset_eat() {   // eat.c:309
 /* base nutrition of a food-class object; this used to include a variation
    of the code that is now in adj_victual_nutrition() and was moved due to
    its affect on weight() */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {number} unsigned int
+ */
 export function obj_nutrition(otmp) {   // eat.c:325
     let nut = 0;
     nut = otmp.otyp === CORPSE ? mons[otmp.corpsenm].cnutrit : otmp.globby | 0 ? otmp.owt : objects[otmp.otyp].oc_nutrition;
@@ -333,6 +365,9 @@ export function obj_nutrition(otmp) {   // eat.c:325
 /* nutrition increment for next byte; this used to be factored into
    victual.piece->oeaten but that produced weight change if hero
    polymorphed to or from one of the races which has nutrition adjusted */
+/**
+ * @returns {number} int
+ */
 function adj_victual_nutrition() {   // eat.c:338
     let otyp = 0, nut = 0;
     otyp = svc.context.victual.piece.otyp;
@@ -354,6 +389,10 @@ function adj_victual_nutrition() {   // eat.c:338
     return nut;
 }
 /* might destroy otmp if hero drops it */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 async function touchfood(otmp) {   // eat.c:360
     let save_plnmsg = 0, $t1;
     if (otmp.quan > 1) {
@@ -394,6 +433,10 @@ async function touchfood(otmp) {   // eat.c:360
  * do_reset_eat() at the beginning of eatfood()) and check for null pointers
  * in do_reset_eat().
  */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function food_disappears(obj) {   // eat.c:396
     if ($c.peq(obj, svc.context.victual.piece)) {
         svc.context.victual.$copyFrom(zero_victual);   /* victual.piece = 0, .o_id = 0 */
@@ -405,6 +448,10 @@ export async function food_disappears(obj) {   // eat.c:396
 /* renaming an object used to result in it having a different address,
    so the sequence start eating/opening, get interrupted, name the food,
    resume eating/opening would restart from scratch */
+/**
+ * @param {$T.obj | null} old_obj struct obj *
+ * @param {$T.obj | null} new_obj struct obj *
+ */
 export function food_substitution(old_obj, new_obj) {   // eat.c:409
     if ($c.peq(old_obj, svc.context.victual.piece)) {
         svc.context.victual.piece = new_obj;
@@ -415,6 +462,9 @@ export function food_substitution(old_obj, new_obj) {   // eat.c:409
         svc.context.tin.o_id = new_obj.o_id;
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function do_reset_eat() {   // eat.c:422
     let save_plnmsg = 0, otmp = null, $t1, $t2;
     do {
@@ -445,6 +495,10 @@ async function do_reset_eat() {   // eat.c:422
 /* if 'prop' is only set because of a timed value (so not an intrinsic
    attribute or because of polymorph shape or worn or carried gear), return
    its timeout, otherwise return 0; used by enlightenment */
+/**
+ * @param {number} prop int
+ * @returns {number | bigint} long
+ */
 export function temp_resist(prop) {   // eat.c:453
     let p = null, timeout = 0;
     p = $c.relem(u.uprops, prop);
@@ -461,6 +515,10 @@ export function temp_resist(prop) {   // eat.c:453
 /* if temporary acid or stoning resistance is timing out while eating
    something which that resistance is protecting against, caller will
    extend resistance's duration so that it times out after meal finishes */
+/**
+ * @param {number} res int
+ * @returns {number} boolean
+ */
 export function eating_dangerous_corpse(res) {   // eat.c:475
     let food = null, mnum = 0;
     if (go.occupation === eatfood && (food = svc.context.victual.piece) !== null && food.otyp === CORPSE && (mnum = food.corpsenm) >= LOW_PM && (carried(food) || obj_here(food, u.ux, u.uy))) {
@@ -484,6 +542,9 @@ export function eating_dangerous_corpse(res) {   // eat.c:475
    also extending the protection against other attacks of the sort
    being resisted */
 /* called each move during eating process */
+/**
+ * @returns {Promise<number>} int
+ */
 async function eatfood() {   // eat.c:519
     let food = null;
     food = svc.context.victual.piece;
@@ -509,6 +570,10 @@ async function eatfood() {   // eat.c:519
         return 0;
     }
 }
+/**
+ * @param {number} message boolean
+ * @returns {Promise<void>}
+ */
 async function done_eating(message) {   // eat.c:544
     let piece = null;
     piece = svc.context.victual.piece;
@@ -535,6 +600,10 @@ async function done_eating(message) {   // eat.c:544
     }
     svc.context.victual.$copyFrom(zero_victual);   /* victual.piece = 0, .o_id = 0 */
 }
+/**
+ * @param {$T.permonst | null} pd struct permonst *
+ * @returns {Promise<void>}
+ */
 export async function eating_conducts(pd) {   // eat.c:576
     let ll_conduct = 0, $t1, $t2;
     ll_conduct = 0;
@@ -556,6 +625,13 @@ export async function eating_conducts(pd) {   // eat.c:576
     }
 }
 /* handle side-effects of mind flayer's tentacle attack */
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {number} visflag boolean
+ * @param {*} dmg_p int *
+ * @returns {Promise<number>} int
+ */
 export async function eat_brains(magr, mdef, visflag, dmg_p) {   // eat.c:603
     let pd = null, give_nutrit = 0, result = 0, xtra_dmg = 0, $t1, $t2, $t3;
     /* for dishing out extra damage in lieu of Int loss */
@@ -703,6 +779,11 @@ export async function eat_brains(magr, mdef, visflag, dmg_p) {   // eat.c:603
     return result;
 }
 /* eating a corpse or egg of one's own species is usually naughty */
+/**
+ * @param {number} pm int
+ * @param {number} allowmsg boolean
+ * @returns {Promise<number>} boolean
+ */
 async function maybe_cannibal(pm, allowmsg) {   // eat.c:758
     let fptr = null;
     fptr = $c.relem(mons, pm);   /* food type */
@@ -730,6 +811,10 @@ async function maybe_cannibal(pm, allowmsg) {   // eat.c:758
     }
     return FALSE;
 }
+/**
+ * @param {number} pm int
+ * @returns {Promise<void>}
+ */
 async function cprefx(pm) {   // eat.c:791
     await maybe_cannibal(pm, TRUE);
     if (flesh_petrifies($c.relem(mons, pm))) {
@@ -801,6 +886,9 @@ async function cprefx(pm) {   // eat.c:791
             break;
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function fix_petrification() {   // eat.c:867
     let buf = new Int8Array(256);
     if (Hallucination()) {
@@ -819,6 +907,11 @@ export async function fix_petrification() {   // eat.c:867
  * intrinsic_possible() instead of givit(), but we're not that nice.
  */
 /* intrinsic_possible() returns TRUE iff a monster can give an intrinsic. */
+/**
+ * @param {number} type int
+ * @param {$T.permonst | null} ptr struct permonst *
+ * @returns {Promise<number>} int
+ */
 export async function intrinsic_possible(type, ptr) {   // eat.c:890
     let res = 0, save_plnmsg = 0, save_plnmsg$2 = 0, save_plnmsg$3 = 0, save_plnmsg$4 = 0, save_plnmsg$5 = 0, save_plnmsg$6 = 0, save_plnmsg$7 = 0, save_plnmsg$8 = 0, save_plnmsg$9 = 0, save_plnmsg$10 = 0, save_plnmsg$11 = 0;
     res = 0;
@@ -989,6 +1082,11 @@ export async function intrinsic_possible(type, ptr) {   // eat.c:890
  * into its own function. Depends on the monster's level and the type of
  * intrinsic it is trying to give you.
  */
+/**
+ * @param {number} type int
+ * @param {$T.permonst | null} ptr struct permonst *
+ * @returns {number} boolean
+ */
 export function should_givit(type, ptr) {   // eat.c:961
     let chance = 0;
     /* some intrinsics are easier to get than others */
@@ -1015,6 +1113,11 @@ export function should_givit(type, ptr) {   // eat.c:961
     }
     return $c.i8(ptr.mlevel > rn2(chance) ? 1 : 0);
 }
+/**
+ * @param {number} type int
+ * @param {$T.permonst | null} ptr struct permonst *
+ * @returns {number} boolean
+ */
 function temp_givit(type, ptr) {   // eat.c:992
     let chance = 0;
     chance = type === STONE_RES ? 6 : type === ACID_RES ? 3 : 0;
@@ -1022,6 +1125,11 @@ function temp_givit(type, ptr) {   // eat.c:992
 }
 /* givit() tries to give you an intrinsic based on the monster's level
  * and what type of intrinsic it is trying to give you.
+ */
+/**
+ * @param {number} type int
+ * @param {$T.permonst | null} ptr struct permonst *
+ * @returns {Promise<void>}
  */
 async function givit(type, ptr) {   // eat.c:1003
     let save_plnmsg = 0, save_plnmsg$2 = 0, save_plnmsg$3 = 0, save_plnmsg$4 = 0, save_plnmsg$5 = 0, save_plnmsg$6 = 0, save_plnmsg$7 = 0, save_plnmsg$8 = 0, save_plnmsg$9 = 0, save_plnmsg$10 = 0, save_plnmsg$11 = 0, save_plnmsg$12 = 0, save_plnmsg$13 = 0;
@@ -1199,6 +1307,9 @@ async function givit(type, ptr) {   // eat.c:1003
             break;
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function eye_of_newt_buzz() {   // eat.c:1103
     let old_uen = 0, $t1;
     /* MRKR: "eye of newt" may give small magical energy boost */
@@ -1221,6 +1332,10 @@ async function eye_of_newt_buzz() {   // eat.c:1103
     }
 }
 /* called after completely consuming a corpse */
+/**
+ * @param {number} pm int
+ * @returns {Promise<void>}
+ */
 async function cpostfx(pm) {   // eat.c:1129
     let tmp = 0, catch_lycanthropy = 0, check_intrinsics = 0, buf = new Int8Array(256), tempshape = null, save_plnmsg = 0, ptr = null, $t1, $t2;
     tmp = 0;
@@ -1417,6 +1532,10 @@ async function cpostfx(pm) {   // eat.c:1129
  * return fake prop value of -1.
  * Non-deterministic; should only be called once per corpse.
  */
+/**
+ * @param {$T.permonst | null} ptr struct permonst *
+ * @returns {Promise<number>} int
+ */
 export async function corpse_intrinsic(ptr) {   // eat.c:1339
     let conveys_STR = 0, i = 0, count = 0, prop = 0, save_plnmsg = 0, save_plnmsg$2 = 0;
     /* Check the monster for all of the intrinsics.  If this
@@ -1463,6 +1582,9 @@ export async function corpse_intrinsic(ptr) {   // eat.c:1339
     }
     return prop;
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function violated_vegetarian() {   // eat.c:1376
     u.uconduct.unvegetarian = $c.add64(u.uconduct.unvegetarian, 1);
     if (gu.urole.mnum === PM.MONK) {
@@ -1473,6 +1595,10 @@ export async function violated_vegetarian() {   // eat.c:1376
 }
 /* common code to check and possibly charge for 1 svc.context.tin.tin,
  * will split() svc.context.tin.tin if necessary */
+/**
+ * @param {number} alter_type int
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 async function costly_tin(alter_type) {   // eat.c:1389
     let tin = null, $t1;
     /* COST_xxx */
@@ -1486,6 +1612,11 @@ async function costly_tin(alter_type) {   // eat.c:1389
     }
     return tin;
 }
+/**
+ * @param {$c.Ptr | null} s char *
+ * @param {*} tinvariety int *
+ * @returns {number} int
+ */
 export function tin_variety_txt(s, tinvariety) {   // eat.c:1405
     let k = 0, l = 0;
     if (s && tinvariety) {
@@ -1503,6 +1634,11 @@ export function tin_variety_txt(s, tinvariety) {   // eat.c:1405
 /*
  * This assumes that buf already contains the word "tin",
  * as is the case with caller xname().
+ */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} mnum int
+ * @param {$c.Ptr | null} buf char *
  */
 export function tin_details(obj, mnum, buf) {   // eat.c:1428
     let buf2 = new Int8Array(256), r = 0;
@@ -1533,6 +1669,10 @@ export function tin_details(obj, mnum, buf) {   // eat.c:1428
         }
     }
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} forcetype int
+ */
 export function set_tin_variety(obj, forcetype) {   // eat.c:1461
     let r = 0, mnum = 0;
     mnum = obj.corpsenm;
@@ -1561,6 +1701,11 @@ export function set_tin_variety(obj, forcetype) {   // eat.c:1461
     }
     obj.spe = $c.i8(-(r + 1 | 0) | 0);   /* offset by 1 to allow index 0 */
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} displ boolean
+ * @returns {number} int
+ */
 function tin_variety(obj, displ) {   // eat.c:1489
     let r = 0, mnum = 0;
     /* we're just displaying so leave things alone */
@@ -1584,6 +1729,10 @@ function tin_variety(obj, displ) {   // eat.c:1489
     return r;
 }
 /* finish consume_tin(); also potentially used by cprefx() and cpostfx() */
+/**
+ * @param {$T.obj | null} tin struct obj *
+ * @returns {Promise<void>}
+ */
 async function use_up_tin(tin) {   // eat.c:1516
     if (carried(tin)) {
         await useup(tin);
@@ -1594,6 +1743,10 @@ async function use_up_tin(tin) {   // eat.c:1516
     svc.context.tin.tin = $c.asRec(null, $T.obj, 112);
     svc.context.tin.o_id = 0;
 }
+/**
+ * @param {$c.Ptr | null} mesg const char *
+ * @returns {Promise<void>}
+ */
 async function consume_tin(mesg) {   // eat.c:1528
     let what = null, which = 0, mnum = 0, r = 0, nutamt = 0, always_eat = 0, tin = null, alreadyglib = 0, $t1, $t2, $t3;
     /* if you've eaten tin itself, chance to not eat contents gets bypassed */
@@ -1755,6 +1908,9 @@ async function consume_tin(mesg) {   // eat.c:1528
     return;
 }
 /* called during each move whilst opening a tin */
+/**
+ * @returns {Promise<number>} int
+ */
 async function opentin() {   // eat.c:1703
     let $t1;
     /* perhaps it was stolen (although that should cause interruption) */
@@ -1772,6 +1928,10 @@ async function opentin() {   // eat.c:1703
     return 0;
 }
 /* called when starting to open a tin */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function start_tin(otmp) {   // eat.c:1723
     let mesg = null, tmp = 0, $goto = null;
     D1: for (;;) {
@@ -1854,6 +2014,9 @@ async function start_tin(otmp) {   // eat.c:1723
     }
 }
 /* called when waking up after fainting */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function Hear_again() {   // eat.c:1801
     /* Chance of deafness going away while fainted/sleeping/etc. */
     if (!rn2(2)) {
@@ -1863,6 +2026,10 @@ export async function Hear_again() {   // eat.c:1801
     return 0;
 }
 /* called on the "first bite" of rotten food */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function rottenfood(obj) {   // eat.c:1813
     let what = null, where = null, duration = 0;
     await pline($c.lit("Blecch!  %s %s!"), is_rottable(obj) ? $c.lit("Rotten") : $c.lit("Awful"), await foodword(obj));
@@ -1902,6 +2069,10 @@ async function rottenfood(obj) {   // eat.c:1813
     return 0;
 }
 /* called when a corpse is selected as food */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} int
+ */
 async function eatcorpse(otmp) {   // eat.c:1855
     let retcode = 0, tp = 0, mnum = 0, rotted = 0, ll_conduct = 0, stoneable = 0, slimeable = 0, glob = 0, age = 0, cannibal = 0, sick_time = 0, yummy = 0, palatable = 0, pmxnam = null, idx = 0, palat_msg = null, use_is = 0, $t1;
     retcode = 0;
@@ -2027,6 +2198,11 @@ async function eatcorpse(otmp) {   // eat.c:1855
     return retcode;
 }
 /* called as you start to eat */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} already_partly_eaten boolean
+ * @returns {Promise<void>}
+ */
 async function start_eating(otmp, already_partly_eaten) {   // eat.c:2022
     let old_nomovemsg = null, save_nomovemsg = null, save_plnmsg = 0, save_plnmsg$2 = 0, save_plnmsg$3 = 0, save_plnmsg$4 = 0, save_plnmsg$5 = 0, $t1;
     do {
@@ -2103,10 +2279,18 @@ async function start_eating(otmp, already_partly_eaten) {   // eat.c:2022
     set_occupation(eatfood, new $c.Ptr(start_eating$msgbuf, 0), 0);
 }
 /* used by shrink_glob() timer routine */
+/**
+ * @param {$T.obj | null} glob struct obj *
+ * @returns {number} boolean
+ */
 export function eating_glob(glob) {   // eat.c:2078
     return $c.i8(go.occupation === eatfood && $c.peq(glob, svc.context.victual.piece) ? 1 : 0);
 }
 /* scare nearby monster when hero eats garlic */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 async function garlic_breath(mtmp) {   // eat.c:2085
     if (olfaction(mtmp.data) && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) < 7) {
         await monflee(mtmp, 0, FALSE, FALSE);
@@ -2118,6 +2302,10 @@ async function garlic_breath(mtmp) {   // eat.c:2085
  * Messages should use present tense since multi-turn food won't be
  * finishing at the time they're issued.
  * Returns FALSE if eating should not succeed for whatever reason.
+ */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} boolean
  */
 async function fprefx(otmp) {   // eat.c:2099
     let x = 0, $goto = null;
@@ -2221,6 +2409,12 @@ async function fprefx(otmp) {   // eat.c:2099
     return TRUE;
 }
 /* increment a combat intrinsic with limits on its growth */
+/**
+ * @param {number} old int
+ * @param {number} inc int
+ * @param {number} typ int
+ * @returns {number} int
+ */
 function bounded_increase(old, inc, typ) {   // eat.c:2221
     let absold = 0, absinc = 0, sgnold = 0, sgninc = 0;
     /* don't include any amount coming from worn rings (caller handles
@@ -2259,9 +2453,17 @@ function bounded_increase(old, inc, typ) {   // eat.c:2221
     }
     return old + inc | 0;
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function accessory_has_effect(otmp) {   // eat.c:2258
     await pline($c.lit("Magic spreads through your body as you digest the %s."), otmp.oclass === RING_CLASS ? $c.lit("ring") : $c.lit("amulet"));
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function eataccessory(otmp) {   // eat.c:2265
     let typ = 0, oldprop = 0, newnap = 0, oldnap = 0, $t1, $t2, $t3;
     typ = otmp.otyp;
@@ -2409,6 +2611,9 @@ async function eataccessory(otmp) {   // eat.c:2265
     }
 }
 /* called after eating non-food */
+/**
+ * @returns {Promise<void>}
+ */
 async function eatspecial() {   // eat.c:2414
     let otmp = null;
     otmp = svc.context.victual.piece;
@@ -2477,6 +2682,10 @@ async function eatspecial() {   // eat.c:2414
         await useupf(otmp, 1);
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<$c.Ptr | null>} const char *
+ */
 async function foodword(otmp) {   // eat.c:2498
     if (otmp.oclass === FOOD_CLASS) {
         return $c.lit("food");
@@ -2487,6 +2696,10 @@ async function foodword(otmp) {   // eat.c:2498
     return foodwords[objects[otmp.otyp].oc_material];
 }
 /* called after consuming (non-corpse) food */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function fpostfx(otmp) {   // eat.c:2510
     let $t1, $t2, $t3;
     switch (otmp.otyp) {
@@ -2586,6 +2799,10 @@ async function fpostfx(otmp) {   // eat.c:2510
  * return 1 if the food was dangerous and you chose to stop.
  * return 2 if the food was dangerous and you chose to eat it anyway.
  */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} int
+ */
 async function edibility_prompts(otmp) {   // eat.c:2627
     let buf = new Int8Array(256), foodsmell = new Int8Array(256), it_or_they = new Int8Array(128), cadaver = 0, stoneorslime = 0, material = 0, mnum = 0, rotted = 0, age = 0;
     /* Blessed food detection grants hero a one-use
@@ -2664,6 +2881,10 @@ async function edibility_prompts(otmp) {   // eat.c:2627
     }
     return 0;
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} int
+ */
 async function doeat_nonfood(otmp) {   // eat.c:2734
     let basenutrit = 0, ll_conduct = 0, nodelicious = 0, material = 0, $t1, $t2;
     /* nutrition of full item */
@@ -2728,6 +2949,9 @@ async function doeat_nonfood(otmp) {   // eat.c:2734
     return ECMD.TIME;
 }
 /* the #eat command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doeat() {   // eat.c:2817
     let otmp = [null], basenutrit = 0, dont_start = 0, already_partly_eaten = 0, ll_conduct = 0, res = 0, one_bite_left = 0, tmp = 0, save_plnmsg = 0, save_plnmsg$2 = 0, $t1, $t2, $t3, $t4, $t5;
     /* nutrition of full item */
@@ -2974,12 +3198,20 @@ export async function doeat() {   // eat.c:2817
     return ECMD.TIME;
 }
 /* getobj callback for object to be opened with a tin opener */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 function tinopen_ok(obj) {   // eat.c:3088
     if (obj && obj.otyp === TIN) {
         return GETOBJ.SUGGEST;
     }
     return GETOBJ.EXCLUDE;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function use_tin_opener(obj) {   // eat.c:3098
     let otmp = null, res = 0, qbuf = new Int8Array(128);
     res = ECMD.OK;
@@ -3008,6 +3240,9 @@ export async function use_tin_opener(obj) {   // eat.c:3098
 /* Take a single bite from a piece of food, checking for choking and
  * modifying usedtime.  Returns 1 if they choked and survived, 0 otherwise.
  */
+/**
+ * @returns {Promise<number>} int
+ */
 async function bite() {   // eat.c:3133
     /* hack to pacify static analyzer incorporated into gcc 12.2 */
     sa_victual(svc.context.victual);
@@ -3033,6 +3268,9 @@ async function bite() {   // eat.c:3133
     return 0;
 }
 /* as time goes by - called by moveloop(every move) & domove(melee attack) */
+/**
+ * @returns {Promise<void>}
+ */
 export async function gethungry() {   // eat.c:3163
     let accessorytime = 0;
     if (u.uinvulnerable | 0 || iflags.debug_hunger) {
@@ -3142,11 +3380,19 @@ export async function gethungry() {   // eat.c:3163
     await newuhs(TRUE);
 }
 /* called after vomiting and after performing feats of magic */
+/**
+ * @param {number} num int
+ * @returns {Promise<void>}
+ */
 export async function morehungry(num) {   // eat.c:3281
     u.uhunger = u.uhunger - num | 0;
     await newuhs(TRUE);
 }
 /* called after eating (and after drinking fruit juice) */
+/**
+ * @param {number} num int
+ * @returns {Promise<void>}
+ */
 export async function lesshungry(num) {   // eat.c:3289
     let iseating = 0, save_plnmsg = 0;
     /* See comments in newuhs() for discussion on force_save_hs */
@@ -3192,6 +3438,9 @@ export async function lesshungry(num) {   // eat.c:3289
     }
     await newuhs(FALSE);
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function unfaint() {   // eat.c:3336
     await Hear_again();
     if (u.uhs > FAINTING) {
@@ -3201,16 +3450,26 @@ async function unfaint() {   // eat.c:3336
     disp.botl = TRUE;
     return 0;
 }
+/**
+ * @returns {number} boolean
+ */
 export function is_fainted() {   // eat.c:3347
     return $c.i8(u.uhs === FAINTED ? 1 : 0);
 }
 /* call when a faint must be prematurely terminated */
+/**
+ * @returns {Promise<void>}
+ */
 export async function reset_faint() {   // eat.c:3354
     if (ga.afternmv === unfaint) {
         await unmul($c.lit("You revive."));
     }
 }
 /* compute and comment on your (new?) hunger status */
+/**
+ * @param {number} incr boolean
+ * @returns {Promise<void>}
+ */
 export async function newuhs(incr) {   // eat.c:3362
     let newhs = 0, h = 0, uhunger_div_by_10 = 0, duration = 0;
     h = u.uhunger;
@@ -3345,6 +3604,10 @@ export async function newuhs(incr) {   // eat.c:3362
     }
 }
 /* getobj callback for object to eat - effectively just wraps is_edible() */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 function eat_ok(obj) {   // eat.c:3517
     /* 'getobj_else' will be non-zero if floor food is present and
        player declined to eat that; used to insert "else" into
@@ -3364,6 +3627,10 @@ function eat_ok(obj) {   // eat.c:3517
 }
 /* getobj callback for object to be offered (corpses and things that look like
  * the Amulet only */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 function offer_ok(obj) {   // eat.c:3539
     if (!obj) {
         return getobj_else ? GETOBJ.EXCLUDE_NONINVENT : GETOBJ.EXCLUDE;
@@ -3382,6 +3649,10 @@ function offer_ok(obj) {   // eat.c:3539
     return GETOBJ.SUGGEST;
 }
 /* getobj callback for object to be tinned */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 function tin_ok(obj) {   // eat.c:3561
     if (!obj) {
         return getobj_else ? GETOBJ.EXCLUDE_NONINVENT : GETOBJ.EXCLUDE;
@@ -3396,6 +3667,11 @@ function tin_ok(obj) {   // eat.c:3561
 }
 /* Returns an object representing food.
  * Object may be either on floor or in inventory.
+ */
+/**
+ * @param {$c.Ptr | null} verb const char *
+ * @param {number} corpsecheck int
+ * @returns {Promise<$T.obj | null>} struct obj *
  */
 export async function floorfood(verb, corpsecheck) {   // eat.c:3579
     let otmp = null, qbuf = new Int8Array(128), c = 0, uptr = null, feeding = 0, offering = 0, gold = null, ttmp = null, u_in_beartrap = 0, beartrap = null, nodig = 0, qsfx = new Int8Array(128), one = 0;
@@ -3526,6 +3802,9 @@ export async function floorfood(verb, corpsecheck) {   // eat.c:3579
 }
 /* Side effects of vomiting */
 /* added nomul (MRS) - it makes sense, you're too busy being sick! */
+/**
+ * @returns {Promise<void>}
+ */
 export async function vomit() {   // eat.c:3736
     let spewed = 0, mattk = null;
     /* A good idea from David Neves */
@@ -3575,6 +3854,11 @@ export async function vomit() {   // eat.c:3736
         }
     }
 }
+/**
+ * @param {number} base int
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function eaten_stat(base, obj) {   // eat.c:3788
     let uneaten_amt = 0, full_amount = 0;
     /* get full_amount first; obj_nutrition() might modify obj->oeaten */
@@ -3588,6 +3872,11 @@ export async function eaten_stat(base, obj) {   // eat.c:3788
     return base < 1 ? 1 : base;
 }
 /* reduce obj's oeaten field, making sure it never hits or passes 0 */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} amt int
+ * @returns {Promise<void>}
+ */
 export async function consume_oeaten(obj, amt) {   // eat.c:3808
     let itembuf = new Int8Array(40), otyp = 0;
     if (!obj_nutrition(obj)) {
@@ -3648,6 +3937,10 @@ export async function consume_oeaten(obj, amt) {   // eat.c:3808
 }
 /* called when eatfood occupation has been interrupted,
    or in the case of theft, is about to be interrupted */
+/**
+ * @param {number} stopping boolean
+ * @returns {Promise<number>} boolean
+ */
 export async function maybe_finished_meal(stopping) {   // eat.c:3877
     /* in case consume_oeaten() has decided that the food is all gone */
     if (go.occupation === eatfood && svc.context.victual.usedtime >= svc.context.victual.reqtime) {
@@ -3661,6 +3954,10 @@ export async function maybe_finished_meal(stopping) {   // eat.c:3877
     return FALSE;
 }
 /* called by revive(); sort of the opposite of maybe_finished_meal() */
+/**
+ * @param {$T.obj | null} corpse struct obj *
+ * @returns {Promise<void>}
+ */
 export async function cant_finish_meal(corpse) {   // eat.c:3893
     /*
      * When a corpse gets resurrected, the makemon() for that might
@@ -3685,6 +3982,10 @@ export async function cant_finish_meal(corpse) {   // eat.c:3893
    We don't care about consumption of non-tinned food here because special
    effects there take place on first bite rather than at end of occupation.
    [Popeye the Sailor gets out of trouble by eating tins of spinach. :-] */
+/**
+ * @param {number} threat int
+ * @returns {number} boolean
+ */
 export function Popeye(threat) {   // eat.c:3920
     let otin = null, mndx = 0;
     if (go.occupation !== opentin) {
@@ -3722,6 +4023,9 @@ export function Popeye(threat) {   // eat.c:3920
 }
 /* the hero has swallowed a monster whole as a purple worm or similar, and has
    finished digesting its corpse (called via ga.afternmv) */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function Finish_digestion() {   // eat.c:3961
     if (gc.corpsenm_digested !== NON_PM) {
         await cpostfx(gc.corpsenm_digested);

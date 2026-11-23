@@ -112,6 +112,9 @@ const mbodypart$fish_parts = $c.nulls(19);   // static in mbodypart()
 const mbodypart$not_claws = new Int8Array(11);   // static in mbodypart()
 const no_longer_petrify_resistant = new Int8Array(33);
 /* update the gy.youmonst.data structure pointer and intrinsics */
+/**
+ * @returns {Promise<void>}
+ */
 export async function set_uasmon() {   // polyself.c:38
     let mdat = null, was_vampshifter = 0, save_uwep = null;
     mdat = $c.relem(mons, u.umonnum);
@@ -376,6 +379,10 @@ export function steed_vs_stealth() {   // polyself.c:158
     }
 }
 /* for changing into form that's immune to strangulation */
+/**
+ * @param {number} on boolean
+ * @returns {Promise<void>}
+ */
 async function check_strangling(on) {   // polyself.c:168
     let was_strangled = 0;
     /* on -- maybe resume strangling */
@@ -399,6 +406,11 @@ async function check_strangling(on) {   // polyself.c:168
     }
 }
 /* make a (new) human out of the player */
+/**
+ * @param {$c.Ptr | null} fmt const char *
+ * @param {$c.Ptr | null} arg const char *
+ * @returns {Promise<void>}
+ */
 async function polyman(fmt, arg) {   // polyself.c:200
     let sticking = 0, was_mimicking = 0, was_blind = 0, had_see_invis = 0, kptr = null, $t1;
     sticking = $c.i8(sticks(gy.youmonst.data) && u.ustuck && !u.uswallow ? 1 : 0);
@@ -463,6 +475,9 @@ async function polyman(fmt, arg) {   // polyself.c:200
     }
     await see_monsters();
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function change_sex() {   // polyself.c:273
     /* Some monsters are always of one sex and their sex can't be changed;
      * Succubi/incubi can change, but are handled below.
@@ -492,6 +507,12 @@ export async function change_sex() {   // polyself.c:273
     }
 }
 /* log a message if non-poly'd hero's gender has changed */
+/**
+ * @param {number} viapoly boolean
+ * @param {number} oldgend int
+ * @param {number} newgend int
+ * @returns {Promise<void>}
+ */
 export async function livelog_newform(viapoly, oldgend, newgend) {   // polyself.c:307
     let buf = new Int8Array(256), oldrole = null, oldrank = null, newrole = null, newrank = null;
     /*
@@ -509,6 +530,9 @@ export async function livelog_newform(viapoly, oldgend, newgend) {   // polyself
         }
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function newman() {   // polyself.c:336
     let newform = null, i = 0, oldlvl = 0, newlvl = 0, oldgend = 0, newgend = 0, hpmax = 0, enmax = 0, $goto = null, $t1, $t2, $t3, $t4;
     D1: for (;;) {
@@ -645,6 +669,10 @@ async function newman() {   // polyself.c:336
         break;
     }
 }
+/**
+ * @param {number} psflags int
+ * @returns {Promise<void>}
+ */
 export async function polyself(psflags) {   // polyself.c:469
     let buf = new Int8Array(256), old_light = 0, new_light = 0, mntmp = Int32Array.of(0), class_ = 0, tryct = 0, gvariant = Int32Array.of(0), forcecontrol = 0, low_control = 0, monsterpoly = 0, formrevert = 0, draconian = 0, iswere = 0, isvamp = 0, controllable_poly = 0, pm_name = null, was_lit = 0, arm_light = 0, $goto = null;
     D1: for (;;) {
@@ -904,6 +932,10 @@ export async function polyself(psflags) {   // polyself.c:469
     }
 }
 /* (try to) make a mntmp monster out of the player; return 1 if successful */
+/**
+ * @param {number} mntmp int
+ * @returns {Promise<number>} int
+ */
 export async function polymon(mntmp) {   // polyself.c:735
     let buf = new Int8Array(256), ustuckNam = new Int8Array(256), sticking = 0, was_blind = 0, dochange = 0, was_expelled = 0, was_hiding_under = 0, mlvl = 0, newMaxStr = 0, usiz = 0, expels_mesg = 0, uptr = null, might_hide = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
     sticking = $c.i8(sticks(gy.youmonst.data) && u.ustuck && !u.uswallow ? 1 : 0);
@@ -1215,6 +1247,9 @@ export async function polymon(mntmp) {   // polyself.c:735
 /* determine hero's temporary strength value used while polymorphed;
    hero poly'd into M2_STRONG monster usually gets 18/100 strength but
    there are exceptions; non-M2_STRONG get maximum strength set to 18 */
+/**
+ * @returns {number} schar
+ */
 export function uasmon_maxStr() {   // polyself.c:1077
     let R = null, newMaxStr = 0, mndx = 0, ptr = null, live_H = 0;
     mndx = u.umonnum;
@@ -1252,6 +1287,10 @@ export function uasmon_maxStr() {   // polyself.c:1077
     return $c.i8(newMaxStr);
 }
 /* dropx() jacket for break_armor() */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function dropp(obj) {   // polyself.c:1123
     let otmp = null;
     /*
@@ -1282,6 +1321,9 @@ async function dropp(obj) {   // polyself.c:1123
         }
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function break_armor() {   // polyself.c:1157
     let otmp = null, uptr = null, hornbuf = new Int8Array(256), l = 0, eyewear = null;
     uptr = gy.youmonst.data;
@@ -1425,6 +1467,10 @@ async function break_armor() {   // polyself.c:1157
     }
     /* rings stay worn even when no hands */
 }
+/**
+ * @param {number} alone int
+ * @returns {Promise<void>}
+ */
 async function drop_weapon(alone) {   // polyself.c:1305
     let otmp = null, what = null, which = null, whichtoo = null, candropwep = 0, candropswapwep = 0, updateinv = 0;
     updateinv = TRUE;
@@ -1483,6 +1529,9 @@ async function drop_weapon(alone) {   // polyself.c:1305
 }
 /* return to original form, usually either due to polymorph timing out
    or dying from loss of hit points while being polymorphed */
+/**
+ * @returns {Promise<void>}
+ */
 export async function rehumanize() {   // polyself.c:1367
     let was_flying = 0;
     was_flying = $c.i8(((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked ? 1 : 0) !== 0 ? 1 : 0);
@@ -1531,6 +1580,9 @@ export async function rehumanize() {   // polyself.c:1367
         await selftouch(new $c.Ptr(no_longer_petrify_resistant, 0));
     }
 }
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dobreathe() {   // polyself.c:1421
     let mattk = null;
     if (Strangled()) {
@@ -1556,6 +1608,9 @@ export async function dobreathe() {   // polyself.c:1421
     }
     return ECMD.TIME;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dospit() {   // polyself.c:1450
     let otmp = null, mattk = null;
     if (!await getdir(null)) {
@@ -1582,6 +1637,9 @@ export async function dospit() {   // polyself.c:1450
     }
     return ECMD.TIME;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doremove() {   // polyself.c:1481
     if (!Punished()) {
         if (u.utrap && u.utraptype === TT.BURIEDBALL) {
@@ -1594,6 +1652,9 @@ export async function doremove() {   // polyself.c:1481
     await unpunish();
     return ECMD.TIME;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dospinweb() {   // polyself.c:1497
     let x = 0, y = 0, ttmp = null, reject_terrain = 0, i = 0, sweep = new Int8Array(30);
     x = u.ux;
@@ -1715,6 +1776,9 @@ export async function dospinweb() {   // polyself.c:1497
     }
     return ECMD.TIME;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dosummon() {   // polyself.c:1624
     let placeholder = Int32Array.of(0);
     if (u.uen < 10) {
@@ -1730,6 +1794,9 @@ export async function dosummon() {   // polyself.c:1624
     }
     return ECMD.TIME;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dogaze() {   // polyself.c:1642
     let mtmp = null, looked = 0, qbuf = new Int8Array(128), i = 0, adtyp = 0, dmg = 0, orig_dmg = 0, lev = 0;
     looked = 0;
@@ -1853,6 +1920,9 @@ export async function dogaze() {   // polyself.c:1642
     return ECMD.TIME;
 }
 /* called by domonability() for #monster */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dohide() {   // polyself.c:1777
     let ismimic = 0, on_ceiling = 0, ct = 0, otmp = null, otop = null, kbuf = new Int8Array(256), corpse_name = null;
     ismimic = $c.i8(gy.youmonst.data.mlet === S.MIMIC ? 1 : 0);
@@ -1939,6 +2009,9 @@ export async function dohide() {   // polyself.c:1777
     await youhiding(FALSE, 0);   /* "you are now hiding" */
     return ECMD.TIME;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dopoly() {   // polyself.c:1877
     let savedat = null;
     savedat = gy.youmonst.data;
@@ -1952,6 +2025,9 @@ export async function dopoly() {   // polyself.c:1877
     return ECMD.TIME;
 }
 /* #monster for hero-as-mind_flayer giving psychic blast */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function domindblast() {   // polyself.c:1894
     let mtmp = null, nmon = null, dmg = 0, u_sen = 0;
     if (u.uen < 10) {
@@ -1993,6 +2069,9 @@ export async function domindblast() {   // polyself.c:1894
     }
     return ECMD.TIME;
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function uunstick() {   // polyself.c:1941
     let mtmp = null;
     mtmp = u.ustuck;
@@ -2003,6 +2082,10 @@ export async function uunstick() {   // polyself.c:1941
     await set_ustuck(null);   /* before pline() */
     await pline($c.lit("%s is no longer in your clutches."), await Monnam(mtmp));
 }
+/**
+ * @param {number} silently boolean
+ * @returns {Promise<void>}
+ */
 export async function skinback(silently) {   // polyself.c:1954
     let old_light = 0;
     if ($G.uskin) {
@@ -2019,6 +2102,11 @@ export async function skinback(silently) {   // polyself.c:1954
         }
     }
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} part int
+ * @returns {Promise<$c.Ptr | null>} const char *
+ */
 export async function mbodypart(mon, part) {   // polyself.c:1972
     let mptr = null;
     /* claw attacks are overloaded in mons[]; most humanoids with
@@ -2116,9 +2204,16 @@ export async function mbodypart(mon, part) {   // polyself.c:1972
     }
     return mbodypart$animal_parts[part];
 }
+/**
+ * @param {number} part int
+ * @returns {Promise<$c.Ptr | null>} const char *
+ */
 export async function body_part(part) {   // polyself.c:2143
     return await mbodypart(gy.youmonst, part);
 }
+/**
+ * @returns {number} int
+ */
 export function poly_gender() {   // polyself.c:2149
     /* Returns gender of polymorphed player;
      * 0/1=same meaning as flags.female, 2=none.
@@ -2128,6 +2223,11 @@ export function poly_gender() {   // polyself.c:2149
     }
     return flags.female;
 }
+/**
+ * @param {number} damtype int
+ * @param {number} dam int
+ * @returns {Promise<void>}
+ */
 export async function ugolemeffects(damtype, dam) {   // polyself.c:2160
     let heal = 0;
     heal = 0;
@@ -2160,6 +2260,10 @@ export async function ugolemeffects(damtype, dam) {   // polyself.c:2160
         await exercise(A.STR, TRUE);
     }
 }
+/**
+ * @param {number} atyp int
+ * @returns {number} int
+ */
 function armor_to_dragon(atyp) {   // polyself.c:2191
     switch (atyp) {
         case GRAY_DRAGON_SCALE_MAIL:
@@ -2223,10 +2327,16 @@ function polysense() {   // polyself.c:2236
     }
 }
 /* True iff hero's role or race has been genocided */
+/**
+ * @returns {number} boolean
+ */
 export function ugenocided() {   // polyself.c:2265
     return $c.i8(svm.mvitals[gu.urole.mnum].mvflags & G_GENOD || svm.mvitals[gu.urace.mnum].mvflags & G_GENOD ? 1 : 0);
 }
 /* how hero feels "inside" after self-genocide of role or race */
+/**
+ * @returns {$c.Ptr | null} const char *
+ */
 export function udeadinside() {   // polyself.c:2273
     /* self-genocide used to always say "you feel dead inside" but that
        seems silly when you're polymorphed into something undead;

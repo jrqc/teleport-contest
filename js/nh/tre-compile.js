@@ -54,6 +54,10 @@ import { tre_mem_alloc_impl, tre_mem_destroy, tre_mem_new_impl } from './tre-mem
 import { tre_parse } from './tre-parse.js';
 import { tre_stack_destroy, tre_stack_new, tre_stack_num_items, tre_stack_pop_int, tre_stack_pop_voidptr, tre_stack_push_int, tre_stack_push_voidptr } from './tre-stack.js';
 
+/**
+ * @param {number} val void *
+ * @returns {number} void *
+ */
 function xlocale_retain(val) {   // xlocale_private.h:96
     let obj = 0;
     obj = val;
@@ -63,6 +67,9 @@ function xlocale_retain(val) {   // xlocale_private.h:96
     $h.i32[obj >>> 2] = $h.i32[obj >>> 2] + 1 | 0;
     return val;
 }
+/**
+ * @param {number} val void *
+ */
 function xlocale_release(val) {   // xlocale_private.h:107
     let obj = 0;
     obj = val;
@@ -75,9 +82,16 @@ function xlocale_release(val) {   // xlocale_private.h:107
         }
     }
 }
+/**
+ * @returns {number} locale_t
+ */
 function __current_locale() {   // xlocale_private.h:122
     return __global_locale;
 }
+/**
+ * @param {number} __loc locale_t
+ * @returns {number} locale_t
+ */
 function __locale_ptr(__loc) {   // xlocale_private.h:128
     if (__loc === 0) {
         __loc = $h.u32[_c_locale >>> 2];
@@ -97,6 +111,14 @@ function __locale_ptr(__loc) {   // xlocale_private.h:128
 /* Merge the tre_last_matched_branch_pre_t of src into dst, creating a new
    one if needed.  If tag_id > 0, add that tag as well (a negative tag_id will
    create an unset tre_last_matched_branch_pre_t. */
+/**
+ * @param {number} mem tre_mem_t
+ * @param {number} dst tre_ast_node_t *
+ * @param {number} src tre_ast_node_t *
+ * @param {number} tag_id int
+ * @param {number} num_tags int
+ * @returns {number} reg_errcode_t
+ */
 function tre_merge_branches(mem, dst, src, tag_id, num_tags) {   // tre-compile.c:206
     let db = 0, sb = 0, l = 0, r = 0, i = 0, u = 0, $t1, $t2, $t3, $t4, $t5;
     db = $h.u32[(dst + 8) >>> 2];
@@ -156,6 +178,12 @@ function tre_merge_branches(mem, dst, src, tag_id, num_tags) {   // tre-compile.
 /* Inserts a catenation node to the root of the tree given in `node'.
    As the left child a new tag with number `tag_id' to `node' is added,
    and the right child is the old root. */
+/**
+ * @param {number} mem tre_mem_t
+ * @param {number} node tre_ast_node_t *
+ * @param {number} tag_id int
+ * @returns {number} reg_errcode_t
+ */
 function tre_add_tag_left(mem, node, tag_id) {   // tre-compile.c:280
     let c = 0, $t1, $t2;
     do {
@@ -185,6 +213,12 @@ function tre_add_tag_left(mem, node, tag_id) {   // tre-compile.c:280
 /* Inserts a catenation node to the root of the tree given in `node'.
    As the right child a new tag with number `tag_id' to `node' is added,
    and the left child is the old root. */
+/**
+ * @param {number} mem tre_mem_t
+ * @param {number} node tre_ast_node_t *
+ * @param {number} tag_id int
+ * @returns {number} reg_errcode_t
+ */
 function tre_add_tag_right(mem, node, tag_id) {   // tre-compile.c:311
     let c = 0, $t1, $t2;
     do {
@@ -213,6 +247,11 @@ function tre_add_tag_right(mem, node, tag_id) {   // tre-compile.c:311
 }
 /* Go through `regset' and set submatch data for submatches that are
    using this tag. */
+/**
+ * @param {number} regset unsigned int *
+ * @param {number} tnfa tre_tnfa_t *
+ * @param {number} tag int
+ */
 function tre_purge_regset(regset, tnfa, tag) {   // tre-compile.c:365
     let i = 0, id = 0, start = 0;
     for (i = 0; $h.u32[(regset + i * 4) >>> 2] !== 4294967295; i = i + 1 | 0) {
@@ -233,6 +272,13 @@ function tre_purge_regset(regset, tnfa, tag) {   // tre-compile.c:365
 }
 /* Adds tags to appropriate locations in the parse tree in `tree', so that
    subexpressions marked for submatch addressing can be traced. */
+/**
+ * @param {number} mem tre_mem_t
+ * @param {number} stack tre_stack_t *
+ * @param {number} tree tre_ast_node_t *
+ * @param {number} tnfa tre_tnfa_t *
+ * @returns {number} reg_errcode_t
+ */
 function tre_add_tags(mem, stack, tree, tnfa) {   // tre-compile.c:394
     let status = 0, symbol = 0, node = 0, bottom = 0, first_pass = 0, regset = 0, orig_regset = 0, regset_contains = 0, num_tags = 0, num_minimals = 0, tag = 0, next_tag = 0, minimal_tag = 0, reorder_tags = 0, rtp = 0, to_reorder = 0, id = 0, direction = 0, top_union = 0, i = 0, i$2 = 0, i$3 = 0, lit = 0, b = 0, t = 0, cat = 0, left = 0, right = 0, reserved_tag = 0, iter = 0, uni = 0, left$2 = 0, right$2 = 0, front_tag = 0, n = 0, last = 0, iter$2 = 0, orig = 0, enter_tag = 0, b$2 = 0, u = 0, _name = 0, _byte = 0, _nbits = 0, _stopbyte = 0, _value = 0, u$2 = 0, e = 0, new_tag = 0, cat$2 = 0, added_tags = 0, orig$2 = 0, uni$2 = 0, lb = 0, rb = 0, lu = 0, ru = 0, u$3 = 0, b$3 = 0, b$4 = 0, u$4 = 0, start_tag = 0, i$4 = 0, j = 0, high = 0, low = 0, ti = 0, need_reorder = 0, i$5 = 0, new_tag_directions = 0, lit$2 = 0, uni$3 = 0, cat$3 = 0, iter$3 = 0, buf = 0, b$5 = 0, bb = 0, bp = 0, u$5 = 0, uu = 0, up = 0, t$2 = 0, i$6 = 0, n$2 = 0, $goto = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8;
     status = 0;
@@ -1488,6 +1534,17 @@ function tre_add_tags(mem, stack, tree, tnfa) {   // tre-compile.c:394
     return status;
 }
 /* Flags for tre_copy_ast(). */
+/**
+ * @param {number} mem tre_mem_t
+ * @param {number} stack tre_stack_t *
+ * @param {number} ast tre_ast_node_t *
+ * @param {number} flags int
+ * @param {number} pos_add int *
+ * @param {number} tag_directions tre_tag_direction_t *
+ * @param {number} copy tre_ast_node_t **
+ * @param {number} max_pos int *
+ * @returns {number} reg_errcode_t
+ */
 function tre_copy_ast(mem, stack, ast, flags, pos_add, tag_directions, copy, max_pos) {   // tre-compile.c:1660
     let status = 0, bottom = 0, num_copied = 0, first_tag = 0, result = 0, symbol = 0, node = 0, lit = 0, pos = 0, min = 0, max = 0, list = 0, uni = 0, tmp = 0, cat = 0, tmp$2 = 0, iter = 0, $t1, $t2, $t3, $t4;
     status = 0;
@@ -1686,6 +1743,14 @@ function tre_copy_ast(mem, stack, ast, flags, pos_add, tag_directions, copy, max
 }
 /* Expands each iteration node that has a finite nonzero minimum or maximum
    iteration count to a catenated sequence of copies of the node. */
+/**
+ * @param {number} mem tre_mem_t
+ * @param {number} stack tre_stack_t *
+ * @param {number} ast tre_ast_node_t *
+ * @param {number} tag_directions tre_tag_direction_t *
+ * @param {number} max_depth int *
+ * @returns {number} reg_errcode_t
+ */
 function tre_expand_ast(mem, stack, ast, tag_directions, max_depth) {   // tre-compile.c:1814
     let status = 0, bottom = 0, pos_add_total = 0, iter_depth = 0, _status = 0, _status$2 = 0, node = 0, symbol = 0, lit = 0, uni = 0, cat = 0, iter = 0, iter$2 = 0, pos_add_last = 0, empty = 0, seq1 = 0, j = 0, pos_add_save = 0, flags = 0, tmp = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(32);
@@ -1954,6 +2019,10 @@ function tre_expand_ast(mem, stack, ast, tag_directions, max_depth) {   // tre-c
         return status;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} mem tre_mem_t
+ * @returns {number} tre_pos_and_tags_t *
+ */
 function tre_set_empty(mem) {   // tre-compile.c:2074
     let new_set = 0;
     new_set = tre_mem_alloc_impl(mem, 0, 0, 1, 64);
@@ -1965,6 +2034,15 @@ function tre_set_empty(mem) {   // tre-compile.c:2074
     $h.i32[(new_set + 8) >>> 2] = -1;
     return new_set;
 }
+/**
+ * @param {number} mem tre_mem_t
+ * @param {number} position int
+ * @param {number | bigint} code_min long
+ * @param {number | bigint} code_max long
+ * @param {number} bracket_match_list tre_bracket_match_list_t *
+ * @param {number} backref int
+ * @returns {number} tre_pos_and_tags_t *
+ */
 function tre_set_one(mem, position, code_min, code_max, bracket_match_list, backref) {   // tre-compile.c:2090
     let new_set = 0;
     new_set = tre_mem_alloc_impl(mem, 0, 0, 1, 128);
@@ -1981,6 +2059,15 @@ function tre_set_one(mem, position, code_min, code_max, bracket_match_list, back
     $h.i32[(new_set + 64 + 8) >>> 2] = -1;
     return new_set;
 }
+/**
+ * @param {number} mem tre_mem_t
+ * @param {number} set1 tre_pos_and_tags_t *
+ * @param {number} set2 tre_pos_and_tags_t *
+ * @param {number} tags int *
+ * @param {number} assertions int
+ * @param {number} params int *
+ * @returns {number} tre_pos_and_tags_t *
+ */
 function tre_set_union(mem, set1, set2, tags, assertions, params) {   // tre-compile.c:2112
     let s1 = 0, s2 = 0, i = 0, j = 0, new_set = 0, new_tags = 0, num_tags = 0, $t1, $t2;
     for (num_tags = 0; tags !== 0 && $h.i32[(tags + num_tags * 4) >>> 2] >= 0; num_tags = num_tags + 1 | 0) {
@@ -2086,6 +2173,16 @@ function tre_set_union(mem, set1, set2, tags, assertions, params) {   // tre-com
    taken according to POSIX.2 rules, and adds the tags on that path to
    `tags'.   `tags' may be NULL.  If `num_tags_seen' is not NULL, it is
    set to the number of tags seen on the path. */
+/**
+ * @param {number} stack tre_stack_t *
+ * @param {number} node tre_ast_node_t *
+ * @param {number} tags int *
+ * @param {number} assertions int *
+ * @param {number} params int *
+ * @param {number} num_tags_seen int *
+ * @param {number} params_seen int *
+ * @returns {number} reg_errcode_t
+ */
 function tre_match_empty(stack, node, tags, assertions, params, num_tags_seen, params_seen) {   // tre-compile.c:2219
     let lit = 0, uni = 0, cat = 0, iter = 0, i = 0, bottom = 0, status = 0;
     bottom = tre_stack_num_items(stack);
@@ -2205,6 +2302,13 @@ function tre_match_empty(stack, node, tags, assertions, params, num_tags_seen, p
    and `lastpos' for the nodes of the AST `tree'; `nextpos' points to an
    integer indicating the next available position, and will be updated on
    return to reflect the number of additional positions assigned. */
+/**
+ * @param {number} mem tre_mem_t
+ * @param {number} stack tre_stack_t *
+ * @param {number} tree tre_ast_node_t *
+ * @param {number} nextpos int *
+ * @returns {number} reg_errcode_t
+ */
 function tre_compute_npfl(mem, stack, tree, nextpos) {   // tre-compile.c:2340
     let bottom = 0, _status = 0, _status$2 = 0, symbol = 0, node = 0, lit = 0, _status$3 = 0, _status$4 = 0, _status$5 = 0, _status$6 = 0, _status$7 = 0, _status$8 = 0, _status$9 = 0, _status$10 = 0, _status$11 = 0, _status$12 = 0, _status$13 = 0, _status$14 = 0, _status$15 = 0, _status$16 = 0, _status$17 = 0, _status$18 = 0, uni = 0, tags = 0, params = 0, status = 0, iter = 0, tags$2 = 0, params$2 = 0, status$2 = 0, cat = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13, $t14, $t15;
     const $sp0 = $h.st.sp, $fp = $h.enter(24);
@@ -2561,6 +2665,14 @@ function tre_compute_npfl(mem, stack, tree, nextpos) {   // tre-compile.c:2340
     } finally { $h.st.sp = $sp0; }
 }
 /* Adds a transition from each position in `p1' to each position in `p2'. */
+/**
+ * @param {number} p1 tre_pos_and_tags_t *
+ * @param {number} p2 tre_pos_and_tags_t *
+ * @param {number} transitions tre_tnfa_transition_t *
+ * @param {number} counts int *
+ * @param {number} offs int *
+ * @returns {number} reg_errcode_t
+ */
 function tre_make_trans(p1, p2, transitions, counts, offs) {   // tre-compile.c:2669
     let orig_p2 = 0, trans = 0, i = 0, j = 0, k = 0, l = 0, dup = 0, prev_p2_pos = 0, $t1, $t2, $t3, $t4;
     orig_p2 = p2;
@@ -2713,6 +2825,13 @@ function tre_make_trans(p1, p2, transitions, counts, offs) {   // tre-compile.c:
    labelled with one character range (there are no transitions on empty
    strings).  The TNFA takes O(n^2) space in the worst case, `n' is size of
    the regexp. */
+/**
+ * @param {number} node tre_ast_node_t *
+ * @param {number} transitions tre_tnfa_transition_t *
+ * @param {number} counts int *
+ * @param {number} offs int *
+ * @returns {number} reg_errcode_t
+ */
 function tre_ast_to_tnfa(node, transitions, counts, offs) {   // tre-compile.c:2879
     let uni = 0, cat = 0, iter = 0, errcode = 0;
     errcode = 0;
@@ -2761,6 +2880,14 @@ function tre_ast_to_tnfa(node, transitions, counts, offs) {   // tre-compile.c:2
 }
 /*CONSTCOND*/
 /*CONSTCOND*/
+/**
+ * @param {number} preg regex_t *
+ * @param {number} regex const tre_char_t *
+ * @param {number | bigint} n size_t
+ * @param {number} cflags int
+ * @param {number} loc locale_t
+ * @returns {number} int
+ */
 export function tre_compile(preg, regex, n, cflags, loc) {   // tre-compile.c:2946
     let stack = 0, tree = 0, tmp_ast_l = 0, tmp_ast_r = 0, p = 0, counts = 0, offs = 0, i = 0, add = 0, transitions = 0, initial = 0, tnfa = 0, submatch_data = 0, tag_directions = 0, errcode = 0, mem = 0, scanning = 0, j = 0, j$2 = 0, $t1, $t2, $t3, $t4;
     const $sp0 = $h.st.sp, $fp = $h.enter(144);
@@ -3132,6 +3259,9 @@ export function tre_compile(preg, regex, n, cflags, loc) {   // tre-compile.c:29
         return errcode;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} preg regex_t *
+ */
 export function tre_free(preg) {   // tre-compile.c:3346
     let tnfa = 0, i = 0, trans = 0;
     $h.i32[preg >>> 2] = 0;

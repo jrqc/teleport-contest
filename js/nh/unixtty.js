@@ -21,6 +21,10 @@ import { exit_nhwindows, raw_print } from './winprocs.macros.js';
 let settty_needed = 0;
 export const inittyb = new $T.termios();
 export const curttyb = new $T.termios();
+/**
+ * @param {number | bigint} speed speed_t
+ * @returns {number} int
+ */
 function speednum(speed) {   // unixtty.c:157
     switch (speed) {
         case 0:
@@ -101,6 +105,10 @@ export function gettty() {   // unixtty.c:214
     settty_needed = 1;
 }
 /* reset terminal to original state */
+/**
+ * @param {$c.Ptr | null} s const char *
+ * @returns {Promise<void>}
+ */
 export async function settty(s) {   // unixtty.c:247
     if (windowprocs.wp_id === wp_tty) {
         await term_end_screen();
@@ -195,6 +203,11 @@ export function introff() {   // unixtty.c:350
 /* __linux__ */
 /* the Be GUI will define its own error proc */
 /* fatal error */
+/**
+ * @param {$c.Ptr | null} s const char *
+ * @param {...*} $va the C variable arguments (...)
+ * @returns {Promise<void>}
+ */
 export async function error(s, ...$va) {   // unixtty.c:489
     let the_args = null;
     the_args = new $c.VaList($va);

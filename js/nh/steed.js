@@ -70,16 +70,27 @@ import { Blind, Blind_telepat, Fumbling, Glib, Hallucination, Lev_at_will, Levit
 /* Monsters that might be ridden */
 const steeds = new Int8Array(7);
 /* caller has decided that hero can't reach something while mounted */
+/**
+ * @returns {Promise<void>}
+ */
 export async function rider_cant_reach() {   // steed.c:17
     await You($c.lit("aren't skilled enough to reach from %s."), await y_monnam(u.usteed));
 }
 /*** Putting the saddle on ***/
 /* Can this monster wear a saddle? */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number} boolean
+ */
 export function can_saddle(mtmp) {   // steed.c:26
     let ptr = null;
     ptr = mtmp.data;
     return $c.i8($c.strchr(new $c.Ptr(steeds, 0), ptr.mlet) && ptr.msize >= MZ.MEDIUM && (!humanoid(ptr) || ptr.mlet === S.CENTAUR) && !amorphous(ptr) && !noncorporeal(ptr) && !is_whirly(ptr) && !unsolid(ptr) ? 1 : 0);
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function use_saddle(otmp) {   // steed.c:36
     let mtmp = null, ptr = null, chance = 0, kbuf = new Int8Array(256);
     if (!await u_handsy()) {
@@ -174,6 +185,11 @@ export async function use_saddle(otmp) {   // steed.c:36
     }
     return ECMD.TIME;
 }
+/**
+ * @param {$T.obj | null} saddle struct obj *
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function put_saddle_on_mon(saddle, mtmp) {   // steed.c:142
     if (!can_saddle(mtmp) || await which_armor(mtmp, W.SADDLE)) {
         if (saddle) {
@@ -199,10 +215,17 @@ export async function put_saddle_on_mon(saddle, mtmp) {   // steed.c:142
 }
 /*** Riding the monster ***/
 /* Can we ride this monster?  Caller should also check can_saddle() */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number} boolean
+ */
 export function can_ride(mtmp) {   // steed.c:169
     return $c.i8(mtmp.mtame && humanoid(gy.youmonst.data) && !verysmall(gy.youmonst.data) && !bigmonst(gy.youmonst.data) && (!Underwater() || is_swimmer(mtmp.data)) ? 1 : 0);
 }
 /* the #ride command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doride() {   // steed.c:178
     let forcemount = 0;
     forcemount = FALSE;
@@ -219,6 +242,11 @@ export async function doride() {   // steed.c:178
     return ECMD.TIME;
 }
 /* Start riding, with the given monster */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} force boolean
+ * @returns {Promise<number>} boolean
+ */
 export async function mount_steed(mtmp, force) {   // steed.c:197
     let otmp = null, buf = new Int8Array(256), ptr = null, qbuf = new Int8Array(128), kbuf = new Int8Array(256), t = null, was_stealthy = 0;
     /* The animal */
@@ -372,6 +400,9 @@ export async function mount_steed(mtmp, force) {   // steed.c:197
     return TRUE;
 }
 /* You and your steed have moved */
+/**
+ * @returns {Promise<void>}
+ */
 export async function exercise_steed() {   // steed.c:387
     if (!u.usteed) {
         return;
@@ -384,6 +415,9 @@ export async function exercise_steed() {   // steed.c:387
     return;
 }
 /* The player kicks or whips the steed */
+/**
+ * @returns {Promise<void>}
+ */
 export async function kick_steed() {   // steed.c:402
     let He = new Int8Array(256), $t1, $t2;
     /* monverbself() appends to the "He"/"She"/"It" value */
@@ -440,6 +474,12 @@ export async function kick_steed() {   // steed.c:402
  * enexto() chooses its point randomly, possibly even outside the
  * room's walls, which is not what we want.
  * Adapted from mail daemon code.
+ */
+/**
+ * @param {$T.nhcoord | null} spot coord *
+ * @param {number} reason int
+ * @param {number} forceit int
+ * @returns {Promise<number>} boolean
  */
 async function landing_spot(spot, reason, forceit) {   // steed.c:460
     let cc = new $T.nhcoord(), try_ = $c.recArray($T.nhcoord, 8), i = 0, j = 0, best_j = 0, clockwise_j = 0, counterclk_j = 0, n = 0, viable = 0, distance = 0, min_distance = 0, x = 0, y = 0, found = 0, impaird = 0, kn_trap = 0, boulder = 0, t = null, save_plnmsg = 0, $t1;
@@ -545,6 +585,10 @@ async function landing_spot(spot, reason, forceit) {   // steed.c:460
     return found;
 }
 /* Stop riding the current steed */
+/**
+ * @param {number} reason int
+ * @returns {Promise<void>}
+ */
 export async function dismount_steed(reason) {   // steed.c:576
     let mtmp = null, otmp = null, verb = null, cc = new $T.nhcoord(), steedcc = new $T.nhcoord(), save_utrap = 0, ulev = 0, ufly = 0, repair_leg_damage = 0, have_spot = 0, was_stealthy = 0, mdat = null;
     /* Player was thrown off etc. */
@@ -777,6 +821,10 @@ export async function dismount_steed(reason) {   // steed.c:576
 }
 /* when attempting to saddle or mount a sleeping steed, try to wake it up
    (for the saddling case, it won't be u.usteed yet) */
+/**
+ * @param {$T.monst | null} steed struct monst *
+ * @returns {Promise<void>}
+ */
 async function maybewakesteed(steed) {   // steed.c:827
     let frozen = 0, wasimmobile = 0;
     frozen = steed.mfrozen | 0;
@@ -800,6 +848,11 @@ async function maybewakesteed(steed) {   // steed.c:827
     await finish_meating(steed);
 }
 /* steed has taken on a new shape */
+/**
+ * @param {$T.monst | null} steed struct monst *
+ * @param {$T.permonst | null} oldshape struct permonst *
+ * @returns {Promise<void>}
+ */
 export async function poly_steed(steed, oldshape) {   // steed.c:852
     let buf = new Int8Array(256);
     if (!can_saddle(steed) || !can_ride(steed)) {
@@ -819,6 +872,10 @@ export async function poly_steed(steed, oldshape) {   // steed.c:852
 }
 /* decide whether hero's steed is able to move;
    doesn't check for holding traps--those affect the hero directly */
+/**
+ * @param {number} checkfeeding boolean
+ * @returns {Promise<number>} boolean
+ */
 export async function stucksteed(checkfeeding) {   // steed.c:878
     let steed = null;
     steed = u.usteed;
@@ -836,6 +893,12 @@ export async function stucksteed(checkfeeding) {   // steed.c:878
     }
     return FALSE;
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function place_monster(mon, x, y) {   // steed.c:898
     let othermon = null, monnm = null, othnm = null, buf = new Int8Array(128);
     buf[0] = 0;

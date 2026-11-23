@@ -91,6 +91,9 @@ const N_PER_BUCKET = 64;
 /* SFCTOOL */
 /* use colors from save file */
 /* Recalculate svl.level.objects[x][y], since this info was not saved. */
+/**
+ * @returns {Promise<void>}
+ */
 async function find_lev_obj() {   // restore.c:71
     let fobjtmp = null, otmp = null, x = 0, y = 0;
     fobjtmp = null;
@@ -129,6 +132,10 @@ async function find_lev_obj() {   // restore.c:71
 /* Things that were marked "in_use" when the game was saved (ex. via the
  * infamous "HUP" cheat) get used up here.
  */
+/**
+ * @param {number} quietly boolean
+ * @returns {Promise<void>}
+ */
 export async function inven_inuse(quietly) {   // restore.c:113
     let otmp = null, otmp2 = null;
     for (otmp = gi.invent; otmp; otmp = otmp2) {
@@ -142,6 +149,10 @@ export async function inven_inuse(quietly) {   // restore.c:113
     }
 }
 /* SFCTOOL */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 async function restlevchn(nhfp) {   // restore.c:130
     let cnt = Int32Array.of(0), tmplev = null, x = null;
     cnt[0] = 0;
@@ -160,6 +171,10 @@ async function restlevchn(nhfp) {   // restore.c:130
         tmplev.next = null;
     }
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 async function restdamage(nhfp) {   // restore.c:153
     let dmgcount = Uint32Array.of(0), counter = 0, tmp_dam = null, ghostly = 0;
     dmgcount[0] = 0;
@@ -181,6 +196,11 @@ async function restdamage(nhfp) {   // restore.c:153
     } while ((counter = counter - 1 | 0) > 0);
 }
 /* restore one object */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function restobj(nhfp, otmp) {   // restore.c:183
     let buflen = Int32Array.of(0), omid = Uint32Array.of(0), omailcmd = null, $t1, $t2;
     buflen[0] = 0;
@@ -222,6 +242,11 @@ async function restobj(nhfp, otmp) {   // restore.c:183
         otmp.oextra.omid = omid[0];
     }
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @param {number} frozen boolean
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 async function restobjchn(nhfp, frozen) {   // restore.c:231
     let otmp = null, otmp2 = null, first = null, buflen = Int32Array.of(0), ghostly = 0, nid = 0, otmp3 = null, $t1;
     otmp2 = null;
@@ -290,6 +315,11 @@ async function restobjchn(nhfp, frozen) {   // restore.c:231
     return first;
 }
 /* restore one monster */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 async function restmon(nhfp, mtmp) {   // restore.c:307
     let buflen = Int32Array.of(0), mc = Int32Array.of(0), $t1;
     buflen[0] = 0;
@@ -356,6 +386,10 @@ async function restmon(nhfp, mtmp) {   // restore.c:307
         mtmp.mextra.mcorpsenm = mc[0];
     }   /* mextra */
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<$T.monst | null>} struct monst *
+ */
 async function restmonchn(nhfp) {   // restore.c:376
     let mtmp = null, mtmp2 = null, first = null, buflen = Int32Array.of(0), offset = 0, ghostly = 0, nid = 0, mndx = 0, obj = null, obj$2 = null, $t1;
     mtmp2 = null;
@@ -430,6 +464,10 @@ async function restmonchn(nhfp) {   // restore.c:376
     }
     return first;
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<$T.fruit | null>} struct fruit *
+ */
 async function loadfruitchn(nhfp) {   // restore.c:468
     let flist = null, fnext = null;
     flist = null;
@@ -446,6 +484,9 @@ async function loadfruitchn(nhfp) {   // restore.c:468
     dealloc_fruit(fnext);
     return flist;
 }
+/**
+ * @param {$T.fruit | null} flist struct fruit *
+ */
 function freefruitchn(flist) {   // restore.c:487
     let fnext = null;
     while (flist) {
@@ -454,6 +495,10 @@ function freefruitchn(flist) {   // restore.c:487
         flist = fnext;
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function ghostfruit(otmp) {   // restore.c:500
     let oldf = null, $t1;
     for (oldf = go.oldfruit; oldf; oldf = oldf.nextf) {
@@ -468,6 +513,10 @@ async function ghostfruit(otmp) {   // restore.c:500
     }
 }
 /* !SFCTOOL */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<number>} boolean
+ */
 async function restgamestate(nhfp) {   // restore.c:525
     let i = 0, newgameflags = new $T.flag(), newgamecontext = new $T.context_info(), bc_obj = null, timebuf = new Int8Array(15), uid = [0], defer_perm_invent = 0, restoring_special = 0, otmp = null, nobj = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8;
     /* all 0, but has some pointers */
@@ -652,6 +701,10 @@ function restlevelstate() {   // restore.c:742
 /* after getlev(), put current level into a level/lock file;
    essential when splitting a save file into individual level files */
 /*ARGSUSED*/
+/**
+ * @param {number} ltmp xint8
+ * @returns {Promise<number>} int
+ */
 async function restlevelfile(ltmp) {   // restore.c:755
     let whynot = new Int8Array(256), nhfp = null;
     nhfp = null;
@@ -680,6 +733,10 @@ async function restlevelfile(ltmp) {   // restore.c:755
  *     current level (including pets)
  *     (non-level-based) game state
  *     other levels
+ */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<number>} int
  */
 export async function dorecover(nhfp) {   // restore.c:789
     let ltmp = Int8Array.of(0), rtmp = 0, tnhfp = null, $t1, $t2;
@@ -796,6 +853,10 @@ export async function dorecover(nhfp) {   // restore.c:789
     return 1;
 }
 /* !SFCTOOL */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 async function rest_stairs(nhfp) {   // restore.c:955
     let buflen = Int32Array.of(0), stway = new $T.stairway(), newst = null;
     buflen[0] = 0;
@@ -819,6 +880,11 @@ async function rest_stairs(nhfp) {   // restore.c:955
         }
     }
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @param {*} cemeteryaddr struct cemetery **
+ * @returns {Promise<void>}
+ */
 export async function restcemetery(nhfp, cemeteryaddr) {   // restore.c:988
     let bonesinfo = null, bonesaddr = null, cflag = Int32Array.of(0), thisbones = null, nextbones = null;
     cflag[0] = 0;
@@ -845,6 +911,10 @@ export async function restcemetery(nhfp, cemeteryaddr) {   // restore.c:988
     }
 }
 /*ARGSUSED*/
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 async function rest_levl(nhfp) {   // restore.c:1021
     let c = 0, r = 0;
     for (c = 0; c < COLNO; c = c + 1 | 0) {
@@ -853,6 +923,10 @@ async function rest_levl(nhfp) {   // restore.c:1021
         }
     }
 }
+/**
+ * @param {$c.Ptr | null} reason char *
+ * @returns {Promise<void>}
+ */
 export async function trickery(reason) {   // restore.c:1035
     await pline($c.lit("Strange, this map is not as I remember it."));
     await pline($c.lit("Somebody is trying some trickery here..."));
@@ -861,6 +935,12 @@ export async function trickery(reason) {   // restore.c:1035
     await done(TRICKED);
 }
 /* !SFCTOOL */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @param {number} pid int
+ * @param {number} lev xint8
+ * @returns {Promise<void>}
+ */
 export async function getlev(nhfp, pid, lev) {   // restore.c:1046
     let trap = null, mtmp = null, br = null, x = 0, y = 0, elapsed = 0, hpid = Int32Array.of(0), dlvl = Int8Array.of(0), i = 0, c = 0, r = 0, ghostly = 0, tmpc = null, trickbuf = new Int8Array(256), stway = null, cc = new $T.nhcoord(), dest = new $T.d_level(), ltmp = new $T.d_level(), ttmp = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
     elapsed = 0;
@@ -1090,11 +1170,17 @@ export function rest_adjust_levelflags() {   // restore.c:1314
     /* adjust timestamps */
     relative_time_to_moves(new $c.FieldRef(svl.level.flags, "stasis_until", "i64"));
 }
+/**
+ * @param {*} timestamp long *
+ */
 export function moves_to_relative_time(timestamp) {   // restore.c:1320
     let prevts = 0;
     prevts = timestamp.get(0);
     timestamp.set(0, $c.sub64(prevts, svm.moves));
 }
+/**
+ * @param {*} timestamp long *
+ */
 export function relative_time_to_moves(timestamp) {   // restore.c:1328
     let prevts = 0;
     prevts = timestamp.get(0);
@@ -1102,6 +1188,12 @@ export function relative_time_to_moves(timestamp) {   // restore.c:1328
 }
 /* "name-role-race-gend-algn" occurs very early in a save file; sometimes we
    want the whole thing, other times just "name" (for svp.plname[]) */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @param {$c.Ptr | null} outbuf char *
+ * @param {number} name_only boolean
+ * @returns {Promise<void>}
+ */
 export async function get_plname_from_file(nhfp, outbuf, name_only) {   // restore.c:1338
     let plbuf = new Int8Array(49), pltmpsiz = Int32Array.of(0);
     /* size must be at least [PL_NSIZ_PLUS] even if name_only */
@@ -1125,6 +1217,10 @@ export async function get_plname_from_file(nhfp, outbuf, name_only) {   // resto
     return;
 }
 /* restore Plane of Water's air bubbles and Plane of Air's clouds */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 async function rest_bubbles(nhfp) {   // restore.c:1369
     let bbubbly = Int8Array.of(0);
     /* whether or not the Plane of Water's air bubbles or Plane of Air's
@@ -1136,6 +1232,10 @@ async function rest_bubbles(nhfp) {   // restore.c:1369
         await restore_waterlevel(nhfp);
     }
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 async function restore_gamelog(nhfp) {   // restore.c:1390
     let slen = Int32Array.of(0), msg = new Int8Array(512), tmp = new $T.gamelog_line();
     slen[0] = 0;
@@ -1156,6 +1256,10 @@ async function restore_gamelog(nhfp) {   // restore.c:1390
         /* !SFCTOOL */
     }
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 async function restore_msghistory(nhfp) {   // restore.c:1415
     let msgsize = Int32Array.of(0), msgcount = 0, msg = new Int8Array(256), save_plnmsg = 0;
     msgsize[0] = 0;
@@ -1196,6 +1300,11 @@ function clear_id_mapping() {   // restore.c:1447
     gn.n_ids_mapped = 0;
 }
 /* Add a mapping to the ID map. */
+/**
+ * @param {number} gid unsigned int
+ * @param {number} nid unsigned int
+ * @returns {Promise<void>}
+ */
 async function add_id_mapping(gid, nid) {   // restore.c:1460
     let idx = 0, gnu = null;
     idx = $c.rem32(gn.n_ids_mapped, N_PER_BUCKET);
@@ -1214,6 +1323,11 @@ async function add_id_mapping(gid, nid) {   // restore.c:1460
  * Global routine to look up a mapping.  If found, return TRUE and fill
  * in the new ID value.  Otherwise, return false and return -1 in the new
  * ID.
+ */
+/**
+ * @param {number} gid unsigned int
+ * @param {*} nidp unsigned int *
+ * @returns {number} boolean
  */
 export function lookup_id_mapping(gid, nidp) {   // restore.c:1484
     let i = 0, curr = null;
@@ -1238,6 +1352,9 @@ export function lookup_id_mapping(gid, nidp) {   // restore.c:1484
     }
     return FALSE;
 }
+/**
+ * @param {number} ghostly boolean
+ */
 function reset_oattached_mids(ghostly) {   // restore.c:1510
     let otmp = null, oldid = 0, nid = Uint32Array.of(0), mtmp = null, $t1;
     for (otmp = svl.level.objlist; otmp; otmp = otmp.nobj) {
@@ -1258,6 +1375,10 @@ function reset_oattached_mids(ghostly) {   // restore.c:1510
 }
 /* put up a menu listing each character from this player's saved games;
    returns 1: use svp.plname[], 0: new game, -1: quit */
+/**
+ * @param {number} bannerwin winid
+ * @returns {Promise<number>} int
+ */
 export async function restore_menu(bannerwin) {   // restore.c:1536
     let tmpwin = 0, any = new $T.any(), saved = null, next = null, mode = 0, menutext = new Int8Array(256), all_normal = 0, chosen_game = [null], k = 0, clet = 0, ch = 0, clr = 0;
     /* if not WIN_ERR, clear window

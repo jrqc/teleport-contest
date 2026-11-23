@@ -26,6 +26,9 @@ const N_P2_ITER = 1;
 const N_P3_ITER = 2;
 
 const dirs = new Int32Array(16);
+/**
+ * @param {number} bg_typ schar
+ */
 function init_map(bg_typ) {   // mkmap.c:24
     let x = 0, y = 0;
     for (x = 1; x < COLNO; x = $c.i16(x + 1)) {
@@ -36,6 +39,10 @@ function init_map(bg_typ) {   // mkmap.c:24
         }
     }
 }
+/**
+ * @param {number} bg_typ schar
+ * @param {number} fg_typ schar
+ */
 function init_fill(bg_typ, fg_typ) {   // mkmap.c:37
     let x = 0, y = 0, limit = 0, count = 0;
     limit = 624;
@@ -49,12 +56,22 @@ function init_fill(bg_typ, fg_typ) {   // mkmap.c:37
         }
     }
 }
+/**
+ * @param {number} col coordxy
+ * @param {number} row coordxy
+ * @param {number} bg_typ schar
+ * @returns {number} schar
+ */
 function get_map(col, row, bg_typ) {   // mkmap.c:55
     if (col <= 0 || row < 0 || col > WIDTH || row >= HEIGHT) {
         return bg_typ;
     }
     return svl.level.locations[col][row].typ;
 }
+/**
+ * @param {number} bg_typ schar
+ * @param {number} fg_typ schar
+ */
 function pass_one(bg_typ, fg_typ) {   // mkmap.c:68
     let x = 0, y = 0, count = 0, dr = 0;
     for (x = 2; x <= WIDTH; x = $c.i16(x + 1)) {
@@ -83,6 +100,10 @@ function pass_one(bg_typ, fg_typ) {   // mkmap.c:68
         }
     }
 }
+/**
+ * @param {number} bg_typ schar
+ * @param {number} fg_typ schar
+ */
 function pass_two(bg_typ, fg_typ) {   // mkmap.c:101
     let x = 0, y = 0, count = 0, dr = 0, $t1;
     for (x = 2; x <= WIDTH; x = $c.i16(x + 1)) {
@@ -105,6 +126,10 @@ function pass_two(bg_typ, fg_typ) {   // mkmap.c:101
         }
     }
 }
+/**
+ * @param {number} bg_typ schar
+ * @param {number} fg_typ schar
+ */
 function pass_three(bg_typ, fg_typ) {   // mkmap.c:124
     let x = 0, y = 0, count = 0, dr = 0, $t1;
     for (x = 2; x <= WIDTH; x = $c.i16(x + 1)) {
@@ -132,6 +157,13 @@ function pass_three(bg_typ, fg_typ) {   // mkmap.c:124
  * have the same rm number as the current location.
  * if anyroom is TRUE, use IS_ROOM to check room membership instead of
  * exactly matching levl[sx][sy].typ and walls are included as well.
+ */
+/**
+ * @param {number} sx coordxy
+ * @param {number} sy coordxy
+ * @param {number} rmno int
+ * @param {number} lit boolean
+ * @param {number} anyroom boolean
  */
 export function flood_fill_rm(sx, sy, rmno, lit, anyroom) {   // mkmap.c:153
     let i = 0, nx = 0, fg_typ = 0, ii = 0, jj = 0;
@@ -230,6 +262,11 @@ function join_map_cleanup() {   // mkmap.c:246
     $t1 = gn.nsubroom = 0, svn.nroom = $t1;
     $t2 = $c.radd(gs.subrooms, gn.nsubroom).hx = -1, svr.rooms[svn.nroom].hx = $t2;
 }
+/**
+ * @param {number} bg_typ schar
+ * @param {number} fg_typ schar
+ * @returns {Promise<void>}
+ */
 async function join_map(bg_typ, fg_typ) {   // mkmap.c:258
     let croom = null, croom2 = null, x = 0, y = 0, sx = 0, sy = 0, sm = new $T.nhcoord(), em = new $T.nhcoord(), $t1, $t2;
     joinm$: {
@@ -293,6 +330,13 @@ async function join_map(bg_typ, fg_typ) {   // mkmap.c:258
     }
     join_map_cleanup();
 }
+/**
+ * @param {number} fg_typ schar
+ * @param {number} bg_typ schar
+ * @param {number} lit boolean
+ * @param {number} walled boolean
+ * @param {number} icedpools boolean
+ */
 function finish_map(fg_typ, bg_typ, lit, walled, icedpools) {   // mkmap.c:331
     let x = 0, y = 0;
     if (walled) {
@@ -335,6 +379,13 @@ function finish_map(fg_typ, bg_typ, lit, walled, icedpools) {   // mkmap.c:331
  * region are already cleared, and roomno and irregular fields outside the
  * region are all set.
  */
+/**
+ * @param {number} lx coordxy
+ * @param {number} ly coordxy
+ * @param {number} hx coordxy
+ * @param {number} hy coordxy
+ * @returns {Promise<void>}
+ */
 export async function remove_rooms(lx, ly, hx, hy) {   // mkmap.c:379
     let i = 0, croom = null;
     for (i = svn.nroom - 1 | 0; i >= 0; i = i - 1 | 0) {
@@ -362,6 +413,9 @@ export async function remove_rooms(lx, ly, hx, hy) {   // mkmap.c:379
  * been reset.
  * Currently handles only the removal of rooms that have no subrooms.
  */
+/**
+ * @param {number} roomno unsigned int
+ */
 function remove_room(roomno) {   // mkmap.c:412
     let croom = null, maxroom = null, x = 0, y = 0, oroomno = 0;
     croom = $c.relem(svr.rooms, roomno);
@@ -387,12 +441,20 @@ function remove_room(roomno) {   // mkmap.c:412
 /* tune map generation via this value */
 /* tune map generation via this value */
 /* tune map smoothing via this value */
+/**
+ * @param {number} litstate int
+ * @returns {number} boolean
+ */
 export function litstate_rnd(litstate) {   // mkmap.c:443
     if (litstate < 0) {
         return $c.i8(rnd(1 + $c.abs(depth(u.uz)) | 0) < 11 && rn2(77) ? TRUE : FALSE);
     }
     return $c.i8(litstate);
 }
+/**
+ * @param {$T.lev_init | null} init_lev lev_init *
+ * @returns {Promise<void>}
+ */
 export async function mkmap(init_lev) {   // mkmap.c:451
     let bg_typ = 0, fg_typ = 0, smooth = 0, join = 0, lit = 0, walled = 0, i = 0, $t1;
     bg_typ = init_lev.bg;

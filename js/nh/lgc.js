@@ -48,6 +48,10 @@ const sweepgen$nextage = $h.data(7, 1);   // static in sweepgen()
 /*
 ** one after last element in a hash array
 */
+/**
+ * @param {number} o GCObject *
+ * @returns {number} GCObject **
+ */
 function getgclist(o) {   // lgc.c:125
     let u = 0;
     switch ($h.u8[o + 8]) {
@@ -76,6 +80,11 @@ function getgclist(o) {   // lgc.c:125
 ** Link a collectable object 'o' with a known type into the list 'p'.
 ** (Must be a macro to access the 'gclist' field in different types.)
 */
+/**
+ * @param {number} o GCObject *
+ * @param {number} pnext GCObject **
+ * @param {number} list GCObject **
+ */
 function linkgclist_(o, pnext, list) {   // lgc.c:148
     0;   /* cannot be in a gray list */
     $h.stp(pnext, $h.u32[list >>> 2]);
@@ -93,6 +102,9 @@ function linkgclist_(o, pnext, list) {   // lgc.c:148
 ** its associated empty value is enough to signal that the entry is
 ** logically empty.
 */
+/**
+ * @param {number} n Node *
+ */
 function clearkey(n) {   // lgc.c:171
     0;
     if ($h.u8[n + 9] & 64) {
@@ -106,6 +118,11 @@ function clearkey(n) {   // lgc.c:171
 ** other objects: if really collected, cannot keep them; for objects
 ** being finalized, keep them in keys, but not in values
 */
+/**
+ * @param {number} g global_State *
+ * @param {number} o const GCObject *
+ * @returns {number} int
+ */
 function iscleared(g, o) {   // lgc.c:185
     if (o === 0) {
         return 0;   /* non-collectable value */
@@ -133,6 +150,11 @@ function iscleared(g, o) {   // lgc.c:185
 ** be done is generational mode, as its sweep does not distinguish
 ** whites from deads.)
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} o GCObject *
+ * @param {number} v GCObject *
+ */
 export function luaC_barrier_(L, o, v) {   // lgc.c:208
     let g = 0;
     g = $h.u32[(L + 24) >>> 2];
@@ -156,6 +178,10 @@ export function luaC_barrier_(L, o, v) {   // lgc.c:208
 ** barrier that moves collector backward, that is, mark the black object
 ** pointing to a white object as gray again.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} o GCObject *
+ */
 export function luaC_barrierback_(L, o) {   // lgc.c:230
     let g = 0;
     g = $h.u32[(L + 24) >>> 2];
@@ -171,6 +197,10 @@ export function luaC_barrierback_(L, o) {   // lgc.c:230
         $h.u8[o + 9] = $c.u8($h.u8[o + 9] & -8 | 5);   /* touched in current cycle */
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} o GCObject *
+ */
 export function luaC_fix(L, o) {   // lgc.c:243
     let g = 0;
     g = $h.u32[(L + 24) >>> 2];
@@ -185,6 +215,13 @@ export function luaC_fix(L, o) {   // lgc.c:243
 ** create a new collectable object (with given type, size, and offset)
 ** and link it to 'allgc' list.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} tt int
+ * @param {number | bigint} sz size_t
+ * @param {number | bigint} offset size_t
+ * @returns {Promise<number>} GCObject *
+ */
 export async function luaC_newobjdt(L, tt, sz, offset) {   // lgc.c:258
     let g = 0, p = 0, o = 0;
     g = $h.u32[(L + 24) >>> 2];
@@ -196,6 +233,12 @@ export async function luaC_newobjdt(L, tt, sz, offset) {   // lgc.c:258
     $h.stp(g + 112, o);
     return o;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} tt int
+ * @param {number | bigint} sz size_t
+ * @returns {Promise<number>} GCObject *
+ */
 export async function luaC_newobj(L, tt, sz) {   // lgc.c:270
     return await luaC_newobjdt(L, tt, sz, 0);
 }
@@ -217,6 +260,10 @@ export async function luaC_newobj(L, tt, sz) {   // lgc.c:270
 ** for at most two levels: An upvalue cannot refer to another upvalue
 ** (only closures can), and a userdata's metatable must be a table.
 */
+/**
+ * @param {number} g global_State *
+ * @param {number} o GCObject *
+ */
 function reallymarkobject(g, o) {   // lgc.c:297
     let uv = 0, u = 0;
     switch ($h.u8[o + 8]) {
@@ -276,6 +323,9 @@ function reallymarkobject(g, o) {   // lgc.c:297
 /*
 ** mark metamethods for basic types
 */
+/**
+ * @param {number} g global_State *
+ */
 function markmt(g) {   // lgc.c:335
     let i = 0;
     for (i = 0; i < 9; i = i + 1 | 0) {
@@ -289,6 +339,10 @@ function markmt(g) {   // lgc.c:335
 /*
 ** mark all objects in list of being-finalized
 */
+/**
+ * @param {number} g global_State *
+ * @returns {number | bigint} lu_mem
+ */
 function markbeingfnz(g) {   // lgc.c:345
     let o = 0, count = 0;
     count = 0;
@@ -313,6 +367,10 @@ function markbeingfnz(g) {   // lgc.c:345
 ** upvalues, as they have nothing to be checked. (If the thread gets an
 ** upvalue later, it will be linked in the list again.)
 */
+/**
+ * @param {number} g global_State *
+ * @returns {number} int
+ */
 function remarkupvals(g) {   // lgc.c:367
     let thread = 0, p = 0, work = 0, uv = 0;
     p = g + 248;
@@ -344,6 +402,9 @@ function remarkupvals(g) {   // lgc.c:367
     }
     return work;
 }
+/**
+ * @param {number} g global_State *
+ */
 function cleargraylists(g) {   // lgc.c:394
     let $t1, $t2, $t3;
     $t1 = $h.stp(g + 144, 0), $h.stp(g + 136, $t1);
@@ -352,6 +413,9 @@ function cleargraylists(g) {   // lgc.c:394
 /*
 ** mark root set and reset all gray lists, to start a new collection
 */
+/**
+ * @param {number} g global_State *
+ */
 function restartcollection(g) {   // lgc.c:403
     cleargraylists(g);
     {
@@ -383,6 +447,10 @@ function restartcollection(g) {   // lgc.c:403
 ** back to a gray list, but then it must become OLD. (That is what
 ** 'correctgraylist' does when it finds a TOUCHED2 object.)
 */
+/**
+ * @param {number} g global_State *
+ * @param {number} o GCObject *
+ */
 function genlink(g, o) {   // lgc.c:430
     0;
     if (($h.u8[o + 9] & 7) === 5) {
@@ -399,6 +467,10 @@ function genlink(g, o) {   // lgc.c:430
 ** atomic phase. In the atomic phase, if table has any white value,
 ** put it in 'weak' list, to be cleared.
 */
+/**
+ * @param {number} g global_State *
+ * @param {number} h Table *
+ */
 function traverseweakvalue(g, h) {   // lgc.c:446
     let n = 0, limit = 0, hasclears = 0;
     limit = $h.u32[(h + 24) >>> 2] + $c.idx($c.u64(1 << $h.u8[h + 11])) * 24;
@@ -439,6 +511,12 @@ function traverseweakvalue(g, h) {   // lgc.c:446
 ** must be kept in some gray list for post-processing; this is done
 ** by 'genlink'.
 */
+/**
+ * @param {number} g global_State *
+ * @param {number} h Table *
+ * @param {number} inv int
+ * @returns {number} int
+ */
 function traverseephemeron(g, h, inv) {   // lgc.c:480
     let marked = 0, hasclears = 0, hasww = 0, i = 0, asize = 0, nsize = 0, n = 0;
     marked = 0;   /* true if an object is marked in this traversal */
@@ -483,6 +561,10 @@ function traverseephemeron(g, h, inv) {   // lgc.c:480
     }
     return marked;
 }
+/**
+ * @param {number} g global_State *
+ * @param {number} h Table *
+ */
 function traversestrongtable(g, h) {   // lgc.c:523
     let n = 0, limit = 0, i = 0, asize = 0;
     limit = $h.u32[(h + 24) >>> 2] + $c.idx($c.u64(1 << $h.u8[h + 11])) * 24;
@@ -514,6 +596,11 @@ function traversestrongtable(g, h) {   // lgc.c:523
     }
     genlink(g, h);
 }
+/**
+ * @param {number} g global_State *
+ * @param {number} h Table *
+ * @returns {number | bigint} lu_mem
+ */
 function traversetable(g, h) {   // lgc.c:542
     let weakkey = 0, weakvalue = 0, mode = 0, smode = 0;
     mode = $h.u32[(h + 40) >>> 2] === 0 ? 0 : ($h.u8[$h.u32[(h + 40) >>> 2] + 10] & 8) >>> 0 ? 0 : luaT_gettm($h.u32[(h + 40) >>> 2], 3, $h.u32[(g + 280 + 3 /* TM_MODE */ * 8) >>> 2]);
@@ -541,6 +628,11 @@ function traversetable(g, h) {   // lgc.c:542
     }
     return (1 + $h.u32[(h + 12) >>> 2] >>> 0) + (Math.imul(2, $h.u32[(h + 32) >>> 2] === 0 ? 0 : 1 << $h.u8[h + 11]) >>> 0) >>> 0;
 }
+/**
+ * @param {number} g global_State *
+ * @param {number} u Udata *
+ * @returns {number} int
+ */
 function traverseudata(g, u) {   // lgc.c:565
     let i = 0;
     {
@@ -564,6 +656,11 @@ function traverseudata(g, u) {   // lgc.c:565
 ** arrays can be larger than needed; the extra slots are filled with
 ** NULL, so the use of 'markobjectN')
 */
+/**
+ * @param {number} g global_State *
+ * @param {number} f Proto *
+ * @returns {number} int
+ */
 function traverseproto(g, f) {   // lgc.c:580
     let i = 0;
     {
@@ -602,6 +699,11 @@ function traverseproto(g, f) {   // lgc.c:580
     }
     return (((1 + $h.i32[(f + 20) >>> 2] | 0) + $h.i32[(f + 16) >>> 2] | 0) + $h.i32[(f + 32) >>> 2] | 0) + $h.i32[(f + 36) >>> 2] | 0;
 }
+/**
+ * @param {number} g global_State *
+ * @param {number} cl CClosure *
+ * @returns {number} int
+ */
 function traverseCclosure(g, cl) {   // lgc.c:595
     let i = 0;
     for (i = 0; i < $h.u8[cl + 10]; i = i + 1 | 0) {   /* mark its upvalues */
@@ -616,6 +718,11 @@ function traverseCclosure(g, cl) {   // lgc.c:595
 ** Traverse a Lua closure, marking its prototype and its upvalues.
 ** (Both can be NULL while closure is being created.)
 */
+/**
+ * @param {number} g global_State *
+ * @param {number} cl LClosure *
+ * @returns {number} int
+ */
 function traverseLclosure(g, cl) {   // lgc.c:606
     let i = 0, uv = 0;
     {
@@ -650,6 +757,11 @@ function traverseLclosure(g, cl) {   // lgc.c:606
 ** (which can only happen in generational mode) or if the traverse is in
 ** the propagate phase (which can only happen in incremental mode).
 */
+/**
+ * @param {number} g global_State *
+ * @param {number} th lua_State *
+ * @returns {Promise<number>} int
+ */
 async function traversethread(g, th) {   // lgc.c:629
     let uv = 0, o = 0;
     o = $h.u32[(th + 48) >>> 2];
@@ -690,6 +802,10 @@ async function traversethread(g, th) {   // lgc.c:629
 /*
 ** traverse one gray object, turning it to black.
 */
+/**
+ * @param {number} g global_State *
+ * @returns {Promise<number | bigint>} lu_mem
+ */
 async function propagatemark(g) {   // lgc.c:660
     let o = 0, $t1;
     o = $h.u32[(g + 136) >>> 2];
@@ -713,6 +829,10 @@ async function propagatemark(g) {   // lgc.c:660
             return 0;
     }
 }
+/**
+ * @param {number} g global_State *
+ * @returns {Promise<number | bigint>} lu_mem
+ */
 async function propagateall(g) {   // lgc.c:676
     let tot = 0;
     tot = 0;
@@ -728,6 +848,10 @@ async function propagateall(g) {   // lgc.c:676
 ** convergence on chains in the same table.
 **
 */
+/**
+ * @param {number} g global_State *
+ * @returns {Promise<void>}
+ */
 async function convergeephemerons(g) {   // lgc.c:691
     let changed = 0, dir = 0, w = 0, next = 0, h = 0;
     dir = 0;
@@ -758,6 +882,10 @@ async function convergeephemerons(g) {   // lgc.c:691
 /*
 ** clear entries with unmarked keys from all weaktables in list 'l'
 */
+/**
+ * @param {number} g global_State *
+ * @param {number} l GCObject *
+ */
 function clearbykeys(g, l) {   // lgc.c:725
     let h = 0, limit = 0, n = 0;
     for (; l; l = $h.u32[(l + 48) >>> 2]) {
@@ -777,6 +905,11 @@ function clearbykeys(g, l) {   // lgc.c:725
 ** clear entries with unmarked values from all weaktables in list 'l' up
 ** to element 'f'
 */
+/**
+ * @param {number} g global_State *
+ * @param {number} l GCObject *
+ * @param {number} f GCObject *
+ */
 function clearbyvalues(g, l, f) {   // lgc.c:744
     let h = 0, n = 0, limit = 0, i = 0, asize = 0, o = 0;
     for (; l !== f; l = $h.u32[(l + 48) >>> 2]) {
@@ -799,12 +932,22 @@ function clearbyvalues(g, l, f) {   // lgc.c:744
         }
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} uv UpVal *
+ * @returns {Promise<void>}
+ */
 async function freeupval(L, uv) {   // lgc.c:765
     if ($h.u32[(uv + 16) >>> 2] !== uv + 24) {
         luaF_unlinkupval(uv);
     }
     await luaM_free_(L, uv, 40);
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} o GCObject *
+ * @returns {Promise<void>}
+ */
 async function freeobj(L, o) {   // lgc.c:772
     let cl = 0, cl$2 = 0, u = 0, ts = 0, ts$2 = 0;
     switch ($h.u8[o + 8]) {
@@ -862,6 +1005,13 @@ async function freeobj(L, o) {   // lgc.c:772
 ** collection cycle. Return where to continue the traversal or NULL if
 ** list is finished. ('*countout' gets the number of elements traversed.)
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} p GCObject **
+ * @param {number} countin int
+ * @param {number} countout int *
+ * @returns {Promise<number>} GCObject **
+ */
 async function sweeplist(L, p, countin, countout) {   // lgc.c:824
     let g = 0, ow = 0, i = 0, white = 0, curr = 0, marked = 0;
     g = $h.u32[(L + 24) >>> 2];
@@ -888,6 +1038,11 @@ async function sweeplist(L, p, countin, countout) {   // lgc.c:824
 /*
 ** sweep a list until a live object (or end of list)
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} p GCObject **
+ * @returns {Promise<number>} GCObject **
+ */
 async function sweeptolive(L, p) {   // lgc.c:851
     let old = 0;
     old = p;
@@ -905,6 +1060,11 @@ async function sweeptolive(L, p) {   // lgc.c:851
 /*
 ** If possible, shrink string table.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} g global_State *
+ * @returns {Promise<void>}
+ */
 async function checkSizes(L, g) {   // lgc.c:871
     let olddebt = 0;
     if (!$h.u8[g + 107]) {
@@ -920,6 +1080,10 @@ async function checkSizes(L, g) {   // lgc.c:871
 ** Get the next udata to be finalized from the 'tobefnz' list, and
 ** link it back into the 'allgc' list.
 */
+/**
+ * @param {number} g global_State *
+ * @returns {number} GCObject *
+ */
 function udata2finalize(g) {   // lgc.c:886
     let o = 0;
     o = $h.u32[(g + 176) >>> 2];   /* get first element */
@@ -935,10 +1099,19 @@ function udata2finalize(g) {   // lgc.c:886
     }
     return o;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} ud void *
+ * @returns {Promise<void>}
+ */
 async function dothecall(L, ud) {   // lgc.c:901
     ud;
     await luaD_callnoyield(L, $h.u32[(L + 16) >>> 2] - 32, 0);
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<void>}
+ */
 async function GCTM(L) {   // lgc.c:907
     let g = 0, tm = 0, io = 0, i_g = 0, status = 0, oldah = 0, oldgcstp = 0, io1 = 0, io2 = 0, io1$2 = 0, io2$2 = 0, $t1, $t2;
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
@@ -990,6 +1163,11 @@ async function GCTM(L) {   // lgc.c:907
 /*
 ** Call a few finalizers
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} n int
+ * @returns {Promise<number>} int
+ */
 async function runafewfinalizers(L, n) {   // lgc.c:938
     let g = 0, i = 0;
     g = $h.u32[(L + 24) >>> 2];
@@ -1001,6 +1179,10 @@ async function runafewfinalizers(L, n) {   // lgc.c:938
 /*
 ** call all pending finalizers
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<void>}
+ */
 async function callallpendingfinalizers(L) {   // lgc.c:950
     let g = 0;
     g = $h.u32[(L + 24) >>> 2];
@@ -1011,6 +1193,10 @@ async function callallpendingfinalizers(L) {   // lgc.c:950
 /*
 ** find last 'next' field in list 'p' list (to add elements in its end)
 */
+/**
+ * @param {number} p GCObject **
+ * @returns {number} GCObject **
+ */
 function findlast(p) {   // lgc.c:960
     while ($h.u32[p >>> 2] !== 0) {
         p = $h.u32[p >>> 2];
@@ -1024,6 +1210,10 @@ function findlast(p) {   // lgc.c:960
 ** don't need to be traversed. In incremental mode, 'finobjold1' is NULL,
 ** so the whole list is traversed.)
 */
+/**
+ * @param {number} g global_State *
+ * @param {number} all int
+ */
 function separatetobefnz(g, all) {   // lgc.c:974
     let curr = 0, p = 0, lastnext = 0;
     p = g + 128;
@@ -1047,6 +1237,10 @@ function separatetobefnz(g, all) {   // lgc.c:974
 /*
 ** If pointer 'p' points to 'o', move it to the next element.
 */
+/**
+ * @param {number} p GCObject **
+ * @param {number} o GCObject *
+ */
 function checkpointer(p, o) {   // lgc.c:997
     if (o === $h.u32[p >>> 2]) {
         $h.stp(p, $h.u32[o >>> 2]);
@@ -1056,6 +1250,10 @@ function checkpointer(p, o) {   // lgc.c:997
 ** Correct pointers to objects inside 'allgc' list when
 ** object 'o' is being removed from the list.
 */
+/**
+ * @param {number} g global_State *
+ * @param {number} o GCObject *
+ */
 function correctpointers(g, o) {   // lgc.c:1007
     checkpointer(g + 192, o);
     checkpointer(g + 200, o);
@@ -1066,6 +1264,12 @@ function correctpointers(g, o) {   // lgc.c:1007
 ** if object 'o' has a finalizer, remove it from 'allgc' list (must
 ** search the list to find it) and link it in 'finobj' list.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} o GCObject *
+ * @param {number} mt Table *
+ * @returns {Promise<void>}
+ */
 export async function luaC_checkfinalizer(L, o, mt) {   // lgc.c:1019
     let g = 0, p = 0, $t1;
     g = $h.u32[(L + 24) >>> 2];
@@ -1105,6 +1309,9 @@ export async function luaC_checkfinalizer(L, o, mt) {   // lgc.c:1019
 ** PAUSEADJ). (Division by 'estimate' should be OK: it cannot be zero,
 ** because Lua cannot even start with less than PAUSEADJ bytes).
 */
+/**
+ * @param {number} g global_State *
+ */
 function setpause(g) {   // lgc.c:1059
     let threshold = 0, debt = 0, pause = 0, estimate = 0;
     pause = Math.imul($h.u8[g + 108], 4);
@@ -1125,6 +1332,11 @@ function setpause(g) {   // lgc.c:1059
 ** are now old---must be in a gray list. Everything else is not in a
 ** gray list. Open upvalues are also kept gray.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} p GCObject **
+ * @returns {Promise<void>}
+ */
 async function sweep2old(L, p) {   // lgc.c:1079
     let curr = 0, g = 0, th = 0;
     g = $h.u32[(L + 24) >>> 2];
@@ -1162,6 +1374,14 @@ async function sweep2old(L, p) {   // lgc.c:1079
 ** here.  They will all be advanced in 'correctgraylist'. That function
 ** will also remove objects turned white here from any gray list.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} g global_State *
+ * @param {number} p GCObject **
+ * @param {number} limit GCObject *
+ * @param {number} pfirstold1 GCObject **
+ * @returns {Promise<number>} GCObject **
+ */
 async function sweepgen(L, g, p, limit, pfirstold1) {   // lgc.c:1115
     let white = 0, curr = 0, marked = 0;
     /* from G_NEW */
@@ -1201,6 +1421,10 @@ async function sweepgen(L, g, p, limit, pfirstold1) {   // lgc.c:1115
 ** age. In incremental mode, all objects are 'new' all the time,
 ** except for fixed strings (which are always old).
 */
+/**
+ * @param {number} g global_State *
+ * @param {number} p GCObject *
+ */
 function whitelist(g, p) {   // lgc.c:1156
     let white = 0;
     white = $c.u8($h.u8[g + 100] & 24);
@@ -1217,6 +1441,10 @@ function whitelist(g, p) {   // lgc.c:1156
 ** Non-white threads also remain on the list; 'TOUCHED2' objects become
 ** regular old; they and anything else are removed from the list.
 */
+/**
+ * @param {number} p GCObject **
+ * @returns {number} GCObject **
+ */
 function correctgraylist(p) {   // lgc.c:1172
     let curr = 0, next = 0;
     while ((curr = $h.u32[p >>> 2]) !== 0) {
@@ -1255,6 +1483,9 @@ function correctgraylist(p) {   // lgc.c:1172
 /*
 ** Correct all gray lists, coalescing them into 'grayagain'.
 */
+/**
+ * @param {number} g global_State *
+ */
 function correctgraylists(g) {   // lgc.c:1205
     let list = 0;
     list = correctgraylist(g + 144);
@@ -1273,6 +1504,11 @@ function correctgraylists(g) {   // lgc.c:1205
 ** Gray objects are already in some gray list, and so will be visited
 ** in the atomic step.
 */
+/**
+ * @param {number} g global_State *
+ * @param {number} from GCObject *
+ * @param {number} to GCObject *
+ */
 function markold(g, from, to) {   // lgc.c:1221
     let p = 0;
     for (p = from; p !== to; p = $h.u32[p >>> 2]) {
@@ -1288,6 +1524,11 @@ function markold(g, from, to) {   // lgc.c:1221
 /*
 ** Finish a young-generation collection.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} g global_State *
+ * @returns {Promise<void>}
+ */
 async function finishgencycle(L, g) {   // lgc.c:1237
     correctgraylists(g);
     await checkSizes(L, g);
@@ -1301,6 +1542,11 @@ async function finishgencycle(L, g) {   // lgc.c:1237
 ** atomic step. Then, sweep all lists and advance pointers. Finally,
 ** finish the collection.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} g global_State *
+ * @returns {Promise<void>}
+ */
 async function youngcollection(L, g) {   // lgc.c:1251
     let psurvival = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
@@ -1342,6 +1588,11 @@ async function youngcollection(L, g) {   // lgc.c:1251
 ** surviving objects to old. Threads go back to 'grayagain'; everything
 ** else is turned black (not in any gray list).
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} g global_State *
+ * @returns {Promise<void>}
+ */
 async function atomic2gen(L, g) {   // lgc.c:1292
     let $t1, $t2, $t3, $t4;
     cleargraylists(g);
@@ -1364,6 +1615,9 @@ async function atomic2gen(L, g) {   // lgc.c:1292
 ** Set debt for the next minor collection, which will happen when
 ** memory grows 'genminormul'%.
 */
+/**
+ * @param {number} g global_State *
+ */
 function setminordebt(g) {   // lgc.c:1318
     luaE_setdebt(g, $c.neg64($c.mul64($c.i64($c.divu64($c.u64($c.add64($h.ld64(g + 16), $h.ld64(g + 24))), 100)), $h.u8[g + 104])));
 }
@@ -1373,6 +1627,11 @@ function setminordebt(g) {   // lgc.c:1318
 ** are cleared. Then, turn all objects into old and finishes the
 ** collection.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} g global_State *
+ * @returns {Promise<number | bigint>} lu_mem
+ */
 async function entergen(L, g) {   // lgc.c:1329
     let numobjs = 0;
     await luaC_runtilstate(L, 256);   /* prepare to start a new cycle */
@@ -1387,6 +1646,9 @@ async function entergen(L, g) {   // lgc.c:1329
 ** intermediate lists point to NULL (to avoid invalid pointers),
 ** and go to the pause state.
 */
+/**
+ * @param {number} g global_State *
+ */
 function enterinc(g) {   // lgc.c:1345
     let $t1, $t2, $t3, $t4;
     whitelist(g, $h.u32[(g + 112) >>> 2]);
@@ -1401,6 +1663,11 @@ function enterinc(g) {   // lgc.c:1345
 /*
 ** Change collector mode to 'newmode'.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} newmode int
+ * @returns {Promise<void>}
+ */
 export async function luaC_changemode(L, newmode) {   // lgc.c:1360
     let g = 0;
     g = $h.u32[(L + 24) >>> 2];
@@ -1416,6 +1683,11 @@ export async function luaC_changemode(L, newmode) {   // lgc.c:1360
 /*
 ** Does a full collection in generational mode.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} g global_State *
+ * @returns {Promise<number | bigint>} lu_mem
+ */
 async function fullgen(L, g) {   // lgc.c:1375
     enterinc(g);
     return await entergen(L, g);
@@ -1441,6 +1713,11 @@ async function fullgen(L, g) {   // lgc.c:1375
 ** field 'g->lastatomic' keeps this count from the last collection.
 ** ('g->lastatomic != 0' also means that the last collection was bad.)
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} g global_State *
+ * @returns {Promise<void>}
+ */
 async function stepgenfull(L, g) {   // lgc.c:1402
     let newatomic = 0, lastatomic = 0;
     /* count of traversed objects */
@@ -1482,6 +1759,11 @@ async function stepgenfull(L, g) {   // lgc.c:1402
 ** 'GCdebt <= 0' means an explicit call to GC step with "size" zero;
 ** in that case, do a minor collection.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} g global_State *
+ * @returns {Promise<void>}
+ */
 async function genstep(L, g) {   // lgc.c:1442
     let majorbase = 0, majorinc = 0, numobjs = 0;
     if ($h.ldu64(g + 40) !== 0) {   /* last collection was a bad one? */
@@ -1522,6 +1804,10 @@ async function genstep(L, g) {   // lgc.c:1442
 ** not need to skip objects created between "now" and the start of the
 ** real sweep.
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<void>}
+ */
 async function entersweep(L) {   // lgc.c:1486
     let g = 0, $t1;
     g = $h.u32[(L + 24) >>> 2];
@@ -1533,6 +1819,12 @@ async function entersweep(L) {   // lgc.c:1486
 ** Delete all objects in list 'p' until (but not including) object
 ** 'limit'.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} p GCObject *
+ * @param {number} limit GCObject *
+ * @returns {Promise<void>}
+ */
 async function deletelist(L, p, limit) {   // lgc.c:1498
     let next = 0;
     while (p !== limit) {
@@ -1545,6 +1837,10 @@ async function deletelist(L, p, limit) {   // lgc.c:1498
 ** Call all finalizers of the objects in the given Lua state, and
 ** then free all objects, except for the main thread.
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<void>}
+ */
 export async function luaC_freeallobjects(L) {   // lgc.c:1511
     let g = 0;
     g = $h.u32[(L + 24) >>> 2];
@@ -1558,6 +1854,10 @@ export async function luaC_freeallobjects(L) {   // lgc.c:1511
     await deletelist(L, $h.u32[(g + 184) >>> 2], 0);   /* collect fixed objects */
     0;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number | bigint>} lu_mem
+ */
 async function atomic(L) {   // lgc.c:1525
     let g = 0, work = 0, origweak = 0, origall = 0, grayagain = 0;
     g = $h.u32[(L + 24) >>> 2];
@@ -1609,6 +1909,13 @@ async function atomic(L) {   // lgc.c:1525
     0;
     return work;   /* estimate of slots marked by 'atomic' */
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} g global_State *
+ * @param {number} nextstate int
+ * @param {number} nextlist GCObject **
+ * @returns {Promise<number>} int
+ */
 async function sweepstep(L, g, nextstate, nextlist) {   // lgc.c:1568
     let olddebt = 0, $t1;
     const $sp0 = $h.st.sp, $fp = $h.enter(4);
@@ -1626,6 +1933,10 @@ async function sweepstep(L, g, nextstate, nextlist) {   // lgc.c:1568
         }
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number | bigint>} lu_mem
+ */
 async function singlestep(L) {   // lgc.c:1585
     let g = 0, work = 0;
     g = $h.u32[(L + 24) >>> 2];
@@ -1707,6 +2018,11 @@ async function singlestep(L) {   // lgc.c:1585
 ** advances the garbage collector until it reaches a state allowed
 ** by 'statemask'
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} statesmask int
+ * @returns {Promise<void>}
+ */
 export async function luaC_runtilstate(L, statesmask) {   // lgc.c:1652
     let g = 0;
     g = $h.u32[(L + 24) >>> 2];
@@ -1721,6 +2037,11 @@ export async function luaC_runtilstate(L, statesmask) {   // lgc.c:1652
 ** finishing a cycle (pause state). Finally, it sets the debt that
 ** controls when next step will be performed.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} g global_State *
+ * @returns {Promise<void>}
+ */
 async function incstep(L, g) {   // lgc.c:1667
     let stepmul = 0, debt = 0, stepsize = 0, work = 0;
     stepmul = Math.imul($h.u8[g + 109], 4) | 1;   /* avoid division by 0 */
@@ -1743,6 +2064,10 @@ async function incstep(L, g) {   // lgc.c:1667
 ** not running, set a reasonable debt to avoid it being called at
 ** every single check.)
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<void>}
+ */
 export async function luaC_step(L) {   // lgc.c:1690
     let g = 0;
     g = $h.u32[(L + 24) >>> 2];
@@ -1763,6 +2088,11 @@ export async function luaC_step(L) {   // lgc.c:1690
 ** to sweep all objects to turn them back to white (as white has not
 ** changed, nothing will be collected).
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} g global_State *
+ * @returns {Promise<void>}
+ */
 async function fullinc(L, g) {   // lgc.c:1710
     if ($h.u8[g + 101] <= 2) {   /* black objects? */
         await entersweep(L);   /* sweep everything to turn them back to white */
@@ -1782,6 +2112,11 @@ async function fullinc(L, g) {   // lgc.c:1710
 ** some operations which could change the interpreter state in some
 ** unexpected ways (running finalizers and shrinking some structures).
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} isemergency int
+ * @returns {Promise<void>}
+ */
 export async function luaC_fullgc(L, isemergency) {   // lgc.c:1730
     let g = 0;
     g = $h.u32[(L + 24) >>> 2];

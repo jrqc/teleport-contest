@@ -28,6 +28,10 @@ const ask_about_panic_save$Instead_prompt = new Int8Array(26);   // static in as
 const buf = new $T.stat();
 /* see whether we should throw away this xlock file;
    if yes, close it, otherwise leave it open */
+/**
+ * @param {number} fd int
+ * @returns {number} int
+ */
 function veryold(fd) {   // unixunix.c:38
     let date = [0], lockedpid = Int32Array.of(0);
     if ($c.fstat(fd, buf)) {
@@ -55,6 +59,9 @@ function veryold(fd) {   // unixunix.c:38
     /*(void) close(fd);*/
     return 1;
 }
+/**
+ * @returns {number} int
+ */
 function eraseoldlocks() {   // unixunix.c:80
     let i = 0;
     program_state.preserve_locks = 0;   /* not required but shows intent */
@@ -73,6 +80,9 @@ function eraseoldlocks() {   // unixunix.c:80
     }
     return 1;   /* success! */
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function getlock() {   // unixunix.c:103
     let i = 0, fd = 0, c = 0, too_old = 0, fq_lock = null, tmp = 0, $t1, $t2;
     i = 0;
@@ -188,6 +198,9 @@ export async function getlock() {   // unixunix.c:103
     }
 }
 /* caller couldn't find a regular save file but did find a panic one */
+/**
+ * @returns {Promise<void>}
+ */
 export async function ask_about_panic_save() {   // unixunix.c:263
     let c = 0;
     c = 0;
@@ -218,6 +231,9 @@ export async function ask_about_panic_save() {   // unixunix.c:263
     return;   /* proceed with new game */
 }
 /* normalize file name - we don't like .'s, /'s, spaces */
+/**
+ * @param {$c.Ptr | null} s char *
+ */
 export function regularize(s) {   // unixunix.c:297
     let lp = null;
     while ((lp = $c.strchr(s, 46)) !== null || (lp = $c.strchr(s, 47)) !== null || (lp = $c.strchr(s, 32)) !== null) {
@@ -233,6 +249,9 @@ export function regularize(s) {   // unixunix.c:297
 /* poll API is signed */
 /* avoid infinite sleep */
 /* TIMED_DELAY for SYSV */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dosh() {   // unixunix.c:344
     let str = null;
     if (!sysopt.shellers || !sysopt.shellers.get(0) || !check_user_string(sysopt.shellers)) {
@@ -252,6 +271,10 @@ export async function dosh() {   // unixunix.c:344
     return 0;
 }
 /* SHELL */
+/**
+ * @param {number} wt int
+ * @returns {Promise<number>} int
+ */
 export async function child(wt) {   // unixunix.c:370
     let f = 0;
     await suspend_nhwindows()(null);   /* also calls end_screen() */
@@ -287,6 +310,10 @@ export async function child(wt) {   // unixunix.c:370
    around the name of a function-like macro prevent macro expansion */
 /* GETRES_SUPPORT */
 /* XXX should be ifdef PANICTRACE_GDB, but there's no such symbol yet */
+/**
+ * @param {$c.Ptr | null} path const char *
+ * @returns {number} boolean
+ */
 export function file_exists(path) {   // unixunix.c:466
     let sb = new $T.stat();
     /* Just see if it's there - trying to figure out if we can actually

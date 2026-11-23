@@ -39,6 +39,10 @@ import { lua_closethread, lua_newthread } from './lstate.js';
 
 const statname = $h.data(32, 8);
 const co_funcs = $h.data(144, 8);
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} lua_State *
+ */
 async function getco(L) {   // lcorolib.c:21
     let co = 0;
     co = lua_tothread(L, 1);
@@ -49,6 +53,12 @@ async function getco(L) {   // lcorolib.c:21
 ** Resumes a coroutine. Returns the number of results for non-error
 ** cases or -1 for errors.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} co lua_State *
+ * @param {number} narg int
+ * @returns {Promise<number>} int
+ */
 async function auxresume(L, co, narg) {   // lcorolib.c:32
     let status = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(4);
@@ -73,6 +83,10 @@ async function auxresume(L, co, narg) {   // lcorolib.c:32
         }
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function luaB_coresume(L) {   // lcorolib.c:56
     let co = 0, r = 0;
     co = await getco(L);
@@ -87,6 +101,10 @@ async function luaB_coresume(L) {   // lcorolib.c:56
         return r + 1 | 0;   /* return true + 'resume' returns */
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function luaB_auxwrap(L) {   // lcorolib.c:73
     let co = 0, r = 0, stat = 0;
     co = lua_tothread(L, -1001001);
@@ -111,6 +129,10 @@ async function luaB_auxwrap(L) {   // lcorolib.c:73
     }
     return r;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function luaB_cocreate(L) {   // lcorolib.c:95
     let NL = 0;
     await luaL_checktype(L, 1, 6);
@@ -119,14 +141,27 @@ async function luaB_cocreate(L) {   // lcorolib.c:95
     lua_xmove(L, NL, 1);   /* move function from L to NL */
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function luaB_cowrap(L) {   // lcorolib.c:105
     await luaB_cocreate(L);
     await lua_pushcclosure(L, $h.fn(luaB_auxwrap), 1);
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function luaB_yield(L) {   // lcorolib.c:112
     return await lua_yieldk(L, lua_gettop(L), 0, 0);
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} co lua_State *
+ * @returns {number} int
+ */
 function auxstatus(L, co) {   // lcorolib.c:127
     const $sp0 = $h.st.sp, $fp = $h.enter(136);
     try {
@@ -153,24 +188,40 @@ function auxstatus(L, co) {   // lcorolib.c:127
         }
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function luaB_costatus(L) {   // lcorolib.c:149
     let co = 0;
     co = await getco(L);
     await lua_pushstring(L, $h.u32[(statname + auxstatus(L, co) * 8) >>> 2]);
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function luaB_yieldable(L) {   // lcorolib.c:156
     let co = 0;
     co = lua_type(L, 1) === -1 ? L : await getco(L);
     lua_pushboolean(L, lua_isyieldable(co));
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {number} int
+ */
 function luaB_corunning(L) {   // lcorolib.c:163
     let ismain = 0;
     ismain = lua_pushthread(L);
     lua_pushboolean(L, ismain);
     return 2;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function luaB_close(L) {   // lcorolib.c:170
     let co = 0, status = 0;
     co = await getco(L);
@@ -194,6 +245,10 @@ async function luaB_close(L) {   // lcorolib.c:170
             return await luaL_error(L, $h.lit("cannot close a %s coroutine"), $h.u32[(statname + status * 8) >>> 2]);
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 export async function luaopen_coroutine(L) {   // lcorolib.c:206
     await luaL_checkversion_(L, 504, 136), await lua_createtable(L, 0, 8), await luaL_setfuncs(L, co_funcs, 0);
     return 1;

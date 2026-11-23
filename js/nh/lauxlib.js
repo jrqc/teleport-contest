@@ -52,6 +52,12 @@ const boxmt = $h.data(48, 8);
 ** Search for 'objidx' in table at index -1. ('objidx' must be an
 ** absolute index.) Return 1 + string at top if it found a good name.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} objidx int
+ * @param {number} level int
+ * @returns {Promise<number>} int
+ */
 async function findfield(L, objidx, level) {   // lauxlib.c:52
     if (level === 0 || !(lua_type(L, -1) === 5)) {
         return 0;   /* not found */
@@ -81,6 +87,11 @@ async function findfield(L, objidx, level) {   // lauxlib.c:52
 /*
 ** Search for a name for a function in all loaded modules
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} ar lua_Debug *
+ * @returns {Promise<number>} int
+ */
 async function pushglobalfuncname(L, ar) {   // lauxlib.c:79
     let top = 0, name = 0;
     top = lua_gettop(L);
@@ -102,6 +113,11 @@ async function pushglobalfuncname(L, ar) {   // lauxlib.c:79
         return 0;
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} ar lua_Debug *
+ * @returns {Promise<void>}
+ */
 async function pushfuncname(L, ar) {   // lauxlib.c:101
     if (await pushglobalfuncname(L, ar)) {
         /* try first a global name */
@@ -118,6 +134,10 @@ async function pushfuncname(L, ar) {   // lauxlib.c:101
         await lua_pushstring(L, $h.lit("?"));
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {number} int
+ */
 function lastlevel(L) {   // lauxlib.c:117
     let li = 0, le = 0, m = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(136);
@@ -141,6 +161,13 @@ function lastlevel(L) {   // lauxlib.c:117
         return le - 1 | 0;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} L1 lua_State *
+ * @param {number} msg const char *
+ * @param {number} level int
+ * @returns {Promise<void>}
+ */
 export async function luaL_traceback(L, L1, msg, level) {   // lauxlib.c:132
     let last = 0, limit2show = 0, n = 0, $t1, $t2, $t3;
     const $sp0 = $h.st.sp, $fp = $h.enter(1192);
@@ -184,6 +211,12 @@ export async function luaL_traceback(L, L1, msg, level) {   // lauxlib.c:132
 ** Error-report functions
 ** =======================================================
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} arg int
+ * @param {number} extramsg const char *
+ * @returns {Promise<number>} int
+ */
 export async function luaL_argerror(L, arg, extramsg) {   // lauxlib.c:176
     let $t1;
     const $sp0 = $h.st.sp, $fp = $h.enter(136);
@@ -204,6 +237,12 @@ export async function luaL_argerror(L, arg, extramsg) {   // lauxlib.c:176
         return await luaL_error(L, $h.lit("bad argument #%d to '%s' (%s)"), arg, $h.u32[($fp + 8) >>> 2], extramsg);
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} arg int
+ * @param {number} tname const char *
+ * @returns {Promise<number>} int
+ */
 export async function luaL_typeerror(L, arg, tname) {   // lauxlib.c:194
     let msg = 0, typearg = 0;
     /* name for the type of the actual argument */
@@ -217,6 +256,12 @@ export async function luaL_typeerror(L, arg, tname) {   // lauxlib.c:194
     msg = await lua_pushfstring(L, $h.lit("%s expected, got %s"), tname, typearg);
     return await luaL_argerror(L, arg, msg);
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} arg int
+ * @param {number} tag int
+ * @returns {Promise<void>}
+ */
 async function tag_error(L, arg, tag) {   // lauxlib.c:208
     await luaL_typeerror(L, arg, lua_typename(L, tag));
 }
@@ -224,6 +269,11 @@ async function tag_error(L, arg, tag) {   // lauxlib.c:208
 ** The use of 'lua_pushfstring' ensures this function does not
 ** need reserved stack space when called.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} level int
+ * @returns {Promise<void>}
+ */
 export async function luaL_where(L, level) {   // lauxlib.c:217
     const $sp0 = $h.st.sp, $fp = $h.enter(136);
     try {
@@ -244,6 +294,12 @@ export async function luaL_where(L, level) {   // lauxlib.c:217
 ** not need reserved stack space when called. (At worst, it generates
 ** an error with "stack overflow" instead of the given message.)
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} fmt const char *
+ * @param {...*} $va the C variable arguments (...)
+ * @returns {Promise<number>} int
+ */
 export async function luaL_error(L, fmt, ...$va) {   // lauxlib.c:235
     let argp = null;
     argp = new $c.VaList($va);
@@ -253,6 +309,12 @@ export async function luaL_error(L, fmt, ...$va) {   // lauxlib.c:235
     await lua_concat(L, 2);
     return await lua_error(L);
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} stat int
+ * @param {number} fname const char *
+ * @returns {Promise<number>} int
+ */
 export async function luaL_fileresult(L, stat, fname) {   // lauxlib.c:246
     let en = 0, msg = 0;
     en = $h.i32[($hl.__error()) >>> 2];   /* calls to Lua API may change this value */
@@ -277,6 +339,11 @@ export async function luaL_fileresult(L, stat, fname) {   // lauxlib.c:246
 */
 /* no op */
 /* } */
+/**
+ * @param {number} L lua_State *
+ * @param {number} stat int
+ * @returns {Promise<number>} int
+ */
 export async function luaL_execresult(L, stat) {   // lauxlib.c:288
     let what = 0;
     if (stat !== 0 && $h.i32[($hl.__error()) >>> 2] !== 0) {   /* error with an 'errno'? */
@@ -305,6 +372,11 @@ export async function luaL_execresult(L, stat) {   // lauxlib.c:288
 ** Userdata's metatable manipulation
 ** =======================================================
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} tname const char *
+ * @returns {Promise<number>} int
+ */
 export async function luaL_newmetatable(L, tname) {   // lauxlib.c:314
     if (await lua_getfield(L, -1001000, tname) !== 0) {   /* name already in use? */
         return 0;   /* leave previous value on top, but return 0 */
@@ -317,10 +389,21 @@ export async function luaL_newmetatable(L, tname) {   // lauxlib.c:314
     await lua_setfield(L, -1001000, tname);   /* registry.name = metatable */
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} tname const char *
+ * @returns {Promise<void>}
+ */
 export async function luaL_setmetatable(L, tname) {   // lauxlib.c:327
     await lua_getfield(L, -1001000, tname);
     await lua_setmetatable(L, -2);
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} ud int
+ * @param {number} tname const char *
+ * @returns {Promise<number>} void *
+ */
 export async function luaL_testudata(L, ud, tname) {   // lauxlib.c:333
     let p = 0;
     p = lua_touserdata(L, ud);
@@ -338,6 +421,12 @@ export async function luaL_testudata(L, ud, tname) {   // lauxlib.c:333
     }
     return 0;   /* value is not a userdata with a metatable */
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} ud int
+ * @param {number} tname const char *
+ * @returns {Promise<number>} void *
+ */
 export async function luaL_checkudata(L, ud, tname) {   // lauxlib.c:348
     let p = 0;
     p = await luaL_testudata(L, ud, tname);
@@ -350,6 +439,13 @@ export async function luaL_checkudata(L, ud, tname) {   // lauxlib.c:348
 ** Argument check functions
 ** =======================================================
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} arg int
+ * @param {number} def const char *
+ * @param {number} lst const char *const *
+ * @returns {Promise<number>} int
+ */
 export async function luaL_checkoption(L, arg, def, lst) {   // lauxlib.c:363
     let name = 0, i = 0;
     name = def ? await luaL_optlstring(L, arg, def, 0) : await luaL_checklstring(L, arg, 0);
@@ -367,6 +463,12 @@ export async function luaL_checkoption(L, arg, def, lst) {   // lauxlib.c:363
 ** this extra space, Lua will generate the same 'stack overflow' error,
 ** but without 'msg'.)
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} space int
+ * @param {number} msg const char *
+ * @returns {Promise<void>}
+ */
 export async function luaL_checkstack(L, space, msg) {   // lauxlib.c:383
     if ((!await lua_checkstack(L, space) ? 1 : 0) !== 0 ? 1 : 0) {
         if (msg) {
@@ -376,16 +478,33 @@ export async function luaL_checkstack(L, space, msg) {   // lauxlib.c:383
         }
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} arg int
+ * @param {number} t int
+ * @returns {Promise<void>}
+ */
 export async function luaL_checktype(L, arg, t) {   // lauxlib.c:393
     if ((lua_type(L, arg) !== t ? 1 : 0) !== 0 ? 1 : 0) {
         await tag_error(L, arg, t);
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} arg int
+ * @returns {Promise<void>}
+ */
 export async function luaL_checkany(L, arg) {   // lauxlib.c:399
     if ((lua_type(L, arg) === -1 ? 1 : 0) !== 0 ? 1 : 0) {
         await luaL_argerror(L, arg, $h.lit("value expected"));
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} arg int
+ * @param {number} len size_t *
+ * @returns {Promise<number>} const char *
+ */
 export async function luaL_checklstring(L, arg, len) {   // lauxlib.c:405
     let s = 0;
     s = await lua_tolstring(L, arg, len);
@@ -394,6 +513,13 @@ export async function luaL_checklstring(L, arg, len) {   // lauxlib.c:405
     }
     return s;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} arg int
+ * @param {number} def const char *
+ * @param {number} len size_t *
+ * @returns {Promise<number>} const char *
+ */
 export async function luaL_optlstring(L, arg, def, len) {   // lauxlib.c:412
     let $t1;
     if (lua_type(L, arg) <= 0) {
@@ -405,6 +531,11 @@ export async function luaL_optlstring(L, arg, def, len) {   // lauxlib.c:412
         return await luaL_checklstring(L, arg, len);
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} arg int
+ * @returns {Promise<number>} lua_Number
+ */
 export async function luaL_checknumber(L, arg) {   // lauxlib.c:423
     let d = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(4);
@@ -416,9 +547,20 @@ export async function luaL_checknumber(L, arg) {   // lauxlib.c:423
         return d;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} arg int
+ * @param {number} def lua_Number
+ * @returns {Promise<number>} lua_Number
+ */
 export async function luaL_optnumber(L, arg, def) {   // lauxlib.c:432
     return lua_type(L, arg) <= 0 ? def : await luaL_checknumber(L, arg);
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} arg int
+ * @returns {Promise<void>}
+ */
 async function interror(L, arg) {   // lauxlib.c:437
     if (lua_isnumber(L, arg)) {
         await luaL_argerror(L, arg, $h.lit("number has no integer representation"));
@@ -426,6 +568,11 @@ async function interror(L, arg) {   // lauxlib.c:437
         await tag_error(L, arg, 3);
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} arg int
+ * @returns {Promise<number | bigint>} lua_Integer
+ */
 export async function luaL_checkinteger(L, arg) {   // lauxlib.c:445
     let d = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(4);
@@ -437,9 +584,21 @@ export async function luaL_checkinteger(L, arg) {   // lauxlib.c:445
         return d;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} arg int
+ * @param {number | bigint} def lua_Integer
+ * @returns {Promise<number | bigint>} lua_Integer
+ */
 export async function luaL_optinteger(L, arg, def) {   // lauxlib.c:455
     return lua_type(L, arg) <= 0 ? def : await luaL_checkinteger(L, arg);
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @param {number | bigint} newsize size_t
+ * @returns {Promise<number>} void *
+ */
 async function resizebox(L, idx, newsize) {   // lauxlib.c:476
     let allocf = 0, box = 0, temp = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
@@ -457,10 +616,18 @@ async function resizebox(L, idx, newsize) {   // lauxlib.c:476
         return temp;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function boxgc(L) {   // lauxlib.c:491
     await resizebox(L, 1, 0);
     return 0;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<void>}
+ */
 async function newbox(L) {   // lauxlib.c:504
     let box = 0;
     box = await lua_newuserdatauv(L, 16, 0);
@@ -484,6 +651,11 @@ async function newbox(L) {   // lauxlib.c:504
 ** bytes. (The test for "not big enough" also gets the case when the
 ** computation of 'newsize' overflows.)
 */
+/**
+ * @param {number} B luaL_Buffer *
+ * @param {number | bigint} sz size_t
+ * @returns {Promise<number | bigint>} size_t
+ */
 async function newbuffsize(B, sz) {   // lauxlib.c:535
     let newsize = 0;
     newsize = $c.mulu64($c.divu64($h.ldu64(B + 8), 2), 3);   /* buffer size * 1.5 */
@@ -500,6 +672,12 @@ async function newbuffsize(B, sz) {   // lauxlib.c:535
 ** 'B'. 'boxidx' is the relative position in the stack where is the
 ** buffer's box or its placeholder.
 */
+/**
+ * @param {number} B luaL_Buffer *
+ * @param {number | bigint} sz size_t
+ * @param {number} boxidx int
+ * @returns {Promise<number>} char *
+ */
 async function prepbuffsize(B, sz, boxidx) {   // lauxlib.c:550
     let L = 0, newbuff = 0, newsize = 0;
     0;
@@ -528,9 +706,20 @@ async function prepbuffsize(B, sz, boxidx) {   // lauxlib.c:550
 /*
 ** returns a pointer to a free area with at least 'sz' bytes
 */
+/**
+ * @param {number} B luaL_Buffer *
+ * @param {number | bigint} sz size_t
+ * @returns {Promise<number>} char *
+ */
 export async function luaL_prepbuffsize(B, sz) {   // lauxlib.c:578
     return await prepbuffsize(B, sz, -1);
 }
+/**
+ * @param {number} B luaL_Buffer *
+ * @param {number} s const char *
+ * @param {number | bigint} l size_t
+ * @returns {Promise<void>}
+ */
 export async function luaL_addlstring(B, s, l) {   // lauxlib.c:583
     let b = 0;
     if (l > 0) {
@@ -540,9 +729,18 @@ export async function luaL_addlstring(B, s, l) {   // lauxlib.c:583
         $h.st64(B + 16, $c.addu64($h.ldu64(B + 16), l));
     }
 }
+/**
+ * @param {number} B luaL_Buffer *
+ * @param {number} s const char *
+ * @returns {Promise<void>}
+ */
 export async function luaL_addstring(B, s) {   // lauxlib.c:592
     await luaL_addlstring(B, s, $hl.strlen(s));
 }
+/**
+ * @param {number} B luaL_Buffer *
+ * @returns {Promise<void>}
+ */
 export async function luaL_pushresult(B) {   // lauxlib.c:597
     let L = 0;
     L = $h.u32[(B + 24) >>> 2];
@@ -553,6 +751,11 @@ export async function luaL_pushresult(B) {   // lauxlib.c:597
     }
     lua_rotate(L, -2, -1), await lua_settop(L, -2);   /* remove box or placeholder from the stack */
 }
+/**
+ * @param {number} B luaL_Buffer *
+ * @param {number | bigint} sz size_t
+ * @returns {Promise<void>}
+ */
 export async function luaL_pushresultsize(B, sz) {   // lauxlib.c:607
     $h.st64(B + 16, $c.addu64($h.ldu64(B + 16), sz));
     await luaL_pushresult(B);
@@ -566,6 +769,10 @@ export async function luaL_pushresultsize(B, sz) {   // lauxlib.c:607
 ** trigger an emergency GC, so we should not remove the string from the
 ** stack before we have the space guaranteed.)
 */
+/**
+ * @param {number} B luaL_Buffer *
+ * @returns {Promise<void>}
+ */
 export async function luaL_addvalue(B) {   // lauxlib.c:622
     let L = 0, s = 0, b = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
@@ -578,6 +785,10 @@ export async function luaL_addvalue(B) {   // lauxlib.c:622
         await lua_settop(L, -2);   /* pop string */
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} B luaL_Buffer *
+ */
 export function luaL_buffinit(L, B) {   // lauxlib.c:633
     $h.stp(B + 24, L);
     $h.stp(B, B + 32);
@@ -585,6 +796,12 @@ export function luaL_buffinit(L, B) {   // lauxlib.c:633
     $h.st64(B + 8, 1024);
     lua_pushlightuserdata(L, B);   /* push placeholder */
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} B luaL_Buffer *
+ * @param {number | bigint} sz size_t
+ * @returns {Promise<number>} char *
+ */
 export async function luaL_buffinitsize(L, B, sz) {   // lauxlib.c:642
     luaL_buffinit(L, B);
     return await prepbuffsize(B, sz, -1);
@@ -601,6 +818,11 @@ export async function luaL_buffinitsize(L, B, sz) {   // lauxlib.c:642
 ** t[freelist] is the index of a first free index, or zero if list is
 ** empty; t[t[freelist]] is the index of the second element; etc.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} t int
+ * @returns {Promise<number>} int
+ */
 export async function luaL_ref(L, t) {   // lauxlib.c:664
     let ref = 0;
     if (lua_type(L, -1) === 0) {
@@ -630,6 +852,12 @@ export async function luaL_ref(L, t) {   // lauxlib.c:664
     await lua_rawseti(L, t, ref);
     return ref;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} t int
+ * @param {number} ref int
+ * @returns {Promise<void>}
+ */
 export async function luaL_unref(L, t, ref) {   // lauxlib.c:692
     if (ref >= 0) {
         t = lua_absindex(L, t);
@@ -640,6 +868,12 @@ export async function luaL_unref(L, t, ref) {   // lauxlib.c:692
         await lua_rawseti(L, t, 3);   /* t[freelist] = ref */
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} ud void *
+ * @param {number} size size_t *
+ * @returns {number} const char *
+ */
 function getF(L, ud, size) {   // lauxlib.c:719
     let lf = 0, $t1;
     lf = ud;
@@ -660,6 +894,12 @@ function getF(L, ud, size) {   // lauxlib.c:719
     }
     return lf + 16;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} what const char *
+ * @param {number} fnameindex int
+ * @returns {Promise<number>} int
+ */
 async function errfile(L, what, fnameindex) {   // lauxlib.c:737
     let err = 0, filename = 0;
     err = $h.i32[($hl.__error()) >>> 2];
@@ -678,6 +918,10 @@ async function errfile(L, what, fnameindex) {   // lauxlib.c:737
 ** not), returns the first character anyway to force an error
 ** (as no chunk can start with 0xEF).
 */
+/**
+ * @param {number} f FILE *
+ * @returns {number} int
+ */
 function skipBOM(f) {   // lauxlib.c:755
     let c = 0;
     c = $c.getc($h.deref(f));   /* read first character */
@@ -695,6 +939,11 @@ function skipBOM(f) {   // lauxlib.c:755
 ** first "valid" character of the file (after the optional BOM and
 ** a first-line comment).
 */
+/**
+ * @param {number} f FILE *
+ * @param {number} cp int *
+ * @returns {number} int
+ */
 function skipcomment(f, cp) {   // lauxlib.c:771
     let c = 0, $t1, $t2;
     c = ($t1 = skipBOM(f), $h.i32[cp >>> 2] = $t1);
@@ -710,6 +959,12 @@ function skipcomment(f, cp) {   // lauxlib.c:771
         return 0;   /* no comment */
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} filename const char *
+ * @param {number} mode const char *
+ * @returns {Promise<number>} int
+ */
 export async function luaL_loadfilex(L, filename, mode) {   // lauxlib.c:784
     let status = 0, readstatus = 0, fnameindex = 0, $t1, $t2, $t3, $t4;
     const $sp0 = $h.st.sp, $fp = $h.enter(1044);
@@ -760,6 +1015,12 @@ export async function luaL_loadfilex(L, filename, mode) {   // lauxlib.c:784
         return status;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} ud void *
+ * @param {number} size size_t *
+ * @returns {number} const char *
+ */
 function getS(L, ud, size) {   // lauxlib.c:833
     let ls = 0;
     ls = ud;
@@ -771,6 +1032,14 @@ function getS(L, ud, size) {   // lauxlib.c:833
     $h.st64(ls + 8, 0);
     return $h.u32[ls >>> 2];
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} buff const char *
+ * @param {number | bigint} size size_t
+ * @param {number} name const char *
+ * @param {number} mode const char *
+ * @returns {Promise<number>} int
+ */
 export async function luaL_loadbufferx(L, buff, size, name, mode) {   // lauxlib.c:843
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
     try {
@@ -779,10 +1048,21 @@ export async function luaL_loadbufferx(L, buff, size, name, mode) {   // lauxlib
         return await lua_load(L, $h.fn(getS), $fp, name, mode);
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} s const char *
+ * @returns {Promise<number>} int
+ */
 export async function luaL_loadstring(L, s) {   // lauxlib.c:852
     return await luaL_loadbufferx(L, s, $hl.strlen(s), s, 0);
 }
 /* }====================================================== */
+/**
+ * @param {number} L lua_State *
+ * @param {number} obj int
+ * @param {number} event const char *
+ * @returns {Promise<number>} int
+ */
 export async function luaL_getmetafield(L, obj, event) {   // lauxlib.c:860
     let tt = 0;
     if (!lua_getmetatable(L, obj)) {   /* no metatable? */
@@ -798,6 +1078,12 @@ export async function luaL_getmetafield(L, obj, event) {   // lauxlib.c:860
         return tt;   /* return metafield type */
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} obj int
+ * @param {number} event const char *
+ * @returns {Promise<number>} int
+ */
 export async function luaL_callmeta(L, obj, event) {   // lauxlib.c:876
     obj = lua_absindex(L, obj);
     if (await luaL_getmetafield(L, obj, event) === 0) {   /* no metafield? */
@@ -807,6 +1093,11 @@ export async function luaL_callmeta(L, obj, event) {   // lauxlib.c:876
     await lua_callk(L, 1, 1, 0, 0);
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @returns {Promise<number | bigint>} lua_Integer
+ */
 export async function luaL_len(L, idx) {   // lauxlib.c:886
     let l = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(4);
@@ -820,6 +1111,12 @@ export async function luaL_len(L, idx) {   // lauxlib.c:886
         return l;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @param {number} len size_t *
+ * @returns {Promise<number>} const char *
+ */
 export async function luaL_tolstring(L, idx, len) {   // lauxlib.c:898
     let tt = 0, kind = 0;
     idx = lua_absindex(L, idx);
@@ -867,6 +1164,12 @@ export async function luaL_tolstring(L, idx, len) {   // lauxlib.c:898
 ** function gets the 'nup' elements at the top as upvalues.
 ** Returns with only the table at the stack.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} l const luaL_Reg *
+ * @param {number} nup int
+ * @returns {Promise<void>}
+ */
 export async function luaL_setfuncs(L, l, nup) {   // lauxlib.c:942
     let i = 0;
     await luaL_checkstack(L, nup, $h.lit("too many upvalues"));
@@ -888,6 +1191,12 @@ export async function luaL_setfuncs(L, l, nup) {   // lauxlib.c:942
 ** ensure that stack[idx][fname] has a table and push that table
 ** into the stack
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} idx int
+ * @param {number} fname const char *
+ * @returns {Promise<number>} int
+ */
 export async function luaL_getsubtable(L, idx, fname) {   // lauxlib.c:963
     if (await lua_getfield(L, idx, fname) === 5) {
         return 1;   /* table already there */
@@ -906,6 +1215,13 @@ export async function luaL_getsubtable(L, idx, fname) {   // lauxlib.c:963
 ** if 'glb' is true, also registers the result in the global table.
 ** Leaves resulting module on the top.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} modname const char *
+ * @param {number} openf lua_CFunction
+ * @param {number} glb int
+ * @returns {Promise<void>}
+ */
 export async function luaL_requiref(L, modname, openf, glb) {   // lauxlib.c:983
     await luaL_getsubtable(L, -1001000, $h.lit("_LOADED"));
     await lua_getfield(L, -1, modname);   /* LOADED[modname] */
@@ -924,6 +1240,13 @@ export async function luaL_requiref(L, modname, openf, glb) {   // lauxlib.c:983
         await lua_setglobal(L, modname);   /* _G[modname] = module */
     }
 }
+/**
+ * @param {number} b luaL_Buffer *
+ * @param {number} s const char *
+ * @param {number} p const char *
+ * @param {number} r const char *
+ * @returns {Promise<void>}
+ */
 export async function luaL_addgsub(b, s, p, r) {   // lauxlib.c:1003
     let wild = 0, l = 0;
     l = $hl.strlen(p);
@@ -934,6 +1257,13 @@ export async function luaL_addgsub(b, s, p, r) {   // lauxlib.c:1003
     }
     await luaL_addstring(b, s);   /* push last suffix */
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} s const char *
+ * @param {number} p const char *
+ * @param {number} r const char *
+ * @returns {Promise<number>} const char *
+ */
 export async function luaL_gsub(L, s, p, r) {   // lauxlib.c:1016
     const $sp0 = $h.st.sp, $fp = $h.enter(1056);
     try {
@@ -943,6 +1273,13 @@ export async function luaL_gsub(L, s, p, r) {   // lauxlib.c:1016
         return await lua_tolstring(L, -1, 0);
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} ud void *
+ * @param {number} ptr void *
+ * @param {number | bigint} osize size_t
+ * @param {number | bigint} nsize size_t
+ * @returns {number} void *
+ */
 function l_alloc(ud, ptr, osize, nsize) {   // lauxlib.c:1026
     ud;
     osize;   /* not used */
@@ -957,6 +1294,10 @@ function l_alloc(ud, ptr, osize, nsize) {   // lauxlib.c:1026
 ** Standard panic funcion just prints an error message. The test
 ** with 'lua_type' avoids possible memory errors in 'lua_tostring'.
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function panic(L) {   // lauxlib.c:1041
     let msg = 0;
     msg = lua_type(L, -1) === 4 ? await lua_tolstring(L, -1, 0) : $h.lit("error object is not a string");
@@ -967,6 +1308,12 @@ async function panic(L) {   // lauxlib.c:1041
 ** Check whether message is a control message. If so, execute the
 ** control or ignore it if unknown.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} message const char *
+ * @param {number} tocont int
+ * @returns {number} int
+ */
 function checkcontrol(L, message, tocont) {   // lauxlib.c:1066
     let $t1;
     if (tocont || $h.i8[($t1 = message, message = $t1 + 1, $t1)] !== 64) {   /* not a control message? */
@@ -980,6 +1327,11 @@ function checkcontrol(L, message, tocont) {   // lauxlib.c:1066
         return 1;   /* it was a control message */
     }
 }
+/**
+ * @param {number} ud void *
+ * @param {number} message const char *
+ * @param {number} tocont int
+ */
 function warnfoff(ud, message, tocont) {   // lauxlib.c:1079
     checkcontrol(ud, message, tocont);
 }
@@ -987,6 +1339,11 @@ function warnfoff(ud, message, tocont) {   // lauxlib.c:1079
 ** Writes the message and handle 'tocont', finishing the message
 ** if needed and setting the next warn function.
 */
+/**
+ * @param {number} ud void *
+ * @param {number} message const char *
+ * @param {number} tocont int
+ */
 function warnfcont(ud, message, tocont) {   // lauxlib.c:1088
     let L = 0;
     L = ud;
@@ -999,6 +1356,11 @@ function warnfcont(ud, message, tocont) {   // lauxlib.c:1088
         lua_setwarnf(L, $h.fn(warnfon), L);   /* next call is a new message */
     }
 }
+/**
+ * @param {number} ud void *
+ * @param {number} message const char *
+ * @param {number} tocont int
+ */
 function warnfon(ud, message, tocont) {   // lauxlib.c:1100
     if (checkcontrol(ud, message, tocont)) {   /* control message? */
         return;   /* nothing else to be done */
@@ -1006,6 +1368,9 @@ function warnfon(ud, message, tocont) {   // lauxlib.c:1100
     $c.fprintf($h.deref($h.u32[$hl.__stderrp >>> 2]), $h.P($h.lit("%s")), $h.P($h.lit("Lua warning: "))), $c.fflush($h.deref($h.u32[$hl.__stderrp >>> 2]));   /* start a new warning */
     warnfcont(ud, message, tocont);   /* finish processing */
 }
+/**
+ * @returns {Promise<number>} lua_State *
+ */
 export async function luaL_newstate() {   // lauxlib.c:1108
     let L = 0;
     L = await lua_newstate($h.fn(l_alloc), 0);
@@ -1015,6 +1380,12 @@ export async function luaL_newstate() {   // lauxlib.c:1108
     }
     return L;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} ver lua_Number
+ * @param {number | bigint} sz size_t
+ * @returns {Promise<void>}
+ */
 export async function luaL_checkversion_(L, ver, sz) {   // lauxlib.c:1118
     let v = 0;
     v = lua_version(L);

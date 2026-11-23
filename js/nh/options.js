@@ -217,6 +217,9 @@ const bgp = $c.nulls(4);
 /* ask user if they want a tutorial, except if tutorial boolean option has
    been set in config - either on or off - in which case just obey that
    setting without asking */
+/**
+ * @returns {Promise<number>} boolean
+ */
 export async function ask_do_tutorial() {   // options.c:430
     let dotut = 0, win = 0, sel = [null], any = new $T.any(), buf = new Int8Array(256), rc = null, norc = 0, n = 0, pass = 0, $t1;
     dotut = flags.tutorial;
@@ -258,6 +261,12 @@ export async function ask_do_tutorial() {   // options.c:430
  *   parseoptions
  *
  **********************************
+ */
+/**
+ * @param {$c.Ptr | null} opts char *
+ * @param {number} tinitial boolean
+ * @param {number} tfrom_file boolean
+ * @returns {Promise<number>} boolean
  */
 export async function parseoptions(opts, tinitial, tfrom_file) {   // options.c:489
     let op = null, negated = 0, got_match = 0, pfx_match = 0, i = 0, matchidx = 0, optresult = 0, optlen = 0, optlen_wo_val = 0, retval = 0, pfxbuf = new Int8Array(256), pfxp = null, $t1;
@@ -419,6 +428,11 @@ export async function parseoptions(opts, tinitial, tfrom_file) {   // options.c:
     await config_error_add($c.lit("Unknown option '%s'"), opts);
     return FALSE;
 }
+/**
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {number} int
+ */
 function check_misc_menu_command(opts, op) {   // options.c:694
     let i = 0, name_to_check = null;
     /* check for menu command mapping */
@@ -431,6 +445,10 @@ function check_misc_menu_command(opts, op) {   // options.c:694
     return -1;
 }
 /* role => 0, race => 1, gender => 2, alignment =>3 */
+/**
+ * @param {number} roleopt int
+ * @returns {number} int
+ */
 function opt2roleopt(roleopt) {   // options.c:715
     switch (roleopt) {
         case opt_role:
@@ -447,6 +465,11 @@ function opt2roleopt(roleopt) {   // options.c:715
     return 0;
 }
 /* fetch saved option string for a particular option phase */
+/**
+ * @param {number} optidx int
+ * @param {number} ophase int
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 async function getoptstr(optidx, ophase) {   // options.c:734
     let roleoptindx = 0, phase = 0;
     roleoptindx = opt2roleopt(optidx);
@@ -468,6 +491,11 @@ async function getoptstr(optidx, ophase) {   // options.c:734
     /*NOTREACHED*/
 }
 /* to track some unparsed option settings in case #saveoptions needs them */
+/**
+ * @param {number} optidx int
+ * @param {$c.Ptr | null} optstr const char *
+ * @returns {Promise<void>}
+ */
 async function saveoptstr(optidx, optstr) {   // options.c:758
     let phase = 0, roleoptindx = 0, p = null, q = null, $t1;
     phase = go.opt_phase | 0;
@@ -487,6 +515,10 @@ async function saveoptstr(optidx, optstr) {   // options.c:758
     $t1 = await dupstr(optstr), roleoptvals[roleoptindx][phase] = $t1;
 }
 /* discard specific saved option string */
+/**
+ * @param {number} optidx int
+ * @param {number} ophase int
+ */
 function unsaveoptstr(optidx, ophase) {   // options.c:776
     let roleoptindx = 0;
     roleoptindx = opt2roleopt(optidx);
@@ -510,6 +542,14 @@ export function freeroleoptvals() {   // options.c:787
 /* len includes terminating '\0' for non-Null values */
 /* 0 */
 /* common to optfn_catname(), optfn_dogname(), optfn_horsename() */
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {number} int
+ */
 function petname_optfn(optidx, req, negated, opts, op) {   // options.c:848
     let failsafe = new Int8Array(64), petname = null;
     petname = optidx === opt_catname ? new $c.Ptr(gc.catname, 0) : optidx === opt_dogname ? new $c.Ptr(gd.dogname, 0) : optidx === opt_horsename ? new $c.Ptr(gh.horsename, 0) : new $c.Ptr(failsafe, 0);
@@ -535,6 +575,14 @@ function petname_optfn(optidx, req, negated, opts, op) {   // options.c:848
  *   Per-option Functions
  *
  **********************************
+ */
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op$in char *
+ * @returns {Promise<number>} int
  */
 async function optfn_alignment(optidx, req, negated, opts, op$in) {   // options.c:885
     const op = [op$in];
@@ -567,6 +615,14 @@ async function optfn_alignment(optidx, req, negated, opts, op$in) {   // options
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_align_message(optidx, req, negated, opts, op) {   // options.c:923
     let which = 0;
     if (req === do_init) {
@@ -604,6 +660,14 @@ async function optfn_align_message(optidx, req, negated, opts, op) {   // option
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_align_status(optidx, req, negated, opts, op) {   // options.c:973
     let which = 0;
     if (req === do_init) {
@@ -641,6 +705,14 @@ async function optfn_align_status(optidx, req, negated, opts, op) {   // options
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {number} int
+ */
 function optfn_altkeyhandling(optidx, req, negated, opts, op) {   // options.c:1022
     if (req === do_init) {
         return optn_ok;
@@ -657,6 +729,14 @@ function optfn_altkeyhandling(optidx, req, negated, opts, op) {   // options.c:1
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_autounlock(optidx, req, negated, opts, op) {   // options.c:1066
     let sep = 0, nxt = null, newflags = 0, i = 0, matched = 0, p = null, $t1;
     if (req === do_init) {
@@ -751,6 +831,14 @@ async function optfn_autounlock(optidx, req, negated, opts, op) {   // options.c
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_boulder(optidx, req, negated, opts, op) {   // options.c:1171
     let clash = 0, sym = 0;
     clash = 0;
@@ -806,9 +894,25 @@ async function optfn_boulder(optidx, req, negated, opts, op) {   // options.c:11
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {number} int
+ */
 function optfn_catname(optidx, req, negated, opts, op) {   // options.c:1249
     return petname_optfn(optidx, req, negated, opts, op);
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_crash_email(optidx, req, negated, opts, op) {   // options.c:1259
     let $t1;
     if (req === do_init) {
@@ -835,6 +939,14 @@ async function optfn_crash_email(optidx, req, negated, opts, op) {   // options.
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_crash_name(optidx, req, negated, opts, op) {   // options.c:1285
     let $t1;
     if (req === do_init) {
@@ -861,6 +973,14 @@ async function optfn_crash_name(optidx, req, negated, opts, op) {   // options.c
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_crash_urlmax(optidx, req, negated, opts, op) {   // options.c:1311
     let temp = 0;
     if (req === do_init) {
@@ -891,6 +1011,14 @@ async function optfn_crash_urlmax(optidx, req, negated, opts, op) {   // options
 /* CRASHREPORT */
 /* "cursesgraphics" */
 /* There is no rogue level cursesgraphics-specific set */
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_DECgraphics(optidx, req, negated, opts, op) {   // options.c:1394
     let badflag = 0, $t1;
     badflag = FALSE;
@@ -925,6 +1053,14 @@ async function optfn_DECgraphics(optidx, req, negated, opts, op) {   // options.
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_disclose(optidx, req, negated, opts, op) {   // options.c:1442
     let i = 0, idx = 0, prefix_val = 0, num = 0, c = 0, dop = null;
     if (req === do_init) {
@@ -1030,9 +1166,25 @@ async function optfn_disclose(optidx, req, negated, opts, op) {   // options.c:1
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {number} int
+ */
 function optfn_dogname(optidx, req, negated, opts, op) {   // options.c:1563
     return petname_optfn(optidx, req, negated, opts, op);
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {number} int
+ */
 function optfn_dungeon(optidx, req, negated, opts, op) {   // options.c:1572
     if (req === do_init) {
         return optn_ok;
@@ -1050,6 +1202,14 @@ function optfn_dungeon(optidx, req, negated, opts, op) {   // options.c:1572
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {number} int
+ */
 function optfn_effects(optidx, req, negated, opts, op) {   // options.c:1594
     if (req === do_init) {
         return optn_ok;
@@ -1067,46 +1227,134 @@ function optfn_effects(optidx, req, negated, opts, op) {   // options.c:1594
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_font_map(optidx, req, negated, opts, op) {   // options.c:1616
     /* send them over to the prefix handling for font_ */
     return await pfxfn_font(optidx, req, negated, opts, op);
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_font_menu(optidx, req, negated, opts, op) {   // options.c:1625
     /* send them over to the prefix handling for font_ */
     return await pfxfn_font(optidx, req, negated, opts, op);
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_font_message(optidx, req, negated, opts, op) {   // options.c:1634
     /* send them over to the prefix handling for font_ */
     return await pfxfn_font(optidx, req, negated, opts, op);
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_font_size_map(optidx, req, negated, opts, op) {   // options.c:1643
     /* send them over to the prefix handling for font_ */
     return await pfxfn_font(optidx, req, negated, opts, op);
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_font_size_menu(optidx, req, negated, opts, op) {   // options.c:1652
     /* send them over to the prefix handling for font_ */
     return await pfxfn_font(optidx, req, negated, opts, op);
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_font_size_message(optidx, req, negated, opts, op) {   // options.c:1661
     /* send them over to the prefix handling for font_ */
     return await pfxfn_font(optidx, req, negated, opts, op);
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_font_size_status(optidx, req, negated, opts, op) {   // options.c:1670
     /* send them over to the prefix handling for font_ */
     return await pfxfn_font(optidx, req, negated, opts, op);
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_font_size_text(optidx, req, negated, opts, op) {   // options.c:1679
     /* send them over to the prefix handling for font_ */
     return await pfxfn_font(optidx, req, negated, opts, op);
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_font_status(optidx, req, negated, opts, op) {   // options.c:1688
     /* send them over to the prefix handling for font_ */
     return await pfxfn_font(optidx, req, negated, opts, op);
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_font_text(optidx, req, negated, opts, op) {   // options.c:1697
     /* send them over to the prefix handling for font_ */
     return await pfxfn_font(optidx, req, negated, opts, op);
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_fruit(optidx, req, negated, opts, op) {   // options.c:1706
     let forig = null, f = null, fnum = Int32Array.of(0);
     forig = null;
@@ -1174,6 +1422,14 @@ async function optfn_fruit(optidx, req, negated, opts, op) {   // options.c:1706
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op$in char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_gender(optidx, req, negated, opts, op$in) {   // options.c:1777
     const op = [op$in];
     let $t1;
@@ -1206,6 +1462,14 @@ async function optfn_gender(optidx, req, negated, opts, op$in) {   // options.c:
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_glyph(optidx, req, negated, opts, op) {   // options.c:1815
     let glyph = Int32Array.of(0);
     if (req === do_init) {
@@ -1239,6 +1503,14 @@ async function optfn_glyph(optidx, req, negated, opts, op) {   // options.c:1815
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_hilite_status(optidx, req, negated, opts, op) {   // options.c:1852
     if (req === do_init) {
         return optn_ok;
@@ -1267,9 +1539,25 @@ async function optfn_hilite_status(optidx, req, negated, opts, op) {   // option
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {number} int
+ */
 function optfn_horsename(optidx, req, negated, opts, op) {   // options.c:1897
     return petname_optfn(optidx, req, negated, opts, op);
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_IBMgraphics(optidx, req, negated, opts, op) {   // options.c:1906
     let sym_name = null, badflag = 0, i = 0, $t1;
     sym_name = allopt[optidx].name;
@@ -1313,6 +1601,14 @@ async function optfn_IBMgraphics(optidx, req, negated, opts, op) {   // options.
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_map_mode(optidx, req, negated, opts, op) {   // options.c:1963
     let i = 0, save_map_mode = 0;
     if (req === do_init) {
@@ -1378,6 +1674,14 @@ async function optfn_map_mode(optidx, req, negated, opts, op) {   // options.c:1
 }
 /* all the key assignment options for menu_* commands are identical
    but optlist.h treats them as distinct rather than sharing one */
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function shared_menu_optfn(optidx, req, negated, opts, op) {   // options.c:2052
     let res = 0;
     if (req === do_init) {
@@ -1400,46 +1704,158 @@ async function shared_menu_optfn(optidx, req, negated, opts, op) {   // options.
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_menu_deselect_all(optidx, req, negated, opts, op) {   // options.c:2077
     return await shared_menu_optfn(optidx, req, negated, opts, op);
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_menu_deselect_page(optidx, req, negated, opts, op) {   // options.c:2085
     return await shared_menu_optfn(optidx, req, negated, opts, op);
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_menu_first_page(optidx, req, negated, opts, op) {   // options.c:2093
     return await shared_menu_optfn(optidx, req, negated, opts, op);
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_menu_invert_all(optidx, req, negated, opts, op) {   // options.c:2101
     return await shared_menu_optfn(optidx, req, negated, opts, op);
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_menu_invert_page(optidx, req, negated, opts, op) {   // options.c:2109
     return await shared_menu_optfn(optidx, req, negated, opts, op);
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_menu_last_page(optidx, req, negated, opts, op) {   // options.c:2117
     return await shared_menu_optfn(optidx, req, negated, opts, op);
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_menu_next_page(optidx, req, negated, opts, op) {   // options.c:2125
     return await shared_menu_optfn(optidx, req, negated, opts, op);
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_menu_previous_page(optidx, req, negated, opts, op) {   // options.c:2133
     return await shared_menu_optfn(optidx, req, negated, opts, op);
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_menu_search(optidx, req, negated, opts, op) {   // options.c:2141
     return await shared_menu_optfn(optidx, req, negated, opts, op);
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_menu_select_all(optidx, req, negated, opts, op) {   // options.c:2149
     return await shared_menu_optfn(optidx, req, negated, opts, op);
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_menu_select_page(optidx, req, negated, opts, op) {   // options.c:2157
     return await shared_menu_optfn(optidx, req, negated, opts, op);
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_menu_shift_left(optidx, req, negated, opts, op) {   // options.c:2165
     return await shared_menu_optfn(optidx, req, negated, opts, op);
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_menu_shift_right(optidx, req, negated, opts, op) {   // options.c:2173
     return await shared_menu_optfn(optidx, req, negated, opts, op);
 }
 /* end of shared key assignments for menu commands */
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_menu_headings(optidx, req, negated, opts, op) {   // options.c:2183
     let ca = new $T.color_and_attr(), ca_buf = new Int8Array(256);
     if (req === do_init) {
@@ -1475,6 +1891,14 @@ async function optfn_menu_headings(optidx, req, negated, opts, op) {   // option
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_menu_objsyms(optidx, req, negated, opts, op) {   // options.c:2225
     let k = 0, l = 0, i = 0, osyms = 0, l5 = 0;
     if (req === do_init) {
@@ -1529,6 +1953,14 @@ async function optfn_menu_objsyms(optidx, req, negated, opts, op) {   // options
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_menuinvertmode(optidx, req, negated, opts, op) {   // options.c:2290
     let mode = 0;
     if (req === do_init) {
@@ -1552,6 +1984,14 @@ async function optfn_menuinvertmode(optidx, req, negated, opts, op) {   // optio
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_menustyle(optidx, req, negated, opts, op) {   // options.c:2320
     let tmp = 0, val_required = 0;
     /* no initializer based on opts because this can be
@@ -1608,6 +2048,14 @@ async function optfn_menustyle(optidx, req, negated, opts, op) {   // options.c:
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {number} int
+ */
 function optfn_monsters(optidx, req, negated, opts, op) {   // options.c:2378
     if (req === do_init) {
         return optn_ok;
@@ -1621,6 +2069,14 @@ function optfn_monsters(optidx, req, negated, opts, op) {   // options.c:2378
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_mouse_support(optidx, req, negated, opts, op) {   // options.c:2396
     let compat = 0, mode = 0, ms = 0;
     if (req === do_init) {
@@ -1660,6 +2116,14 @@ async function optfn_mouse_support(optidx, req, negated, opts, op) {   // option
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_msg_window(optidx, req, negated, opts, op) {   // options.c:2456
     let retval = 0, tmp = 0;
     retval = optn_ok;
@@ -1711,6 +2175,14 @@ async function optfn_msg_window(optidx, req, negated, opts, op) {   // options.c
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_msghistory(optidx, req, negated, opts, op) {   // options.c:2523
     let $t1;
     if (req === do_init) {
@@ -1732,6 +2204,14 @@ async function optfn_msghistory(optidx, req, negated, opts, op) {   // options.c
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_name(optidx, req, negated, opts, op) {   // options.c:2549
     if (req === do_init) {
         return optn_ok;
@@ -1751,6 +2231,14 @@ async function optfn_name(optidx, req, negated, opts, op) {   // options.c:2549
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_number_pad(optidx, req, negated, opts, op) {   // options.c:2574
     let compat = 0, mode = 0, indx = 0;
     if (req === do_init) {
@@ -1810,6 +2298,14 @@ async function optfn_number_pad(optidx, req, negated, opts, op) {   // options.c
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {number} int
+ */
 function optfn_objects(optidx, req, negated, opts, op) {   // options.c:2648
     if (req === do_init) {
         return optn_ok;
@@ -1827,6 +2323,14 @@ function optfn_objects(optidx, req, negated, opts, op) {   // options.c:2648
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_packorder(optidx, req, negated, opts, op) {   // options.c:2670
     let ocl = new Int8Array(19);
     if (req === do_init) {
@@ -1860,6 +2364,14 @@ async function optfn_packorder(optidx, req, negated, opts, op) {   // options.c:
 /* 0 */
 /* CHANGE_COLOR */
 /* for "paranoid_confirmation:foo" and alias "[!]prayconfirm" */
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} opt_negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_paranoid_confirmation(optidx, req, opt_negated, opts, op) {   // options.c:2818
     let fld_negated = 0, i = 0, prayconfirm = new Int8Array(6), pp = null, plus_or_minus = 0, tmpbuf = new Int8Array(256);
     /*
@@ -2060,6 +2572,14 @@ async function optfn_paranoid_confirmation(optidx, req, opt_negated, opts, op) {
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_perminv_mode(optidx, req, negated, opts, op) {   // options.c:3046
     let old_perm_invent = 0, old_perminv_mode = 0, retval = 0, pi0 = null, pi1 = null, i = 0, ln = 0;
     old_perm_invent = iflags.perm_invent;
@@ -2135,6 +2655,14 @@ async function optfn_perminv_mode(optidx, req, negated, opts, op) {   // options
     }
     return retval;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_petattr(optidx, req, negated, opts, op) {   // options.c:3138
     let retval = 0, itmp = 0;
     retval = optn_ok;
@@ -2182,6 +2710,14 @@ async function optfn_petattr(optidx, req, negated, opts, op) {   // options.c:31
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_pettype(optidx, req, negated, opts, op) {   // options.c:3197
     if (req === do_init) {
         return optn_ok;
@@ -2241,6 +2777,14 @@ async function optfn_pettype(optidx, req, negated, opts, op) {   // options.c:31
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_pickup_burden(optidx, req, negated, opts, op) {   // options.c:3256
     if (req === do_init) {
         return optn_ok;
@@ -2292,6 +2836,14 @@ async function optfn_pickup_burden(optidx, req, negated, opts, op) {   // option
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_pickup_types(optidx, req, negated, opts, op) {   // options.c:3308
     let ocl = new Int8Array(19), tbuf = new Int8Array(19), qbuf = new Int8Array(128), abuf = new Int8Array(256), oc_sym = 0, num = 0, badopt = 0, compat = 0, use_menu = 0, wasspace = 0;
     badopt = FALSE;
@@ -2376,6 +2928,14 @@ async function optfn_pickup_types(optidx, req, negated, opts, op) {   // options
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_pile_limit(optidx, req, negated, opts, op) {   // options.c:3404
     let $t1;
     if (req === do_init) {
@@ -2407,6 +2967,14 @@ async function optfn_pile_limit(optidx, req, negated, opts, op) {   // options.c
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_player_selection(optidx, req, negated, opts, op) {   // options.c:3438
     if (req === do_init) {
         return optn_ok;
@@ -2432,6 +3000,14 @@ async function optfn_player_selection(optidx, req, negated, opts, op) {   // opt
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_playmode(optidx, req, negated, opts, op) {   // options.c:3471
     let $t1;
     if (req === do_init) {
@@ -2463,6 +3039,14 @@ async function optfn_playmode(optidx, req, negated, opts, op) {   // options.c:3
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op$in char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_race(optidx, req, negated, opts, op$in) {   // options.c:3507
     const op = [op$in];
     let $t1;
@@ -2495,6 +3079,14 @@ async function optfn_race(optidx, req, negated, opts, op$in) {   // options.c:35
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_roguesymset(optidx, req, negated, opts, op) {   // options.c:3545
     let $t1, $t2;
     if (req === do_init) {
@@ -2534,6 +3126,14 @@ async function optfn_roguesymset(optidx, req, negated, opts, op) {   // options.
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op$in char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_role(optidx, req, negated, opts, op$in) {   // options.c:3589
     const op = [op$in];
     let $t1;
@@ -2566,6 +3166,14 @@ async function optfn_role(optidx, req, negated, opts, op$in) {   // options.c:35
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_runmode(optidx, req, negated, opts, op) {   // options.c:3627
     if (req === do_init) {
         return optn_ok;
@@ -2601,6 +3209,14 @@ async function optfn_runmode(optidx, req, negated, opts, op) {   // options.c:36
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_scores(optidx, req, negated, opts, op) {   // options.c:3669
     let inum = 0, $t1, $t2;
     if (req === do_init) {
@@ -2690,6 +3306,14 @@ async function optfn_scores(optidx, req, negated, opts, op) {   // options.c:366
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_scroll_amount(optidx, req, negated, opts, op) {   // options.c:3763
     let $t1;
     if (req === do_init) {
@@ -2716,6 +3340,14 @@ async function optfn_scroll_amount(optidx, req, negated, opts, op) {   // option
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_scroll_margin(optidx, req, negated, opts, op) {   // options.c:3794
     let $t1;
     if (req === do_init) {
@@ -2742,6 +3374,14 @@ async function optfn_scroll_margin(optidx, req, negated, opts, op) {   // option
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_soundlib(optidx, req, negated, opts, op) {   // options.c:3824
     let soundlibbuf = new Int8Array(16), option_id = 0;
     if (req === do_init) {
@@ -2773,6 +3413,14 @@ async function optfn_soundlib(optidx, req, negated, opts, op) {   // options.c:3
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_sortdiscoveries(optidx, req, negated, opts, op) {   // options.c:3863
     if (req === do_init) {
         flags.discosort = 111;
@@ -2823,6 +3471,14 @@ async function optfn_sortdiscoveries(optidx, req, negated, opts, op) {   // opti
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_sortloot(optidx, req, negated, opts, op) {   // options.c:3914
     let i = 0, c = 0;
     if (req === do_init) {
@@ -2864,6 +3520,14 @@ async function optfn_sortloot(optidx, req, negated, opts, op) {   // options.c:3
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_sortvanquished(optidx, req, negated, opts, op) {   // options.c:3958
     let optname = null, p = null, vndx = 0, prev_sortmode = 0;
     /* insight.c */
@@ -2907,6 +3571,14 @@ async function optfn_sortvanquished(optidx, req, negated, opts, op) {   // optio
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_statushilites(optidx, req, negated, opts, op) {   // options.c:4013
     let $t1;
     if (req === do_init) {
@@ -2942,6 +3614,14 @@ async function optfn_statushilites(optidx, req, negated, opts, op) {   // option
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_statuslines(optidx, req, negated, opts, op) {   // options.c:4067
     let retval = 0, itmp = 0;
     retval = optn_ok;
@@ -2982,6 +3662,14 @@ async function optfn_statuslines(optidx, req, negated, opts, op) {   // options.
     return optn_ok;
 }
 /* WIN32CON */
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_suppress_alert(optidx, req, negated, opts, op) {   // options.c:4135
     if (req === do_init) {
         return optn_ok;
@@ -3008,6 +3696,14 @@ async function optfn_suppress_alert(optidx, req, negated, opts, op) {   // optio
     return optn_ok;
 }
 /* symbols.c */
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_symset(optidx, req, negated, opts, op) {   // options.c:4167
     let reslt = 0, $t1, $t2;
     if (req === do_init) {
@@ -3063,6 +3759,14 @@ async function optfn_symset(optidx, req, negated, opts, op) {   // options.c:416
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_term_cols(optidx, req, negated, opts, op) {   // options.c:4239
     let retval = 0, ltmp = 0;
     retval = optn_ok;
@@ -3097,6 +3801,14 @@ async function optfn_term_cols(optidx, req, negated, opts, op) {   // options.c:
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_term_rows(optidx, req, negated, opts, op) {   // options.c:4280
     let retval = 0, ltmp = 0;
     retval = optn_ok;
@@ -3131,6 +3843,14 @@ async function optfn_term_rows(optidx, req, negated, opts, op) {   // options.c:
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_tile_file(optidx, req, negated, opts, op) {   // options.c:4321
     let $t1;
     if (req === do_init) {
@@ -3162,6 +3882,14 @@ async function optfn_tile_file(optidx, req, negated, opts, op) {   // options.c:
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_tile_height(optidx, req, negated, opts, op) {   // options.c:4354
     let $t1;
     if (req === do_init) {
@@ -3190,6 +3918,14 @@ async function optfn_tile_height(optidx, req, negated, opts, op) {   // options.
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_tile_width(optidx, req, negated, opts, op) {   // options.c:4386
     let $t1;
     if (req === do_init) {
@@ -3218,6 +3954,14 @@ async function optfn_tile_width(optidx, req, negated, opts, op) {   // options.c
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {number} int
+ */
 function optfn_traps(optidx, req, negated, opts, op) {   // options.c:4418
     if (req === do_init) {
         return optn_ok;
@@ -3235,6 +3979,14 @@ function optfn_traps(optidx, req, negated, opts, op) {   // options.c:4418
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_vary_msgcount(optidx, req, negated, opts, op) {   // options.c:4440
     let $t1;
     if (req === do_init) {
@@ -3263,6 +4015,14 @@ async function optfn_vary_msgcount(optidx, req, negated, opts, op) {   // option
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_versinfo(optidx, req, negated, opts, op) {   // options.c:4472
     let optname = null, vi = 0, have_branch = 0, val = 0, dflt = 0, vbuf = new Int8Array(128), g = 0, b = 0, n = 0;
     optname = allopt[optidx].name;
@@ -3319,6 +4079,14 @@ async function optfn_versinfo(optidx, req, negated, opts, op) {   // options.c:4
 /* video:string */
 /* NO_TERMS */
 /* MSDOS */
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_warnings(optidx, req, negated, opts, op) {   // options.c:4682
     let reslt = 0;
     if (req === do_init) {
@@ -3334,6 +4102,14 @@ async function optfn_warnings(optidx, req, negated, opts, op) {   // options.c:4
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_whatis_coord(optidx, req, negated, opts, op) {   // options.c:4703
     let c = 0;
     if (req === do_init) {
@@ -3365,6 +4141,14 @@ async function optfn_whatis_coord(optidx, req, negated, opts, op) {   // options
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_whatis_filter(optidx, req, negated, opts, op) {   // options.c:4748
     let c = 0;
     if (req === do_init) {
@@ -3406,6 +4190,14 @@ async function optfn_whatis_filter(optidx, req, negated, opts, op) {   // option
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_windowborders(optidx, req, negated, opts, op) {   // options.c:4797
     let retval = 0, itmp = 0;
     retval = optn_ok;
@@ -3450,6 +4242,14 @@ async function optfn_windowborders(optidx, req, negated, opts, op) {   // option
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_windowcolors(optidx, req, negated, opts, op) {   // options.c:4894
     let wccount = 0, fg = null, bg = null;
     if (req === do_init) {
@@ -3489,6 +4289,14 @@ async function optfn_windowcolors(optidx, req, negated, opts, op) {   // options
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_windowtype(optidx, req, negated, opts, op) {   // options.c:4943
     if (req === do_init) {
         return optn_ok;
@@ -3532,6 +4340,14 @@ async function optfn_windowtype(optidx, req, negated, opts, op) {   // options.c
 /*
  *    Prefix-handling functions
  */
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function pfxfn_cond_(optidx, req, negated, opts, op) {   // options.c:4994
     let reslt = 0;
     if (req === do_init) {
@@ -3571,6 +4387,14 @@ async function pfxfn_cond_(optidx, req, negated, opts, op) {   // options.c:4994
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function pfxfn_font(optidx, req, negated, opts, op) {   // options.c:5039
     let opttype = 0, $t1, $t2, $t3, $t4, $t5;
     opttype = -1;
@@ -3689,6 +4513,14 @@ async function pfxfn_font(optidx, req, negated, opts, op) {   // options.c:5039
 /*
  *    General boolean option handler
  *    (Use optidx to reference the specific option)
+ */
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
  */
 export async function optfn_boolean(optidx, req, negated, opts, op) {   // options.c:5192
     let nosexchange = 0, ln = 0, $t1, $t2, $t3;
@@ -3916,6 +4748,14 @@ export async function optfn_boolean(optidx, req, negated, opts, op) {   // optio
     }
     return optn_ok;
 }
+/**
+ * @param {number} midx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function spcfn_misc_menu_cmd(midx, req, negated, opts, op) {   // options.c:5452
     let c = 0;
     if (req === do_init) {
@@ -3948,6 +4788,9 @@ async function spcfn_misc_menu_cmd(midx, req, negated, opts, op) {   // options.
  **********************************
  */
 /* test whether 'perm_invent' can be toggled On */
+/**
+ * @returns {number} boolean
+ */
 function can_set_perm_invent() {   // options.c:5488
     let old_perminv_mode = 0;
     /*
@@ -3970,6 +4813,9 @@ function can_set_perm_invent() {   // options.c:5488
     nhUse(old_perminv_mode);
     return TRUE;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function handler_menustyle() {   // options.c:5544
     let tmpwin = 0, any = new $T.any(), chngd = 0, i = 0, n = 0, old_menu_style = 0, buf = new Int8Array(256), sep = 0, style_pick = [null], clr = 0;
     old_menu_style = flags.menu_style;
@@ -4005,6 +4851,10 @@ async function handler_menustyle() {   // options.c:5544
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @returns {Promise<number>} int
+ */
 async function handler_align_misc(optidx) {   // options.c:5586
     let tmpwin = 0, any = new $T.any(), window_pick = [null], abuf = new Int8Array(256), clr = 0;
     window_pick[0] = null;
@@ -4033,6 +4883,10 @@ async function handler_align_misc(optidx) {   // options.c:5586
     await destroy_nhwindow()(tmpwin);
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @returns {Promise<number>} int
+ */
 async function handler_autounlock(optidx) {   // options.c:5624
     let tmpwin = 0, any = new $T.any(), chngd = 0, oldflags = 0, optname = null, buf = new Int8Array(256), sep = 0, window_pick = [null], i = 0, n = 0, presel = 0, res = 0, clr = 0, newflags = 0;
     oldflags = flags.autounlock;
@@ -4075,6 +4929,9 @@ async function handler_autounlock(optidx) {   // options.c:5624
     }
     return res;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function handler_disclose() {   // options.c:5675
     let tmpwin = 0, any = new $T.any(), i = 0, n = 0, buf = new Int8Array(256), disc_cat = new Int32Array(6), pick_cnt = 0, pick_idx = 0, opt_idx = 0, c = 0, disclosure_pick = [null], clr = 0;
     /* order of disclose_names[] must correspond to
@@ -4139,6 +4996,9 @@ async function handler_disclose() {   // options.c:5675
     }
     return optn_ok;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function handler_menu_headings() {   // options.c:5780
     let gotca = 0;
     gotca = await query_color_attr(iflags.menu_headings, $c.lit("How to highlight menu headings:"));
@@ -4151,6 +5011,9 @@ async function handler_menu_headings() {   // options.c:5780
     adjust_menu_promptstyle($G.WIN_INVEN, iflags.menu_headings);
     return optn_ok;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function handler_menu_objsyms() {   // options.c:5795
     let tmpwin = 0, any = new $T.any(), buf = new Int8Array(256), picklist = [null], sep = 0, i = 0, j = 0, n = 0, clr = 0;
     picklist[0] = null;
@@ -4179,6 +5042,9 @@ async function handler_menu_objsyms() {   // options.c:5795
     await destroy_nhwindow()(tmpwin);
     return optn_ok;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function handler_msg_window() {   // options.c:5832
     let tmpwin = 0, any = new $T.any(), is_tty = 0, is_curses = 0, clr = 0, chngd = 0, i = 0, n = 0, buf = new Int8Array(256), c = 0, sep = 0, old_prevmsg_window = 0, window_pick = [null], $t1;
     /* tty or curses */
@@ -4227,6 +5093,9 @@ async function handler_msg_window() {   // options.c:5832
     }
     return optn_ok;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function handler_number_pad() {   // options.c:5893
     let tmpwin = 0, any = new $T.any(), i = 0, mode_pick = [null], clr = 0;
     mode_pick[0] = null;
@@ -4274,6 +5143,9 @@ async function handler_number_pad() {   // options.c:5893
     await destroy_nhwindow()(tmpwin);
     return optn_ok;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function handler_paranoid_confirmation() {   // options.c:5953
     let tmpwin = 0, any = new $T.any(), i = 0, mkey = 0, mbuf = new Int8Array(128), ebuf = new Int8Array(256), cbuf = new Int8Array(128), explain = null, cmdnm = null, paranoia_picks = [null], clr = 0;
     paranoia_picks[0] = null;
@@ -4324,6 +5196,9 @@ async function handler_paranoid_confirmation() {   // options.c:5953
     await destroy_nhwindow()(tmpwin);
     return optn_ok;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function handler_perminv_mode() {   // options.c:6011
     let tmpwin = 0, any = new $T.any(), let_ = 0, buf = new Int8Array(256), sepbuf = new Int8Array(10), pi0 = null, pi1 = null, pi_pick = [null], old_perm_invent = 0, i = 0, n = 0, old_pi = 0, new_pi = 0, widest = 0, numspaces = 0, $t1;
     pi_pick[0] = null;
@@ -4382,6 +5257,9 @@ async function handler_perminv_mode() {   // options.c:6011
     }
     return optn_ok;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function handler_pickup_burden() {   // options.c:6086
     let tmpwin = 0, any = new $T.any(), i = 0, burden_name = null, burden_letters = null, burden_pick = [null], clr = 0;
     burden_letters = $c.lit("ubsntl");
@@ -4403,12 +5281,18 @@ async function handler_pickup_burden() {   // options.c:6086
     await destroy_nhwindow()(tmpwin);
     return optn_ok;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function handler_pickup_types() {   // options.c:6114
     let buf = new Int8Array(256);
     /* parseoptions will prompt for the list of types */
     await parseoptions($c.strcpy(new $c.Ptr(buf, 0), $c.lit("pickup_types")), FALSE, FALSE);
     return optn_ok;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function handler_runmode() {   // options.c:6124
     let tmpwin = 0, any = new $T.any(), i = 0, mode_name = null, mode_pick = [null], clr = 0;
     mode_pick[0] = null;
@@ -4429,6 +5313,9 @@ async function handler_runmode() {   // options.c:6124
     await destroy_nhwindow()(tmpwin);
     return optn_ok;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function handler_petattr() {   // options.c:6152
     let tmp = 0;
     tmp = await query_attr($c.lit("Select pet highlight attribute"), iflags.wc2_petattr);
@@ -4441,6 +5328,9 @@ async function handler_petattr() {   // options.c:6152
     }
     return optn_ok;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function handler_sortloot() {   // options.c:6167
     let tmpwin = 0, any = new $T.any(), i = 0, n = 0, sortl_name = null, sortl_pick = [null], clr = 0, c = 0;
     sortl_pick[0] = null;
@@ -4470,6 +5360,9 @@ async function handler_sortloot() {   // options.c:6167
     await destroy_nhwindow()(tmpwin);
     return optn_ok;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function handler_whatis_coord() {   // options.c:6206
     let tmpwin = 0, any = new $T.any(), buf = new Int8Array(256), window_pick = [null], pick_cnt = 0, gpc = 0, clr = 0;
     window_pick[0] = null;
@@ -4510,6 +5403,9 @@ async function handler_whatis_coord() {   // options.c:6206
     await destroy_nhwindow()(tmpwin);
     return optn_ok;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function handler_whatis_filter() {   // options.c:6279
     let tmpwin = 0, any = new $T.any(), window_pick = [null], pick_cnt = 0, gfilt = 0, clr = 0;
     window_pick[0] = null;
@@ -4537,12 +5433,19 @@ async function handler_whatis_filter() {   // options.c:6279
     await destroy_nhwindow()(tmpwin);
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @returns {Promise<number>} int
+ */
 async function handler_symset(optidx) {   // options.c:6321
     let reslt = 0;
     reslt = await do_symset($c.i8(optidx === opt_roguesymset ? 1 : 0));   /* symbols.c */
     go.opt_need_redraw = TRUE;
     return reslt;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function handler_autopickup_exception() {   // options.c:6331
     let tmpwin = 0, any = new $T.any(), i = 0, opt_idx = 0, numapes = 0, apebuf = new Int8Array(258), ape = null, clr = 0, pick_idx = 0, pick_cnt = 0, pick_list = [null], $t1;
     numapes = 0;
@@ -4610,6 +5513,9 @@ async function handler_autopickup_exception() {   // options.c:6331
     }
     return optn_ok;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function handler_menu_colors() {   // options.c:6407
     let tmpwin = 0, any = new $T.any(), buf = new Int8Array(256), opt_idx = 0, nmc = 0, mcclr = 0, mcattr = 0, mcbuf = new Int8Array(256), clr = 0, pick_idx = 0, pick_cnt = 0, mc_idx = 0, ln = 0, sattr = null, sclr = null, pick_list = [null], tmp = null, clrbuf = new Int8Array(128), $goto = null, $t1;
     D1: for (;;) {
@@ -4693,6 +5599,9 @@ async function handler_menu_colors() {   // options.c:6407
         break;
     }
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function handler_msgtype() {   // options.c:6502
     let tmpwin = 0, any = new $T.any(), opt_idx = 0, nmt = 0, mttyp = 0, mtbuf = new Int8Array(256), pick_idx = 0, pick_cnt = 0, mt_idx = 0, ln = 0, mtype = null, pick_list = [null], tmp = null, clr = 0, $t1;
     msgtypes_again$: for (;;) {
@@ -4753,6 +5662,9 @@ async function handler_msgtype() {   // options.c:6502
     }
     return optn_ok;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function handler_versinfo() {   // options.c:6573
     let tmpwin = 0, any = new $T.any(), vi_pick = [null], have_branch = 0, n = 0, vi = 0, i = 0, newval = 0, $t1, $t2, $t3;
     vi_pick[0] = null;
@@ -4783,6 +5695,9 @@ async function handler_versinfo() {   // options.c:6573
     await destroy_nhwindow()(tmpwin);
     return optn_ok;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function handler_windowborders() {   // options.c:6620
     let tmpwin = 0, any = new $T.any(), i = 0, mode_name = null, mode_pick = [null], clr = 0;
     mode_pick[0] = null;
@@ -4812,6 +5727,11 @@ async function handler_windowborders() {   // options.c:6620
  *
  **********************************
  */
+/**
+ * @param {$c.Ptr | null} opts char *
+ * @param {number} val_optional boolean
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 async function string_for_opt(opts, val_optional) {   // options.c:6665
     let colon = null, equals = null;
     colon = $c.strchr(opts, 58);
@@ -4827,6 +5747,12 @@ async function string_for_opt(opts, val_optional) {   // options.c:6665
     }
     return colon;
 }
+/**
+ * @param {$c.Ptr | null} optname const char *
+ * @param {$c.Ptr | null} opts char *
+ * @param {number} val_optional boolean
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 async function string_for_env_opt(optname, opts, val_optional) {   // options.c:6683
     if (!go.opt_initial) {
         await rejectoption(optname);
@@ -4834,12 +5760,20 @@ async function string_for_env_opt(optname, opts, val_optional) {   // options.c:
     }
     return await string_for_opt(opts, val_optional);
 }
+/**
+ * @param {$c.Ptr | null} optname const char *
+ * @param {number} with_parameter boolean
+ * @returns {Promise<void>}
+ */
 async function bad_negation(optname, with_parameter) {   // options.c:6693
     await config_error_add($c.lit("The %s option may not %sbe negated."), optname, with_parameter ? $c.lit("both have a value and ") : $c.lit(""));
 }
 /* go through all of the options and set the minmatch value
    based on what is needed for uniqueness of each individual
    option. Set a minimum of 3 characters. */
+/**
+ * @returns {Promise<void>}
+ */
 async function determine_ambiguities() {   // options.c:6703
     let i = 0, j = 0, len = 0, tmpneeded = 0, needed = new Int32Array(218), p1 = null, p2 = null;
     for (i = 0; i < 217; i = i + 1 | 0) {
@@ -4871,6 +5805,11 @@ async function determine_ambiguities() {   // options.c:6703
         allopt[i].minmatch = needed[i] < 3 ? 3 : needed[i] <= len ? needed[i] : len;
     }
 }
+/**
+ * @param {$c.Ptr | null} user_string const char *
+ * @param {number} len int
+ * @returns {number} int
+ */
 function length_without_val(user_string, len) {   // options.c:6739
     let p = null, q = null;
     p = $c.strchr(user_string, 58);
@@ -4891,6 +5830,13 @@ function length_without_val(user_string, len) {   // options.c:6739
 /* check whether a user-supplied option string is a proper leading
    substring of a particular option name; option string might have
    a colon or equals sign and arbitrary value appended to it */
+/**
+ * @param {$c.Ptr | null} user_string const char *
+ * @param {$c.Ptr | null} optn_name const char *
+ * @param {number} min_length int
+ * @param {number} val_allowed boolean
+ * @returns {number} boolean
+ */
 export function match_optname(user_string, optn_name, min_length, val_allowed) {   // options.c:6760
     let len = 0;
     len = $c.i32($c.strlen(user_string));
@@ -4905,6 +5851,10 @@ export function reset_duplicate_opt_detection() {   // options.c:6773
         allopt[k].dupdetected = 0;
     }
 }
+/**
+ * @param {number} optidx int
+ * @returns {number} boolean
+ */
 function duplicate_opt_detection(optidx) {   // options.c:6782
     let $t1;
     if (go.opt_initial && go.opt_from_file) {
@@ -4912,6 +5862,10 @@ function duplicate_opt_detection(optidx) {   // options.c:6782
     }
     return FALSE;
 }
+/**
+ * @param {number} optidx int
+ * @returns {Promise<void>}
+ */
 async function complain_about_duplicate(optidx) {   // options.c:6790
     let buf = new Int8Array(256);
     /* the Mac has trouble dealing with the output of messages while
@@ -4927,6 +5881,10 @@ async function complain_about_duplicate(optidx) {   // options.c:6790
     /* ?MACOS9 */
     return;
 }
+/**
+ * @param {$c.Ptr | null} optname const char *
+ * @returns {Promise<void>}
+ */
 async function rejectoption(optname) {   // options.c:6812
     await pline($c.lit("%s can be set only from NETHACKOPTIONS or %s."), optname, get_configfile());
 }
@@ -4955,6 +5913,10 @@ OPTIONS=gender
  * if it's put in a smaller buffer, the responsible code will have to
  * bounds-check itself.
  */
+/**
+ * @param {$c.Ptr | null} ev const char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function nh_getenv(ev) {   // options.c:6848
     let getev = null;
     getev = $c.getenv(ev);
@@ -4966,6 +5928,11 @@ export function nh_getenv(ev) {   // options.c:6848
 }
 /* copy up to maxlen-1 characters; 'dest' must be able to hold maxlen;
    treat comma as alternate end of 'src' */
+/**
+ * @param {$c.Ptr | null} dest char *
+ * @param {$c.Ptr | null} src const char *
+ * @param {number} maxlen int
+ */
 function nmcpy(dest, src, maxlen) {   // options.c:6861
     let count = 0, $t1, $t2, $t3, $t4;
     for (count = 1; count < maxlen; count = count + 1 | 0) {
@@ -4997,6 +5964,10 @@ function nmcpy(dest, src, maxlen) {   // options.c:6861
  * yield 'M', then stop.  Any \X or \O followed by something other than
  * an appropriate digit will also fall through to \<other> and yield 'X'
  * or 'O', plus stop if the non-digit is end-of-string.
+ */
+/**
+ * @param {$c.Ptr | null} cp const char *
+ * @param {$c.Ptr | null} tp char *
  */
 function escapes(cp, tp) {   // options.c:6896
     let dp = null, cval = 0, meta = 0, dcount = 0, $t1, $t2;
@@ -5066,6 +6037,10 @@ function escapes(cp, tp) {   // options.c:6896
 }
 /* returns a one-byte character from the text; may change txt[];
    moved from cmd.c in order to get access to escapes() */
+/**
+ * @param {$c.Ptr | null} txt char *
+ * @returns {number} uchar
+ */
 export function txt2key(txt) {   // options.c:6971
     let uc = 0, makemeta = 0, tbuf = new Int8Array(128), key = 0, i = 0;
     makemeta = FALSE;
@@ -5172,6 +6147,9 @@ export function txt2key(txt) {   // options.c:6971
  **********************************
  */
 /* process options, possibly including SYSCF */
+/**
+ * @returns {Promise<void>}
+ */
 export async function initoptions() {   // options.c:7079
     /*
      * Most places that call initoptions_init()/initoptions() would
@@ -5206,6 +6184,9 @@ export async function initoptions() {   // options.c:7079
     await initoptions_finish();
 }
 /* set up default values for options where 0 or False isn't sufficient */
+/**
+ * @returns {Promise<void>}
+ */
 export async function initoptions_init() {   // options.c:7119
     let opts = null, i = 0, have_branch = 0, $t1, $t2, $t3;
     have_branch = $c.i8(nomakedefs.git_branch && nomakedefs.git_branch.get(0) ? 1 : 0);
@@ -5366,6 +6347,9 @@ export async function initoptions_init() {   // options.c:7119
  *        by default,
  *      then process the value of NETHACKOPTIONS as extra options.
  */
+/**
+ * @returns {Promise<void>}
+ */
 export async function initoptions_finish() {   // options.c:7324
     let sym = 0;
     sym = 0;
@@ -5426,6 +6410,9 @@ export async function initoptions_finish() {   // options.c:7324
    default interface; re-check with the active interface now */
 /* can_set_perm_invent() expects to be called when perm_invent
    is about to be toggled On, so start with it Off */
+/**
+ * @returns {Promise<void>}
+ */
 export async function allopt_array_init() {   // options.c:7405
     let i = 0;
     if (!allopt_array_init$options_array_inited_already) {
@@ -5462,6 +6449,9 @@ export async function allopt_array_init() {   // options.c:7405
  */
 /* iflags.menuobjsyms also controls iflags.menu_head_objsym, and
    iflags.use_menu_glyphs; they affect execution but are no longer options */
+/**
+ * @param {number} newobjsyms int
+ */
 function set_menuobjsyms_flags(newobjsyms) {   // options.c:7446
     iflags.menuobjsyms = newobjsyms;
     iflags.menu_head_objsym = $c.i8((newobjsyms & 1) !== 0 ? TRUE : FALSE);
@@ -5478,6 +6468,10 @@ function set_menuobjsyms_flags(newobjsyms) {   // options.c:7446
  *
  * Used by: optfn_packorder()
  *
+ */
+/**
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
  */
 async function change_inv_order(op) {   // options.c:7466
     let oc_sym = 0, num = 0, sp = null, buf = new Int8Array(128), retval = 0, fail = 0, $t1, $t2, $t3;
@@ -5529,6 +6523,11 @@ async function change_inv_order(op) {   // options.c:7466
  * Used by: optfn_warnings()
  *
  */
+/**
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} optype const char *
+ * @returns {Promise<number>} boolean
+ */
 async function warning_opts(opts, optype) {   // options.c:7521
     let translate = new Uint8Array(6), length = 0, i = 0;
     if ($c.peq(opts = await string_for_env_opt(optype, opts, FALSE), new $c.Ptr(empty_optstr, 0))) {
@@ -5543,6 +6542,9 @@ async function warning_opts(opts, optype) {   // options.c:7521
     assign_warnings(new $c.Ptr(translate, 0));
     return TRUE;
 }
+/**
+ * @param {$c.Ptr | null} graph_chars uchar *
+ */
 export function assign_warnings(graph_chars) {   // options.c:7541
     let i = 0;
     for (i = 0; i < WARNCOUNT; i = i + 1 | 0) {
@@ -5556,6 +6558,11 @@ export function assign_warnings(graph_chars) {   // options.c:7541
  *
  * Used by: optfn_suppress_alert()
  *
+ */
+/**
+ * @param {$c.Ptr | null} op char *
+ * @param {$c.Ptr | null} optn const char *
+ * @returns {Promise<number>} int
  */
 async function feature_alert_opts(op, optn) {   // options.c:7558
     let buf = new Int8Array(256), fnv = 0;
@@ -5585,6 +6592,10 @@ async function feature_alert_opts(op, optn) {   // options.c:7558
 /* parse key:command[,key2:command2,...] after BINDINGS= prefix has been
    stripped; returns False if any problem seen, True if every binding in
    the comma-separated list is successful */
+/**
+ * @param {$c.Ptr | null} bindings char *
+ * @returns {Promise<number>} boolean
+ */
 export async function parsebindings(bindings) {   // options.c:7596
     let bind = null, key = 0, i = 0, ret = 0, $t1, $t2;
     ret = TRUE;   /* assume success */
@@ -5654,6 +6665,10 @@ export async function parsebindings(bindings) {   // options.c:7596
     }
     return ret;
 }
+/**
+ * @param {number} typ int
+ * @returns {$c.Ptr | null} const char *
+ */
 function msgtype2name(typ) {   // options.c:7690
     let i = 0;
     for (i = 0; i < 6; i = i + 1 | 0) {
@@ -5663,6 +6678,9 @@ function msgtype2name(typ) {   // options.c:7690
     }
     return null;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function query_msgtype() {   // options.c:7701
     let tmpwin = 0, any = new $T.any(), i = 0, pick_cnt = 0, picks = [null], clr = 0;
     picks[0] = null;
@@ -5686,6 +6704,11 @@ async function query_msgtype() {   // options.c:7701
     }
     return -1;
 }
+/**
+ * @param {number} typ int
+ * @param {$c.Ptr | null} pattern char *
+ * @returns {Promise<number>} boolean
+ */
 async function msgtype_add(typ, pattern) {   // options.c:7731
     let tmp = null, errbuf = new Int8Array(256), re_error_desc = null, $t1, $t2;
     tmp = $c.asRec(await alloc(32), $T.plinemsg_type, 32);
@@ -5718,6 +6741,9 @@ export function msgtype_free() {   // options.c:7757
     }
     gp.plinemsg_types = null;
 }
+/**
+ * @param {number} idx int
+ */
 function free_one_msgtype(idx) {   // options.c:7772
     let tmp = null, prev = null, next = null;
     /* 0 .. */
@@ -5741,6 +6767,11 @@ function free_one_msgtype(idx) {   // options.c:7772
         tmp = tmp.next;
     }
 }
+/**
+ * @param {$c.Ptr | null} msg const char *
+ * @param {number} norepeat boolean
+ * @returns {number} int
+ */
 export function msgtype_type(msg, norepeat) {   // options.c:7797
     let tmp = null;
     /* called from Norep(via pline) */
@@ -5757,6 +6788,10 @@ export function msgtype_type(msg, norepeat) {   // options.c:7797
 }
 /* negate one or more types of messages so that their type handling will
    be disabled or re-enabled; MSGTYPE_NORMAL (value 0) is not affected */
+/**
+ * @param {number} hide boolean
+ * @param {number} hide_mask int
+ */
 export function hide_unhide_msgtypes(hide, hide_mask) {   // options.c:7815
     let tmp = null, mt = 0;
     /* negative msgtype value won't be recognized by pline, so does nothing */
@@ -5770,6 +6805,9 @@ export function hide_unhide_msgtypes(hide, hide_mask) {   // options.c:7815
         }
     }
 }
+/**
+ * @returns {number} int
+ */
 function msgtype_count() {   // options.c:7831
     let c = 0, tmp = null;
     c = 0;
@@ -5780,6 +6818,10 @@ function msgtype_count() {   // options.c:7831
     }
     return c;
 }
+/**
+ * @param {$c.Ptr | null} str char *
+ * @returns {Promise<number>} boolean
+ */
 export async function msgtype_parse_add(str) {   // options.c:7844
     let pattern = new Int8Array(256), msgtype = new Int8Array(11), typ = 0, i = 0;
     if ($c.sscanf(str, $c.lit("%10s \"%255[^\"]\""), new $c.Ptr(msgtype, 0), new $c.Ptr(pattern, 0)) === 2) {
@@ -5802,6 +6844,11 @@ export async function msgtype_parse_add(str) {   // options.c:7844
 }
 /* parse 'str' as a regular expression to check whether it's valid;
    compiled regexp gets thrown away regardless of the outcome */
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @param {$c.Ptr | null} errmsg const char *
+ * @returns {Promise<number>} boolean
+ */
 async function test_regex_pattern(str, errmsg) {   // options.c:7871
     let match = null, re_error_desc = null, errbuf = new Int8Array(256), retval = 0;
     if (!str) {
@@ -5829,6 +6876,14 @@ async function test_regex_pattern(str, errmsg) {   // options.c:7871
     return retval;
 }
 /* parse 'role' or 'race' or 'gender' or 'alignment' */
+/**
+ * @param {number} optidx int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} fullname const char *
+ * @param {$c.Ptr | null} opts char *
+ * @param {*} opp char **
+ * @returns {Promise<number>} boolean
+ */
 async function parse_role_opt(optidx, negated, fullname, opts, opp) {   // options.c:7905
     let preval = null, op = null, which = 0, ok = 0, sp = null, val_negated = 0, prev_negated = 0, first = 0, negbuf = new Int8Array(256);
     /* not 'const' but never modified */
@@ -5926,6 +6981,10 @@ async function parse_role_opt(optidx, negated, fullname, opts, opp) {   // optio
 }
 /* fetch a saved role|race|gender|alignment value suitable for writing into
    a new run-time config file */
+/**
+ * @param {number} optidx int
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 async function get_cnf_role_opt(optidx) {   // options.c:8021
     let phase = 0, op = null;
     op = null;
@@ -5938,6 +6997,10 @@ async function get_cnf_role_opt(optidx) {   // options.c:8021
     return op;
 }
 /* Check if character c is illegal as a menu command key */
+/**
+ * @param {number} c uchar
+ * @returns {Promise<number>} boolean
+ */
 async function illegal_menu_cmd_key(c) {   // options.c:8037
     let j = 0;
     if (c === 0 || c === 13 || c === 10 || c === 27 || c === 32 || digit($c.i8(c)) || letter($c.i8(c)) && c !== 64) {
@@ -5958,6 +7021,11 @@ async function illegal_menu_cmd_key(c) {   // options.c:8037
  * Convert the given string of object classes to a string of default object
  * symbols.
  */
+/**
+ * @param {$c.Ptr | null} src char *
+ * @param {$c.Ptr | null} dest char *
+ * @returns {Promise<void>}
+ */
 export async function oc_to_str(src, dest) {   // options.c:8062
     let i = 0, $t1, $t2;
     while ((i = ($t1 = src, src = $t1.add(1), $t1).get(0)) !== 0) {
@@ -5973,6 +7041,11 @@ export async function oc_to_str(src, dest) {   // options.c:8062
  * Add the given mapping to the menu command map list.  Always keep the
  * maps valid C strings.
  */
+/**
+ * @param {number} from_ch char
+ * @param {number} to_ch char
+ * @returns {Promise<void>}
+ */
 export async function add_menu_cmd_alias(from_ch, to_ch) {   // options.c:8080
     if (gn.n_menu_mapped >= MAX_MENU_MAPPED_CMDS) {
         await pline($c.lit("out of menu map space."));
@@ -5984,6 +7057,10 @@ export async function add_menu_cmd_alias(from_ch, to_ch) {   // options.c:8080
         gm.mapped_menu_op[gn.n_menu_mapped] = 0;
     }
 }
+/**
+ * @param {number} ch char
+ * @returns {number} char
+ */
 export function get_menu_cmd_key(ch) {   // options.c:8094
     let found = null, idx = 0;
     found = $c.strchr(new $c.Ptr(gm.mapped_menu_op, 0), ch);
@@ -5997,6 +7074,10 @@ export function get_menu_cmd_key(ch) {   // options.c:8094
  * Map the given character to its corresponding menu command.  If it
  * doesn't match anything, just return the original.
  */
+/**
+ * @param {number} ch char
+ * @returns {number} char
+ */
 export function map_menu_cmd(ch) {   // options.c:8111
     let found = null, idx = 0;
     found = $c.strchr(new $c.Ptr(gm.mapped_menu_cmds, 0), ch);
@@ -6008,6 +7089,12 @@ export function map_menu_cmd(ch) {   // options.c:8111
 }
 /* get keystrokes that are used for menu scrolling operations which apply;
    printable: for use in a prompt, non-printable: for yn_function() choices */
+/**
+ * @param {$c.Ptr | null} outbuf char *
+ * @param {number} scrollmask unsigned int
+ * @param {number} printable boolean
+ * @returns {$c.Ptr | null} char *
+ */
 export function collect_menu_keys(outbuf, scrollmask, printable) {   // options.c:8126
     let i = 0, c = 0;
     /* at least big enough for 6 "M-^X" sequences +'\0'*/
@@ -6035,6 +7122,11 @@ export function collect_menu_keys(outbuf, scrollmask, printable) {   // options.
  * type to the chain and returns the new one.
  * If replace_fruit is sent in, replace the fruit in the chain rather than
  * adding a new entry--for user specified fruits only.
+ */
+/**
+ * @param {$c.Ptr | null} str char *
+ * @param {$T.fruit | null} replace_fruit struct fruit *
+ * @returns {Promise<number>} int
  */
 export async function fruitadd(str, replace_fruit) {   // options.c:8170
     let i = 0, f = null, highest_fruit_id = Int32Array.of(0), globpfx = 0, buf = new Int8Array(32), altname = new Int8Array(32), user_specified = 0, found = 0, numeric = 0, c = null, $t1;
@@ -6141,6 +7233,14 @@ export async function fruitadd(str, replace_fruit) {   // options.c:8170
  **********************************
  */
 /* RESTORE is after show_menucontrols() */
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_o_autopickup_exceptions(optidx, req, negated, opts, op) {   // options.c:8302
     if (req === do_init) {
         return optn_ok;
@@ -6159,6 +7259,14 @@ async function optfn_o_autopickup_exceptions(optidx, req, negated, opts, op) {  
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_o_bind_keys(optidx, req, negated, opts, op) {   // options.c:8324
     if (req === do_init) {
         return optn_ok;
@@ -6177,6 +7285,14 @@ async function optfn_o_bind_keys(optidx, req, negated, opts, op) {   // options.
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_o_autocomplete(optidx, req, negated, opts, op) {   // options.c:8346
     if (req === do_init) {
         return optn_ok;
@@ -6195,6 +7311,14 @@ async function optfn_o_autocomplete(optidx, req, negated, opts, op) {   // optio
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_o_menu_colors(optidx, req, negated, opts, op) {   // options.c:8368
     if (req === do_init) {
         return optn_ok;
@@ -6213,6 +7337,14 @@ async function optfn_o_menu_colors(optidx, req, negated, opts, op) {   // option
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_o_message_types(optidx, req, negated, opts, op) {   // options.c:8389
     if (req === do_init) {
         return optn_ok;
@@ -6231,6 +7363,14 @@ async function optfn_o_message_types(optidx, req, negated, opts, op) {   // opti
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_o_status_cond(optidx, req, negated, opts, op) {   // options.c:8414
     if (req === do_init) {
         return optn_ok;
@@ -6256,6 +7396,14 @@ async function optfn_o_status_cond(optidx, req, negated, opts, op) {   // option
     }
     return optn_ok;
 }
+/**
+ * @param {number} optidx int
+ * @param {number} req int
+ * @param {number} negated boolean
+ * @param {$c.Ptr | null} opts char *
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function optfn_o_status_hilites(optidx, req, negated, opts, op) {   // options.c:8446
     if (req === do_init) {
         return optn_ok;
@@ -6285,6 +7433,11 @@ async function optfn_o_status_hilites(optidx, req, negated, opts, op) {   // opt
 /* Get string value of configuration option.
  * Currently handles only boolean and compound options.
  */
+/**
+ * @param {$c.Ptr | null} optname const char *
+ * @param {number} cnfvalid boolean
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function get_option_value(optname, cnfvalid) {   // options.c:8481
     let bool_p = null, i = 0, reslt = 0;
     for (i = 0; allopt[i].name !== null; i = i + 1 | 0) {
@@ -6304,6 +7457,11 @@ export async function get_option_value(optname, cnfvalid) {   // options.c:8481
     }
     return null;
 }
+/**
+ * @param {number} startpass int
+ * @param {number} endpass int
+ * @returns {Promise<number>} unsigned int
+ */
 async function longest_option_name(startpass, endpass) {   // options.c:8508
     let longest_name_len = 0, i = 0, pass = 0, optflags = 0, name = null, len = 0;
     /* spin through the options to find the longest name */
@@ -6329,6 +7487,9 @@ async function longest_option_name(startpass, endpass) {   // options.c:8508
     return longest_name_len;
 }
 /* guts of doset_simple(); called repeatedly until no choice is made */
+/**
+ * @returns {Promise<number>} int
+ */
 async function doset_simple_menu() {   // options.c:8536
     let fmtstr_doset_simple = new Int8Array(14), pick_list = [null], bool_p = null, name = null, fmtstr = null, buf = new Int8Array(256), buf2 = new Int8Array(256), abuf = new Int8Array(256), tmpwin = 0, any = new $T.any(), section = 0, i = 0, k = 0, pick_cnt = 0, reslt = 0, toggled_help = 0;
     /* unlike doset()'s fmtstr, there is no leading %s for indentation */
@@ -6472,6 +7633,9 @@ async function doset_simple_menu() {   // options.c:8536
 }
 /* #options - the user friendly version:  get one option from a subset of
    the zillion choices, act upon it, and prompt for another */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doset_simple() {   // options.c:8707
     let pickedone = 0, flush = 0;
     pickedone = 0;
@@ -6498,6 +7662,11 @@ export async function doset_simple() {   // options.c:8707
     give_opt_msg = TRUE;
     return ECMD.OK;
 }
+/**
+ * @param {number} idx int
+ * @param {$c.Ptr | null} b boolean *
+ * @returns {$c.Ptr | null} const char *
+ */
 function term_for_boolean(idx, b) {   // options.c:8738
     let i = 0, f_t = 0, boolean_term = null;
     f_t = b.get(0) ? 1 : 0;
@@ -6509,6 +7678,9 @@ function term_for_boolean(idx, b) {   // options.c:8738
     return boolean_term;
 }
 /* the #optionsfull command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doset() {   // options.c:8758
     let fmtstr_doset = new Int8Array(16), buf = new Int8Array(256), name = null, indent = null, i = 0, pass = 0, pick_cnt = 0, pick_idx = 0, opt_indx = 0, bool_p = null, tmpwin = 0, any = new $T.any(), pick_list = [null], indexoffset = 0, startpass = 0, endpass = 0, gavehelp = 0, skiphelp = 0, clr = 0, k = 0, reslt = 0, abuf = new Int8Array(256);
     /* changing options via menu by Per Liboriussen */
@@ -6679,6 +7851,9 @@ export async function doset() {   // options.c:8758
     await reset_needed_visuals();
     return ECMD.OK;
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function reset_needed_visuals() {   // options.c:8980
     if (go.opt_need_glyph_reset) {
         reset_glyphmap(gm_optionchange);
@@ -6712,6 +7887,14 @@ async function reset_needed_visuals() {   // options.c:8980
     go.opt_update_basic_palette = FALSE;
 }
 /* doset(#optionsfull command) menu entries for compound options */
+/**
+ * @param {number} win winid
+ * @param {$c.Ptr | null} option const char *
+ * @param {$c.Ptr | null} fmtstr const char *
+ * @param {number} idx int
+ * @param {number} indexoffset int
+ * @returns {Promise<void>}
+ */
 async function doset_add_menu(win, option, fmtstr, idx, indexoffset) {   // options.c:9018
     let value = null, indent = null, buf = new Int8Array(256), buf2 = new Int8Array(256), any = new $T.any(), i = 0, reslt = 0, clr = 0;
     /* window to add to */
@@ -6750,6 +7933,11 @@ async function doset_add_menu(win, option, fmtstr, idx, indexoffset) {   // opti
     await add_menu(win, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_SKIPINVERT);
 }
 /* display keys for menu actions; used by cmd.c '?i' and pager.c '?k' */
+/**
+ * @param {number} win winid
+ * @param {number} dolist boolean
+ * @returns {Promise<void>}
+ */
 export async function show_menu_controls(win, dolist) {   // options.c:9070
     let buf = new Int8Array(256), fmt = null, arg = null, xcp = null, has_menu_shift = 0, i = 0, ch = 0;
     has_menu_shift = wc2_supported($c.lit("menu_shift"));
@@ -6814,6 +8002,9 @@ export async function show_menu_controls(win, dolist) {   // options.c:9070
         arg = $c.lit("");
     }
 }
+/**
+ * @returns {number} int
+ */
 function count_cond() {   // options.c:9179
     let i = 0, cnt = 0;
     cnt = 0;
@@ -6824,6 +8015,9 @@ function count_cond() {   // options.c:9179
     }
     return cnt;
 }
+/**
+ * @returns {number} int
+ */
 function count_apes() {   // options.c:9191
     let numapes = 0, ape = null;
     numapes = 0;
@@ -6835,6 +8029,11 @@ function count_apes() {   // options.c:9191
     return numapes;
 }
 /* common to msg-types, menu-colors, autopickup-exceptions */
+/**
+ * @param {$c.Ptr | null} optname const char *
+ * @param {number} numtotal int
+ * @returns {Promise<number>} int
+ */
 async function handle_add_list_remove(optname, numtotal) {   // options.c:9208
     let tmpwin = 0, any = new $T.any(), i = 0, pick_cnt = 0, opt_idx = 0, pick_list = [null], clr = 0, tmpbuf = new Int8Array(256);
     pick_list[0] = null;
@@ -6864,6 +8063,9 @@ async function handle_add_list_remove(optname, numtotal) {   // options.c:9208
     await destroy_nhwindow()(tmpwin);
     return opt_idx;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dotogglepickup() {   // options.c:9256
     let buf = new Int8Array(256), ocl = new Int8Array(19);
     flags.pickup = $c.i8(!flags.pickup ? 1 : 0);
@@ -6877,6 +8079,10 @@ export async function dotogglepickup() {   // options.c:9256
     return ECMD.OK;
 }
 /* toggle any (settable in-game) boolean option by name */
+/**
+ * @param {$c.Ptr | null} p const char *
+ * @returns {Promise<number>} int
+ */
 export async function toggle_bool_option(p) {   // options.c:9278
     let i = 0, ret = 0, buf = new Int8Array(256);
     ret = ECMD.FAIL;
@@ -6891,6 +8097,10 @@ export async function toggle_bool_option(p) {   // options.c:9278
     }
     return ret;
 }
+/**
+ * @param {$c.Ptr | null} mapping const char *
+ * @returns {Promise<number>} int
+ */
 export async function add_autopickup_exception(mapping) {   // options.c:9300
     let ape = null, text = new Int8Array(256), end = Int8Array.of(0), n = 0, grab = 0, errbuf = new Int8Array(256), re_error_desc = null, $t1, $t2;
     grab = FALSE;
@@ -6924,6 +8134,9 @@ export async function add_autopickup_exception(mapping) {   // options.c:9300
     ga.apelist = ape;
     return 1;
 }
+/**
+ * @param {$T.autopickup_exception | null} whichape struct autopickup_exception *
+ */
 function remove_autopickup_exception(whichape) {   // options.c:9349
     let ape = null, freeape = null, prev = null;
     prev = null;
@@ -6954,6 +8167,10 @@ export function free_autopickup_exceptions() {   // options.c:9372
         $c.free(ape);
     }
 }
+/**
+ * @param {$c.Ptr | null} strval const char *
+ * @returns {number} int
+ */
 export function sym_val(strval) {   // options.c:9385
     let buf = new Int8Array(128), tmp = new Int8Array(128), p = null;
     /* up to 4*BUFSZ-1 long; only first few
@@ -6994,6 +8211,9 @@ export function sym_val(strval) {   // options.c:9385
     }
     return new $c.Ptr(buf, 0).get(0);
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function option_help() {   // options.c:9462
     let buf = new Int8Array(256), buf2 = new Int8Array(256), optname = null, i = 0, datawin = 0;
     datawin = await create_nhwindow()(NHW.TEXT);
@@ -7075,6 +8295,10 @@ export async function option_help() {   // options.c:9462
    entry spread across multiple lines with backslash+newline if needed;
    conditions with their default settings (cond_blind, !cond_glowhands, &c)
    are excluded */
+/**
+ * @param {$T.strbuf | null} sbuf strbuf_t *
+ * @returns {Promise<void>}
+ */
 async function all_options_conds(sbuf) {   // options.c:9556
     let buf = new Int8Array(256), nextcond = new Int8Array(256), idx = 0, gotone = 0;
     idx = 0;
@@ -7110,6 +8334,10 @@ async function all_options_conds(sbuf) {   // options.c:9556
     }
 }
 /* append menucolor lines to strbuf */
+/**
+ * @param {$T.strbuf | null} sbuf strbuf_t *
+ * @returns {Promise<void>}
+ */
 async function all_options_menucolors(sbuf) {   // options.c:9595
     let i = 0, ncolors = 0, tmp = null, buf = new Int8Array(512), arr = null, sattr = null, sclr = null, $t1;
     i = 0;
@@ -7134,6 +8362,10 @@ async function all_options_menucolors(sbuf) {   // options.c:9595
     }
     $c.free(arr);
 }
+/**
+ * @param {$T.strbuf | null} sbuf strbuf_t *
+ * @returns {Promise<void>}
+ */
 async function all_options_msgtypes(sbuf) {   // options.c:9628
     let tmp = null, buf = new Int8Array(256), mtype = null;
     tmp = gp.plinemsg_types;
@@ -7144,6 +8376,10 @@ async function all_options_msgtypes(sbuf) {   // options.c:9628
         tmp = tmp.next;
     }
 }
+/**
+ * @param {$T.strbuf | null} sbuf strbuf_t *
+ * @returns {Promise<void>}
+ */
 async function all_options_apes(sbuf) {   // options.c:9643
     let tmp = null, buf = new Int8Array(256);
     tmp = ga.apelist;
@@ -7155,6 +8391,10 @@ async function all_options_apes(sbuf) {   // options.c:9643
 }
 /* CHANGE_COLOR */
 /* return strbuf of all options, to write to file */
+/**
+ * @param {$T.strbuf | null} sbuf strbuf_t *
+ * @returns {Promise<void>}
+ */
 export async function all_options_strbuf(sbuf) {   // options.c:9678
     let name = null, tmp = new Int8Array(256), buf2 = null, bool_p = null, i = 0;
     strbuf_init(sbuf);
@@ -7216,6 +8456,11 @@ export async function all_options_strbuf(sbuf) {   // options.c:9678
  * prints the next boolean option, on the same line if possible, on a new
  * line if not. End with next_opt("").
  */
+/**
+ * @param {number} datawin winid
+ * @param {$c.Ptr | null} str const char *
+ * @returns {Promise<void>}
+ */
 export async function next_opt(datawin, str) {   // options.c:9755
     let i = 0, s = null;
     if (!next_opt$buf) {
@@ -7251,6 +8496,11 @@ export async function next_opt(datawin, str) {   // options.c:9755
  * set_option_mod_status()
  * with the appropriate second argument.
  */
+/**
+ * @param {$c.Ptr | null} optnam const char *
+ * @param {number} status int
+ * @returns {Promise<void>}
+ */
 export async function set_option_mod_status(optnam, status) {   // options.c:9855
     let k = 0;
     if (SET__IS_VALUE_VALID(status)) {
@@ -7273,6 +8523,11 @@ export async function set_option_mod_status(optnam, status) {   // options.c:985
  *    example: set_wc_option_mod_status(WC_COLOR|WC_SCROLL_MARGIN,
  * set_in_game);
  */
+/**
+ * @param {number | bigint} optmask unsigned long
+ * @param {number} status int
+ * @returns {Promise<void>}
+ */
 export async function set_wc_option_mod_status(optmask, status) {   // options.c:9881
     let k = 0;
     k = 0;
@@ -7287,6 +8542,10 @@ export async function set_wc_option_mod_status(optmask, status) {   // options.c
         k = k + 1 | 0;
     }
 }
+/**
+ * @param {$c.Ptr | null} optnam const char *
+ * @returns {number} boolean
+ */
 function is_wc_option(optnam) {   // options.c:9899
     let k = 0;
     k = 0;
@@ -7298,6 +8557,10 @@ function is_wc_option(optnam) {   // options.c:9899
     }
     return FALSE;
 }
+/**
+ * @param {$c.Ptr | null} optnam const char *
+ * @returns {number} boolean
+ */
 function wc_supported(optnam) {   // options.c:9912
     let k = 0;
     for (k = 0; wc_options[k].wc_name; k = k + 1 | 0) {
@@ -7317,6 +8580,11 @@ function wc_supported(optnam) {   // options.c:9912
  * set_wc2_option_mod_status(WC2_FULLSCREEN|WC2_SOFTKEYBOARD|WC2_WRAPTEXT,
  * set_in_config);
  */
+/**
+ * @param {number | bigint} optmask unsigned long
+ * @param {number} status int
+ * @returns {Promise<void>}
+ */
 export async function set_wc2_option_mod_status(optmask, status) {   // options.c:9935
     let k = 0;
     k = 0;
@@ -7331,6 +8599,10 @@ export async function set_wc2_option_mod_status(optmask, status) {   // options.
         k = k + 1 | 0;
     }
 }
+/**
+ * @param {$c.Ptr | null} optnam const char *
+ * @returns {number} boolean
+ */
 function is_wc2_option(optnam) {   // options.c:9953
     let k = 0;
     k = 0;
@@ -7342,6 +8614,10 @@ function is_wc2_option(optnam) {   // options.c:9953
     }
     return FALSE;
 }
+/**
+ * @param {$c.Ptr | null} optnam const char *
+ * @returns {number} boolean
+ */
 function wc2_supported(optnam) {   // options.c:9966
     let k = 0;
     for (k = 0; wc2_options[k].wc_name; k = k + 1 | 0) {
@@ -7351,6 +8627,11 @@ function wc2_supported(optnam) {   // options.c:9966
     }
     return FALSE;
 }
+/**
+ * @param {number} opttype int
+ * @param {$c.Ptr | null} fontname char *
+ * @returns {Promise<void>}
+ */
 async function wc_set_font_name(opttype, fontname) {   // options.c:9979
     let fn = null, $t1;
     fn = null;
@@ -7384,6 +8665,10 @@ async function wc_set_font_name(opttype, fontname) {   // options.c:9979
     }
     return;
 }
+/**
+ * @param {$c.Ptr | null} op char *
+ * @returns {Promise<number>} int
+ */
 async function wc_set_window_colors(op) {   // options.c:10023
     let j = 0, clr = 0, buf = new Int8Array(256), wn = null, tfg = null, tbg = null, newop = null, $t1, $t2, $t3, $t4, $t5;
     /* syntax:
@@ -7509,6 +8794,13 @@ export function set_playmode() {   // options.c:10134
     }
     /* don't need to do anything special for normal play */
 }
+/**
+ * @param {$c.Ptr | null} buf char *
+ * @param {number | bigint} sz size_t
+ * @param {number} whichpass int
+ * @param {$c.Ptr | null} bool_p boolean *
+ * @param {$T.allopt_t | null} thisopt struct allopt_t *
+ */
 function enhance_menu_text(buf, sz, whichpass, bool_p, thisopt) {   // options.c:10155
     let nowsz = 0, availsz = 0;
     if (!buf) {
@@ -7534,11 +8826,17 @@ export function disregard_all_options() {   // options.c:10192
         allopt[i].disregarded = TRUE;
     }
 }
+/**
+ * @param {number} optidx enum opt
+ */
 export function heed_this_option(optidx) {   // options.c:10201
     if (optidx >= 0 && optidx < OPTCOUNT) {
         allopt[optidx].disregarded = FALSE;
     }
 }
+/**
+ * @param {number} optidx enum opt
+ */
 export function disregard_this_option(optidx) {   // options.c:10207
     if (optidx >= 0 && optidx < OPTCOUNT) {
         allopt[optidx].disregarded = TRUE;

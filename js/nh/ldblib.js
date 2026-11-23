@@ -48,15 +48,29 @@ const dblib = $h.data(288, 8);
 ** guarantees about its stack space; any push in L1 must be
 ** checked.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} L1 lua_State *
+ * @param {number} n int
+ * @returns {Promise<void>}
+ */
 async function checkstack(L, L1, n) {   // ldblib.c:35
     if ((L !== L1 && !await lua_checkstack(L1, n) ? 1 : 0) !== 0 ? 1 : 0) {
         await luaL_error(L, $h.lit("stack overflow"));
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {number} int
+ */
 function db_getregistry(L) {   // ldblib.c:41
     lua_pushvalue(L, -1001000);
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function db_getmetatable(L) {   // ldblib.c:47
     await luaL_checkany(L, 1);
     if (!lua_getmetatable(L, 1)) {
@@ -64,6 +78,10 @@ async function db_getmetatable(L) {   // ldblib.c:47
     }
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function db_setmetatable(L) {   // ldblib.c:56
     let t = 0;
     t = lua_type(L, 2);
@@ -72,6 +90,10 @@ async function db_setmetatable(L) {   // ldblib.c:56
     await lua_setmetatable(L, 1);
     return 1;   /* return 1st argument */
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function db_getuservalue(L) {   // ldblib.c:65
     let n = 0;
     n = $c.i32(await luaL_optinteger(L, 2, 1));
@@ -83,6 +105,10 @@ async function db_getuservalue(L) {   // ldblib.c:65
     }
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function db_setuservalue(L) {   // ldblib.c:77
     let n = 0;
     n = $c.i32(await luaL_optinteger(L, 3, 1));
@@ -100,6 +126,11 @@ async function db_setuservalue(L) {   // ldblib.c:77
 ** 1 if this argument is present (so that functions can skip it to
 ** access their other arguments)
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} arg int *
+ * @returns {number} lua_State *
+ */
 function getthread(L, arg) {   // ldblib.c:94
     if (lua_type(L, 1) === 8) {
         $h.i32[arg >>> 2] = 1;
@@ -114,14 +145,32 @@ function getthread(L, arg) {   // ldblib.c:94
 ** from 'lua_getinfo' into result table. Key is always a string;
 ** value can be a string, an int, or a boolean.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} k const char *
+ * @param {number} v const char *
+ * @returns {Promise<void>}
+ */
 async function settabss(L, k, v) {   // ldblib.c:111
     await lua_pushstring(L, v);
     await lua_setfield(L, -2, k);
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} k const char *
+ * @param {number} v int
+ * @returns {Promise<void>}
+ */
 async function settabsi(L, k, v) {   // ldblib.c:116
     lua_pushinteger(L, v);
     await lua_setfield(L, -2, k);
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} k const char *
+ * @param {number} v int
+ * @returns {Promise<void>}
+ */
 async function settabsb(L, k, v) {   // ldblib.c:121
     lua_pushboolean(L, v);
     await lua_setfield(L, -2, k);
@@ -133,6 +182,12 @@ async function settabsb(L, k, v) {   // ldblib.c:121
 ** 'lua_getinfo' on top of the result table so that it can call
 ** 'lua_setfield'.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} L1 lua_State *
+ * @param {number} fname const char *
+ * @returns {Promise<void>}
+ */
 async function treatstackoption(L, L1, fname) {   // ldblib.c:134
     if (L === L1) {
         lua_rotate(L, -2, 1);   /* exchange object and table */
@@ -147,6 +202,10 @@ async function treatstackoption(L, L1, fname) {   // ldblib.c:134
 ** two optional outputs (function and line table) from function
 ** 'lua_getinfo'.
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function db_getinfo(L) {   // ldblib.c:149
     let L1 = 0, options = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(140);
@@ -207,6 +266,10 @@ async function db_getinfo(L) {   // ldblib.c:149
         return 1;   /* return table */
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function db_getlocal(L) {   // ldblib.c:203
     let L1 = 0, nvar = 0, name = 0, level = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(144);
@@ -238,6 +301,10 @@ async function db_getlocal(L) {   // ldblib.c:203
         }
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function db_setlocal(L) {   // ldblib.c:234
     let name = 0, L1 = 0, level = 0, nvar = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(144);
@@ -263,6 +330,11 @@ async function db_setlocal(L) {   // ldblib.c:234
 /*
 ** get (if 'get' is true) or set an upvalue from a closure
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} get int
+ * @returns {Promise<number>} int
+ */
 async function auxupvalue(L, get) {   // ldblib.c:258
     let name = 0, n = 0;
     n = $c.i32(await luaL_checkinteger(L, 2));   /* upvalue index */
@@ -275,9 +347,17 @@ async function auxupvalue(L, get) {   // ldblib.c:258
     lua_rotate(L, -(get + 1 | 0) | 0, 1);   /* no-op if get is false */
     return get + 1 | 0;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function db_getupvalue(L) {   // ldblib.c:270
     return await auxupvalue(L, 1);
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function db_setupvalue(L) {   // ldblib.c:275
     await luaL_checkany(L, 3);
     return await auxupvalue(L, 0);
@@ -286,6 +366,13 @@ async function db_setupvalue(L) {   // ldblib.c:275
 ** Check whether a given upvalue from a given closure exists and
 ** returns its index
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} argf int
+ * @param {number} argnup int
+ * @param {number} pnup int *
+ * @returns {Promise<number>} void *
+ */
 async function checkupval(L, argf, argnup, pnup) {   // ldblib.c:285
     let id = 0, nup = 0;
     nup = $c.i32(await luaL_checkinteger(L, argnup));   /* upvalue index */
@@ -297,6 +384,10 @@ async function checkupval(L, argf, argnup, pnup) {   // ldblib.c:285
     }
     return id;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function db_upvalueid(L) {   // ldblib.c:298
     let id = 0;
     id = await checkupval(L, 1, 2, 0);
@@ -307,6 +398,10 @@ async function db_upvalueid(L) {   // ldblib.c:298
     }
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function db_upvaluejoin(L) {   // ldblib.c:308
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
     try {
@@ -322,6 +417,11 @@ async function db_upvaluejoin(L) {   // ldblib.c:308
 ** Call hook function registered at hook table for the current
 ** thread (if there is one)
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} ar lua_Debug *
+ * @returns {Promise<void>}
+ */
 async function hookf(L, ar) {   // ldblib.c:323
     await lua_getfield(L, -1001000, $h.u32[HOOKKEY >>> 2]);
     lua_pushthread(L);
@@ -340,6 +440,11 @@ async function hookf(L, ar) {   // ldblib.c:323
 /*
 ** Convert a string mask (for 'sethook') into a bit mask
 */
+/**
+ * @param {number} smask const char *
+ * @param {number} count int
+ * @returns {number} int
+ */
 function makemask(smask, count) {   // ldblib.c:342
     let mask = 0;
     mask = 0;
@@ -360,6 +465,11 @@ function makemask(smask, count) {   // ldblib.c:342
 /*
 ** Convert a bit mask (for 'gethook') into a string mask
 */
+/**
+ * @param {number} mask int
+ * @param {number} smask char *
+ * @returns {number} char *
+ */
 function unmakemask(mask, smask) {   // ldblib.c:355
     let i = 0, $t1, $t2, $t3;
     i = 0;
@@ -375,6 +485,10 @@ function unmakemask(mask, smask) {   // ldblib.c:355
     $h.i8[smask + i] = 0;
     return smask;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function db_sethook(L) {   // ldblib.c:365
     let mask = 0, count = 0, func = 0, L1 = 0, smask = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(4);
@@ -409,6 +523,10 @@ async function db_sethook(L) {   // ldblib.c:365
         return 0;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function db_gethook(L) {   // ldblib.c:395
     let L1 = 0, mask = 0, hook = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(9);
@@ -436,6 +554,10 @@ async function db_gethook(L) {   // ldblib.c:395
         return 3;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function db_debug(L) {   // ldblib.c:420
     const $sp0 = $h.st.sp, $fp = $h.enter(250);
     try {
@@ -451,6 +573,10 @@ async function db_debug(L) {   // ldblib.c:420
         }
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function db_traceback(L) {   // ldblib.c:435
     let L1 = 0, msg = 0, level = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(4);
@@ -466,6 +592,10 @@ async function db_traceback(L) {   // ldblib.c:435
         return 1;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 async function db_setcstacklimit(L) {   // ldblib.c:449
     let limit = 0, res = 0;
     limit = $c.i32(await luaL_checkinteger(L, 1));
@@ -473,6 +603,10 @@ async function db_setcstacklimit(L) {   // ldblib.c:449
     lua_pushinteger(L, res);
     return 1;
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<number>} int
+ */
 export async function luaopen_debug(L) {   // ldblib.c:479
     await luaL_checkversion_(L, 504, 136), await lua_createtable(L, 0, 17), await luaL_setfuncs(L, dblib, 0);
     return 1;

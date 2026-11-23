@@ -48,6 +48,10 @@ import { __global_locale, _c_locale } from './c_locale.js';
 /* setup defaults */
 export const __mb_cur_max = $h.data(4, 4);
 export const __mb_sb_limit = $h.data(4, 4);   /* Expected to be <= _CACHED_RUNES */
+/**
+ * @param {number} val void *
+ * @returns {number} void *
+ */
 function xlocale_retain(val) {   // xlocale_private.h:96
     let obj = 0;
     obj = val;
@@ -57,6 +61,9 @@ function xlocale_retain(val) {   // xlocale_private.h:96
     $h.i32[obj >>> 2] = $h.i32[obj >>> 2] + 1 | 0;
     return val;
 }
+/**
+ * @param {number} val void *
+ */
 function xlocale_release(val) {   // xlocale_private.h:107
     let obj = 0;
     obj = val;
@@ -69,9 +76,16 @@ function xlocale_release(val) {   // xlocale_private.h:107
         }
     }
 }
+/**
+ * @returns {number} locale_t
+ */
 function __current_locale() {   // xlocale_private.h:122
     return __global_locale;
 }
+/**
+ * @param {number} __loc locale_t
+ * @returns {number} locale_t
+ */
 function __locale_ptr(__loc) {   // xlocale_private.h:128
     if (__loc === 0) {
         __loc = $h.u32[_c_locale >>> 2];
@@ -80,6 +94,10 @@ function __locale_ptr(__loc) {   // xlocale_private.h:128
     }
     return __loc;
 }
+/**
+ * @param {number} xrl struct xlocale_ctype *
+ * @returns {number} int
+ */
 export function _none_init(xrl) {   // none.c:65
     $h.stp(xrl + 72, $h.fn(_none_mbrtowc));
     $h.stp(xrl + 80, $h.fn(_none_mbsinit));
@@ -90,6 +108,11 @@ export function _none_init(xrl) {   // none.c:65
     $h.i32[(xrl + 68) >>> 2] = 256;
     return 0;
 }
+/**
+ * @param {number} ps const mbstate_t *
+ * @param {number} loc locale_t
+ * @returns {number} int
+ */
 export function _none_mbsinit(ps, loc) {   // none.c:79
     /*
             * Encoding is not state dependent - we are always in the
@@ -97,6 +120,14 @@ export function _none_mbsinit(ps, loc) {   // none.c:79
             */
     return 1;
 }
+/**
+ * @param {number} pwc wchar_t *restrict
+ * @param {number} s const char *restrict
+ * @param {number | bigint} n size_t
+ * @param {number} ps mbstate_t *restrict
+ * @param {number} loc locale_t
+ * @returns {number | bigint} size_t
+ */
 export function _none_mbrtowc(pwc, s, n, ps, loc) {   // none.c:90
     if (s === 0) {   /* Reset to initial shift state (no-op) */
         return 0;
@@ -109,6 +140,13 @@ export function _none_mbrtowc(pwc, s, n, ps, loc) {   // none.c:90
     }
     return $c.u64($h.i8[s] === 0 ? 0 : 1);
 }
+/**
+ * @param {number} s char *restrict
+ * @param {number} wc wchar_t
+ * @param {number} ps mbstate_t *restrict
+ * @param {number} loc locale_t
+ * @returns {number | bigint} size_t
+ */
 export function _none_wcrtomb(s, wc, ps, loc) {   // none.c:106
     if (s === 0) {   /* Reset to initial shift state (no-op) */
         return 1;
@@ -120,6 +158,15 @@ export function _none_wcrtomb(s, wc, ps, loc) {   // none.c:106
     $h.i8[s] = $c.i8($c.u8(wc));
     return 1;
 }
+/**
+ * @param {number} dst wchar_t *restrict
+ * @param {number} src const char **restrict
+ * @param {number | bigint} nms size_t
+ * @param {number | bigint} len size_t
+ * @param {number} ps mbstate_t *restrict
+ * @param {number} loc locale_t
+ * @returns {number | bigint} size_t
+ */
 export function _none_mbsnrtowcs(dst, src, nms, len, ps, loc) {   // none.c:122
     let s = 0, nchr = 0, $t1, $t2, $t3, $t4, $t5, $t6;
     if (dst === 0) {
@@ -138,6 +185,15 @@ export function _none_mbsnrtowcs(dst, src, nms, len, ps, loc) {   // none.c:122
     $h.stp(src, s);
     return nchr;
 }
+/**
+ * @param {number} dst char *restrict
+ * @param {number} src const wchar_t **restrict
+ * @param {number | bigint} nwc size_t
+ * @param {number | bigint} len size_t
+ * @param {number} ps mbstate_t *restrict
+ * @param {number} loc locale_t
+ * @returns {number | bigint} size_t
+ */
 export function _none_wcsnrtombs(dst, src, nwc, len, ps, loc) {   // none.c:147
     let s = 0, nchr = 0, $t1, $t2, $t3, $t4, $t5, $t6;
     if (dst === 0) {

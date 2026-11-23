@@ -75,6 +75,15 @@ const arti_enum_dump = $c.recArray($T.enum_dump, 35);
 const mcastu_enum_dump = $c.recArray($T.enum_dump, 20);
 /* approximate 'getopt_long()' for one option; all the comments refer to
    "-windowtype" but the code isn't specific to that  */
+/**
+ * @param {$c.Ptr | null} arg char *
+ * @param {number} lflags int
+ * @param {$c.Ptr | null} optname const char *
+ * @param {$c.Ptr | null} origarg const char *
+ * @param {*} argc_p int *
+ * @param {*} argv_p char ***
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 async function lopt(arg, lflags, optname, origarg, argc_p, argv_p) {   // earlyarg.c:71
     let argc = 0, argv = null, p = null, nextarg = null, l = 0, opttype = 0, oneletterok = 0, complain = 0, $goto = null;
     D1: for (;;) {
@@ -170,6 +179,11 @@ async function lopt(arg, lflags, optname, origarg, argc_p, argv_p) {   // earlya
 /* move argv[ndx] to end of argv[] array, then reduce argc to hide it;
    prevents process_options() from encountering it after early_options()
    has processed it; elements get reordered but all remain intact */
+/**
+ * @param {number} ndx int
+ * @param {*} ac_p int *
+ * @param {*} av_p char ***
+ */
 function consume_arg(ndx, ac_p, av_p) {   // earlyarg.c:149
     let gone = null, av = null, i = 0, ac = 0;
     av = av_p.get(0);
@@ -185,6 +199,11 @@ function consume_arg(ndx, ac_p, av_p) {   // earlyarg.c:149
     ac_p.set(0, ac_p.get(0) - 1 | 0);
 }
 /* consume two tokens for '-argname value' w/o '=' or ':' */
+/**
+ * @param {number} ndx int
+ * @param {*} ac_p int *
+ * @param {*} av_p char ***
+ */
 function consume_two_args(ndx, ac_p, av_p) {   // earlyarg.c:166
     /* when consuming "-two arg" from "-two arg -three -four",
        the *ac_p manipulation results in "-three -four -two arg"
@@ -196,6 +215,12 @@ function consume_two_args(ndx, ac_p, av_p) {   // earlyarg.c:166
     ac_p.set(0, ac_p.get(0) - 1 | 0);   /* take away restored slot */
 }
 /* process some command line arguments before loading options */
+/**
+ * @param {*} argc_p int *
+ * @param {*} argv_p char ***
+ * @param {*} hackdir_p char **
+ * @returns {Promise<void>}
+ */
 export async function early_options(argc_p, argv_p, hackdir_p) {   // earlyarg.c:180
     let argv = [null], arg = null, origarg = null, argc = Int32Array.of(0), oldargc = 0, ndx = 0, consumed = 0, $t1, $t2;
     ndx = 0;
@@ -349,12 +374,19 @@ export async function early_options(argc_p, argv_p, hackdir_p) {   // earlyarg.c
 /* for command-line options that perform some immediate action and then
    terminate the program without starting play, like 'nethack --version'
    or 'nethack -s Zelda'; do some cleanup before that termination */
+/**
+ * @returns {Promise<void>}
+ */
 async function opt_terminate() {   // earlyarg.c:366
     program_state.early_options = 0;
     await config_error_done();   /* free memory allocated by config_error_init() */
     await nh_terminate(0);
     /*NOTREACHED*/
 }
+/**
+ * @param {$c.Ptr | null} hackdir const char *
+ * @returns {Promise<void>}
+ */
 async function opt_usage(hackdir) {   // earlyarg.c:376
     await chdirx(hackdir, TRUE);
     genl_display_file($c.lit("usagehlp"), TRUE);
@@ -362,6 +394,10 @@ async function opt_usage(hackdir) {   // earlyarg.c:376
 }
 /* show the sysconf file name, playground directory, run-time configuration
    file name, dumplog file name if applicable, and some other things */
+/**
+ * @param {$c.Ptr | null} dir const char *
+ * @returns {Promise<void>}
+ */
 export async function after_opt_showpaths(dir) {   // earlyarg.c:391
     await chdirx(dir, FALSE);
     await opt_terminate();
@@ -370,6 +406,12 @@ export async function after_opt_showpaths(dir) {   // earlyarg.c:391
 /* handle "-s <score options> [character-names]" to show all the entries
    in the high scores file ('record') belonging to particular characters;
    nethack will end after doing so without starting play */
+/**
+ * @param {number} argc int
+ * @param {*} argv char **
+ * @param {$c.Ptr | null} dir const char *
+ * @returns {Promise<void>}
+ */
 async function scores_only(argc, argv, dir) {   // earlyarg.c:406
     /* do this now rather than waiting for final termination, in case there
        is an error summary coming */
@@ -391,6 +433,12 @@ async function scores_only(argc, argv, dir) {   // earlyarg.c:406
  *    0 = no match
  *    1 = found and skip past this argument
  *    2 = found and trigger immediate exit
+ */
+/**
+ * @param {number} argc int
+ * @param {*} argv char **
+ * @param {number} e_arg enum earlyarg
+ * @returns {Promise<number>} int
  */
 export async function argcheck(argc, argv, e_arg) {   // earlyarg.c:450
     let i = 0, idx = 0, match = 0, userea = null, dashdash = null, extended_opt = null, cpy_extended_opt = null, insert_into_pastebuf = 0;
@@ -497,6 +545,9 @@ export async function argcheck(argc, argv, e_arg) {   // earlyarg.c:450
  *                    can be debugged without buffering.
  * fuzzer           - enable fuzzer without debugger intervention.
  */
+/**
+ * @param {$c.Ptr | null} opts char *
+ */
 function debug_fields(opts) {   // earlyarg.c:576
     let op = null, negated = 0, $t1;
     negated = FALSE;
@@ -539,6 +590,9 @@ function debug_fields(opts) {   // earlyarg.c:576
     }
     return;
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function dump_enums() {   // earlyarg.c:706
     let nmprefix = null, i = 0, j = 0, nmwidth = 0, comment = new Int8Array(256);
     /* 0 = dump numerically only, 1 = add 'char' comment */
@@ -560,6 +614,9 @@ async function dump_enums() {   // earlyarg.c:706
     await raw_print()($c.lit(""));
 }
 /* NODUMPENUMS */
+/**
+ * @returns {Promise<void>}
+ */
 export async function dump_glyphids() {   // earlyarg.c:806
     await dump_all_glyphids($c.__stdoutp);
 }

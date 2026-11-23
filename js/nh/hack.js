@@ -132,26 +132,48 @@ let weightlist = null;
 /* XXX: if more sources of water walking than just boots are added,
    cause_known(insight.c) should be externified and used for this */
 /* mode values for findtravelpath() */
+/**
+ * @param {number} ui unsigned int
+ * @returns {$T.any | null} anything *
+ */
 export function uint_to_any(ui) {   // hack.c:73
     gt.tmp_anything.$copyFrom(cg.zeroany);
     gt.tmp_anything.a_uint = ui;
     return gt.tmp_anything;
 }
+/**
+ * @param {number | bigint} lng long
+ * @returns {$T.any | null} anything *
+ */
 export function long_to_any(lng) {   // hack.c:81
     gt.tmp_anything.$copyFrom(cg.zeroany);
     gt.tmp_anything.a_long = lng;
     return gt.tmp_anything;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {$T.any | null} anything *
+ */
 export function monst_to_any(mtmp) {   // hack.c:89
     gt.tmp_anything.$copyFrom(cg.zeroany);
     gt.tmp_anything.a_monst = mtmp;
     return gt.tmp_anything;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {$T.any | null} anything *
+ */
 export function obj_to_any(obj) {   // hack.c:97
     gt.tmp_anything.$copyFrom(cg.zeroany);
     gt.tmp_anything.a_obj = obj;
     return gt.tmp_anything;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$c.Ptr | null} msg const char *
+ * @returns {Promise<number>} boolean
+ */
 export async function revive_nasty(x, y, msg) {   // hack.c:105
     let otmp = null, otmp2 = null, mtmp = null, cc = new $T.nhcoord(), revived = 0;
     otmp = null;
@@ -182,6 +204,11 @@ export async function revive_nasty(x, y, msg) {   // hack.c:105
 }
 /* can hero move onto a spot containing one or more boulders?
    used for m<dir> and travel and during boulder push failure */
+/**
+ * @param {number} sx coordxy
+ * @param {number} sy coordxy
+ * @returns {number} boolean
+ */
 function could_move_onto_boulder(sx, sy) {   // hack.c:145
     /* can if able to phaze through rock (must be poly'd, so not riding) */
     if (Passes_walls()) {
@@ -203,6 +230,15 @@ function could_move_onto_boulder(sx, sy) {   // hack.c:145
     /* can squeeze to spot if carrying extremely little, otherwise can't */
     return $c.i8(squeezeablylightinvent());
 }
+/**
+ * @param {number} sx coordxy
+ * @param {number} sy coordxy
+ * @param {number} rx coordxy
+ * @param {number} ry coordxy
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} costly boolean
+ * @returns {Promise<void>}
+ */
 async function dopush(sx, sy, rx, ry, otmp, costly) {   // hack.c:166
     let shkp = null, what = null, givemesg = 0, easypush = 0;
     {
@@ -267,6 +303,12 @@ async function dopush(sx, sy, rx, ry, otmp, costly) {   // hack.c:166
         await stolen_value(otmp, sx, sy, TRUE, FALSE);
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} sx coordxy
+ * @param {number} sy coordxy
+ * @returns {Promise<void>}
+ */
 async function cannot_push_msg(otmp, sx, sy) {   // hack.c:247
     let what = null;
     what = await the(await xname(otmp));
@@ -279,6 +321,12 @@ async function cannot_push_msg(otmp, sx, sy) {   // hack.c:247
         await feel_location(sx, sy);
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} sx coordxy
+ * @param {number} sy coordxy
+ * @returns {Promise<number>} int
+ */
 async function cannot_push(otmp, sx, sy) {   // hack.c:262
     let canpickup = 0, willpickup = 0;
     if (throws_rocks(gy.youmonst.data)) {
@@ -315,6 +363,10 @@ async function cannot_push(otmp, sx, sy) {   // hack.c:262
         return -1;
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function rock_disappear_msg(otmp) {   // hack.c:315
     if (u.usteed) {
         await pline($c.lit("%s pushes %s and suddenly it disappears!"), await YMonnam(u.usteed), await the(await xname(otmp)));
@@ -322,6 +374,10 @@ async function rock_disappear_msg(otmp) {   // hack.c:315
         await You($c.lit("push %s and suddenly it disappears!"), await the(await xname(otmp)));
     }
 }
+/**
+ * @param {number} sx coordxy
+ * @param {number} sy coordxy
+ */
 function moverock_done(sx, sy) {   // hack.c:327
     let otmp = null;
     for (otmp = svl.level.objects[sx][sy]; otmp; otmp = otmp.v.v_nexthere) {
@@ -330,6 +386,9 @@ function moverock_done(sx, sy) {   // hack.c:327
         }
     }
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function moverock() {   // hack.c:336
     let sx = 0, sy = 0, ret = 0;
     sx = $c.i16(u.ux + u.dx | 0), sy = $c.i16(u.uy + u.dy | 0);   /* boulder starting position */
@@ -337,6 +396,11 @@ async function moverock() {   // hack.c:336
     moverock_done(sx, sy);
     return ret;
 }
+/**
+ * @param {number} sx coordxy
+ * @param {number} sy coordxy
+ * @returns {Promise<number>} int
+ */
 async function moverock_core(sx, sy) {   // hack.c:348
     let rx = 0, ry = 0, otmp = null, ttmp = null, mtmp = null, costly = 0, firstboulder = 0, oldglyph = 0, res = 0, deliver_part1 = 0, you_or_steed = new Int8Array(256), newlev = 0, dest = new $T.d_level(), tox = 0, toy = 0, $t1;
     firstboulder = TRUE;
@@ -595,6 +659,11 @@ async function moverock_core(sx, sy) {   // hack.c:348
  *  Chew on a wall, door, or boulder.  [What about statues?]
  *  Returns TRUE if still eating, FALSE when done.
  */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} int
+ */
 export async function still_chewing(x, y) {   // hack.c:647
     let lev = null, boulder = null, digtxt = null, dmgtxt = null, nut = 0, $t1, $t2;
     lev = $c.relem(svl.level.locations[x], y);
@@ -723,6 +792,12 @@ export async function still_chewing(x, y) {   // hack.c:647
     $c.memset(svc.context.digging, 0, 32);
     return 0;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} ox coordxy
+ * @param {number} oy coordxy
+ * @returns {Promise<void>}
+ */
 export async function movobj(obj, ox, oy) {   // hack.c:825
     /* optimize by leaving on the fobj chain? */
     await remove_object(obj);
@@ -731,6 +806,9 @@ export async function movobj(obj, ox, oy) {   // hack.c:825
     await place_object(obj, ox, oy);
     await newsym(ox, oy);
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function dosinkfall() {   // hack.c:836
     let obj = null, dmg = 0, lev_boots = 0, innate_lev = 0, blockd_lev = 0, ufall = 0, save_ELev = 0, save_HLev = 0, $t1;
     /* to handle being chained to buried iron ball, trying to
@@ -808,14 +886,30 @@ async function dosinkfall() {   // hack.c:836
     float_vs_flight();
 }
 /* intended to be called only on ROCKs or TREEs */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 export function may_dig(x, y) {   // hack.c:923
     let lev = null;
     lev = $c.relem(svl.level.locations[x], y);
     return $c.i8(!((IS_STWALL(lev.typ) || IS_TREE(lev.typ)) && (lev.flags | 0) & W.NONDIGGABLE) ? 1 : 0);
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 export function may_passwall(x, y) {   // hack.c:932
     return $c.i8(!(svl.level.locations[x][y].typ <= DBWALL && (svl.level.locations[x][y].flags | 0) & W.NONPASSWALL) ? 1 : 0);
 }
+/**
+ * @param {$T.permonst | null} mdat struct permonst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 export function bad_rock(mdat, x, y) {   // hack.c:939
     return $c.i8((svl.level.flags.sokoban_rules | 0) && sobj_at(BOULDER, x, y) || svl.level.locations[x][y].typ < POOL && (!tunnels(mdat) || needspick(mdat) || !may_dig(x, y)) && !(passes_walls(mdat) && may_passwall(x, y)) ? 1 : 0);
 }
@@ -823,6 +917,10 @@ export function bad_rock(mdat, x, y) {   // hack.c:939
    monster--who might be the hero--can fit through, and if not then return
    the reason why:  1: can't fit, 2: possessions won't fit, 3: sokoban
    returns 0 if we can squeeze through */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {number} int
+ */
 export function cant_squeeze_thru(mon) {   // hack.c:953
     let amt = 0, ptr = null;
     ptr = mon.data;
@@ -845,11 +943,24 @@ export function cant_squeeze_thru(mon) {   // hack.c:953
     /* can squeeze through */
     return 0;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 export function invocation_pos(x, y) {   // hack.c:982
     return $c.i8(Invocation_lev(u.uz) && x === svi.inv_pos.x && y === svi.inv_pos.y ? 1 : 0);
 }
 /* return TRUE if (ux+dx,uy+dy) is an OK place to move;
    mode is one of DO_MOVE, TEST_MOVE, TEST_TRAV, or TEST_TRAP */
+/**
+ * @param {number} ux coordxy
+ * @param {number} uy coordxy
+ * @param {number} dx coordxy
+ * @param {number} dy coordxy
+ * @param {number} mode int
+ * @returns {Promise<number>} boolean
+ */
 export async function test_move(ux, uy, dx, dy, mode) {   // hack.c:991
     let x = 0, y = 0, tmpr = null, ust = null, buf = new Int8Array(256), glyph = 0, sym = 0, tmp = 0, cq = null, t = null, obj = null, $goto = null, $t1, $t2;
     /* these are -1|0|+1, not coordinates */
@@ -1109,6 +1220,10 @@ export async function test_move(ux, uy, dx, dy, mode) {   // hack.c:991
  * gt.travelmap keeps track of map locations we've moved through
  * this travel session. It will be cleared once the travel stops.
  */
+/**
+ * @param {number} mode int
+ * @returns {Promise<number>} boolean
+ */
 async function findtravelpath(mode) {   // hack.c:1266
     let travel = $c.matrix(Int16Array, [80, 21]), travelstepx = $c.matrix(Int16Array, [2, 1680]), travelstepy = $c.matrix(Int16Array, [2, 1680]), tx = 0, ty = 0, ux = 0, uy = 0, n = 0, set = 0, radius = 0, i = 0, nn = 0, dir = 0, x = 0, y = 0, dirmax = 0, alreadyrepeated = 0, nx = 0, ny = 0, visited = 0, px = 0, py = 0, dist = 0, nxtdist = 0, d2 = 0, nd2 = 0, ctrav = 0, ptrav = 0, $t1, $t2, $t3, $t4, $t5;
     if (!gt.travelmap) {
@@ -1343,6 +1458,11 @@ async function findtravelpath(mode) {   // hack.c:1266
     nomul(0);
     return FALSE;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} boolean
+ */
 export async function is_valid_travelpt(x, y) {   // hack.c:1526
     let tx = 0, ty = 0, ret = 0, glyph = 0;
     tx = u.tx;
@@ -1364,6 +1484,12 @@ export async function is_valid_travelpt(x, y) {   // hack.c:1526
 /* try to escape being stuck in a trapped state by walking out of it;
    return true iff moving should continue to intended destination
    (all failures and most successful escapes leave hero at original spot) */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$T.trap | null} desttrap struct trap *
+ * @returns {Promise<number>} boolean
+ */
 async function trapmove(x, y, desttrap) {   // hack.c:1550
     let anchored = 0, predicament = null, culprit = null, steedname = null, cc = new $T.nhcoord(), $goto = null;
     /* targeted destination, <u.ux+u.dx,u.uy+u.dy> */
@@ -1510,6 +1636,9 @@ async function trapmove(x, y, desttrap) {   // hack.c:1550
     }
     return FALSE;
 }
+/**
+ * @returns {Promise<number>} boolean
+ */
 export async function u_rooted() {   // hack.c:1694
     if (!gy.youmonst.data.mmove) {
         await You($c.lit("are rooted %s."), Levitation() || (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? $c.lit("in place") : $c.lit("to the ground"));
@@ -1518,6 +1647,10 @@ export async function u_rooted() {   // hack.c:1694
     }
     return FALSE;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function notice_mon(mtmp) {   // hack.c:1708
     let spot = 0;
     if (a11y.mon_notices && !a11y.mon_notices_blocked) {
@@ -1531,12 +1664,21 @@ export async function notice_mon(mtmp) {   // hack.c:1708
         }
     }
 }
+/**
+ * @param {*} ptr1 const void *
+ * @param {*} ptr2 const void *
+ * @returns {number} int
+ */
 function notice_mons_cmp(ptr1, ptr2) {   // hack.c:1735
     let m1 = null, m2 = null;
     m1 = $c.asArr(ptr1, 'ptr').get(0);
     m2 = $c.asArr(ptr2, 'ptr').get(0);
     return dist2(m1.mx, m1.my, u.ux, u.uy) - dist2(m2.mx, m2.my, u.ux, u.uy) | 0;
 }
+/**
+ * @param {number} reset boolean
+ * @returns {Promise<void>}
+ */
 export async function notice_all_mons(reset) {   // hack.c:1744
     let mtmp = null, arr = null, j = 0, i = 0, cnt = 0, $t1;
     if (a11y.mon_notices && !a11y.mon_notices_blocked) {
@@ -1577,6 +1719,11 @@ export async function notice_all_mons(reset) {   // hack.c:1744
     }
 }
 /* maybe disturb buried zombies when an object is dropped or thrown nearby */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} violent boolean
+ * @returns {Promise<void>}
+ */
 export async function impact_disturbs_zombies(obj, violent) {   // hack.c:1787
     /* if object won't make a noticeable impact, let buried zombies rest */
     if (obj.owt < (violent ? 10 : 100) || is_flimsy(obj)) {
@@ -1585,6 +1732,11 @@ export async function impact_disturbs_zombies(obj, violent) {   // hack.c:1787
     await disturb_buried_zombies(obj.ox, obj.oy);
 }
 /* reduce zombification timeout of buried zombies around px, py */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function disturb_buried_zombies(x, y) {   // hack.c:1798
     let otmp = null, t = 0;
     for (otmp = svl.level.buriedobjlist; otmp; otmp = otmp.nobj) {
@@ -1595,6 +1747,10 @@ export async function disturb_buried_zombies(x, y) {   // hack.c:1798
     }
 }
 /* return an appropriate locomotion word for hero */
+/**
+ * @param {$c.Ptr | null} def const char *
+ * @returns {$c.Ptr | null} const char *
+ */
 export function u_locomotion(def) {   // hack.c:1817
     let capitalize = 0;
     capitalize = $c.i8(def.get(0) === highc(def.get(0)) ? 1 : 0);
@@ -1606,6 +1762,11 @@ export function u_locomotion(def) {   // hack.c:1817
     return Levitation() ? capitalize ? $c.lit("Float") : $c.lit("float") : (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked ? capitalize ? $c.lit("Fly") : $c.lit("fly") : locomotion(gy.youmonst.data, def);
 }
 /* Return a simplified floor solid/liquid state based on hero's state */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} schar
+ */
 function u_simple_floortyp(x, y) {   // hack.c:1833
     let u_in_air = 0;
     u_in_air = $c.i8(Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked || !(!($c.andu64(gy.youmonst.data.mflags1, M1.FLY) !== 0) && !(gy.youmonst.data.mlet === S.EYE || gy.youmonst.data.mlet === S.LIGHT) && (!($c.andu64(gy.youmonst.data.mflags1, M1.CLING) !== 0) || !has_ceiling(u.uz))) ? 1 : 0);
@@ -1626,6 +1787,10 @@ function u_simple_floortyp(x, y) {   // hack.c:1833
     return ROOM;
 }
 /* maybe show a helpful gameplay tip? returns True if tip gets shown */
+/**
+ * @param {number} tip int
+ * @returns {Promise<number>} boolean
+ */
 export async function handle_tip(tip) {   // hack.c:1852
     if (!flags.tips) {
         return FALSE;
@@ -1655,6 +1820,11 @@ export async function handle_tip(tip) {   // hack.c:1852
     return FALSE;
 }
 /* Is it dangerous for hero to move to x,y due to water or lava? */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} boolean
+ */
 async function swim_move_danger(x, y) {   // hack.c:1885
     let newtyp = 0, liquid_wall = 0;
     newtyp = u_simple_floortyp(x, y);
@@ -1685,6 +1855,11 @@ async function swim_move_danger(x, y) {   // hack.c:1885
     return FALSE;
 }
 /* moving with 'm' prefix, bump into a monster? */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} glyph int
+ * @returns {Promise<number>} boolean
+ */
 async function domove_bump_mon(mtmp, glyph) {   // hack.c:1925
     /* If they used a 'm' command, trying to move onto a monster
      * prints the below message and wastes a turn.  The exception is
@@ -1709,6 +1884,13 @@ async function domove_bump_mon(mtmp, glyph) {   // hack.c:1925
    returns TRUE if hero movement is used up.
    sets displaceu, if hero and monster could swap places instead.
 */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {$c.Ptr | null} displaceu boolean *
+ * @returns {Promise<number>} boolean
+ */
 async function domove_attackmon_at(mtmp, x, y, displaceu) {   // hack.c:1955
     let $t1;
     /* assert(mtmp != NULL) */
@@ -1733,6 +1915,11 @@ async function domove_attackmon_at(mtmp, x, y, displaceu) {   // hack.c:1955
     return FALSE;
 }
 /* force-fight iron bars with your weapon? */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} boolean
+ */
 async function domove_fight_ironbars(x, y) {   // hack.c:1996
     let obj = [null], breakflags = 0;
     if (svc.context.forcefight && svl.level.locations[x][y].typ === IRONBARS && $G.uwep) {
@@ -1755,6 +1942,11 @@ async function domove_fight_ironbars(x, y) {   // hack.c:1996
     return FALSE;
 }
 /* force-fight a spider web with your weapon */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} boolean
+ */
 async function domove_fight_web(x, y) {   // hack.c:2021
     let trap = null, wtype = 0, wskill_minus_2 = 0, roll = 0, uwepstr = null, scndstr = null, uwepbuf = new Int8Array(256), scndbuf = new Int8Array(256), onewep = 0;
     trap = t_at(x, y);
@@ -1818,6 +2010,12 @@ async function domove_fight_web(x, y) {   // hack.c:2021
     return FALSE;
 }
 /* maybe swap places with a pet? returns TRUE if swapped places */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} boolean
+ */
 async function domove_swap_with_pet(mtmp, x, y) {   // hack.c:2098
     let trap = null, didnt_move = 0, u_with_boulder = 0, what = null, which = null, anbuf = new Int8Array(10), tmp = 0, mndx = 0, $t1;
     /* if it turns out we can't actually move */
@@ -1924,6 +2122,11 @@ async function domove_swap_with_pet(mtmp, x, y) {   // hack.c:2098
     return $c.i8(!didnt_move ? 1 : 0);
 }
 /* force-fight (x,y) which doesn't have anything to fight */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} boolean
+ */
 async function domove_fight_empty(x, y) {   // hack.c:2229
     let off_edge = 0, glyph = 0, boulder = null, explo = 0, solid = 0, buf = new Int8Array(256), attk = null;
     off_edge = $c.i8(!isok(x, y) ? 1 : 0);
@@ -2016,6 +2219,9 @@ async function domove_fight_empty(x, y) {   // hack.c:2229
     return FALSE;
 }
 /* does the plane of air disturb movement? */
+/**
+ * @returns {Promise<number>} boolean
+ */
 async function air_turbulence() {   // hack.c:2342
     if ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) && rn2(4) && !Levitation() && !((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked)) {
         switch (rn2(3)) {
@@ -2036,6 +2242,11 @@ async function air_turbulence() {   // hack.c:2342
     return FALSE;
 }
 /* does water disturb the movement? */
+/**
+ * @param {*} x coordxy *
+ * @param {*} y coordxy *
+ * @returns {Promise<number>} boolean
+ */
 async function water_turbulence(x, y) {   // hack.c:2365
     let wtcap = 0, wtmod = 0;
     if (u.uinwater) {
@@ -2061,6 +2272,9 @@ async function water_turbulence(x, y) {   // hack.c:2365
     }
     return FALSE;
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function slippery_ice_fumbling() {   // hack.c:2396
     let recharged = 0, iceskater = null;
     recharged = $c.i8(!Levitation() && is_ice(u.ux, u.uy) ? 1 : 0);
@@ -2078,10 +2292,18 @@ async function slippery_ice_fumbling() {   // hack.c:2396
         u.uprops[FUMBLING].intrinsic = $c.and64(u.uprops[FUMBLING].intrinsic, ~FROMOUTSIDE);
     }
 }
+/**
+ * @returns {number} boolean
+ */
 export function u_maybe_impaired() {   // hack.c:2418
     return $c.i8(u.uprops[STUNNED].intrinsic || u.uprops[CONFUSION].intrinsic && !rn2(5) ? 1 : 0);
 }
 /* change movement dir if impaired. return TRUE if can't move */
+/**
+ * @param {*} x coordxy *
+ * @param {*} y coordxy *
+ * @returns {number} boolean
+ */
 function impaired_movement(x, y) {   // hack.c:2425
     let tries = 0, $t1;
     if (u_maybe_impaired()) {
@@ -2098,6 +2320,12 @@ function impaired_movement(x, y) {   // hack.c:2425
     }
     return FALSE;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} msg boolean
+ * @returns {Promise<number>} boolean
+ */
 async function avoid_moving_on_trap(x, y, msg) {   // hack.c:2444
     let trap = null;
     /* the vibrating square is implemented as a trap but treated as if
@@ -2111,6 +2339,12 @@ async function avoid_moving_on_trap(x, y, msg) {   // hack.c:2444
     }
     return FALSE;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} msg boolean
+ * @returns {Promise<number>} boolean
+ */
 async function avoid_moving_on_liquid(x, y, msg) {   // hack.c:2463
     let in_air = 0;
     in_air = $c.i8(Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked ? 1 : 0);
@@ -2133,6 +2367,11 @@ async function avoid_moving_on_liquid(x, y, msg) {   // hack.c:2463
 }
 /* when running/rushing, avoid stepping on a known trap or pool of liquid.
    returns TRUE if avoided. */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} boolean
+ */
 async function avoid_running_into_trap_or_liquid(x, y) {   // hack.c:2495
     let would_stop = 0;
     would_stop = $c.i8(svc.context.run >= 2 ? 1 : 0);
@@ -2151,6 +2390,11 @@ async function avoid_running_into_trap_or_liquid(x, y) {   // hack.c:2495
 /* if paranoid_confirm:Trap is enabled, check whether the next step forward
    needs player confirmation due to visible region or discovered trap;
    result: True => stop moving, False => proceed */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} boolean
+ */
 async function avoid_trap_andor_region(x, y) {   // hack.c:2515
     let qbuf = new Int8Array(128), newreg = null, oldreg = null, trap = null, traptype = 0, into = 0;
     trap = null;
@@ -2200,6 +2444,11 @@ async function avoid_trap_andor_region(x, y) {   // hack.c:2515
     return FALSE;
 }
 /* trying to move out-of-bounds? */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} boolean
+ */
 async function move_out_of_bounds(x, y) {   // hack.c:2586
     let dx = 0, dy = 0;
     if (!isok(x, y)) {
@@ -2229,6 +2478,9 @@ async function move_out_of_bounds(x, y) {   // hack.c:2586
     return FALSE;
 }
 /* carrying too much to be able to move? */
+/**
+ * @returns {Promise<number>} boolean
+ */
 async function carrying_too_much() {   // hack.c:2616
     let wtcap = 0;
     if (((wtcap = near_capacity()) >= OVERLOADED || wtcap > SLT_ENCUMBER && (Upolyd() ? u.mh < 5 && u.mh !== u.mhmax : u.uhp < 10 && u.uhp !== u.uhpmax)) && !((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level))) {
@@ -2245,6 +2497,11 @@ async function carrying_too_much() {   // hack.c:2616
 }
 /* try to pull free from sticking monster, or you release a monster
    you're sticking to. returns TRUE if you lose your movement. */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} boolean
+ */
 async function escape_from_sticky_mon(x, y) {   // hack.c:2639
     let mtmp = null;
     if (u.ustuck && (x !== u.ustuck.mx || y !== u.ustuck.my)) {
@@ -2295,6 +2552,9 @@ async function escape_from_sticky_mon(x, y) {   // hack.c:2639
     }
     return FALSE;
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function domove() {   // hack.c:2695
     let ux1 = 0, uy1 = 0;
     ux1 = u.ux;
@@ -2309,6 +2569,9 @@ export async function domove() {   // hack.c:2695
     gd.domove_attempting = 0;
     gk.kickedloc.x = 0, gk.kickedloc.y = 0;
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function domove_core() {   // hack.c:2712
     let mtmp = null, tmpr = null, x = Int16Array.of(0), y = Int16Array.of(0), glyph = 0, chainx = Int16Array.of(0), chainy = Int16Array.of(0), ballx = Int16Array.of(0), bally = Int16Array.of(0), bc_control = Int32Array.of(0), cause_delay = Int8Array.of(0), displaceu = Int8Array.of(0), moved = 0, noticed_it = 0, $t1;
     chainx[0] = 0;
@@ -2560,6 +2823,9 @@ async function domove_core() {   // hack.c:2712
 }
 /* delay output based on value of runmode,
    if hero is running or doing a multi-turn action */
+/**
+ * @returns {Promise<void>}
+ */
 export async function runmode_delay_output() {   // hack.c:2996
     if ((svc.context.run || gm.multi) && flags.runmode !== RUN.TPORT) {
         /* for tport mode, don't display anything until we've stopped;
@@ -2581,6 +2847,13 @@ export async function runmode_delay_output() {   // hack.c:2996
         }
     }
 }
+/**
+ * @param {number} x1 coordxy
+ * @param {number} y1 coordxy
+ * @param {number} x2 coordxy
+ * @param {number} y2 coordxy
+ * @returns {Promise<void>}
+ */
 async function maybe_smudge_engr(x1, y1, x2, y2) {   // hack.c:3020
     let ep = null;
     if (can_reach_floor(TRUE)) {
@@ -2593,6 +2866,9 @@ async function maybe_smudge_engr(x1, y1, x2, y2) {   // hack.c:3020
     }
 }
 /* HP loss or passing out from overexerting yourself */
+/**
+ * @returns {Promise<void>}
+ */
 export async function overexert_hp() {   // hack.c:3035
     let hp = null;
     hp = !Upolyd() ? new $c.FieldRef(u, "uhp", "i32") : new $c.FieldRef(u, "mh", "i32");
@@ -2606,6 +2882,9 @@ export async function overexert_hp() {   // hack.c:3035
     }
 }
 /* combat increases metabolism */
+/**
+ * @returns {Promise<number>} boolean
+ */
 export async function overexertion() {   // hack.c:3051
     /* this used to be part of domove() when moving to a monster's
        position, but is now called by do_attack() so that it doesn't
@@ -2616,6 +2895,9 @@ export async function overexertion() {   // hack.c:3051
     }
     return $c.i8(gm.multi < 0 ? 1 : 0);   /* might have fainted (forced to sleep) */
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function invocation_message() {   // hack.c:3064
     let buf = new Int8Array(256), otmp = null;
     /* a special clue-msg when on the Invocation position */
@@ -2713,6 +2995,9 @@ export function classify_terrain() {   // hack.c:3090
 /* moving onto different terrain;
    might be going into solid rock, inhibiting levitation or flight,
    or coming back out of such, reinstating levitation/flying */
+/**
+ * @returns {Promise<void>}
+ */
 export async function switch_terrain() {   // hack.c:3178
     let lev = null, blocklev = 0, was_levitating = 0, was_flying = 0;
     lev = $c.relem(svl.level.locations[u.ux], u.uy);
@@ -2757,6 +3042,10 @@ export async function switch_terrain() {   // hack.c:3178
     }
 }
 /* set or clear u.uinwater */
+/**
+ * @param {number} in_out int
+ * @returns {Promise<void>}
+ */
 export async function set_uinwater(in_out) {   // hack.c:3221
     if (in_out !== (u.uinwater | 0)) {
         u.uinwater = ((in_out ? 1 : 0) >>> 0) & 1;
@@ -2766,6 +3055,10 @@ export async function set_uinwater(in_out) {   // hack.c:3221
 /* extracted from spoteffects; called by spoteffects to check for entering or
    leaving a pool of water/lava, and by moveloop to check for staying on one;
    returns true to skip rest of spoteffects */
+/**
+ * @param {number} newspot boolean
+ * @returns {Promise<number>} boolean
+ */
 export async function pooleffects(newspot) {   // hack.c:3233
     let still_inwater = 0, was_underwater = 0;
     /* true if called by spoteffects */
@@ -2842,6 +3135,10 @@ export async function pooleffects(newspot) {   // hack.c:3233
     }
     return FALSE;
 }
+/**
+ * @param {number} pick boolean
+ * @returns {Promise<void>}
+ */
 export async function spoteffects(pick) {   // hack.c:3312
     let mtmp = null, trap = null, trapflag = 0, pit = 0, time_left = 0, dmg = 0, $t1, $t2;
     trap = t_at(u.ux, u.uy);
@@ -2973,6 +3270,11 @@ export async function spoteffects(pick) {   // hack.c:3312
     return;
 }
 /* returns first matching monster */
+/**
+ * @param {$T.permonst | null} mdat struct permonst *
+ * @param {number} roomno int
+ * @returns {$T.monst | null} struct monst *
+ */
 function monstinroom(mdat, roomno) {   // hack.c:3466
     let mtmp = null;
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
@@ -2986,6 +3288,11 @@ function monstinroom(mdat, roomno) {   // hack.c:3466
     return null;
 }
 /* check whether room contains a particular type of furniture */
+/**
+ * @param {number} furniture int
+ * @param {number} roomno int
+ * @returns {number} boolean
+ */
 function furniture_present(furniture, roomno) {   // hack.c:3482
     let x = 0, y = 0, lx = 0, ly = 0, hx = 0, hy = 0, sroom = null;
     sroom = $c.relem(svr.rooms, roomno);
@@ -3002,6 +3309,12 @@ function furniture_present(furniture, roomno) {   // hack.c:3482
     }
     return FALSE;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} typewanted int
+ * @returns {$c.Ptr | null} char *
+ */
 export function in_rooms(x, y, typewanted) {   // hack.c:3498
     let rno = 0, ptr = null, typefound = 0, min_x = 0, min_y = 0, max_x = 0, max_y_offset = 0, step = 0, lev = null;
     rno = 0;
@@ -3061,6 +3374,11 @@ export function in_rooms(x, y, typewanted) {   // hack.c:3498
     return ptr;
 }
 /* is (x,y) in a town? */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 export function in_town(x, y) {   // hack.c:3564
     let sroom = null, has_subrooms = 0;
     has_subrooms = FALSE;
@@ -3081,6 +3399,9 @@ export function in_town(x, y) {   // hack.c:3564
     }
     return $c.i8(!has_subrooms ? 1 : 0);
 }
+/**
+ * @param {number} newlev boolean
+ */
 function move_update(newlev) {   // hack.c:3588
     let c = 0, ptr1 = null, ptr2 = null, ptr3 = null, ptr4 = null, $t1, $t2, $t3, $t4;
     $c.strcpy(new $c.Ptr(u.urooms0, 0), new $c.Ptr(u.urooms, 0));
@@ -3116,6 +3437,10 @@ function move_update(newlev) {   // hack.c:3588
     ptr2.set(0, 0);
 }
 /* possibly deliver a one-time room entry message */
+/**
+ * @param {number} newlev boolean
+ * @returns {Promise<void>}
+ */
 export async function check_special_room(newlev) {   // hack.c:3626
     let mtmp = null, ptr = null, roomno = 0, rt = 0, msg_given = 0, run = null, oracle = null;
     move_update(newlev);
@@ -3267,6 +3592,9 @@ export async function check_special_room(newlev) {   // hack.c:3626
    0 = cannot pickup, no time taken
   -1 = do normal pickup
   -2 = loot the monster */
+/**
+ * @returns {Promise<number>} int
+ */
 async function pickup_checks() {   // hack.c:3788
     let traphere = null, lev = null, surf = null;
     /* uswallow case added by GAN 01/29/87 */
@@ -3348,6 +3676,9 @@ async function pickup_checks() {   // hack.c:3788
     return -1;   /* can do normal pickup */
 }
 /* the #pickup command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dopickup() {   // hack.c:3876
     let count = 0, tmpcount = Int32Array.of(0), ret = 0;
     count = $c.i32(gc.command_count);
@@ -3363,6 +3694,9 @@ export async function dopickup() {   // hack.c:3876
 /* stop running if we see something interesting next to us */
 /* turn around a corner if that is the only way we can proceed */
 /* do not turn left or right twice */
+/**
+ * @returns {Promise<void>}
+ */
 export async function lookaround() {   // hack.c:3898
     let x = 0, y = 0, i = 0, x0 = 0, y0 = 0, m0 = 0, i0 = 0, corrct = 0, noturn = 0, mtmp = null, infront = 0, $goto = null;
     D1: for (;;) {
@@ -3546,6 +3880,11 @@ export async function lookaround() {   // hack.c:3898
     }
 }
 /* check for a doorway which lacks its door (NODOOR or BROKEN) */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 export function doorless_door(x, y) {   // hack.c:4063
     let lev_p = null;
     lev_p = $c.relem(svl.level.locations[x], y);
@@ -3561,6 +3900,11 @@ export function doorless_door(x, y) {   // hack.c:4063
 }
 /* used by drown() to check whether hero can crawl from water to <x,y>;
    also used by findtravelpath() when destination is one step away */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} boolean
+ */
 export async function crawl_destination(x, y) {   // hack.c:4079
     /* is location ok in general? */
     if (!goodpos(x, y, gy.youmonst, 0)) {
@@ -3586,6 +3930,9 @@ export async function crawl_destination(x, y) {   // hack.c:4079
 }
 /* something like lookaround, but we are not running */
 /* react only to monsters that might hit us */
+/**
+ * @returns {number} int
+ */
 export function monster_nearby() {   // hack.c:4106
     let x = 0, y = 0, mtmp = null;
     /* Also see the similar check in dochugw() in monmove.c */
@@ -3601,6 +3948,9 @@ export function monster_nearby() {   // hack.c:4106
     }
     return 0;
 }
+/**
+ * @param {number} and_travel boolean
+ */
 export function end_running(and_travel) {   // hack.c:4130
     let $t1, $t2;
     /* moveloop() suppresses time_botl when context.run is non-zero; when
@@ -3632,6 +3982,9 @@ export function end_running(and_travel) {   // hack.c:4130
         gm.multi = 0;
     }
 }
+/**
+ * @param {number} nval int
+ */
 export function nomul(nval) {   // hack.c:4161
     if (gm.multi < nval) {
         return;   /* This is a bug fix by ab@unido */
@@ -3647,6 +4000,10 @@ export function nomul(nval) {   // hack.c:4161
     cmdq_clear(CQ_CANNED);
 }
 /* called when a non-movement, multi-turn action has completed */
+/**
+ * @param {$c.Ptr | null} msg_override const char *
+ * @returns {Promise<void>}
+ */
 export async function unmul(msg_override) {   // hack.c:4177
     let f = null;
     disp.botl = TRUE;
@@ -3678,6 +4035,9 @@ export async function unmul(msg_override) {   // hack.c:4177
         await f();
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function maybe_wail() {   // hack.c:4211
     let who = null, i = 0, powercnt = 0;
     if (svm.moves <= $c.add64(gw.wailmsg, 50)) {
@@ -3701,12 +4061,22 @@ async function maybe_wail() {   // hack.c:4211
     }
 }
 /* show a message how much damage you received */
+/**
+ * @param {number} dmg int
+ * @returns {Promise<void>}
+ */
 export async function showdamage(dmg) {   // hack.c:4247
     if (!iflags.showdamage || !dmg) {
         return;
     }
     await pline($c.lit("[HP %i, %i left]"), -dmg | 0, Upolyd() ? u.mh : u.uhp);
 }
+/**
+ * @param {number} n int
+ * @param {$c.Ptr | null} knam const char *
+ * @param {number} k_format schar
+ * @returns {Promise<void>}
+ */
 export async function losehp(n, knam, k_format) {   // hack.c:4256
     /* code below is prepared to handle negative 'loss' so don't add this
      * until we've verified that no callers intentionally rely on that */
@@ -3741,6 +4111,9 @@ export async function losehp(n, knam, k_format) {   // hack.c:4256
         await maybe_wail();
     }
 }
+/**
+ * @returns {number} int
+ */
 export function weight_cap() {   // hack.c:4295
     let carrcap = 0, save_ELev = 0, save_BLev = 0;
     save_ELev = u.uprops[LEVITATION].extrinsic;
@@ -3792,6 +4165,9 @@ export function weight_cap() {   // hack.c:4295
 }
 /* returns how far beyond the normal capacity the player is currently. */
 /* inv_weight() is negative if the player is below normal capacity. */
+/**
+ * @returns {number} int
+ */
 export function inv_weight() {   // hack.c:4351
     let otmp = null, wt = 0, $t1;
     otmp = gi.invent;
@@ -3811,6 +4187,10 @@ export function inv_weight() {   // hack.c:4351
  * Returns 0 if below normal capacity, or the number of "capacity units"
  * over the normal capacity the player is loaded.  Max is 5.
  */
+/**
+ * @param {number} xtra_wt int
+ * @returns {number} int
+ */
 export function calc_capacity(xtra_wt) {   // hack.c:4372
     let cap = 0, wt = 0;
     wt = inv_weight() + xtra_wt | 0;
@@ -3823,14 +4203,24 @@ export function calc_capacity(xtra_wt) {   // hack.c:4372
     cap = $c.div32(Math.imul(wt, 2), gw.wc) + 1 | 0;
     return cap < OVERLOADED ? cap : OVERLOADED;
 }
+/**
+ * @returns {number} int
+ */
 export function near_capacity() {   // hack.c:4385
     return calc_capacity(0);
 }
+/**
+ * @returns {number} int
+ */
 export function max_capacity() {   // hack.c:4391
     let wt = 0;
     wt = inv_weight();
     return wt - Math.imul(2, gw.wc) | 0;
 }
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @returns {Promise<number>} boolean
+ */
 export async function check_capacity(str) {   // hack.c:4399
     if (near_capacity() >= EXT_ENCUMBER) {
         if (str) {
@@ -3842,6 +4232,9 @@ export async function check_capacity(str) {   // hack.c:4399
     }
     return 0;
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function dump_weights() {   // hack.c:4421
     let i = 0, cnt = 0, nmwidth = 0, mcount = 0, ocount = 0, nmbuf = new Int8Array(256), nmbufbase = new Int8Array(256), num_entries = 0, cm = 0, oc_name = null, wt = 0, $t1, $t2;
     cnt = 0;
@@ -3893,6 +4286,11 @@ export async function dump_weights() {   // hack.c:4421
     $c.free(weightlist);
     await freedynamicdata();
 }
+/**
+ * @param {*} p1 const void *
+ * @param {*} p2 const void *
+ * @returns {number} int
+ */
 function cmp_weights(p1, p2) {   // hack.c:4486
     let i1 = null, i2 = null;
     i1 = $c.asRec(p1, $T.weight_table_entry, 32);
@@ -3900,6 +4298,10 @@ function cmp_weights(p1, p2) {   // hack.c:4486
     /* return (i1->wt - i2->wt); */
     return $c.strcmp(i1.nm, i2.nm);
 }
+/**
+ * @param {number} incl_gold boolean
+ * @returns {number} int
+ */
 export function inv_cnt(incl_gold) {   // hack.c:4496
     let otmp = null, ct = 0;
     otmp = gi.invent;
@@ -3916,6 +4318,10 @@ export function inv_cnt(incl_gold) {   // hack.c:4496
 /* Intended use is for your or some monster's inventory, */
 /* now that u.gold/m.gold is gone.*/
 /* Counting money in a container might be possible too. */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {number | bigint} long
+ */
 export function money_cnt(otmp) {   // hack.c:4514
     while (otmp) {
         if (otmp.oclass === COIN_CLASS) {
@@ -3925,6 +4331,12 @@ export function money_cnt(otmp) {   // hack.c:4514
     }
     return 0;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} old_typ schar
+ * @returns {Promise<void>}
+ */
 export async function spot_checks(x, y, old_typ) {   // hack.c:4525
     let new_typ = 0, db_ice_now = 0;
     new_typ = svl.level.locations[x][y].typ;
@@ -3946,6 +4358,11 @@ export async function spot_checks(x, y, old_typ) {   // hack.c:4525
     }
 }
 /* calculate x/y, rounding as appropriate */
+/**
+ * @param {number | bigint} x long
+ * @param {number} y int
+ * @returns {Promise<number>} int
+ */
 export async function rounddiv(x, y) {   // hack.c:4551
     let r = 0, m = 0, divsgn = 0;
     divsgn = 1;

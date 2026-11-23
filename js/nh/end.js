@@ -105,6 +105,10 @@ let Schroedingers_cat = 0;
 const death_fixups = $c.recArray($T.anon_end_350, 2);
 /* called as signal() handler, so sent at least one arg */
 /*ARGSUSED*/
+/**
+ * @param {number} sig_unused int
+ * @returns {Promise<void>}
+ */
 export async function done1(sig_unused) {   // end.c:69
     $c.signal(2, $c.ptrConst(1));
     iflags.debug_fuzzer = fuzzer_off;
@@ -121,6 +125,9 @@ export async function done1(sig_unused) {   // end.c:69
     }
 }
 /* "#quit" command or keyboard interrupt */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function done2() {   // end.c:91
     let abandon_tutorial = 0, c = 0;
     abandon_tutorial = 0;
@@ -163,6 +170,10 @@ export async function done2() {   // end.c:91
 }
 /* called as signal() handler, so sent at least 1 arg */
 /*ARGSUSED*/
+/**
+ * @param {number} sig_unused int
+ * @returns {Promise<void>}
+ */
 async function done_intr(sig_unused) {   // end.c:155
     program_state.stopprint = program_state.stopprint + 1 | 0;
     $c.signal(2, $c.ptrConst(1));
@@ -170,6 +181,10 @@ async function done_intr(sig_unused) {   // end.c:155
     return;
 }
 /* signal() handler */
+/**
+ * @param {number} sig int
+ * @returns {Promise<void>}
+ */
 async function done_hangup(sig) {   // end.c:170
     program_state.done_hup = program_state.done_hup + 1 | 0;
     sethanguphandler($c.ptrConst(1));
@@ -179,6 +194,11 @@ async function done_hangup(sig) {   // end.c:170
 /* NO_SIGNAL */
 /* one compiler warns if the format
    string is the result of a ? x : y */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} how int
+ * @returns {Promise<void>}
+ */
 export async function done_in_by(mtmp, how) {   // end.c:186
     let buf = new Int8Array(256), mptr = null, champtr = null, distorted = 0, mimicker = 0, imitator = 0, shape = new Int8Array(256), realnm = null, fakenm = null, alt = 0, shknm = null, honorific = null, reasondummy = Int8Array.of(0), p = null, reasonmid = Uint32Array.of(0);
     mptr = mtmp.data;
@@ -316,6 +336,9 @@ export async function done_in_by(mtmp, how) {   // end.c:186
 }
 /* clear away while-helpless when the cause of death caused that
    helplessness (ie, "petrified by <foo> while getting stoned") */
+/**
+ * @param {number} how int
+ */
 function fixup_death(how) {   // end.c:367
     let i = 0;
     if (gm.multi_reason) {
@@ -337,6 +360,11 @@ function fixup_death(how) {   // end.c:367
     }
 }
 /*VARARGS1*/
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @param {...*} $va the C variable arguments (...)
+ * @returns {Promise<void>}
+ */
 export async function panic(str, ...$va) {   // end.c:395
     let the_args = null, buf = new Int8Array(256), maybe_rebuild = null, $t1;
     {
@@ -389,6 +417,11 @@ export async function panic(str, ...$va) {   // end.c:395
     }
     await really_done(PANICKED);
 }
+/**
+ * @param {number} category int
+ * @param {$c.Ptr | null} defquery char *
+ * @returns {Promise<number>} boolean
+ */
 async function should_query_disclose_option(category, defquery) {   // end.c:477
     let idx = 0, disclose = 0, dop = null;
     defquery.set(0, 110);
@@ -426,6 +459,10 @@ async function should_query_disclose_option(category, defquery) {   // end.c:477
 /* one space for indentation */
 /* DUMPLOG */
 /*ARGSUSED*/
+/**
+ * @param {number} how int
+ * @param {number | bigint} when time_t
+ */
 function dump_everything(how, when) {   // end.c:543
     /* ASCENDED, ESCAPED, QUIT, etc */
     /* date+time at end of game */
@@ -446,6 +483,11 @@ function dump_everything(how, when) {   // end.c:543
     nhUse(how);
     nhUse(when);
 }
+/**
+ * @param {number} how int
+ * @param {number} taken boolean
+ * @returns {Promise<void>}
+ */
 async function disclose(how, taken) {   // end.c:620
     let c = 0, defquery = Int8Array.of(0), qbuf = new Int8Array(128), ask = 0, acnt = 0;
     c = 0;
@@ -520,6 +562,10 @@ async function disclose(how, taken) {   // end.c:620
     }
 }
 /* try to get the player back in a viable state after being killed */
+/**
+ * @param {number} how int
+ * @returns {Promise<void>}
+ */
 async function savelife(how) {   // end.c:705
     let uhpmin = 0, givehp = 0;
     givehp = 50 + Math.imul(10, $c.div32(ACURR(A.CON), 2)) | 0;
@@ -578,6 +624,9 @@ async function savelife(how) {   // end.c:705
  * Get valuables from the given list.  Revised code: the list always remains
  * intact.
  */
+/**
+ * @param {$T.obj | null} list struct obj *
+ */
 function get_valuables(list) {   // end.c:764
     let obj = null, i = 0;
     /* inventory or container contents */
@@ -612,6 +661,10 @@ function get_valuables(list) {   // end.c:764
  *  Sort collected valuables, most frequent to least.  We could just
  *  as easily use qsort, but we don't care about efficiency here.
  */
+/**
+ * @param {$T.valuable_data | null} list struct valuable_data *
+ * @param {number} size int
+ */
 function sort_valuables(list, size) {   // end.c:799
     let i = 0, j = 0, ltmp = new $T.valuable_data();
     /* max value is less than 20 */
@@ -638,6 +691,9 @@ function sort_valuables(list, size) {   // end.c:799
 /* Schroedinger's Cat */
 /* Ascending is deterministic */
 /* deal with some objects which may be in an abnormal state at end of game */
+/**
+ * @returns {Promise<void>}
+ */
 export async function done_object_cleanup() {   // end.c:852
     let ox = 0, oy = 0;
     /* might have been killed while using a disposable item, so make sure
@@ -691,6 +747,12 @@ export async function done_object_cleanup() {   // end.c:852
     return;
 }
 /* called twice; first to calculate total, then to list relevant items */
+/**
+ * @param {$T.obj | null} list struct obj *
+ * @param {number} counting boolean
+ * @param {number} endwin winid
+ * @returns {Promise<void>}
+ */
 async function artifact_score(list, counting, endwin) {   // end.c:908
     let pbuf = new Int8Array(256), otmp = null, value = 0, points = 0, $t1, $t2, $t3;
     /* true => add up points; false => display them */
@@ -716,6 +778,10 @@ async function artifact_score(list, counting, endwin) {   // end.c:908
 }
 /* when dying while running the debug fuzzer, [almost] always keep going;
    True: forced survival; False: doomed unless wearing life-save amulet */
+/**
+ * @param {number} how int
+ * @returns {Promise<number>} boolean
+ */
 async function fuzzer_savelife(how) {   // end.c:946
     let potion = null, propidx = 0, proptim = 0, remedies = 0, $t1;
     /*
@@ -783,6 +849,10 @@ async function fuzzer_savelife(how) {   // end.c:946
     return 0;   /* panic or too many consecutive deaths */
 }
 /* Be careful not to call panic from here! */
+/**
+ * @param {number} how int
+ * @returns {Promise<void>}
+ */
 export async function done(how) {   // end.c:1021
     let survive = 0, killbuf = new Int8Array(256), $t1, $t2, $t3, $t4;
     survive = 0;
@@ -883,6 +953,10 @@ export async function done(how) {   // end.c:1021
     /*NOTREACHED*/
 }
 /* separated from done() in order to specify the __noreturn__ attribute */
+/**
+ * @param {number} how int
+ * @returns {Promise<void>}
+ */
 async function really_done(how) {   // end.c:1132
     let taken = 0, pbuf = new Int8Array(256), endwin = 0, bones_ok = 0, have_windows = 0, corpse = null, endtime = 0, umoney = 0, tmp = 0, silently = 0, obj = null, nextobj = null, mnum = 0, was_already_grave = 0, deepest = 0, mtmp = null, otmp = null, val = null, i = 0, mhp = 0, m_lev = 0, typ = 0, count = 0, where = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
     endwin = WIN_ERR;
@@ -1277,6 +1351,13 @@ async function really_done(how) {   // end.c:1132
     await nh_terminate(0);
 }
 /* used for disclosure and for the ':' choice when looting a container */
+/**
+ * @param {$T.obj | null} list struct obj *
+ * @param {number} identified boolean
+ * @param {number} all_containers boolean
+ * @param {number} reportempty boolean
+ * @returns {Promise<void>}
+ */
 export async function container_contents(list, identified, all_containers, reportempty) {   // end.c:1596
     let box = null, obj = null, buf = new Int8Array(256), cat = 0, dumping = 0, tmpwin = 0, sortedcobj = [null], srtc = null, sortflags = 0, $t1, $t2, $t3, $t4;
     dumping = iflags.in_dumplog;
@@ -1345,6 +1426,10 @@ export async function container_contents(list, identified, all_containers, repor
     }
 }
 /* should be called with either EXIT_SUCCESS or EXIT_FAILURE */
+/**
+ * @param {number} status int
+ * @returns {Promise<void>}
+ */
 export async function nh_terminate(status) {   // end.c:1676
     program_state.in_moveloop = 0;   /* won't be returning to normal play */
     /* Issue #460: capture the final post-topten screen state once,
@@ -1374,6 +1459,12 @@ export async function nh_terminate(status) {   // end.c:1676
     $c.exit(status);
 }
 /* set a delayed killer, ensure non-delayed killer is cleared out */
+/**
+ * @param {number} id int
+ * @param {number} format int
+ * @param {$c.Ptr | null} killername const char *
+ * @returns {Promise<void>}
+ */
 export async function delayed_killer(id, format, killername) {   // end.c:1721
     let k = null;
     k = find_delayed_killer(id);
@@ -1389,6 +1480,10 @@ export async function delayed_killer(id, format, killername) {   // end.c:1721
     $c.strcpy(new $c.Ptr(k.name, 0), killername ? killername : $c.lit(""));
     svk.killer.name[0] = 0;
 }
+/**
+ * @param {number} id int
+ * @returns {$T.kinfo | null} struct kinfo *
+ */
 export function find_delayed_killer(id) {   // end.c:1740
     let k = null;
     for (k = svk.killer.next; k !== null; k = k.next) {
@@ -1398,6 +1493,10 @@ export function find_delayed_killer(id) {   // end.c:1740
     }
     return k;
 }
+/**
+ * @param {$T.kinfo | null} kptr struct kinfo *
+ * @returns {Promise<void>}
+ */
 export async function dealloc_killer(kptr) {   // end.c:1752
     let prev = null, k = null, save_plnmsg = 0;
     prev = svk.killer;
@@ -1424,6 +1523,10 @@ export async function dealloc_killer(kptr) {   // end.c:1752
         } while (0);
     }
 }
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 export async function save_killers(nhfp) {   // end.c:1774
     let kptr = null;
     if (update_file(nhfp)) {
@@ -1440,6 +1543,10 @@ export async function save_killers(nhfp) {   // end.c:1774
     }
 }
 /* !SFCTOOL */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 export async function restore_killers(nhfp) {   // end.c:1794
     let kptr = null, $t1;
     for (kptr = svk.killer; kptr !== null; kptr = kptr.next) {
@@ -1449,6 +1556,10 @@ export async function restore_killers(nhfp) {   // end.c:1794
         }
     }
 }
+/**
+ * @param {$c.Ptr | null} p char *
+ * @returns {number} int
+ */
 function wordcount(p) {   // end.c:1807
     let words = 0;
     words = 0;
@@ -1465,6 +1576,10 @@ function wordcount(p) {   // end.c:1807
     }
     return words;
 }
+/**
+ * @param {*} inp char **
+ * @param {$c.Ptr | null} out char *
+ */
 function bel_copy1(inp, out) {   // end.c:1823
     let in_ = null, $t1, $t2, $t3, $t4;
     in_ = inp.get(0);
@@ -1478,6 +1593,10 @@ function bel_copy1(inp, out) {   // end.c:1823
     out.set(0, 0);
     inp.set(0, in_);
 }
+/**
+ * @param {$c.Ptr | null} in_ char *
+ * @returns {Promise<$c.Ptr | null>} char *
+ */
 export async function build_english_list(in_) {   // end.c:1837
     let out = null, p = [null], len = 0, words = 0;
     p[0] = in_;
@@ -1526,6 +1645,10 @@ export async function build_english_list(in_) {   // end.c:1837
  * And the UI: if sysopt.crashreporturl, and defined(CRASHREPORT)
  * we gather the stacktrace (etc) and launch a browser to submit a bug report
  * otherwise we just use stdout.  Requires libc for now.
+ */
+/**
+ * @param {$c.Ptr | null} why char *
+ * @returns {Promise<void>}
  */
 export async function NH_abort(why) {   // end.c:1910
     let gdb_prio = 0, libc_prio = 0;

@@ -70,6 +70,9 @@ const random_insult = $c.nulls(28);
 const random_malediction = $c.nulls(11);
 /* If you've found the Amulet, make the Wizard appear after some time */
 /* Also, give hints about portal locations, if amulet is worn/wielded -dlc */
+/**
+ * @returns {Promise<void>}
+ */
 export async function amulet() {   // wizard.c:61
     let mtmp = null, ttmp = null, amu = null, du = 0;
     /* caller takes care of this check */
@@ -106,6 +109,10 @@ export async function amulet() {   // wizard.c:61
         }
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number} int
+ */
 export function mon_has_amulet(mtmp) {   // wizard.c:106
     let otmp = null;
     for (otmp = mtmp.minvent; otmp; otmp = otmp.nobj) {
@@ -115,6 +122,10 @@ export function mon_has_amulet(mtmp) {   // wizard.c:106
     }
     return 0;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number} int
+ */
 export function mon_has_special(mtmp) {   // wizard.c:117
     let otmp = null;
     for (otmp = mtmp.minvent; otmp; otmp = otmp.nobj) {
@@ -130,6 +141,10 @@ export function mon_has_special(mtmp) {   // wizard.c:117
  *
  *      The strategy section decides *what* the monster is going
  *      to attempt, the tactics section implements the decision.
+ */
+/**
+ * @param {number} mask int
+ * @returns {number} short
  */
 function which_arti(mask) {   // wizard.c:142
     switch (mask) {
@@ -151,6 +166,11 @@ function which_arti(mask) {   // wizard.c:142
  *      since bell, book, candle, and amulet are all objects, not really
  *      artifacts right now.  [MRS]
  */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} otyp short
+ * @returns {number} boolean
+ */
 function mon_has_arti(mtmp, otyp) {   // wizard.c:165
     let otmp = null;
     for (otmp = mtmp.minvent; otmp; otmp = otmp.nobj) {
@@ -168,6 +188,11 @@ function mon_has_arti(mtmp, otyp) {   // wizard.c:165
  * Returns some monster other than mtmp that
  * has artifact, or NULL monst pointer.
  */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} otyp short
+ * @returns {$T.monst | null} struct monst *
+ */
 function other_mon_has_arti(mtmp, otyp) {   // wizard.c:184
     let mtmp2 = null;
     for (mtmp2 = svl.level.monlist; mtmp2; mtmp2 = mtmp2.nmon) {   /* no need for !DEADMONSTER check here since they have no inventory */
@@ -183,6 +208,10 @@ function other_mon_has_arti(mtmp, otyp) {   // wizard.c:184
  * Returns obj of type specified if there is one
  * on the ground, otherwise returns NULL obj pointer.
  */
+/**
+ * @param {number} otyp short
+ * @returns {$T.obj | null} struct obj *
+ */
 function on_ground(otyp) {   // wizard.c:202
     let otmp = null;
     for (otmp = svl.level.objlist; otmp; otmp = otmp.nobj) {
@@ -196,6 +225,10 @@ function on_ground(otyp) {   // wizard.c:202
     }
     return null;
 }
+/**
+ * @param {number} mask int
+ * @returns {number} boolean
+ */
 function you_have(mask) {   // wizard.c:216
     switch (mask) {
         case M3.WANTSAMUL:
@@ -213,6 +246,11 @@ function you_have(mask) {   // wizard.c:216
     }
     return 0;
 }
+/**
+ * @param {number} mask int
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number | bigint} unsigned long
+ */
 function target_on(mask, mtmp) {   // wizard.c:236
     let otyp = 0, otmp = null, mtmp2 = null, $t1;
     if (!(mtmp.data.mflags3 & mask)) {
@@ -239,6 +277,10 @@ function target_on(mask, mtmp) {   // wizard.c:236
     $t1 = mtmp.mgoal.y = 0, mtmp.mgoal.x = $t1;
     return STRAT.NONE;
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {number | bigint} unsigned long
+ */
 function strategy(mtmp) {   // wizard.c:270
     let strat = 0, dstrat = 0;
     /* perhaps a shopkeeper has been polymorphed into a master
@@ -304,6 +346,12 @@ function strategy(mtmp) {   // wizard.c:270
 }
 /* pick a destination for a covetous monster to flee to so that it can
    heal or for guardians (Kops) to congregate at to block hero's progress */
+/**
+ * @param {*} sx coordxy *
+ * @param {*} sy coordxy *
+ * @param {number} dir boolean
+ * @returns {Promise<void>}
+ */
 export async function choose_stairs(sx, sy, dir) {   // wizard.c:332
     let stway = null, stdir = 0;
     /* output; left as-is if no spot found */
@@ -338,6 +386,10 @@ export async function choose_stairs(sx, sy, dir) {   // wizard.c:332
         sx.set(0, stway.sx), sy.set(0, stway.sy);
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<number>} int
+ */
 export async function tactics(mtmp) {   // wizard.c:369
     let strat = 0, sx = Int16Array.of(0), sy = Int16Array.of(0), mx = 0, my = 0, where = 0, tx = 0, ty = 0, targ = 0, otmp = null;
     strat = strategy(mtmp);
@@ -439,6 +491,10 @@ export async function tactics(mtmp) {   // wizard.c:369
     return 0;
 }
 /* are there any monsters mon could aggravate? */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<number>} boolean
+ */
 export async function has_aggravatables(mon) {   // wizard.c:474
     let mtmp = null, in_w_tower = 0;
     in_w_tower = await In_W_tower(mon.mx, mon.my, u.uz);
@@ -458,6 +514,9 @@ export async function has_aggravatables(mon) {   // wizard.c:474
     }
     return FALSE;
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function aggravate() {   // wizard.c:494
     let mtmp = null, in_w_tower = 0;
     in_w_tower = await In_W_tower(u.ux, u.uy, u.uz);
@@ -479,6 +538,9 @@ export async function aggravate() {   // wizard.c:494
 /* "Double Trouble" spell cast by the Wizard; caller is responsible for
    only casting this when there is currently one wizard in existence;
    the clone can't use it unless/until its creator has been killed off */
+/**
+ * @returns {Promise<void>}
+ */
 export async function clonewiz() {   // wizard.c:517
     let mtmp2 = null, $t1, $t2, $t3;
     if ((mtmp2 = await makemon($c.relem(mons, PM.WIZARD_OF_YENDOR), u.ux, u.uy, MM.NOWAIT)) !== null) {
@@ -495,6 +557,10 @@ export async function clonewiz() {   // wizard.c:517
     }
 }
 /* also used by newcham() */
+/**
+ * @param {number} difcap int
+ * @returns {number} int
+ */
 export function pick_nasty(difcap) {   // wizard.c:538
     let alt = 0, res = 0, mnam = null, lastspace = null;
     /* if non-zero, try to make difficulty be lower than this */
@@ -538,6 +604,10 @@ export function pick_nasty(difcap) {   // wizard.c:538
    'summoner' as neutral, since that will produce the greatest number of
    creatures on average (in 3.6.0 and earlier, Null was treated as chaotic);
    returns the number of monsters created */
+/**
+ * @param {$T.monst | null} summoner struct monst *
+ * @returns {Promise<number>} int
+ */
 export async function nasty(summoner) {   // wizard.c:591
     let mtmp = null, bypos = new $T.nhcoord(), i = 0, j = 0, count = 0, census = 0, tmp = 0, makeindex = 0, s_cls = 0, m_cls = 0, difcap = 0, trylimit = 0, castalign = 0, mmflags = 0, $t1, $t2, $t3;
     /* when a monster casts the "summon nasties" spell, it gives feedback;
@@ -645,6 +715,9 @@ export async function nasty(summoner) {   // wizard.c:591
     return count;
 }
 /* Let's resurrect the Wizard, for some unexpected fun. */
+/**
+ * @returns {Promise<void>}
+ */
 export async function resurrect() {   // wizard.c:715
     let mtmp = null, mmtmp = null, elapsed = 0, verb = null;
     if (!svc.context.no_of_wizards) {
@@ -709,6 +782,9 @@ export async function resurrect() {   // wizard.c:715
 }
 /* Here, we make trouble for the poor shmuck who actually
    managed to do in the Wizard. */
+/**
+ * @returns {Promise<void>}
+ */
 export async function intervene() {   // wizard.c:785
     let which = 0;
     which = (svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level) ? rnd(4) : rn2(6);
@@ -746,6 +822,10 @@ export function wizdeadorgone() {   // wizard.c:815
     }
 }
 /* Insult or intimidate the player */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 export async function cuss(mtmp) {   // wizard.c:846
     if (Deaf()) {
         return;

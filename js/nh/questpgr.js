@@ -37,6 +37,10 @@ import { Blind } from './youprop.macros.js';
 
 const com_pager_core$howtoput = $c.nulls(6);   // static in com_pager_core()
 const com_pager_core$howtoput2i = new Int32Array(6);   // static in com_pager_core()
+/**
+ * @param {number} typ int
+ * @returns {Promise<number>} short
+ */
 export async function quest_info(typ) {   // questpgr.c:31
     switch (typ) {
         case 0:
@@ -53,6 +57,9 @@ export async function quest_info(typ) {   // questpgr.c:31
     return 0;
 }
 /* return your role leader's name */
+/**
+ * @returns {$c.Ptr | null} const char *
+ */
 export function ldrname() {   // questpgr.c:50
     let i = 0;
     i = gu.urole.ldrnum;
@@ -60,12 +67,23 @@ export function ldrname() {   // questpgr.c:50
     return new $c.Ptr(gn.nambuf, 0);
 }
 /* return your intermediate target string */
+/**
+ * @returns {$c.Ptr | null} const char *
+ */
 function intermed() {   // questpgr.c:61
     return gu.urole.intermed;
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {number} boolean
+ */
 export function is_quest_artifact(otmp) {   // questpgr.c:67
     return $c.i8(otmp.oartifact === gu.urole.questarti ? 1 : 0);
 }
+/**
+ * @param {$T.obj | null} ochain struct obj *
+ * @returns {$T.obj | null} struct obj *
+ */
 function find_qarti(ochain) {   // questpgr.c:73
     let otmp = null, qarti = null;
     for (otmp = ochain; otmp; otmp = otmp.nobj) {
@@ -80,6 +98,10 @@ function find_qarti(ochain) {   // questpgr.c:73
 }
 /* check several object chains for the quest artifact to determine
    whether it is present on the current level */
+/**
+ * @param {number} whichchains unsigned int
+ * @returns {$T.obj | null} struct obj *
+ */
 export function find_quest_artifact(whichchains) {   // questpgr.c:89
     let mtmp = null, qarti = null;
     qarti = null;
@@ -119,24 +141,37 @@ export function find_quest_artifact(whichchains) {   // questpgr.c:89
     return qarti;
 }
 /* return your role nemesis' name */
+/**
+ * @returns {$c.Ptr | null} const char *
+ */
 function neminame() {   // questpgr.c:124
     let i = 0;
     i = gu.urole.neminum;
     $c.sprintf(new $c.Ptr(gn.nambuf, 0), $c.lit("%s%s"), $c.andu64($c.relem(mons, i).mflags2, M2.PNAME) !== 0 ? $c.lit("") : $c.lit("the "), mons[i].pmnames[NEUTRAL]);
     return new $c.Ptr(gn.nambuf, 0);
 }
+/**
+ * @returns {$c.Ptr | null} const char *
+ */
 function guardname() {   // questpgr.c:134
     let i = 0;
     /* return your role leader's guard monster name */
     i = gu.urole.guardnum;
     return mons[i].pmnames[NEUTRAL];
 }
+/**
+ * @returns {$c.Ptr | null} const char *
+ */
 function homebase() {   // questpgr.c:142
     /* return your role leader's location */
     return gu.urole.homebase;
 }
 /* returns 1 if nemesis death message mentions noxious fumes, otherwise 0;
    does not display the message */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<number>} int
+ */
 export async function stinky_nemesis(mon) {   // questpgr.c:150
     let mesg = [null], res = 0, p = null;
     mesg[0] = null;
@@ -166,6 +201,11 @@ export async function stinky_nemesis(mon) {   // questpgr.c:150
 }
 /* replace deity, leader, nemesis, or artifact name with pronoun;
    overwrites cvt_buf[] */
+/**
+ * @param {number} who char
+ * @param {number} which char
+ * @returns {Promise<void>}
+ */
 async function qtext_pronoun(who, which) {   // questpgr.c:199
     let pnoun = null, godgend = 0, lwhich = 0, $t1;
     /* 'd' => deity, 'l' => leader, 'n' => nemesis, 'o' => arti */
@@ -190,6 +230,10 @@ async function qtext_pronoun(who, which) {   // questpgr.c:199
     }
     return;
 }
+/**
+ * @param {number} c char
+ * @returns {Promise<void>}
+ */
 async function convert_arg(c) {   // questpgr.c:236
     let str = null, p = null;
     switch (c) {
@@ -277,6 +321,11 @@ async function convert_arg(c) {   // questpgr.c:236
     }
     $c.strcpy(new $c.Ptr(gc.cvt_buf, 0), str);
 }
+/**
+ * @param {$c.Ptr | null} in_line char *
+ * @param {$c.Ptr | null} out_line char *
+ * @returns {Promise<void>}
+ */
 async function convert_line(in_line, out_line) {   // questpgr.c:328
     let c = null, cc = null, $t1, $t2, $t3, $t4;
     cc = out_line;
@@ -364,6 +413,10 @@ async function convert_line(in_line, out_line) {   // questpgr.c:328
     cc.set(0, 0);
     return;
 }
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @returns {Promise<void>}
+ */
 async function deliver_by_pline(str) {   // questpgr.c:423
     let in_line = new Int8Array(256), out_line = new Int8Array(256), msgp = null, msgend = null;
     msgp = str;
@@ -376,6 +429,11 @@ async function deliver_by_pline(str) {   // questpgr.c:423
         await pline($c.lit("%s"), new $c.Ptr(out_line, 0));
     }
 }
+/**
+ * @param {$c.Ptr | null} msg const char *
+ * @param {number} how int
+ * @returns {Promise<void>}
+ */
 async function deliver_by_window(msg, how) {   // questpgr.c:439
     let in_line = new Int8Array(256), out_line = new Int8Array(256), msgp = null, msgend = null, datawin = 0;
     msgp = msg;
@@ -391,6 +449,10 @@ async function deliver_by_window(msg, how) {   // questpgr.c:439
     await display_nhwindow()(datawin, 1);
     await destroy_nhwindow()(datawin);
 }
+/**
+ * @param {number} common boolean
+ * @returns {number} boolean
+ */
 function skip_pager(common) {   // questpgr.c:459
     /* WIZKIT: suppress plot feedback if starting with quest artifact */
     if (program_state.wizkit_wishing) {
@@ -398,6 +460,13 @@ function skip_pager(common) {   // questpgr.c:459
     }
     return 0;
 }
+/**
+ * @param {$c.Ptr | null} section const char *
+ * @param {$c.Ptr | null} msgid const char *
+ * @param {number} showerror boolean
+ * @param {*} rawtext char **
+ * @returns {Promise<number>} boolean
+ */
 async function com_pager_core(section, msgid, showerror, rawtext) {   // questpgr.c:468
     let output = 0, L = null, text = null, synopsis = null, fallback_msgid = null, res = 0, sbi = new $T.nhl_sandbox_info(), nelems = 0, tmpbuf = new Int8Array(256), in_line = new Int8Array(256), out_line = new Int8Array(256), $t1;
     text = null;
@@ -531,14 +600,25 @@ async function com_pager_core(section, msgid, showerror, rawtext) {   // questpg
     await nhl_done(L);
     return res;
 }
+/**
+ * @param {$c.Ptr | null} msgid const char *
+ * @returns {Promise<void>}
+ */
 export async function com_pager(msgid) {   // questpgr.c:624
     await com_pager_core($c.lit("common"), msgid, 1, null);
 }
+/**
+ * @param {$c.Ptr | null} msgid const char *
+ * @returns {Promise<void>}
+ */
 export async function qt_pager(msgid) {   // questpgr.c:630
     if (!await com_pager_core(gu.urole.filecode, msgid, 0, null)) {
         await com_pager_core($c.lit("common"), msgid, 1, null);
     }
 }
+/**
+ * @returns {Promise<$T.permonst | null>} struct permonst *
+ */
 export async function qt_montype() {   // questpgr.c:637
     let qpm = 0;
     if (rn2(5)) {
@@ -555,6 +635,9 @@ export async function qt_montype() {   // questpgr.c:637
     return await mkclass(gu.urole.enemy2sym, 0);
 }
 /* special levels can include a custom arrival message; display it */
+/**
+ * @returns {Promise<void>}
+ */
 export async function deliver_splev_message() {   // questpgr.c:655
     /* there's no provision for delivering via window instead of pline */
     if (gl.lev_message) {

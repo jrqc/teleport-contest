@@ -32,6 +32,10 @@ import { $G } from './globals.js';
 import { __global_locale, _c_locale } from './c_locale.js';
 
 const wctype_l$props = $h.data(272, 8);   // static in wctype_l()
+/**
+ * @param {number} val void *
+ * @returns {number} void *
+ */
 function xlocale_retain(val) {   // xlocale_private.h:96
     let obj = 0;
     obj = val;
@@ -41,6 +45,9 @@ function xlocale_retain(val) {   // xlocale_private.h:96
     $h.i32[obj >>> 2] = $h.i32[obj >>> 2] + 1 | 0;
     return val;
 }
+/**
+ * @param {number} val void *
+ */
 function xlocale_release(val) {   // xlocale_private.h:107
     let obj = 0;
     obj = val;
@@ -53,9 +60,16 @@ function xlocale_release(val) {   // xlocale_private.h:107
         }
     }
 }
+/**
+ * @returns {number} locale_t
+ */
 function __current_locale() {   // xlocale_private.h:122
     return __global_locale;
 }
+/**
+ * @param {number} __loc locale_t
+ * @returns {number} locale_t
+ */
 function __locale_ptr(__loc) {   // xlocale_private.h:128
     if (__loc === 0) {
         __loc = $h.u32[_c_locale >>> 2];
@@ -64,6 +78,11 @@ function __locale_ptr(__loc) {   // xlocale_private.h:128
     }
     return __loc;
 }
+/**
+ * @param {number} property const char *
+ * @param {number} loc locale_t
+ * @returns {number} wctype_t
+ */
 export function wctype_l(property, loc) {   // wctype.c:38
     let rl = 0, i = 0, rp = 0, $t1;
     /* BSD extension */
@@ -93,6 +112,10 @@ export function wctype_l(property, loc) {   // wctype.c:38
     }
     return 0;
 }
+/**
+ * @param {number} property const char *
+ * @returns {number} wctype_t
+ */
 export function wctype(property) {   // wctype.c:85
     return wctype_l(property, __current_locale());
 }

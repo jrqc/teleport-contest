@@ -12,6 +12,10 @@ import { bannerc_string, md_ignored_features, mdlib_version_string, version_id_s
 /* nomakedefs_populated: flag for whether 'nomakedefs' should be freed */
 let nomakedefs_populated = 0;
 export const nomakedefs = new $T.nomakedefs_s();
+/**
+ * @param {$T.version_info | null} version struct version_info *
+ * @returns {Promise<void>}
+ */
 export async function populate_nomakedefs(version) {   // date.c:52
     let i = 0, tmpbuf1 = new Int8Array(256), tmpbuf2 = new Int8Array(256), strp = null, mth = $c.nulls(12), t = new $T.tm(), timeresult = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10;
     mth.fill(null);

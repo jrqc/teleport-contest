@@ -166,6 +166,11 @@ const nilstring = new Int8Array(1);
 /* for blue */
 /* !TERMLIB && ANSI_DEFAULT */
 const nulstr = new Int8Array(1);
+/**
+ * @param {*} wid int *
+ * @param {*} hgt int *
+ * @returns {Promise<void>}
+ */
 export async function term_startup(wid, hgt) {   // termcap.c:82
     let term = null, tptr = null, tbufptr = [null], pc = null, i = 0, buf = new Int8Array(256), $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12;
     term = $c.getenv($c.lit("TERM"));
@@ -339,6 +344,9 @@ export function term_shutdown() {   // termcap.c:342
     }
     return;
 }
+/**
+ * @param {number} state int
+ */
 export function tty_number_pad(state) {   // termcap.c:359
     switch (state) {
         case -1:
@@ -458,6 +466,9 @@ export function term_start_screen() {   // termcap.c:511
         tty_number_pad(1);   /* make keypad send digits */
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function term_end_screen() {   // termcap.c:543
     await term_clear_screen();
     xputs(VE);
@@ -469,6 +480,11 @@ export async function term_end_screen() {   // termcap.c:543
    trampoli.[ch] files for what is deemed to be performance reasons.  If
    this define is moved and or xputc() is taken out of the ROOT overlay,
    then action must be taken in trampoli.[ch]. */
+/**
+ * @param {number} x int
+ * @param {number} y int
+ * @returns {Promise<void>}
+ */
 export async function nocmov(x, y) {   // termcap.c:559
     if ($G.ttyDisplay.cury > y) {
         if (UP) {
@@ -519,12 +535,20 @@ export async function nocmov(x, y) {   // termcap.c:559
         }
     }
 }
+/**
+ * @param {number} x int
+ * @param {number} y int
+ */
 export function cmov(x, y) {   // termcap.c:608
     xputs($c.tgoto(tc_lcl_data.tc_CM, x, y));
     $G.ttyDisplay.cury = $c.i16(y);
     $G.ttyDisplay.curx = $c.i16(x);
 }
 /* See note above.  xputc() is a special function for overlays. */
+/**
+ * @param {number} c int
+ * @returns {number} int
+ */
 export function xputc(c) {   // termcap.c:617
     /* actually char, but explicitly specify its widened type */
     /*
@@ -569,6 +593,9 @@ export function xputc(c) {   // termcap.c:617
  *
  * When NOMUX_MARKERS is unset the emit is a no-op â the binary plays
  * normally with no extra stdout output. */
+/**
+ * @returns {number} int
+ */
 function nomux_markers_enabled() {   // termcap.c:665
     let ev = null;
     if (nomux_markers_enabled$cached < 0) {
@@ -579,6 +606,9 @@ function nomux_markers_enabled() {   // termcap.c:665
 }
 /* Emit a single in-band marker carrying the current rendered screen.
  * KIND distinguishes input boundaries from animation frames. */
+/**
+ * @param {$c.Ptr | null} kind const char *
+ */
 function nomux_emit_marker(kind) {   // termcap.c:681
     let scr = null, cx = Int32Array.of(0), cy = Int32Array.of(0), scr_len = 0;
     if (!nomux_markers_enabled()) {
@@ -620,6 +650,10 @@ export function nomux_clear_screen() {   // termcap.c:725
         }
     }
 }
+/**
+ * @param {number} row int
+ * @param {number} col int
+ */
 export function nomux_clear_to_eol(row, col) {   // termcap.c:735
     let c = 0;
     if (row < 0 || row >= 24) {
@@ -641,6 +675,9 @@ export function nomux_clear_to_eol(row, col) {   // termcap.c:735
         nomux_buf[row][c].decgfx = 0;
     }
 }
+/**
+ * @param {number} ch int
+ */
 export function nomux_putch(ch) {   // termcap.c:755
     let row = 0, col = 0;
     if (!$G.ttyDisplay || ch < 32) {
@@ -655,6 +692,9 @@ export function nomux_putch(ch) {   // termcap.c:755
         nomux_buf[row][col].decgfx = nomux_decgfx_cur;
     }
 }
+/**
+ * @param {number} attr int
+ */
 export function nomux_set_attr(attr) {   // termcap.c:768
     switch (attr) {
         case ATR.INVERSE:
@@ -671,6 +711,9 @@ export function nomux_set_attr(attr) {   // termcap.c:768
 export function nomux_end_attr() {   // termcap.c:775
     nomux_attr_cur = 0;
 }
+/**
+ * @param {number} color int
+ */
 export function nomux_set_fg(color) {   // termcap.c:776
     /* Mirror C's wc2_darkgray remap: when that option is on,
      * hilites[CLR_BLACK] is wired to BRIGHT_BLACK so the terminal
@@ -686,6 +729,10 @@ export function nomux_set_fg(color) {   // termcap.c:776
 export function nomux_end_fg() {   // termcap.c:787
     nomux_fg_cur = 7;
 }
+/**
+ * @param {number} fg int
+ * @returns {number} int
+ */
 function nomux_sgr_fg(fg) {   // termcap.c:789
     if (fg >= 0 && fg <= 7) {
         return 30 + fg | 0;
@@ -695,6 +742,9 @@ function nomux_sgr_fg(fg) {   // termcap.c:789
     }
     return 37;
 }
+/**
+ * @returns {$c.Ptr | null} char *
+ */
 export function nomux_capture_screen() {   // termcap.c:796
     let p = null, row = 0, col = 0, end = 0, cur_fg = 0, cur_attr = 0, in_dec = 0, c = null, ch = 0, fg = 0, at = 0, $t1, $t2, $t3, $t4, $t5;
     p = new $c.Ptr(nomux_out, 0);
@@ -788,6 +838,9 @@ export function nomux_enter_raw_mode() {   // termcap.c:875
      * lines print. Mirror that by clearing the shadow. */
     nomux_clear_screen();
 }
+/**
+ * @param {number} ch int
+ */
 function nomux_raw_putch(ch) {   // termcap.c:885
     if (ch === 10) {
         nomux_raw_row = nomux_raw_row + 1 | 0;
@@ -819,6 +872,10 @@ function nomux_raw_putch(ch) {   // termcap.c:885
  * flush/separator calls (pline-flushers, tty_raw_print_bold("") visual
  * spacing) that the tmux capture path also discarded. Treating them as
  * content would shift end-of-game output (topten) down by a row. */
+/**
+ * @param {$c.Ptr | null} s const char *
+ * @param {number} bold int
+ */
 export function nomux_raw_emit(s, bold) {   // termcap.c:916
     let p = null;
     if (!nomux_raw_active) {
@@ -862,6 +919,10 @@ export function nomux_raw_emit_eol() {   // termcap.c:948
         nomux_raw_putch(10);
     }
 }
+/**
+ * @param {*} cx int *
+ * @param {*} cy int *
+ */
 export function nomux_get_cursor(cx, cy) {   // termcap.c:952
     if (nomux_raw_active) {
         cx.set(0, nomux_raw_col);
@@ -872,9 +933,15 @@ export function nomux_get_cursor(cx, cy) {   // termcap.c:952
     cy.set(0, $G.ttyDisplay ? $G.ttyDisplay.cury : 0);
 }
 /* NOMUX_CAPTURE */
+/**
+ * @param {$c.Ptr | null} s const char *
+ */
 export function xputs(s) {   // termcap.c:964
     $c.tputs(s, 1, xputc);
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function cl_end() {   // termcap.c:974
     let cx = 0;
     if (CE) {
@@ -892,6 +959,9 @@ export async function cl_end() {   // termcap.c:974
         await tty_curs($G.BASE_WINDOW, $G.ttyDisplay.curx + 1 | 0, $G.ttyDisplay.cury);
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function term_clear_screen() {   // termcap.c:996
     /* note: if CL is null, then termcap initialization failed,
      * so don't attempt screen-oriented I/O during final cleanup.
@@ -904,6 +974,9 @@ export async function term_clear_screen() {   // termcap.c:996
         await erase_tty_screen();
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 export async function home() {   // termcap.c:1013
     let $t1;
     if (HO) {
@@ -951,6 +1024,9 @@ export function graph_off() {   // termcap.c:1103
     }
 }
 /* delay 50 ms */
+/**
+ * @returns {Promise<void>}
+ */
 export async function tty_delay_output() {   // termcap.c:1129
     let no_delay_env = null, cmlen = 0, i = 0;
     if (tty_delay_output$no_delay < 0) {
@@ -991,6 +1067,9 @@ export async function tty_delay_output() {   // termcap.c:1129
     /* MICRO */
 }
 /* must only be called with curx = 1 */
+/**
+ * @returns {Promise<void>}
+ */
 export async function cl_eos() {   // termcap.c:1198
     let r = 0, cy = 0;
     /* free after Robert Viduya */
@@ -1013,6 +1092,9 @@ export async function cl_eos() {   // termcap.c:1198
         await tty_curs($G.BASE_WINDOW, $G.ttyDisplay.curx + 1 | 0, $G.ttyDisplay.cury);
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function init_hilite() {   // termcap.c:1300
     let c = 0, colors = 0, setf = null, scratch = null, md_len = 0, work = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
     colors = $c.tgetnum(nhStr($c.lit("Co")));
@@ -1164,6 +1246,10 @@ function kill_hilite() {   // termcap.c:1400
         hilites[c] = null;
     }
 }
+/**
+ * @param {number} n int
+ * @returns {$c.Ptr | null} char *
+ */
 function s_atr2str(n) {   // termcap.c:1702
     switch (n) {
         case ATR.ITALIC:
@@ -1206,6 +1292,10 @@ function s_atr2str(n) {   // termcap.c:1702
     }
     return new $c.Ptr(nulstr, 0);
 }
+/**
+ * @param {number} n int
+ * @returns {$c.Ptr | null} char *
+ */
 function e_atr2str(n) {   // termcap.c:1741
     switch (n) {
         case ATR.ITALIC:
@@ -1236,6 +1326,10 @@ function e_atr2str(n) {   // termcap.c:1741
 }
 /* suppress nonfunctional highlights so render_status() might be able to
    optimize more; keep this in sync with s_atr2str() */
+/**
+ * @param {number} msk int
+ * @returns {number} int
+ */
 export function term_attr_fixup(msk) {   // termcap.c:1773
     /* underline is converted to bold if its start sequence isn't available */
     if (msk & HL.ULINE && (!nh_US() || !tc_lcl_data.tc_US.get(0))) {
@@ -1253,6 +1347,9 @@ export function term_attr_fixup(msk) {   // termcap.c:1773
     }
     return msk;
 }
+/**
+ * @param {number} attr int
+ */
 export function term_start_attr(attr) {   // termcap.c:1793
     let astr = null;
     if (attr) {
@@ -1263,6 +1360,9 @@ export function term_start_attr(attr) {   // termcap.c:1793
         }
     }
 }
+/**
+ * @param {number} attr int
+ */
 export function term_end_attr(attr) {   // termcap.c:1807
     let astr = null;
     if (attr) {
@@ -1295,6 +1395,9 @@ export function term_end_color() {   // termcap.c:1842
     nomux_end_fg();
     nomux_end_attr();
 }
+/**
+ * @param {number} color int
+ */
 export function term_start_color(color) {   // termcap.c:1852
     nomux_set_fg(color);
     if (color === NO_COLOR) {
@@ -1303,12 +1406,18 @@ export function term_start_color(color) {   // termcap.c:1852
         xputs(hilites[color]);
     }
 }
+/**
+ * @param {number} color int
+ */
 export function term_start_bgcolor(color) {   // termcap.c:1864
     let tmp = new Int8Array(8);
     $c.sprintf(new $c.Ptr(tmp, 0), $c.lit("\x1b[%dm"), $c.rem32(color, 8) + 40 | 0);
     xputs(new $c.Ptr(tmp, 0));
 }
 /* hide or show cursor */
+/**
+ * @param {number} visibility int
+ */
 export function term_curs_set(visibility) {   // termcap.c:1873
     if (term_curs_set$vis === visibility) {
         return;
@@ -1320,6 +1429,9 @@ export function term_curs_set(visibility) {   // termcap.c:1873
     }
     term_curs_set$vis = visibility;
 }
+/**
+ * @param {number | bigint} mcolor long
+ */
 function emit24bit(mcolor) {   // termcap.c:1941
     nh_snprintf($c.lit("emit24bit"), 1948, new $c.Ptr(emit24bit$tcolorbuf, 0), 128, $c.lit("\x1b[38;2;%ld;%ld;%ldm"), $c.and64($c.shr64(mcolor, 16), 255), $c.and64($c.shr64(mcolor, 8), 255), $c.and64($c.shr64(mcolor, 0), 255));
     /* red */
@@ -1327,10 +1439,17 @@ function emit24bit(mcolor) {   // termcap.c:1941
     /* blue */
     xputs(new $c.Ptr(emit24bit$tcolorbuf, 0));
 }
+/**
+ * @param {number} color256idx int
+ */
 function emit256(color256idx) {   // termcap.c:1952
     nh_snprintf($c.lit("emit256"), 1957, new $c.Ptr(emit256$tcolorbuf, 0), 128, $c.lit("\x1b[38;5;%dm"), color256idx);
     xputs(new $c.Ptr(emit256$tcolorbuf, 0));
 }
+/**
+ * @param {number} customcolor uint32
+ * @param {number} color256idx uint16
+ */
 export function term_start_extracolor(customcolor, color256idx) {   // termcap.c:1962
     let mcolor = 0;
     /* color 0 has bit 0x1000000 set */

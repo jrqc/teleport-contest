@@ -59,12 +59,20 @@ import { revive } from './zap.js';
 const shrine_pos$buf = new $T.nhcoord();   // static in shrine_pos()
 const squadprob = $c.recArray($T.anon_mkroom_807, 4);
 /* defined in shknam.c */
+/**
+ * @param {$T.mkroom | null} sroom struct mkroom *
+ * @returns {number} boolean
+ */
 function isbig(sroom) {   // mkroom.c:42
     let area = 0;
     area = Math.imul((sroom.hx - sroom.lx | 0) + 1 | 0, (sroom.hy - sroom.ly | 0) + 1 | 0);
     return $c.i8(area > 20 ? 1 : 0);
 }
 /* make and stock a room of a given type */
+/**
+ * @param {number} roomtype int
+ * @returns {Promise<void>}
+ */
 export async function do_mkroom(roomtype) {   // mkroom.c:52
     if (roomtype >= SHOPBASE) {
         await mkshop();   /* someday, we should be able to specify shop type */
@@ -105,6 +113,9 @@ export async function do_mkroom(roomtype) {   // mkroom.c:52
         }
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function mkshop() {   // mkroom.c:95
     let sroom = null, i = 0, ep = null, x = 0, y = 0, j = 0;
     i = -1;
@@ -226,6 +237,10 @@ async function mkshop() {   // mkroom.c:95
     sroom.needfill = FILL_NORMAL;
 }
 /* pick an unused room, preferably with only one door */
+/**
+ * @param {number} strict boolean
+ * @returns {$T.mkroom | null} struct mkroom *
+ */
 function pick_room(strict) {   // mkroom.c:220
     let sroom = null, i = 0, $t1;
     i = svn.nroom;
@@ -252,6 +267,9 @@ function pick_room(strict) {   // mkroom.c:220
     }
     return null;
 }
+/**
+ * @param {number} type int
+ */
 function mkzoo(type) {   // mkroom.c:244
     let sroom = null;
     if ((sroom = pick_room(FALSE)) !== null) {
@@ -261,6 +279,11 @@ function mkzoo(type) {   // mkroom.c:244
         sroom.needfill = FILL_NORMAL;
     }
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 async function mk_zoo_thronemon(x, y) {   // mkroom.c:257
     let i = 0, pm = 0, mon = null;
     i = rnd(await level_difficulty());
@@ -274,6 +297,10 @@ async function mk_zoo_thronemon(x, y) {   // mkroom.c:257
         await mongets(mon, MACE);
     }
 }
+/**
+ * @param {$T.mkroom | null} sroom struct mkroom *
+ * @returns {Promise<void>}
+ */
 export async function fill_zoo(sroom) {   // mkroom.c:276
     let mon = null, sx = 0, sy = 0, i = 0, sh = 0, goldlim = 0, type = 0, tx = 0, ty = 0, rmno = 0, mm = new $T.nhcoord(), distval = 0, sobj = null, chest = null, gold = null, $goto = null, $t1, $t2, $t3, $t4;
     goldlim = 0;
@@ -436,6 +463,12 @@ export async function fill_zoo(sroom) {   // mkroom.c:276
     }
 }
 /* make a swarm of undead around mm */
+/**
+ * @param {$T.nhcoord | null} mm coord *
+ * @param {number} revive_corpses boolean
+ * @param {number} mm_flags int
+ * @returns {Promise<void>}
+ */
 export async function mkundead(mm, revive_corpses, mm_flags) {   // mkroom.c:456
     let cnt = 0, mdat = null, otmp = null, cc = new $T.nhcoord(), $t1;
     cnt = $c.div32(await level_difficulty() + 1 | 0, 10) + rnd(5) | 0;
@@ -447,6 +480,9 @@ export async function mkundead(mm, revive_corpses, mm_flags) {   // mkroom.c:456
     }
     svl.level.flags.graveyard = (TRUE) & 1;   /* reduced chance for undead corpse */
 }
+/**
+ * @returns {Promise<$T.permonst | null>} struct permonst *
+ */
 async function morguemon() {   // mkroom.c:478
     let i = 0, hd = 0, ndemon_res = 0;
     i = rn2(100);
@@ -467,6 +503,9 @@ async function morguemon() {   // mkroom.c:478
     }
     return i < 20 ? $c.relem(mons, PM.GHOST) : i < 40 ? $c.relem(mons, PM.WRAITH) : await mkclass(S.ZOMBIE, 0);
 }
+/**
+ * @returns {Promise<$T.permonst | null>} struct permonst *
+ */
 export async function antholemon() {   // mkroom.c:502
     let mtyp = 0, indx = 0, trycnt = 0;
     trycnt = 0;
@@ -490,6 +529,9 @@ export async function antholemon() {   // mkroom.c:502
     } while ((trycnt = trycnt + 1 | 0) < 3 && svm.mvitals[mtyp].mvflags & G_GONE);
     return svm.mvitals[mtyp].mvflags & G_GONE ? null : $c.relem(mons, mtyp);
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function mkswamp() {   // mkroom.c:530
     let sroom = null, i = 0, eelct = 0, sx = 0, sy = 0, rmno = 0;
     /* Michiel Huisjes & Fred de Wilde */
@@ -526,6 +568,10 @@ async function mkswamp() {   // mkroom.c:530
         svl.level.flags.has_swamp = (1) & 1;
     }
 }
+/**
+ * @param {number} roomno int
+ * @returns {$T.nhcoord | null} coord *
+ */
 function shrine_pos(roomno) {   // mkroom.c:577
     let delta = 0, troom = null;
     troom = $c.relem(svr.rooms, roomno - ROOMOFFSET | 0);
@@ -544,6 +590,9 @@ function shrine_pos(roomno) {   // mkroom.c:577
     }
     return shrine_pos$buf;
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function mktemple() {   // mkroom.c:598
     let sroom = null, shrine_spot = null, lev = null, $t1;
     if (!(sroom = pick_room(TRUE))) {
@@ -563,6 +612,11 @@ async function mktemple() {   // mkroom.c:598
     lev.flags = ((lev.flags | 0 | AM.SHRINE) >>> 0) & 31;
     svl.level.flags.has_temple = (1) & 1;
 }
+/**
+ * @param {number} sx int
+ * @param {number} sy int
+ * @returns {number} boolean
+ */
 export function nexttodoor(sx, sy) {   // mkroom.c:623
     let dx = 0, dy = 0, lev = null;
     for (dx = -1; dx <= 1; dx = dx + 1 | 0) {
@@ -578,6 +632,10 @@ export function nexttodoor(sx, sy) {   // mkroom.c:623
     }
     return FALSE;
 }
+/**
+ * @param {$T.mkroom | null} sroom struct mkroom *
+ * @returns {number} boolean
+ */
 export function has_dnstairs(sroom) {   // mkroom.c:640
     let stway = null;
     stway = gs.stairs;
@@ -589,6 +647,10 @@ export function has_dnstairs(sroom) {   // mkroom.c:640
     }
     return FALSE;
 }
+/**
+ * @param {$T.mkroom | null} sroom struct mkroom *
+ * @returns {number} boolean
+ */
 export function has_upstairs(sroom) {   // mkroom.c:653
     let stway = null;
     stway = gs.stairs;
@@ -600,12 +662,26 @@ export function has_upstairs(sroom) {   // mkroom.c:653
     }
     return FALSE;
 }
+/**
+ * @param {$T.mkroom | null} croom struct mkroom *
+ * @returns {number} int
+ */
 export function somex(croom) {   // mkroom.c:666
     return rn2((croom.hx - croom.lx | 0) + 1 | 0) + croom.lx | 0;
 }
+/**
+ * @param {$T.mkroom | null} croom struct mkroom *
+ * @returns {number} int
+ */
 export function somey(croom) {   // mkroom.c:672
     return rn2((croom.hy - croom.ly | 0) + 1 | 0) + croom.ly | 0;
 }
+/**
+ * @param {$T.mkroom | null} croom struct mkroom *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 export function inside_room(croom, x, y) {   // mkroom.c:678
     let i = 0;
     if (croom.irregular) {
@@ -618,6 +694,11 @@ export function inside_room(croom, x, y) {   // mkroom.c:678
    returns TRUE if any such space found.
    can return a non-accessible location, eg. inside a wall
    if a themed room is not irregular, but has some non-room terrain */
+/**
+ * @param {$T.mkroom | null} croom struct mkroom *
+ * @param {$T.nhcoord | null} c coord *
+ * @returns {number} boolean
+ */
 export function somexy(croom, c) {   // mkroom.c:694
     let try_cnt = 0, i = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8;
     try_cnt = 0;
@@ -667,6 +748,11 @@ export function somexy(croom, c) {   // mkroom.c:694
     return TRUE;
 }
 /* like somexy(), but returns an accessible location */
+/**
+ * @param {$T.mkroom | null} croom struct mkroom *
+ * @param {$T.nhcoord | null} c coord *
+ * @returns {number} boolean
+ */
 export function somexyspace(croom, c) {   // mkroom.c:744
     let trycnt = 0, okay = 0, $t1;
     trycnt = 0;
@@ -680,6 +766,10 @@ export function somexyspace(croom, c) {   // mkroom.c:744
  *      Special values :
  *              - ANY_SHOP
  *              - ANY_TYPE
+ */
+/**
+ * @param {number} type schar
+ * @returns {$T.mkroom | null} struct mkroom *
  */
 export function search_special(type) {   // mkroom.c:765
     let croom = null;
@@ -695,6 +785,9 @@ export function search_special(type) {   // mkroom.c:765
     }
     return null;
 }
+/**
+ * @returns {Promise<$T.permonst | null>} struct permonst *
+ */
 export async function courtmon() {   // mkroom.c:783
     let i = 0;
     i = rn2(60) + rn2(Math.imul(3, await level_difficulty())) | 0;
@@ -719,6 +812,9 @@ export async function courtmon() {   // mkroom.c:783
     }
 }
 /* return soldier types. */
+/**
+ * @returns {Promise<$T.permonst | null>} struct permonst *
+ */
 async function squadmon() {   // mkroom.c:817
     let sel_prob = 0, i = 0, cpro = 0, mndx = 0;
     sel_prob = rnd(80 + await level_difficulty() | 0);
@@ -743,6 +839,11 @@ async function squadmon() {   // mkroom.c:817
  * save_room : A recursive function that saves a room and its subrooms
  * (if any).
  */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @param {$T.mkroom | null} r struct mkroom *
+ * @returns {Promise<void>}
+ */
 async function save_room(nhfp, r) {   // mkroom.c:844
     let i = 0;
     /*
@@ -758,6 +859,10 @@ async function save_room(nhfp, r) {   // mkroom.c:844
 /*
  * save_rooms : Save all the rooms on disk!
  */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
+ */
 export async function save_rooms(nhfp) {   // mkroom.c:863
     let i = 0;
     /* First, write the number of rooms */
@@ -767,6 +872,11 @@ export async function save_rooms(nhfp) {   // mkroom.c:863
     }
 }
 /* !SFCTOOL */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @param {$T.mkroom | null} r struct mkroom *
+ * @returns {Promise<void>}
+ */
 async function rest_room(nhfp, r) {   // mkroom.c:875
     let i = 0, $t1;
     await sfi_mkroom(nhfp, r, $c.lit("room-mkroom"));
@@ -779,6 +889,10 @@ async function rest_room(nhfp, r) {   // mkroom.c:875
 /*
  * rest_rooms : That's for restoring rooms. Read the rooms structure from
  * the disk.
+ */
+/**
+ * @param {$T.nh_file | null} nhfp NHFILE *
+ * @returns {Promise<void>}
  */
 export async function rest_rooms(nhfp) {   // mkroom.c:893
     let i = 0;
@@ -793,6 +907,10 @@ export async function rest_rooms(nhfp) {   // mkroom.c:893
 }
 /* convert a display symbol for terrain into topology type;
    used for remembered terrain when mimics pose as furniture */
+/**
+ * @param {number} sym int
+ * @returns {number} int
+ */
 export function cmap_to_type(sym) {   // mkroom.c:912
     let typ = 0;
     typ = STONE;   /* catchall */
@@ -934,6 +1052,10 @@ export function cmap_to_type(sym) {   // mkroom.c:912
  * Note that the invalidity of the shape derives from the position of its door
  * already being chosen. It's quite possible that if the door were somewhere
  * else on the perimeter of this room, it would work fine as a shop.*/
+/**
+ * @param {$T.mkroom | null} sroom struct mkroom *
+ * @returns {Promise<number>} boolean
+ */
 async function invalid_shop_shape(sroom) {   // mkroom.c:1050
     let x = 0, y = 0, doorx = 0, doory = 0, insidex = 0, insidey = 0, insidect = 0;
     doorx = $c.radd(svd.doors, sroom.fdoor).x;

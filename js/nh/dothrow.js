@@ -105,6 +105,12 @@ const gem_accept$addluck = new Int8Array(12);   // static in gem_accept()
 /* uwep might already be removed from inventory so test for W_WEP instead;
    for Valk+Mjollnir, caller needs to validate the strength requirement */
 /* gt.thrownobj (decl.c) tracks an object until it lands */
+/**
+ * @param {number} pm int
+ * @param {$T.obj | null} ammo struct obj *
+ * @param {$T.obj | null} launcher struct obj *
+ * @returns {number} int
+ */
 export function multishot_class_bonus(pm, ammo, launcher) {   // dothrow.c:39
     let multishot = 0, skill = 0;
     /* can be NULL */
@@ -152,6 +158,11 @@ export function multishot_class_bonus(pm, ammo, launcher) {   // dothrow.c:39
     return multishot;
 }
 /* Throw the selected object, asking for direction */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} shotlimit int
+ * @returns {Promise<number>} int
+ */
 async function throw_obj(obj, shotlimit) {   // dothrow.c:87
     let otmp = null, oldslot = null, multishot = 0, skill = 0, wep_mask = 0, twoweap = 0, weakmultishot = 0, res = 0, save_osplit = new $T.obj_split(), $t1;
     res = ECMD.TIME;
@@ -336,6 +347,10 @@ async function throw_obj(obj, shotlimit) {   // dothrow.c:87
     return res;
 }
 /* common to dothrow() and dofire() */
+/**
+ * @param {*} shotlimit_p int *
+ * @returns {Promise<number>} boolean
+ */
 async function ok_to_throw(shotlimit_p) {   // dothrow.c:297
     /* (see dothrow()) */
     shotlimit_p.set(0, $c.i32(gc.command_count < 0 ? 0 : gc.command_count > LARGEST_INT ? LARGEST_INT : gc.command_count));
@@ -354,6 +369,10 @@ async function ok_to_throw(shotlimit_p) {   // dothrow.c:297
     return TRUE;
 }
 /* getobj callback for object to be thrown */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function throw_ok(obj) {   // dothrow.c:317
     if (!obj) {
         return GETOBJ.EXCLUDE;
@@ -385,6 +404,9 @@ async function throw_ok(obj) {   // dothrow.c:317
     return GETOBJ.DOWNPLAY;
 }
 /* the #throw command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dothrow() {   // dothrow.c:352
     let obj = null, shotlimit = Int32Array.of(0);
     /*
@@ -408,6 +430,9 @@ export async function dothrow() {   // dothrow.c:352
 }
 /* KMH -- Automatically fill quiver */
 /* Suggested by Jeffrey Bay <jbay@convex.hp.com> */
+/**
+ * @returns {Promise<void>}
+ */
 async function autoquiver() {   // dothrow.c:381
     let otmp = null, oammo = null, omissile = null, omisc = null, altammo = null;
     oammo = null;
@@ -470,6 +495,10 @@ async function autoquiver() {   // dothrow.c:381
 }
 /* look through hero inventory for launcher matching ammo,
    avoiding known cursed items. Returns NULL if no match. */
+/**
+ * @param {$T.obj | null} ammo struct obj *
+ * @returns {$T.obj | null} struct obj *
+ */
 function find_launcher(ammo) {   // dothrow.c:447
     let otmp = null, oX = null;
     if (!ammo) {
@@ -491,6 +520,9 @@ function find_launcher(ammo) {   // dothrow.c:447
     return oX;
 }
 /* the #fire command -- throw from the quiver or use wielded polearm */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dofire() {   // dothrow.c:469
     let shotlimit = Int32Array.of(0), obj = null, uwep_Throw_and_Return = 0, skip_fireassist = 0, altres = 0, res = 0, olauncher = null;
     /* AutoReturn() verifies Valkyrie if weapon is Mjollnir, but it relies
@@ -597,6 +629,10 @@ export async function dofire() {   // dothrow.c:469
     return res === ECMD.TIME ? res : altres;
 }
 /* if in midst of multishot shooting/throwing, stop early */
+/**
+ * @param {number} verbose boolean
+ * @returns {Promise<void>}
+ */
 export async function endmultishot(verbose) {   // dothrow.c:590
     if (gm.m_shot.i < gm.m_shot.n) {
         if (verbose && !svc.context.mon_moving) {
@@ -607,6 +643,11 @@ export async function endmultishot(verbose) {   // dothrow.c:590
 }
 /* Object hits floor at hero's feet.
    Called from drop(), throwit(), hold_another_object(), litter(). */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} verbosely boolean
+ * @returns {Promise<void>}
+ */
 export async function hitfloor(obj, verbosely) {   // dothrow.c:606
     let verb = null, surf = null, t = null;
     /* usually True; False if caller has given drop mesg */
@@ -653,6 +694,13 @@ export async function hitfloor(obj, verbosely) {   // dothrow.c:606
  * except the starting one.  If the proc returns FALSE, stop walking
  * and return FALSE.  If stopped early, dest_cc will be the location
  * before the failed callback.
+ */
+/**
+ * @param {$T.nhcoord | null} src_cc coord *
+ * @param {$T.nhcoord | null} dest_cc coord *
+ * @param {Function | null} check_proc boolean (*)(genericptr_t, coordxy, coordxy)
+ * @param {*} arg genericptr_t
+ * @returns {Promise<number>} boolean
  */
 export async function walk_path(src_cc, dest_cc, check_proc, arg) {   // dothrow.c:656
     let err = 0, x = 0, y = 0, dx = 0, dy = 0, x_change = 0, y_change = 0, i = 0, prev_x = 0, prev_y = 0, keep_going = 0, $t1, $t2;
@@ -732,6 +780,12 @@ export async function walk_path(src_cc, dest_cc, check_proc, arg) {   // dothrow
    indicating lev/fly-to-dest vs lev/fly-to-dest-minus-one-land-on-dest
    vs drag-to-dest; original callers use first mode, jumping wants second,
    grappling hook backfire and thrown chained ball need third */
+/**
+ * @param {*} arg genericptr_t
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} boolean
+ */
 export async function hurtle_jump(arg, x, y) {   // dothrow.c:742
     let res = 0, save_EWwalking = 0;
     save_EWwalking = u.uprops[WWALKING].extrinsic;
@@ -758,6 +812,12 @@ export async function hurtle_jump(arg, x, y) {   // dothrow.c:742
  *      o creepy feeling if pass through monster (if ever implemented...)
  *      o bounce off walls
  *      o let jumps go over boulders
+ */
+/**
+ * @param {*} arg genericptr_t
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} boolean
  */
 export async function hurtle_step(arg, x, y) {   // dothrow.c:773
     let ox = 0, oy = 0, range = null, obj = null, mon = null, may_pass = 0, via_jumping = 0, stopping_short = 0, ttmp = null, lev = null, ltyp = 0, dmg = 0, why = null, diagonal = 0, open_door = 0, odoor_diag = 0, too_much = 0, mnam = null, glyph = 0, bc_control = Int32Array.of(0), ballx = Int16Array.of(0), bally = Int16Array.of(0), chainx = Int16Array.of(0), chainy = Int16Array.of(0), cause_delay = Int8Array.of(0);
@@ -926,6 +986,12 @@ export async function hurtle_step(arg, x, y) {   // dothrow.c:773
 }
 /* used by mhurtle_step() for actual hurtling and also to vary message
    if target will/won't change location when knocked back */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} boolean
+ */
 export function will_hurtle(mon, x, y) {   // dothrow.c:977
     if (!isok(x, y)) {
         return FALSE;
@@ -940,6 +1006,12 @@ export function will_hurtle(mon, x, y) {   // dothrow.c:977
      */
     return goodpos(x, y, mon, MM.IGNOREWATER | MM.IGNORELAVA);
 }
+/**
+ * @param {*} arg genericptr_t
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} boolean
+ */
 async function mhurtle_step(arg, x, y) {   // dothrow.c:992
     let mon = null, mtmp = null, res = 0;
     mon = $c.asRec(arg, $T.monst, 192);
@@ -1014,6 +1086,13 @@ async function mhurtle_step(arg, x, y) {   // dothrow.c:992
  * dx and dy should be the direction of the hurtle, not of the original
  * kick or throw.
  */
+/**
+ * @param {number} dx int
+ * @param {number} dy int
+ * @param {number} range$in int
+ * @param {number} verbose boolean
+ * @returns {Promise<void>}
+ */
 export async function hurtle(dx, dy, range$in, verbose) {   // dothrow.c:1078
     const range = Int32Array.of(range$in);
     let uc = new $T.nhcoord(), cc = new $T.nhcoord();
@@ -1056,6 +1135,13 @@ export async function hurtle(dx, dy, range$in, verbose) {   // dothrow.c:1078
     await walk_path(uc, cc, hurtle_step, new $c.Ptr(range, 0));
 }
 /* Move a monster through the air for a few squares. */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} dx int
+ * @param {number} dy int
+ * @param {number} range int
+ * @returns {Promise<void>}
+ */
 export async function mhurtle(mon, dx, dy, range) {   // dothrow.c:1130
     let mc = new $T.nhcoord(), cc = new $T.nhcoord();
     await wakeup(mon, $c.i8(!svc.context.mon_moving ? 1 : 0));
@@ -1104,6 +1190,13 @@ export async function mhurtle(mon, dx, dy, range) {   // dothrow.c:1130
     }
     return;
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} broken boolean
+ * @returns {Promise<void>}
+ */
 async function check_shop_obj(obj, x, y, broken) {   // dothrow.c:1181
     let costly_xy = 0, shkp = null, oshops = null, gtg = 0;
     shkp = await shop_keeper(new $c.Ptr(u.ushops, 0).get(0));
@@ -1139,6 +1232,10 @@ async function check_shop_obj(obj, x, y, broken) {   // dothrow.c:1181
 /* Will 'obj' cause damage if it falls on hero's head when thrown upward?
    Not used to handle things which break when they hit.
    Stone missile hitting hero w/ Passes_walls attribute handled separately. */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 export function harmless_missile(obj) {   // dothrow.c:1220
     let otyp = 0;
     otyp = obj.otyp;
@@ -1173,6 +1270,11 @@ export function harmless_missile(obj) {   // dothrow.c:1220
  * Hero tosses an object upwards with appropriate consequences.
  *
  * Returns FALSE if the object is gone.
+ */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} hitsroof boolean
+ * @returns {Promise<number>} boolean
  */
 async function toss_up(obj, hitsroof) {   // dothrow.c:1256
     let action = null, otyp = 0, petrifier = 0, blindinc = 0, material = 0, is_silver = 0, less_damage = 0, harmless = 0, artimsg = 0, dmg = Int32Array.of(0), $goto = null;
@@ -1353,12 +1455,20 @@ async function toss_up(obj, hitsroof) {   // dothrow.c:1256
     }
 }
 /* return true for weapon meant to be thrown; excludes ammo */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 export function throwing_weapon(obj) {   // dothrow.c:1430
     /* daggers and knife (excludes scalpel) */
     /* special cases [might want to add AXE] */
     return $c.i8(is_missile(obj) || is_spear(obj) || is_blade(obj) && !is_sword(obj) && (objects[obj.otyp].oc_dir | 0) & PIERCE || obj.otyp === WAR_HAMMER || obj.otyp === AKLYS ? 1 : 0);
 }
 /* the currently thrown object is returning to you (not for boomerangs) */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function sho_obj_return_to_u(obj) {   // dothrow.c:1442
     let x = 0, y = 0, $t1;
     /* might already be our location (bounced off a wall) */
@@ -1375,12 +1485,19 @@ async function sho_obj_return_to_u(obj) {   // dothrow.c:1442
         await tmp_at(DISP_END, 0);
     }
 }
+/**
+ * @param {number} clear_thrownobj boolean
+ */
 function throwit_return(clear_thrownobj) {   // dothrow.c:1460
     iflags.returning_missile = null;
     if (clear_thrownobj) {
         gt.thrownobj = null;
     }
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 async function swallowit(obj) {   // dothrow.c:1468
     if (!$c.peq(obj, $G.uball)) {
         await mpickobj(u.ustuck, obj);   /* clears 'gt.thrownobj' */
@@ -1393,6 +1510,11 @@ async function swallowit(obj) {   // dothrow.c:1468
    mon may be NULL.
    returns TRUE if shopkeeper caught the object.
    may delete object, clearing gt.thrownobj */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<number>} boolean
+ */
 export async function throwit_mon_hit(obj, mon) {   // dothrow.c:1482
     let obj_gone = 0;
     if (mon) {
@@ -1415,6 +1537,13 @@ export async function throwit_mon_hit(obj, mon) {   // dothrow.c:1482
     return FALSE;
 }
 /* throw an object, NB: obj may be consumed in the process */
+/**
+ * @param {$T.obj | null} obj$in struct obj *
+ * @param {number | bigint} wep_mask long
+ * @param {number} twoweap boolean
+ * @param {$T.obj | null} oldslot struct obj *
+ * @returns {Promise<void>}
+ */
 export async function throwit(obj$in, wep_mask, twoweap, oldslot) {   // dothrow.c:1510
     const obj = [obj$in];
     let mon = null, range = 0, urange = 0, arw = null, crossbowing = 0, impaired = 0, tethered_weapon = 0, slipok = 0, dmg = Int32Array.of(0), $t1, $t2, $t3, $t4, $t5, $t6, $t7;
@@ -1730,6 +1859,13 @@ export async function throwit(obj$in, wep_mask, twoweap, oldslot) {   // dothrow
 /* handle a throw-and-return missile coming back into inventory; makes sure
    that if it was wielded, it will be re-wielded; if it was split off of a
    stack (boomerang), don't let it merge with a different compatible stack */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number | bigint} wep_mask long
+ * @param {number} twoweap boolean
+ * @param {$T.obj | null} oldslot struct obj *
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 async function return_throw_to_inv(obj, wep_mask, twoweap, oldslot) {   // dothrow.c:1855
     let otmp = null;
     /* object to add to invent */
@@ -1781,6 +1917,12 @@ async function return_throw_to_inv(obj, wep_mask, twoweap, oldslot) {   // dothr
     return obj;
 }
 /* an object may hit a monster; various factors adjust chance of hitting */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} mon_notices boolean
+ * @returns {Promise<number>} int
+ */
 export async function omon_adj(mon, obj, mon_notices) {   // dothrow.c:1913
     let tmp = 0;
     tmp = 0;
@@ -1817,6 +1959,12 @@ export async function omon_adj(mon, obj, mon_notices) {   // dothrow.c:1913
     return tmp;
 }
 /* thrown object misses target monster */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} maybe_wakeup boolean
+ * @returns {Promise<void>}
+ */
 async function tmiss(obj, mon, maybe_wakeup) {   // dothrow.c:1951
     let missile = null;
     missile = await mshot_xname(obj);
@@ -1836,6 +1984,10 @@ async function tmiss(obj, mon, maybe_wakeup) {   // dothrow.c:1951
     return;
 }
 /* whether or not object should be destroyed when it hits its target */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 export function should_mulch_missile(obj) {   // dothrow.c:1976
     let broken = 0, chance = 0;
     /* only ammo (excluding magic stones) or missiles will break */
@@ -1861,6 +2013,11 @@ export function should_mulch_missile(obj) {   // dothrow.c:1976
  * Return 1 if obj has disappeared or otherwise been taken care of,
  * 0 if caller must take care of it.
  * Also used for kicked objects and for polearms/grapnel applied at range.
+ */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
  */
 export async function thitmonst(mon, obj) {   // dothrow.c:2011
     let tmp = 0, disttmp = 0, otyp = 0, hmode = 0, guaranteed_hit = 0, dieroll = 0, next2u = 0, wasthrown = 0, chopper = 0, was_swallowed = 0, trail = new Int8Array(256), monname = null, md = null;
@@ -2129,6 +2286,11 @@ export async function thitmonst(mon, obj) {   // dothrow.c:2011
     }
     return 0;
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<number>} int
+ */
 async function gem_accept(mon, obj) {   // dothrow.c:2309
     let buf = new Int8Array(256), is_buddy = 0, is_gem = 0, ret = 0;
     is_buddy = $c.i8(sgn(mon.data.maligntyp) === sgn(u.ualign.type) ? 1 : 0);
@@ -2226,6 +2388,13 @@ async function gem_accept(mon, obj) {   // dothrow.c:2309
  * The hero causes breakage of an object (throwing, dropping it, etc.)
  * Return 0 if the object didn't break, 1 if the object broke.
  */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} breakflags unsigned int
+ * @returns {Promise<number>} int
+ */
 export async function hero_breaks(obj, x, y, breakflags) {   // dothrow.c:2417
     let from_invent = 0, in_view = 0, brk = 0;
     /* object location (ox, oy may not be right) */
@@ -2249,6 +2418,12 @@ export async function hero_breaks(obj, x, y, breakflags) {   // dothrow.c:2417
  * something to it.
  * Return 0 if the object doesn't break, 1 if the object broke.
  */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<number>} int
+ */
 export async function breaks(obj, x, y) {   // dothrow.c:2444
     let in_view = 0;
     /* object location (ox, oy may not be right) */
@@ -2259,6 +2434,12 @@ export async function breaks(obj, x, y) {   // dothrow.c:2444
     await breakmsg(obj, in_view);
     return await breakobj(obj, x, y, FALSE, FALSE);
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function release_camera_demon(obj, x, y) {   // dothrow.c:2457
     let mtmp = null;
     if (!rn2(3) && (mtmp = await makemon($c.relem(mons, rn2(3) ? PM.HOMUNCULUS : PM.IMP), x, y, MM.NOMSG)) !== null) {
@@ -2275,6 +2456,14 @@ export async function release_camera_demon(obj, x, y) {   // dothrow.c:2457
  * and break messages have been delivered prior to getting here.
  * (No longer true; breakmsg() is silent for crackable armor and we
  * call erode_obj() for it and that delivers a damaged-the-item message.)
+ */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @param {number} hero_caused boolean
+ * @param {number} from_invent boolean
+ * @returns {Promise<number>} int
  */
 export async function breakobj(obj, x, y, hero_caused, from_invent) {   // dothrow.c:2480
     let fracture = 0, explosion = 0, eyes = null, o_shop = null, shkp = null, eshkp = null;
@@ -2377,6 +2566,10 @@ export async function breakobj(obj, x, y, hero_caused, from_invent) {   // dothr
  * thrown or dropped from height) is going to break, but don't actually
  * break it. Return 0 if the object isn't going to break, 1 if it is.
  */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 export function breaktest(obj) {   // dothrow.c:2582
     let nonbreakchance = 0;
     nonbreakchance = 1;   /* chance for non-artifacts to resist */
@@ -2406,6 +2599,11 @@ export function breaktest(obj) {   // dothrow.c:2582
             return FALSE;
     }
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} in_view boolean
+ * @returns {Promise<void>}
+ */
 async function breakmsg(obj, in_view) {   // dothrow.c:2612
     let to_pieces = null;
     if (is_crackable(obj)) {   /* breakobj() will call erode_obj() for message */
@@ -2448,6 +2646,10 @@ async function breakmsg(obj, in_view) {   // dothrow.c:2612
             break;
     }
 }
+/**
+ * @param {$T.obj | null} obj$in struct obj *
+ * @returns {Promise<number>} int
+ */
 async function throw_gold(obj$in) {   // dothrow.c:2656
     const obj = [obj$in];
     let range = 0, odx = 0, ody = 0, mon = null, swallower = null;

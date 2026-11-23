@@ -39,6 +39,11 @@ import { luaO_pushfstring } from './lobject.js';
 import { luaS_createlngstrobj, luaS_newlstr } from './lstring.js';
 import { luaZ_fill, luaZ_read } from './lzio.js';
 
+/**
+ * @param {number} S LoadState *
+ * @param {number} why const char *
+ * @returns {Promise<void>}
+ */
 async function error(S, why) {   // lundump.c:40
     await luaO_pushfstring($h.u32[S >>> 2], $h.lit("%s: bad binary format (%s)"), $h.u32[(S + 16) >>> 2], why);
     await luaD_throw($h.u32[S >>> 2], 3);
@@ -47,11 +52,21 @@ async function error(S, why) {   // lundump.c:40
 ** All high-level loads go through loadVector; you can change it to
 ** adapt to the endianness of the input
 */
+/**
+ * @param {number} S LoadState *
+ * @param {number} b void *
+ * @param {number | bigint} size size_t
+ * @returns {Promise<void>}
+ */
 async function loadBlock(S, b, size) {   // lundump.c:52
     if (await luaZ_read($h.u32[(S + 8) >>> 2], b, size) !== 0) {
         await error(S, $h.lit("truncated chunk"));
     }
 }
+/**
+ * @param {number} S LoadState *
+ * @returns {Promise<number>} lu_byte
+ */
 async function loadByte(S) {   // lundump.c:61
     let b = 0, $t1, $t2;
     b = ($t1 = $h.ldu64($h.u32[(S + 8) >>> 2]), $h.st64($h.u32[(S + 8) >>> 2], $c.subu64($t1, 1)), $t1) > 0 ? $c.u8($h.i8[($t2 = $h.u32[($h.u32[(S + 8) >>> 2] + 8) >>> 2], $h.stp($h.u32[(S + 8) >>> 2] + 8, $t2 + 1), $t2)]) : await luaZ_fill($h.u32[(S + 8) >>> 2]);
@@ -60,6 +75,11 @@ async function loadByte(S) {   // lundump.c:61
     }
     return $c.u8(b);
 }
+/**
+ * @param {number} S LoadState *
+ * @param {number | bigint} limit size_t
+ * @returns {Promise<number | bigint>} size_t
+ */
 async function loadUnsigned(S, limit) {   // lundump.c:69
     let x = 0, b = 0;
     x = 0;
@@ -73,12 +93,24 @@ async function loadUnsigned(S, limit) {   // lundump.c:69
     } while ((b & 128) === 0);
     return x;
 }
+/**
+ * @param {number} S LoadState *
+ * @returns {Promise<number | bigint>} size_t
+ */
 async function loadSize(S) {   // lundump.c:83
     return await loadUnsigned(S, 18446744073709551615n);
 }
+/**
+ * @param {number} S LoadState *
+ * @returns {Promise<number>} int
+ */
 async function loadInt(S) {   // lundump.c:88
     return $c.i32(await loadUnsigned(S, 2147483647));
 }
+/**
+ * @param {number} S LoadState *
+ * @returns {Promise<number>} lua_Number
+ */
 async function loadNumber(S) {   // lundump.c:93
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
     try {
@@ -86,6 +118,10 @@ async function loadNumber(S) {   // lundump.c:93
         return $h.f64[$fp >>> 3];
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} S LoadState *
+ * @returns {Promise<number | bigint>} lua_Integer
+ */
 async function loadInteger(S) {   // lundump.c:100
     const $sp0 = $h.st.sp, $fp = $h.enter(8);
     try {
@@ -96,6 +132,11 @@ async function loadInteger(S) {   // lundump.c:100
 /*
 ** Load a nullable string into prototype 'p'.
 */
+/**
+ * @param {number} S LoadState *
+ * @param {number} p Proto *
+ * @returns {Promise<number>} TString *
+ */
 async function loadStringN(S, p) {   // lundump.c:110
     let L = 0, ts = 0, size = 0, io = 0, x_ = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(40);
@@ -129,6 +170,11 @@ async function loadStringN(S, p) {   // lundump.c:110
 /*
 ** Load a non-nullable string into prototype 'p'.
 */
+/**
+ * @param {number} S LoadState *
+ * @param {number} p Proto *
+ * @returns {Promise<number>} TString *
+ */
 async function loadString(S, p) {   // lundump.c:136
     let st = 0;
     st = await loadStringN(S, p);
@@ -137,6 +183,11 @@ async function loadString(S, p) {   // lundump.c:136
     }
     return st;
 }
+/**
+ * @param {number} S LoadState *
+ * @param {number} f Proto *
+ * @returns {Promise<void>}
+ */
 async function loadCode(S, f) {   // lundump.c:144
     let n = 0, $t1;
     n = await loadInt(S);
@@ -144,6 +195,11 @@ async function loadCode(S, f) {   // lundump.c:144
     $h.i32[(f + 24) >>> 2] = n;
     await loadBlock(S, $h.u32[(f + 64) >>> 2], $c.mulu64($c.u64(n), 4));
 }
+/**
+ * @param {number} S LoadState *
+ * @param {number} f Proto *
+ * @returns {Promise<void>}
+ */
 async function loadConstants(S, f) {   // lundump.c:155
     let i = 0, n = 0, o = 0, t = 0, io = 0, io$2 = 0, io$3 = 0, x_ = 0, $t1, $t2, $t3;
     n = await loadInt(S);
@@ -194,6 +250,11 @@ async function loadConstants(S, f) {   // lundump.c:155
         }
     }
 }
+/**
+ * @param {number} S LoadState *
+ * @param {number} f Proto *
+ * @returns {Promise<void>}
+ */
 async function loadProtos(S, f) {   // lundump.c:191
     let i = 0, n = 0, $t1, $t2;
     n = await loadInt(S);
@@ -214,6 +275,11 @@ async function loadProtos(S, f) {   // lundump.c:191
 ** the creation of the error message can call an emergency collection;
 ** in that case all prototypes must be consistent for the GC.
 */
+/**
+ * @param {number} S LoadState *
+ * @param {number} f Proto *
+ * @returns {Promise<void>}
+ */
 async function loadUpvalues(S, f) {   // lundump.c:212
     let i = 0, n = 0, $t1, $t2, $t3, $t4;
     n = await loadInt(S);
@@ -229,6 +295,11 @@ async function loadUpvalues(S, f) {   // lundump.c:212
         $t4 = await loadByte(S), $h.u8[$h.u32[(f + 80) >>> 2] + i * 16 + 10] = $t4;
     }
 }
+/**
+ * @param {number} S LoadState *
+ * @param {number} f Proto *
+ * @returns {Promise<void>}
+ */
 async function loadDebug(S, f) {   // lundump.c:227
     let i = 0, n = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9;
     n = await loadInt(S);
@@ -261,6 +332,12 @@ async function loadDebug(S, f) {   // lundump.c:227
         $t9 = await loadStringN(S, f), $h.stp($h.u32[(f + 80) >>> 2] + i * 16, $t9);
     }
 }
+/**
+ * @param {number} S LoadState *
+ * @param {number} f Proto *
+ * @param {number} psource TString *
+ * @returns {Promise<void>}
+ */
 async function loadFunction(S, f, psource) {   // lundump.c:258
     let $t1, $t2, $t3, $t4, $t5, $t6;
     $t1 = await loadStringN(S, f), $h.stp(f + 112, $t1);
@@ -278,6 +355,12 @@ async function loadFunction(S, f, psource) {   // lundump.c:258
     await loadProtos(S, f);
     await loadDebug(S, f);
 }
+/**
+ * @param {number} S LoadState *
+ * @param {number} s const char *
+ * @param {number} msg const char *
+ * @returns {Promise<void>}
+ */
 async function checkliteral(S, s, msg) {   // lundump.c:275
     let len = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(12);
@@ -290,11 +373,21 @@ async function checkliteral(S, s, msg) {   // lundump.c:275
         }
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} S LoadState *
+ * @param {number | bigint} size size_t
+ * @param {number} tname const char *
+ * @returns {Promise<void>}
+ */
 async function fchecksize(S, size, tname) {   // lundump.c:284
     if (await loadByte(S) !== size) {
         await error(S, await luaO_pushfstring($h.u32[S >>> 2], $h.lit("%s size mismatch"), tname));
     }
 }
+/**
+ * @param {number} S LoadState *
+ * @returns {Promise<void>}
+ */
 async function checkHeader(S) {   // lundump.c:292
     /* skip 1st char (already read and checked) */
     await checkliteral(S, $h.lit("\x1bLua") + 1, $h.lit("not a binary chunk"));
@@ -318,6 +411,12 @@ async function checkHeader(S) {   // lundump.c:292
 /*
 ** Load precompiled chunk.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} Z ZIO *
+ * @param {number} name const char *
+ * @returns {Promise<number>} LClosure *
+ */
 export async function luaU_undump(L, Z, name) {   // lundump.c:313
     let cl = 0, io = 0, x_ = 0, $t1;
     const $sp0 = $h.st.sp, $fp = $h.enter(24);

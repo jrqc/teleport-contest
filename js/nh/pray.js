@@ -155,6 +155,10 @@ let turn_undead_range = 0;
 let turn_undead_msg_cnt = 0;
 const hallu_gods = $c.nulls(14);
 /* critically low hit points if hp <= 5 or hp <= maxhp/N for some N */
+/**
+ * @param {number} only_if_injured boolean
+ * @returns {number} boolean
+ */
 export function critically_low_hp(only_if_injured) {   // pray.c:116
     let divisor = 0, hplim = 0, curhp = 0, maxhp = 0;
     /* determines whether maxhp <= 5 matters */
@@ -199,6 +203,9 @@ export function critically_low_hp(only_if_injured) {   // pray.c:116
 }
 /* return True if surrounded by impassible rock, regardless of the state
    of your own location (for example, inside a doorless closet) */
+/**
+ * @returns {number} boolean
+ */
 export function stuck_in_wall() {   // pray.c:161
     let i = 0, j = 0, x = 0, y = 0, count = 0;
     count = 0;
@@ -232,6 +239,9 @@ export function stuck_in_wall() {   // pray.c:161
  * unintentional shape changes from the other kind. Oh well.
  * 3.4.2: make an exception if polymorphed into a form which lacks
  * hands; that's a case where the ramifications override this doubt.
+ */
+/**
+ * @returns {Promise<number>} int
  */
 async function in_trouble() {   // pray.c:198
     let otmp = null, i = 0;
@@ -338,6 +348,9 @@ async function in_trouble() {   // pray.c:198
     return 0;
 }
 /* select an item for TROUBLE_CURSED_ITEMS */
+/**
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 async function worst_cursed_item() {   // pray.c:288
     let otmp = null;
     /* if strained or worse, check for loadstone first */
@@ -411,6 +424,11 @@ async function worst_cursed_item() {   // pray.c:288
     }
     return otmp;
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {$c.Ptr | null} what const char *
+ * @returns {Promise<void>}
+ */
 async function fix_curse_trouble(otmp, what) {   // pray.c:349
     if (!otmp) {
         await impossible($c.lit("fix_curse_trouble: nothing to uncurse."));
@@ -431,6 +449,10 @@ async function fix_curse_trouble(otmp, what) {   // pray.c:349
     await uncurse(otmp);
     await update_inventory();
 }
+/**
+ * @param {number} trouble int
+ * @returns {Promise<void>}
+ */
 async function fix_worst_trouble(trouble) {   // pray.c:373
     let i = 0, maxhp = 0, otmp = null, what = null, msgbuf = new Int8Array(256), eyes = null, cure_deaf = 0;
     otmp = null;
@@ -674,6 +696,10 @@ async function fix_worst_trouble(trouble) {   // pray.c:373
  * bathroom walls, but who is foiled by bathrobes." --Bertrand Russell, 1943
  * Divine wrath, dungeon walls, and armor follow the same principle.
  */
+/**
+ * @param {number} resp_god aligntyp
+ * @returns {Promise<void>}
+ */
 async function god_zaps_you(resp_god) {   // pray.c:610
     if (u.uswallow) {
         await pline($c.lit("Suddenly a bolt of lightning comes down at you from the heavens!"));
@@ -753,12 +779,21 @@ async function god_zaps_you(resp_god) {   // pray.c:610
         }
     }
 }
+/**
+ * @param {number} resp_god aligntyp
+ * @param {number} via_disintegration boolean
+ * @returns {Promise<void>}
+ */
 async function fry_by_god(resp_god, via_disintegration) {   // pray.c:694
     await You($c.lit("%s!"), !via_disintegration ? $c.lit("fry to a crisp") : $c.lit("disintegrate into a pile of dust"));
     svk.killer.format = KILLED.BY;
     $c.sprintf(new $c.Ptr(svk.killer.name, 0), $c.lit("the wrath of %s"), await align_gname(resp_god));
     await done(DIED);
 }
+/**
+ * @param {number} resp_god aligntyp
+ * @returns {Promise<void>}
+ */
 async function angrygods(resp_god) {   // pray.c:704
     let maxanger = 0, new_ublesscnt = 0;
     if (Inhell()) {
@@ -828,6 +863,10 @@ async function angrygods(resp_god) {   // pray.c:704
     return;
 }
 /* helper to print "str appears at your feet", or appropriate */
+/**
+ * @param {$c.Ptr | null} str const char *
+ * @returns {Promise<void>}
+ */
 async function at_your_feet(str) {   // pray.c:788
     if (Blind()) {
         str = c_common_strings.c_Something;
@@ -839,6 +878,9 @@ async function at_your_feet(str) {   // pray.c:788
         await pline($c.lit("%s %s %s your %s!"), str, await vtense(str, Blind() ? $c.lit("land") : $c.lit("appear")), Levitation() ? $c.lit("beneath") : $c.lit("at"), await makeplural(await body_part(FOOT)));
     }
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function gcrownu() {   // pray.c:805
     let obj = null, what = null, already_exists = 0, in_hand = 0, class_gift = 0, bbuf = new Int8Array(256), lbuf = new Int8Array(256), swordbuf = new Int8Array(256), $t1, $t2;
     u.uprops[SEE_INVIS].intrinsic = $c.or64(u.uprops[SEE_INVIS].intrinsic, FROMOUTSIDE);
@@ -995,6 +1037,9 @@ async function gcrownu() {   // pray.c:805
     await add_weapon_skill(1);
     return;
 }
+/**
+ * @returns {Promise<void>}
+ */
 async function give_spell() {   // pray.c:999
     let otmp = null, spe_let = 0, spe_knowledge = 0, trycnt = 0, spe_name = null, $t1;
     trycnt = u.ulevel + 1 | 0;
@@ -1059,6 +1104,10 @@ async function give_spell() {   // pray.c:999
     }
     return;
 }
+/**
+ * @param {number} g_align aligntyp
+ * @returns {Promise<void>}
+ */
 async function pleased(g_align) {   // pray.c:1071
     let trouble = 0, pat_on_head = 0, kick_on_butt = 0, action = 0, prayer_luck = 0, tryct = 0, repair_buf = new Int8Array(256), otmp = null, nextobj = null, any = 0, incr = 0, largest_ublesscnt_incr = 0, $t1, $t2, $t3, $t4;
     /* don't use p_trouble, worst trouble may get fixed while praying */
@@ -1351,6 +1400,10 @@ async function pleased(g_align) {   // pray.c:1071
 /* either blesses or curses water on the altar,
  * returns true if it found any water here.
  */
+/**
+ * @param {number} bless_water boolean
+ * @returns {Promise<number>} boolean
+ */
 async function water_prayer(bless_water) {   // pray.c:1387
     let otmp = null, changed = 0, other = 0, bc_known = 0;
     changed = 0;
@@ -1372,6 +1425,11 @@ async function water_prayer(bless_water) {   // pray.c:1387
     }
     return $c.i8(changed > 0 ? 1 : 0);
 }
+/**
+ * @param {number} g_align aligntyp
+ * @param {$c.Ptr | null} words const char *
+ * @returns {Promise<void>}
+ */
 async function godvoice(g_align, words) {   // pray.c:1415
     let quot = null;
     quot = $c.lit("");
@@ -1382,10 +1440,18 @@ async function godvoice(g_align, words) {   // pray.c:1415
     }
     await pline_The($c.lit("voice of %s %s: %s%s%s"), await align_gname(g_align), godvoices[rn2(4)], quot, words, quot);
 }
+/**
+ * @param {number} g_align aligntyp
+ * @returns {Promise<void>}
+ */
 async function gods_angry(g_align) {   // pray.c:1429
     await godvoice(g_align, $c.lit("Thou hast angered me."));
 }
 /* The g_align god is upset with you. */
+/**
+ * @param {number} g_align aligntyp
+ * @returns {Promise<void>}
+ */
 async function gods_upset(g_align) {   // pray.c:1436
     if (g_align === u.ualign.type) {
         u.ugangr = u.ugangr + 1 | 0;
@@ -1394,6 +1460,10 @@ async function gods_upset(g_align) {   // pray.c:1436
     }
     await angrygods(g_align);
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<void>}
+ */
 async function consume_offering(otmp) {   // pray.c:1446
     if (Hallucination()) {
         switch (rn2(3)) {
@@ -1421,6 +1491,10 @@ async function consume_offering(otmp) {   // pray.c:1446
 }
 /* feedback when attempting to offer the Amulet on a "low altar" (not one of
    the high altars in the temples on the Astral Plane or Moloch's Sanctum) */
+/**
+ * @param {number} altaralign aligntyp
+ * @returns {Promise<void>}
+ */
 async function offer_too_soon(altaralign) {   // pray.c:1480
     if (altaralign === A.NONE && Inhell()) {
         /* offering on an unaligned altar in Gehennom;
@@ -1435,6 +1509,11 @@ async function offer_too_soon(altaralign) {   // pray.c:1480
     /* else headed towards celestial disgrace */
     await You_feel($c.lit("%s."), Hallucination() ? $c.lit("homesick") : altaralign === u.ualign.type ? $c.lit("an urge to return to the surface") : $c.lit("ashamed"));
 }
+/**
+ * @param {number} highaltar boolean
+ * @param {number} altaralign aligntyp
+ * @returns {Promise<void>}
+ */
 export async function desecrate_altar(highaltar, altaralign) {   // pray.c:1501
     let gvbuf = new Int8Array(256);
     /*
@@ -1457,6 +1536,11 @@ export async function desecrate_altar(highaltar, altaralign) {   // pray.c:1501
 /* offering the Amulet on a high altar (checked by caller) ends the game;
    we don't declare this 'NORETURN' because done() can return (if called
    with some reasons other than ASCENDED and ESCAPED) */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} altaralign aligntyp
+ * @returns {Promise<void>}
+ */
 async function offer_real_amulet(otmp, altaralign) {   // pray.c:1529
     /* The final Test.  Did you win? */
     if ($c.peq($G.uamul, otmp)) {
@@ -1511,6 +1595,11 @@ async function offer_real_amulet(otmp, altaralign) {   // pray.c:1529
     }
     /*NOTREACHED*/
 }
+/**
+ * @param {number} highaltar boolean
+ * @param {number} altaralign aligntyp
+ * @returns {Promise<void>}
+ */
 async function offer_negative_valued(highaltar, altaralign) {   // pray.c:1592
     if (altaralign !== u.ualign.type && highaltar) {
         await desecrate_altar(highaltar, altaralign);
@@ -1518,6 +1607,12 @@ async function offer_negative_valued(highaltar, altaralign) {   // pray.c:1592
         await gods_upset(altaralign);
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} highaltar boolean
+ * @param {number} altaralign aligntyp
+ * @returns {Promise<void>}
+ */
 async function offer_fake_amulet(otmp, highaltar, altaralign) {   // pray.c:1602
     if (!highaltar && !otmp.known) {
         await offer_too_soon(altaralign);
@@ -1540,6 +1635,11 @@ async function offer_fake_amulet(otmp, highaltar, altaralign) {   // pray.c:1602
     }
 }
 /* possibly convert an altar's alignment or the hero's alignment */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} altaralign aligntyp
+ * @returns {Promise<void>}
+ */
 async function offer_different_alignment_altar(otmp, altaralign) {   // pray.c:1631
     let pri = null, shrine = 0;
     /* Is this a conversion ? */
@@ -1597,6 +1697,12 @@ async function offer_different_alignment_altar(otmp, altaralign) {   // pray.c:1
         }
     }
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} highaltar boolean
+ * @param {number} altaralign aligntyp
+ * @returns {Promise<void>}
+ */
 async function sacrifice_your_race(otmp, highaltar, altaralign) {   // pray.c:1698
     let pm = 0, dmon = null, demonless_msg = null, dbuf = new Int8Array(256);
     if (is_demon(gy.youmonst.data)) {
@@ -1667,6 +1773,10 @@ async function sacrifice_your_race(otmp, highaltar, altaralign) {   // pray.c:16
         await useupf(otmp, 1);
     }
 }
+/**
+ * @param {number} max_giftvalue uchar
+ * @returns {Promise<number>} int
+ */
 async function bestow_artifact(max_giftvalue) {   // pray.c:1781
     let nartifacts = 0, do_bestow = 0, otmp = null, buf = new Int8Array(256), $t1;
     nartifacts = nartifact_exist();
@@ -1716,6 +1826,10 @@ async function bestow_artifact(max_giftvalue) {   // pray.c:1781
     }
     return FALSE;
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {Promise<number>} int
+ */
 async function sacrifice_value(otmp) {   // pray.c:1839
     let value = 0;
     value = 0;
@@ -1728,6 +1842,9 @@ async function sacrifice_value(otmp) {   // pray.c:1839
     return value;
 }
 /* the #offer command - sacrifice something to the gods */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dosacrifice() {   // pray.c:1854
     let otmp = null, highaltar = 0, altaralign = 0;
     altaralign = $c.i8(((svl.level.locations[u.ux][u.uy].flags | 0) & AM.MASK & AM.MASK) === 0 ? A.NONE : ((svl.level.locations[u.ux][u.uy].flags | 0) & AM.MASK & AM.MASK) === AM.LAWFUL ? A.LAWFUL : ((svl.level.locations[u.ux][u.uy].flags | 0) & AM.MASK & AM.MASK) - 2 | 0);
@@ -1763,6 +1880,11 @@ export async function dosacrifice() {   // pray.c:1854
     await pline($c.lit("%s"), c_common_strings.c_nothing_happens);
     return ECMD.TIME;
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} altaralign aligntyp
+ * @returns {Promise<number>} int
+ */
 async function eval_offering(otmp, altaralign) {   // pray.c:1899
     let ptr = null, value = 0, unicalign = 0;
     value = await sacrifice_value(otmp);
@@ -1815,6 +1937,12 @@ async function eval_offering(otmp, altaralign) {   // pray.c:1899
     }
     return value;
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {number} highaltar boolean
+ * @param {number} altaralign aligntyp
+ * @returns {Promise<void>}
+ */
 async function offer_corpse(otmp, highaltar, altaralign) {   // pray.c:1959
     let value = 0, ptr = null, mtmp = null, saved_anger = 0, saved_cnt = 0, orig_luck = 0, luck_increase = 0, $t1;
     /*
@@ -1965,6 +2093,10 @@ async function offer_corpse(otmp, highaltar, altaralign) {   // pray.c:1959
     }
 }
 /* determine prayer results in advance; also used for enlightenment */
+/**
+ * @param {number} praying boolean
+ * @returns {Promise<number>} boolean
+ */
 export async function can_pray(praying) {   // pray.c:2124
     let alignment = 0, $t1;
     /* false means no messages should be given */
@@ -2012,6 +2144,9 @@ export async function can_pray(praying) {   // pray.c:2124
     return $c.i8(!praying ? $c.i8(gp.p_type === 3 && !Inhell() ? 1 : 0) : TRUE);
 }
 /* return TRUE if praying revived a pet corpse */
+/**
+ * @returns {Promise<number>} boolean
+ */
 async function pray_revive() {   // pray.c:2177
     let otmp = null;
     for (otmp = svl.level.objects[u.ux][u.uy]; otmp; otmp = otmp.v.v_nexthere) {
@@ -2029,6 +2164,9 @@ async function pray_revive() {   // pray.c:2177
     }
 }
 /* #pray command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function dopray() {   // pray.c:2199
     let ok = 0, save_doagain = 0, $t1;
     /*
@@ -2096,6 +2234,9 @@ export async function dopray() {   // pray.c:2199
     }
     return ECMD.TIME;
 }
+/**
+ * @returns {Promise<number>} int
+ */
 async function prayer_done() {   // pray.c:2276
     let alignment = 0, $t1, $t2;
     /* M. Stephenson (1.0.3b) */
@@ -2163,6 +2304,10 @@ async function prayer_done() {   // pray.c:2276
     return 1;
 }
 /* iterable for undead turning by priest/knight */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<void>}
+ */
 async function maybe_turn_mon_iter(mtmp) {   // pray.c:2347
     let xlev = 0, $t1;
     /* 3.6.3: used to use cansee() here but the purpose is to prevent
@@ -2220,6 +2365,9 @@ async function maybe_turn_mon_iter(mtmp) {   // pray.c:2347
     }
 }
 /* #turn command */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function doturn() {   // pray.c:2414
     let Gname = null, $t1;
     /* Knights & Priest(esse)s only please */
@@ -2285,6 +2433,11 @@ export async function doturn() {   // pray.c:2414
     gn.nomovemsg = c_common_strings.c_You_can_move_again;
     return ECMD.TIME;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {number} int
+ */
 export function altarmask_at(x, y) {   // pray.c:2490
     let res = 0, mon = null;
     res = 0;
@@ -2298,10 +2451,18 @@ export function altarmask_at(x, y) {   // pray.c:2490
     }
     return res;
 }
+/**
+ * @returns {Promise<$c.Ptr | null>} const char *
+ */
 export async function a_gname() {   // pray.c:2507
     return await a_gname_at(u.ux, u.uy);
 }
 /* returns the name of an altar's deity */
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<$c.Ptr | null>} const char *
+ */
 export async function a_gname_at(x, y) {   // pray.c:2514
     if (!(svl.level.locations[x][y].typ === ALTAR)) {
         return null;
@@ -2309,9 +2470,16 @@ export async function a_gname_at(x, y) {   // pray.c:2514
     return await align_gname($c.i8(((svl.level.locations[x][y].flags | 0) & AM.MASK & AM.MASK) === 0 ? A.NONE : ((svl.level.locations[x][y].flags | 0) & AM.MASK & AM.MASK) === AM.LAWFUL ? A.LAWFUL : ((svl.level.locations[x][y].flags | 0) & AM.MASK & AM.MASK) - 2 | 0));
 }
 /* returns the name of the hero's deity */
+/**
+ * @returns {Promise<$c.Ptr | null>} const char *
+ */
 export async function u_gname() {   // pray.c:2524
     return await align_gname(u.ualign.type);
 }
+/**
+ * @param {number} alignment aligntyp
+ * @returns {Promise<$c.Ptr | null>} const char *
+ */
 export async function align_gname(alignment) {   // pray.c:2530
     let gnam = null;
     switch (alignment) {
@@ -2339,6 +2507,10 @@ export async function align_gname(alignment) {   // pray.c:2530
 }
 /* hallucination handling for priest/minion names: select a random god
    iff character is hallucinating */
+/**
+ * @param {number} alignment aligntyp
+ * @returns {Promise<$c.Ptr | null>} const char *
+ */
 export async function halu_gname(alignment) {   // pray.c:2577
     let gnam = null, which = 0;
     gnam = null;
@@ -2386,6 +2558,10 @@ export async function halu_gname(alignment) {   // pray.c:2577
     return gnam;
 }
 /* deity's title */
+/**
+ * @param {number} alignment aligntyp
+ * @returns {$c.Ptr | null} const char *
+ */
 export function align_gtitle(alignment) {   // pray.c:2628
     let gnam = null, result = null;
     result = $c.lit("god");
@@ -2408,6 +2584,11 @@ export function align_gtitle(alignment) {   // pray.c:2628
     }
     return result;
 }
+/**
+ * @param {number} x coordxy
+ * @param {number} y coordxy
+ * @returns {Promise<void>}
+ */
 export async function altar_wrath(x, y) {   // pray.c:2652
     let altaralign = 0;
     altaralign = $c.i8(((svl.level.locations[x][y].flags | 0) & AM.MASK & AM.MASK) === 0 ? A.NONE : ((svl.level.locations[x][y].flags | 0) & AM.MASK & AM.MASK) === AM.LAWFUL ? A.LAWFUL : ((svl.level.locations[x][y].flags | 0) & AM.MASK & AM.MASK) - 2 | 0);
@@ -2426,6 +2607,11 @@ export async function altar_wrath(x, y) {   // pray.c:2652
     }
 }
 /* assumes isok() at one space away, but not necessarily at two */
+/**
+ * @param {number} dx int
+ * @param {number} dy int
+ * @returns {number} boolean
+ */
 function blocked_boulder(dx, dy) {   // pray.c:2677
     let otmp = null, nx = 0, ny = 0, count = 0;
     count = 0;

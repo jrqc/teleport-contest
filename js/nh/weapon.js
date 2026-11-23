@@ -106,6 +106,10 @@ const arwep = $c.recArray($T.throw_and_return_weapon, 1);
 /* Weapons in order of preference */
 const hwep = new Int16Array(45);
 const skill_ranges = $c.recArray($T.skill_range, 3);
+/**
+ * @param {number} skill int
+ * @returns {Promise<void>}
+ */
 async function give_may_advance_msg(skill) {   // weapon.c:76
     await You_feel($c.lit("more confident in your %sskills."), skill === P.NONE ? $c.lit("") : skill <= P_LAST_WEAPON ? $c.lit("weapon ") : skill <= P_LAST_SPELL ? $c.lit("spell casting ") : $c.lit("fighting "));
     await handle_tip(TIP.ENHANCE);
@@ -113,6 +117,10 @@ async function give_may_advance_msg(skill) {   // weapon.c:76
 /* weapon's skill category name for use as generalized description of weapon;
    mostly used to shorten "you drop your <weapon>" messages when slippery
    fingers or polymorph causes hero to involuntarily drop wielded weapon(s) */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<$c.Ptr | null>} const char *
+ */
 export async function weapon_descr(obj) {   // weapon.c:90
     let skill = 0, descr = null;
     skill = weapon_type(obj);
@@ -164,6 +172,11 @@ export async function weapon_descr(obj) {   // weapon.c:90
 /*
  *      hitval returns an integer representing the "to hit" bonuses
  *      of "otmp" against the monster.
+ */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<number>} int
  */
 export async function hitval(otmp, mon) {   // weapon.c:149
     let tmp = 0, ptr = null, Is_weapon = 0;
@@ -225,6 +238,11 @@ export async function hitval(otmp, mon) {   // weapon.c:149
 /*
  *      dmgval returns an integer representing the damage bonuses
  *      of "otmp" against the monster.
+ */
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<number>} int
  */
 export async function dmgval(otmp, mon) {   // weapon.c:216
     let tmp = 0, otyp = 0, ptr = null, Is_weapon = 0, wt = 0, bonus = 0;
@@ -364,6 +382,13 @@ export async function dmgval(otmp, mon) {   // weapon.c:216
 }
 /* check whether blessed and/or silver damage applies for *non-weapon* hit;
    return value is the amount of the extra damage */
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {number | bigint} armask long
+ * @param {*} silverhit_p long *
+ * @returns {Promise<number>} int
+ */
 export async function special_dmgval(magr, mdef, armask, silverhit_p) {   // weapon.c:361
     let obj = null, left_ring = 0, right_ring = 0, silverhit = 0, bonus = 0;
     /* attacker */
@@ -430,6 +455,12 @@ export async function special_dmgval(magr, mdef, armask, silverhit_p) {   // wea
 }
 /* give a "silver <item> sears <target>" message;
    not used for weapon hit, so we only handle rings */
+/**
+ * @param {$T.monst | null} magr struct monst *
+ * @param {$T.monst | null} mdef struct monst *
+ * @param {number | bigint} silverhit long
+ * @returns {Promise<void>}
+ */
 export async function silver_sears(magr, mdef, silverhit) {   // weapon.c:436
     let rings = new Int8Array(20), ltyp = 0, rtyp = 0, both = 0, l_dknown = 0, r_dknown = 0, l_ag = 0, r_ag = 0;
     /* plenty of room for "rings" */
@@ -451,6 +482,11 @@ export async function silver_sears(magr, mdef, silverhit) {   // weapon.c:436
         await Your($c.lit("%s%s %s %s!"), l_ag || r_ag ? $c.lit("silver ") : both ? $c.lit("") : $c.and64(silverhit, W.RINGL) !== 0 ? $c.lit("left ") : $c.lit("right "), new $c.Ptr(rings, 0), await vtense(new $c.Ptr(rings, 0), $c.lit("sear")), await mon_nam(mdef));
     }
 }
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @param {number} type int
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 async function oselect(mtmp, type) {   // weapon.c:476
     let otmp = null;
     for (otmp = mtmp.minvent; otmp; otmp = otmp.nobj) {
@@ -468,6 +504,10 @@ async function oselect(mtmp, type) {   // weapon.c:476
     }
     return null;
 }
+/**
+ * @param {$T.obj | null} otmp struct obj *
+ * @returns {$T.throw_and_return_weapon | null} const struct throw_and_return_weapon *
+ */
 export function autoreturn_weapon(otmp) {   // weapon.c:520
     let i = 0;
     for (i = 0; i < 1; i = i + 1 | 0) {
@@ -478,6 +518,10 @@ export function autoreturn_weapon(otmp) {   // weapon.c:520
     return null;
 }
 /* select a ranged weapon for the monster */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function select_rwep(mtmp) {   // weapon.c:533
     let otmp = null, mwep = null, mweponly = 0, i = 0, mlet = 0, arw = null, prop = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
     mlet = mtmp.data.mlet;
@@ -615,6 +659,10 @@ export async function select_rwep(mtmp) {   // weapon.c:533
     return null;
 }
 /* is 'obj' a type of weapon that any monster knows how to throw? */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} boolean
+ */
 export function monmightthrowwep(obj) {   // weapon.c:680
     let idx = 0;
     for (idx = 0; idx < 24; idx = $c.i16(idx + 1)) {
@@ -625,6 +673,10 @@ export function monmightthrowwep(obj) {   // weapon.c:680
     return FALSE;
 }
 /* select a hand to hand weapon for the monster */
+/**
+ * @param {$T.monst | null} mtmp struct monst *
+ * @returns {Promise<$T.obj | null>} struct obj *
+ */
 export async function select_hwep(mtmp) {   // weapon.c:705
     let otmp = null, i = 0, strong = 0, wearing_shield = 0;
     strong = $c.i8(strongmonst(mtmp.data));
@@ -668,6 +720,11 @@ export async function select_hwep(mtmp) {   // weapon.c:705
 }
 /* Called after polymorphing a monster, robbing it, etc....  Monsters
  * otherwise never unwield stuff on their own.  Might print message.
+ */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {number} polyspot boolean
+ * @returns {Promise<void>}
  */
 export async function possibly_unwield(mon, polyspot) {   // weapon.c:747
     let obj = null, mw_tmp = null;
@@ -724,6 +781,10 @@ export async function possibly_unwield(mon, polyspot) {   // weapon.c:747
 }
 /* Let a monster try to wield a weapon, based on mon->weapon_check.
  * Returns 1 if the monster took time to do it, 0 if it did not.
+ */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<number>} int
  */
 export async function mon_wield_item(mon) {   // weapon.c:801
     let obj = null, exclaim = 0, mw_tmp = null, welded_buf = new Int8Array(256), mon_hand = null, newly_welded = 0, arw = null, mon_hand$2 = null;
@@ -846,6 +907,10 @@ export async function mon_wield_item(mon) {   // weapon.c:801
     return 0;
 }
 /* force monster to stop wielding current weapon, if any */
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @returns {Promise<void>}
+ */
 export async function mwepgone(mon) {   // weapon.c:938
     let mwep = null;
     mwep = mon.mw;
@@ -855,6 +920,9 @@ export async function mwepgone(mon) {   // weapon.c:938
     }
 }
 /* attack bonus for strength & dexterity */
+/**
+ * @returns {Promise<number>} int
+ */
 export async function abon() {   // weapon.c:950
     let sbon = 0, str = 0, dex = 0;
     str = ACURR(A.STR);
@@ -895,6 +963,9 @@ export async function abon() {   // weapon.c:950
     }
 }
 /* damage bonus for strength */
+/**
+ * @returns {number} int
+ */
 export function dbon() {   // weapon.c:993
     let str = 0;
     str = ACURR(A.STR);
@@ -920,6 +991,11 @@ export function dbon() {   // weapon.c:993
     }
 }
 /* called when wet_a_towel() or dry_a_towel() is changing a towel's wetness */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} newspe int
+ * @returns {Promise<void>}
+ */
 async function finish_towel_change(obj, newspe) {   // weapon.c:1020
     /* towel wetness is always between 0 (dry) and 7, inclusive */
     newspe = newspe < 7 ? newspe : 7;
@@ -935,6 +1011,12 @@ async function finish_towel_change(obj, newspe) {   // weapon.c:1020
     }
 }
 /* increase a towel's wetness */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} amt int
+ * @param {number} verbose boolean
+ * @returns {Promise<void>}
+ */
 export async function wet_a_towel(obj, amt, verbose) {   // weapon.c:1038
     let newspe = 0, wetness = null;
     /* positive: new val; negative: increment by -amt; zero: no-op */
@@ -955,6 +1037,12 @@ export async function wet_a_towel(obj, amt, verbose) {   // weapon.c:1038
     }
 }
 /* decrease a towel's wetness; unlike when wetting, 0 is not a no-op */
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @param {number} amt int
+ * @param {number} verbose boolean
+ * @returns {Promise<void>}
+ */
 export async function dry_a_towel(obj, amt, verbose) {   // weapon.c:1067
     let newspe = 0;
     /* positive or zero: new value; negative: decrement by abs(amt) */
@@ -974,6 +1062,11 @@ export async function dry_a_towel(obj, amt, verbose) {   // weapon.c:1067
     }
 }
 /* copy the skill level name into the given buffer */
+/**
+ * @param {number} skill int
+ * @param {$c.Ptr | null} buf char *
+ * @returns {$c.Ptr | null} char *
+ */
 export function skill_level_name(skill, buf) {   // weapon.c:1092
     let ptr = null;
     switch (u.weapon_skills[skill].skill) {
@@ -1003,10 +1096,18 @@ export function skill_level_name(skill, buf) {   // weapon.c:1092
     $c.strcpy(buf, ptr);
     return buf;
 }
+/**
+ * @param {number} skill int
+ * @returns {$c.Ptr | null} const char *
+ */
 export function skill_name(skill) {   // weapon.c:1125
     return skill_names_indices[skill] > 0 ? obj_descr[objects[skill_names_indices[skill]].oc_name_idx].oc_name : skill === P.BARE_HANDED_COMBAT ? barehands_or_martial[gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK ? 1 : 0] : odd_skill_names[-skill_names_indices[skill] | 0];
 }
 /* return the # of slots required to advance the skill */
+/**
+ * @param {number} skill int
+ * @returns {number} int
+ */
 function slots_required(skill) {   // weapon.c:1132
     let tmp = 0;
     tmp = u.weapon_skills[skill].skill;
@@ -1028,6 +1129,11 @@ function slots_required(skill) {   // weapon.c:1132
     return $c.div32(tmp + 1 | 0, 2);
 }
 /* return true if this skill can be advanced */
+/**
+ * @param {number} skill int
+ * @param {number} speedy boolean
+ * @returns {number} boolean
+ */
 export function can_advance(skill, speedy) {   // weapon.c:1156
     if (P_RESTRICTED(skill) || u.weapon_skills[skill].skill >= u.weapon_skills[skill].max_skill || u.skills_advanced >= P_SKILL_LIMIT) {
         return FALSE;
@@ -1038,6 +1144,10 @@ export function can_advance(skill, speedy) {   // weapon.c:1156
     return $c.i8(u.weapon_skills[skill].advance >= Math.imul(Math.imul(u.weapon_skills[skill].skill, u.weapon_skills[skill].skill), 20) && u.weapon_slots >= slots_required(skill) ? 1 : 0);
 }
 /* return true if this skill could be advanced if more slots were available */
+/**
+ * @param {number} skill int
+ * @returns {number} boolean
+ */
 function could_advance(skill) {   // weapon.c:1173
     if (P_RESTRICTED(skill) || u.weapon_skills[skill].skill >= u.weapon_skills[skill].max_skill || u.skills_advanced >= P_SKILL_LIMIT) {
         return FALSE;
@@ -1046,12 +1156,20 @@ function could_advance(skill) {   // weapon.c:1173
 }
 /* return true if this skill has reached its maximum and there's been enough
    practice to become eligible for the next step if that had been possible */
+/**
+ * @param {number} skill int
+ * @returns {number} boolean
+ */
 function peaked_skill(skill) {   // weapon.c:1187
     if (P_RESTRICTED(skill)) {
         return FALSE;
     }
     return $c.i8(u.weapon_skills[skill].skill >= u.weapon_skills[skill].max_skill && u.weapon_skills[skill].advance >= Math.imul(Math.imul(u.weapon_skills[skill].skill, u.weapon_skills[skill].skill), 20) ? 1 : 0);
 }
+/**
+ * @param {number} skill int
+ * @returns {Promise<void>}
+ */
 async function skill_advance(skill) {   // weapon.c:1198
     let $t1, $t2;
     $t1 = slots_required(skill), u.weapon_slots = u.weapon_slots - $t1 | 0;
@@ -1070,6 +1188,12 @@ async function skill_advance(skill) {   // weapon.c:1198
 
    if selectable is set, give selection letters for skills that can be
    advanced and leave room for them on skills that can't be advanced */
+/**
+ * @param {number} win winid
+ * @param {number} selectable boolean
+ * @param {number} speedy boolean
+ * @returns {Promise<void>}
+ */
 export async function add_skills_to_menu(win, selectable, speedy) {   // weapon.c:1229
     let pass = 0, i = 0, len = 0, longest = 0, any = new $T.any(), buf = new Int8Array(256), sklnambuf = new Int8Array(256), prefix = null, clr = 0, $t1;
     clr = NO_COLOR;
@@ -1134,6 +1258,9 @@ export async function add_skills_to_menu(win, selectable, speedy) {   // weapon.
     }
 }
 /* Displays a skill list for dumplog purposes. */
+/**
+ * @returns {Promise<void>}
+ */
 export async function show_skills() {   // weapon.c:1306
     let win = 0, selected = [null];
     await pline($c.lit("Skills:"));
@@ -1151,6 +1278,9 @@ export async function show_skills() {   // weapon.c:1306
  * to call us back for instant action.  Even if it did, we would also need
  * to be able to update the menu since selecting one item could make
  * others unselectable.
+ */
+/**
+ * @returns {Promise<number>} int
  */
 export async function enhance_weapon_skill() {   // weapon.c:1329
     let i = 0, n = 0, to_advance = 0, eventually_advance = 0, maxxed_cnt = 0, buf = new Int8Array(256), selected = [null], win = 0, speedy = 0;
@@ -1220,6 +1350,9 @@ export async function enhance_weapon_skill() {   // weapon.c:1329
  * Change from restricted to unrestricted, allowing P_BASIC as max.  This
  * function may be called with with P_NONE.  Used in pray.c as well as below.
  */
+/**
+ * @param {number} skill int
+ */
 export function unrestrict_weapon_skill(skill) {   // weapon.c:1414
     if (skill < P.NUM_SKILLS && P_RESTRICTED(skill)) {
         u.weapon_skills[skill].skill = P.UNSKILLED;
@@ -1227,6 +1360,11 @@ export function unrestrict_weapon_skill(skill) {   // weapon.c:1414
         u.weapon_skills[skill].advance = 0;
     }
 }
+/**
+ * @param {number} skill int
+ * @param {number} degree int
+ * @returns {Promise<void>}
+ */
 export async function use_skill(skill, degree) {   // weapon.c:1424
     let advance_before = 0;
     if (skill !== P.NONE && !P_RESTRICTED(skill)) {
@@ -1237,6 +1375,10 @@ export async function use_skill(skill, degree) {   // weapon.c:1424
         }
     }
 }
+/**
+ * @param {number} n int
+ * @returns {Promise<void>}
+ */
 export async function add_weapon_skill(n) {   // weapon.c:1437
     let i = 0, before = 0, after = 0;
     /* number of slots to gain; normally one */
@@ -1255,6 +1397,10 @@ export async function add_weapon_skill(n) {   // weapon.c:1437
         await give_may_advance_msg(P.NONE);
     }
 }
+/**
+ * @param {number} n int
+ * @returns {Promise<void>}
+ */
 export async function lose_weapon_skill(n) {   // weapon.c:1453
     let skill = 0, $t1;
     /* number of slots to lose; normally one */
@@ -1276,6 +1422,10 @@ export async function lose_weapon_skill(n) {   // weapon.c:1453
         }
     }
 }
+/**
+ * @param {number} n int
+ * @returns {Promise<void>}
+ */
 export async function drain_weapon_skill(n) {   // weapon.c:1476
     let skill = 0, i = 0, curradv = 0, prevadv = 0, tmpskills = new Int32Array(38), $t1, $t2;
     /* number of skills to drain */
@@ -1310,6 +1460,10 @@ export async function drain_weapon_skill(n) {   // weapon.c:1476
         }
     }
 }
+/**
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {number} int
+ */
 export function weapon_type(obj) {   // weapon.c:1517
     let type = 0;
     /* KMH -- now uses the object table */
@@ -1322,6 +1476,9 @@ export function weapon_type(obj) {   // weapon.c:1517
     type = objects[obj.otyp].oc_subtyp;
     return type < 0 ? -type | 0 : type;
 }
+/**
+ * @returns {number} int
+ */
 export function uwep_skill_type() {   // weapon.c:1532
     if (u.twoweap) {
         return P.TWO_WEAPON_COMBAT;
@@ -1332,6 +1489,10 @@ export function uwep_skill_type() {   // weapon.c:1532
  * Return hit bonus/penalty based on skill of weapon.
  * weapon can be null, meaning bare-handed combat.
  * Treat restricted weapons as unskilled.
+ */
+/**
+ * @param {$T.obj | null} weapon struct obj *
+ * @returns {Promise<number>} int
  */
 export async function weapon_hit_bonus(weapon) {   // weapon.c:1545
     let type = 0, wep_type = 0, skill = 0, bonus = 0;
@@ -1424,6 +1585,10 @@ export async function weapon_hit_bonus(weapon) {   // weapon.c:1545
  * weapon can be null, meaning bare-handed combat.
  * Treat restricted weapons as unskilled.
  */
+/**
+ * @param {$T.obj | null} weapon struct obj *
+ * @returns {Promise<number>} int
+ */
 export async function weapon_dam_bonus(weapon) {   // weapon.c:1644
     let type = 0, wep_type = 0, skill = 0, bonus = 0;
     bonus = 0;
@@ -1511,6 +1676,10 @@ export async function weapon_dam_bonus(weapon) {   // weapon.c:1644
  * hero is holding, finally reading the given array that sets
  * maximums.
  */
+/**
+ * @param {$T.def_skill | null} class_skill const struct def_skill *
+ * @returns {Promise<void>}
+ */
 export async function skill_init(class_skill) {   // weapon.c:1738
     let obj = null, skmax = 0, skill = 0;
     /* initialize skill array; by default, everything is restricted */
@@ -1578,6 +1747,11 @@ export async function skill_init(class_skill) {   // weapon.c:1738
         await skill_based_spellbook_id();
     }
 }
+/**
+ * @param {$T.monst | null} mon struct monst *
+ * @param {$T.obj | null} obj struct obj *
+ * @returns {Promise<void>}
+ */
 export async function setmnotwielded(mon, obj) {   // weapon.c:1814
     if (!obj) {
         return;

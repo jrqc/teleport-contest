@@ -44,6 +44,11 @@ import { luaU_undump } from './lundump.js';
 import { luaV_execute, luaV_finishOp } from './lvm.js';
 import { luaZ_fill } from './lzio.js';
 
+/**
+ * @param {number} L lua_State *
+ * @param {number} errcode int
+ * @param {number} oldtop StkId
+ */
 export function luaD_seterrorobj(L, errcode, oldtop) {   // ldo.c:91
     let io = 0, x_ = 0, io1 = 0, io2 = 0;
     switch (errcode) {
@@ -81,6 +86,11 @@ export function luaD_seterrorobj(L, errcode, oldtop) {   // ldo.c:91
     }
     $h.stp(L + 16, oldtop + 16);
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} errcode int
+ * @returns {Promise<void>}
+ */
 export async function luaD_throw(L, errcode) {   // ldo.c:111
     let g = 0, io1 = 0, io2 = 0, $t1;
     if ($h.u32[(L + 88) >>> 2]) {
@@ -114,6 +124,12 @@ export async function luaD_throw(L, errcode) {   // ldo.c:111
         }
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} f Pfunc
+ * @param {number} ud void *
+ * @returns {Promise<number>} int
+ */
 export async function luaD_rawrunprotected(L, f, ud) {   // ldo.c:135
     let oldnCcalls = 0, $t1;
     const $sp0 = $h.st.sp, $fp = $h.enter(208);
@@ -142,6 +158,9 @@ export async function luaD_rawrunprotected(L, f, ud) {   // ldo.c:135
 /*
 ** Change all pointers to the stack into offsets.
 */
+/**
+ * @param {number} L lua_State *
+ */
 function relstack(L) {   // ldo.c:162
     let ci = 0, up = 0;
     $h.st64(L + 16, $h.u32[(L + 16) >>> 2] - $h.u32[(L + 48) >>> 2]);
@@ -157,6 +176,9 @@ function relstack(L) {   // ldo.c:162
 /*
 ** Change back all offsets into pointers.
 */
+/**
+ * @param {number} L lua_State *
+ */
 function correctstack(L) {   // ldo.c:179
     let ci = 0, up = 0;
     $h.stp(L + 16, $h.u32[(L + 48) >>> 2] + $c.idx($h.ld64(L + 16)));
@@ -174,6 +196,10 @@ function correctstack(L) {   // ldo.c:179
 }
 /* some space for error handling */
 /* raise an error while running the message handler */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<void>}
+ */
 export async function luaD_errerr(L) {   // ldo.c:200
     let msg = 0, io = 0, x_ = 0;
     msg = await luaS_newlstr(L, $h.lit("error in error handling"), 23);
@@ -198,6 +224,12 @@ export async function luaD_errerr(L) {   // ldo.c:200
 ** In case of allocation error, raise an error or return false according
 ** to 'raiseerror'.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} newsize int
+ * @param {number} raiseerror int
+ * @returns {Promise<number>} int
+ */
 export async function luaD_reallocstack(L, newsize, raiseerror) {   // ldo.c:219
     let oldsize = 0, i = 0, newstack = 0, oldgcstop = 0;
     oldsize = $c.i32(($h.u32[(L + 40) >>> 2] - $h.u32[(L + 48) >>> 2]) / 16);
@@ -228,6 +260,12 @@ export async function luaD_reallocstack(L, newsize, raiseerror) {   // ldo.c:219
 ** Try to grow the stack by at least 'n' elements. When 'raiseerror'
 ** is true, raises any error; otherwise, return 0 in case of errors.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} n int
+ * @param {number} raiseerror int
+ * @returns {Promise<number>} int
+ */
 export async function luaD_growstack(L, n, raiseerror) {   // ldo.c:249
     let size = 0, newsize = 0, needed = 0;
     size = $c.i32(($h.u32[(L + 40) >>> 2] - $h.u32[(L + 48) >>> 2]) / 16);
@@ -266,6 +304,10 @@ export async function luaD_growstack(L, n, raiseerror) {   // ldo.c:249
 ** Compute how much of the stack is being used, by computing the
 ** maximum top of all call frames in the stack and the current top.
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {number} int
+ */
 function stackinuse(L) {   // ldo.c:283
     let ci = 0, res = 0, lim = 0;
     lim = $h.u32[(L + 16) >>> 2];
@@ -290,6 +332,10 @@ function stackinuse(L) {   // ldo.c:283
 ** stacksize (equal to ERRORSTACKSIZE in this case), and so the stack
 ** will be reduced to a "regular" size.
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<void>}
+ */
 export async function luaD_shrinkstack(L) {   // ldo.c:307
     let inuse = 0, max = 0, nsize = 0;
     inuse = stackinuse(L);
@@ -305,6 +351,10 @@ export async function luaD_shrinkstack(L) {   // ldo.c:307
     }
     await luaE_shrinkCI(L);   /* shrink CI list */
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {Promise<void>}
+ */
 export async function luaD_inctop(L) {   // ldo.c:322
     if ((($h.u32[(L + 40) >>> 2] - $h.u32[(L + 16) >>> 2]) / 16 <= 1 ? 1 : 0) !== 0 ? 1 : 0) {
         0;
@@ -321,6 +371,14 @@ export async function luaD_inctop(L) {   // ldo.c:322
 ** called. (Both 'L->hook' and 'L->hookmask', which trigger this
 ** function, can be changed asynchronously by signals.)
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} event int
+ * @param {number} line int
+ * @param {number} ftransfer int
+ * @param {number} ntransfer int
+ * @returns {Promise<void>}
+ */
 export async function luaD_hook(L, event, line, ftransfer, ntransfer) {   // ldo.c:335
     let hook = 0, mask = 0, ci = 0, top = 0, ci_top = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(136);
@@ -371,6 +429,11 @@ export async function luaD_hook(L, event, line, ftransfer, ntransfer) {   // ldo
 ** whenever 'hookmask' is not zero, so it checks whether call hooks are
 ** active.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} ci CallInfo *
+ * @returns {Promise<void>}
+ */
 export async function luaD_hookcall(L, ci) {   // ldo.c:376
     let event = 0, p = 0;
     $h.i32[(L + 180) >>> 2] = 0;   /* set 'oldpc' for new function */
@@ -388,6 +451,12 @@ export async function luaD_hookcall(L, ci) {   // ldo.c:376
 ** 'oldpc'. (Note that this correction is needed by the line hook, so it
 ** is done even when return hooks are off.)
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} ci CallInfo *
+ * @param {number} nres int
+ * @returns {Promise<void>}
+ */
 async function rethook(L, ci, nres) {   // ldo.c:394
     let firstres = 0, delta = 0, ftransfer = 0, p = 0;
     if ($h.i32[(L + 192) >>> 2] & 2) {
@@ -414,6 +483,11 @@ async function rethook(L, ci, nres) {   // ldo.c:394
 ** stack, below original 'func', so that 'luaD_precall' can call it. Raise
 ** an error if there is no '__call' metafield.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} func StkId
+ * @returns {Promise<number>} StkId
+ */
 async function tryfuncTM(L, func) {   // ldo.c:419
     let tm = 0, p = 0, t__ = 0, io1 = 0, io2 = 0, io1$2 = 0, io2$2 = 0;
     if ((($h.u32[(L + 40) >>> 2] - $h.u32[(L + 16) >>> 2]) / 16 <= 1 ? 1 : 0) !== 0 ? 1 : 0) {
@@ -460,6 +534,13 @@ async function tryfuncTM(L, func) {   // ldo.c:419
 ** expressions, multiple results for tail calls/single parameters)
 ** separated.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} res StkId
+ * @param {number} nres int
+ * @param {number} wanted int
+ * @returns {Promise<void>}
+ */
 async function moveresults(L, res, nres, wanted) {   // ldo.c:440
     let firstresult = 0, i = 0, io1 = 0, io2 = 0, savedres = 0, io1$2 = 0, io2$2 = 0;
     switch (wanted) {
@@ -531,6 +612,12 @@ async function moveresults(L, res, nres, wanted) {   // ldo.c:440
 ** info. If function has to close variables, hook must be called after
 ** that.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} ci CallInfo *
+ * @param {number} nres int
+ * @returns {Promise<void>}
+ */
 export async function luaD_poscall(L, ci, nres) {   // ldo.c:492
     let wanted = 0;
     wanted = $h.i16[(ci + 60) >>> 1];
@@ -543,6 +630,14 @@ export async function luaD_poscall(L, ci, nres) {   // ldo.c:492
     0;
     $h.stp(L + 32, $h.u32[(ci + 16) >>> 2]);   /* back to caller (after closing variables) */
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} func StkId
+ * @param {number} nret int
+ * @param {number} mask int
+ * @param {number} top StkId
+ * @returns {Promise<number>} CallInfo *
+ */
 async function prepCallInfo(L, func, nret, mask, top) {   // ldo.c:509
     let ci = 0, $t1;
     ci = ($t1 = $h.u32[($h.u32[(L + 32) >>> 2] + 24) >>> 2] ? $h.u32[($h.u32[(L + 32) >>> 2] + 24) >>> 2] : await luaE_extendCI(L), $h.stp(L + 32, $t1));   /* new frame */
@@ -555,6 +650,13 @@ async function prepCallInfo(L, func, nret, mask, top) {   // ldo.c:509
 /*
 ** precall for C functions
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} func StkId
+ * @param {number} nresults int
+ * @param {number} f lua_CFunction
+ * @returns {Promise<number>} int
+ */
 async function precallC(L, func, nresults, f) {   // ldo.c:523
     let n = 0, ci = 0, t__ = 0, narg = 0, $t1;
     /* number of returns */
@@ -592,6 +694,14 @@ async function precallC(L, func, nresults, f) {   // ldo.c:523
 ** (so that it includes the function itself). Return the number of
 ** results, if it was a C function, or -1 for a Lua function.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} ci CallInfo *
+ * @param {number} func StkId
+ * @param {number} narg1 int
+ * @param {number} delta int
+ * @returns {Promise<number>} int
+ */
 export async function luaD_pretailcall(L, ci, func, narg1, delta) {   // ldo.c:550
     let p = 0, fsize = 0, nfixparams = 0, i = 0, t__ = 0, io1 = 0, io2 = 0;
     retry$: for (;;) {
@@ -663,6 +773,12 @@ export async function luaD_pretailcall(L, ci, func, narg1, delta) {   // ldo.c:5
 ** returns NULL, with all the results on the stack, starting at the
 ** original function position.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} func StkId
+ * @param {number} nresults int
+ * @returns {Promise<number>} CallInfo *
+ */
 export async function luaD_precall(L, func, nresults) {   // ldo.c:595
     let ci = 0, p = 0, narg = 0, nfixparams = 0, fsize = 0, t__ = 0, $t1, $t2;
     retry$: for (;;) {
@@ -724,6 +840,13 @@ export async function luaD_precall(L, func, nresults) {   // ldo.c:595
 ** check the stack before doing anything else. 'luaD_precall' already
 ** does that.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} func StkId
+ * @param {number} nResults int
+ * @param {number} inc l_uint32
+ * @returns {Promise<void>}
+ */
 async function ccall(L, func, nResults, inc) {   // ldo.c:635
     let ci = 0, t__ = 0;
     $h.u32[(L + 176) >>> 2] = $h.u32[(L + 176) >>> 2] + inc >>> 0;
@@ -747,12 +870,24 @@ async function ccall(L, func, nResults, inc) {   // ldo.c:635
 /*
 ** External interface for 'ccall'
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} func StkId
+ * @param {number} nResults int
+ * @returns {Promise<void>}
+ */
 export async function luaD_call(L, func, nResults) {   // ldo.c:653
     await ccall(L, func, nResults, 1);
 }
 /*
 ** Similar to 'luaD_call', but does not allow yields during the call.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} func StkId
+ * @param {number} nResults int
+ * @returns {Promise<void>}
+ */
 export async function luaD_callnoyield(L, func, nResults) {   // ldo.c:661
     await ccall(L, func, nResults, 65537);
 }
@@ -772,6 +907,11 @@ export async function luaD_callnoyield(L, func, nResults) {   // ldo.c:661
 ** particular, field CIST_RECST preserves the error status across these
 ** multiple runs, changing only if there is a new error.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} ci CallInfo *
+ * @returns {Promise<number>} int
+ */
 async function finishpcallk(L, ci) {   // ldo.c:682
     let status = 0, func = 0;
     status = $h.u16[(ci + 62) >>> 1] >> 10 & 7;   /* get original status */
@@ -805,6 +945,11 @@ async function finishpcallk(L, ci) {   // ldo.c:682
 ** of the function called by 'lua_callk'/'lua_pcallk', so we are
 ** conservative and use LUA_MULTRET (always adjust).
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} ci CallInfo *
+ * @returns {Promise<void>}
+ */
 async function finishCcall(L, ci) {   // ldo.c:715
     let n = 0, status = 0;
     /* actual number of results from C function */
@@ -837,6 +982,11 @@ async function finishCcall(L, ci) {   // ldo.c:715
 ** previously interrupted coroutine until the stack is empty (or another
 ** interruption long-jumps out of the loop).
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} ud void *
+ * @returns {Promise<void>}
+ */
 async function unroll(L, ud) {   // ldo.c:743
     let ci = 0;
     ud;
@@ -855,6 +1005,10 @@ async function unroll(L, ud) {   // ldo.c:743
 ** Try to find a suspended protected call (a "recover point") for the
 ** given thread.
 */
+/**
+ * @param {number} L lua_State *
+ * @returns {number} CallInfo *
+ */
 function findpcall(L) {   // ldo.c:761
     let ci = 0;
     for (ci = $h.u32[(L + 32) >>> 2]; ci !== 0; ci = $h.u32[(ci + 16) >>> 2]) {
@@ -870,6 +1024,12 @@ function findpcall(L) {   // ldo.c:761
 ** of the coroutine itself. (Such errors should not be handled by any
 ** coroutine error handler and should not kill the coroutine.)
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} msg const char *
+ * @param {number} narg int
+ * @returns {Promise<number>} int
+ */
 async function resume_error(L, msg, narg) {   // ldo.c:776
     let io = 0, x_ = 0;
     $h.stp(L + 16, $h.u32[(L + 16) >>> 2] + -narg * 16);   /* remove args from the stack */
@@ -894,6 +1054,11 @@ async function resume_error(L, msg, narg) {   // ldo.c:776
 ** function), plus erroneous cases: non-suspended coroutine or dead
 ** coroutine.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} ud void *
+ * @returns {Promise<void>}
+ */
 async function resume(L, ud) {   // ldo.c:792
     let n = 0, firstArg = 0, ci = 0;
     n = $h.i32[ud >>> 2];   /* number of arguments */
@@ -935,6 +1100,11 @@ async function resume(L, ud) {   // ldo.c:792
 ** (status == LUA_YIELD), or an unprotected error ('findpcall' doesn't
 ** find a recover point).
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} status int
+ * @returns {Promise<number>} int
+ */
 async function precover(L, status) {   // ldo.c:831
     let ci = 0;
     while (status > 1 && (ci = findpcall(L)) !== 0) {
@@ -944,6 +1114,13 @@ async function precover(L, status) {   // ldo.c:831
     }
     return status;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} from lua_State *
+ * @param {number} nargs$in int
+ * @param {number} nresults int *
+ * @returns {Promise<number>} int
+ */
 export async function lua_resume(L, from, nargs$in, nresults) {   // ldo.c:842
     let status = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(4);
@@ -983,9 +1160,20 @@ export async function lua_resume(L, from, nargs$in, nresults) {   // ldo.c:842
         return status;
     } finally { $h.st.sp = $sp0; }
 }
+/**
+ * @param {number} L lua_State *
+ * @returns {number} int
+ */
 export function lua_isyieldable(L) {   // ldo.c:877
     return ($h.u32[(L + 176) >>> 2] & 4294901760) >>> 0 === 0 ? 1 : 0;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} nresults int
+ * @param {number | bigint} ctx lua_KContext
+ * @param {number} k lua_KFunction
+ * @returns {Promise<number>} int
+ */
 export async function lua_yieldk(L, nresults, ctx, k) {   // ldo.c:882
     let ci = 0;
     L;
@@ -1019,6 +1207,11 @@ export async function lua_yieldk(L, nresults, ctx, k) {   // ldo.c:882
 /*
 ** Auxiliary function to call 'luaF_close' in protected mode.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} ud void *
+ * @returns {Promise<void>}
+ */
 async function closepaux(L, ud) {   // ldo.c:925
     let pcl = 0;
     pcl = ud;
@@ -1028,6 +1221,12 @@ async function closepaux(L, ud) {   // ldo.c:925
 ** Calls 'luaF_close' in protected mode. Return the original status
 ** or, in case of errors, the new status.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number | bigint} level ptrdiff_t
+ * @param {number} status int
+ * @returns {Promise<number>} int
+ */
 export async function luaD_closeprotected(L, level, status) {   // ldo.c:935
     let old_ci = 0, old_allowhooks = 0;
     const $sp0 = $h.st.sp, $fp = $h.enter(16);
@@ -1054,6 +1253,14 @@ export async function luaD_closeprotected(L, level, status) {   // ldo.c:935
 ** thread information ('allowhook', etc.) and in particular
 ** its stack level in case of errors.
 */
+/**
+ * @param {number} L lua_State *
+ * @param {number} func Pfunc
+ * @param {number} u void *
+ * @param {number | bigint} old_top ptrdiff_t
+ * @param {number | bigint} ef ptrdiff_t
+ * @returns {Promise<number>} int
+ */
 export async function luaD_pcall(L, func, u, old_top, ef) {   // ldo.c:957
     let status = 0, old_ci = 0, old_allowhooks = 0, old_errfunc = 0;
     old_ci = $h.u32[(L + 32) >>> 2];
@@ -1072,12 +1279,23 @@ export async function luaD_pcall(L, func, u, old_top, ef) {   // ldo.c:957
     $h.st64(L + 168, old_errfunc);
     return status;
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} mode const char *
+ * @param {number} x const char *
+ * @returns {Promise<void>}
+ */
 async function checkmode(L, mode, x) {   // ldo.c:990
     if (mode && $hl.strchr(mode, $h.i8[x]) === 0) {
         await luaO_pushfstring(L, $h.lit("attempt to load a %s chunk (mode is '%s')"), x, mode);
         await luaD_throw(L, 3);
     }
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} ud void *
+ * @returns {Promise<void>}
+ */
 async function f_parser(L, ud) {   // ldo.c:999
     let cl = 0, p = 0, c = 0, $t1, $t2;
     p = ud;
@@ -1092,6 +1310,13 @@ async function f_parser(L, ud) {   // ldo.c:999
     0;
     await luaF_initupvals(L, cl);
 }
+/**
+ * @param {number} L lua_State *
+ * @param {number} z ZIO *
+ * @param {number} name const char *
+ * @param {number} mode const char *
+ * @returns {Promise<number>} int
+ */
 export async function luaD_protectedparser(L, z, name, mode) {   // ldo.c:1016
     let status = 0, $t1;
     const $sp0 = $h.st.sp, $fp = $h.enter(96);
