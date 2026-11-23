@@ -234,7 +234,7 @@ export class HeapEmitter extends TUEmitter {
     frameAddr(v) { return v.off ? E(`$fp + ${v.off}`, PREC.add) : E('$fp'); }
 
     // ---------- statements that differ ----------
-    stmt(n, ind) {
+    stmtBody(n, ind) {
         if (n && n.kind === 'DeclStmt') {
             const out = [];
             for (const d of kids(n)) {
@@ -261,7 +261,7 @@ export class HeapEmitter extends TUEmitter {
             const ft = this.S.resolve(this.fn.t.ret);
             if (e && ft.k === 'rec') return [`${ind}return $h.ret(${this.rv(e).c}, ${this.sz(ft)});`];
         }
-        return super.stmt(n, ind);
+        return super.stmtBody(n, ind);
     }
     /**
      * LUAI_TRY: `if (_setjmp(buf) == 0) { a } [else { b }]` becomes try { a } catch

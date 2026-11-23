@@ -71,7 +71,7 @@ for (const e of [...db, ...luaDb]) {
     const r = prog.emitTU(tu);
     results.push(r);
     errors.push(...r.errors);
-    perTu.push({ file: tu.file, errors: r.errors.length });
+    perTu.push({ file: tu.file, errors: r.errors.length, comments: r.comments });
     process.stderr.write(r.errors.length ? 'x' : '.');
 }
 // readability plan P2c: where each header's constants were named (tests/transpiler/consts.test.mjs)
@@ -95,7 +95,9 @@ for (const e of errors) {
     groups.get(k).push(e);
 }
 const rep = [];
-rep.push('# Emit report (M1)', '', `${perTu.length} TUs, ${perTu.reduce((a, t) => a + t.lines, 0)} lines of JS, ${errors.length} functions/globals not emitted, ${bad.length} files fail node --check, ${prog.missingFn.size} called functions undefined`, '');
+const cms = perTu.filter((t) => t.comments);
+const cmC = cms.reduce((a, t) => a + t.comments.carried, 0), cmT = cms.reduce((a, t) => a + t.comments.total, 0);
+rep.push('# Emit report (M1)', '', `C comments carried (readability plan P4): ${cmC} of ${cmT}; least carried: ${cms.map((t) => [t.comments.total - t.comments.carried, path.basename(t.file)]).sort((a, b) => b[0] - a[0]).slice(0, 8).map(([d, f]) => `${f} ${d}`).join(', ')}`, '', `${perTu.length} TUs, ${perTu.reduce((a, t) => a + t.lines, 0)} lines of JS, ${errors.length} functions/globals not emitted, ${bad.length} files fail node --check, ${prog.missingFn.size} called functions undefined`, '');
 rep.push('## Errors by kind', '', '| Count | Kind | Example |', '|---|---|---|');
 for (const [k, v] of [...groups].sort((a, b) => b[1].length - a[1].length)) rep.push(`| ${v.length} | ${k.replace(/\|/g, '\\|')} | ${v[0].replace(/\|/g, '\\|').slice(0, 140)} |`);
 rep.push('', '## node --check failures', '', ...bad.map((b) => `- ${b}`));
