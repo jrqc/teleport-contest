@@ -16,3 +16,4 @@ step to revert is the one pushed last before that run.
 | 2026-11-23 05:32 | `a17eef9` | Readability P2c-2: constant namespaces |
 | 2026-11-23 15:54 | `95b3095` | Readability P4: C comments and notices |
 | 2026-11-23 16:43 | `7f196ad` | Readability: fortify names |
+| 2026-11-23 17:37 | `eec068c` | Readability: JSDoc from C signatures |
