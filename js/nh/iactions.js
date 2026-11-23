@@ -92,7 +92,7 @@ async function item_naming_classification(obj, onamebuf, ocallbuf) {   // iactio
        "rename" don't fit for changing a type name */
     $t1 = ocallbuf.set(0, 0), onamebuf.set(0, $t1);
     if (name_ok(obj) === GETOBJ.SUGGEST) {
-        $c.__builtin___sprintf_chk(onamebuf, 0, -1, $c.lit("%s %s %s"), !(obj.oextra && obj.oextra.oname) || !obj.oextra.oname.get(0) ? new $c.Ptr(item_naming_classification$Name, 0) : new $c.Ptr(item_naming_classification$Rename, 0), the_unique_obj(obj) ? $c.lit("the") : !(obj.quan !== 1 || obj.oartifact === ART.EYES_OF_THE_OVERWORLD && !undiscovered_artifact(ART.EYES_OF_THE_OVERWORLD)) ? $c.lit("this specific") : $c.lit("this stack of"), await simpleonames(obj));
+        $c.sprintf(onamebuf, $c.lit("%s %s %s"), !(obj.oextra && obj.oextra.oname) || !obj.oextra.oname.get(0) ? new $c.Ptr(item_naming_classification$Name, 0) : new $c.Ptr(item_naming_classification$Rename, 0), the_unique_obj(obj) ? $c.lit("the") : !(obj.quan !== 1 || obj.oartifact === ART.EYES_OF_THE_OVERWORLD && !undiscovered_artifact(ART.EYES_OF_THE_OVERWORLD)) ? $c.lit("this specific") : $c.lit("this stack of"), await simpleonames(obj));
         /*"these",*/
     }
     if (call_ok(obj) === GETOBJ.SUGGEST) {
@@ -103,7 +103,7 @@ async function item_naming_classification(obj, onamebuf, ocallbuf) {   // iactio
         } else if (!is_plural(obj)) {
             callname = await makeplural(callname);
         }
-        $c.__builtin___sprintf_chk(ocallbuf, 0, -1, $c.lit("%s the type for %s"), !objects[obj.otyp].oc_uname || !objects[obj.otyp].oc_uname.get(0) ? new $c.Ptr(item_naming_classification$Call, 0) : new $c.Ptr(item_naming_classification$Recall, 0), callname);
+        $c.sprintf(ocallbuf, $c.lit("%s the type for %s"), !objects[obj.otyp].oc_uname || !objects[obj.otyp].oc_uname.get(0) ? new $c.Ptr(item_naming_classification$Call, 0) : new $c.Ptr(item_naming_classification$Recall, 0), callname);
     }
     return $c.i8(onamebuf.get(0) || ocallbuf.get(0) ? TRUE : FALSE);
 }
@@ -114,21 +114,21 @@ async function item_reading_classification(obj, outbuf) {   // iactions.c:86
     res = IA.READ_OBJ;
     outbuf.set(0, 0);
     if (otyp === FORTUNE_COOKIE) {
-        $c.__builtin___strcpy_chk(outbuf, $c.lit("Read the message inside this cookie"), -1);
+        $c.strcpy(outbuf, $c.lit("Read the message inside this cookie"));
     } else if (otyp === T_SHIRT) {
-        $c.__builtin___strcpy_chk(outbuf, $c.lit("Read the slogan on the shirt"), -1);
+        $c.strcpy(outbuf, $c.lit("Read the slogan on the shirt"));
     } else if (otyp === ALCHEMY_SMOCK) {
-        $c.__builtin___strcpy_chk(outbuf, $c.lit("Read the slogan on the apron"), -1);
+        $c.strcpy(outbuf, $c.lit("Read the slogan on the apron"));
     } else if (otyp === HAWAIIAN_SHIRT) {
-        $c.__builtin___strcpy_chk(outbuf, $c.lit("Look at the pattern on the shirt"), -1);
+        $c.strcpy(outbuf, $c.lit("Look at the pattern on the shirt"));
     } else if (obj.oclass === SCROLL_CLASS) {
         magic = obj.dknown | 0 && otyp !== SCR_MAIL && (otyp !== SCR_BLANK_PAPER || !objects[otyp].oc_name_known) ? $c.lit(" to activate its magic") : $c.lit("");
-        $c.__builtin___sprintf_chk(outbuf, 0, -1, $c.lit("Read this scroll%s"), magic);
+        $c.sprintf(outbuf, $c.lit("Read this scroll%s"), magic);
     } else if (obj.oclass === SPBOOK_CLASS) {
         novel = $c.i8(otyp === SPE_NOVEL ? 1 : 0);
         blank = $c.i8(otyp === SPE_BLANK_PAPER && objects[otyp].oc_name_known | 0 ? 1 : 0);
         tome = $c.i8(otyp === SPE_BOOK_OF_THE_DEAD && objects[otyp].oc_name_known | 0 ? 1 : 0);
-        $c.__builtin___sprintf_chk(outbuf, 0, -1, $c.lit("%s this %s"), novel || blank ? $c.lit("Read") : tome ? $c.lit("Examine") : $c.lit("Study"), novel ? await simpleonames(obj) : tome ? $c.lit("tome") : $c.lit("spellbook"));
+        $c.sprintf(outbuf, $c.lit("%s this %s"), novel || blank ? $c.lit("Read") : tome ? $c.lit("Examine") : $c.lit("Study"), novel ? await simpleonames(obj) : tome ? $c.lit("tome") : $c.lit("spellbook"));
         /* "novel" or "paperback book" */
     } else {
         res = IA.NONE;
@@ -293,7 +293,7 @@ export async function itemactions(otmp) {   // iactions.c:278
          * TODO: if uwep is ammo, tell player that to shoot instead of toss,
          *       the corresponding launcher must be wielded;
          */
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s '%c' to %s %s %s"), verb, 45, action, which, otmp.quan !== 1 || otmp.oartifact === ART.EYES_OF_THE_OVERWORLD && !undiscovered_artifact(ART.EYES_OF_THE_OVERWORLD) ? await makeplural(what) : what);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s '%c' to %s %s %s"), verb, 45, action, which, otmp.quan !== 1 || otmp.oartifact === ART.EYES_OF_THE_OVERWORLD && !undiscovered_artifact(ART.EYES_OF_THE_OVERWORLD) ? await makeplural(what) : what);
         await ia_addmenu(win, IA.UNWIELD, 45, new $c.Ptr(buf, 0));
     }
     /* a: apply */
@@ -330,28 +330,28 @@ export async function itemactions(otmp) {   // iactions.c:278
     } else if (otmp.otyp === BELL || otmp.otyp === BELL_OF_OPENING) {
         await ia_addmenu(win, IA.APPLY_OBJ, 97, $c.lit("Ring the bell"));
     } else if (otmp.otyp === CANDELABRUM_OF_INVOCATION) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s the candelabrum"), light);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s the candelabrum"), light);
         await ia_addmenu(win, IA.APPLY_OBJ, 97, new $c.Ptr(buf, 0));
     } else if (otmp.otyp === WAX_CANDLE || otmp.otyp === TALLOW_CANDLE) {
         multiple = $c.i8(otmp.quan === 1 ? FALSE : TRUE);
         s = multiple ? $c.lit("these") : $c.lit("this");
         o = carrying(CANDELABRUM_OF_INVOCATION);
         if (o && o.spe < 7) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Attach %s to your candelabrum, or %s %s"), s, !otmp.lamplit ? $c.lit("light") : $c.lit("extinguish"), multiple ? $c.lit("them") : $c.lit("it"));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Attach %s to your candelabrum, or %s %s"), s, !otmp.lamplit ? $c.lit("light") : $c.lit("extinguish"), multiple ? $c.lit("them") : $c.lit("it"));
         } else {
             /* [lowercase] */
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s %s %s"), light, s, await simpleonames(otmp));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s %s %s"), light, s, await simpleonames(otmp));
         }
         await ia_addmenu(win, IA.APPLY_OBJ, 97, new $c.Ptr(buf, 0));
     } else if (otmp.otyp === OIL_LAMP || otmp.otyp === MAGIC_LAMP || otmp.otyp === BRASS_LANTERN) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s this light source"), light);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s this light source"), light);
         await ia_addmenu(win, IA.APPLY_OBJ, 97, new $c.Ptr(buf, 0));
     } else if (otmp.otyp === POT_OIL && objects[otmp.otyp].oc_name_known | 0) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s this oil"), light);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s this oil"), light);
         await ia_addmenu(win, IA.APPLY_OBJ, 97, new $c.Ptr(buf, 0));
     } else if (otmp.oclass === POTION_CLASS) {
         /* FIXME? this should probably be moved to 'D' rather than be 'a' */
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Dip something into %s potion%s"), otmp.quan !== 1 || otmp.oartifact === ART.EYES_OF_THE_OVERWORLD && !undiscovered_artifact(ART.EYES_OF_THE_OVERWORLD) ? $c.lit("one of these") : $c.lit("this"), otmp.quan === 1 ? $c.lit("") : $c.lit("s"));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Dip something into %s potion%s"), otmp.quan !== 1 || otmp.oartifact === ART.EYES_OF_THE_OVERWORLD && !undiscovered_artifact(ART.EYES_OF_THE_OVERWORLD) ? $c.lit("one of these") : $c.lit("this"), otmp.quan === 1 ? $c.lit("") : $c.lit("s"));
         await ia_addmenu(win, IA.DIP_OBJ, 97, new $c.Ptr(buf, 0));
     } else if (otmp.otyp === EXPENSIVE_CAMERA) {
         await ia_addmenu(win, IA.APPLY_OBJ, 97, $c.lit("Take a photograph"));
@@ -389,15 +389,15 @@ export async function itemactions(otmp) {   // iactions.c:278
        always have a takeoff/remove choice so we don't have to worry
        about the menu maybe being empty when 'd' is suppressed */
     if (!already_worn) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Drop this %s"), otmp.quan > 1 ? $c.lit("stack") : $c.lit("item"));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Drop this %s"), otmp.quan > 1 ? $c.lit("stack") : $c.lit("item"));
         await ia_addmenu(win, IA.DROP_OBJ, 100, new $c.Ptr(buf, 0));
     }
     /* e: eat item */
     if (otmp.otyp === TIN) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Open %s%s and eat the contents"), otmp.quan > 1 ? $c.lit("one of these tins") : $c.lit("this tin"), otmp.otyp === TIN && $G.uwep && $G.uwep.otyp === TIN_OPENER ? $c.lit(" with your tin opener") : $c.lit(""));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Open %s%s and eat the contents"), otmp.quan > 1 ? $c.lit("one of these tins") : $c.lit("this tin"), otmp.otyp === TIN && $G.uwep && $G.uwep.otyp === TIN_OPENER ? $c.lit(" with your tin opener") : $c.lit(""));
         await ia_addmenu(win, IA.EAT_OBJ, 101, new $c.Ptr(buf, 0));
     } else if (is_edible(otmp)) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Eat %s"), otmp.quan > 1 ? $c.lit("one of these") : $c.lit("this"));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Eat %s"), otmp.quan > 1 ? $c.lit("one of these") : $c.lit("this"));
         await ia_addmenu(win, IA.EAT_OBJ, 101, new $c.Ptr(buf, 0));
     }
     /* E: engrave with item */
@@ -406,17 +406,17 @@ export async function itemactions(otmp) {   // iactions.c:278
     } else if (otmp.otyp === MAGIC_MARKER) {
         await ia_addmenu(win, IA.ENGRAVE_OBJ, 69, $c.lit("Scribble graffiti on the floor"));
     } else if (otmp.oclass === WEAPON_CLASS || otmp.oclass === WAND_CLASS || otmp.oclass === GEM_CLASS || otmp.oclass === RING_CLASS) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s on the %s with %s"), otmp.oclass === WEAPON_CLASS && objects[otmp.otyp].oc_subtyp >= P.DAGGER && objects[otmp.otyp].oc_subtyp <= P.SABER || otmp.oclass === WAND_CLASS || (otmp.oclass === GEM_CLASS || otmp.oclass === RING_CLASS) && objects[otmp.otyp].oc_tough | 0 ? $c.lit("Engrave") : $c.lit("Write"), surface(u.ux, u.uy), otmp.quan > 1 ? $c.lit("one of these items") : $c.lit("this item"));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s on the %s with %s"), otmp.oclass === WEAPON_CLASS && objects[otmp.otyp].oc_subtyp >= P.DAGGER && objects[otmp.otyp].oc_subtyp <= P.SABER || otmp.oclass === WAND_CLASS || (otmp.oclass === GEM_CLASS || otmp.oclass === RING_CLASS) && objects[otmp.otyp].oc_tough | 0 ? $c.lit("Engrave") : $c.lit("Write"), surface(u.ux, u.uy), otmp.quan > 1 ? $c.lit("one of these items") : $c.lit("this item"));
         await ia_addmenu(win, IA.ENGRAVE_OBJ, 69, new $c.Ptr(buf, 0));
     }
     /* f: fire quivered ammo */
     if ($c.peq(otmp, $G.uquiver)) {
         shoot = $c.i8(ammo_and_launcher(otmp, $G.uwep));
         /* FIXME: see the multi-shot FIXME about "one of" for 't: throw' */
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s %s"), shoot ? $c.lit("Shoot") : $c.lit("Throw"), otmp.quan > 1 ? $c.lit("one of these") : $c.lit("this"));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s %s"), shoot ? $c.lit("Shoot") : $c.lit("Throw"), otmp.quan > 1 ? $c.lit("one of these") : $c.lit("this"));
         if (shoot) {
             (!!$c.peq($G.uwep, $c.asRec(null, $T.obj, 112)) ? 1 : 0) ? $c.__assert_rtn($c.lit("itemactions"), $c.lit("iactions.c"), 456, $c.lit("uwep != NULL")) : 0;
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" with your wielded %s"), await simpleonames($G.uwep));
+            $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit(" with your wielded %s"), await simpleonames($G.uwep));
         }
         await ia_addmenu(win, IA.FIRE_OBJ, 102, new $c.Ptr(buf, 0));
     }
@@ -443,7 +443,7 @@ export async function itemactions(otmp) {   // iactions.c:278
     /* FIXME: should also handle player owned container (so not
        flagged 'unpaid') holding shop owned items */
     if (otmp.unpaid | 0 && (mtmp = await shop_keeper(in_rooms(u.ux, u.uy, SHOPBASE).get(0))) !== null && inhishop(mtmp)) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Buy this unpaid %s"), otmp.quan > 1 ? $c.lit("stack") : $c.lit("item"));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Buy this unpaid %s"), otmp.quan > 1 ? $c.lit("stack") : $c.lit("item"));
         await ia_addmenu(win, IA.BUY_OBJ, 112, new $c.Ptr(buf, 0));
     }
     /* P: put on accessory */
@@ -455,20 +455,20 @@ export async function itemactions(otmp) {   // iactions.c:278
            item actions can be used to learn commands */
         new $c.Ptr(buf, 0).set(0, 0);
         if (otmp.oclass === AMULET_CLASS) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), !$G.uamul ? $c.lit("Put this amulet on") : $c.lit("[already wearing an amulet]"), 256);
+            $c.strcpy(new $c.Ptr(buf, 0), !$G.uamul ? $c.lit("Put this amulet on") : $c.lit("[already wearing an amulet]"));
         } else if (otmp.oclass === RING_CLASS || otmp.otyp === MEAT_RING) {
             if (!$G.uleft || !$G.uright) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("Put this ring on"), 256);
+                $c.strcpy(new $c.Ptr(buf, 0), $c.lit("Put this ring on"));
             } else {
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("[both ring %s in use]"), await makeplural(await body_part(FINGER)));
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("[both ring %s in use]"), await makeplural(await body_part(FINGER)));
             }
         } else if (otmp.otyp === BLINDFOLD || otmp.otyp === TOWEL || otmp.otyp === LENSES) {
             if ($G.ublindf) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("[already wearing eyewear]"), 256);
+                $c.strcpy(new $c.Ptr(buf, 0), $c.lit("[already wearing eyewear]"));
             } else if (otmp.otyp === LENSES) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("Put these lenses on"), 256);
+                $c.strcpy(new $c.Ptr(buf, 0), $c.lit("Put these lenses on"));
             } else {
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Put this on%s"), otmp.otyp === TOWEL ? $c.lit(" to blindfold yourself") : $c.lit(""));
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Put this on%s"), otmp.otyp === TOWEL ? $c.lit(" to blindfold yourself") : $c.lit(""));
             }
         }
         if (new $c.Ptr(buf, 0).get(0)) {
@@ -477,12 +477,12 @@ export async function itemactions(otmp) {   // iactions.c:278
     }
     /* q: drink item */
     if (otmp.oclass === POTION_CLASS) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Quaff (drink) %s"), otmp.quan > 1 ? $c.lit("one of these potions") : $c.lit("this potion"));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Quaff (drink) %s"), otmp.quan > 1 ? $c.lit("one of these potions") : $c.lit("this potion"));
         await ia_addmenu(win, IA.QUAFF_OBJ, 113, new $c.Ptr(buf, 0));
     }
     /* Q: quiver throwable item */
     if ((otmp.oclass === GEM_CLASS || otmp.oclass === WEAPON_CLASS) && !$c.peq(otmp, $G.uquiver)) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Quiver this %s for easy %s with 'f'ire"), otmp.quan > 1 ? $c.lit("stack") : $c.lit("item"), (otmp.oclass === WEAPON_CLASS || otmp.oclass === GEM_CLASS) && objects[otmp.otyp].oc_subtyp >= -P.CROSSBOW && objects[otmp.otyp].oc_subtyp <= -P.BOW && ($G.uwep && objects[otmp.otyp].oc_subtyp === (-objects[$G.uwep.otyp].oc_subtyp | 0)) ? $c.lit("shooting") : $c.lit("throwing"));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Quiver this %s for easy %s with 'f'ire"), otmp.quan > 1 ? $c.lit("stack") : $c.lit("item"), (otmp.oclass === WEAPON_CLASS || otmp.oclass === GEM_CLASS) && objects[otmp.otyp].oc_subtyp >= -P.CROSSBOW && objects[otmp.otyp].oc_subtyp <= -P.BOW && ($G.uwep && objects[otmp.otyp].oc_subtyp === (-objects[$G.uwep.otyp].oc_subtyp | 0)) ? $c.lit("shooting") : $c.lit("throwing"));
         await ia_addmenu(win, IA.QUIVER_OBJ, 81, new $c.Ptr(buf, 0));
     }
     /* r: read item */
@@ -491,12 +491,12 @@ export async function itemactions(otmp) {   // iactions.c:278
     }
     /* R: remove accessory or rub item */
     if ($c.and64(otmp.owornmask, W_ACCESSORY)) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Remove this %s"), $c.and64(otmp.owornmask, W.AMUL) ? $c.lit("amulet") : $c.and64(otmp.owornmask, W_RING) ? $c.lit("ring") : $c.and64(otmp.owornmask, W.TOOL) ? $c.lit("eyewear") : $c.lit("accessory"));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Remove this %s"), $c.and64(otmp.owornmask, W.AMUL) ? $c.lit("amulet") : $c.and64(otmp.owornmask, W_RING) ? $c.lit("ring") : $c.and64(otmp.owornmask, W.TOOL) ? $c.lit("eyewear") : $c.lit("accessory"));
         /* catchall -- can't happen */
         await ia_addmenu(win, IA.TAKEOFF_OBJ, 82, new $c.Ptr(buf, 0));
     }
     if (otmp.otyp === OIL_LAMP || otmp.otyp === MAGIC_LAMP || otmp.otyp === BRASS_LANTERN) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Rub this %s"), await simpleonames(otmp));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Rub this %s"), await simpleonames(otmp));
         await ia_addmenu(win, IA.RUB_OBJ, 82, new $c.Ptr(buf, 0));
     } else if (otmp.oclass === GEM_CLASS && is_graystone(otmp)) {
         await ia_addmenu(win, IA.RUB_OBJ, 82, $c.lit("Rub something on this stone"));
@@ -512,7 +512,7 @@ export async function itemactions(otmp) {   // iactions.c:278
          *  volley count and that could randomly yield 1 here and 2..N
          *  while throwing or vice versa.
          */
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s %s%s"), shoot$2 ? $c.lit("Shoot") : $c.lit("Throw"), otmp.quan === 1 ? $c.lit("this item") : otmp.otyp === GOLD_PIECE ? $c.lit("them") : $c.lit("one of these"), $c.peq(otmp, $G.uquiver) && (otmp.otyp !== GOLD_PIECE || otmp.quan === 1) ? $c.lit(" (same as 'f')") : $c.lit(""));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s %s%s"), shoot$2 ? $c.lit("Shoot") : $c.lit("Throw"), otmp.quan === 1 ? $c.lit("this item") : otmp.otyp === GOLD_PIECE ? $c.lit("them") : $c.lit("one of these"), $c.peq(otmp, $G.uquiver) && (otmp.otyp !== GOLD_PIECE || otmp.quan === 1) ? $c.lit(" (same as 'f')") : $c.lit(""));
         /* if otmp is quivered, we've already listed
            'f - shoot|throw this item' as a choice;
            if 't' is duplicating that, say so ('t' and 'f'
@@ -537,7 +537,7 @@ export async function itemactions(otmp) {   // iactions.c:278
     if ($c.peq(otmp, $G.uwep) || cantwield(gy.youmonst.data)) {
         /* either already wielded or can't wield anything; skip 'w' */
     } else if (otmp.oclass === WEAPON_CLASS || is_weptool(otmp) || is_wet_towel(otmp) || otmp.otyp === HEAVY_IRON_BALL) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Wield this %s as your weapon"), otmp.quan > 1 ? $c.lit("stack") : $c.lit("item"));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Wield this %s as your weapon"), otmp.quan > 1 ? $c.lit("stack") : $c.lit("item"));
         await ia_addmenu(win, IA.WIELD_OBJ, 119, new $c.Ptr(buf, 0));
     } else if (otmp.otyp === TIN_OPENER) {
         await ia_addmenu(win, IA.WIELD_OBJ, 119, $c.lit("Wield the tin opener to easily open tins"));
@@ -545,7 +545,7 @@ export async function itemactions(otmp) {   // iactions.c:278
         /* originally this was using "hold this item in your hands" but
            there's no concept of "holding an item", plus it unwields
            whatever item you already have wielded so use "wield this item" */
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Wield this %s in your %s"), otmp.quan > 1 ? $c.lit("stack") : $c.lit("item"), await makeplural(await body_part(HAND)));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Wield this %s in your %s"), otmp.quan > 1 ? $c.lit("stack") : $c.lit("item"), await makeplural(await body_part(HAND)));
         /* only two-handed weapons and unicorn horns care about
            pluralizing "hand" and they won't reach here, but plural
            sounds better when poly'd into something with "claw" */
@@ -562,9 +562,9 @@ export async function itemactions(otmp) {   // iactions.c:278
             Wmask = armcat_to_wornmask(objects[otmp.otyp].oc_subtyp);
             o$2 = wearmask_to_obj(Wmask);
             if (!o$2) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("Wear this armor"), 256);
+                $c.strcpy(new $c.Ptr(buf, 0), $c.lit("Wear this armor"));
             } else {
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("[already wearing %s]"), await an(await armor_simple_name(o$2)));
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("[already wearing %s]"), await an(await armor_simple_name(o$2)));
             }
             await ia_addmenu(win, IA.WEAR_OBJ, 87, new $c.Ptr(buf, 0));
         }
@@ -585,7 +585,7 @@ export async function itemactions(otmp) {   // iactions.c:278
     /* if already two-weaponing, no special checks needed to toggle off */
     /* but if not, try to filter most "you can't do that" here */
     if (($c.peq(otmp, $G.uwep) || $c.peq(otmp, $G.uswapwep)) && (u.twoweap || could_twoweap(gy.youmonst.data) && !$G.uarms && $G.uwep && MAYBETWOWEAPON($G.uwep) && $G.uswapwep && MAYBETWOWEAPON($G.uswapwep))) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Toggle two-weapon combat %s"), u.twoweap ? $c.lit("off") : $c.lit("on"));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Toggle two-weapon combat %s"), u.twoweap ? $c.lit("off") : $c.lit("on"));
         await ia_addmenu(win, IA.TWOWEAPON, 88, new $c.Ptr(buf, 0));
     }
     /* z: Zap wand */
@@ -594,10 +594,10 @@ export async function itemactions(otmp) {   // iactions.c:278
     }
     /* ?: Look up an item in the game's database */
     if (await ia_checkfile(otmp)) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Look up information about %s"), otmp.quan > 1 ? $c.lit("these") : $c.lit("this"));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Look up information about %s"), otmp.quan > 1 ? $c.lit("these") : $c.lit("this"));
         await ia_addmenu(win, IA.WHATIS_OBJ, 47, new $c.Ptr(buf, 0));
     }
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Do what with %s?"), await the(await cxname(otmp)));
+    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Do what with %s?"), await the(await cxname(otmp)));
     await end_menu()(win, new $c.Ptr(buf, 0));
     n = await select_menu(win, PICK.ONE, new $c.Ptr(selected, 0));
     if (n > 0) {

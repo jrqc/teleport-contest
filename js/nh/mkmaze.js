@@ -733,7 +733,7 @@ async function migr_booty_item(otyp, gang) {   // mkmaze.c:780
     otmp = await mksobj_migr_to_species(otyp, M2.ORC, TRUE, FALSE);
     if (otmp && gang) {
         await new_oname(otmp, await Strlen_(gang, $c.lit("migr_booty_item"), 786) + 1 >>> 0 | 0);   /* removes old name if present */
-        $c.__builtin___strcpy_chk(otmp.oextra.oname, gang, -1);
+        $c.strcpy(otmp.oextra.oname, gang);
         if (objects[otyp].oc_class === FOOD_CLASS) {
             if (otyp === SLIME_MOLD) {
                 $t1 = $c.i8(await fruitadd(orcfruit[rn2(2)], null)), otmp.spe = $t1;
@@ -1100,7 +1100,7 @@ export async function makemaz(s) {   // mkmaze.c:1127
         if (sp && sp.rndlevs) {
             nh_snprintf($c.lit("makemaz"), 1136, new $c.Ptr(protofile, 0), 20, $c.lit("%s-%d"), s, rnd(sp.rndlevs));
         } else {
-            $c.__builtin___strcpy_chk(new $c.Ptr(protofile, 0), s, 20);
+            $c.strcpy(new $c.Ptr(protofile, 0), s);
         }
     } else if (new $c.Ptr(svd.dungeons[u.uz.dnum].proto, 0).get(0)) {
         if (dunlevs_in_dungeon(u.uz) > 1) {
@@ -1112,10 +1112,10 @@ export async function makemaz(s) {   // mkmaze.c:1127
         } else if (sp && sp.rndlevs) {
             nh_snprintf($c.lit("makemaz"), 1152, new $c.Ptr(protofile, 0), 20, $c.lit("%s-%d"), new $c.Ptr(svd.dungeons[u.uz.dnum].proto, 0), rnd(sp.rndlevs));
         } else {
-            $c.__builtin___strcpy_chk(new $c.Ptr(protofile, 0), new $c.Ptr(svd.dungeons[u.uz.dnum].proto, 0), 20);
+            $c.strcpy(new $c.Ptr(protofile, 0), new $c.Ptr(svd.dungeons[u.uz.dnum].proto, 0));
         }
     } else {
-        $c.__builtin___strcpy_chk(new $c.Ptr(protofile, 0), $c.lit(""), 20);
+        $c.strcpy(new $c.Ptr(protofile, 0), $c.lit(""));
     }
     /* SPLEVTYPE format is "level-choice,level-choice"... */
     if (wizard() && new $c.Ptr(protofile, 0).get(0) && sp && sp.rndlevs) {
@@ -1128,7 +1128,7 @@ export async function makemaz(s) {   // mkmaze.c:1127
                     pick = $c.atoi(ep.add(len));
                     /* use choice only if valid */
                     if (pick > 0 && pick <= sp.rndlevs) {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(protofile, 0).add(len), 0, -1, $c.lit("%d"), pick);
+                        $c.sprintf(new $c.Ptr(protofile, 0).add(len), $c.lit("%d"), pick);
                     }
                     break;
                 } else {
@@ -1142,7 +1142,7 @@ export async function makemaz(s) {   // mkmaze.c:1127
     }
     if (new $c.Ptr(protofile, 0).get(0)) {
         check_ransacked(new $c.Ptr(protofile, 0));
-        $c.__builtin___strcat_chk(new $c.Ptr(protofile, 0), $c.lit(".lua"), 20);
+        $c.strcat(new $c.Ptr(protofile, 0), $c.lit(".lua"));
         gi.in_mk_themerooms = FALSE;
         if (await load_special(new $c.Ptr(protofile, 0))) {
             /* some levels can end up with monsters
@@ -1752,7 +1752,7 @@ async function mk_bubble(x, y, n) {   // mkmaze.c:1873
     $t1 = $c.i8(1 - rn2(3) | 0), b.dx = $t1;
     $t2 = $c.i8(1 - rn2(3) | 0), b.dy = $t2;
     /* y dimension is the length of bitmap data - see bmask above */
-    $c.__builtin___memcpy_chk(new $c.Ptr(b.bm, 0), mk_bubble$bmask[n], $c.mulu64($c.u64(mk_bubble$bmask[n].get(1) + 2 | 0), 1), -1);
+    $c.memcpy(new $c.Ptr(b.bm, 0), mk_bubble$bmask[n], $c.mulu64($c.u64(mk_bubble$bmask[n].get(1) + 2 | 0), 1));
     b.cons = null;
     if (!svb.bbubbles) {
         svb.bbubbles = b;

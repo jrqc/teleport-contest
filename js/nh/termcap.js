@@ -199,7 +199,7 @@ export async function term_startup(wid, hgt) {   // termcap.c:82
         flags.null = 0;   /* this should be a termcap flag */
     }
     if ($c.tgetent(tptr, term) < 1) {
-        $c.__builtin___strncpy_chk(new $c.Ptr(buf, 0), term, 228, 256);
+        $c.strncpy(new $c.Ptr(buf, 0), term, 228);
         buf[BUFSZ - 1] = 0;
         await error($c.lit("Unknown terminal type: %s."), term);
     }
@@ -320,10 +320,10 @@ export async function term_startup(wid, hgt) {   // termcap.c:82
        after exit_nhwindows(); if the sequences are too long, then bold
        won't work after that--it will be rendered as ordinary text */
     if (nh_HI() && $c.strlen(tc_lcl_data.tc_HI) < 16) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(tty_standout_on, 0), tc_lcl_data.tc_HI, 16);
+        $c.strcpy(new $c.Ptr(tty_standout_on, 0), tc_lcl_data.tc_HI);
     }
     if (nh_HE() && $c.strlen(tc_lcl_data.tc_HE) < 16) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(tty_standout_off, 0), tc_lcl_data.tc_HE, 16);
+        $c.strcpy(new $c.Ptr(tty_standout_off, 0), tc_lcl_data.tc_HE);
     }
 }
 /* note: at present, this routine is not part of the formal window interface
@@ -722,30 +722,30 @@ export function nomux_capture_screen() {   // termcap.c:796
             if (at !== cur_attr) {
                 /* Handle attr changes individually */
                 if (at & 1 && !(cur_attr & 1)) {
-                    p = p.add($c.__builtin___sprintf_chk(p, 0, -1, $c.lit("\x1b[7m")));
+                    p = p.add($c.sprintf(p, $c.lit("\x1b[7m")));
                 }
                 if (!(at & 1) && cur_attr & 1) {
-                    p = p.add($c.__builtin___sprintf_chk(p, 0, -1, $c.lit("\x1b[27m")));
+                    p = p.add($c.sprintf(p, $c.lit("\x1b[27m")));
                 }
                 if (at & 2 && !(cur_attr & 2)) {
-                    p = p.add($c.__builtin___sprintf_chk(p, 0, -1, $c.lit("\x1b[1m")));
+                    p = p.add($c.sprintf(p, $c.lit("\x1b[1m")));
                 }
                 if (!(at & 2) && cur_attr & 2) {
-                    p = p.add($c.__builtin___sprintf_chk(p, 0, -1, $c.lit("\x1b[22m")));
+                    p = p.add($c.sprintf(p, $c.lit("\x1b[22m")));
                 }
                 if (at & 4 && !(cur_attr & 4)) {
-                    p = p.add($c.__builtin___sprintf_chk(p, 0, -1, $c.lit("\x1b[4m")));
+                    p = p.add($c.sprintf(p, $c.lit("\x1b[4m")));
                 }
                 if (!(at & 4) && cur_attr & 4) {
-                    p = p.add($c.__builtin___sprintf_chk(p, 0, -1, $c.lit("\x1b[24m")));
+                    p = p.add($c.sprintf(p, $c.lit("\x1b[24m")));
                 }
                 cur_attr = at;
             }
             if (fg !== cur_fg) {
                 if (fg === 7) {
-                    p = p.add($c.__builtin___sprintf_chk(p, 0, -1, $c.lit("\x1b[39m")));   /* reset fg to default */
+                    p = p.add($c.sprintf(p, $c.lit("\x1b[39m")));   /* reset fg to default */
                 } else {
-                    p = p.add($c.__builtin___sprintf_chk(p, 0, -1, $c.lit("\x1b[%dm"), nomux_sgr_fg(fg)));
+                    p = p.add($c.sprintf(p, $c.lit("\x1b[%dm"), nomux_sgr_fg(fg)));
                 }
                 cur_fg = fg;
             }
@@ -764,11 +764,11 @@ export function nomux_capture_screen() {   // termcap.c:796
         }
         /* End-of-line: reset to defaults â match tmux format */
         if (cur_attr && cur_fg !== 7) {
-            p = p.add($c.__builtin___sprintf_chk(p, 0, -1, $c.lit("\x1b[0m")));   /* both attr+color: full reset */
+            p = p.add($c.sprintf(p, $c.lit("\x1b[0m")));   /* both attr+color: full reset */
         } else if (cur_attr) {
-            p = p.add($c.__builtin___sprintf_chk(p, 0, -1, $c.lit("\x1b[0m")));   /* attr only: full reset */
+            p = p.add($c.sprintf(p, $c.lit("\x1b[0m")));   /* attr only: full reset */
         } else if (cur_fg !== 7) {
-            p = p.add($c.__builtin___sprintf_chk(p, 0, -1, $c.lit("\x1b[39m")));   /* color only: fg reset */
+            p = p.add($c.sprintf(p, $c.lit("\x1b[39m")));   /* color only: fg reset */
             cur_fg = 7;
             cur_attr = 0;
         }
@@ -1057,10 +1057,10 @@ async function init_hilite() {   // termcap.c:1300
         while ($t3 = c, c = $t3 - 1 | 0, $t3) {
             scratch = $c.tparm(setf, ti_map[c].ti_color);
             work = $c.asArr(await alloc($c.u32($c.addu64($c.addu64($c.strlen(scratch), $c.u64(md_len)), 1))), Int8Array);
-            $c.__builtin___strcpy_chk(work, MD, -1);
+            $c.strcpy(work, MD);
             hilites[ti_map[c].nh_bright_color] = work;
             work = work.add(md_len);
-            $c.__builtin___strcpy_chk(work, scratch, -1);
+            $c.strcpy(work, scratch);
             hilites[ti_map[c].nh_color] = work;
         }
     }
@@ -1070,8 +1070,8 @@ async function init_hilite() {   // termcap.c:1300
     } else {
         scratch = $c.tparm(setf, 7);
         $t5 = $c.asArr(await alloc($c.u32($c.addu64($c.addu64($c.strlen(scratch), $c.u64(md_len)), 1))), Int8Array), hilites[CLR.WHITE] = $t5;
-        $c.__builtin___strcpy_chk(hilites[CLR.WHITE], MD, -1);
-        $c.__builtin___strcat_chk(hilites[CLR.WHITE], scratch, -1);
+        $c.strcpy(hilites[CLR.WHITE], MD);
+        $c.strcat(hilites[CLR.WHITE], scratch);
     }
     hilites[CLR.GRAY] = new $c.Ptr(nilstring, 0);
     hilites[NO_COLOR] = new $c.Ptr(nilstring, 0);
@@ -1087,8 +1087,8 @@ async function init_hilite() {   // termcap.c:1300
             */
             scratch = $c.tparm(setf, 0);
             $t7 = $c.asArr(await alloc($c.u32($c.addu64($c.addu64($c.strlen(scratch), $c.u64(md_len)), 1))), Int8Array), hilites[CLR.BLACK] = $t7;
-            $c.__builtin___strcpy_chk(hilites[CLR.BLACK], MD, -1);
-            $c.__builtin___strcat_chk(hilites[CLR.BLACK], scratch, -1);
+            $c.strcpy(hilites[CLR.BLACK], MD);
+            $c.strcat(hilites[CLR.BLACK], scratch);
         }
     } else {
         /* But it's conceivable that hilighted black-on-black could
@@ -1305,7 +1305,7 @@ export function term_start_color(color) {   // termcap.c:1852
 }
 export function term_start_bgcolor(color) {   // termcap.c:1864
     let tmp = new Int8Array(8);
-    $c.__builtin___sprintf_chk(new $c.Ptr(tmp, 0), 0, 8, $c.lit("\x1b[%dm"), $c.rem32(color, 8) + 40 | 0);
+    $c.sprintf(new $c.Ptr(tmp, 0), $c.lit("\x1b[%dm"), $c.rem32(color, 8) + 40 | 0);
     xputs(new $c.Ptr(tmp, 0));
 }
 /* hide or show cursor */

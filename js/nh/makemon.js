@@ -1815,7 +1815,7 @@ export async function mkclass_aligned(class_, spc, atyp) {   // makemon.c:1880
     num = 0;
     /* +1: insurance for final return value */
     gehennom = Inhell() !== 0 ? 1 : 0;
-    $c.__builtin___memset_chk(new $c.Ptr(nums, 0), 0, 1324, 1324);
+    $c.memset(new $c.Ptr(nums, 0), 0, 1324);
     maxmlev = await level_difficulty() >> 1;
     if (class_ < 1 || class_ >= MAXMCLASSES) {
         await impossible($c.lit("mkclass called with bad class!"));
@@ -2048,7 +2048,7 @@ export async function grow_up(mtmp, victim) {   // makemon.c:2051
             /* 3.6.1:
              * Temporary (?) hack to fix growing into opposite gender.
              */
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%s"), mtmp.female | 0 && !fem ? $c.lit("male ") : fem && !mtmp.female ? $c.lit("female ") : $c.lit(""), pmname(ptr, fem | 0));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s%s"), mtmp.female | 0 && !fem ? $c.lit("male ") : fem && !mtmp.female ? $c.lit("female ") : $c.lit(""), pmname(ptr, fem | 0));
             /* deal with female gnome becoming a gnome lord */
             /* or a male gnome becoming a gnome lady
                (can't happen with 3.6.0 mons[], but perhaps

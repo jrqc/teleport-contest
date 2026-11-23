@@ -313,7 +313,7 @@ export async function wiz_kill() {   // wizcmds.c:243
         mtmp = null;
         if (cc.x === u.ux && cc.y === u.uy) {
             if (u.usteed) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Kill %.110s?"), await mon_nam(u.usteed));
+                $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("Kill %.110s?"), await mon_nam(u.usteed));
                 if ((c = await ynq(new $c.Ptr(qbuf, 0))) === 113) {
                     break;
                 }
@@ -322,9 +322,9 @@ export async function wiz_kill() {   // wizcmds.c:243
                 }
             }
             if (!mtmp) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("%s?"), gu.urole.mnum === PM.SAMURAI ? $c.lit("Perform seppuku") : $c.lit("Commit suicide"));
+                $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("%s?"), gu.urole.mnum === PM.SAMURAI ? $c.lit("Perform seppuku") : $c.lit("Commit suicide"));
                 if (await paranoid_query(TRUE, new $c.Ptr(qbuf, 0))) {
-                    $c.__builtin___sprintf_chk(new $c.Ptr(svk.killer.name, 0), 0, 256, $c.lit("%s own player"), genders[flags.female ? 1 : 0].his);
+                    $c.sprintf(new $c.Ptr(svk.killer.name, 0), $c.lit("%s own player"), genders[flags.female ? 1 : 0].his);
                     svk.killer.format = KILLED.BY;
                     await done(DIED);
                 }
@@ -404,7 +404,7 @@ export async function wiz_load_lua() {   // wizcmds.c:353
             return ECMD.CANCEL;
         }
         if (!$c.strchr(new $c.Ptr(buf, 0), 46)) {
-            $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit(".lua"), 256);
+            $c.strcat(new $c.Ptr(buf, 0), $c.lit(".lua"));
         }
         await load_lua(new $c.Ptr(buf, 0), sbi);
     } else {
@@ -422,7 +422,7 @@ export async function wiz_load_splua() {   // wizcmds.c:376
             return ECMD.CANCEL;
         }
         if (!$c.strchr(new $c.Ptr(buf, 0), 46)) {
-            $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit(".lua"), 256);
+            $c.strcat(new $c.Ptr(buf, 0), $c.lit(".lua"));
         }
         await lspo_reset_level(null);
         await load_special(new $c.Ptr(buf, 0));
@@ -602,7 +602,7 @@ export async function wiz_show_seenv() {   // wizcmds.c:576
                 if (v === 0) {
                     $t2 = row[curx + 1 | 0] = 32, row[curx] = $t2;
                 } else {
-                    $c.__builtin___sprintf_chk(new $c.Ptr(row, curx), 0, -1, $c.lit("%02x"), v);
+                    $c.sprintf(new $c.Ptr(row, curx), $c.lit("%02x"), v);
                 }
             }
         }
@@ -623,7 +623,7 @@ export async function wiz_show_seenv() {   // wizcmds.c:576
 export async function wiz_show_vision() {   // wizcmds.c:621
     let win = 0, x = 0, y = 0, v = 0, row = new Int8Array(81);
     win = await create_nhwindow()(NHW.TEXT);
-    $c.__builtin___sprintf_chk(new $c.Ptr(row, 0), 0, 81, $c.lit("Flags: 0x%x could see, 0x%x in sight, 0x%x temp lit"), COULD_SEE, IN_SIGHT, TEMP_LIT);
+    $c.sprintf(new $c.Ptr(row, 0), $c.lit("Flags: 0x%x could see, 0x%x in sight, 0x%x temp lit"), COULD_SEE, IN_SIGHT, TEMP_LIT);
     await putstr()(win, 0, new $c.Ptr(row, 0));
     await putstr()(win, 0, $c.lit(""));
     for (y = 0; y < ROWNO; y = $c.i16(y + 1)) {
@@ -705,117 +705,117 @@ export async function wiz_map_levltyp() {   // wizcmds.c:693
     }
     {
         slev = Is_special(u.uz);
-        $c.__builtin___sprintf_chk(new $c.Ptr(dsc, 0), 0, 256, $c.lit("D:%d,L:%d"), u.uz.dnum, u.uz.dlevel);
+        $c.sprintf(new $c.Ptr(dsc, 0), $c.lit("D:%d,L:%d"), u.uz.dnum, u.uz.dlevel);
         /* [dungeon branch features currently omitted] */
         /* special level features */
         if (slev) {
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(dsc, 0)), 0, -1, $c.lit(" \"%s\""), new $c.Ptr(slev.proto, 0));
+            $c.sprintf(eos(new $c.Ptr(dsc, 0)), $c.lit(" \"%s\""), new $c.Ptr(slev.proto, 0));
             /* special level flags (note: dungeon.def doesn't set `maze'
                or `hell' for any specific levels so those never show up) */
             if (slev.flags.maze_like) {
-                $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" mazelike"), 256);
+                $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" mazelike"));
             }
             if (slev.flags.hellish) {
-                $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" hellish"), 256);
+                $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" hellish"));
             }
             if (slev.flags.town) {
-                $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" town"), 256);
+                $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" town"));
             }
             if (slev.flags.rogue_like) {
-                $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" roguelike"), 256);
+                $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" roguelike"));
             }
             /* alignment currently omitted to save space */
         }
         /* level features */
         if (svl.level.flags.nfountains) {
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(dsc, 0)), 0, -1, $c.lit(" %c:%d"), defsyms[S.fountain].sym, svl.level.flags.nfountains);
+            $c.sprintf(eos(new $c.Ptr(dsc, 0)), $c.lit(" %c:%d"), defsyms[S.fountain].sym, svl.level.flags.nfountains);
         }
         if (svl.level.flags.nsinks) {
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(dsc, 0)), 0, -1, $c.lit(" %c:%d"), defsyms[S.sink].sym, svl.level.flags.nsinks);
+            $c.sprintf(eos(new $c.Ptr(dsc, 0)), $c.lit(" %c:%d"), defsyms[S.sink].sym, svl.level.flags.nsinks);
         }
         if (svl.level.flags.has_vault) {
-            $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" vault"), 256);
+            $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" vault"));
         }
         if (svl.level.flags.has_shop) {
-            $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" shop"), 256);
+            $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" shop"));
         }
         if (svl.level.flags.has_temple) {
-            $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" temple"), 256);
+            $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" temple"));
         }
         if (svl.level.flags.has_court) {
-            $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" throne"), 256);
+            $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" throne"));
         }
         if (svl.level.flags.has_zoo) {
-            $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" zoo"), 256);
+            $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" zoo"));
         }
         if (svl.level.flags.has_morgue) {
-            $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" morgue"), 256);
+            $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" morgue"));
         }
         if (svl.level.flags.has_barracks) {
-            $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" barracks"), 256);
+            $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" barracks"));
         }
         if (svl.level.flags.has_beehive) {
-            $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" hive"), 256);
+            $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" hive"));
         }
         if (svl.level.flags.has_swamp) {
-            $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" swamp"), 256);
+            $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" swamp"));
         }
         /* level flags */
         if (svl.level.flags.noteleport) {
-            $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" noTport"), 256);
+            $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" noTport"));
         }
         if (svl.level.flags.hardfloor) {
-            $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" noDig"), 256);
+            $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" noDig"));
         }
         if (svl.level.flags.nommap) {
-            $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" noMMap"), 256);
+            $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" noMMap"));
         }
         if (!svl.level.flags.hero_memory) {
-            $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" noMem"), 256);
+            $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" noMem"));
         }
         if (svl.level.flags.shortsighted) {
-            $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" shortsight"), 256);
+            $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" shortsight"));
         }
         if (svl.level.flags.graveyard) {
-            $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" graveyard"), 256);
+            $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" graveyard"));
         }
         if (svl.level.flags.is_maze_lev) {
-            $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" maze"), 256);
+            $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" maze"));
         }
         if (svl.level.flags.is_cavernous_lev) {
-            $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" cave"), 256);
+            $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" cave"));
         }
         if (svl.level.flags.arboreal) {
-            $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" tree"), 256);
+            $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" tree"));
         }
         if (Sokoban()) {
-            $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" sokoban-rules"), 256);
+            $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" sokoban-rules"));
         }
         /* non-flag info; probably should include dungeon branching
            checks (extra stairs and magic portals) here */
         if (Invocation_lev(u.uz)) {
-            $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" invoke"), 256);
+            $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" invoke"));
         }
         if (On_W_tower_level(u.uz)) {
-            $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" tower"), 256);
+            $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" tower"));
         }
         /* append a branch identifier for completeness' sake */
         if (u.uz.dnum === 0) {
-            $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" dungeon"), 256);
+            $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" dungeon"));
         } else if (u.uz.dnum === svd.dungeon_topology.d_mines_dnum) {
-            $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" mines"), 256);
+            $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" mines"));
         } else if (In_sokoban(u.uz)) {
-            $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" sokoban"), 256);
+            $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" sokoban"));
         } else if (u.uz.dnum === svd.dungeon_topology.d_quest_dnum) {
-            $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" quest"), 256);
+            $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" quest"));
         } else if ((svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level)) {
-            $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" ludios"), 256);
+            $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" ludios"));
         } else if (u.uz.dnum === 1) {
-            $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" gehennom"), 256);
+            $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" gehennom"));
         } else if (u.uz.dnum === svd.dungeon_topology.d_tower_dnum) {
-            $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" vlad"), 256);
+            $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" vlad"));
         } else if (In_endgame(u.uz)) {
-            $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" endgame"), 256);
+            $c.strcat(new $c.Ptr(dsc, 0), $c.lit(" endgame"));
         } else {
             /* somebody's added a dungeon branch we're not expecting */
             brname = new $c.Ptr(svd.dungeons[u.uz.dnum].dname, 0);
@@ -825,7 +825,7 @@ export async function wiz_map_levltyp() {   // wizcmds.c:693
             if (!strncmpi(brname, $c.lit("the "), 4)) {
                 brname = brname.add(4);
             }
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(dsc, 0)), 0, -1, $c.lit(" %s"), brname);
+            $c.sprintf(eos(new $c.Ptr(dsc, 0)), $c.lit(" %s"), brname);
         }
         /* limit the line length to map width */
         if ($c.strlen(new $c.Ptr(dsc, 0)) >= COLNO) {
@@ -856,7 +856,7 @@ export async function wiz_levltyp_legend() {   // wizcmds.c:841
             dsc = levltyp[j];
             /* same int-to-char conversion as wiz_map_levltyp() */
             c = !dsc.get(0) ? 32 : !$c.strncmp(dsc, $c.lit("unreachable"), 11) ? 42 : j < 10 ? 48 + j | 0 : j < 36 ? (97 + j | 0) - 10 | 0 : (65 + j | 0) - 36 | 0;
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, fmt, c, dsc);
+            $c.sprintf(eos(new $c.Ptr(buf, 0)), fmt, c, dsc);
             if (j > i) {
                 await putstr()(win, 0, new $c.Ptr(buf, 0));
                 new $c.Ptr(buf, 0).set(0, 0);
@@ -933,7 +933,7 @@ export async function wiz_intrinsic() {   // wizcmds.c:949
         await start_menu()(win, MENU.BEHAVE_STANDARD);
         if (iflags.cmdassist) {
             /* start menu with a subtitle */
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("[Precede any selection with a count to increment by other than %d.]"), DEFAULT_TIMEOUT_INCR);
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("[Precede any selection with a count to increment by other than %d.]"), DEFAULT_TIMEOUT_INCR);
             await add_menu_str(win, new $c.Ptr(buf, 0));
         }
         for (i = 0; (propname = property_by_index(i, new $c.Ptr(p, 0))) !== null; i = i + 1 | 0) {
@@ -953,9 +953,9 @@ export async function wiz_intrinsic() {   // wizcmds.c:949
             any.a_int = i + 1 | 0;   /* +1: avoid 0 */
             oldtimeout = $c.and64(u.uprops[p[0]].intrinsic, TIMEOUT);
             if (oldtimeout) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%-27s [%li]"), propname, oldtimeout);
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%-27s [%li]"), propname, oldtimeout);
             } else {
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s"), propname);
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s"), propname);
             }
             await add_menu(win, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
         }
@@ -999,18 +999,18 @@ export async function wiz_intrinsic() {   // wizcmds.c:949
                         await make_sick(newtimeout, new $c.Ptr(wiz_intrinsic$wizintrinsic, 0), TRUE, typ);
                         break;
                     case SLIMED:
-                        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(wiz_intrinsic$fmt, 0), !u.uprops[SLIMED].intrinsic ? $c.lit("") : $c.lit(" still"), $c.lit("turning into slime"));
+                        $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(wiz_intrinsic$fmt, 0), !u.uprops[SLIMED].intrinsic ? $c.lit("") : $c.lit(" still"), $c.lit("turning into slime"));
                         await make_slimed(newtimeout, new $c.Ptr(buf, 0));
                         break;
                     case STONED:
-                        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(wiz_intrinsic$fmt, 0), !u.uprops[STONED].intrinsic ? $c.lit("") : $c.lit(" still"), $c.lit("turning into stone"));
+                        $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(wiz_intrinsic$fmt, 0), !u.uprops[STONED].intrinsic ? $c.lit("") : $c.lit(" still"), $c.lit("turning into stone"));
                         await make_stoned(newtimeout, new $c.Ptr(buf, 0), KILLED.BY, new $c.Ptr(wiz_intrinsic$wizintrinsic, 0));
                         break;
                     case STUNNED:
                         await make_stunned(newtimeout, TRUE);
                         break;
                     case VOMITING:
-                        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(wiz_intrinsic$fmt, 0), !u.uprops[VOMITING].intrinsic ? $c.lit("") : $c.lit(" still"), $c.lit("vomiting"));
+                        $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(wiz_intrinsic$fmt, 0), !u.uprops[VOMITING].intrinsic ? $c.lit("") : $c.lit(" still"), $c.lit("vomiting"));
                         await make_vomiting(newtimeout, FALSE);
                         await pline1(new $c.Ptr(buf, 0));
                         break;
@@ -1105,7 +1105,7 @@ async function obj_chain(win, src, chain, force, total_count, total_size) {   //
     if (count[0] || size[0] || force) {
         total_count.set(0, $c.add64(total_count.get(0), count[0]));
         total_size.set(0, $c.add64(total_size.get(0), size[0]));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(template, 0), src, count[0], size[0]);
+        $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(template, 0), src, count[0], size[0]);
         await putstr()(win, 0, new $c.Ptr(buf, 0));
     }
 }
@@ -1119,7 +1119,7 @@ async function mon_invent_chain(win, src, chain, total_count, total_size) {   //
     if (count[0] || size[0]) {
         total_count.set(0, $c.add64(total_count.get(0), count[0]));
         total_size.set(0, $c.add64(total_size.get(0), size[0]));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(template, 0), src, count[0], size[0]);
+        $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(template, 0), src, count[0], size[0]);
         await putstr()(win, 0, new $c.Ptr(buf, 0));
     }
 }
@@ -1142,7 +1142,7 @@ async function contained_stats(win, src, total_count, total_size) {   // wizcmds
     if (count[0] || size[0]) {
         total_count.set(0, $c.add64(total_count.get(0), count[0]));
         total_size.set(0, $c.add64(total_size.get(0), size[0]));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(template, 0), src, count[0], size[0]);
+        $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(template, 0), src, count[0], size[0]);
         await putstr()(win, 0, new $c.Ptr(buf, 0));
     }
 }
@@ -1191,7 +1191,7 @@ async function mon_chain(win, src, chain, force, total_count, total_size) {   //
     if (count || size || force) {
         total_count.set(0, $c.add64(total_count.get(0), count));
         total_size.set(0, $c.add64(total_size.get(0), size));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(template, 0), src, count, size);
+        $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(template, 0), src, count, size);
         await putstr()(win, 0, new $c.Ptr(buf, 0));
     }
 }
@@ -1210,21 +1210,21 @@ async function misc_stats(win, total_count, total_size) {   // wizcmds.c:1284
     }
     total_count.set(0, $c.add64(total_count.get(0), count[0]));
     total_size.set(0, $c.add64(total_size.get(0), size[0]));
-    $c.__builtin___sprintf_chk(new $c.Ptr(hdrbuf, 0), 0, 128, $c.lit("traps, size %ld"), 32);
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(template, 0), new $c.Ptr(hdrbuf, 0), count[0], size[0]);
+    $c.sprintf(new $c.Ptr(hdrbuf, 0), $c.lit("traps, size %ld"), 32);
+    $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(template, 0), new $c.Ptr(hdrbuf, 0), count[0], size[0]);
     await putstr()(win, 0, new $c.Ptr(buf, 0));
     count[0] = size[0] = 0;
     engr_stats($c.lit("engravings, size %ld+text"), new $c.Ptr(hdrbuf, 0), new $c.Ptr(count, 0), new $c.Ptr(size, 0));
     total_count.set(0, $c.add64(total_count.get(0), count[0]));
     total_size.set(0, $c.add64(total_size.get(0), size[0]));
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(template, 0), new $c.Ptr(hdrbuf, 0), count[0], size[0]);
+    $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(template, 0), new $c.Ptr(hdrbuf, 0), count[0], size[0]);
     await putstr()(win, 0, new $c.Ptr(buf, 0));
     count[0] = size[0] = 0;
     light_stats($c.lit("light sources, size %ld"), new $c.Ptr(hdrbuf, 0), new $c.Ptr(count, 0), new $c.Ptr(size, 0));
     if (count[0] || size[0]) {
         total_count.set(0, $c.add64(total_count.get(0), count[0]));
         total_size.set(0, $c.add64(total_size.get(0), size[0]));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(template, 0), new $c.Ptr(hdrbuf, 0), count[0], size[0]);
+        $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(template, 0), new $c.Ptr(hdrbuf, 0), count[0], size[0]);
         await putstr()(win, 0, new $c.Ptr(buf, 0));
     }
     count[0] = size[0] = 0;
@@ -1232,7 +1232,7 @@ async function misc_stats(win, total_count, total_size) {   // wizcmds.c:1284
     if (count[0] || size[0]) {
         total_count.set(0, $c.add64(total_count.get(0), count[0]));
         total_size.set(0, $c.add64(total_size.get(0), size[0]));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(template, 0), new $c.Ptr(hdrbuf, 0), count[0], size[0]);
+        $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(template, 0), new $c.Ptr(hdrbuf, 0), count[0], size[0]);
         await putstr()(win, 0, new $c.Ptr(buf, 0));
     }
     count[0] = size[0] = 0;
@@ -1243,8 +1243,8 @@ async function misc_stats(win, total_count, total_size) {   // wizcmds.c:1284
     if (count[0] || size[0]) {
         total_count.set(0, $c.add64(total_count.get(0), count[0]));
         total_size.set(0, $c.add64(total_size.get(0), size[0]));
-        $c.__builtin___sprintf_chk(new $c.Ptr(hdrbuf, 0), 0, 128, $c.lit("shop damage, size %ld"), 32);
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(template, 0), new $c.Ptr(hdrbuf, 0), count[0], size[0]);
+        $c.sprintf(new $c.Ptr(hdrbuf, 0), $c.lit("shop damage, size %ld"), 32);
+        $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(template, 0), new $c.Ptr(hdrbuf, 0), count[0], size[0]);
         await putstr()(win, 0, new $c.Ptr(buf, 0));
     }
     count[0] = size[0] = 0;
@@ -1252,7 +1252,7 @@ async function misc_stats(win, total_count, total_size) {   // wizcmds.c:1284
     if (count[0] || size[0]) {
         total_count.set(0, $c.add64(total_count.get(0), count[0]));
         total_size.set(0, $c.add64(total_size.get(0), size[0]));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(template, 0), new $c.Ptr(hdrbuf, 0), count[0], size[0]);
+        $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(template, 0), new $c.Ptr(hdrbuf, 0), count[0], size[0]);
         await putstr()(win, 0, new $c.Ptr(buf, 0));
     }
     count[0] = size[0] = 0;
@@ -1263,8 +1263,8 @@ async function misc_stats(win, total_count, total_size) {   // wizcmds.c:1284
     if (count[0] || size[0]) {
         total_count.set(0, $c.add64(total_count.get(0), count[0]));
         total_size.set(0, $c.add64(total_size.get(0), size[0]));
-        $c.__builtin___sprintf_chk(new $c.Ptr(hdrbuf, 0), 0, 128, $c.lit("delayed killer%s, size %ld"), count[0] === 1 ? $c.lit("") : $c.lit("s"), 272);
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(template, 0), new $c.Ptr(hdrbuf, 0), count[0], size[0]);
+        $c.sprintf(new $c.Ptr(hdrbuf, 0), $c.lit("delayed killer%s, size %ld"), count[0] === 1 ? $c.lit("") : $c.lit("s"), 272);
+        $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(template, 0), new $c.Ptr(hdrbuf, 0), count[0], size[0]);
         await putstr()(win, 0, new $c.Ptr(buf, 0));
     }
     count[0] = size[0] = 0;
@@ -1275,8 +1275,8 @@ async function misc_stats(win, total_count, total_size) {   // wizcmds.c:1284
     if (count[0] || size[0]) {
         total_count.set(0, $c.add64(total_count.get(0), count[0]));
         total_size.set(0, $c.add64(total_size.get(0), size[0]));
-        $c.__builtin___sprintf_chk(new $c.Ptr(hdrbuf, 0), 0, 128, $c.lit("bones history, size %ld"), 184);
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(template, 0), new $c.Ptr(hdrbuf, 0), count[0], size[0]);
+        $c.sprintf(new $c.Ptr(hdrbuf, 0), $c.lit("bones history, size %ld"), 184);
+        $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(template, 0), new $c.Ptr(hdrbuf, 0), count[0], size[0]);
         await putstr()(win, 0, new $c.Ptr(buf, 0));
     }
     count[0] = size[0] = 0;
@@ -1289,8 +1289,8 @@ async function misc_stats(win, total_count, total_size) {   // wizcmds.c:1284
     if (count[0] || size[0]) {
         total_count.set(0, $c.add64(total_count.get(0), count[0]));
         total_size.set(0, $c.add64(total_size.get(0), size[0]));
-        $c.__builtin___strcpy_chk(new $c.Ptr(hdrbuf, 0), $c.lit("object type names, text"), 128);
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(template, 0), new $c.Ptr(hdrbuf, 0), count[0], size[0]);
+        $c.strcpy(new $c.Ptr(hdrbuf, 0), $c.lit("object type names, text"));
+        $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(template, 0), new $c.Ptr(hdrbuf, 0), count[0], size[0]);
         await putstr()(win, 0, new $c.Ptr(buf, 0));
     }
 }
@@ -1410,9 +1410,9 @@ async function list_migrating_mons(nextlevl) {   // wizcmds.c:1506
         strkitten(here ? new $c.Ptr(prmpt, 0) : new $c.Ptr(xtra, 0), 99);
         strkitten(nxtlv ? new $c.Ptr(prmpt, 0) : new $c.Ptr(xtra, 0), 110);
         strkitten(other ? new $c.Ptr(prmpt, 0) : new $c.Ptr(xtra, 0), 111);
-        $c.__builtin___strcat_chk(new $c.Ptr(prmpt, 0), $c.lit("a q"), 10);
+        $c.strcat(new $c.Ptr(prmpt, 0), $c.lit("a q"));
         if (new $c.Ptr(xtra, 0).get(0)) {
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(prmpt, 0)), 0, -1, $c.lit("%c%s"), 27, new $c.Ptr(xtra, 0));
+            $c.sprintf(eos(new $c.Ptr(prmpt, 0)), $c.lit("%c%s"), 27, new $c.Ptr(xtra, 0));
         }
         c = await yn_function($c.lit("List which?"), new $c.Ptr(prmpt, 0), 113, TRUE);
         n = (c === 99 ? here : c === 110 ? nxtlv : c === 111 ? other : c === 97 ? (here + nxtlv | 0) + other | 0 : 0) >>> 0;
@@ -1422,10 +1422,10 @@ async function list_migrating_mons(nextlevl) {   // wizcmds.c:1506
                 case 99:
                 case 110:
                 case 111:
-                    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Monster%s migrating to %s:"), n === 1 ? $c.lit("") : $c.lit("s"), c === 99 ? $c.lit("current level") : c === 110 ? $c.lit("next level") : $c.lit("'other' levels"));
+                    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Monster%s migrating to %s:"), n === 1 ? $c.lit("") : $c.lit("s"), c === 99 ? $c.lit("current level") : c === 110 ? $c.lit("next level") : $c.lit("'other' levels"));
                     break;
                 default:
-                    $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("All migrating monsters:"), 256);
+                    $c.strcpy(new $c.Ptr(buf, 0), $c.lit("All migrating monsters:"));
                     break;
             }
             await putstr()(win, 0, new $c.Ptr(buf, 0));
@@ -1456,20 +1456,20 @@ async function list_migrating_mons(nextlevl) {   // wizcmds.c:1506
             }
             /* sort elements [0] through [n-1] */
             for (n = 0; (mtmp = marray.get(n)) !== null; n = n + 1 >>> 0) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("  %s"), minimal_monnam(mtmp, FALSE));
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("  %s"), minimal_monnam(mtmp, FALSE));
                 /* minimal_monnam() appends map coordinates; strip that */
                 strsubst(new $c.Ptr(buf, 0), $c.lit(" <0,0>"), $c.lit(""));
                 if (has_mgivenname(mtmp)) {   /* if mtmp is named, include that */
-                    $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" named %s"), mtmp.mextra.mgivenname);
+                    $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit(" named %s"), mtmp.mextra.mgivenname);
                 }
                 if (c === 111 || c === 97) {
-                    $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" to %d:%d"), mtmp.mux, mtmp.muy);
+                    $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit(" to %d:%d"), mtmp.mux, mtmp.muy);
                 }
                 xyloc = mtmp.mtrack[0].x;   /* (for legibility) */
                 if (xyloc === MIGR.EXACT_XY) {
                     x = mtmp.mtrack[1].x;
                     y = mtmp.mtrack[1].y;
-                    $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" at <%d,%d>"), x, y);
+                    $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit(" at <%d,%d>"), x, y);
                 }
                 await putstr()(win, 0, new $c.Ptr(buf, 0));
             }
@@ -1490,7 +1490,7 @@ export async function wiz_show_stats() {   // wizcmds.c:1616
     await putstr()(win, 0, $c.lit("Current memory statistics:"));
     total_obj_count[0] = total_obj_size[0] = 0;
     await putstr()(win, 0, new $c.Ptr(stats_hdr, 0));
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("  Objects, base size %ld"), 112);
+    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("  Objects, base size %ld"), 112);
     await putstr()(win, 0, new $c.Ptr(buf, 0));
     await obj_chain(win, $c.lit("invent"), gi.invent, TRUE, new $c.Ptr(total_obj_count, 0), new $c.Ptr(total_obj_size, 0));
     await obj_chain(win, $c.lit("fobj"), svl.level.objlist, TRUE, new $c.Ptr(total_obj_count, 0), new $c.Ptr(total_obj_size, 0));
@@ -1501,11 +1501,11 @@ export async function wiz_show_stats() {   // wizcmds.c:1616
     await mon_invent_chain(win, $c.lit("migrating minvent"), gm.migrating_mons, new $c.Ptr(total_obj_count, 0), new $c.Ptr(total_obj_size, 0));
     await contained_stats(win, $c.lit("contained"), new $c.Ptr(total_obj_count, 0), new $c.Ptr(total_obj_size, 0));
     await putstr()(win, 0, new $c.Ptr(stats_sep, 0));
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(template, 0), $c.lit("  Obj total"), total_obj_count[0], total_obj_size[0]);
+    $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(template, 0), $c.lit("  Obj total"), total_obj_count[0], total_obj_size[0]);
     await putstr()(win, 0, new $c.Ptr(buf, 0));
     total_mon_count[0] = total_mon_size[0] = 0;
     await putstr()(win, 0, $c.lit(""));
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("  Monsters, base size %ld"), 192);
+    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("  Monsters, base size %ld"), 192);
     await putstr()(win, 0, new $c.Ptr(buf, 0));
     await mon_chain(win, $c.lit("fmon"), svl.level.monlist, TRUE, new $c.Ptr(total_mon_count, 0), new $c.Ptr(total_mon_size, 0));
     await mon_chain(win, $c.lit("migrating"), gm.migrating_mons, FALSE, new $c.Ptr(total_mon_count, 0), new $c.Ptr(total_mon_size, 0));
@@ -1515,25 +1515,25 @@ export async function wiz_show_stats() {   // wizcmds.c:1616
         await mon_chain(win, $c.lit("mydogs"), gm.mydogs, FALSE, new $c.Ptr(total_mon_count, 0), new $c.Ptr(total_mon_size, 0));
     }
     await putstr()(win, 0, new $c.Ptr(stats_sep, 0));
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(template, 0), $c.lit("  Mon total"), total_mon_count[0], total_mon_size[0]);
+    $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(template, 0), $c.lit("  Mon total"), total_mon_count[0], total_mon_size[0]);
     await putstr()(win, 0, new $c.Ptr(buf, 0));
     total_ovr_count[0] = total_ovr_size[0] = 0;
     await putstr()(win, 0, $c.lit(""));
     await putstr()(win, 0, $c.lit("  Overview"));
     await overview_stats(win, new $c.Ptr(template, 0), new $c.Ptr(total_ovr_count, 0), new $c.Ptr(total_ovr_size, 0));
     await putstr()(win, 0, new $c.Ptr(stats_sep, 0));
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(template, 0), $c.lit("  Over total"), total_ovr_count[0], total_ovr_size[0]);
+    $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(template, 0), $c.lit("  Over total"), total_ovr_count[0], total_ovr_size[0]);
     await putstr()(win, 0, new $c.Ptr(buf, 0));
     total_misc_count[0] = total_misc_size[0] = 0;
     await putstr()(win, 0, $c.lit(""));
     await putstr()(win, 0, $c.lit("  Miscellaneous"));
     await misc_stats(win, new $c.Ptr(total_misc_count, 0), new $c.Ptr(total_misc_size, 0));
     await putstr()(win, 0, new $c.Ptr(stats_sep, 0));
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(template, 0), $c.lit("  Misc total"), total_misc_count[0], total_misc_size[0]);
+    $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(template, 0), $c.lit("  Misc total"), total_misc_count[0], total_misc_size[0]);
     await putstr()(win, 0, new $c.Ptr(buf, 0));
     await putstr()(win, 0, $c.lit(""));
     await putstr()(win, 0, new $c.Ptr(stats_sep, 0));
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(template, 0), $c.lit("  Grand total"), $c.add64($c.add64($c.add64(total_obj_count[0], total_mon_count[0]), total_ovr_count[0]), total_misc_count[0]), $c.add64($c.add64($c.add64(total_obj_size[0], total_mon_size[0]), total_ovr_size[0]), total_misc_size[0]));
+    $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(template, 0), $c.lit("  Grand total"), $c.add64($c.add64($c.add64(total_obj_count[0], total_mon_count[0]), total_ovr_count[0]), total_misc_count[0]), $c.add64($c.add64($c.add64(total_obj_size[0], total_mon_size[0]), total_ovr_size[0]), total_misc_size[0]));
     await putstr()(win, 0, new $c.Ptr(buf, 0));
     await display_nhwindow()(win, FALSE);
     await destroy_nhwindow()(win);
@@ -1556,14 +1556,14 @@ export async function wiz_display_macros() {   // wizcmds.c:1705
                 if (!($t1 = trouble, trouble = $t1 + 1 | 0, $t1)) {
                     await putstr()(win, 0, new $c.Ptr(wiz_display_macros$display_issues, 0));
                 }
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("glyph_is_cmap() / glyph_to_cmap(glyph=%d) sync failure, returned NO_GLYPH (%d)"), glyph, test);
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("glyph_is_cmap() / glyph_to_cmap(glyph=%d) sync failure, returned NO_GLYPH (%d)"), glyph, test);
                 await putstr()(win, 0, new $c.Ptr(buf, 0));
             }
             if (glyph_is_cmap_zap(glyph) && !(test >= S.vbeam && test <= S.rslant)) {
                 if (!($t2 = trouble, trouble = $t2 + 1 | 0, $t2)) {
                     await putstr()(win, 0, new $c.Ptr(wiz_display_macros$display_issues, 0));
                 }
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("glyph_is_cmap_zap(glyph=%d) returned non-zap cmap %d"), glyph, test);
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("glyph_is_cmap_zap(glyph=%d) returned non-zap cmap %d"), glyph, test);
                 await putstr()(win, 0, new $c.Ptr(buf, 0));
             }
             /* check against defsyms array subscripts */
@@ -1571,7 +1571,7 @@ export async function wiz_display_macros() {   // wizcmds.c:1705
                 if (!($t3 = trouble, trouble = $t3 + 1 | 0, $t3)) {
                     await putstr()(win, 0, new $c.Ptr(wiz_display_macros$display_issues, 0));
                 }
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("glyph_to_cmap(glyph=%d) returns %d exceeds defsyms[%d] bounds (MAX_GLYPH = %d)"), glyph, test, 106, max_glyph);
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("glyph_to_cmap(glyph=%d) returns %d exceeds defsyms[%d] bounds (MAX_GLYPH = %d)"), glyph, test, 106, max_glyph);
                 await putstr()(win, 0, new $c.Ptr(buf, 0));
             }
         }
@@ -1583,7 +1583,7 @@ export async function wiz_display_macros() {   // wizcmds.c:1705
                 if (!($t4 = trouble, trouble = $t4 + 1 | 0, $t4)) {
                     await putstr()(win, 0, new $c.Ptr(wiz_display_macros$display_issues, 0));
                 }
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("glyph_to_mon(glyph=%d) returns %d exceeds mons[%d] bounds"), glyph, test, NUMMONS);
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("glyph_to_mon(glyph=%d) returns %d exceeds mons[%d] bounds"), glyph, test, NUMMONS);
                 await putstr()(win, 0, new $c.Ptr(buf, 0));
             }
         }
@@ -1595,7 +1595,7 @@ export async function wiz_display_macros() {   // wizcmds.c:1705
                 if (!($t5 = trouble, trouble = $t5 + 1 | 0, $t5)) {
                     await putstr()(win, 0, new $c.Ptr(wiz_display_macros$display_issues, 0));
                 }
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("glyph_to_obj(glyph=%d) returns %d exceeds objects[%d] bounds"), glyph, test, NUM_OBJECTS);
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("glyph_to_obj(glyph=%d) returns %d exceeds objects[%d] bounds"), glyph, test, NUM_OBJECTS);
                 await putstr()(win, 0, new $c.Ptr(buf, 0));
             }
         }
@@ -1652,7 +1652,7 @@ export async function wiz_mon_diff() {   // wizcmds.c:1790
 export async function wiz_objprobs() {   // wizcmds.c:1832
     let win = 0, buf = new Int8Array(256), probsum = new Int32Array(18), otyp = 0, oclass = 0;
     oclass = objects[FIRST_OBJECT].oc_class;
-    $c.__builtin___memset_chk(new $c.Ptr(probsum, 0), 0, 72, 72);
+    $c.memset(new $c.Ptr(probsum, 0), 0, 72);
     for (otyp = FIRST_OBJECT; otyp < NUM_OBJECTS; otyp = otyp + 1 | 0) {
         probsum[objects[otyp].oc_class] = probsum[objects[otyp].oc_class] + objects[otyp].oc_prob | 0;
     }
@@ -1735,14 +1735,14 @@ export async function wiz_custom() {   // wizcmds.c:1934
         win = await create_nhwindow()(NHW.MENU);
         await start_menu()(win, MENU.BEHAVE_STANDARD);
         await add_menu_heading(win, $c.lit("    glyph  glyph identifier                             sym   clr customcolor unicode utf8"));
-        $c.__builtin___sprintf_chk(new $c.Ptr(bufa, 0), 0, 256, $c.lit("%s: colorcount=%ld %s"), new $c.Ptr(wiz_custom$wizcustom, 0), iflags.colorcount, gs.symset[PRIMARYSET].name ? gs.symset[PRIMARYSET].name : $c.lit("default"));
+        $c.sprintf(new $c.Ptr(bufa, 0), $c.lit("%s: colorcount=%ld %s"), new $c.Ptr(wiz_custom$wizcustom, 0), iflags.colorcount, gs.symset[PRIMARYSET].name ? gs.symset[PRIMARYSET].name : $c.lit("default"));
         if (gc.currentgraphics === PRIMARYSET && gs.symset[PRIMARYSET].name) {
-            $c.__builtin___strcat_chk(new $c.Ptr(bufa, 0), $c.lit(", active"), 256);
+            $c.strcat(new $c.Ptr(bufa, 0), $c.lit(", active"));
         }
         if (gs.symset[PRIMARYSET].handling) {
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(bufa, 0)), 0, -1, $c.lit(", handler=%s"), known_handling[gs.symset[PRIMARYSET].handling]);
+            $c.sprintf(eos(new $c.Ptr(bufa, 0)), $c.lit(", handler=%s"), known_handling[gs.symset[PRIMARYSET].handling]);
         }
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s"), new $c.Ptr(bufa, 0));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s"), new $c.Ptr(bufa, 0));
         await wizcustom_glyphids(win);
         await end_menu()(win, new $c.Ptr(bufa, 0));
         n = await select_menu(win, PICK.NONE, new $c.Ptr(pick_list, 0));
@@ -1766,16 +1766,16 @@ export async function wizcustom_callback(win, glyphnum, id) {   // wizcmds.c:198
     if (win && id) {
         cgm = $c.relem(glyphmap, glyphnum);
         if (cgm.u || cgm.customcolor !== 0) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(bufa, 0), 0, 256, $c.lit("[%04d] %-44s"), glyphnum, id);
-            $c.__builtin___sprintf_chk(new $c.Ptr(bufb, 0), 0, 256, $c.lit("'\\%03d' %02d"), gs.showsyms[cgm.sym.symidx], cgm.sym.color);
-            $c.__builtin___sprintf_chk(new $c.Ptr(bufc, 0), 0, 256, $c.lit("%011lx"), cgm.customcolor);
+            $c.sprintf(new $c.Ptr(bufa, 0), $c.lit("[%04d] %-44s"), glyphnum, id);
+            $c.sprintf(new $c.Ptr(bufb, 0), $c.lit("'\\%03d' %02d"), gs.showsyms[cgm.sym.symidx], cgm.sym.color);
+            $c.sprintf(new $c.Ptr(bufc, 0), $c.lit("%011lx"), cgm.customcolor);
             bufu[0] = 0;
             if (cgm.u && cgm.u.utf8str) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(bufu, 0), 0, 256, $c.lit("U+%04lx"), cgm.u.utf32ch);
+                $c.sprintf(new $c.Ptr(bufu, 0), $c.lit("U+%04lx"), cgm.u.utf32ch);
                 cp = cgm.u.utf8str;
                 while (cp.get(0)) {
-                    $c.__builtin___sprintf_chk(new $c.Ptr(bufd, 0), 0, 256, $c.lit(" <%d>"), cp.get(0));
-                    $c.__builtin___strcat_chk(new $c.Ptr(bufu, 0), new $c.Ptr(bufd, 0), 256);
+                    $c.sprintf(new $c.Ptr(bufd, 0), $c.lit(" <%d>"), cp.get(0));
+                    $c.strcat(new $c.Ptr(bufu, 0), new $c.Ptr(bufd, 0));
                     cp = cp.add(1);
                 }
             }

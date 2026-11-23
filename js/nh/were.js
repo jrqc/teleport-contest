@@ -161,21 +161,21 @@ export async function were_summon(ptr, yours, visible, genbuf) {   // were.c:142
             case PM.HUMAN_WERERAT:
                 typ = rn2(3) ? PM.SEWER_RAT : rn2(3) ? PM.GIANT_RAT : PM.RABID_RAT;
                 if (genbuf) {
-                    $c.__builtin___strcpy_chk(genbuf, $c.lit("rat"), -1);
+                    $c.strcpy(genbuf, $c.lit("rat"));
                 }
                 break;
             case PM.WEREJACKAL:
             case PM.HUMAN_WEREJACKAL:
                 typ = rn2(7) ? PM.JACKAL : rn2(3) ? PM.COYOTE : PM.FOX;
                 if (genbuf) {
-                    $c.__builtin___strcpy_chk(genbuf, $c.lit("jackal"), -1);
+                    $c.strcpy(genbuf, $c.lit("jackal"));
                 }
                 break;
             case PM.WEREWOLF:
             case PM.HUMAN_WEREWOLF:
                 typ = rn2(5) ? PM.WOLF : rn2(2) ? PM.WARG : PM.WINTER_WOLF;
                 if (genbuf) {
-                    $c.__builtin___strcpy_chk(genbuf, $c.lit("wolf"), -1);
+                    $c.strcpy(genbuf, $c.lit("wolf"));
                 }
                 break;
             default:
@@ -202,7 +202,7 @@ export async function you_were() {   // were.c:192
     }
     if (controllable_poly) {
         /* `+4' => skip "were" prefix to get name of beast */
-        $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Do you want to change into %s?"), await an(mons[u.ulycn].pmnames[NEUTRAL].add(4)));
+        $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("Do you want to change into %s?"), await an(mons[u.ulycn].pmnames[NEUTRAL].add(4)));
         if (!await paranoid_query($c.i8(ParanoidWerechange()), new $c.Ptr(qbuf, 0))) {
             return;
         }

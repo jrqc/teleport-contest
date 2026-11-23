@@ -350,7 +350,7 @@ export function tre_tnfa_run_backtrack(tnfa, string, len, type, match_tags, efla
                 if (len > 2147483647) {
                     len = 2147483647;
                 }
-                $h.A($c.__builtin___memset_chk($h.P($fp + 8), 0, 128, -1));
+                $hl.memset($fp + 8, 0, 128);
                 /* TRE_MBSTATE */
                 if (!mem) {
                     return 12;
@@ -394,9 +394,9 @@ export function tre_tnfa_run_backtrack(tnfa, string, len, type, match_tags, efla
             case "retry":
                 $goto = null;   // retry:
                 {
-                    $h.A($c.__builtin___memset_chk($h.P(tags), 0, $c.mulu64($c.u64(num_tags), 16), -1));
+                    $hl.memset(tags, 0, $c.mulu64($c.u64(num_tags), 16));
                     if (match_tags) {
-                        $h.A($c.__builtin___memset_chk($h.P(match_tags), 0, $c.mulu64($c.u64(num_tags), 16), -1));
+                        $hl.memset(match_tags, 0, $c.mulu64($c.u64(num_tags), 16));
                     }
                     for (i = 0; i < $h.i32[(tnfa + 92) >>> 2]; i = i + 1 | 0) {
                         $h.i32[(states_seen + i * 4) >>> 2] = 0;
@@ -523,7 +523,7 @@ export function tre_tnfa_run_backtrack(tnfa, string, len, type, match_tags, efla
                             $h.stp(stack + 24, $h.u32[(trans_i + 8) >>> 2]);
                             $h.i32[(stack + 32) >>> 2] = $h.i32[(trans_i + 16) >>> 2];
                             $h.i32[(stack + 36) >>> 2] = $h.i32[$fp >>> 2];
-                            $hl.__builtin___memcpy_chk($h.u32[(stack + 40) >>> 2], tags, $c.mulu64($c.u64(num_tags), 16), -1);
+                            $hl.memcpy($h.u32[(stack + 40) >>> 2], tags, $c.mulu64($c.u64(num_tags), 16));
                             $h.copy(stack + 48, $fp + 8, 128);
                         } while (0, 0);
                         {
@@ -608,7 +608,7 @@ export function tre_tnfa_run_backtrack(tnfa, string, len, type, match_tags, efla
                                     /* TRE_DEBUG */
                                     match_eo = $c.i32(pos);
                                     if (match_tags) {
-                                        $hl.__builtin___memcpy_chk(match_tags, tags, $c.mulu64($c.u64(num_tags), 16), -1);
+                                        $hl.memcpy(match_tags, tags, $c.mulu64($c.u64(num_tags), 16));
                                     }
                                 }
                                 /* Our TNFAs never have transitions leaving from the final state,
@@ -859,7 +859,7 @@ export function tre_tnfa_run_backtrack(tnfa, string, len, type, match_tags, efla
                                             $h.stp(stack + 24, $h.u32[(trans_i + 8) >>> 2]);
                                             $h.i32[(stack + 32) >>> 2] = $h.i32[(trans_i + 16) >>> 2];
                                             $h.i32[(stack + 36) >>> 2] = $h.i32[$fp >>> 2];
-                                            $hl.__builtin___memcpy_chk($h.u32[(stack + 40) >>> 2], tags, $c.mulu64($c.u64(num_tags), 16), -1);
+                                            $hl.memcpy($h.u32[(stack + 40) >>> 2], tags, $c.mulu64($c.u64(num_tags), 16));
                                             $h.copy(stack + 48, $fp + 8, 128);
                                         } while (0, 0);
                                         {
@@ -903,7 +903,7 @@ export function tre_tnfa_run_backtrack(tnfa, string, len, type, match_tags, efla
                                         str_wide = $h.u32[(stack + 16) >>> 2];
                                         state = $h.u32[(stack + 24) >>> 2];
                                         $h.i32[$fp >>> 2] = $h.i32[(stack + 36) >>> 2];
-                                        $hl.__builtin___memcpy_chk(tags, $h.u32[(stack + 40) >>> 2], $c.mulu64($c.u64(num_tags), 16), -1);
+                                        $hl.memcpy(tags, $h.u32[(stack + 40) >>> 2], $c.mulu64($c.u64(num_tags), 16));
                                         $h.copy($fp + 8, stack + 48, 128);
                                         stack = $h.u32[(stack + 176) >>> 2];
                                     } while (0, 0);

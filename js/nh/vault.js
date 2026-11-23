@@ -77,7 +77,7 @@ export async function newegd(mtmp) {   // vault.c:23
     }
     if (!EGD(mtmp)) {
         $t2 = $c.asRec(await alloc(640), $T.egd, 640), mtmp.mextra.egd = $t2;
-        $c.__builtin___memset_chk(mtmp.mextra.egd, 0, 640, -1);
+        $c.memset(mtmp.mextra.egd, 0, 640);
         mtmp.mextra.egd.parentmid = mtmp.m_id;
     }
 }
@@ -891,7 +891,7 @@ export async function gd_move(grd) {   // vault.c:888
             if (egrd.fcend === 1) {
                 if (u_in_vault && (u_carry_gold || um_dist(grd.mx, grd.my, 1))) {
                     if (egrd.warncnt === 3 && !Deaf()) {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%sfollow me!"), u_carry_gold ? !umoney ? $c.lit("drop that hidden gold and ") : $c.lit("drop that gold and ") : $c.lit(""));
+                        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%sfollow me!"), u_carry_gold ? !umoney ? $c.lit("drop that hidden gold and ") : $c.lit("drop that gold and ") : $c.lit(""));
                         if (egrd.dropgoldcnt || !u_carry_gold) {
                             await verbalize($c.lit("I repeat, %s"), new $c.Ptr(buf, 0));
                         } else {
@@ -1168,7 +1168,7 @@ export async function paygd(silently) {   // vault.c:1205
             }
             gdx = svr.rooms[grd.mextra.egd.vroom].lx + rn2(2) | 0;
             gdy = svr.rooms[grd.mextra.egd.vroom].ly + rn2(2) | 0;
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("To Croesus: here's the gold recovered from %s the %s."), new $c.Ptr(svp.plname, 0), pmname($c.relem(mons, u.umonster), flags.female ? FEMALE : MALE));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("To Croesus: here's the gold recovered from %s the %s."), new $c.Ptr(svp.plname, 0), pmname($c.relem(mons, u.umonster), flags.female ? FEMALE : MALE));
             await make_grave($c.i16(gdx), $c.i16(gdy), new $c.Ptr(buf, 0));
         }
         for (coins = gi.invent; coins; coins = nextcoins) {

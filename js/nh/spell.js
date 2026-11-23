@@ -412,7 +412,7 @@ async function learn() {   // spell.c:356
         await deadbook(book);
         return 0;
     }
-    $c.__builtin___sprintf_chk(new $c.Ptr(splname, 0), 0, 256, objects[booktype].oc_name_known | 0 ? $c.lit("\"%s\"") : $c.lit("the \"%s\" spell"), obj_descr[objects[booktype].oc_name_idx].oc_name);
+    $c.sprintf(new $c.Ptr(splname, 0), objects[booktype].oc_name_known | 0 ? $c.lit("\"%s\"") : $c.lit("the \"%s\" spell"), obj_descr[objects[booktype].oc_name_idx].oc_name);
     for (i = 0; i < MAXSPELL; i = i + 1 | 0) {
         if (svs.spl_book[i].sp_id === booktype || svs.spl_book[i].sp_id === NO_SPELL) {
             break;
@@ -585,7 +585,7 @@ export async function study_book(spellbook) {   // spell.c:468
                 read_ability = (((ACURR(A.INT) + 4 | 0) + $c.div32(u.ulevel, 2) | 0) - Math.imul(2, objects[booktype].oc_oc2) | 0) + ($G.ublindf && $G.ublindf.otyp === LENSES ? 2 : 0) | 0;
                 /* only wizards know if a spell is too difficult */
                 if (gu.urole.mnum === PM.WIZARD && read_ability < 20 && !confused) {
-                    $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("This spellbook is %sdifficult to comprehend.  Continue?"), read_ability < 12 ? $c.lit("very ") : $c.lit(""));
+                    $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("This spellbook is %sdifficult to comprehend.  Continue?"), read_ability < 12 ? $c.lit("very ") : $c.lit(""));
                     if (await y_n(new $c.Ptr(qbuf, 0)) !== 121) {
                         spellbook.in_use = (FALSE) & 1;
                         return 1;
@@ -722,14 +722,14 @@ async function getspell(spell_no) {   // spell.c:715
     if (flags.menu_style === MENU.TRADITIONAL) {
         /* if we get here, we know there is at least 1 known spell */
         if (nspells === 1) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(lets, 0), $c.lit("a"), 256);
+            $c.strcpy(new $c.Ptr(lets, 0), $c.lit("a"));
         } else if (nspells < 27) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(lets, 0), 0, 256, $c.lit("a-%c"), (97 + nspells | 0) - 1 | 0);
+            $c.sprintf(new $c.Ptr(lets, 0), $c.lit("a-%c"), (97 + nspells | 0) - 1 | 0);
         } else if (nspells === 27) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(lets, 0), $c.lit("a-zA"), 256);
+            $c.strcpy(new $c.Ptr(lets, 0), $c.lit("a-zA"));
         } else {
             /* this assumes that there are at most 52 spells... */
-            $c.__builtin___sprintf_chk(new $c.Ptr(lets, 0), 0, 256, $c.lit("a-zA-%c"), (65 + nspells | 0) - 27 | 0);
+            $c.sprintf(new $c.Ptr(lets, 0), $c.lit("a-zA-%c"), (65 + nspells | 0) - 27 | 0);
         }
         nh_snprintf($c.lit("getspell"), 755, new $c.Ptr(qbuf, 0), 128, $c.lit("Cast which spell? [%s *?]"), new $c.Ptr(lets, 0));
         for (retry_limit = 0; ; retry_limit = retry_limit + 1 | 0) {
@@ -1292,7 +1292,7 @@ export async function spelleffects(spell_otyp, atme, force) {   // spell.c:1385
                     while ($t2 = n, n = $t2 - 1 | 0, $t2) {
                         if (!u.dx && !u.dy && !u.dz) {
                             if ((damage = await zapyourself(pseudo, TRUE)) !== 0) {
-                                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("zapped %sself with a spell"), genders[flags.female ? 1 : 0].him);
+                                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("zapped %sself with a spell"), genders[flags.female ? 1 : 0].him);
                                 await losehp(damage, new $c.Ptr(buf, 0), NO_KILLER_PREFIX);
                             }
                         } else {
@@ -1355,7 +1355,7 @@ export async function spelleffects(spell_otyp, atme, force) {   // spell.c:1385
                 }
                 if (!u.dx && !u.dy && !u.dz) {
                     if ((damage = await zapyourself(pseudo, TRUE)) !== 0) {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(buf$2, 0), 0, 256, $c.lit("zapped %sself with a spell"), genders[flags.female ? 1 : 0].him);
+                        $c.sprintf(new $c.Ptr(buf$2, 0), $c.lit("zapped %sself with a spell"), genders[flags.female ? 1 : 0].him);
                         if (physical_damage) {
                             damage = Maybe_Half_Phys(damage);
                         }
@@ -1802,7 +1802,7 @@ export async function dovspell() {   // spell.c:2021
                     await sortspells();
                 }
             } else {
-                $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Reordering spells; swap '%c' with"), $c.i8(splnum[0] < 26 ? 97 + splnum[0] | 0 : (65 + splnum[0] | 0) - 26 | 0));
+                $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("Reordering spells; swap '%c' with"), $c.i8(splnum[0] < 26 ? 97 + splnum[0] | 0 : (65 + splnum[0] | 0) - 26 | 0));
                 if (!await dospellmenu(new $c.Ptr(qbuf, 0), splnum[0], new $c.Ptr(othnum, 0))) {
                     break;
                 }
@@ -1852,23 +1852,23 @@ async function dospellmenu(prompt, splaction, spell_no) {   // spell.c:2075
      * need to be subtracted.
      */
     if (!iflags.menu_tab_sep) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%-20s Level %-12s Fail Retention"), splaction === SPELLMENU_DUMP ? $c.lit("") : $c.lit("    "), $c.lit("Name"), $c.lit("Category"));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s%-20s Level %-12s Fail Retention"), splaction === SPELLMENU_DUMP ? $c.lit("") : $c.lit("    "), $c.lit("Name"), $c.lit("Category"));
         fmt = $c.lit("%-20s  %2d   %-12s %3d%% %9s");
         sep = 32;
     } else {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Name\tLevel\tCategory\tFail\tRetention"));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Name\tLevel\tCategory\tFail\tRetention"));
         fmt = $c.lit("%s\t%-d\t%s\t%-d%%\t%s");
         sep = 9;
     }
     if (wizard()) {
-        $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%c%6s"), sep, $c.lit("turns"));
+        $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("%c%6s"), sep, $c.lit("turns"));
     }
     await add_menu_heading(tmpwin, new $c.Ptr(buf, 0));
     for (i = 0; i < MAXSPELL && svs.spl_book[i].sp_id !== NO_SPELL; i = i + 1 | 0) {
         splnum = !gs.spl_orderindx ? i : gs.spl_orderindx.get(i);
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, fmt, obj_descr[objects[svs.spl_book[splnum].sp_id].oc_name_idx].oc_name, svs.spl_book[splnum].sp_lev, await spelltypemnemonic(spell_skilltype(svs.spl_book[splnum].sp_id)), 100 - await percent_success(splnum) | 0, spellretention(splnum, new $c.Ptr(retentionbuf, 0)));
+        $c.sprintf(new $c.Ptr(buf, 0), fmt, obj_descr[objects[svs.spl_book[splnum].sp_id].oc_name_idx].oc_name, svs.spl_book[splnum].sp_lev, await spelltypemnemonic(spell_skilltype(svs.spl_book[splnum].sp_id)), 100 - await percent_success(splnum) | 0, spellretention(splnum, new $c.Ptr(retentionbuf, 0)));
         if (wizard()) {
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%c%6d"), sep, svs.spl_book[i].sp_know);
+            $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("%c%6d"), sep, svs.spl_book[i].sp_know);
         }
         any.a_int = splnum + 1 | 0;   /* must be non-zero */
         await add_menu(tmpwin, nul_glyphinfo, any, spellet(splnum), 0, ATR.NONE, clr, new $c.Ptr(buf, 0), splnum === splaction ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
@@ -2024,10 +2024,10 @@ function spellretention(idx, outbuf) {   // spell.c:2295
     outbuf.set(0, 0);   /* lint suppression */
     if (turnsleft < 1) {
         /* spell has expired; hero can't successfully cast it anymore */
-        $c.__builtin___strcpy_chk(outbuf, $c.lit("(gone)"), -1);
+        $c.strcpy(outbuf, $c.lit("(gone)"));
     } else if (turnsleft >= KEEN) {
         /* full retention, first turn or immediately after reading book */
-        $c.__builtin___strcpy_chk(outbuf, $c.lit("100%"), -1);
+        $c.strcpy(outbuf, $c.lit("100%"));
     } else {
         /*
          * Retention is displayed as a range of percentages of
@@ -2047,7 +2047,7 @@ function spellretention(idx, outbuf) {   // spell.c:2295
         accuracy = skill === P.EXPERT ? 2 : skill === P.SKILLED ? 5 : skill === P.BASIC ? 10 : 25;
         /* round up to the high end of this range */
         percent = $c.mul64(accuracy, $c.add64($c.div64($c.sub64(percent, 1), accuracy), 1));
-        $c.__builtin___sprintf_chk(outbuf, 0, -1, $c.lit("%ld%%-%ld%%"), $c.add64($c.sub64(percent, accuracy), 1), percent);
+        $c.sprintf(outbuf, $c.lit("%ld%%-%ld%%"), $c.add64($c.sub64(percent, accuracy), 1), percent);
     }
     return outbuf;
 }

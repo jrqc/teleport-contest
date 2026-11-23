@@ -346,7 +346,7 @@ export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:
     if (olet === MON_EXPLODE && !you_exploding) {
         /* when explode() is called recursively, svk.killer.name might change
            so retain a copy of the current value for this explosion */
-        str = $c.__builtin___strcpy_chk(new $c.Ptr(killr_buf, 0), new $c.Ptr(svk.killer.name, 0), 256);
+        str = $c.strcpy(new $c.Ptr(killr_buf, 0), new $c.Ptr(svk.killer.name, 0));
         do_hallu = $c.i8(Hallucination() && (strstri(str, $c.lit("'s explosion")) || strstri(str, $c.lit("s' explosion"))) ? 1 : 0);
     }
     if (type === PHYS_EXPL_TYPE) {
@@ -538,7 +538,7 @@ export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:
                        like "Barney" here in order to suppress "the" below,
                        so avoid any which begins with a capital letter) */
                     do {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(hallu_buf, 0), 0, 256, $c.lit("%s explosion"), s_suffix(await rndmonnam(null)));
+                        $c.sprintf(new $c.Ptr(hallu_buf, 0), $c.lit("%s explosion"), s_suffix(await rndmonnam(null)));
                     } while (new $c.Ptr(hallu_buf, 0).get(0) !== lowc(new $c.Ptr(hallu_buf, 0).get(0)) && (tryct = tryct + 1 | 0) < 20);
                     str = new $c.Ptr(hallu_buf, 0);
                 }
@@ -633,7 +633,7 @@ export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:
             if (do_hallu) {
                 /* (see explanation above) */
                 do {
-                    $c.__builtin___sprintf_chk(new $c.Ptr(hallu_buf, 0), 0, 256, $c.lit("%s explosion"), s_suffix(await rndmonnam(null)));
+                    $c.sprintf(new $c.Ptr(hallu_buf, 0), $c.lit("%s explosion"), s_suffix(await rndmonnam(null)));
                 } while (new $c.Ptr(hallu_buf, 0).get(0) !== lowc(new $c.Ptr(hallu_buf, 0).get(0)));
                 str = new $c.Ptr(hallu_buf, 0);
             }
@@ -686,7 +686,7 @@ export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:
                     if (generic) {   /* explosion was unseen; str=="explosion", */
                         /* svk.killer.name=="gas spore's explosion". */
                     } else if (!$c.peq(str, new $c.Ptr(svk.killer.name, 0)) && !$c.peq(str, new $c.Ptr(hallu_buf, 0))) {
-                        $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), str, 256);
+                        $c.strcpy(new $c.Ptr(svk.killer.name, 0), str);
                     }
                     svk.killer.format = KILLED.BY_AN;
                 } else if (olet === TRAP_EXPLODE) {
@@ -697,7 +697,7 @@ export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:
                     nh_snprintf($c.lit("explode"), 660, new $c.Ptr(svk.killer.name, 0), 256, $c.lit("caught %sself in %s own %s"), genders[flags.female ? 1 : 0].him, genders[flags.female ? 1 : 0].his, str);
                 } else {
                     $t4 = !strncmpi(str, $c.lit("tower of flame"), -1) || !strncmpi(str, $c.lit("fireball"), -1) ? KILLED.BY_AN : KILLED.BY, svk.killer.format = $t4;
-                    $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), str, 256);
+                    $c.strcpy(new $c.Ptr(svk.killer.name, 0), str);
                 }
                 if (iflags.last_msg === PLNMSG.CAUGHT_IN_EXPLOSION || iflags.last_msg === PLNMSG.TOWER_OF_FLAME) {   /*seffects()*/
                     await pline($c.lit("It is fatal."));
@@ -1035,7 +1035,7 @@ export async function mon_explodes(mon, mattk) {   // explode.c:1019
     }
     /* This might end up killing you, too; you never know...
      * also, it is used in explode() messages */
-    $c.__builtin___sprintf_chk(new $c.Ptr(svk.killer.name, 0), 0, 256, $c.lit("%s explosion"), s_suffix(pmname(mon.data, Mgender(mon))));
+    $c.sprintf(new $c.Ptr(svk.killer.name, 0), $c.lit("%s explosion"), s_suffix(pmname(mon.data, Mgender(mon))));
     svk.killer.format = KILLED.BY_AN;
     await explode(mon.mx, mon.my, type, dmg, MON_EXPLODE, await adtyp_to_expltype(mattk.adtyp));
     /* reset killer */

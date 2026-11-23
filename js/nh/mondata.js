@@ -845,7 +845,7 @@ export async function name_to_monplus(in_str, remainder_p, gender_name_var) {   
     if (remainder_p) {
         remainder_p.set(0, null);
     }
-    str = $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), in_str, 256);
+    str = $c.strcpy(new $c.Ptr(buf, 0), in_str);
     if (!$c.strncmp(str, $c.lit("a "), 2)) {
         str = str.add(2);
     } else if (!$c.strncmp(str, $c.lit("an "), 3)) {
@@ -856,13 +856,13 @@ export async function name_to_monplus(in_str, remainder_p, gender_name_var) {   
     slen = $c.strlen(str);
     term = str.add($c.idx(slen));
     if ((s = strstri(str, $c.lit("vortices"))) !== null) {
-        $c.__builtin___strcpy_chk(s.add(4), $c.lit("ex"), -1);
+        $c.strcpy(s.add(4), $c.lit("ex"));
     } else if (slen > 3 && !strncmpi(term.add(-3), $c.lit("ies"), -1) && (slen < 7 || strncmpi(term.add(-7), $c.lit("zombies"), -1))) {
         /* be careful with "ies"; "priest", "zombies" */
-        $c.__builtin___strcpy_chk(term.add(-3), $c.lit("y"), -1);
+        $c.strcpy(term.add(-3), $c.lit("y"));
     } else if (slen > 3 && !strncmpi(term.add(-3), $c.lit("ves"), -1)) {
         /* luckily no monster names end in fe or ve with ves plurals */
-        $c.__builtin___strcpy_chk(term.add(-3), $c.lit("f"), -1);
+        $c.strcpy(term.add(-3), $c.lit("f"));
     }
     slen = $c.strlen(str);   /* length possibly needs recomputing */
     {

@@ -389,7 +389,7 @@ async function add_branch(dgn, child_entry_level, pd) {   // dungeon.c:514
     let branch_num = 0, new_branch = null, $t1, $t2, $t3, $t4, $t5;
     branch_num = await find_branch(new $c.Ptr(svd.dungeons[dgn].dname, 0), pd);
     new_branch = $c.asRec(await alloc(32), $T.branch, 32);
-    $c.__builtin___memset_chk(new_branch, 0, 32, -1);
+    $c.memset(new_branch, 0, 32);
     new_branch.next = null;
     $t2 = ($t1 = add_branch$branch_id, add_branch$branch_id = $t1 + 1 | 0, $t1), new_branch.id = $t2;
     $t3 = await correct_branch_type($c.relem(pd.tmpbranch, branch_num)), new_branch.type = $t3;
@@ -432,9 +432,9 @@ async function init_level(dgn, proto_index, pd) {   // dungeon.c:566
         return;
     }
     $t1 = new_level = $c.asRec(await alloc(40), $T.s_level, 40), pd.final_lev[proto_index] = $t1;
-    $c.__builtin___memset_chk(new_level, 0, 40, -1);
+    $c.memset(new_level, 0, 40);
     /* load new level with data */
-    $c.__builtin___strcpy_chk(new $c.Ptr(new_level.proto, 0), tlevel.name, 15);
+    $c.strcpy(new $c.Ptr(new_level.proto, 0), tlevel.name);
     new_level.boneid = tlevel.boneschar;
     new_level.dlevel.dnum = $c.i16(dgn);
     new_level.dlevel.dlevel = 0;   /* for now */
@@ -798,10 +798,10 @@ async function init_dungeon_dungeons(L, pd, dngidx) {   // dungeon.c:997
     pd.tmpdungeon[dngidx].chance = dgn_chance;
     pd.tmpdungeon[dngidx].entry_lev = dgn_entry;
     /* FIXME: these should have length checks */
-    $c.__builtin___strcpy_chk(new $c.Ptr(svd.dungeons[dngidx].fill_lvl, 0), dgn_fill, -1);
-    $c.__builtin___strcpy_chk(new $c.Ptr(svd.dungeons[dngidx].dname, 0), dgn_name, -1);
-    $c.__builtin___strcpy_chk(new $c.Ptr(svd.dungeons[dngidx].proto, 0), dgn_protoname, -1);
-    $c.__builtin___strcpy_chk(new $c.Ptr(svd.dungeons[dngidx].themerms, 0), dgn_themerms, -1);
+    $c.strcpy(new $c.Ptr(svd.dungeons[dngidx].fill_lvl, 0), dgn_fill);
+    $c.strcpy(new $c.Ptr(svd.dungeons[dngidx].dname, 0), dgn_name);
+    $c.strcpy(new $c.Ptr(svd.dungeons[dngidx].proto, 0), dgn_protoname);
+    $c.strcpy(new $c.Ptr(svd.dungeons[dngidx].themerms, 0), dgn_themerms);
     /* FIXME: accept "none", convert that to '\0' */
     svd.dungeons[dngidx].boneid = $c.i8(dgn_bonetag.get(0) ? dgn_bonetag.get(0) : 0);
     $c.free(dgn_fill);
@@ -861,7 +861,7 @@ async function fixup_level_locations() {   // dungeon.c:1122
                 /* This is where the name substitution on the
                  * levels of the quest dungeon occur.
                  */
-                $c.__builtin___sprintf_chk(new $c.Ptr(x.proto, 0), 0, 15, $c.lit("%s%s"), gu.urole.filecode, lev_map.lev_name.add(1));
+                $c.sprintf(new $c.Ptr(x.proto, 0), $c.lit("%s%s"), gu.urole.filecode, lev_map.lev_name.add(1));
             } else if ($c.peq(lev_map.lev_spec, svd.dungeon_topology.d_knox_level)) {
                 /*
                  * Kludge to allow floating Knox entrance.  We
@@ -928,7 +928,7 @@ export async function init_dungeons() {   // dungeon.c:1205
     sbi.memlimit = 1048576;
     sbi.steps = 0;
     sbi.perpcall = 1048576;
-    $c.__builtin___memset_chk(pd, 0, 3952, 3952);
+    $c.memset(pd, 0, 3952);
     $t1 = pd.n_brs = 0, pd.n_levs = $t1;
     L = await nhl_init(sbi);   /* private Lua state for this function */
     if (!L) {
@@ -936,10 +936,10 @@ export async function init_dungeons() {   // dungeon.c:1205
         /*NOTREACHED*/
     }
     if (!await nhl_loadlua(L, $c.lit("dungeon.lua"))) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(tbuf, 0), 0, 256, $c.lit("Cannot open dungeon description - \"%s"), $c.lit("dungeon.lua"));
+        $c.sprintf(new $c.Ptr(tbuf, 0), $c.lit("Cannot open dungeon description - \"%s"), $c.lit("dungeon.lua"));
         /* using a resource from the executable */
         /* using a file or DLB file */
-        $c.__builtin___strcat_chk(new $c.Ptr(tbuf, 0), $c.lit("\" file!"), 256);
+        $c.strcat(new $c.Ptr(tbuf, 0), $c.lit("\" file!"));
         await panic1(new $c.Ptr(tbuf, 0));
     }
     if (iflags.window_inited) {
@@ -1621,7 +1621,7 @@ export async function lev_by_name(nam) {   // dungeon.c:2098
             nam = nam.add(4);
         }
         if ((p = strstri(nam, $c.lit(" level"))) !== null && $c.peq(p, eos(nam).add(-6))) {
-            nam = $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), nam, 256);
+            nam = $c.strcpy(new $c.Ptr(buf, 0), nam);
             eos(new $c.Ptr(buf, 0)).add(-6).set(0, 0);
         }
         /* hell is the old name, and wouldn't match; gehennom would match its
@@ -1711,7 +1711,7 @@ async function tport_menu(win, entry, lchoices, lvl_p, cannotreach) {   // dunge
     if (cannotreach) {
         /* not selectable, but still consumes next menuletter;
            prepend padding in place of missing menu selector */
-        $c.__builtin___sprintf_chk(new $c.Ptr(tmpbuf, 0), 0, 256, $c.lit("    %s"), entry);
+        $c.sprintf(new $c.Ptr(tmpbuf, 0), $c.lit("    %s"), entry);
         entry = new $c.Ptr(tmpbuf, 0);
     } else {
         any.a_int = lchoices.idx + 1 | 0;
@@ -1749,7 +1749,7 @@ async function print_branch(win, dnum, lower_bound, upper_bound, bymenu, lchoice
     /* This assumes that end1 is the "parent". */
     for (br = svb.branches; br; br = br.next) {
         if (br.end1.dnum === dnum && lower_bound < br.end1.dlevel && br.end1.dlevel <= upper_bound) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%c %s to %s: %d"), bymenu ? chr_u_on_lvl(br.end1) : 32, br_string(br.type), new $c.Ptr(svd.dungeons[br.end2.dnum].dname, 0), depth(br.end1));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%c %s to %s: %d"), bymenu ? chr_u_on_lvl(br.end1) : 32, br_string(br.type), new $c.Ptr(svd.dungeons[br.end2.dnum].dname, 0), depth(br.end1));
             if (bymenu) {
                 await tport_menu(win, new $c.Ptr(buf, 0), lchoices_p, br.end1, unreachable_level(br.end1, FALSE));
             } else {
@@ -1782,9 +1782,9 @@ export async function print_dungeon(bymenu, rlev, rdgn) {   // dungeon.c:2290
         /* Most entrances are uninteresting. */
         if (dptr.entry_lev !== 1) {
             if (dptr.entry_lev === nlev) {
-                $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit(", entrance from below"), 256);
+                $c.strcat(new $c.Ptr(buf, 0), $c.lit(", entrance from below"));
             } else {
-                $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(", entrance on %d"), (dptr.depth_start + dptr.entry_lev | 0) - 1 | 0);
+                $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit(", entrance on %d"), (dptr.depth_start + dptr.entry_lev | 0) - 1 | 0);
             }
         }
         if (bymenu) {
@@ -1802,9 +1802,9 @@ export async function print_dungeon(bymenu, rlev, rdgn) {   // dungeon.c:2290
             }
             /* print any branches before this level */
             await print_branch(win, i, last_level, slev.dlevel.dlevel, bymenu, lchoices);
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%c %s: %d"), chr_u_on_lvl(slev.dlevel), new $c.Ptr(slev.proto, 0), depth(slev.dlevel));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%c %s: %d"), chr_u_on_lvl(slev.dlevel), new $c.Ptr(slev.proto, 0), depth(slev.dlevel));
             if ((svd.dungeon_topology.d_stronghold_level.dlevel || svd.dungeon_topology.d_stronghold_level.dnum) && on_level(slev.dlevel, svd.dungeon_topology.d_stronghold_level)) {
-                $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" (tune %s)"), new $c.Ptr(svt.tune, 0));
+                $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit(" (tune %s)"), new $c.Ptr(svt.tune, 0));
             }
             if (bymenu) {
                 await tport_menu(win, new $c.Ptr(buf, 0), lchoices, slev.dlevel, unreachable_level(slev.dlevel, unplaced));
@@ -1839,14 +1839,14 @@ export async function print_dungeon(bymenu, rlev, rdgn) {   // dungeon.c:2290
                 await putstr()(win, 0, $c.lit("Floating branches"));
                 first = FALSE;
             }
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("   %s to %s"), br_string(br.type), new $c.Ptr(svd.dungeons[br.end2.dnum].dname, 0));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("   %s to %s"), br_string(br.type), new $c.Ptr(svd.dungeons[br.end2.dnum].dname, 0));
             await putstr()(win, 0, new $c.Ptr(buf, 0));
         }
     }
     /* I hate searching for the invocation pos while debugging. -dean */
     if (Invocation_lev(u.uz)) {
         await putstr()(win, 0, $c.lit(""));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Invocation position @ (%d,%d), hero @ (%d,%d)"), svi.inv_pos.x, svi.inv_pos.y, u.ux, u.uy);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Invocation position @ (%d,%d), hero @ (%d,%d)"), svi.inv_pos.x, svi.inv_pos.y, u.ux, u.uy);
         await putstr()(win, 0, new $c.Ptr(buf, 0));
     } else {
         /* if current level has a magic portal, report its location;
@@ -1861,10 +1861,10 @@ export async function print_dungeon(bymenu, rlev, rdgn) {   // dungeon.c:2290
             }
         }
         if (trap) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Portal @ (%d,%d), hero @ (%d,%d)"), trap.tx, trap.ty, u.ux, u.uy);
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Portal @ (%d,%d), hero @ (%d,%d)"), trap.tx, trap.ty, u.ux, u.uy);
         } else if ((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) || (svd.dungeon_topology.d_fire_level.dlevel || svd.dungeon_topology.d_fire_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_fire_level) || (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_qstart_level.dlevel || svd.dungeon_topology.d_qstart_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_qstart_level) || await at_dgn_entrance($c.lit("The Quest")) || (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level)) {
             /* only report "no portal found" when actually expecting a portal */
-            $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("No portal found."), 256);
+            $c.strcpy(new $c.Ptr(buf, 0), $c.lit("No portal found."));
         }
         /* only give output if we found a portal or expected one and didn't */
         if (new $c.Ptr(buf, 0).get(0)) {
@@ -1933,12 +1933,12 @@ async function query_annotation(lev) {   // dungeon.c:2500
     }
     nbuf[0] = 0;
     if (mptr.custom) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(tmpbuf, 0), 0, 256, $c.lit("Replace annotation \"%.30s%s\" with?"), mptr.custom, $c.strlen(mptr.custom) > 30 ? $c.lit("...") : $c.lit(""));
+        $c.sprintf(new $c.Ptr(tmpbuf, 0), $c.lit("Replace annotation \"%.30s%s\" with?"), mptr.custom, $c.strlen(mptr.custom) > 30 ? $c.lit("...") : $c.lit(""));
         await getlin(new $c.Ptr(tmpbuf, 0), new $c.Ptr(nbuf, 0));
     } else {
         /* level description */
         if (!lev || on_level(u.uz, lev)) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(lbuf, 0), $c.lit("this dungeon level"), 128);
+            $c.strcpy(new $c.Ptr(lbuf, 0), $c.lit("this dungeon level"));
         } else {
             dflgs = lev.dnum === u.uz.dnum ? 0 : 2;
             save_uz.$copyFrom(u.uz);
@@ -2140,17 +2140,17 @@ export async function overview_stats(win, statsfmt, total_count, total_size) {  
             asize = $c.add64(asize, mptr.custom_lth + 1 >>> 0);
         }
     }
-    $c.__builtin___sprintf_chk(new $c.Ptr(hdrbuf, 0), 0, 128, $c.lit("general, size %ld"), 384);
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, statsfmt, new $c.Ptr(hdrbuf, 0), ocount, osize);
+    $c.sprintf(new $c.Ptr(hdrbuf, 0), $c.lit("general, size %ld"), 384);
+    $c.sprintf(new $c.Ptr(buf, 0), statsfmt, new $c.Ptr(hdrbuf, 0), ocount, osize);
     await putstr()(win, 0, new $c.Ptr(buf, 0));
     if (bcount) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(hdrbuf, 0), 0, 128, $c.lit("cemetery, size %ld"), 184);
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, statsfmt, new $c.Ptr(hdrbuf, 0), bcount, bsize);
+        $c.sprintf(new $c.Ptr(hdrbuf, 0), $c.lit("cemetery, size %ld"), 184);
+        $c.sprintf(new $c.Ptr(buf, 0), statsfmt, new $c.Ptr(hdrbuf, 0), bcount, bsize);
         await putstr()(win, 0, new $c.Ptr(buf, 0));
     }
     if (acount) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(hdrbuf, 0), 0, 128, $c.lit("annotations, text"));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, statsfmt, new $c.Ptr(hdrbuf, 0), acount, asize);
+        $c.sprintf(new $c.Ptr(hdrbuf, 0), $c.lit("annotations, text"));
+        $c.sprintf(new $c.Ptr(buf, 0), statsfmt, new $c.Ptr(hdrbuf, 0), acount, asize);
         await putstr()(win, 0, new $c.Ptr(buf, 0));
     }
     total_count.set(0, $c.add64(total_count.get(0), $c.add64($c.add64(ocount, bcount), acount)));
@@ -2179,14 +2179,14 @@ export async function init_mapseen(lev) {   // dungeon.c:2835
      * sort first by dungeon (in order of discovery) and then by level number.
      */
     init = $c.asRec(await alloc(384), $T.mapseen, 384);
-    $c.__builtin___memset_chk(init, 0, 384, -1);
+    $c.memset(init, 0, 384);
     /* memset is fine for feature bits, flags, and rooms array;
        explicitly initialize pointers to null */
     init.next = null, init.br = null, init.custom = null;
     init.final_resting_place = null;
     /* svl.lastseentyp[][] is reused for each level, so get rid of
        previous level's data */
-    $c.__builtin___memset_chk(new $c.Ptr(svl.lastseentyp, 0), 0, 1680, 42568);
+    $c.memset(new $c.Ptr(svl.lastseentyp, 0), 0, 1680);
     init.lev.dnum = lev.dnum;
     init.lev.dlevel = lev.dlevel;
     /* walk until we get to the place where we should insert init */
@@ -2382,7 +2382,7 @@ export async function recalc_mapseen() {   // dungeon.c:3075
         return;
     }
     /* reset all features; mptr->feat.* = 0; */
-    $c.__builtin___memset_chk(mptr.feat, 0, 4, -1);
+    $c.memset(mptr.feat, 0, 4);
     /* reset most flags; some level-specific ones are left as-is */
     if (mptr.flags.notreachable) {
         mptr.flags.notreachable = (0) & 1;   /* reached it; Eye of the Aethiopica? */
@@ -2660,7 +2660,7 @@ export function endgamelevelname(outbuf, indx) {   // dungeon.c:3410
     outbuf.set(0, 0);
     switch (indx) {
         case -5:
-            $c.__builtin___strcpy_chk(outbuf, $c.lit("Astral Plane"), -1);
+            $c.strcpy(outbuf, $c.lit("Astral Plane"));
             break;
         case -4:
             planename = $c.lit("Water");
@@ -2676,9 +2676,9 @@ export function endgamelevelname(outbuf, indx) {   // dungeon.c:3410
             break;
     }
     if (planename) {
-        $c.__builtin___sprintf_chk(outbuf, 0, -1, $c.lit("Plane of %s"), planename);
+        $c.sprintf(outbuf, $c.lit("Plane of %s"), planename);
     } else if (!outbuf.get(0)) {
-        $c.__builtin___sprintf_chk(outbuf, 0, -1, $c.lit("unknown plane #%d"), indx);
+        $c.sprintf(outbuf, $c.lit("unknown plane #%d"), indx);
     }
     return outbuf;
 }
@@ -2705,9 +2705,9 @@ function tunesuffix(mptr, outbuf, bsz) {   // dungeon.c:3460
     outbuf.set(0, 0);
     if (mptr.flags.castletune | 0 && u.uevent.uheard_tune | 0) {
         if ((u.uevent.uheard_tune | 0) === 2) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(tmp, 0), 0, 256, $c.lit("notes \"%s\""), new $c.Ptr(svt.tune, 0));
+            $c.sprintf(new $c.Ptr(tmp, 0), $c.lit("notes \"%s\""), new $c.Ptr(svt.tune, 0));
         } else {
-            $c.__builtin___strcpy_chk(new $c.Ptr(tmp, 0), $c.lit("5-note tune"), 256);
+            $c.strcpy(new $c.Ptr(tmp, 0), $c.lit("5-note tune"));
         }
         nh_snprintf($c.lit("tunesuffix"), 3473, outbuf, bsz, $c.lit(" (play %s to open or close drawbridge)"), new $c.Ptr(tmp, 0));
     }
@@ -2741,33 +2741,33 @@ async function print_mapseen(win, mptr, final, how, printdun) {   // dungeon.c:3
     if (printdun) {
         /* suppress the negative numbers in the endgame */
         if (svd.dungeons[dnum].dunlev_ureached === svd.dungeons[dnum].entry_lev || In_endgame(mptr.lev)) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s:"), new $c.Ptr(svd.dungeons[dnum].dname, 0));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s:"), new $c.Ptr(svd.dungeons[dnum].dname, 0));
         } else if (await builds_up(mptr.lev)) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s: levels %d up to %d"), new $c.Ptr(svd.dungeons[dnum].dname, 0), (depthstart + svd.dungeons[dnum].entry_lev | 0) - 1 | 0, (depthstart + svd.dungeons[dnum].dunlev_ureached | 0) - 1 | 0);
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s: levels %d up to %d"), new $c.Ptr(svd.dungeons[dnum].dname, 0), (depthstart + svd.dungeons[dnum].entry_lev | 0) - 1 | 0, (depthstart + svd.dungeons[dnum].dunlev_ureached | 0) - 1 | 0);
         } else {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s: levels %d to %d"), new $c.Ptr(svd.dungeons[dnum].dname, 0), depthstart, (depthstart + svd.dungeons[dnum].dunlev_ureached | 0) - 1 | 0);
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s: levels %d to %d"), new $c.Ptr(svd.dungeons[dnum].dname, 0), depthstart, (depthstart + svd.dungeons[dnum].dunlev_ureached | 0) - 1 | 0);
         }
         await add_menu_heading(win, new $c.Ptr(buf, 0));
     }
     /* calculate level number */
     i = (depthstart + mptr.lev.dlevel | 0) - 1 | 0;
     if (In_endgame(mptr.lev)) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%s:"), final !== -1 ? $c.lit("   ") : $c.lit(""), endgamelevelname(new $c.Ptr(tmpbuf, 0), i));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s%s:"), final !== -1 ? $c.lit("   ") : $c.lit(""), endgamelevelname(new $c.Ptr(tmpbuf, 0), i));
     } else {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%sLevel %d:"), final !== -1 ? $c.lit("   ") : $c.lit(""), i);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%sLevel %d:"), final !== -1 ? $c.lit("   ") : $c.lit(""), i);
     }
     /* wizmode prints out proto dungeon names for clarity */
     if (wizard()) {
         if ((slev = Is_special(mptr.lev)) !== null) {
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" [%s]"), new $c.Ptr(slev.proto, 0));
+            $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit(" [%s]"), new $c.Ptr(slev.proto, 0));
         }
     }
     /* [perhaps print custom annotation on its own line when it's long] */
     if (mptr.custom) {
-        $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" \"%s\""), mptr.custom);
+        $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit(" \"%s\""), mptr.custom);
     }
     if (on_level(u.uz, mptr.lev)) {
-        $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" <- You %s here."), final <= 0 || final === 1 && how === ASCENDED ? $c.lit("are") : final === 1 && how === ESCAPED ? $c.lit("left from") : $c.lit("were"));
+        $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit(" <- You %s here."), final <= 0 || final === 1 && how === ASCENDED ? $c.lit("are") : final === 1 && how === ESCAPED ? $c.lit("left from") : $c.lit("were"));
     }
     any.$copyFrom(cg.zeroany);
     if (final === -1) {
@@ -2787,11 +2787,11 @@ async function print_mapseen(win, mptr, final, how, printdun) {   // dungeon.c:3
             if ((mptr.feat.nshop | 0) > 1) {
                 do {
                     if (mptr.feat.nshop) {
-                        $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%s%s %s%s"), ($t2 = i, i = $t2 + 1 | 0, $t2) > 0 ? $c.lit(", ") : $c.lit("      "), seen_string($c.i16(mptr.feat.nshop), $c.lit("shop")), $c.lit("shop"), (mptr.feat.nshop | 0) === 1 ? $c.lit("") : $c.lit("s"));
+                        $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("%s%s %s%s"), ($t2 = i, i = $t2 + 1 | 0, $t2) > 0 ? $c.lit(", ") : $c.lit("      "), seen_string($c.i16(mptr.feat.nshop), $c.lit("shop")), $c.lit("shop"), (mptr.feat.nshop | 0) === 1 ? $c.lit("") : $c.lit("s"));
                     }
                 } while (0);
             } else {
-                $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%s%s"), ($t3 = i, i = $t3 + 1 | 0, $t3) > 0 ? $c.lit(", ") : $c.lit("      "), await an(shop_string(mptr.feat.shoptype | 0)));
+                $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("%s%s"), ($t3 = i, i = $t3 + 1 | 0, $t3) > 0 ? $c.lit(", ") : $c.lit("      "), await an(shop_string(mptr.feat.shoptype | 0)));
             }
         }
         if ((mptr.feat.naltar | 0) > 0 || (mptr.feat.ntemple | 0) > 0) {
@@ -2802,17 +2802,17 @@ async function print_mapseen(win, mptr, final, how, printdun) {   // dungeon.c:3
                to say so */
             do {
                 if (mptr.feat.ntemple | 0 && mptr.feat.naltar | 0) {
-                    $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%s%s %s%s and %s %s%s"), ($t4 = i, i = $t4 + 1 | 0, $t4) > 0 ? $c.lit(", ") : $c.lit("      "), seen_string($c.i16(mptr.feat.ntemple), $c.lit("temple")), $c.lit("temple"), (mptr.feat.ntemple | 0) === 1 ? $c.lit("") : $c.lit("s"), seen_string($c.i16(mptr.feat.naltar), $c.lit("altar")), $c.lit("altar"), (mptr.feat.naltar | 0) === 1 ? $c.lit("") : $c.lit("s"));
+                    $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("%s%s %s%s and %s %s%s"), ($t4 = i, i = $t4 + 1 | 0, $t4) > 0 ? $c.lit(", ") : $c.lit("      "), seen_string($c.i16(mptr.feat.ntemple), $c.lit("temple")), $c.lit("temple"), (mptr.feat.ntemple | 0) === 1 ? $c.lit("") : $c.lit("s"), seen_string($c.i16(mptr.feat.naltar), $c.lit("altar")), $c.lit("altar"), (mptr.feat.naltar | 0) === 1 ? $c.lit("") : $c.lit("s"));
                 } else if (mptr.feat.ntemple) {
                     do {
                         if (mptr.feat.ntemple) {
-                            $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%s%s %s%s"), ($t5 = i, i = $t5 + 1 | 0, $t5) > 0 ? $c.lit(", ") : $c.lit("      "), seen_string($c.i16(mptr.feat.ntemple), $c.lit("temple")), $c.lit("temple"), (mptr.feat.ntemple | 0) === 1 ? $c.lit("") : $c.lit("s"));
+                            $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("%s%s %s%s"), ($t5 = i, i = $t5 + 1 | 0, $t5) > 0 ? $c.lit(", ") : $c.lit("      "), seen_string($c.i16(mptr.feat.ntemple), $c.lit("temple")), $c.lit("temple"), (mptr.feat.ntemple | 0) === 1 ? $c.lit("") : $c.lit("s"));
                         }
                     } while (0);
                 } else if (mptr.feat.naltar) {
                     do {
                         if (mptr.feat.naltar) {
-                            $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%s%s %s%s"), ($t6 = i, i = $t6 + 1 | 0, $t6) > 0 ? $c.lit(", ") : $c.lit("      "), seen_string($c.i16(mptr.feat.naltar), $c.lit("altar")), $c.lit("altar"), (mptr.feat.naltar | 0) === 1 ? $c.lit("") : $c.lit("s"));
+                            $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("%s%s %s%s"), ($t6 = i, i = $t6 + 1 | 0, $t6) > 0 ? $c.lit(", ") : $c.lit("      "), seen_string($c.i16(mptr.feat.naltar), $c.lit("altar")), $c.lit("altar"), (mptr.feat.naltar | 0) === 1 ? $c.lit("") : $c.lit("s"));
                         }
                     } while (0);
                 }
@@ -2821,91 +2821,91 @@ async function print_mapseen(win, mptr, final, how, printdun) {   // dungeon.c:3
             atmp = mptr.feat.msalign;   /*    0,  1,  2,  3 */
             atmp = Msa2amask(atmp);   /*    0,  1,  2,  4 */
             if (Amask2align(atmp) === u.ualign.type) {   /* -128, -1,  0, +1 */
-                $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" to %s"), await align_gname(u.ualign.type));
+                $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit(" to %s"), await align_gname(u.ualign.type));
             }
         }
         do {
             if (mptr.feat.nthrone) {
-                $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%s%s %s%s"), ($t7 = i, i = $t7 + 1 | 0, $t7) > 0 ? $c.lit(", ") : $c.lit("      "), seen_string($c.i16(mptr.feat.nthrone), $c.lit("throne")), $c.lit("throne"), (mptr.feat.nthrone | 0) === 1 ? $c.lit("") : $c.lit("s"));
+                $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("%s%s %s%s"), ($t7 = i, i = $t7 + 1 | 0, $t7) > 0 ? $c.lit(", ") : $c.lit("      "), seen_string($c.i16(mptr.feat.nthrone), $c.lit("throne")), $c.lit("throne"), (mptr.feat.nthrone | 0) === 1 ? $c.lit("") : $c.lit("s"));
             }
         } while (0);
         do {
             if (mptr.feat.nfount) {
-                $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%s%s %s%s"), ($t8 = i, i = $t8 + 1 | 0, $t8) > 0 ? $c.lit(", ") : $c.lit("      "), seen_string($c.i16(mptr.feat.nfount), $c.lit("fountain")), $c.lit("fountain"), (mptr.feat.nfount | 0) === 1 ? $c.lit("") : $c.lit("s"));
+                $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("%s%s %s%s"), ($t8 = i, i = $t8 + 1 | 0, $t8) > 0 ? $c.lit(", ") : $c.lit("      "), seen_string($c.i16(mptr.feat.nfount), $c.lit("fountain")), $c.lit("fountain"), (mptr.feat.nfount | 0) === 1 ? $c.lit("") : $c.lit("s"));
             }
         } while (0);
         do {
             if (mptr.feat.nsink) {
-                $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%s%s %s%s"), ($t9 = i, i = $t9 + 1 | 0, $t9) > 0 ? $c.lit(", ") : $c.lit("      "), seen_string($c.i16(mptr.feat.nsink), $c.lit("sink")), $c.lit("sink"), (mptr.feat.nsink | 0) === 1 ? $c.lit("") : $c.lit("s"));
+                $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("%s%s %s%s"), ($t9 = i, i = $t9 + 1 | 0, $t9) > 0 ? $c.lit(", ") : $c.lit("      "), seen_string($c.i16(mptr.feat.nsink), $c.lit("sink")), $c.lit("sink"), (mptr.feat.nsink | 0) === 1 ? $c.lit("") : $c.lit("s"));
             }
         } while (0);
         do {
             if (mptr.feat.ngrave) {
-                $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%s%s %s%s"), ($t10 = i, i = $t10 + 1 | 0, $t10) > 0 ? $c.lit(", ") : $c.lit("      "), seen_string($c.i16(mptr.feat.ngrave), $c.lit("grave")), $c.lit("grave"), (mptr.feat.ngrave | 0) === 1 ? $c.lit("") : $c.lit("s"));
+                $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("%s%s %s%s"), ($t10 = i, i = $t10 + 1 | 0, $t10) > 0 ? $c.lit(", ") : $c.lit("      "), seen_string($c.i16(mptr.feat.ngrave), $c.lit("grave")), $c.lit("grave"), (mptr.feat.ngrave | 0) === 1 ? $c.lit("") : $c.lit("s"));
             }
         } while (0);
         do {
             if (mptr.feat.ntree) {
-                $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%s%s %s%s"), ($t11 = i, i = $t11 + 1 | 0, $t11) > 0 ? $c.lit(", ") : $c.lit("      "), seen_string($c.i16(mptr.feat.ntree), $c.lit("tree")), $c.lit("tree"), (mptr.feat.ntree | 0) === 1 ? $c.lit("") : $c.lit("s"));
+                $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("%s%s %s%s"), ($t11 = i, i = $t11 + 1 | 0, $t11) > 0 ? $c.lit(", ") : $c.lit("      "), seen_string($c.i16(mptr.feat.ntree), $c.lit("tree")), $c.lit("tree"), (mptr.feat.ntree | 0) === 1 ? $c.lit("") : $c.lit("s"));
             }
         } while (0);
         /* capitalize afterwards */
         i = $c.i32($c.strlen($c.lit("      ")));
         $t12 = highc(buf[i]), buf[i] = $t12;
         /* capitalizing it makes it a sentence; terminate with '.' */
-        $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit("."), 256);
+        $c.strcat(new $c.Ptr(buf, 0), $c.lit("."));
         await add_menu_str(win, new $c.Ptr(buf, 0));
     }
     /* we assume that these are mutually exclusive */
     new $c.Ptr(buf, 0).set(0, 0);
     if (mptr.flags.oracle) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%sOracle of Delphi."), $c.lit("      "));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%sOracle of Delphi."), $c.lit("      "));
     } else if (In_sokoban(mptr.lev)) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%s."), $c.lit("      "), mptr.flags.sokosolved | 0 ? $c.lit("Solved") : $c.lit("Unsolved"));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s%s."), $c.lit("      "), mptr.flags.sokosolved | 0 ? $c.lit("Solved") : $c.lit("Unsolved"));
     } else if (mptr.flags.bigroom) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%sA very big room."), $c.lit("      "));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%sA very big room."), $c.lit("      "));
     } else if (mptr.flags.roguelevel) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%sA primitive area."), $c.lit("      "));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%sA primitive area."), $c.lit("      "));
     } else if (on_level(mptr.lev, svd.dungeon_topology.d_qstart_level)) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%sHome%s."), $c.lit("      "), mptr.flags.notreachable | 0 ? $c.lit(" (no way back...)") : $c.lit(""));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%sHome%s."), $c.lit("      "), mptr.flags.notreachable | 0 ? $c.lit(" (no way back...)") : $c.lit(""));
         if (u.uevent.qcompleted) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%sCompleted quest for %s."), $c.lit("      "), ldrname());
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%sCompleted quest for %s."), $c.lit("      "), ldrname());
         } else if (mptr.flags.questing) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%sGiven quest by %s."), $c.lit("      "), ldrname());
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%sGiven quest by %s."), $c.lit("      "), ldrname());
         }
     } else if (mptr.flags.ludios) {
         /* presence of the ludios branch in #overview output indicates that
            the player has made it onto the level; presence of this annotation
            indicates that the fort's entrance has been seen (or mapped) */
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%sFort Ludios."), $c.lit("      "));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%sFort Ludios."), $c.lit("      "));
     } else if (mptr.flags.castle) {
         nh_snprintf($c.lit("print_mapseen"), 3663, new $c.Ptr(buf, 0), 256, $c.lit("%sThe castle%s."), $c.lit("      "), tunesuffix(mptr, new $c.Ptr(tmpbuf, 0), 256));
     } else if (mptr.flags.valley) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%sValley of the Dead."), $c.lit("      "));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%sValley of the Dead."), $c.lit("      "));
     } else if (mptr.flags.vibrating_square) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%sGateway to Moloch's Sanctum."), $c.lit("      "));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%sGateway to Moloch's Sanctum."), $c.lit("      "));
     } else if (mptr.flags.msanctum) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%sMoloch's Sanctum."), $c.lit("      "));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%sMoloch's Sanctum."), $c.lit("      "));
     }
     if (new $c.Ptr(buf, 0).get(0)) {
         await add_menu_str(win, new $c.Ptr(buf, 0));
     }
     /* quest entrance is not mutually-exclusive with bigroom or rogue level */
     if (mptr.flags.quest_summons) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%sSummoned by %s."), $c.lit("      "), ldrname());
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%sSummoned by %s."), $c.lit("      "), ldrname());
         await add_menu_str(win, new $c.Ptr(buf, 0));
     }
     /* print out branches */
     if (mptr.br) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%s to %s"), $c.lit("      "), br_string2(mptr.br), new $c.Ptr(svd.dungeons[mptr.br.end2.dnum].dname, 0));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s%s to %s"), $c.lit("      "), br_string2(mptr.br), new $c.Ptr(svd.dungeons[mptr.br.end2.dnum].dname, 0));
         /* Since mapseen objects are printed out in increasing order
          * of dlevel, clarify which level this branch is going to
          * if the branch goes upwards.  Unless it's the end game.
          */
         if (mptr.br.end1_up && !In_endgame(mptr.br.end2)) {
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(", level %d"), depth(mptr.br.end2));
+            $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit(", level %d"), depth(mptr.br.end2));
         }
-        $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit("."), 256);
+        $c.strcat(new $c.Ptr(buf, 0), $c.lit("."));
         await add_menu_str(win, new $c.Ptr(buf, 0));
     }
     /* maybe print out bones details */
@@ -2917,7 +2917,7 @@ async function print_mapseen(win, mptr, final, how, printdun) {   // dungeon.c:3
             }
         }
         if (kncnt) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%s"), $c.lit("      "), $c.lit("Final resting place for"));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s%s"), $c.lit("      "), $c.lit("Final resting place for"));
             await add_menu_str(win, new $c.Ptr(buf, 0));
             if (died_here) {
                 /* disclosure occurs before bones creation, so listing dead
@@ -2933,7 +2933,7 @@ async function print_mapseen(win, mptr, final, how, printdun) {   // dungeon.c:3
             }
             for (bp = mptr.final_resting_place; bp; bp = bp.next) {
                 if (bp.bonesknown || wizard() || final > 0) {
-                    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%s%s, %s%c"), $c.lit("      "), $c.lit("   "), new $c.Ptr(bp.who, 0), new $c.Ptr(bp.how, 0), (kncnt = kncnt - 1 | 0) ? 44 : 46);
+                    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s%s%s, %s%c"), $c.lit("      "), $c.lit("   "), new $c.Ptr(bp.who, 0), new $c.Ptr(bp.how, 0), (kncnt = kncnt - 1 | 0) ? 44 : 46);
                     await add_menu_str(win, new $c.Ptr(buf, 0));
                 }
             }

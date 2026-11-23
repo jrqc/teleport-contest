@@ -48,7 +48,7 @@ export async function genl_outrip(tmpwin, how, when) {   // rip.c:86
     }
     dp.set(x, null);
     /* Put name on stone */
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%.*s"), STONE_LINE_LEN, new $c.Ptr(svp.plname, 0));
+    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%.*s"), STONE_LINE_LEN, new $c.Ptr(svp.plname, 0));
     center(NAME_LINE, new $c.Ptr(buf, 0));
     /* Put $ on stone */
     cash = gd.done_money > 0 ? gd.done_money : 0;
@@ -56,7 +56,7 @@ export async function genl_outrip(tmpwin, how, when) {   // rip.c:86
     if (cash > 999999999) {
         cash = 999999999;
     }
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%ld Au"), cash);
+    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%ld Au"), cash);
     center(GOLD_LINE, new $c.Ptr(buf, 0));
     /* Put together death description */
     await formatkiller(new $c.Ptr(buf, 0), 256, how, FALSE);
@@ -85,7 +85,7 @@ export async function genl_outrip(tmpwin, how, when) {   // rip.c:86
     }
     /* Put year on stone */
     year = $c.i32($c.rem64($c.div64(yyyymmdd(when), 10000), 10000));
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%4d"), year);
+    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%4d"), year);
     center(YEAR_LINE, new $c.Ptr(buf, 0));
     await putstr()(tmpwin, 0, $c.lit(""));
     for (; dp.get(0); dp = dp.add(1)) {

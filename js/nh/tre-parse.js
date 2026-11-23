@@ -427,7 +427,7 @@ function tre_parse_bracket_items(ctx, items, items_size, result) {   // tre-pars
                                                                 $h.i32[($fp + 68 + $c.idx(len) * 4) >>> 2] = 0;
                                                                 {
                                                                     $h.stp($fp + 456, $fp + 68);
-                                                                    $h.A($c.__builtin___memset_chk($h.P($fp + 328), 0, 128, -1));
+                                                                    $hl.memset($fp + 328, 0, 128);
                                                                     len = wcsrtombs_l($fp + 4, $fp + 456, 64, $fp + 328, $h.u32[(ctx + 48) >>> 2]);
                                                                 }
                                                                 /* defined HAVE_WCSTOMBS */
@@ -619,19 +619,19 @@ function tre_parse_bracket(ctx, result) {   // tre-parse.c:723
                     for (cp = $h.u32[($fp + 16) >>> 2] + 16; $h.u32[cp >>> 2]; cp = cp + 16) {
                         /* The "- 2" is to account for the "[." */
                         if ((i = $c.sub64(($h.u32[cp >>> 2] - re) / 4, 2)) > 0) {
-                            $hl.__builtin___memcpy_chk(sp, re, $c.mulu64(4, $c.u64(i)), -1);
+                            $hl.memcpy(sp, re, $c.mulu64(4, $c.u64(i)));
                             sp = sp + $c.idx(i) * 4;
                         }
                         /* The "+ 2" is to account for the ".]" */
                         re = $h.u32[cp >>> 2] + $h.i32[(cp + 8) >>> 2] * 4 + 8;
                     }
                     i = ($h.u32[($h.u32[($fp + 16) >>> 2]) >>> 2] - re) / 4;   /* Includes the trailing right bracket */
-                    $hl.__builtin___memcpy_chk(sp, re, $c.mulu64(4, $c.u64(i)), -1);
+                    $hl.memcpy(sp, re, $c.mulu64(4, $c.u64(i)));
                     sp = sp + $c.idx(i) * 4;
                     $h.i32[(($t3 = sp, sp = $t3 + 4, $t3)) >>> 2] = 124;
                 }
                 for (cp = $h.u32[($fp + 16) >>> 2] + 16; $h.u32[cp >>> 2]; cp = cp + 16) {
-                    $hl.__builtin___memcpy_chk(sp, $h.u32[cp >>> 2], $c.mulu64(4, $c.u64($h.i32[(cp + 8) >>> 2])), -1);
+                    $hl.memcpy(sp, $h.u32[cp >>> 2], $c.mulu64(4, $c.u64($h.i32[(cp + 8) >>> 2])));
                     sp = sp + $h.i32[(cp + 8) >>> 2] * 4;
                     if ($h.u32[(cp + 16) >>> 2]) {
                         $h.i32[(($t4 = sp, sp = $t4 + 4, $t4)) >>> 2] = 124;
@@ -640,7 +640,7 @@ function tre_parse_bracket(ctx, result) {   // tre-parse.c:723
                 $h.i32[sp >>> 2] = 0;
                 do {
                 } while (0, 0);
-                $hl.__builtin___memcpy_chk($fp + 24, ctx, 136, -1);
+                $hl.memcpy($fp + 24, ctx, 136);
                 $h.stp($fp + 24 + 24, str);
                 $h.st64($fp + 24 + 56, $c.u64((sp - str) / 4));
                 $h.i32[($fp + 24 + 88) >>> 2] = 1;
@@ -671,7 +671,7 @@ function tre_parse_bracket(ctx, result) {   // tre-parse.c:723
                     status = 12;
                     break parse_bracket_done$;
                 }
-                $hl.__builtin___memcpy_chk($h.u32[(l + 16) >>> 2], $h.u32[$fp >>> 2], $c.addu64(8, $c.mulu64(8, $c.u64($h.i32[($h.u32[$fp >>> 2]) >>> 2]))), -1);
+                $hl.memcpy($h.u32[(l + 16) >>> 2], $h.u32[$fp >>> 2], $c.addu64(8, $c.mulu64(8, $c.u64($h.i32[($h.u32[$fp >>> 2]) >>> 2]))));
             }
         }
         /* TRE_DEBUG */
@@ -1594,7 +1594,7 @@ export function tre_parse(ctx) {   // tre-parse.c:1304
                                     {
                                         tre_expand_macro($h.u32[(ctx + 24) >>> 2] + 4, $h.u32[(ctx + 40) >>> 2], $fp + 8, 64);
                                         if ($h.i32[($fp + 8) >>> 2] !== 0) {
-                                            $hl.__builtin___memcpy_chk($fp + 264, ctx, 136, -1);
+                                            $hl.memcpy($fp + 264, ctx, 136);
                                             $h.stp($fp + 264 + 24, $fp + 8);
                                             $t5 = wcslen($fp + 8), $h.st64($fp + 264 + 56, $t5);
                                             $h.i32[($fp + 264 + 88) >>> 2] = 1;

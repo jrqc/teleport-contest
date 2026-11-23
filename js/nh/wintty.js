@@ -1130,21 +1130,21 @@ async function process_menu_window(window, cw) {   // wintty.c:1359
             }
             /* set extra chars.. */
             if (new $c.Ptr(gacc, 0).get(0)) {
-                $c.__builtin___strcat_chk(new $c.Ptr(resp, 0), new $c.Ptr(gacc, 0), 128);   /* group accelerators */
+                $c.strcat(new $c.Ptr(resp, 0), new $c.Ptr(gacc, 0));   /* group accelerators */
                 if (cw.how === PICK.ONE) {
                     resp_len = $c.i32($c.strlen(new $c.Ptr(resp, 0)));
                 }
             }
-            $c.__builtin___strcat_chk(new $c.Ptr(resp, 0), $c.lit(" "), 128);   /* next page or end */
-            $c.__builtin___strcat_chk(new $c.Ptr(resp, 0), $c.lit("0123456789\x1b\n\r"), 128);   /* counts, quit */
-            $c.__builtin___strcat_chk(new $c.Ptr(resp, 0), new $c.Ptr(gm.mapped_menu_cmds, 0), 128);
-            $c.__builtin___strcat_chk(new $c.Ptr(resp, 0), new $c.Ptr(default_menu_cmds, 0), 128);
+            $c.strcat(new $c.Ptr(resp, 0), $c.lit(" "));   /* next page or end */
+            $c.strcat(new $c.Ptr(resp, 0), $c.lit("0123456789\x1b\n\r"));   /* counts, quit */
+            $c.strcat(new $c.Ptr(resp, 0), new $c.Ptr(gm.mapped_menu_cmds, 0));
+            $c.strcat(new $c.Ptr(resp, 0), new $c.Ptr(default_menu_cmds, 0));
             if (cw.npages > 1) {
-                $c.__builtin___sprintf_chk(cw.morestr, 0, -1, $c.lit("(%d of %d)"), curr_page + 1 | 0, $c.i32(cw.npages));
+                $c.sprintf(cw.morestr, $c.lit("(%d of %d)"), curr_page + 1 | 0, $c.i32(cw.npages));
             } else if (msave) {
-                $c.__builtin___strcpy_chk(cw.morestr, msave, -1);
+                $c.strcpy(cw.morestr, msave);
             } else {
-                $c.__builtin___strcpy_chk(cw.morestr, new $c.Ptr(defmorestr, 0), -1);
+                $c.strcpy(cw.morestr, new $c.Ptr(defmorestr, 0));
             }
             await tty_curs(window, 1, page_lines);
             await cl_end();
@@ -1322,7 +1322,7 @@ async function process_menu_window(window, cw) {   // wintty.c:1359
                         if (!tmpbuf[0] || tmpbuf[0] === 27) {
                             break;
                         }
-                        $c.__builtin___sprintf_chk(new $c.Ptr(searchbuf, 0), 0, 258, $c.lit("*%s*"), new $c.Ptr(tmpbuf, 0));
+                        $c.sprintf(new $c.Ptr(searchbuf, 0), $c.lit("*%s*"), new $c.Ptr(tmpbuf, 0));
                         for (curr = cw.mlist; curr; curr = curr.next) {
                             if (on_curr_page) {
                                 lineno = lineno + 1 | 0;
@@ -1907,7 +1907,7 @@ export async function tty_putstr(window, attr, str) {   // wintty.c:2277
             n0 = $c.add64($c.i64($c.strlen(str)), 1);
             ob = ($t2 = $c.asArr(await alloc($c.u32(n0) + 1 >>> 0), Int8Array), cw.data.set($c.idx(cw.cury), $t2));
             ($t3 = ob, ob = $t3.add(1), $t3).set(0, $c.i8(attr + 1 | 0));   /* avoid nuls, for convenience */
-            $c.__builtin___strcpy_chk(ob, str, -1);
+            $c.strcpy(ob, str);
             if (n0 > cw.maxcol) {
                 cw.maxcol = n0;
             }
@@ -2040,8 +2040,8 @@ export async function tty_add_menu(window, glyphinfo, identifier, ch, gch, attr,
             await impossible($c.lit("Menu item too long (%d)."), len);
             len = BUFSZ - 1;
         }
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 260, $c.lit("%c - "), ch ? ch : 63);
-        $c.__builtin___strncpy_chk(new $c.Ptr(buf, 0).add(4), str, $c.u64(len), 256);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%c - "), ch ? ch : 63);
+        $c.strncpy(new $c.Ptr(buf, 0).add(4), str, $c.u64(len));
         buf[4 + len | 0] = 0;
         newstr = new $c.Ptr(buf, 0);
     } else {
@@ -2154,7 +2154,7 @@ export async function tty_end_menu(window, prompt) {   // wintty.c:2706
      */
     if (cw.npages > 1) {
         /* produce the largest demo string */
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 128, $c.lit("(%ld of %ld) "), cw.npages, cw.npages);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("(%ld of %ld) "), cw.npages, cw.npages);
         len = $c.i16($c.strlen(new $c.Ptr(buf, 0)));
         $t5 = await dupstr($c.lit("")), cw.morestr = $t5;
     } else {
@@ -3040,7 +3040,7 @@ export async function tty_status_update(fldidx, ptr, chg, percent, color, colorm
             if (fmt.get(0) === 32 && (fldidx === fieldorder.get(0)[0] || fldidx === fieldorder.get(1)[0] || fldidx === fieldorder.get(2)[0])) {
                 fmt = fmt.add(1);   /* skip leading space for first field on line */
             }
-            $c.__builtin___sprintf_chk(status_vals[fldidx], 0, -1, fmt, text);
+            $c.sprintf(status_vals[fldidx], fmt, text);
             tty_status[NOW][fldidx].idx = fldidx;
             tty_status[NOW][fldidx].color = color & 255;
             $t1 = term_attr_fixup(attrmask), tty_status[NOW][fldidx].attr = $t1;
@@ -3325,7 +3325,7 @@ function shrink_enc(lvl) {   // wintty.c:4936
     /* shrink or restore the encumbrance word */
     if (lvl <= 2) {
         enc_shrinklvl = lvl;
-        $c.__builtin___sprintf_chk(status_vals[BL.CAP], 0, -1, $c.lit(" %s"), encvals[lvl][enclev]);
+        $c.sprintf(status_vals[BL.CAP], $c.lit(" %s"), encvals[lvl][enclev]);
     }
     $t1 = $c.strlen(status_vals[BL.CAP]), tty_status[NOW][BL.CAP].lth = $t1;
 }
@@ -3335,9 +3335,9 @@ function shrink_dlvl(lvl) {   // wintty.c:4947
     levval = $c.strchr(status_vals[BL.LEVELDESC], 58);
     if (levval) {
         dlvl_shrinklvl = lvl;
-        $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), lvl === 0 ? $c.lit("Dlvl") : $c.lit("Dl"), 256);
-        $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), levval, 256);
-        $c.__builtin___strcpy_chk(status_vals[BL.LEVELDESC], new $c.Ptr(buf, 0), -1);
+        $c.strcpy(new $c.Ptr(buf, 0), lvl === 0 ? $c.lit("Dlvl") : $c.lit("Dl"));
+        $c.strcat(new $c.Ptr(buf, 0), levval);
+        $c.strcpy(status_vals[BL.LEVELDESC], new $c.Ptr(buf, 0));
         $t1 = $c.strlen(status_vals[BL.LEVELDESC]), tty_status[NOW][BL.LEVELDESC].lth = $t1;
     }
 }
@@ -3574,10 +3574,10 @@ async function render_status() {   // wintty.c:5068
                     /* force exactly 30 characters, padded with spaces
                        if shorter or truncated if longer */
                     if ($c.strlen(text) !== 30) {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(bar, 0), 0, 31, $c.lit("%-30.30s"), text);
-                        $c.__builtin___strcpy_chk(status_vals[BL.TITLE], new $c.Ptr(bar, 0), -1);
+                        $c.sprintf(new $c.Ptr(bar, 0), $c.lit("%-30.30s"), text);
+                        $c.strcpy(status_vals[BL.TITLE], new $c.Ptr(bar, 0));
                     } else {
-                        $c.__builtin___strcpy_chk(new $c.Ptr(bar, 0), text, 31);
+                        $c.strcpy(new $c.Ptr(bar, 0), text);
                     }
                     if (hpbar_crit_hp) {
                         repad_with_dashes(new $c.Ptr(bar, 0));

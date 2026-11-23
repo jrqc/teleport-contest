@@ -156,8 +156,8 @@ function hack_artifacts() {   // artifact.c:87
 }
 /* zero out the artifact existence list */
 export function init_artifacts() {   // artifact.c:111
-    $c.__builtin___memset_chk($c.relem(artiexist, 0), 0, 136, 136);
-    $c.__builtin___memset_chk(new $c.Ptr(artidisco, 0), 0, 66, 66);
+    $c.memset($c.relem(artiexist, 0), 0, 136);
+    $c.memset(new $c.Ptr(artidisco, 0), 0, 66);
     hack_artifacts();
 }
 export async function save_artifacts(nhfp) {   // artifact.c:119
@@ -573,7 +573,7 @@ export function restrict_name(otmp, name) {   // artifact.c:575
        otherwise, include all other undiscovered objects
        of the same class which have the same description
        or share the same pool of shuffled descriptions */
-    $c.__builtin___memset_chk(new $c.Ptr(sametype, 0), 0, 481, 481);   /* FALSE */
+    $c.memset(new $c.Ptr(sametype, 0), 0, 481);   /* FALSE */
     sametype[otyp] = TRUE;
     if (!objects[otyp].oc_name_known && (odesc = obj_descr[objects[otyp].oc_descr_idx].oc_descr) !== null) {
         obj_shuffle_range(otyp, new $c.Ptr(lo, 0), new $c.Ptr(hi, 0));
@@ -918,7 +918,7 @@ export async function touch_artifact(obj, mon) {   // artifact.c:908
         if ((objects[obj.otyp].oc_material | 0) === SILVER && Hate_silver()) {
             tmp = rnd(10), dmg = dmg + Maybe_Half_Phys(tmp) | 0;
         }
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("touching %s"), oart.name);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("touching %s"), oart.name);
         await losehp(dmg, new $c.Ptr(buf, 0), KILLED.BY);   /* magic damage, not physical */
         await exercise(A.WIS, FALSE);
     }
@@ -1092,7 +1092,7 @@ export async function disp_artifact_discoveries(tmpwin) {   // artifact.c:1147
         if (!$c.strcmp(algnstr, $c.lit("unaligned"))) {
             algnstr = $c.lit("non-aligned");
         }
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("  %s [%s %s]"), artiname(m), algnstr, await simple_typename(otyp));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("  %s [%s %s]"), artiname(m), algnstr, await simple_typename(otyp));
         await putstr()(tmpwin, 0, new $c.Ptr(buf, 0));
     }
     return i;
@@ -1203,7 +1203,7 @@ async function Mb_hit(magr, mdef, mb, dmgptr, dieroll, vis, hittee) {   // artif
                     /* canceled shapeshifter/vamp may have changed forms, so
                        update its name if necessary */
                     if (!$c.peq(mdef.data, old_mdat)) {
-                        $c.__builtin___strcpy_chk(hittee, await mon_nam(mdef), -1);
+                        $c.strcpy(hittee, await mon_nam(mdef));
                     }
                     if ($c.peq(mdef.data, $c.relem(mons, PM.CLAY_GOLEM))) {
                         mdef.mhp = 1;   /* cancelled clay golems will die */
@@ -1288,13 +1288,13 @@ async function Mb_hit(magr, mdef, mb, dmgptr, dieroll, vis, hittee) {   // artif
         if ((do_stun || do_confuse) && flags.verbose) {
             buf[0] = 0;
             if (do_stun) {
-                $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit("stunned"), 256);
+                $c.strcat(new $c.Ptr(buf, 0), $c.lit("stunned"));
             }
             if (do_stun && do_confuse) {
-                $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit(" and "), 256);
+                $c.strcat(new $c.Ptr(buf, 0), $c.lit(" and "));
             }
             if (do_confuse) {
-                $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit("confused"), 256);
+                $c.strcat(new $c.Ptr(buf, 0), $c.lit("confused"));
             }
             await pline($c.lit("%s %s %s%c"), hittee, await vtense(c_common_strings.c_fakename[fakeidx], $c.lit("are")), new $c.Ptr(buf, 0), do_stun && do_confuse ? 33 : 46);
         }
@@ -1319,7 +1319,7 @@ export async function artifact_hit(magr, mdef, otmp, dmgptr, dieroll) {   // art
     youattack = $c.i8($c.peq(magr, gy.youmonst) ? 1 : 0);
     youdefend = $c.i8($c.peq(mdef, gy.youmonst) ? 1 : 0);
     vis = $c.i8(!youattack && magr && cansee(magr.mx, magr.my) || !youdefend && cansee(mdef.mx, mdef.my) || youattack && engulfing_u(mdef) && !Blind() ? 1 : 0);
-    $c.__builtin___strcpy_chk(new $c.Ptr(hittee, 0), youdefend ? new $c.Ptr(artifact_hit$you, 0) : await mon_nam(mdef), 256);
+    $c.strcpy(new $c.Ptr(hittee, 0), youdefend ? new $c.Ptr(artifact_hit$you, 0) : await mon_nam(mdef));
     /* The following takes care of most of the damage, but not all--
      * the exception being for level draining, which is specially
      * handled.  Messages are done in this function, however.
@@ -2174,11 +2174,11 @@ function glow_strength(count) {   // artifact.c:2442
 }
 export function glow_verb(count, ingsfx) {   // artifact.c:2451
     /* 0 means blind rather than no applicable creatures */
-    $c.__builtin___strcpy_chk(new $c.Ptr(glow_verb$resbuf, 0), glow_verbs[glow_strength(count)], 20);
+    $c.strcpy(new $c.Ptr(glow_verb$resbuf, 0), glow_verbs[glow_strength(count)]);
     /* ing_suffix() will double the last consonant for all the words
        we're using and none of them should have that, so bypass it */
     if (ingsfx) {
-        $c.__builtin___strcat_chk(new $c.Ptr(glow_verb$resbuf, 0), $c.lit("ing"), 20);
+        $c.strcat(new $c.Ptr(glow_verb$resbuf, 0), $c.lit("ing"));
     }
     return new $c.Ptr(glow_verb$resbuf, 0);
 }
@@ -2257,7 +2257,7 @@ export async function retouch_object(objp, loseit) {   // artifact.c:2508
             if (bane) {
                 dmg = dmg + rnd(10) | 0;
             }
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("handling %s"), what);
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("handling %s"), what);
             await losehp(dmg, new $c.Ptr(buf, 0), KILLED.BY);
             await exercise(A.CON, FALSE);
         }

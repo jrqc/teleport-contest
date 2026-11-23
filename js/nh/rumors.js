@@ -99,7 +99,7 @@ export async function getrumor(truth, rumor_buf, exclude_cookie) {   // rumors.c
                 init_rumors(rumors);
                 if (gt.true_rumor_size < 0) {
                     /* init failed */
-                    $c.__builtin___sprintf_chk(rumor_buf, 0, -1, $c.lit("Error reading \"%.80s\"."), $c.lit("rumors"));
+                    $c.sprintf(rumor_buf, $c.lit("Error reading \"%.80s\"."), $c.lit("rumors"));
                     return rumor_buf;
                 }
             }
@@ -123,9 +123,9 @@ export async function getrumor(truth, rumor_buf, exclude_cookie) {   // rumors.c
                     break;
                 default:
                     await impossible($c.lit("strange truth value for rumor"));
-                    return $c.__builtin___strcpy_chk(rumor_buf, $c.lit("Oops..."), -1);
+                    return $c.strcpy(rumor_buf, $c.lit("Oops..."));
             }
-            $c.__builtin___strcpy_chk(rumor_buf, await get_rnd_line(rumors, new $c.Ptr(line, 0), 256, rn2, beginning, ending, MD_PAD.RUMORS), -1);
+            $c.strcpy(rumor_buf, await get_rnd_line(rumors, new $c.Ptr(line, 0), 256, rn2, beginning, ending, MD_PAD.RUMORS));
         } while (($t1 = count, count = $t1 + 1 | 0, $t1) < 50 && exclude_cookie && !$c.strncmp(rumor_buf, getrumor$cookie_marker, $c.u64(marklen)));
         $c.fclose(rumors);
         if (count >= 50) {
@@ -173,9 +173,9 @@ export async function rumor_check() {   // rumors.c:196
                 /*
                  * reveal the values.
                  */
-                $c.__builtin___sprintf_chk(new $c.Ptr(rumor_buf, 0), 0, 256, $c.lit("T start=%06ld (%06lx), end=%06ld (%06lx), size=%06ld (%06lx)"), $c.i64(gt.true_rumor_start), gt.true_rumor_start, gt.true_rumor_end, $c.u64(gt.true_rumor_end), gt.true_rumor_size, $c.u64(gt.true_rumor_size));
+                $c.sprintf(new $c.Ptr(rumor_buf, 0), $c.lit("T start=%06ld (%06lx), end=%06ld (%06lx), size=%06ld (%06lx)"), $c.i64(gt.true_rumor_start), gt.true_rumor_start, gt.true_rumor_end, $c.u64(gt.true_rumor_end), gt.true_rumor_size, $c.u64(gt.true_rumor_size));
                 await putstr()(tmpwin[0], 0, new $c.Ptr(rumor_buf, 0));
-                $c.__builtin___sprintf_chk(new $c.Ptr(rumor_buf, 0), 0, 256, $c.lit("F start=%06ld (%06lx), end=%06ld (%06lx), size=%06ld (%06lx)"), $c.i64(gf.false_rumor_start), gf.false_rumor_start, gf.false_rumor_end, $c.u64(gf.false_rumor_end), gf.false_rumor_size, $c.u64(gf.false_rumor_size));
+                $c.sprintf(new $c.Ptr(rumor_buf, 0), $c.lit("F start=%06ld (%06lx), end=%06ld (%06lx), size=%06ld (%06lx)"), $c.i64(gf.false_rumor_start), gf.false_rumor_start, gf.false_rumor_end, $c.u64(gf.false_rumor_end), gf.false_rumor_size, $c.u64(gf.false_rumor_size));
                 await putstr()(tmpwin[0], 0, new $c.Ptr(rumor_buf, 0));
                 /*
                  * check the first rumor (start of true rumors) by
@@ -191,7 +191,7 @@ export async function rumor_check() {   // rumors.c:196
                 if ((endp = $c.strchr(new $c.Ptr(line, 0), 10)) !== null) {
                     endp.set(0, 0);
                 }
-                $c.__builtin___sprintf_chk(new $c.Ptr(rumor_buf, 0), 0, 256, $c.lit("T %06ld %s"), ftell_rumor_start, xcrypt(new $c.Ptr(line, 0), new $c.Ptr(xbuf, 0)));
+                $c.sprintf(new $c.Ptr(rumor_buf, 0), $c.lit("T %06ld %s"), ftell_rumor_start, xcrypt(new $c.Ptr(line, 0), new $c.Ptr(xbuf, 0)));
                 await putstr()(tmpwin[0], 0, new $c.Ptr(rumor_buf, 0));
                 /* find last true rumor */
                 while ($c.fgets(new $c.Ptr(line, 0), 256, rumors) && $c.ftell(rumors) < gt.true_rumor_end) {
@@ -200,7 +200,7 @@ export async function rumor_check() {   // rumors.c:196
                 if ((endp = $c.strchr(new $c.Ptr(line, 0), 10)) !== null) {
                     endp.set(0, 0);
                 }
-                $c.__builtin___sprintf_chk(new $c.Ptr(rumor_buf, 0), 0, 256, $c.lit("  %6s %s"), $c.lit(""), xcrypt(new $c.Ptr(line, 0), new $c.Ptr(xbuf, 0)));
+                $c.sprintf(new $c.Ptr(rumor_buf, 0), $c.lit("  %6s %s"), $c.lit(""), xcrypt(new $c.Ptr(line, 0), new $c.Ptr(xbuf, 0)));
                 await putstr()(tmpwin[0], 0, new $c.Ptr(rumor_buf, 0));
                 rumor_buf[0] = 0;
                 $c.fseek(rumors, $c.i64(gf.false_rumor_start), 0);
@@ -209,7 +209,7 @@ export async function rumor_check() {   // rumors.c:196
                 if ((endp = $c.strchr(new $c.Ptr(line, 0), 10)) !== null) {
                     endp.set(0, 0);
                 }
-                $c.__builtin___sprintf_chk(new $c.Ptr(rumor_buf, 0), 0, 256, $c.lit("F %06ld %s"), ftell_rumor_start, xcrypt(new $c.Ptr(line, 0), new $c.Ptr(xbuf, 0)));
+                $c.sprintf(new $c.Ptr(rumor_buf, 0), $c.lit("F %06ld %s"), ftell_rumor_start, xcrypt(new $c.Ptr(line, 0), new $c.Ptr(xbuf, 0)));
                 await putstr()(tmpwin[0], 0, new $c.Ptr(rumor_buf, 0));
                 /* find last false rumor */
                 while ($c.fgets(new $c.Ptr(line, 0), 256, rumors) && $c.ftell(rumors) < gf.false_rumor_end) {
@@ -218,7 +218,7 @@ export async function rumor_check() {   // rumors.c:196
                 if ((endp = $c.strchr(new $c.Ptr(line, 0), 10)) !== null) {
                     endp.set(0, 0);
                 }
-                $c.__builtin___sprintf_chk(new $c.Ptr(rumor_buf, 0), 0, 256, $c.lit("  %6s %s"), $c.lit(""), xcrypt(new $c.Ptr(line, 0), new $c.Ptr(xbuf, 0)));
+                $c.sprintf(new $c.Ptr(rumor_buf, 0), $c.lit("  %6s %s"), $c.lit(""), xcrypt(new $c.Ptr(line, 0), new $c.Ptr(xbuf, 0)));
                 await putstr()(tmpwin[0], 0, new $c.Ptr(rumor_buf, 0));
                 $c.fclose(rumors);
                 /* if a previous attempt couldn't open file or rejected its contents,
@@ -272,12 +272,12 @@ async function others_check(ftype, fname, winptr) {   // rumors.c:308
             /* "don't edit" comment */
             new $c.Ptr(line, 0).set(0, 0);
             if (!$c.fgets(new $c.Ptr(line, 0), 256, fh)) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(xbuf, 0), 0, 256, new $c.Ptr(others_check$errfmt, 0), fname, $c.lit("error; can't read comment line"));
+                $c.sprintf(new $c.Ptr(xbuf, 0), new $c.Ptr(others_check$errfmt, 0), fname, $c.lit("error; can't read comment line"));
                 await putstr()(tmpwin, 0, new $c.Ptr(xbuf, 0));
                 break closeit$;
             }
             if (new $c.Ptr(line, 0).get(0) !== 35) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(xbuf, 0), 0, 256, new $c.Ptr(others_check$errfmt, 0), fname, $c.lit("malformed; first line is not a comment line:"));
+                $c.sprintf(new $c.Ptr(xbuf, 0), new $c.Ptr(others_check$errfmt, 0), fname, $c.lit("malformed; first line is not a comment line:"));
                 await putstr()(tmpwin, 0, new $c.Ptr(xbuf, 0));
                 /* show the bad line; we don't know whether it has been
                    encrypted via xcrypt() so show it both ways */
@@ -295,7 +295,7 @@ async function others_check(ftype, fname, winptr) {   // rumors.c:308
                can only require a line to exist */
             new $c.Ptr(line, 0).set(0, 0);
             if (!$c.fgets(new $c.Ptr(line, 0), 256, fh) || new $c.Ptr(line, 0).get(0) === 10) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(xbuf, 0), 0, 256, new $c.Ptr(others_check$errfmt, 0), fname, !new $c.Ptr(line, 0).get(0) ? $c.lit("can't read first non-comment line") : $c.lit("first non-comment line is empty"));
+                $c.sprintf(new $c.Ptr(xbuf, 0), new $c.Ptr(others_check$errfmt, 0), fname, !new $c.Ptr(line, 0).get(0) ? $c.lit("can't read first non-comment line") : $c.lit("first non-comment line is empty"));
                 await putstr()(tmpwin, 0, new $c.Ptr(xbuf, 0));
                 break closeit$;
             }
@@ -418,7 +418,7 @@ async function get_rnd_line(fh, buf, bufsiz, rng, startpos, endpos, padlength) {
     }
     /* decrypt line; make sure that our intermediate buffer is big enough */
     xbufp = $c.strlen(buf) <= 255 ? new $c.Ptr(xbuf, 0) : $c.asArr(await alloc($c.u32($c.strlen(buf)) + 1 >>> 0), Int8Array);
-    $c.__builtin___strcpy_chk(buf, xcrypt(buf, xbufp), -1);
+    $c.strcpy(buf, xcrypt(buf, xbufp));
     if (!$c.peq(xbufp, new $c.Ptr(xbuf, 0))) {
         $c.free(xbufp);
     }
@@ -442,7 +442,7 @@ export async function get_rnd_text(fname, buf, rng, padlength) {   // rumors.c:4
         $c.fseek(fh, 0, 1);
         starttxt = $c.ftell(fh);
         /* get a randomly chosen line; it comes back decrypted and unpadded */
-        $c.__builtin___strcpy_chk(buf, await get_rnd_line(fh, new $c.Ptr(line, 0), 256, rng, starttxt, 0, padlength), -1);
+        $c.strcpy(buf, await get_rnd_line(fh, new $c.Ptr(line, 0), 256, rng, starttxt, 0, padlength));
         $c.fclose(fh);
     } else {
         await couldnt_open_file(fname);
@@ -599,7 +599,7 @@ export async function doconsult(oracl) {   // rumors.c:696
         await You($c.lit("have no gold."));
         return ECMD.OK;
     }
-    $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("\"Wilt thou settle for a minor consultation?\" (%d %s)"), minor_cost, await currency(minor_cost));
+    $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("\"Wilt thou settle for a minor consultation?\" (%d %s)"), minor_cost, await currency(minor_cost));
     switch (await ynq(new $c.Ptr(qbuf, 0))) {
         default:
         case 113:
@@ -616,7 +616,7 @@ export async function doconsult(oracl) {   // rumors.c:696
             if (umoney <= minor_cost || (svo.oracle_cnt === 1 || go.oracle_flg < 0)) {
                 return ECMD.OK;
             }
-            $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("\"Then dost thou desire a major one?\" (%d %s)"), major_cost, await currency(major_cost));
+            $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("\"Then dost thou desire a major one?\" (%d %s)"), major_cost, await currency(major_cost));
             if (await y_n(new $c.Ptr(qbuf, 0)) !== 121) {
                 return ECMD.OK;
             }
@@ -789,7 +789,7 @@ async function init_CapMons() {   // rumors.c:829
         tmpwin = await create_nhwindow()(NHW.TEXT);
         await putstr()(tmpwin, 0, $c.lit("Capitalized monster type names normally preceded by \"the\":"));
         for (i = 0; i < CapMonSiz - 1 >>> 0; i = i + 1 >>> 0) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("  %.77s"), CapMons.get(i));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("  %.77s"), CapMons.get(i));
             await putstr()(tmpwin, 0, new $c.Ptr(buf, 0));
         }
         await display_nhwindow()(tmpwin, TRUE);

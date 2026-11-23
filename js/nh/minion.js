@@ -64,7 +64,7 @@ export async function newemin(mtmp) {   // minion.c:17
     }
     if (!EMIN(mtmp)) {
         $t2 = $c.asRec(await alloc(8), $T.emin, 8), mtmp.mextra.emin = $t2;
-        $c.__builtin___memset_chk(mtmp.mextra.emin, 0, 8, -1);
+        $c.memset(mtmp.mextra.emin, 0, 8);
         mtmp.mextra.emin.parentmid = mtmp.m_id;
     }
 }

@@ -724,25 +724,25 @@ async function parse_id(id, findwhat) {   // glyphs.c:824
                     } else if (glyph_is_female_pet(glyph)) {
                         buf2 = $c.lit("pet_female_");
                     }
-                    $c.__builtin___strcpy_chk(new $c.Ptr(buf[0], 0), $c.lit("G_"), 512);
-                    $c.__builtin___strcat_chk(new $c.Ptr(buf[0], 0), buf2, 512);
-                    $c.__builtin___strcat_chk(new $c.Ptr(buf[0], 0), buf3, 512);
+                    $c.strcpy(new $c.Ptr(buf[0], 0), $c.lit("G_"));
+                    $c.strcat(new $c.Ptr(buf[0], 0), buf2);
+                    $c.strcat(new $c.Ptr(buf[0], 0), buf3);
                 } else if (glyph_is_body(glyph)) {
                     /* buf2 will hold the distinguishing prefix */
                     /* buf3 will hold the base name */
                     buf2 = glyph_is_body_piletop(glyph) ? $c.lit("piletop_body_") : $c.lit("body_");
                     buf3 = monsdump[glyph_to_body_corpsenm(glyph)].nm;
-                    $c.__builtin___strcpy_chk(new $c.Ptr(buf[0], 0), $c.lit("G_"), 512);
-                    $c.__builtin___strcat_chk(new $c.Ptr(buf[0], 0), buf2, 512);
-                    $c.__builtin___strcat_chk(new $c.Ptr(buf[0], 0), buf3, 512);
+                    $c.strcpy(new $c.Ptr(buf[0], 0), $c.lit("G_"));
+                    $c.strcat(new $c.Ptr(buf[0], 0), buf2);
+                    $c.strcat(new $c.Ptr(buf[0], 0), buf3);
                 } else if (glyph_is_statue(glyph)) {
                     /* buf2 will hold the distinguishing prefix */
                     /* buf3 will hold the base name */
                     buf2 = glyph_is_fem_statue_piletop(glyph) ? $c.lit("piletop_statue_of_female_") : glyph_is_fem_statue(glyph) ? $c.lit("statue_of_female_") : glyph_is_male_statue_piletop(glyph) ? $c.lit("piletop_statue_of_male_") : glyph_is_male_statue(glyph) ? $c.lit("statue_of_male_") : $c.lit("");   /* shouldn't happen */
                     buf3 = monsdump[glyph_to_statue_corpsenm(glyph)].nm;
-                    $c.__builtin___strcpy_chk(new $c.Ptr(buf[0], 0), $c.lit("G_"), 512);
-                    $c.__builtin___strcat_chk(new $c.Ptr(buf[0], 0), buf2, 512);
-                    $c.__builtin___strcat_chk(new $c.Ptr(buf[0], 0), buf3, 512);
+                    $c.strcpy(new $c.Ptr(buf[0], 0), $c.lit("G_"));
+                    $c.strcat(new $c.Ptr(buf[0], 0), buf2);
+                    $c.strcat(new $c.Ptr(buf[0], 0), buf3);
                 } else if (glyph_is_object(glyph)) {
                     i = glyph_to_obj(glyph);
                     /* buf2 will hold the distinguishing prefix */
@@ -767,12 +767,12 @@ async function parse_id(id, findwhat) {   // glyphs.c:824
                             buf2 = $c.lit("");
                         }
                         buf3 = i === SCR_BLANK_PAPER ? $c.lit("blank scroll") : i === SPE_BLANK_PAPER ? $c.lit("blank spellbook") : i === SLIME_MOLD ? $c.lit("slime mold") : obj_descr[i].oc_name ? obj_descr[i].oc_name : obj_descr[i].oc_descr;
-                        $c.__builtin___strcpy_chk(new $c.Ptr(buf[0], 0), $c.lit("G_"), 512);
+                        $c.strcpy(new $c.Ptr(buf[0], 0), $c.lit("G_"));
                         if (glyph_is_normal_piletop_obj(glyph)) {
-                            $c.__builtin___strcat_chk(new $c.Ptr(buf[0], 0), $c.lit("piletop_"), 512);
+                            $c.strcat(new $c.Ptr(buf[0], 0), $c.lit("piletop_"));
                         }
-                        $c.__builtin___strcat_chk(new $c.Ptr(buf[0], 0), buf2, 512);
-                        $c.__builtin___strcat_chk(new $c.Ptr(buf[0], 0), buf3, 512);
+                        $c.strcat(new $c.Ptr(buf[0], 0), buf2);
+                        $c.strcat(new $c.Ptr(buf[0], 0), buf3);
                     }
                 } else if (glyph_is_cmap(glyph) || glyph_is_cmap_zap(glyph) || glyph_is_swallow(glyph) || glyph_is_explosion(glyph)) {
                     cmap = -1;
@@ -829,10 +829,10 @@ async function parse_id(id, findwhat) {   // glyphs.c:824
                         j = glyph - GLYPH.SWALLOW_OFF | 0;
                         cmap = glyph_to_swallow(glyph);
                         mnum = $c.div32(j, S.sw_br - S.sw_tl + 1);
-                        $c.__builtin___strcpy_chk(new $c.Ptr(buf[3], 0), $c.lit("swallow "), 128);
-                        $c.__builtin___strcat_chk(new $c.Ptr(buf[3], 0), monsdump[mnum].nm, 128);
-                        $c.__builtin___strcat_chk(new $c.Ptr(buf[3], 0), $c.lit(" "), 128);
-                        $c.__builtin___strcat_chk(new $c.Ptr(buf[3], 0), parse_id$swallow_texts[cmap], 128);
+                        $c.strcpy(new $c.Ptr(buf[3], 0), $c.lit("swallow "));
+                        $c.strcat(new $c.Ptr(buf[3], 0), monsdump[mnum].nm);
+                        $c.strcat(new $c.Ptr(buf[3], 0), $c.lit(" "));
+                        $c.strcat(new $c.Ptr(buf[3], 0), parse_id$swallow_texts[cmap]);
                         buf3 = new $c.Ptr(buf[3], 0);
                         skip_base = TRUE;
                     } else if (glyph_is_explosion(glyph)) {
@@ -851,16 +851,16 @@ async function parse_id(id, findwhat) {   // glyphs.c:824
                             buf3 = loadsyms[cmap + cmap_offset | 0].name.add(2);
                         }
                     }
-                    $c.__builtin___strcpy_chk(new $c.Ptr(buf[0], 0), $c.lit("G_"), 512);
-                    $c.__builtin___strcat_chk(new $c.Ptr(buf[0], 0), buf2, 512);
-                    $c.__builtin___strcat_chk(new $c.Ptr(buf[0], 0), buf3, 512);
-                    $c.__builtin___strcat_chk(new $c.Ptr(buf[0], 0), buf4, 512);
+                    $c.strcpy(new $c.Ptr(buf[0], 0), $c.lit("G_"));
+                    $c.strcat(new $c.Ptr(buf[0], 0), buf2);
+                    $c.strcat(new $c.Ptr(buf[0], 0), buf3);
+                    $c.strcat(new $c.Ptr(buf[0], 0), buf4);
                 } else if (glyph_is_invisible(glyph)) {
-                    $c.__builtin___strcpy_chk(new $c.Ptr(buf[0], 0), $c.lit("G_invisible"), 512);
+                    $c.strcpy(new $c.Ptr(buf[0], 0), $c.lit("G_invisible"));
                 } else if (glyph_is_nothing(glyph)) {
-                    $c.__builtin___strcpy_chk(new $c.Ptr(buf[0], 0), $c.lit("G_nothing"), 512);
+                    $c.strcpy(new $c.Ptr(buf[0], 0), $c.lit("G_nothing"));
                 } else if (glyph_is_unexplored(glyph)) {
-                    $c.__builtin___strcpy_chk(new $c.Ptr(buf[0], 0), $c.lit("G_unexplored"), 512);
+                    $c.strcpy(new $c.Ptr(buf[0], 0), $c.lit("G_unexplored"));
                 } else if (glyph_is_warning(glyph)) {
                     j = glyph - GLYPH.WARNING_OFF | 0;
                     nh_snprintf($c.lit("parse_id"), 1106, new $c.Ptr(buf[0], 0), 128, $c.lit("G_%s%d"), $c.lit("warning"), j);

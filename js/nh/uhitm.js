@@ -139,9 +139,9 @@ export async function dynamic_multi_reason(mon, verb, by_gaze) {   // uhitm.c:10
     who = await x_monnam(mon, ARTICLE.A, null, SUPPRESS.IT | SUPPRESS.INVISIBLE | SUPPRESS.HALLUCINATION | SUPPRESS.SADDLE | SUPPRESS_NAME, FALSE);
     p = new $c.Ptr(gm.multireasonbuf, 0);
     /* prefix info for done_in_by() */
-    $c.__builtin___sprintf_chk(p, 0, -1, $c.lit("%u:"), mon.m_id);
+    $c.sprintf(p, $c.lit("%u:"), mon.m_id);
     p = eos(p);
-    $c.__builtin___sprintf_chk(p, 0, -1, $c.lit("%s by %s%s"), verb, !by_gaze ? who : s_suffix(who), !by_gaze ? $c.lit("") : $c.lit(" gaze"));
+    $c.sprintf(p, $c.lit("%s by %s%s"), verb, !by_gaze ? who : s_suffix(who), !by_gaze ? $c.lit("") : $c.lit(" gaze"));
     gm.multi_reason = p;
 }
 export async function erode_armor(mdef, hurt) {   // uhitm.c:126
@@ -272,7 +272,7 @@ export async function attack_checks(mtmp, wep) {   // uhitm.c:189
             return FALSE;
         }
         if (!tp_sensemon(mtmp) && !Detect_monsters()) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(lmonbuf, 0), await l_monnam(mtmp), 256);
+            $c.strcpy(new $c.Ptr(lmonbuf, 0), await l_monnam(mtmp));
             /* might be unseen if invisible and hero can't see invisible */
             notseen = $c.i8(!$c.strcmp(new $c.Ptr(lmonbuf, 0), $c.lit("it")) ? 1 : 0);   /* note: not strcmpi() */
             if (!Blind() && Hallucination()) {
@@ -300,7 +300,7 @@ export async function attack_checks(mtmp, wep) {   // uhitm.c:189
             return FALSE;
         }
         if (canspotmon(mtmp)) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Really attack %s?"), await mon_nam(mtmp));
+            $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("Really attack %s?"), await mon_nam(mtmp));
             if (!await paranoid_query($c.i8(ParanoidHit()), new $c.Ptr(qbuf, 0))) {
                 svc.context.move = 0;
                 return TRUE;
@@ -452,7 +452,7 @@ export async function do_attack(mtmp) {   // uhitm.c:448
                 if (mtmp.mtame) {   /* see 'additional considerations' above */
                     await monflee(mtmp, rnd(6), FALSE, FALSE);
                 }
-                $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await y_monnam(mtmp), 256);
+                $c.strcpy(new $c.Ptr(buf, 0), await y_monnam(mtmp));
                 $t1 = highc(buf[0]), buf[0] = $t1;
                 await You($c.lit("stop.  %s is in the way!"), new $c.Ptr(buf, 0));
                 end_running(TRUE);
@@ -867,14 +867,14 @@ async function hmon_hitmon_weapon_melee(hmd, mon, obj) {   // uhitm.c:934
            by a shop or "Mon's X shatters" if X is carried by a monster
            (or "{Your|The} X shatters" if {carried by hero|last resort})*/
         if (canseemon(mon)) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await Yobjnam2(monwep, $c.lit("shatter")), 256);
+            $c.strcpy(new $c.Ptr(buf, 0), await Yobjnam2(monwep, $c.lit("shatter")));
         } else {
             /* hero is blind or can't see invisible mon */
             /* construct "Its weapon shatters"; not an exact replacement
                for Yobjnam2() if an unseen mon other than the shopkeeper
                is wielding a shop-owned weapon; telepathy or extended
                monster detection will name mon but not its weapon */
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s weapon%s %s"), s_suffix(await Monnam(mon)), monwep.quan === 1 ? $c.lit("") : $c.lit("s"), await otense(monwep, $c.lit("shatter")));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s weapon%s %s"), s_suffix(await Monnam(mon)), monwep.quan === 1 ? $c.lit("") : $c.lit("s"), await otense(monwep, $c.lit("shatter")));
         }
         buf[$c.idx(226)] = 0;
         await pline($c.lit("%s%s"), new $c.Ptr(buf, 0), new $c.Ptr(hmon_hitmon_weapon_melee$from_your_blow, 0));
@@ -1138,7 +1138,7 @@ async function hmon_hitmon_misc_obj(hmd, mon, obj) {   // uhitm.c:1119
                     }
                     /* note: s_suffix returns a modifiable buffer */
                     if (haseyes(hmd.mdat) && !$c.peq(hmd.mdat, $c.relem(mons, PM.FLOATING_EYE))) {
-                        whom = $c.__builtin___strcat_chk($c.__builtin___strcat_chk(s_suffix(whom), $c.lit(" "), -1), await mbodypart(mon, FACE), -1);
+                        whom = $c.strcat($c.strcat(s_suffix(whom), $c.lit(" ")), await mbodypart(mon, FACE));
                     }
                     await pline($c.lit("%s %s over %s!"), what, await vtense(what, $c.lit("splash")), whom);
                 }
@@ -1256,9 +1256,9 @@ async function hmon_hitmon_do_hit(hmd, mon, obj) {   // uhitm.c:1387
         /* remember obj's name since it might end up being destroyed and
            we'll want to use it after that */
         if (!(artifact_light(obj) && obj.lamplit | 0)) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(hmd.saved_oname, 0), await cxname(obj), -1);
+            $c.strcpy(new $c.Ptr(hmd.saved_oname, 0), await cxname(obj));
         } else {
-            $c.__builtin___strcpy_chk(new $c.Ptr(hmd.saved_oname, 0), await bare_artifactname(obj), -1);
+            $c.strcpy(new $c.Ptr(hmd.saved_oname, 0), await bare_artifactname(obj));
         }
         if (obj.oclass === WEAPON_CLASS || is_weptool(obj) || obj.oclass === GEM_CLASS) {
             await hmon_hitmon_weapon(hmd, mon, obj);
@@ -1440,7 +1440,7 @@ async function hmon_hitmon_splitmon(hmd, mon, obj) {   // uhitm.c:1604
         if ((mclone = await clone_mon(mon, 0, 0)) !== null) {
             withwhat[0] = 0;
             if (u.twoweap && flags.verbose) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(withwhat, 0), 0, 256, $c.lit(" with %s"), await yname(obj));
+                $c.sprintf(new $c.Ptr(withwhat, 0), $c.lit(" with %s"), await yname(obj));
             }
             await pline($c.lit("%s divides as you hit it%s!"), await Monnam(mon), new $c.Ptr(withwhat, 0));
             hmd.hittxt = TRUE;
@@ -1475,7 +1475,7 @@ async function hmon_hitmon_msg_silver(hmd, mon, obj) {   // uhitm.c:1663
                saved_oname[] from xname(via cxname()) */
             nh_snprintf($c.lit("hmon_hitmon_msg_silver"), 1682, new $c.Ptr(silverobjbuf, 0), 256, $c.lit("Your %s%s %s"), strstri(new $c.Ptr(hmd.saved_oname, 0), $c.lit("silver")) ? $c.lit("") : $c.lit("silver "), new $c.Ptr(hmd.saved_oname, 0), await vtense(new $c.Ptr(hmd.saved_oname, 0), $c.lit("sear")));
             strNsubst(new $c.Ptr(silverobjbuf, 0), $c.lit("%"), $c.lit("%%"), 0);
-            $c.__builtin___strncat_chk(new $c.Ptr(silverobjbuf, 0), $c.lit(" %s!"), $c.subu64(256, $c.addu64($c.strlen(new $c.Ptr(silverobjbuf, 0)), 1)), 256);
+            $c.strncat(new $c.Ptr(silverobjbuf, 0), $c.lit(" %s!"), $c.subu64(256, $c.addu64($c.strlen(new $c.Ptr(silverobjbuf, 0)), 1)));
             fmt = new $c.Ptr(silverobjbuf, 0);
         } else {
             fmt = $c.lit("The silver sears %s!");
@@ -1486,7 +1486,7 @@ async function hmon_hitmon_msg_silver(hmd, mon, obj) {   // uhitm.c:1663
     }
     /* note: s_suffix returns a modifiable buffer */
     if (!noncorporeal(hmd.mdat) && !amorphous(hmd.mdat)) {
-        whom = $c.__builtin___strcat_chk(s_suffix(whom), $c.lit(" flesh"), -1);
+        whom = $c.strcat(s_suffix(whom), $c.lit(" flesh"));
     }
     await pline(fmt, whom);
 }
@@ -1495,8 +1495,8 @@ async function hmon_hitmon_msg_lightobj(hmd, mon, obj) {   // uhitm.c:1702
     whom = await mon_nam(mon);
     if (canspotmon(mon)) {
         if (hmd.saved_oname[0]) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(emitlightobjbuf, 0), 0, 256, $c.lit("%s radiance penetrates deep into"), s_suffix(new $c.Ptr(hmd.saved_oname, 0)));
-            $c.__builtin___strcat_chk(new $c.Ptr(emitlightobjbuf, 0), $c.lit(" %s!"), 256);
+            $c.sprintf(new $c.Ptr(emitlightobjbuf, 0), $c.lit("%s radiance penetrates deep into"), s_suffix(new $c.Ptr(hmd.saved_oname, 0)));
+            $c.strcat(new $c.Ptr(emitlightobjbuf, 0), $c.lit(" %s!"));
             fmt = new $c.Ptr(emitlightobjbuf, 0);
         } else {
             fmt = $c.lit("The light sears %s!");
@@ -1507,7 +1507,7 @@ async function hmon_hitmon_msg_lightobj(hmd, mon, obj) {   // uhitm.c:1702
     }
     /* note: s_suffix returns a modifiable buffer */
     if (!noncorporeal(hmd.mdat) && !amorphous(hmd.mdat)) {
-        whom = $c.__builtin___strcat_chk(s_suffix(whom), $c.lit(" flesh"), -1);
+        whom = $c.strcat(s_suffix(whom), $c.lit(" flesh"));
     }
     await pline(fmt, whom);
 }
@@ -1648,7 +1648,7 @@ async function hmon_hitmon(mon, obj, thrown, dieroll) {   // uhitm.c:1754
        last message, so reformat while obj is still accessible */
     if (hmd.unpoisonmsg) {
         (!!$c.peq(obj, $c.asRec(null, $T.obj, 112)) ? 1 : 0) ? $c.__assert_rtn($c.lit("hmon_hitmon"), $c.lit("uhitm.c"), 1888, $c.lit("obj != NULL")) : 0;
-        $c.__builtin___strcpy_chk(new $c.Ptr(hmd.saved_oname, 0), await cxname(obj), 256);
+        $c.strcpy(new $c.Ptr(hmd.saved_oname, 0), await cxname(obj));
     }
     /* [note: thrown obj might go away during killed()/xkilled() call
        (via 'thrownobj'; if swallowed, it gets added to engulfer's
@@ -1723,14 +1723,14 @@ async function first_weapon_hit(weapon) {   // uhitm.c:1963
     buf[0] = 0;
     /* include "cursed" if known but don't bother with blessed */
     if (weapon.cursed | 0 && weapon.bknown | 0) {
-        $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit("cursed "), 256);   /* normally supplied by doname() */
+        $c.strcat(new $c.Ptr(buf, 0), $c.lit("cursed "));   /* normally supplied by doname() */
     }
     if (obj_is_pname(weapon)) {
-        $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), weapon.oextra.oname, 256);   /* fully IDed artifact */
+        $c.strcat(new $c.Ptr(buf, 0), weapon.oextra.oname);   /* fully IDed artifact */
     } else {
-        $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), await simpleonames(weapon), 256);
+        $c.strcat(new $c.Ptr(buf, 0), await simpleonames(weapon));
         if (weapon.oartifact && weapon.dknown | 0) {
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" named %s"), await bare_artifactname(weapon));
+            $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit(" named %s"), await bare_artifactname(weapon));
         }
     }
     /* when a hit breaks the never-hit-with-wielded-weapon conduct
@@ -1917,7 +1917,7 @@ async function steal_it(mdef, mattk) {   // uhitm.c:2174
            but was using hardcoded pronouns She/her for target monster;
            switch to dynamic pronoun */
         if (gender(mdef) === (u.mfemale | 0) && gy.youmonst.data.mlet === S.NYMPH) {
-            await You($c.lit("charm %s.  %s gladly hands over %s%s possessions."), await mon_nam(mdef), upstart($c.__builtin___strcpy_chk(new $c.Ptr(heshe, 0), genders[pronoun_gender(mdef, PRONOUN.HALLU)].he, 20)), !gold ? $c.lit("") : $c.lit("most of "), genders[pronoun_gender(mdef, PRONOUN.HALLU)].his);
+            await You($c.lit("charm %s.  %s gladly hands over %s%s possessions."), await mon_nam(mdef), upstart($c.strcpy(new $c.Ptr(heshe, 0), genders[pronoun_gender(mdef, PRONOUN.HALLU)].he)), !gold ? $c.lit("") : $c.lit("most of "), genders[pronoun_gender(mdef, PRONOUN.HALLU)].his);
         } else {
             await You($c.lit("seduce %s and %s starts to take off %s clothes."), await mon_nam(mdef), genders[pronoun_gender(mdef, PRONOUN.HALLU)].he, genders[pronoun_gender(mdef, PRONOUN.HALLU)].his);
         }
@@ -2523,7 +2523,7 @@ export async function mhitm_ad_sgld(magr, mattk, mdef, mhm) {   // uhitm.c:2790
             await add_to_minv(magr, gold);
         }
         mdef.mstrategy = $c.andu64(mdef.mstrategy, 18446744073172680703n);
-        $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await Monnam(magr), 256);
+        $c.strcpy(new $c.Ptr(buf, 0), await Monnam(magr));
         if (gv.vis && canseemon(mdef)) {
             await pline($c.lit("%s steals some gold from %s."), new $c.Ptr(buf, 0), await mon_nam(mdef));
         }
@@ -2550,7 +2550,7 @@ export async function mhitm_ad_tlpt(magr, mattk, mdef, mhm) {   // uhitm.c:2859
         } else {
             u_saw_mon = $c.i8(canseemon(mdef) || engulfing_u(mdef) ? 1 : 0);
             /* record the name before losing sight of monster */
-            $c.__builtin___strcpy_chk(new $c.Ptr(nambuf, 0), await Monnam(mdef), 256);
+            $c.strcpy(new $c.Ptr(nambuf, 0), await Monnam(mdef));
             if (await u_teleport_mon(mdef, FALSE) && u_saw_mon && !(canseemon(mdef) || engulfing_u(mdef))) {
                 await pline($c.lit("%s suddenly disappears!"), new $c.Ptr(nambuf, 0));
             }
@@ -2619,7 +2619,7 @@ export async function mhitm_ad_tlpt(magr, mattk, mdef, mhm) {   // uhitm.c:2859
             /* save the name before monster teleports, otherwise
                we'll get "it" in the suddenly disappears message */
             if (gv.vis && wasseen) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(mdef_Monnam, 0), await Monnam(mdef), 256);
+                $c.strcpy(new $c.Ptr(mdef_Monnam, 0), await Monnam(mdef));
             }
             mdef.mstrategy = $c.andu64(mdef.mstrategy, 18446744073172680703n);
             await rloc(mdef, RLOC.NOMSG);
@@ -2830,7 +2830,7 @@ export async function mhitm_ad_drst(magr, mattk, mdef, mhm) {   // uhitm.c:3122
         }
         await hitmsg(magr, mattk);
         if (!negated && !rn2(8)) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s %s"), s_suffix(await Monnam(magr)), mpoisons_subj(magr, mattk));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s %s"), s_suffix(await Monnam(magr)), mpoisons_subj(magr, mattk));
             await poisoned(new $c.Ptr(buf, 0), ptmp, pmname(pa, Mgender(magr)), 30, FALSE);
         }
     } else {
@@ -2947,7 +2947,7 @@ export async function mhitm_ad_drin(magr, mattk, mdef, mhm) {   // uhitm.c:3168
         }
         if ($c.and64(mdef.misc_worn_check, W.ARMH) && rn2(8)) {
             if (gv.vis && canspotmon(magr) && canseemon(mdef)) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), s_suffix(await Monnam(mdef)), 256);
+                $c.strcpy(new $c.Ptr(buf, 0), s_suffix(await Monnam(mdef)));
                 await pline($c.lit("%s helmet blocks %s attack to %s head."), new $c.Ptr(buf, 0), s_suffix(await mon_nam(magr)), genders[pronoun_gender(mdef, PRONOUN.HALLU)].his);
             }
             return;
@@ -3042,7 +3042,7 @@ export async function mhitm_ad_wrap(magr, mattk, mdef, mhm) {   // uhitm.c:3337
                     moat = $c.i8(svl.level.locations[magr.mx][magr.my].typ !== POOL && !is_waterwall(magr.mx, magr.my) && !((svd.dungeon_topology.d_medusa_level.dlevel || svd.dungeon_topology.d_medusa_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_medusa_level)) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) ? 1 : 0);
                     await urgent_pline($c.lit("%s drowns you..."), await Monnam(magr));
                     svk.killer.format = KILLED.BY_AN;
-                    $c.__builtin___sprintf_chk(new $c.Ptr(svk.killer.name, 0), 0, 256, $c.lit("%s by %s"), moat ? $c.lit("moat") : $c.lit("pool of water"), await an(pmname(magr.data, Mgender(magr))));
+                    $c.sprintf(new $c.Ptr(svk.killer.name, 0), $c.lit("%s by %s"), moat ? $c.lit("moat") : $c.lit("pool of water"), await an(pmname(magr.data, Mgender(magr))));
                     await done(DROWNING);
                 } else if (mattk.aatyp === AT.HUGS) {
                     await You($c.lit("are being crushed."));
@@ -3104,7 +3104,7 @@ export async function mhitm_ad_plys(magr, mattk, mdef, mhm) {   // uhitm.c:3431
         /* mhitm */
         if (mdef.mcanmove | 0 && !rn2(3) && !await mhitm_mgc_atk_negated(magr, mdef, TRUE)) {
             if (gv.vis && canspotmon(mdef)) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await Monnam(mdef), 256);
+                $c.strcpy(new $c.Ptr(buf, 0), await Monnam(mdef));
                 await pline($c.lit("%s is frozen by %s."), new $c.Ptr(buf, 0), await mon_nam(magr));
             }
             paralyze_monst(mdef, rnd(10));
@@ -3141,7 +3141,7 @@ export async function mhitm_ad_slee(magr, mattk, mdef, mhm) {   // uhitm.c:3479
         /* mhitm */
         if (!mdef.msleeping && await sleep_monst(mdef, rnd(10), -1) && await sleep_monst(mdef, rnd(10), -1)) {
             if (gv.vis && canspotmon(mdef)) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await Monnam(mdef), 256);
+                $c.strcpy(new $c.Ptr(buf, 0), await Monnam(mdef));
                 await pline($c.lit("%s is put to sleep by %s."), new $c.Ptr(buf, 0), await mon_nam(magr));
             }
             mdef.mstrategy = $c.andu64(mdef.mstrategy, 18446744073172680703n);
@@ -3710,7 +3710,7 @@ export async function mhitm_ad_phys(magr, mattk, mdef, mhm) {   // uhitm.c:3981
                     /* similar to mhitm_really_poison, but we don't use the
                      * exact same values, nor do we want same 1/8 chance of
                      * poison taking (use 1/4, same as in the mhitm case). */
-                    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s %s"), s_suffix(await Monnam(magr)), mpoisons_subj(magr, mattk));
+                    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s %s"), s_suffix(await Monnam(magr)), mpoisons_subj(magr, mattk));
                     /* arbitrary, but most poison sources in the game are
                      * strength-based. With hpdamchance = 10, HP damage occurs
                      * 1/2 of the time and it will hit Str rest of the time.
@@ -4252,17 +4252,17 @@ export async function mhitm_ad_sedu(magr, mattk, mdef, mhm) {   // uhitm.c:4623
         if (obj) {
             /* make a special x_monnam() call that never omits
                the saddle, and save it for later messages */
-            $c.__builtin___strcpy_chk(new $c.Ptr(mdefnambuf, 0), await x_monnam(mdef, ARTICLE.THE, null, 0, FALSE), 256);
+            $c.strcpy(new $c.Ptr(mdefnambuf, 0), await x_monnam(mdef, ARTICLE.THE, null, 0, FALSE));
             if ($c.peq(u.usteed, mdef) && $c.peq(obj, await which_armor(mdef, W.SADDLE))) {   /* "You can no longer ride <steed>." */
                 await dismount_steed(DISMOUNT.POLY);
             }
             await extract_from_minvent(mdef, obj, TRUE, FALSE);
             /* add_to_minv() might free 'obj' [if it merges] */
             if (gv.vis) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(onambuf, 0), await doname(obj), 256);
+                $c.strcpy(new $c.Ptr(onambuf, 0), await doname(obj));
             }
             await add_to_minv(magr, obj);
-            $c.__builtin___strcpy_chk(new $c.Ptr(buf$2, 0), await Monnam(magr), 256);
+            $c.strcpy(new $c.Ptr(buf$2, 0), await Monnam(magr));
             if (gv.vis && canseemon(mdef)) {
                 await pline($c.lit("%s steals %s from %s!"), new $c.Ptr(buf$2, 0), new $c.Ptr(onambuf, 0), new $c.Ptr(mdefnambuf, 0));
             }
@@ -4600,7 +4600,7 @@ async function gulpum(mdef, mattk) {   // uhitm.c:4958
                 mnam = await an(mnam);
             }
             await You($c.lit("%s %s."), u_digest ? $c.lit("englut") : $c.lit("engulf"), await mon_nam(mdef));
-            $c.__builtin___sprintf_chk(new $c.Ptr(kbuf, 0), 0, 256, $c.lit("%s %s%s"), u_digest ? $c.lit("swallowing") : u_enfold ? $c.lit("enclosing") : $c.lit("engulfing"), mnam, u_digest ? $c.lit(" whole") : $c.lit(""));
+            $c.sprintf(new $c.Ptr(kbuf, 0), $c.lit("%s %s%s"), u_digest ? $c.lit("swallowing") : u_enfold ? $c.lit("enclosing") : $c.lit("engulfing"), mnam, u_digest ? $c.lit(" whole") : $c.lit(""));
             await instapetrify(new $c.Ptr(kbuf, 0));
         } else {
             await start_engulf(mdef);
@@ -4610,7 +4610,7 @@ async function gulpum(mdef, mattk) {   // uhitm.c:4958
                     if (is_rider(pd)) {
                         await pline($c.lit("Unfortunately, digesting any of it is fatal."));
                         await end_engulf();
-                        $c.__builtin___sprintf_chk(new $c.Ptr(svk.killer.name, 0), 0, 256, $c.lit("unwisely tried to eat %s"), pmname(pd, Mgender(mdef)));
+                        $c.sprintf(new $c.Ptr(svk.killer.name, 0), $c.lit("unwisely tried to eat %s"), pmname(pd, Mgender(mdef)));
                         svk.killer.format = NO_KILLER_PREFIX;
                         await done(DIED);
                         return M_ATTK.MISS;   /* lifesaved */
@@ -4643,7 +4643,7 @@ async function gulpum(mdef, mattk) {   // uhitm.c:4958
                         } else {
                             tmp = 0;
                         }
-                        $c.__builtin___sprintf_chk(new $c.Ptr(gulpum$msgbuf, 0), 0, 256, $c.lit("You totally digest %s."), await mon_nam(mdef));
+                        $c.sprintf(new $c.Ptr(gulpum$msgbuf, 0), $c.lit("You totally digest %s."), await mon_nam(mdef));
                         if (tmp !== 0) {
                             /* setting afternmv = end_engulf is tempting,
                              * but will cause problems if the player is
@@ -4664,7 +4664,7 @@ async function gulpum(mdef, mattk) {   // uhitm.c:4958
                             await pline($c.lit("%s"), new $c.Ptr(gulpum$msgbuf, 0));
                         }
                         if ($c.peq(pd, $c.relem(mons, PM.GREEN_SLIME))) {
-                            $c.__builtin___sprintf_chk(new $c.Ptr(gulpum$msgbuf, 0), 0, 256, $c.lit("%s isn't sitting well with you."), await The(pmname(pd, Mgender(mdef))));
+                            $c.sprintf(new $c.Ptr(gulpum$msgbuf, 0), $c.lit("%s isn't sitting well with you."), await The(pmname(pd, Mgender(mdef))));
                             if (!Unchanging()) {
                                 await make_slimed(5, null);
                             }
@@ -4906,8 +4906,8 @@ export async function mhitm_knockback(magr, mdef, mattk, hitflags, weapon_used) 
     knockedhow = dismount ? $c.lit("out of your saddle") : will_hurtle(mdef, $c.i16(defx + dx | 0), $c.i16(defy + dy | 0)) ? $c.lit("backward") : $c.lit("back");
     /* give the message */
     if (u_def || canseemon(mdef)) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(magrbuf, 0), u_agr ? $c.lit("You") : await Monnam(magr), 256);
-        $c.__builtin___strcpy_chk(new $c.Ptr(mdefbuf, 0), u_def || was_u ? $c.lit("you") : await y_monnam(mdef), 256);
+        $c.strcpy(new $c.Ptr(magrbuf, 0), u_agr ? $c.lit("You") : await Monnam(magr));
+        $c.strcpy(new $c.Ptr(mdefbuf, 0), u_def || was_u ? $c.lit("you") : await y_monnam(mdef));
         if (was_u) {
             nh_snprintf($c.lit("mhitm_knockback"), 5366, eos(new $c.Ptr(mdefbuf, 0)), $c.subu64(256, $c.strlen(new $c.Ptr(mdefbuf, 0))), $c.lit(" and %s"), await y_monnam(u.usteed));
         }
@@ -5694,7 +5694,7 @@ export async function that_is_a_mimic(mtmp, mimic_flags) {   // uhitm.c:6201
     what = null;
     reveal_it = $c.i8((mimic_flags & MIM.REVEAL) >>> 0 !== 0 ? 1 : 0);
     omit_wait = $c.i8((mimic_flags & MIM.OMIT_WAIT) >>> 0 !== 0 ? 1 : 0);
-    $c.__builtin___strcpy_chk(new $c.Ptr(fmtbuf, 0), $c.lit("Wait!  That's %s!"), 256);
+    $c.strcpy(new $c.Ptr(fmtbuf, 0), $c.lit("Wait!  That's %s!"));
     if (Blind()) {
         if (!Blind_telepat()) {
             what = new $c.Ptr(that_is_a_mimic$generic, 0);   /* with default fmt */

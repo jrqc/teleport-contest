@@ -75,7 +75,7 @@ export function mixed_to_utf8(buf, bufsz, str, retflags) {   // utf8map.c:86
     put = buf;
     glyphinfo.$copyFrom(nul_glyphinfo);
     if (!str) {
-        return $c.__builtin___strcpy_chk(buf, $c.lit(""), -1);
+        return $c.strcpy(buf, $c.lit(""));
     }
     L1: while (str.get(0) && $c.pcmp(put, buf.add($c.idx(bufsz)).add(-1)) < 0) {
         if (str.get(0) === 92) {

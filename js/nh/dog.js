@@ -96,7 +96,7 @@ export async function newedog(mtmp) {   // dog.c:23
     }
     if (!EDOG(mtmp)) {
         $t2 = $c.asRec(await alloc(64), $T.edog, 64), mtmp.mextra.edog = $t2;
-        $c.__builtin___memset_chk(mtmp.mextra.edog, 0, 64, -1);
+        $c.memset(mtmp.mextra.edog, 0, 64);
         mtmp.mextra.edog.parentmid = mtmp.m_id;
     }
 }

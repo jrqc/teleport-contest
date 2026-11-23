@@ -59,7 +59,7 @@ async function hooked_tty_getlin(query, bufp, hook) {   // getline.c:43
     bufp.set(0, 0);
     for (; ; ) {
         $c.fflush($c.__stdoutp);
-        $c.__builtin___strcat_chk($c.__builtin___strcat_chk($c.__builtin___strcpy_chk(new $c.Ptr(gt.toplines, 0), query, 300), $c.lit(" "), -1), obufp, -1);
+        $c.strcat($c.strcat($c.strcpy(new $c.Ptr(gt.toplines, 0), query), $c.lit(" ")), obufp);
         term_curs_set(1);
         c = await pgetchar();
         term_curs_set(0);
@@ -239,7 +239,7 @@ async function ext_cmd_getlin_hook(base) {   // getline.c:272
     nmatches = await extcmds_match(base, ECM.NOFLAGS, new $c.Ptr(ecmatches, 0));
     if (nmatches === 1) {
         ec = extcmds_getentry(ecmatches[0].get(0));
-        $c.__builtin___strcpy_chk(base, ec.ef_txt, -1);
+        $c.strcpy(base, ec.ef_txt);
         return 1;
     }
     return 0;   /* didn't match anything */

@@ -409,23 +409,23 @@ export function append_price_quote(buf, eos, otyp) {   // shk.c:454
     if (objects[otyp].oc_sell_minseen > objects[otyp].oc_sell_maxseen && objects[otyp].oc_buy_minseen > objects[otyp].oc_buy_maxseen) {
         return;
     }
-    eos2 = eos2.add($c.__builtin___sprintf_chk(eos2, 0, -1, $c.lit(" {")));
+    eos2 = eos2.add($c.sprintf(eos2, $c.lit(" {")));
     if (objects[otyp].oc_buy_minseen < objects[otyp].oc_buy_maxseen) {
-        eos2 = eos2.add($c.__builtin___sprintf_chk(eos2, 0, -1, $c.lit("buy %lu-%lu"), objects[otyp].oc_buy_minseen, objects[otyp].oc_buy_maxseen));
+        eos2 = eos2.add($c.sprintf(eos2, $c.lit("buy %lu-%lu"), objects[otyp].oc_buy_minseen, objects[otyp].oc_buy_maxseen));
         sep = $c.lit(" ");
     } else if (objects[otyp].oc_buy_minseen === objects[otyp].oc_buy_maxseen) {
-        eos2 = eos2.add($c.__builtin___sprintf_chk(eos2, 0, -1, $c.lit("buy %lu"), objects[otyp].oc_buy_minseen));
+        eos2 = eos2.add($c.sprintf(eos2, $c.lit("buy %lu"), objects[otyp].oc_buy_minseen));
         sep = $c.lit(" ");
     }
     if (objects[otyp].oc_sell_minseen < objects[otyp].oc_sell_maxseen) {
-        eos2 = eos2.add($c.__builtin___sprintf_chk(eos2, 0, -1, $c.lit("%ssell %lu-%lu"), sep, objects[otyp].oc_sell_minseen, objects[otyp].oc_sell_maxseen));
+        eos2 = eos2.add($c.sprintf(eos2, $c.lit("%ssell %lu-%lu"), sep, objects[otyp].oc_sell_minseen, objects[otyp].oc_sell_maxseen));
     } else if (objects[otyp].oc_sell_minseen === objects[otyp].oc_sell_maxseen) {
-        eos2 = eos2.add($c.__builtin___sprintf_chk(eos2, 0, -1, $c.lit("%ssell %lu"), sep, objects[otyp].oc_sell_minseen));
+        eos2 = eos2.add($c.sprintf(eos2, $c.lit("%ssell %lu"), sep, objects[otyp].oc_sell_minseen));
     }
-    eos2 = eos2.add($c.__builtin___sprintf_chk(eos2, 0, -1, $c.lit("}")));
+    eos2 = eos2.add($c.sprintf(eos2, $c.lit("}")));
     len2 = $c.u64($c.pdiff(eos2, new $c.Ptr(buf2, 0)));
     if (len2 < $c.subu64($c.subu64(BUFSZ, len), 1)) {
-        $c.__builtin___strcpy_chk(eos.get(0), new $c.Ptr(buf2, 0), -1);
+        $c.strcpy(eos.get(0), new $c.Ptr(buf2, 0));
         eos.set(0, eos.get(0).add($c.idx(len2)));
     }
 }
@@ -643,7 +643,7 @@ export async function u_entered_shop(enterstring) {   // shk.c:751
         if (!$c.strchr(new $c.Ptr(u_entered_shop$empty_shops, 0), enterstring.get(0)) && !$c.peq(in_rooms(u.ux, u.uy, SHOPBASE), in_rooms(u.ux0, u.uy0, SHOPBASE))) {
             await deserted_shop(enterstring);
         }
-        $c.__builtin___strcpy_chk(new $c.Ptr(u_entered_shop$empty_shops, 0), new $c.Ptr(u.ushops, 0), 5);
+        $c.strcpy(new $c.Ptr(u_entered_shop$empty_shops, 0), new $c.Ptr(u.ushops, 0));
         u.ushops[0] = 0;
         return;
     }
@@ -654,7 +654,7 @@ export async function u_entered_shop(enterstring) {   // shk.c:751
         if (!$c.strchr(new $c.Ptr(u_entered_shop$empty_shops, 0), enterstring.get(0))) {
             await deserted_shop(enterstring);
         }
-        $c.__builtin___strcpy_chk(new $c.Ptr(u_entered_shop$empty_shops, 0), new $c.Ptr(u.ushops, 0), 5);
+        $c.strcpy(new $c.Ptr(u_entered_shop$empty_shops, 0), new $c.Ptr(u.ushops, 0));
         u.ushops[0] = 0;
         return;
     }
@@ -664,7 +664,7 @@ export async function u_entered_shop(enterstring) {   // shk.c:751
         /* You seem to be new here */
         eshkp.visitct = 0;
         eshkp.following = 0;
-        $c.__builtin___strncpy_chk(new $c.Ptr(eshkp.customer, 0), new $c.Ptr(svp.plname, 0), PL.NSIZ, 32);
+        $c.strncpy(new $c.Ptr(eshkp.customer, 0), new $c.Ptr(svp.plname, 0), PL.NSIZ);
         pacify_shk(shkp, TRUE);
     }
     if (muteshk(shkp) || eshkp.following) {
@@ -1166,7 +1166,7 @@ export async function make_happy_shk(shkp, silentkops) {   // shk.c:1395
     }
     if (!inhishop(shkp)) {
         vanished = $c.i8(canseemon(shkp));
-        $c.__builtin___strcpy_chk(new $c.Ptr(shk_nam, 0), await shkname(shkp), 256);
+        $c.strcpy(new $c.Ptr(shk_nam, 0), await shkname(shkp));
         if (on_level(eshkp.shoplevel, u.uz)) {
             await home_shk(shkp, FALSE);
             if (canspotmon(shkp)) {
@@ -1206,7 +1206,7 @@ export function hot_pursuit(shkp) {   // shk.c:1449
         return;
     }
     rile_shk(shkp);
-    $c.__builtin___strncpy_chk(new $c.Ptr(shkp.mextra.eshk.customer, 0), new $c.Ptr(svp.plname, 0), PL.NSIZ, 32);
+    $c.strncpy(new $c.Ptr(shkp.mextra.eshk.customer, 0), new $c.Ptr(svp.plname, 0), PL.NSIZ);
     shkp.mextra.eshk.following = 1;
     /* shopkeeper networking:  clear obj->no_charge for all obj on the
        floor of this level (including inside containers on floor), even
@@ -1410,20 +1410,20 @@ async function menu_pick_pay_items(ibillct, ibill) {   // shk.c:1668
             largest_amt = $c.radd(ibill, i).cost;
         }
     }
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%ld"), largest_amt);
+    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%ld"), largest_amt);
     amt_width = $c.i32($c.strlen(new $c.Ptr(buf, 0)));
     /* show the "used up items" header if there are any used up items on
        the bill, no matter whether there are also any intact items;
        note: ibill[] has been sorted to hold used-up items first */
     if ($c.radd(ibill, 0).usedup <= PartlyUsedUp) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Used up item%s:"), ibillct > 1 && $c.radd(ibill, 1).usedup <= PartlyUsedUp ? $c.lit("s") : $c.lit(""));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Used up item%s:"), ibillct > 1 && $c.radd(ibill, 1).usedup <= PartlyUsedUp ? $c.lit("s") : $c.lit(""));
         await add_menu_heading(win, new $c.Ptr(buf, 0));
     }
     for (i = 0; i < ibillct; i = i + 1 | 0) {
         /* the "unpaid items" header is only shown if the "used up items"
            one was shown before the first menu entry */
         if (i > 0 && $c.radd(ibill, i - 1 | 0).usedup <= PartlyUsedUp && $c.radd(ibill, i).usedup >= PartlyIntact) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Unpaid item%s:"), i < (ibillct - 1 | 0) ? $c.lit("s") : $c.lit(""));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Unpaid item%s:"), i < (ibillct - 1 | 0) ? $c.lit("s") : $c.lit(""));
             await add_menu_heading(win, new $c.Ptr(buf, 0));
         }
         otmp = $c.radd(ibill, i).obj;
@@ -1658,15 +1658,15 @@ export async function dopay() {   // shk.c:1743
         dtmp = eshkp.debit;
         loan = eshkp.loan;
         umoney = money_cnt(gi.invent);
-        $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("You owe %s %ld %s "), await shkname(shkp), dtmp, await currency(dtmp));
+        $c.sprintf(new $c.Ptr(sbuf, 0), $c.lit("You owe %s %ld %s "), await shkname(shkp), dtmp, await currency(dtmp));
         if (loan) {
             if (loan === dtmp) {
-                $c.__builtin___strcat_chk(new $c.Ptr(sbuf, 0), $c.lit("you picked up in the store."), 256);
+                $c.strcat(new $c.Ptr(sbuf, 0), $c.lit("you picked up in the store."));
             } else {
-                $c.__builtin___strcat_chk(new $c.Ptr(sbuf, 0), $c.lit("for gold picked up and the use of merchandise."), 256);
+                $c.strcat(new $c.Ptr(sbuf, 0), $c.lit("for gold picked up and the use of merchandise."));
             }
         } else {
-            $c.__builtin___strcat_chk(new $c.Ptr(sbuf, 0), $c.lit("for the use of merchandise."), 256);
+            $c.strcat(new $c.Ptr(sbuf, 0), $c.lit("for the use of merchandise."));
         }
         await pline1(new $c.Ptr(sbuf, 0));
         if ($c.add64(umoney, eshkp.credit) < dtmp) {
@@ -1919,7 +1919,7 @@ async function dopayobj(shkp, bp, obj, which, itemize, unseen) {   // shk.c:2220
          *  This should also accept 'a' and 'q' to end itemized paying:
          *  'a' to buy the rest without asking, 'q' to just stop.
          */
-        $c.__builtin___sprintf_chk(new $c.Ptr(qsfx, 0), 0, 256, $c.lit(" for %ld %s.  Pay?"), ltmp, await currency(ltmp));
+        $c.sprintf(new $c.Ptr(qsfx, 0), $c.lit(" for %ld %s.  Pay?"), ltmp, await currency(ltmp));
         await safe_qbuf(new $c.Ptr(qbuf, 0), null, new $c.Ptr(qsfx, 0), obj, quan === 1 ? Doname2 : doname, ansimpleoname, quan === 1 ? $c.lit("that") : $c.lit("those"));
         if (await y_n(new $c.Ptr(qbuf, 0)) === 110) {
             buy = PAY_SKIP;   /* don't want to buy */
@@ -2057,7 +2057,7 @@ async function reject_purchase(shkp, obj, billed_quan) {   // shk.c:2419
         if (obj.where === OBJ.CONTAINED) {
             nh_snprintf($c.lit("reject_purchase"), 2434, new $c.Ptr(which, 0), 256, $c.lit("the one%s in %s"), intact_quan === 1 ? $c.lit("") : $c.lit("s"), await thesimpleoname(obj.v.v_ocontainer));
         } else {
-            $c.__builtin___sprintf_chk(new $c.Ptr(which, 0), 0, 256, $c.lit("%s"), intact_quan > 1 ? $c.lit("these") : $c.lit("this one"));
+            $c.sprintf(new $c.Ptr(which, 0), $c.lit("%s"), intact_quan > 1 ? $c.lit("these") : $c.lit("this one"));
         }
         /* short name suffices */
         await verbalize($c.lit("%s for the other %s before buying %s."), ANGRY(shkp) ? $c.lit("Pay") : $c.lit("Please pay"), await simpleonames(obj), new $c.Ptr(which, 0));
@@ -2190,7 +2190,7 @@ async function inherits(shkp, numsk, croaked, silently) {   // shk.c:2577
                 if (cansee(shkp.mx, shkp.my) && croaked && !silently) {
                     takes[0] = 0;
                     if (has_head(shkp.data) && !rn2(2)) {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(takes, 0), 0, 256, $c.lit(", shakes %s %s,"), genders[pronoun_gender(shkp, PRONOUN.NO_IT | PRONOUN.HALLU)].his, await mbodypart(shkp, HEAD));
+                        $c.sprintf(new $c.Ptr(takes, 0), $c.lit(", shakes %s %s,"), genders[pronoun_gender(shkp, PRONOUN.NO_IT | PRONOUN.HALLU)].his, await mbodypart(shkp, HEAD));
                     }
                     await pline($c.lit("%s %slooks at your corpse%s and %s."), await Shknam(shkp), helpless(shkp) ? $c.lit("wakes up, ") : $c.lit(""), new $c.Ptr(takes, 0), !inhishop(shkp) ? $c.lit("disappears") : $c.lit("sighs"));
                 }
@@ -2226,12 +2226,12 @@ async function inherits(shkp, numsk, croaked, silently) {   // shk.c:2577
                         umoney = money_cnt(gi.invent);
                         takes[0] = 0;
                         if (helpless(shkp)) {
-                            $c.__builtin___strcat_chk(new $c.Ptr(takes, 0), $c.lit("wakes up and "), 256);
+                            $c.strcat(new $c.Ptr(takes, 0), $c.lit("wakes up and "));
                         }
                         if (!(dist2(shkp.mx, shkp.my, u.ux, u.uy) <= 2)) {
-                            $c.__builtin___strcat_chk(new $c.Ptr(takes, 0), $c.lit("comes and "), 256);
+                            $c.strcat(new $c.Ptr(takes, 0), $c.lit("comes and "));
                         }
-                        $c.__builtin___strcat_chk(new $c.Ptr(takes, 0), $c.lit("takes"), 256);
+                        $c.strcat(new $c.Ptr(takes, 0), $c.lit("takes"));
                         if (loss > umoney || !loss || uinshop) {
                             eshkp.robbed = $c.sub64(eshkp.robbed, umoney);
                             if (eshkp.robbed < 0) {
@@ -2911,7 +2911,7 @@ async function shk_names_obj(shkp, obj, fmt, amt, arg) {   // shk.c:3413
     obj_name = await paydoname(obj);
     /* Use an alternate message when extra information is being provided */
     if (was_unknown) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(fmtbuf, 0), 0, 256, $c.lit("%%s; you %s"), fmt);
+        $c.sprintf(new $c.Ptr(fmtbuf, 0), $c.lit("%%s; you %s"), fmt);
         $t1 = highc(obj_name.get(0)), obj_name.set(0, $t1);
         await pline(new $c.Ptr(fmtbuf, 0), obj_name, obj.quan > 1 ? $c.lit("them") : $c.lit("it"), amt, plur(amt), arg);
     } else {
@@ -3018,13 +3018,13 @@ export async function addtobill(obj, ininv, dummy, silent) {   // shk.c:3490
             await pline($c.lit("%s will cost you %ld %s%s."), await The(await xname(obj)), ltmp, await currency(ltmp), obj.quan > 1 ? $c.lit(" each") : $c.lit(""));
         } else {
             save_quan = obj.quan;
-            $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("\"For you,"), 256);
+            $c.strcpy(new $c.Ptr(buf, 0), $c.lit("\"For you,"));
             if (ANGRY(shkp[0])) {
-                $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit(" scum;"), 256);
+                $c.strcat(new $c.Ptr(buf, 0), $c.lit(" scum;"));
             } else if (!shkp[0].mextra.eshk.surcharge) {
-                $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit(" "), 256);
+                $c.strcat(new $c.Ptr(buf, 0), $c.lit(" "));
                 append_honorific(new $c.Ptr(buf, 0));
-                $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit("; only"), 256);
+                $c.strcat(new $c.Ptr(buf, 0), $c.lit("; only"));
             }
             obj.quan = 1;   /* fool xname() into giving singular */
             set_voice(shkp[0], 0, 80, 0);
@@ -3043,13 +3043,13 @@ export async function addtobill(obj, ininv, dummy, silent) {   // shk.c:3490
 function append_honorific(buf) {   // shk.c:3602
     /* (chooses among [0]..[3] normally; [1]..[4] after the
        Wizard has been killed or invocation ritual performed) */
-    $c.__builtin___strcat_chk(buf, append_honorific$honored[rn2(4) + (u.uevent.udemigod | 0) | 0], -1);
+    $c.strcat(buf, append_honorific$honored[rn2(4) + (u.uevent.udemigod | 0) | 0]);
     if (is_vampire(gy.youmonst.data)) {
-        $c.__builtin___strcat_chk(buf, flags.female ? $c.lit(" dark lady") : $c.lit(" dark lord"), -1);
+        $c.strcat(buf, flags.female ? $c.lit(" dark lady") : $c.lit(" dark lord"));
     } else if (u.umonnum !== u.umonster ? $c.andu64(gy.youmonst.data.mflags2, M2.ELF) !== 0 : gu.urace.mnum === PM.ELF) {
-        $c.__builtin___strcat_chk(buf, flags.female ? $c.lit(" hiril") : $c.lit(" hir"), -1);
+        $c.strcat(buf, flags.female ? $c.lit(" hiril") : $c.lit(" hir"));
     } else {
-        $c.__builtin___strcat_chk(buf, !($c.andu64(gy.youmonst.data.mflags2, M2.HUMAN) !== 0) ? $c.lit(" creature") : flags.female ? $c.lit(" lady") : $c.lit(" sir"), -1);
+        $c.strcat(buf, !($c.andu64(gy.youmonst.data.mflags2, M2.HUMAN) !== 0) ? $c.lit(" creature") : flags.female ? $c.lit(" lady") : $c.lit(" sir"));
     }
 }
 export async function splitbill(obj, otmp) {   // shk.c:3623
@@ -3234,11 +3234,11 @@ export async function stolen_value(obj, x, y, peaceful, silent) {   // shk.c:375
                 }
                 still = $c.lit("still ");
             }
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%sowe %s %ld %s"), still, await shkname(shkp[0]), value, await currency(value));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%sowe %s %ld %s"), still, await shkname(shkp[0]), value, await currency(value));
             if (u_count) {   /* u_count > 0 implies Has_contents(obj) */
-                $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" for %s%sits contents"), was_unpaid ? $c.lit("it and ") : $c.lit(""), c_count > u_count ? $c.lit("some of ") : $c.lit(""));
+                $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit(" for %s%sits contents"), was_unpaid ? $c.lit("it and ") : $c.lit(""), c_count > u_count ? $c.lit("some of ") : $c.lit(""));
             } else if (obj.oclass !== COIN_CLASS) {
-                $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" for %s"), obj.quan > 1 ? $c.lit("them") : $c.lit("it"));
+                $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit(" for %s"), obj.quan > 1 ? $c.lit("them") : $c.lit("it"));
             }
             await You($c.lit("%s!"), new $c.Ptr(buf, 0));   /* "You owe <shk> N zorkmids for it!" */
         }
@@ -3415,7 +3415,7 @@ export async function sellobj(obj, x, y) {   // shk.c:3927
             c = gs.sell_response = 121;
         } else if (gs.sell_response !== 110) {
             await pline($c.lit("%s cannot pay you at present."), await Shknam(shkp));
-            $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 256, $c.lit("Will you accept %ld %s in credit for "), tmpcr, await currency(tmpcr));
+            $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("Will you accept %ld %s in credit for "), tmpcr, await currency(tmpcr));
             record_price_quote(obj.otyp, $c.u64($c.div64(tmpcr, obj.quan)), FALSE);
             c = await yn_function(await safe_qbuf(new $c.Ptr(qbuf, 0), new $c.Ptr(qbuf, 0), $c.lit("?"), obj, doname, thesimpleoname, obj.quan === 1 ? $c.lit("that") : $c.lit("those")), new $c.Ptr(ynaqchars, 0), 121, TRUE);
             if (c === 97) {
@@ -3494,9 +3494,9 @@ export async function sellobj(obj, x, y) {   // shk.c:3927
                when container's contents are unknown, plural "items"
                should be used to not give away information.
              */
-            $c.__builtin___sprintf_chk(new $c.Ptr(qbuf$2, 0), 0, 256, $c.lit("%s offers%s %ld gold piece%s for %s%s "), await Shknam(shkp), short_funds ? $c.lit(" only") : $c.lit(""), offer, offer === 1 ? $c.lit("") : $c.lit("s"), cltmp && !ltmp ? yourc === 1 ? $c.lit("your item in ") : $c.lit("your items in ") : $c.lit(""), obj.unpaid | 0 ? $c.lit("the") : $c.lit("your"));
+            $c.sprintf(new $c.Ptr(qbuf$2, 0), $c.lit("%s offers%s %ld gold piece%s for %s%s "), await Shknam(shkp), short_funds ? $c.lit(" only") : $c.lit(""), offer, offer === 1 ? $c.lit("") : $c.lit("s"), cltmp && !ltmp ? yourc === 1 ? $c.lit("your item in ") : $c.lit("your items in ") : $c.lit(""), obj.unpaid | 0 ? $c.lit("the") : $c.lit("your"));
             one = $c.i8(!ltmp ? yourc === 1 ? 1 : 0 : obj.quan === 1 && !cltmp ? 1 : 0);
-            $c.__builtin___sprintf_chk(new $c.Ptr(qsfx, 0), 0, 256, $c.lit("%s.  Sell %s?"), cltmp && ltmp ? only_partially_your_contents ? yourc === 1 ? $c.lit(" and item inside") : $c.lit(" and items inside") : new $c.Ptr(and_its_contents, 0) : $c.lit(""), one ? $c.lit("it") : $c.lit("them"));
+            $c.sprintf(new $c.Ptr(qsfx, 0), $c.lit("%s.  Sell %s?"), cltmp && ltmp ? only_partially_your_contents ? yourc === 1 ? $c.lit(" and item inside") : $c.lit(" and items inside") : new $c.Ptr(and_its_contents, 0) : $c.lit(""), one ? $c.lit("it") : $c.lit("them"));
             record_price_quote(obj.otyp, $c.u64($c.div64(offer, obj.quan)), FALSE);
             await safe_qbuf(new $c.Ptr(qbuf$2, 0), new $c.Ptr(qbuf$2, 0), new $c.Ptr(qsfx, 0), obj, xname, simpleonames, one ? $c.lit("that") : $c.lit("those"));
         } else {
@@ -3735,7 +3735,7 @@ export async function add_damage(x, y, cost) {   // shk.c:4399
         }
     }
     tmp_dam = $c.asRec(await alloc(32), $T.damage, 32);
-    $c.__builtin___memset_chk(tmp_dam, 0, 32, -1);
+    $c.memset(tmp_dam, 0, 32);
     tmp_dam.when = svm.moves;
     tmp_dam.place.x = x;
     tmp_dam.place.y = y;
@@ -3824,7 +3824,7 @@ function discard_damage_struct(dam) {   // shk.c:4509
             prev.next = dam.next;
         }
     }
-    $c.__builtin___memset_chk(dam, 0, 32, -1);
+    $c.memset(dam, 0, 32);
     $c.free(dam);
 }
 /* discard all damage structs owned by shopkeeper */
@@ -3843,7 +3843,7 @@ function discard_damage_owned_by(shkp) {   // shk.c:4530
             if ($c.peq(dam, svl.level.damagelist)) {
                 svl.level.damagelist = dam2;
             }
-            $c.__builtin___memset_chk(dam, 0, 32, -1);
+            $c.memset(dam, 0, 32);
             $c.free(dam), dam = $c.asRec(null, $T.damage, 32);
         } else {
             prevdam = dam;
@@ -3877,7 +3877,7 @@ function litter_getpos(litter, x, y, shkp) {   // shk.c:4591
     let i = 0, ix = 0, iy = 0, k = 0;
     /* array of 9 uint8's */
     k = 0;   /* number of adjacent shop spots */
-    $c.__builtin___memset_chk(litter, 0, 9, -1);
+    $c.memset(litter, 0, 9);
     if (svl.level.objects[x][y] && !(svl.level.locations[x][y].typ >= ROOM)) {
         for (i = 0; i < 9; i = i + 1 | 0) {
             ix = x + horiz(i) | 0;
@@ -4370,7 +4370,7 @@ export async function pay_for_damage(dmgstr, cant_mollify) {   // shk.c:5174
             continue;
         }
         cost_of_damage = $c.add64(cost_of_damage, tmp_dam.cost);
-        $c.__builtin___strcpy_chk(new $c.Ptr(shops_affected, 0), in_rooms(tmp_dam.place.x, tmp_dam.place.y, SHOPBASE), 5);
+        $c.strcpy(new $c.Ptr(shops_affected, 0), in_rooms(tmp_dam.place.x, tmp_dam.place.y, SHOPBASE));
         for (shp = new $c.Ptr(shops_affected, 0); shp.get(0); shp = shp.add(1)) {
             if (!(tmp_shk = await shop_keeper(shp.get(0)))) {
                 continue;
@@ -4411,7 +4411,7 @@ export async function pay_for_damage(dmgstr, cant_mollify) {   // shk.c:5174
     x = appear_here.place.x;
     y = appear_here.place.y;
     /* not the best introduction to the shk... */
-    $c.__builtin___strncpy_chk(new $c.Ptr(shkp.mextra.eshk.customer, 0), new $c.Ptr(svp.plname, 0), PL.NSIZ, 32);
+    $c.strncpy(new $c.Ptr(shkp.mextra.eshk.customer, 0), new $c.Ptr(svp.plname, 0), PL.NSIZ);
     /* if the shk is already on the war path, be sure it's all out */
     if (ANGRY(shkp) || shkp.mextra.eshk.following) {
         hot_pursuit(shkp);
@@ -4465,7 +4465,7 @@ export async function pay_for_damage(dmgstr, cant_mollify) {   // shk.c:5174
     if (Invis()) {
         await Your($c.lit("invisibility does not fool %s!"), await shkname(shkp));
     }
-    $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 80, $c.lit("%sYou did %ld %s worth of damage!%s  Pay?"), !animal ? await cad(TRUE) : $c.lit(""), cost_of_damage, await currency(cost_of_damage), !animal ? $c.lit("\"") : $c.lit(""));
+    $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("%sYou did %ld %s worth of damage!%s  Pay?"), !animal ? await cad(TRUE) : $c.lit(""), cost_of_damage, await currency(cost_of_damage), !animal ? $c.lit("\"") : $c.lit(""));
     if (await y_n(new $c.Ptr(qbuf, 0)) !== 110) {
         was_seen = $c.i8(canseemon(shkp));
         was_outside = $c.i8(!inhishop(shkp) ? 1 : 0);
@@ -4572,12 +4572,12 @@ export async function price_quote(first_obj) {   // shk.c:5406
             cost = $c.mul64(cost, await get_pricing_units(otmp));   /* always quan 1, vary by wt */
         }
         if (!cost) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(price, 0), $c.lit("no charge"), 40);
+            $c.strcpy(new $c.Ptr(price, 0), $c.lit("no charge"));
             contentsonly = FALSE;
         } else {
-            $c.__builtin___sprintf_chk(new $c.Ptr(price, 0), 0, 40, $c.lit("%ld %s%s"), cost, await currency(cost), otmp.quan > 1 ? $c.lit(" each") : $c.lit(""));
+            $c.sprintf(new $c.Ptr(price, 0), $c.lit("%ld %s%s"), cost, await currency(cost), otmp.quan > 1 ? $c.lit(" each") : $c.lit(""));
         }
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%s, %s"), contentsonly ? new $c.Ptr(the_contents_of, 0) : $c.lit(""), await doname(otmp), new $c.Ptr(price, 0));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s%s, %s"), contentsonly ? new $c.Ptr(the_contents_of, 0) : $c.lit(""), await doname(otmp), new $c.Ptr(price, 0));
         await putstr()(tmpwin, 0, new $c.Ptr(buf, 0)), cnt = cnt + 1 | 0;
     }
     if (cnt > 1) {
@@ -4589,7 +4589,7 @@ export async function price_quote(first_obj) {   // shk.c:5406
         } else {
             /* print cost in slightly different format, so can't reuse buf;
                cost and contentsonly are already set up */
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%s"), contentsonly ? new $c.Ptr(the_contents_of, 0) : $c.lit(""), await doname(first_obj));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s%s"), contentsonly ? new $c.Ptr(the_contents_of, 0) : $c.lit(""), await doname(first_obj));
             await verbalize($c.lit("%s, price %ld %s%s%s"), upstart(new $c.Ptr(buf, 0)), cost, await currency(cost), first_obj.quan > 1 ? $c.lit(" each") : $c.lit(""), contentsonly ? $c.lit(".") : shk_embellish(first_obj, cost));
         }
     }
@@ -4775,7 +4775,7 @@ export async function check_unpaid_usage(otmp, altusage) {   // shk.c:5688
     arg1 = arg2 = $c.lit("");
     if (otmp.oclass === SPBOOK_CLASS) {
         fmt = $c.lit("%sYou owe%s %ld %s.");
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("This is no free library, %s!  "), await cad(FALSE));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("This is no free library, %s!  "), await cad(FALSE));
         arg1 = rn2(2) ? new $c.Ptr(buf, 0) : $c.lit("");
         arg2 = shkp.mextra.eshk.debit > 0 ? $c.lit(" an additional") : $c.lit("");
     } else if (otmp.otyp === POT_OIL) {
@@ -4908,11 +4908,11 @@ export async function shk_your(buf, obj) {   // shk.c:5862
     if (chk_pm && type_is_pname($c.relem(mons, obj.corpsenm))) {
         return buf;   /* skip ownership prefix and space: "Medusa's corpse" */
     } else if (chk_pm && the_unique_pm($c.relem(mons, obj.corpsenm))) {
-        $c.__builtin___strcpy_chk(buf, $c.lit("the"), -1);   /* override ownership: "the Oracle's corpse" */
+        $c.strcpy(buf, $c.lit("the"));   /* override ownership: "the Oracle's corpse" */
     } else if (!await shk_owns(buf, obj) && !await mon_owns(buf, obj)) {
-        $c.__builtin___strcpy_chk(buf, c_common_strings.c_the_your[obj.where === OBJ.INVENT ? 1 : 0], -1);
+        $c.strcpy(buf, c_common_strings.c_the_your[obj.where === OBJ.INVENT ? 1 : 0]);
     }
-    return $c.__builtin___strcat_chk(buf, $c.lit(" "), -1);
+    return $c.strcat(buf, $c.lit(" "));
 }
 export async function Shk_Your(buf, obj) {   // shk.c:5877
     let $t1;
@@ -4924,13 +4924,13 @@ async function shk_owns(buf, obj) {   // shk.c:5885
     let shkp = null, x = Int16Array.of(0), y = Int16Array.of(0);
     if (get_obj_location(obj, new $c.Ptr(x, 0), new $c.Ptr(y, 0), 0) && (obj.unpaid | 0 || obj.where === OBJ.FLOOR && !obj.no_charge && await costly_spot(x[0], y[0]))) {
         shkp = await shop_keeper(inside_shop(x[0], y[0]));
-        return $c.__builtin___strcpy_chk(buf, shkp ? s_suffix(await shkname(shkp)) : c_common_strings.c_the_your[0], -1);
+        return $c.strcpy(buf, shkp ? s_suffix(await shkname(shkp)) : c_common_strings.c_the_your[0]);
     }
     return null;
 }
 async function mon_owns(buf, obj) {   // shk.c:5900
     if (obj.where === OBJ.MINVENT) {
-        return $c.__builtin___strcpy_chk(buf, s_suffix(await y_monnam(obj.v.v_ocarry)), -1);
+        return $c.strcpy(buf, s_suffix(await y_monnam(obj.v.v_ocarry)));
     }
     return null;
 }
@@ -4960,7 +4960,7 @@ async function cad(altusage) {   // shk.c:5908
         cadbuf = await mon_nam(gy.youmonst);   /* snag an output buffer */
         /* alternate usage adds a leading double quote and trailing
            exclamation point plus sentence separating spaces */
-        $c.__builtin___sprintf_chk(cadbuf, 0, -1, $c.lit("\"%s!  "), res);
+        $c.sprintf(cadbuf, $c.lit("\"%s!  "), res);
         $t1 = highc(cadbuf.get(1)), cadbuf.set(1, $t1);
         res = cadbuf;
     }

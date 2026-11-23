@@ -41,7 +41,7 @@ export function colortable_to_int32(cte) {   // coloratt.c:237
     return clr;
 }
 export function color_attr_to_str(ca) {   // coloratt.c:249
-    $c.__builtin___sprintf_chk(new $c.Ptr(color_attr_to_str$buf, 0), 0, 256, $c.lit("%s&%s"), clr2colorname(ca.color), attr2attrname(ca.attr));
+    $c.sprintf(new $c.Ptr(color_attr_to_str$buf, 0), $c.lit("%s&%s"), clr2colorname(ca.color), attr2attrname(ca.attr));
     return new $c.Ptr(color_attr_to_str$buf, 0);
 }
 /* parse string like "color&attr" into color_attr */
@@ -50,7 +50,7 @@ export async function color_attr_parse_str(ca, str) {   // coloratt.c:261
     amp = null;
     c = NO_COLOR;
     a = ATR.NONE;
-    $c.__builtin___strncpy_chk(new $c.Ptr(buf, 0), str, 255, 256);
+    $c.strncpy(new $c.Ptr(buf, 0), str, 255);
     buf[$c.idx(255)] = 0;
     if ((amp = $c.strchr(new $c.Ptr(buf, 0), 38)) !== null) {
         amp.set(0, 0);
@@ -311,7 +311,7 @@ export async function basic_menu_colors(load_colors) {   // coloratt.c:530
                 if (c === CLR.BLACK || c === CLR.WHITE || c === NO_COLOR) {
                     continue;   /* skip these */
                 }
-                $c.__builtin___sprintf_chk(new $c.Ptr(cnm, 0), 0, 128, patternfmt, colornames[i].name);
+                $c.sprintf(new $c.Ptr(cnm, 0), patternfmt, colornames[i].name);
                 await add_menu_coloring_parsed(new $c.Ptr(cnm, 0), c, ATR.NONE);
             }
             /* right now, menu_colorings contains the alternate color list;
@@ -356,7 +356,7 @@ export async function add_menu_coloring(tmpstr) {   // coloratt.c:617
     /* never Null but could be empty */
     c = NO_COLOR;
     a = ATR.NONE;
-    $c.__builtin___strncpy_chk(new $c.Ptr(str, 0), tmpstr, 255, 256);
+    $c.strncpy(new $c.Ptr(str, 0), tmpstr, 255);
     str[$c.idx(255)] = 0;
     if ((cs = $c.strchr(new $c.Ptr(str, 0), 61)) === null) {
         await config_error_add($c.lit("Malformed MENUCOLOR"));
@@ -465,7 +465,7 @@ export async function check_enhanced_colors(buf) {   // coloratt.c:723
             altbuf = await dupstr(buf);
             /* use direct copy because strsubst() is case-sensitive */
             /*(void) strncpy(&altbuf[greyoffset], "gray", 4);*/
-            $c.__builtin___memcpy_chk(altbuf.add($c.idx(greyoffset)), $c.lit("gray"), 4, -1);
+            $c.memcpy(altbuf.add($c.idx(greyoffset)), $c.lit("gray"), 4);
         }
         for (color = 0; color < 155; color = color + 1 | 0) {
             if (fuzzymatch(buf, colortable[color].name, $c.lit(" -_"), TRUE) || altbuf && fuzzymatch(altbuf, colortable[color].name, $c.lit(" -_"), TRUE)) {

@@ -71,7 +71,7 @@ export async function formatkiller(buf, siz, how, incl_helpless) {   // topten.c
             kname = await an(kname);
         case KILLED.BY:
             /*FALLTHRU*/
-            $c.__builtin___strncat_chk(buf, formatkiller$killed_by_prefix[how], siz - 1 >>> 0, -1);
+            $c.strncat(buf, formatkiller$killed_by_prefix[how], siz - 1 >>> 0);
             l = await Strlen_(buf, $c.lit("formatkiller"), 123);
             buf = buf.add(l), siz = siz - l >>> 0;
             break;
@@ -104,10 +104,10 @@ export async function formatkiller(buf, siz, how, incl_helpless) {   // topten.c
     if (incl_helpless && gm.multi < 0) {
         /* X <= siz: 'sizeof "string"' includes 1 for '\0' terminator */
         if (gm.multi_reason && $c.addu64($c.strlen(gm.multi_reason), 9) <= siz) {
-            $c.__builtin___sprintf_chk(buf, 0, -1, $c.lit(", while %s"), gm.multi_reason);
+            $c.sprintf(buf, $c.lit(", while %s"), gm.multi_reason);
         } else if (17 <= siz) {
             /* either gm.multi_reason wasn't specified or wouldn't fit */
-            $c.__builtin___strcpy_chk(buf, $c.lit(", while helpless"), -1);
+            $c.strcpy(buf, $c.lit(", while helpless"));
         }
         /* else extra death info won't fit, so leave it out */
     }
@@ -154,7 +154,7 @@ async function readentry(rfile, tt) {   // topten.c:220
             /* sscanf will fail and tt->points will be set to 0 */
             new $c.Ptr(inbuf, 0).set(0, 0);
         } else if (!$c.strchr(new $c.Ptr(inbuf, 0), 10)) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(inbuf, $c.idx(127)), $c.lit("\n"), 2);
+            $c.strcpy(new $c.Ptr(inbuf, $c.idx(127)), $c.lit("\n"));
             discardexcess(rfile);
         }
         /* Check for backwards compatibility */
@@ -168,11 +168,11 @@ async function readentry(rfile, tt) {   // topten.c:220
             }
             tt.plrole[1] = 0;
             if ((i = await str2role(new $c.Ptr(tt.plrole, 0))) >= 0) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(tt.plrole, 0), roles[i].filecode, 4);
+                $c.strcpy(new $c.Ptr(tt.plrole, 0), roles[i].filecode);
             }
-            $c.__builtin___strcpy_chk(new $c.Ptr(tt.plrace, 0), $c.lit("?"), 4);
-            $c.__builtin___strcpy_chk(new $c.Ptr(tt.plgend, 0), tt.plgend[0] === 77 ? $c.lit("Mal") : $c.lit("Fem"), 4);
-            $c.__builtin___strcpy_chk(new $c.Ptr(tt.plalign, 0), $c.lit("?"), 4);
+            $c.strcpy(new $c.Ptr(tt.plrace, 0), $c.lit("?"));
+            $c.strcpy(new $c.Ptr(tt.plgend, 0), tt.plgend[0] === 77 ? $c.lit("Mal") : $c.lit("Fem"));
+            $c.strcpy(new $c.Ptr(tt.plalign, 0), $c.lit("?"));
         } else if ($c.sscanf(new $c.Ptr(inbuf, 0), new $c.Ptr(readentry$fmt33, 0), new $c.Ptr(s1, 0), new $c.Ptr(s2, 0), new $c.Ptr(s3, 0), new $c.Ptr(s4, 0), new $c.Ptr(s5, 0), new $c.Ptr(s6, 0)) === 6) {
             copynchars(new $c.Ptr(tt.plrole, 0), new $c.Ptr(s1, 0), 3);
             copynchars(new $c.Ptr(tt.plrace, 0), new $c.Ptr(s2, 0), 3);
@@ -210,12 +210,12 @@ function writeentry(rfile, tt) {   // topten.c:301
 async function writexlentry(rfile, tt, how) {   // topten.c:340
     let buf = new Int8Array(256), tmpbuf = new Int8Array(101), achbuf = new Int8Array(1280);
     /* xlogfile field separator. */
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("version=%d.%d.%d"), tt.ver_major, tt.ver_minor, tt.patchlevel);
-    $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%cpoints=%ld%cdeathdnum=%d%cdeathlev=%d"), 9, tt.points, 9, tt.deathdnum, 9, tt.deathlev);
-    $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%cmaxlvl=%d%chp=%d%cmaxhp=%d"), 9, tt.maxlvl, 9, tt.hp, 9, tt.maxhp);
-    $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%cdeaths=%d%cdeathdate=%ld%cbirthdate=%ld%cuid=%d"), 9, tt.deaths, 9, tt.deathdate, 9, tt.birthdate, 9, tt.uid);
+    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("version=%d.%d.%d"), tt.ver_major, tt.ver_minor, tt.patchlevel);
+    $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("%cpoints=%ld%cdeathdnum=%d%cdeathlev=%d"), 9, tt.points, 9, tt.deathdnum, 9, tt.deathlev);
+    $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("%cmaxlvl=%d%chp=%d%cmaxhp=%d"), 9, tt.maxlvl, 9, tt.hp, 9, tt.maxhp);
+    $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("%cdeaths=%d%cdeathdate=%ld%cbirthdate=%ld%cuid=%d"), 9, tt.deaths, 9, tt.deathdate, 9, tt.birthdate, 9, tt.uid);
     $c.fprintf(rfile, $c.lit("%s"), new $c.Ptr(buf, 0));
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%crole=%s%crace=%s%cgender=%s%calign=%s"), 9, new $c.Ptr(tt.plrole, 0), 9, new $c.Ptr(tt.plrace, 0), 9, new $c.Ptr(tt.plgend, 0), 9, new $c.Ptr(tt.plalign, 0));
+    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%crole=%s%crace=%s%cgender=%s%calign=%s"), 9, new $c.Ptr(tt.plrole, 0), 9, new $c.Ptr(tt.plrace, 0), 9, new $c.Ptr(tt.plgend, 0), 9, new $c.Ptr(tt.plalign, 0));
     /* make a copy of death reason that doesn't include ", while helpless" */
     await formatkiller(new $c.Ptr(tmpbuf, 0), 101, how, FALSE);
     /* (already includes separator) */
@@ -332,9 +332,9 @@ function encodeachieve(secondlong) {   // topten.c:455
 function add_achieveX(buf, achievement, condition) {   // topten.c:480
     if (condition) {
         if (buf.get(0) !== 0) {
-            $c.__builtin___strcat_chk(buf, $c.lit(","), -1);
+            $c.strcat(buf, $c.lit(","));
         }
-        $c.__builtin___strcat_chk(buf, achievement, -1);
+        $c.strcat(buf, achievement);
     }
 }
 function encode_extended_achievements(buf) {   // topten.c:491
@@ -417,7 +417,7 @@ function encode_extended_achievements(buf) {   // topten.c:491
             case ACH.RNK7:
             case ACH.RNK8:
                 /* rank 0 is the starting condition, not an achievement; 8 is Xp 30 */
-                $c.__builtin___sprintf_chk(new $c.Ptr(rnkbuf, 0), 0, 40, $c.lit("attained_the_rank_of_%s"), rank_of(rank_to_xlev(absidx - (ACH.RNK1 - 1) | 0), gu.urole.mnum, $c.i8(achidx < 0 ? TRUE : FALSE)));
+                $c.sprintf(new $c.Ptr(rnkbuf, 0), $c.lit("attained_the_rank_of_%s"), rank_of(rank_to_xlev(absidx - (ACH.RNK1 - 1) | 0), gu.urole.mnum, $c.i8(achidx < 0 ? TRUE : FALSE)));
                 strNsubst(new $c.Ptr(rnkbuf, 0), $c.lit(" "), $c.lit("_"), 0);   /* replace every ' ' with '_' */
                 achievement = lcase(new $c.Ptr(rnkbuf, 0));
                 break;
@@ -544,7 +544,7 @@ export async function topten(how, when) {   // topten.c:628
                 if (how !== PANICKED) {
                     if (!program_state.done_hup) {
                         await topten_print($c.lit(""));
-                        $c.__builtin___sprintf_chk(new $c.Ptr(pbuf, 0), 0, 256, $c.lit("Since you were in %s mode, the score list will not be checked."), flags.debug ? $c.lit("wizard") : $c.lit("discover"));
+                        $c.sprintf(new $c.Ptr(pbuf, 0), $c.lit("Since you were in %s mode, the score list will not be checked."), flags.debug ? $c.lit("wizard") : $c.lit("discover"));
                         await topten_print(new $c.Ptr(pbuf, 0));
                     }
                 }
@@ -599,7 +599,7 @@ export async function topten(how, when) {   // topten.c:628
                         rank0 = 0;
                         rank1 = rank;
                         if (!program_state.done_hup) {
-                            $c.__builtin___sprintf_chk(new $c.Ptr(pbuf$2, 0), 0, 256, $c.lit("You didn't beat your previous score of %ld points."), t1.points);
+                            $c.sprintf(new $c.Ptr(pbuf$2, 0), $c.lit("You didn't beat your previous score of %ld points."), t1.points);
                             await topten_print(new $c.Ptr(pbuf$2, 0));
                             await topten_print($c.lit(""));
                         }
@@ -636,7 +636,7 @@ export async function topten(how, when) {   // topten.c:628
                         if (rank0 <= 10) {
                             await topten_print($c.lit("You made the top ten list!"));
                         } else {
-                            $c.__builtin___sprintf_chk(new $c.Ptr(pbuf$3, 0), 0, 256, $c.lit("You reached the %d%s place on the top %d list."), rank0, ordin(rank0), sysopt.entrymax);
+                            $c.sprintf(new $c.Ptr(pbuf$3, 0), $c.lit("You reached the %d%s place on the top %d list."), rank0, ordin(rank0), sysopt.entrymax);
                             await topten_print(new $c.Ptr(pbuf$3, 0));
                         }
                         await topten_print($c.lit(""));
@@ -717,12 +717,12 @@ export async function topten(how, when) {   // topten.c:628
 }
 async function outheader() {   // topten.c:929
     let linebuf = new Int8Array(256), bp = null, $t1;
-    $c.__builtin___strcpy_chk(new $c.Ptr(linebuf, 0), $c.lit(" No  Points     Name"), 256);
+    $c.strcpy(new $c.Ptr(linebuf, 0), $c.lit(" No  Points     Name"));
     bp = eos(new $c.Ptr(linebuf, 0));
     while ($c.pcmp(bp, new $c.Ptr(linebuf, 0).add(COLNO).add(-9)) < 0) {
         ($t1 = bp, bp = $t1.add(1), $t1).set(0, 32);
     }
-    $c.__builtin___strcpy_chk(bp, $c.lit("Hp [max]"), -1);
+    $c.strcpy(bp, $c.lit("Hp [max]"));
     await topten_print(new $c.Ptr(linebuf, 0));
 }
 /* so>0: standout line; so=0: ordinary line */
@@ -731,52 +731,52 @@ async function outentry(rank, t1, so) {   // topten.c:946
     second_line = TRUE;
     linebuf[0] = 0;
     if (rank) {
-        $c.__builtin___sprintf_chk(eos(new $c.Ptr(linebuf, 0)), 0, -1, $c.lit("%3d"), rank);
+        $c.sprintf(eos(new $c.Ptr(linebuf, 0)), $c.lit("%3d"), rank);
     } else {
-        $c.__builtin___strcat_chk(new $c.Ptr(linebuf, 0), $c.lit("   "), 256);
+        $c.strcat(new $c.Ptr(linebuf, 0), $c.lit("   "));
     }
-    $c.__builtin___sprintf_chk(eos(new $c.Ptr(linebuf, 0)), 0, -1, $c.lit(" %10ld  %.10s"), t1.points ? t1.points : u.urexp, new $c.Ptr(t1.name, 0));
-    $c.__builtin___sprintf_chk(eos(new $c.Ptr(linebuf, 0)), 0, -1, $c.lit("-%s"), new $c.Ptr(t1.plrole, 0));
+    $c.sprintf(eos(new $c.Ptr(linebuf, 0)), $c.lit(" %10ld  %.10s"), t1.points ? t1.points : u.urexp, new $c.Ptr(t1.name, 0));
+    $c.sprintf(eos(new $c.Ptr(linebuf, 0)), $c.lit("-%s"), new $c.Ptr(t1.plrole, 0));
     if (t1.plrace[0] !== 63) {
-        $c.__builtin___sprintf_chk(eos(new $c.Ptr(linebuf, 0)), 0, -1, $c.lit("-%s"), new $c.Ptr(t1.plrace, 0));
+        $c.sprintf(eos(new $c.Ptr(linebuf, 0)), $c.lit("-%s"), new $c.Ptr(t1.plrace, 0));
     }
     /* Printing of gender and alignment is intentional.  It has been
      * part of the NetHack Geek Code, and illustrates a proper way to
      * specify a character from the command line.
      */
-    $c.__builtin___sprintf_chk(eos(new $c.Ptr(linebuf, 0)), 0, -1, $c.lit("-%s"), new $c.Ptr(t1.plgend, 0));
+    $c.sprintf(eos(new $c.Ptr(linebuf, 0)), $c.lit("-%s"), new $c.Ptr(t1.plgend, 0));
     if (t1.plalign[0] !== 63) {
-        $c.__builtin___sprintf_chk(eos(new $c.Ptr(linebuf, 0)), 0, -1, $c.lit("-%s "), new $c.Ptr(t1.plalign, 0));
+        $c.sprintf(eos(new $c.Ptr(linebuf, 0)), $c.lit("-%s "), new $c.Ptr(t1.plalign, 0));
     } else {
-        $c.__builtin___strcat_chk(new $c.Ptr(linebuf, 0), $c.lit(" "), 256);
+        $c.strcat(new $c.Ptr(linebuf, 0), $c.lit(" "));
     }
     if (!$c.strncmp($c.lit("escaped"), new $c.Ptr(t1.death, 0), 7)) {
-        $c.__builtin___sprintf_chk(eos(new $c.Ptr(linebuf, 0)), 0, -1, $c.lit("escaped the dungeon %s[max level %d]"), !$c.strncmp($c.lit(" ("), new $c.Ptr(t1.death, 0).add(7), 2) ? new $c.Ptr(t1.death, 0).add(7).add(2) : $c.lit(""), t1.maxlvl);
+        $c.sprintf(eos(new $c.Ptr(linebuf, 0)), $c.lit("escaped the dungeon %s[max level %d]"), !$c.strncmp($c.lit(" ("), new $c.Ptr(t1.death, 0).add(7), 2) ? new $c.Ptr(t1.death, 0).add(7).add(2) : $c.lit(""), t1.maxlvl);
         /* fixup for closing paren in "escaped... with...Amulet)[max..." */
         if ((bp = $c.strchr(new $c.Ptr(linebuf, 0), 41)) !== null) {
             bp.set(0, $c.i8(t1.deathdnum === svd.dungeon_topology.d_astral_level.dnum ? 0 : 32));
         }
         second_line = FALSE;
     } else if (!$c.strncmp($c.lit("ascended"), new $c.Ptr(t1.death, 0), 8)) {
-        $c.__builtin___sprintf_chk(eos(new $c.Ptr(linebuf, 0)), 0, -1, $c.lit("ascended to demigod%s-hood"), t1.plgend[0] === 70 ? $c.lit("dess") : $c.lit(""));
+        $c.sprintf(eos(new $c.Ptr(linebuf, 0)), $c.lit("ascended to demigod%s-hood"), t1.plgend[0] === 70 ? $c.lit("dess") : $c.lit(""));
         second_line = FALSE;
     } else {
         if (!$c.strncmp(new $c.Ptr(t1.death, 0), $c.lit("quit"), 4)) {
-            $c.__builtin___strcat_chk(new $c.Ptr(linebuf, 0), $c.lit("quit"), 256);
+            $c.strcat(new $c.Ptr(linebuf, 0), $c.lit("quit"));
             second_line = FALSE;
         } else if (!$c.strncmp(new $c.Ptr(t1.death, 0), $c.lit("died of st"), 10)) {
-            $c.__builtin___strcat_chk(new $c.Ptr(linebuf, 0), $c.lit("starved to death"), 256);
+            $c.strcat(new $c.Ptr(linebuf, 0), $c.lit("starved to death"));
             second_line = FALSE;
         } else if (!$c.strncmp(new $c.Ptr(t1.death, 0), $c.lit("choked"), 6)) {
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(linebuf, 0)), 0, -1, $c.lit("choked on h%s food"), t1.plgend[0] === 70 ? $c.lit("er") : $c.lit("is"));
+            $c.sprintf(eos(new $c.Ptr(linebuf, 0)), $c.lit("choked on h%s food"), t1.plgend[0] === 70 ? $c.lit("er") : $c.lit("is"));
         } else if (!$c.strncmp(new $c.Ptr(t1.death, 0), $c.lit("poisoned"), 8)) {
-            $c.__builtin___strcat_chk(new $c.Ptr(linebuf, 0), $c.lit("was poisoned"), 256);
+            $c.strcat(new $c.Ptr(linebuf, 0), $c.lit("was poisoned"));
         } else if (!$c.strncmp(new $c.Ptr(t1.death, 0), $c.lit("crushed"), 7)) {
-            $c.__builtin___strcat_chk(new $c.Ptr(linebuf, 0), $c.lit("was crushed to death"), 256);
+            $c.strcat(new $c.Ptr(linebuf, 0), $c.lit("was crushed to death"));
         } else if (!$c.strncmp(new $c.Ptr(t1.death, 0), $c.lit("petrified by "), 13)) {
-            $c.__builtin___strcat_chk(new $c.Ptr(linebuf, 0), $c.lit("turned to stone"), 256);
+            $c.strcat(new $c.Ptr(linebuf, 0), $c.lit("turned to stone"));
         } else {
-            $c.__builtin___strcat_chk(new $c.Ptr(linebuf, 0), $c.lit("died"), 256);
+            $c.strcat(new $c.Ptr(linebuf, 0), $c.lit("died"));
         }
         if (t1.deathdnum === svd.dungeon_topology.d_astral_level.dnum) {
             fmt = $c.lit(" on the Plane of %s");
@@ -801,26 +801,26 @@ async function outentry(rank, t1, so) {   // topten.c:946
                     arg = $c.lit("Void");
                     break;
             }
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(linebuf, 0)), 0, -1, fmt, arg);
+            $c.sprintf(eos(new $c.Ptr(linebuf, 0)), fmt, arg);
         } else {
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(linebuf, 0)), 0, -1, $c.lit(" in %s"), new $c.Ptr(svd.dungeons[t1.deathdnum].dname, 0));
+            $c.sprintf(eos(new $c.Ptr(linebuf, 0)), $c.lit(" in %s"), new $c.Ptr(svd.dungeons[t1.deathdnum].dname, 0));
             if (t1.deathdnum !== svd.dungeon_topology.d_knox_level.dnum) {
-                $c.__builtin___sprintf_chk(eos(new $c.Ptr(linebuf, 0)), 0, -1, $c.lit(" on level %d"), t1.deathlev);
+                $c.sprintf(eos(new $c.Ptr(linebuf, 0)), $c.lit(" on level %d"), t1.deathlev);
             }
             if (t1.deathlev !== t1.maxlvl) {
-                $c.__builtin___sprintf_chk(eos(new $c.Ptr(linebuf, 0)), 0, -1, $c.lit(" [max %d]"), t1.maxlvl);
+                $c.sprintf(eos(new $c.Ptr(linebuf, 0)), $c.lit(" [max %d]"), t1.maxlvl);
             }
         }
         /* kludge for "quit while already on Charon's boat" */
         if (!$c.strncmp(new $c.Ptr(t1.death, 0), $c.lit("quit "), 5)) {
-            $c.__builtin___strcat_chk(new $c.Ptr(linebuf, 0), new $c.Ptr(t1.death, 0).add(4), 256);
+            $c.strcat(new $c.Ptr(linebuf, 0), new $c.Ptr(t1.death, 0).add(4));
         }
     }
-    $c.__builtin___strcat_chk(new $c.Ptr(linebuf, 0), $c.lit("."), 256);
+    $c.strcat(new $c.Ptr(linebuf, 0), $c.lit("."));
     /* Quit, starved, ascended, and escaped contain no second line */
     if (second_line) {
         bp = eos(new $c.Ptr(linebuf, 0));
-        $c.__builtin___sprintf_chk(bp, 0, -1, $c.lit("  %c%s."), highc(new $c.Ptr(t1.death, 0).get(0)), new $c.Ptr(t1.death, 0).add(1));
+        $c.sprintf(bp, $c.lit("  %c%s."), highc(new $c.Ptr(t1.death, 0).get(0)), new $c.Ptr(t1.death, 0).add(1));
         /* fix up "Killed by Mr. Asidonhopo; the shopkeeper"; that starts
            with a comma but has it changed to semi-colon to keep the comma
            out of 'record'; change it back for display */
@@ -830,7 +830,7 @@ async function outentry(rank, t1, so) {   // topten.c:946
     if (t1.hp <= 0) {
         hpbuf[0] = 45, hpbuf[1] = 0;
     } else {
-        $c.__builtin___sprintf_chk(new $c.Ptr(hpbuf, 0), 0, 24, $c.lit("%d"), t1.hp);
+        $c.sprintf(new $c.Ptr(hpbuf, 0), $c.lit("%d"), t1.hp);
     }
     /* beginning of hp column after padding (not actually padded yet) */
     hppos = 70;
@@ -847,9 +847,9 @@ async function outentry(rank, t1, so) {   // topten.c:946
             bp = bp.add(-5);
         }
         if (bp.get(0) !== 32) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(linebuf3, 0), bp, 256);
+            $c.strcpy(new $c.Ptr(linebuf3, 0), bp);
         } else {
-            $c.__builtin___strcpy_chk(new $c.Ptr(linebuf3, 0), bp.add(1), 256);
+            $c.strcpy(new $c.Ptr(linebuf3, 0), bp.add(1));
         }
         bp.set(0, 0);
         if (so) {
@@ -872,8 +872,8 @@ async function outentry(rank, t1, so) {   // topten.c:946
         while ($c.pcmp(bp, new $c.Ptr(linebuf, 0).add(hppos)) < 0) {
             ($t2 = bp, bp = $t2.add(1), $t2).set(0, 32);
         }
-        $c.__builtin___strcpy_chk(bp, new $c.Ptr(hpbuf, 0), -1);
-        $c.__builtin___sprintf_chk(eos(bp), 0, -1, $c.lit(" %s[%d]"), t1.maxhp < 10 ? $c.lit("  ") : t1.maxhp < 100 ? $c.lit(" ") : $c.lit(""), t1.maxhp);
+        $c.strcpy(bp, new $c.Ptr(hpbuf, 0));
+        $c.sprintf(eos(bp), $c.lit(" %s[%d]"), t1.maxhp < 10 ? $c.lit("  ") : t1.maxhp < 100 ? $c.lit(" ") : $c.lit(""), t1.maxhp);
     }
     if (so) {
         bp = eos(new $c.Ptr(linebuf, 0));
@@ -1034,14 +1034,14 @@ export async function prscore(argc, argv) {   // topten.c:1194
             }
         }
     } else {
-        $c.__builtin___sprintf_chk(new $c.Ptr(pbuf, 0), 0, 256, $c.lit("Cannot find any %sentries for "), current_ver ? $c.lit("current ") : $c.lit(""));
+        $c.sprintf(new $c.Ptr(pbuf, 0), $c.lit("Cannot find any %sentries for "), current_ver ? $c.lit("current ") : $c.lit(""));
         if (playerct < 1) {
-            $c.__builtin___strcat_chk(new $c.Ptr(pbuf, 0), $c.lit("you"), 256);
+            $c.strcat(new $c.Ptr(pbuf, 0), $c.lit("you"));
         } else {
             /* minor bug: 'nethack -s -u ziggy' will say "any of"
                even though the '-u' doesn't indicate multiple names */
             if (playerct > 1) {
-                $c.__builtin___strcat_chk(new $c.Ptr(pbuf, 0), $c.lit("any of "), 256);
+                $c.strcat(new $c.Ptr(pbuf, 0), $c.lit("any of "));
             }
             for (i = 0; i < playerct; i = i + 1 | 0) {
                 /* accept '-u name' and '-uname' as well as just 'name'
@@ -1055,25 +1055,25 @@ export async function prscore(argc, argv) {   // topten.c:1194
                 /* stop printing players if there are too many to fit */
                 if ($c.addu64($c.addu64($c.strlen(new $c.Ptr(pbuf, 0)), $c.strlen(players.get(i))), 2) >= BUFSZ) {
                     if ($c.strlen(new $c.Ptr(pbuf, 0)) < BUFSZ - 4) {
-                        $c.__builtin___strcat_chk(new $c.Ptr(pbuf, 0), $c.lit("..."), 256);
+                        $c.strcat(new $c.Ptr(pbuf, 0), $c.lit("..."));
                     } else {
-                        $c.__builtin___strcpy_chk(new $c.Ptr(pbuf, 0).add($c.idx($c.strlen(new $c.Ptr(pbuf, 0)))).add(-4), $c.lit("..."), -1);
+                        $c.strcpy(new $c.Ptr(pbuf, 0).add($c.idx($c.strlen(new $c.Ptr(pbuf, 0)))).add(-4), $c.lit("..."));
                     }
                     break;
                 }
-                $c.__builtin___strcat_chk(new $c.Ptr(pbuf, 0), players.get(i), 256);
+                $c.strcat(new $c.Ptr(pbuf, 0), players.get(i));
                 if (i < (playerct - 1 | 0)) {
                     if (players.get(i).get(0) === 45 && $c.strchr($c.lit("pr"), players.get(i).get(1)) && players.get(i).get(2) === 0) {
-                        $c.__builtin___strcat_chk(new $c.Ptr(pbuf, 0), $c.lit(" "), 256);
+                        $c.strcat(new $c.Ptr(pbuf, 0), $c.lit(" "));
                     } else {
-                        $c.__builtin___strcat_chk(new $c.Ptr(pbuf, 0), $c.lit(":"), 256);
+                        $c.strcat(new $c.Ptr(pbuf, 0), $c.lit(":"));
                     }
                 }
             }
         }
         /* append end-of-sentence punctuation if there is room */
         if ($c.strlen(new $c.Ptr(pbuf, 0)) < BUFSZ - 1) {
-            $c.__builtin___strcat_chk(new $c.Ptr(pbuf, 0), $c.lit("."), 256);
+            $c.strcat(new $c.Ptr(pbuf, 0), $c.lit("."));
         }
         await raw_print()(new $c.Ptr(pbuf, 0));
         await raw_printf($c.lit("Usage: %s -s [-v] <playertypes> [maxrank] [playernames]"), gh.hname);

@@ -218,7 +218,7 @@ async function internshrstr(L, str, l) {   // lstring.c:189
     }
     ts = await createstrobj(L, l, 4, h);
     $h.u8[ts + 11] = $c.u8(l);
-    $hl.__builtin___memcpy_chk(ts + 24, str, $c.mulu64(l, 1), -1);
+    $hl.memcpy(ts + 24, str, $c.mulu64(l, 1));
     $h.stp(ts + 16, $h.u32[list >>> 2]);
     $h.stp(list, ts);
     $h.i32[(tb + 8) >>> 2] = $h.i32[(tb + 8) >>> 2] + 1 | 0;
@@ -236,7 +236,7 @@ export async function luaS_newlstr(L, str, l) {   // lstring.c:222
             await luaM_toobig(L);
         }
         ts = await luaS_createlngstrobj(L, l);
-        $hl.__builtin___memcpy_chk(ts + 24, str, $c.mulu64(l, 1), -1);
+        $hl.memcpy(ts + 24, str, $c.mulu64(l, 1));
         return ts;
     }
 }

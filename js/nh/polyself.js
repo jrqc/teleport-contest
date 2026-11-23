@@ -435,10 +435,10 @@ async function polyman(fmt, arg) {   // polyself.c:200
         kptr = find_delayed_killer(POLYMORPH);
         if (kptr !== null && kptr.name[0]) {
             svk.killer.format = kptr.format;
-            $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), new $c.Ptr(kptr.name, 0), 256);
+            $c.strcpy(new $c.Ptr(svk.killer.name, 0), new $c.Ptr(kptr.name, 0));
         } else {
             svk.killer.format = KILLED.BY;
-            $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), $c.lit("self-genocide"), 256);
+            $c.strcpy(new $c.Ptr(svk.killer.name, 0), $c.lit("self-genocide"));
         }
         await dealloc_killer(kptr);
         await done(GENOCIDED);
@@ -478,9 +478,9 @@ export async function change_sex() {   // polyself.c:273
     }
     max_rank_sz();   /* [this appears to be superfluous] */
     if ((Upolyd() ? u.mfemale | 0 : flags.female) && gu.urole.name.f) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(svp.pl_character, 0), gu.urole.name.f, 32);
+        $c.strcpy(new $c.Ptr(svp.pl_character, 0), gu.urole.name.f);
     } else {
-        $c.__builtin___strcpy_chk(new $c.Ptr(svp.pl_character, 0), gu.urole.name.m, 32);
+        $c.strcpy(new $c.Ptr(svp.pl_character, 0), gu.urole.name.m);
     }
     if (!Upolyd()) {
         u.umonnum = u.umonster;
@@ -504,7 +504,7 @@ export async function livelog_newform(viapoly, oldgend, newgend) {   // polyself
             newrole = newgend && gu.urole.name.f ? gu.urole.name.f : gu.urole.name.m;
             oldrank = rank_of(u.ulevel, gu.urole.mnum, $c.i8(oldgend));
             newrank = rank_of(u.ulevel, gu.urole.mnum, $c.i8(newgend));
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%.10s %.30s"), genders[flags.female].adj, newrank);
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%.10s %.30s"), genders[flags.female].adj, newrank);
             await livelog_printf(LL.MINORAC, $c.lit("%s into %s"), viapoly ? $c.lit("polymorphed") : $c.lit("transformed"), await an($c.strcmp(newrole, oldrole) ? newrole : $c.strcmp(newrank, oldrank) ? newrank : new $c.Ptr(buf, 0)));
         }
     }
@@ -610,7 +610,7 @@ async function newman() {   // polyself.c:336
                     /* we come directly here if experience level went to 0 or less */
                     await urgent_pline($c.lit("Your new form doesn't seem healthy enough to survive."));
                     svk.killer.format = KILLED.BY_AN;
-                    $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), $c.lit("unsuccessful polymorph"), 256);
+                    $c.strcpy(new $c.Ptr(svk.killer.name, 0), $c.lit("unsuccessful polymorph"));
                     await done(DIED);
                     /* must have been life-saved to get here */
                     await newuhs(FALSE);
@@ -703,7 +703,7 @@ export async function polyself(psflags) {   // polyself.c:469
                                     await pline($c.lit("%s"), c_common_strings.c_Never_mind);
                                     return;
                                 }
-                                $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("*"), 256);   /* resort to random */
+                                $c.strcpy(new $c.Ptr(buf, 0), $c.lit("*"));   /* resort to random */
                             }
                             if (!$c.strcmp(new $c.Ptr(buf, 0), $c.lit("*")) || !$c.strcmp(new $c.Ptr(buf, 0), $c.lit("random"))) {
                                 /* explicitly requesting random result */
@@ -811,7 +811,7 @@ export async function polyself(psflags) {   // polyself.c:469
                             /* dragon scale mail reverts to scales */
                             /* similar to noarmor(invent.c),
                                shorten to "<color> scale mail" */
-                            $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await simpleonames($G.uarm), 256);
+                            $c.strcpy(new $c.Ptr(buf, 0), await simpleonames($G.uarm));
                             strsubst(new $c.Ptr(buf, 0), $c.lit(" dragon "), $c.lit(" "));
                             /* tricky phrasing; dragon scale mail is singular, dragon
                                scales are plural (note: we don't use "set of scales",
@@ -849,7 +849,7 @@ export async function polyself(psflags) {   // polyself.c:469
                         }
                     }
                     if (controllable_poly) {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Become %s?"), await an(pmname($c.relem(mons, mntmp[0]), gvariant[0])));
+                        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Become %s?"), await an(pmname($c.relem(mons, mntmp[0]), gvariant[0])));
                         if (await y_n(new $c.Ptr(buf, 0)) !== 121) {
                             return;
                         }
@@ -961,13 +961,13 @@ export async function polymon(mntmp) {   // polyself.c:735
             dochange = TRUE;
         }
     }
-    $c.__builtin___strcpy_chk(new $c.Ptr(ustuckNam, 0), u.ustuck ? await Some_Monnam(u.ustuck) : $c.lit(""), 256);
-    $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), u.umonnum !== mntmp ? $c.lit("") : $c.lit("new "), 256);
+    $c.strcpy(new $c.Ptr(ustuckNam, 0), u.ustuck ? await Some_Monnam(u.ustuck) : $c.lit(""));
+    $c.strcpy(new $c.Ptr(buf, 0), u.umonnum !== mntmp ? $c.lit("") : $c.lit("new "));
     if (dochange) {
         flags.female = $c.i8(!flags.female ? 1 : 0);
-        $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.andu64($c.relem(mons, mntmp).mflags2, M2.MALE) !== 0 || $c.andu64($c.relem(mons, mntmp).mflags2, M2.FEMALE) !== 0 ? $c.lit("") : flags.female ? $c.lit("female ") : $c.lit("male "), 256);
+        $c.strcat(new $c.Ptr(buf, 0), $c.andu64($c.relem(mons, mntmp).mflags2, M2.MALE) !== 0 || $c.andu64($c.relem(mons, mntmp).mflags2, M2.FEMALE) !== 0 ? $c.lit("") : flags.female ? $c.lit("female ") : $c.lit("male "));
     }
-    $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), pmname($c.relem(mons, mntmp), flags.female ? FEMALE : MALE), 256);
+    $c.strcat(new $c.Ptr(buf, 0), pmname($c.relem(mons, mntmp), flags.female ? FEMALE : MALE));
     await You($c.lit("%s %s!"), u.umonnum !== mntmp ? $c.lit("turn into") : $c.lit("feel like"), await an(new $c.Ptr(buf, 0)));
     if (Stoned() && poly_when_stoned($c.relem(mons, mntmp))) {
         /* poly_when_stoned already checked stone golem genocide */
@@ -1074,7 +1074,7 @@ export async function polymon(mntmp) {   // polyself.c:735
             expels_mesg = TRUE;
             if (unsolid(gy.youmonst.data)) {
                 if (canseemon(u.ustuck) || sensemon(u.ustuck)) {   /* [see below for explanation] */
-                    $c.__builtin___strcpy_chk(new $c.Ptr(ustuckNam, 0), await Monnam(u.ustuck), 256);
+                    $c.strcpy(new $c.Ptr(ustuckNam, 0), await Monnam(u.ustuck));
                 }
                 await pline($c.lit("%s can no longer contain you."), new $c.Ptr(ustuckNam, 0));
                 expels_mesg = FALSE;
@@ -1096,7 +1096,7 @@ export async function polymon(mntmp) {   // polyself.c:735
            to can't-see; but might have changed from can't-see to can-see so
            override here if hero knows who u.ustuck is */
         if (canseemon(u.ustuck) || sensemon(u.ustuck)) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(ustuckNam, 0), await Monnam(u.ustuck), 256);
+            $c.strcpy(new $c.Ptr(ustuckNam, 0), await Monnam(u.ustuck));
         }
         await set_ustuck(null);
         await pline($c.lit("%s loses its grip on you."), new $c.Ptr(ustuckNam, 0));
@@ -1107,7 +1107,7 @@ export async function polymon(mntmp) {   // polyself.c:735
     if (u.usteed) {
         if (touch_petrifies(u.usteed.data) && !Stone_resistance() && rnl(3)) {
             await pline($c.lit("%s touch %s."), new $c.Ptr(no_longer_petrify_resistant, 0), await mon_nam(u.usteed));
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("riding %s"), await an(pmname(u.usteed.data, Mgender(u.usteed))));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("riding %s"), await an(pmname(u.usteed.data, Mgender(u.usteed))));
             await instapetrify(new $c.Ptr(buf, 0));
         }
         if (!can_ride(u.usteed)) {
@@ -1358,7 +1358,7 @@ async function break_armor() {   // polyself.c:1157
         if ((otmp = $G.uarmh) !== null) {
             if (is_flimsy(otmp) && !donning(otmp)) {
                 /* Future possibilities: This could damage/destroy helmet */
-                $c.__builtin___sprintf_chk(new $c.Ptr(hornbuf, 0), 0, 256, $c.lit("horn%s"), num_horns(uptr) === 1 ? $c.lit("") : $c.lit("s"));
+                $c.sprintf(new $c.Ptr(hornbuf, 0), $c.lit("horn%s"), num_horns(uptr) === 1 ? $c.lit("") : $c.lit("s"));
                 await Your($c.lit("%s %s through %s."), new $c.Ptr(hornbuf, 0), await vtense(new $c.Ptr(hornbuf, 0), $c.lit("pierce")), await yname(otmp));
             } else {
                 if (donning(otmp)) {
@@ -1490,7 +1490,7 @@ export async function rehumanize() {   // polyself.c:1367
     if (Unchanging()) {
         if (u.mh < 1) {
             svk.killer.format = NO_KILLER_PREFIX;
-            $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), $c.lit("killed while stuck in creature form"), 256);
+            $c.strcpy(new $c.Ptr(svk.killer.name, 0), $c.lit("killed while stuck in creature form"));
             await done(DIED);
             /* can get to here if declining to die in explore or wizard
                mode; since we're wearing an amulet of unchanging we can't
@@ -1514,7 +1514,7 @@ export async function rehumanize() {   // polyself.c:1367
         /* can only happen if some bit of code reduces u.uhp
            instead of u.mh while poly'd */
         await Your($c.lit("old form was not healthy enough to survive."));
-        $c.__builtin___sprintf_chk(new $c.Ptr(svk.killer.name, 0), 0, 256, $c.lit("reverting to unhealthy %s form"), gu.urace.adj);
+        $c.sprintf(new $c.Ptr(svk.killer.name, 0), $c.lit("reverting to unhealthy %s form"), gu.urace.adj);
         svk.killer.format = KILLED.BY;
         await done(DIED);
     }
@@ -1626,13 +1626,13 @@ export async function dospinweb() {   // polyself.c:1497
                 sweep[0] = 0;
                 switch (u.ustuck.data.mattk[i].adtyp) {
                     case AD.FIRE:
-                        $c.__builtin___strcpy_chk(new $c.Ptr(sweep, 0), $c.lit("ignites and "), 30);
+                        $c.strcpy(new $c.Ptr(sweep, 0), $c.lit("ignites and "));
                         break;
                     case AD.ELEC:
-                        $c.__builtin___strcpy_chk(new $c.Ptr(sweep, 0), $c.lit("fries and "), 30);
+                        $c.strcpy(new $c.Ptr(sweep, 0), $c.lit("fries and "));
                         break;
                     case AD.COLD:
-                        $c.__builtin___strcpy_chk(new $c.Ptr(sweep, 0), $c.lit("freezes, shatters and "), 30);
+                        $c.strcpy(new $c.Ptr(sweep, 0), $c.lit("freezes, shatters and "));
                         break;
                 }
                 await pline_The($c.lit("web %sis swept away!"), new $c.Ptr(sweep, 0));
@@ -1774,7 +1774,7 @@ export async function dogaze() {   // polyself.c:1642
                 await You($c.lit("avoid gazing at %s."), await y_monnam(mtmp));
             } else {
                 if (flags.confirm && mtmp.mpeaceful | 0 && !u.uprops[CONFUSION].intrinsic) {
-                    $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Really %s %s?"), adtyp === AD.CONF ? $c.lit("confuse") : $c.lit("attack"), await mon_nam(mtmp));
+                    $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("Really %s %s?"), adtyp === AD.CONF ? $c.lit("confuse") : $c.lit("attack"), await mon_nam(mtmp));
                     if (await y_n(new $c.Ptr(qbuf, 0)) !== 121) {
                         continue;
                     }
@@ -1841,7 +1841,7 @@ export async function dogaze() {   // polyself.c:1642
                     /* as if gazing at a sleeping anything is fruitful... */
                     await urgent_pline($c.lit("You turn to stone..."));
                     svk.killer.format = KILLED.BY;
-                    $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), $c.lit("deliberately meeting Medusa's gaze"), 256);
+                    $c.strcpy(new $c.Ptr(svk.killer.name, 0), $c.lit("deliberately meeting Medusa's gaze"));
                     await done(STONING);
                 }
             }
@@ -1902,7 +1902,7 @@ export async function dohide() {   // polyself.c:1777
             /* no need to check poly_when_stoned(); no hide-underers can
                turn into stone golems instead of becoming petrified */
             await pline($c.lit("Hiding under %s%s is a fatal mistake..."), corpse_name, plur(ct));
-            $c.__builtin___sprintf_chk(new $c.Ptr(kbuf, 0), 0, 256, $c.lit("hiding under %s%s"), corpse_name, ct === 1 ? $c.lit("") : $c.lit("s"));
+            $c.sprintf(new $c.Ptr(kbuf, 0), $c.lit("hiding under %s%s"), corpse_name, ct === 1 ? $c.lit("") : $c.lit("s"));
             await instapetrify(new $c.Ptr(kbuf, 0));
             /* only reach here if life-saved */
             u.uundetected = (0) & 1;

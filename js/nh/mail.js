@@ -65,8 +65,8 @@ export async function getmailstatus() {   // mail.c:97
         pw_name = $c.getpwuid($c.getuid()).pw_name;
         /* note: 'sizeof "LITERAL"' includes +1 for terminating '\0' */
         mailbox = $c.asArr(await alloc($c.u32($c.addu64($c.strlen(pw_name), 11))), Int8Array);
-        $c.__builtin___strcpy_chk(mailbox, $c.lit("/usr/mail/"), -1);
-        $c.__builtin___strcat_chk(mailbox, pw_name, -1);
+        $c.strcpy(mailbox, $c.lit("/usr/mail/"));
+        $c.strcat(mailbox, pw_name);
         /* AMS */
         /* MAILPATH */
     }

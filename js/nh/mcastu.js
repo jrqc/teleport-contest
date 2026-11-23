@@ -304,7 +304,7 @@ export async function touch_of_death(mtmp) {   // mcastu.c:323
         await rehumanize();   /* fatal iff Unchanging */
     } else if (drain >= u.uhpmax) {
         svk.killer.format = KILLED.BY;
-        $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), new $c.Ptr(kbuf, 0), 256);
+        $c.strcpy(new $c.Ptr(svk.killer.name, 0), new $c.Ptr(kbuf, 0));
         await done(DIED);
     } else {
         /* HP manipulation similar to poisoned(attrib.c) */
@@ -326,7 +326,7 @@ export async function death_inflicted_by(outbuf, deathreason, mtmp) {   // mcast
     /* assumed big enough; pm_names are short */
     /* cause of death */
     /* monster who caused it */
-    $c.__builtin___strcpy_chk(outbuf, deathreason, -1);
+    $c.strcpy(outbuf, deathreason);
     if (mtmp) {
         mptr = mtmp.data;
         champtr = ismnum(mtmp.cham) ? $c.relem(mons, mtmp.cham) : mptr;
@@ -339,9 +339,9 @@ export async function death_inflicted_by(outbuf, deathreason, mtmp) {   // mcast
         if (!type_is_pname(champtr) && !the_unique_pm(mptr)) {
             realnm = await an(realnm);
         }
-        $c.__builtin___sprintf_chk(eos(outbuf), 0, -1, $c.lit(" inflicted by %s%s"), the_unique_pm(mptr) ? $c.lit("the ") : $c.lit(""), realnm);
+        $c.sprintf(eos(outbuf), $c.lit(" inflicted by %s%s"), the_unique_pm(mptr) ? $c.lit("the ") : $c.lit(""), realnm);
         if (!$c.peq(champtr, mptr)) {
-            $c.__builtin___sprintf_chk(eos(outbuf), 0, -1, $c.lit(" imitating %s"), await an(fakenm));
+            $c.sprintf(eos(outbuf), $c.lit(" imitating %s"), await an(fakenm));
         }
     }
     return outbuf;
@@ -605,7 +605,7 @@ async function mcast_insects(mtmp) {   // mcastu.c:645
             await You_hear($c.lit("someone summoning %s."), what);
         } else {
             if (!$c.peq(what, new $c.Ptr(whatbuf, 0))) {
-                what = $c.__builtin___strcpy_chk(new $c.Ptr(whatbuf, 0), what, 128);
+                what = $c.strcpy(new $c.Ptr(whatbuf, 0), what);
             }
             /* unseen caster summoned seen critter(s) */
             arg = newseen === (oldseen + 1 | 0) ? await an(await makesingular(what)) : new $c.Ptr(whatbuf, 0);

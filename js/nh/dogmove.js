@@ -337,7 +337,7 @@ export async function dog_eat(mtmp, obj, x, y, devour) {   // dogmove.c:218
         }
     }
     if (obj.unpaid) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(objnambuf, 0), await xname(obj), 256);
+        $c.strcpy(new $c.Ptr(objnambuf, 0), await xname(obj));
         iflags.suppress_price = iflags.suppress_price - 1 | 0;
     }
     if ($c.peq(mtmp.data, $c.relem(mons, PM.RUST_MONSTER)) && obj.oerodeproof | 0) {
@@ -1380,7 +1380,7 @@ export async function quickmimic(mtmp) {   // dogmove.c:1472
     if (trycnt === 0) {
         idx = 8;
     }
-    $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await y_monnam(mtmp), 256);   /* "your <pet>" or "the <mon>" or "Fang" */
+    $c.strcpy(new $c.Ptr(buf, 0), await y_monnam(mtmp));   /* "your <pet>" or "the <mon>" or "Fang" */
     spotted = canspotmon(mtmp);
     seeloc = cansee(mtmp.mx, mtmp.my);
     mtmp.m_ap_type = qm[idx].m_ap_type;

@@ -447,7 +447,7 @@ export async function silver_sears(magr, mdef, silverhit) {   // weapon.c:436
            rtyp will always be STRANGE_OBJECT) even if both rings are known
            silver [see hmonas(uhitm.c) for explanation of 'multi_claw'] */
         both = $c.i8(ltyp === rtyp && l_dknown === r_dknown || l_ag && r_ag ? 1 : 0);
-        $c.__builtin___sprintf_chk(new $c.Ptr(rings, 0), 0, 20, $c.lit("ring%s"), both ? $c.lit("s") : $c.lit(""));
+        $c.sprintf(new $c.Ptr(rings, 0), $c.lit("ring%s"), both ? $c.lit("s") : $c.lit(""));
         await Your($c.lit("%s%s %s %s!"), l_ag || r_ag ? $c.lit("silver ") : both ? $c.lit("") : $c.and64(silverhit, W.RINGL) !== 0 ? $c.lit("left ") : $c.lit("right "), new $c.Ptr(rings, 0), await vtense(new $c.Ptr(rings, 0), $c.lit("sear")), await mon_nam(mdef));
     }
 }
@@ -792,7 +792,7 @@ export async function mon_wield_item(mon) {   // weapon.c:801
                 if (bimanual(mw_tmp)) {
                     mon_hand = await makeplural(mon_hand);
                 }
-                $c.__builtin___sprintf_chk(new $c.Ptr(welded_buf, 0), 0, 256, $c.lit("%s welded to %s %s"), await otense(mw_tmp, $c.lit("are")), genders[pronoun_gender(mon, PRONOUN.HALLU)].his, mon_hand);
+                $c.sprintf(new $c.Ptr(welded_buf, 0), $c.lit("%s welded to %s %s"), await otense(mw_tmp, $c.lit("are")), genders[pronoun_gender(mon, PRONOUN.HALLU)].his, mon_hand);
                 if (obj.otyp === PICK_AXE) {
                     await pline($c.lit("Since %s weapon%s %s,"), s_suffix(await mon_nam(mon)), plur(mw_tmp.quan), new $c.Ptr(welded_buf, 0));
                     await pline($c.lit("%s cannot wield that %s."), await mon_nam(mon), await xname(obj));
@@ -1000,7 +1000,7 @@ export function skill_level_name(skill, buf) {   // weapon.c:1092
             ptr = $c.lit("Unknown");
             break;
     }
-    $c.__builtin___strcpy_chk(buf, ptr, -1);
+    $c.strcpy(buf, ptr);
     return buf;
 }
 export function skill_name(skill) {   // weapon.c:1125
@@ -1181,19 +1181,19 @@ export async function enhance_weapon_skill() {   // weapon.c:1329
            with "*" or "#" below */
         if (eventually_advance > 0 || maxxed_cnt > 0) {
             if (eventually_advance > 0) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("(Skill%s flagged by \"*\" may be enhanced %s.)"), eventually_advance === 1 ? $c.lit("") : $c.lit("s"), u.ulevel < MAXULEV ? $c.lit("when you're more experienced") : $c.lit("if skill slots become available"));
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("(Skill%s flagged by \"*\" may be enhanced %s.)"), eventually_advance === 1 ? $c.lit("") : $c.lit("s"), u.ulevel < MAXULEV ? $c.lit("when you're more experienced") : $c.lit("if skill slots become available"));
                 await add_menu_str(win, new $c.Ptr(buf, 0));
             }
             if (maxxed_cnt > 0) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("(Skill%s flagged by \"#\" cannot be enhanced any further.)"), maxxed_cnt === 1 ? $c.lit("") : $c.lit("s"));
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("(Skill%s flagged by \"#\" cannot be enhanced any further.)"), maxxed_cnt === 1 ? $c.lit("") : $c.lit("s"));
                 await add_menu_str(win, new $c.Ptr(buf, 0));
             }
             await add_menu_str(win, $c.lit(""));
         }
         await add_skills_to_menu(win, $c.i8(((to_advance + eventually_advance | 0) + maxxed_cnt | 0) > 0 ? 1 : 0), speedy);
-        $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), to_advance > 0 ? $c.lit("Pick a skill to advance:") : $c.lit("Current skills:"), 256);
+        $c.strcpy(new $c.Ptr(buf, 0), to_advance > 0 ? $c.lit("Pick a skill to advance:") : $c.lit("Current skills:"));
         if (wizard() && !speedy) {
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("  (%d slot%s available)"), u.weapon_slots, u.weapon_slots === 1 ? $c.lit("") : $c.lit("s"));
+            $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("  (%d slot%s available)"), u.weapon_slots, u.weapon_slots === 1 ? $c.lit("") : $c.lit("s"));
         }
         await end_menu()(win, new $c.Ptr(buf, 0));
         n = await select_menu(win, to_advance ? PICK.ONE : PICK.NONE, new $c.Ptr(selected, 0));
@@ -1279,7 +1279,7 @@ export async function lose_weapon_skill(n) {   // weapon.c:1453
 export async function drain_weapon_skill(n) {   // weapon.c:1476
     let skill = 0, i = 0, curradv = 0, prevadv = 0, tmpskills = new Int32Array(38), $t1, $t2;
     /* number of skills to drain */
-    $c.__builtin___memset_chk(new $c.Ptr(tmpskills, 0), 0, 152, 152);
+    $c.memset(new $c.Ptr(tmpskills, 0), 0, 152);
     while ((n = n - 1 | 0) >= 0) {
         if (u.skills_advanced) {
             /* Pick a random skill, deleting it from the list. */

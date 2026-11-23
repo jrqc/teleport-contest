@@ -283,7 +283,7 @@ function l_str2d(s, result) {   // lobject.c:251
             if (pdot === 0 || $hl.strlen(s) > 200) {
                 return 0;   /* string too long or no dot; fail */
             }
-            $hl.__builtin___strcpy_chk($fp, s, -1);   /* copy string to buffer */
+            $hl.strcpy($fp, s);   /* copy string to buffer */
             $t1 = $h.i8[$h.u32[($hl.localeconv()) >>> 2]], $h.i8[$fp + $c.idx(pdot - s)] = $t1;   /* correct decimal point */
             endptr = l_str2dloc($fp, result, mode);   /* try again */
             if (endptr !== 0) {
@@ -391,9 +391,9 @@ function tostringbuff(obj, buff) {   // lobject.c:355
     let len = 0, $t1, $t2, $t3, $t4;
     0;
     if ($h.u8[obj + 8] === 3) {
-        len = $c.__builtin___snprintf_chk($h.P(buff), 44, 0, -1, $h.P($h.lit("%lld")), $h.ld64(obj));
+        len = $c.snprintf($h.P(buff), 44, $h.P($h.lit("%lld")), $h.ld64(obj));
     } else {
-        len = $c.__builtin___snprintf_chk($h.P(buff), 44, 0, -1, $h.P($h.lit("%.14g")), $h.f64[obj >>> 3]);
+        len = $c.snprintf($h.P(buff), 44, $h.P($h.lit("%.14g")), $h.f64[obj >>> 3]);
         if ($h.i8[buff + $c.idx($hl.strspn(buff, $h.lit("-0123456789")))] === 0) {
             /* looks like an int? */
             $t2 = $h.i8[$h.u32[($hl.localeconv()) >>> 2]], $t3 = buff + ($t1 = len, len = $t1 + 1 | 0, $t1), $h.i8[$t3] = $t2;
@@ -474,7 +474,7 @@ async function addstr2buff(buff, str, slen) {   // lobject.c:453
     if (slen <= 199) {
         /* does string fit into buffer? */
         bf = await getbuff(buff, $c.i32(slen));
-        $hl.__builtin___memcpy_chk(bf, str, slen, -1);   /* add string to buffer */
+        $hl.memcpy(bf, str, slen);   /* add string to buffer */
         $h.i32[(buff + 12) >>> 2] = $h.i32[(buff + 12) >>> 2] + $c.i32(slen) | 0;
     } else {
         /* string larger than buffer */
@@ -563,7 +563,7 @@ export async function luaO_pushvfstring(L, fmt, argp) {   // lobject.c:480
                         sz = 32;   /* enough space for '%p' */
                         bf = await getbuff($fp, sz);
                         p = argp.next();
-                        len = $c.__builtin___snprintf_chk($h.P(bf), $c.u64(sz), 0, -1, $h.P($h.lit("%p")), $h.P(p));
+                        len = $c.snprintf($h.P(bf), $c.u64(sz), $h.P($h.lit("%p")), $h.P(p));
                         $h.i32[($fp + 12) >>> 2] = $h.i32[($fp + 12) >>> 2] + len | 0;
                         break;
                     }
@@ -606,30 +606,30 @@ export function luaO_chunkid(out, source, srclen) {   // lobject.c:567
     if ($h.i8[source] === 61) {
         /* 'literal' source */
         if (srclen <= bufflen) {   /* small enough? */
-            $hl.__builtin___memcpy_chk(out, source + 1, $c.mulu64(srclen, 1), -1);
+            $hl.memcpy(out, source + 1, $c.mulu64(srclen, 1));
         } else {
             /* truncate it */
-            $hl.__builtin___memcpy_chk(out, source + 1, $c.mulu64($c.subu64(bufflen, 1), 1), -1), out = out + $c.idx($c.subu64(bufflen, 1));
+            $hl.memcpy(out, source + 1, $c.mulu64($c.subu64(bufflen, 1), 1)), out = out + $c.idx($c.subu64(bufflen, 1));
             $h.i8[out] = 0;
         }
     } else if ($h.i8[source] === 64) {
         /* file name */
         if (srclen <= bufflen) {   /* small enough? */
-            $hl.__builtin___memcpy_chk(out, source + 1, $c.mulu64(srclen, 1), -1);
+            $hl.memcpy(out, source + 1, $c.mulu64(srclen, 1));
         } else {
             /* add '...' before rest of name */
-            $hl.__builtin___memcpy_chk(out, $h.lit("..."), 3, -1), out = out + $c.idx(3);
+            $hl.memcpy(out, $h.lit("..."), 3), out = out + $c.idx(3);
             bufflen = $c.subu64(bufflen, 3);
-            $hl.__builtin___memcpy_chk(out, source + 1 + $c.idx(srclen) + -$c.idx(bufflen), $c.mulu64(bufflen, 1), -1);
+            $hl.memcpy(out, source + 1 + $c.idx(srclen) + -$c.idx(bufflen), $c.mulu64(bufflen, 1));
         }
     } else {
         /* string; format as [string "source"] */
         nl = $hl.strchr(source, 10);   /* find first new line (if any) */
-        $hl.__builtin___memcpy_chk(out, $h.lit("[string \""), 9, -1), out = out + $c.idx(9);   /* add prefix */
+        $hl.memcpy(out, $h.lit("[string \""), 9), out = out + $c.idx(9);   /* add prefix */
         bufflen = $c.subu64(bufflen, 15);   /* save space for prefix+suffix+'\0' */
         if (srclen < bufflen && nl === 0) {
             /* small one-line source? */
-            $hl.__builtin___memcpy_chk(out, source, $c.mulu64(srclen, 1), -1), out = out + $c.idx(srclen);   /* keep it */
+            $hl.memcpy(out, source, $c.mulu64(srclen, 1)), out = out + $c.idx(srclen);   /* keep it */
         } else {
             if (nl !== 0) {
                 srclen = $c.u64(nl - source);   /* stop at first newline */
@@ -637,10 +637,10 @@ export function luaO_chunkid(out, source, srclen) {   // lobject.c:567
             if (srclen > bufflen) {
                 srclen = bufflen;
             }
-            $hl.__builtin___memcpy_chk(out, source, $c.mulu64(srclen, 1), -1), out = out + $c.idx(srclen);
-            $hl.__builtin___memcpy_chk(out, $h.lit("..."), 3, -1), out = out + $c.idx(3);
+            $hl.memcpy(out, source, $c.mulu64(srclen, 1)), out = out + $c.idx(srclen);
+            $hl.memcpy(out, $h.lit("..."), 3), out = out + $c.idx(3);
         }
-        $hl.__builtin___memcpy_chk(out, $h.lit("\"]"), 3, -1);
+        $hl.memcpy(out, $h.lit("\"]"), 3);
     }
 }
 

@@ -313,7 +313,7 @@ export function tre_tnfa_run_parallel(tnfa, string, len, type, match_tags, eflag
                 if (len > 2147483647) {
                     len = 2147483647;
                 }
-                $h.A($c.__builtin___memset_chk($h.P($fp + 8), 0, 128, -1));
+                $hl.memset($fp + 8, 0, 128);
                 /* TRE_MBSTATE */
                 do {
                 } while (0, 0);
@@ -342,7 +342,7 @@ export function tre_tnfa_run_parallel(tnfa, string, len, type, match_tags, eflag
                     if (buf === 0) {
                         return 12;
                     }
-                    $h.A($c.__builtin___memset_chk($h.P(buf), 0, total_bytes, -1));
+                    $hl.memset(buf, 0, total_bytes);
                     /* Get the various pointers within tmp_buf (properly aligned). */
                     tmp_tags = buf;
                     tmp_buf = buf + $c.idx(tbytes);
@@ -603,7 +603,7 @@ export function tre_tnfa_run_parallel(tnfa, string, len, type, match_tags, eflag
                                 do {
                                 } while (0, 0);
                                 $h.stp(reach_next_i, $h.u32[(trans_i + 8) >>> 2]);
-                                $h.A($c.__builtin___memset_chk($h.P($h.u32[(reach_next_i + 8) >>> 2]), 0, tbytes, -1));
+                                $hl.memset($h.u32[(reach_next_i + 8) >>> 2], 0, tbytes);
                                 tag_i = $h.u32[(trans_i + 24) >>> 2];
                                 if (tag_i) {
                                     while ($h.i32[tag_i >>> 2] >= 0) {
@@ -618,7 +618,7 @@ export function tre_tnfa_run_parallel(tnfa, string, len, type, match_tags, eflag
                                     do {
                                     } while (0, 0);
                                     match_eo = $c.i32(pos);
-                                    $hl.__builtin___memcpy_chk(match_tags, $h.u32[(reach_next_i + 8) >>> 2], tbytes, -1);
+                                    $hl.memcpy(match_tags, $h.u32[(reach_next_i + 8) >>> 2], tbytes);
                                 }
                                 $h.i32[(reach_pos + $h.i32[(trans_i + 16) >>> 2] * 16) >>> 2] = $c.i32(pos);
                                 $h.stp(reach_pos + $h.i32[(trans_i + 16) >>> 2] * 16 + 8, reach_next_i + 8);
@@ -714,7 +714,7 @@ export function tre_tnfa_run_parallel(tnfa, string, len, type, match_tags, eflag
                                     continue;
                                 }
                                 /* Compute the tags after this transition. */
-                                $hl.__builtin___memcpy_chk(tmp_tags, $h.u32[(reach_i + 8) >>> 2], tbytes, -1);
+                                $hl.memcpy(tmp_tags, $h.u32[(reach_i + 8) >>> 2], tbytes);
                                 tag_i = $h.u32[(trans_i + 24) >>> 2];
                                 if (tag_i !== 0) {
                                     while ($h.i32[tag_i >>> 2] >= 0) {
@@ -756,7 +756,7 @@ export function tre_tnfa_run_parallel(tnfa, string, len, type, match_tags, eflag
                                     if ($h.u32[reach_next_i >>> 2] === $h.u32[(tnfa + 16) >>> 2] && (match_eo === -1 || num_tags > 0 && tre_tag_get($h.u32[(reach_next_i + 8) >>> 2], 0) <= tre_tag_get(match_tags, 0))) {
                                         /* TRE_DEBUG */
                                         match_eo = $c.i32(pos);
-                                        $hl.__builtin___memcpy_chk(match_tags, $h.u32[(reach_next_i + 8) >>> 2], tbytes, -1);
+                                        $hl.memcpy(match_tags, $h.u32[(reach_next_i + 8) >>> 2], tbytes);
                                     }
                                     reach_next_i = reach_next_i + 16;
                                 } else {
@@ -771,7 +771,7 @@ export function tre_tnfa_run_parallel(tnfa, string, len, type, match_tags, eflag
                                         if ($h.u32[(trans_i + 8) >>> 2] === $h.u32[(tnfa + 16) >>> 2]) {
                                             /* TRE_DEBUG */
                                             match_eo = $c.i32(pos);
-                                            $hl.__builtin___memcpy_chk(match_tags, tmp_tags, tbytes, -1);
+                                            $hl.memcpy(match_tags, tmp_tags, tbytes);
                                         }
                                         tmp_tags = tmp_iptr;
                                     }

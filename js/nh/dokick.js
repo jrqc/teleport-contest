@@ -497,7 +497,7 @@ async function kick_object(x, y, kickobjnam) {   // dokick.c:489
     gk.kickedobj = svl.level.objects[x][y];
     if (gk.kickedobj) {
         /* formatted object name matters iff res==0 */
-        $c.__builtin___strcpy_chk(kickobjnam, await killer_xname(gk.kickedobj), -1);
+        $c.strcpy(kickobjnam, await killer_xname(gk.kickedobj));
         /* kick object; if fatal, done() will clean up kickedobj */
         res = await really_kick_object(x, y);
         gk.kickedobj = null;
@@ -536,7 +536,7 @@ async function really_kick_object(x, y) {   // dokick.c:508
             /* hero has been transformed but kick continues */
         } else {
             /* normalize body shape here; foot, not body_part(FOOT) */
-            $c.__builtin___sprintf_chk(new $c.Ptr(svk.killer.name, 0), 0, 256, $c.lit("kicking %s barefoot"), await killer_xname(gk.kickedobj));
+            $c.sprintf(new $c.Ptr(svk.killer.name, 0), $c.lit("kicking %s barefoot"), await killer_xname(gk.kickedobj));
             await instapetrify(new $c.Ptr(svk.killer.name, 0));
         }
     }
@@ -787,7 +787,7 @@ function kickstr(buf, kickobjnam) {   // dokick.c:794
     } else {
         what = $c.lit("something weird");
     }
-    return $c.__builtin___strcat_chk($c.__builtin___strcpy_chk(buf, $c.lit("kicking "), -1), what, -1);
+    return $c.strcat($c.strcpy(buf, $c.lit("kicking ")), what);
 }
 async function watchman_thief_arrest(mtmp) {   // dokick.c:834
     if (is_watch(mtmp.data) && couldsee(mtmp.mx, mtmp.my) && mtmp.mpeaceful | 0) {
@@ -1491,7 +1491,7 @@ export async function impact_drop(missile, x, y, dlev) {   // dokick.c:1511
             await You($c.lit("removed %ld %s worth of goods!"), price, await currency(price));
             if (cansee(shkp.mx, shkp.my)) {
                 if (shkp.mextra.eshk.customer[0] === 0) {
-                    $c.__builtin___strncpy_chk(new $c.Ptr(shkp.mextra.eshk.customer, 0), new $c.Ptr(svp.plname, 0), PL.NSIZ, 32);
+                    $c.strncpy(new $c.Ptr(shkp.mextra.eshk.customer, 0), new $c.Ptr(svp.plname, 0), PL.NSIZ);
                 }
                 if (angry) {
                     await pline($c.lit("%s is infuriated!"), await Shknam(shkp));
@@ -1759,21 +1759,21 @@ async function otransit_msg(otmp, nodrop, chainthere, num) {   // dokick.c:1909
     } else {
         optr = await Tobjnam(otmp, null);
     }
-    $c.__builtin___strcpy_chk(new $c.Ptr(obuf, 0), optr, 256);
+    $c.strcpy(new $c.Ptr(obuf, 0), optr);
     if (num || chainthere) {
         /* As of 3.6.2: use a separate buffer for the suffix to avoid risk of
            overrunning obuf[] (let pline() handle truncation if necessary) */
         if (num) {
             /* means: other objects are impacted */
-            $c.__builtin___sprintf_chk(new $c.Ptr(xbuf, 0), 0, 256, $c.lit(" %s %s object%s"), await otense(otmp, $c.lit("hit")), num === 1 ? $c.lit("another") : $c.lit("other"), num > 1 ? $c.lit("s") : $c.lit(""));
+            $c.sprintf(new $c.Ptr(xbuf, 0), $c.lit(" %s %s object%s"), await otense(otmp, $c.lit("hit")), num === 1 ? $c.lit("another") : $c.lit("other"), num > 1 ? $c.lit("s") : $c.lit(""));
         } else {
             /* chain-only msg */
-            $c.__builtin___sprintf_chk(new $c.Ptr(xbuf, 0), 0, 256, $c.lit(" %s your chain"), await otense(otmp, $c.lit("rattle")));
+            $c.sprintf(new $c.Ptr(xbuf, 0), $c.lit(" %s your chain"), await otense(otmp, $c.lit("rattle")));
         }
         if (nodrop) {
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(xbuf, 0)), 0, -1, $c.lit("."));
+            $c.sprintf(eos(new $c.Ptr(xbuf, 0)), $c.lit("."));
         } else {
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(xbuf, 0)), 0, -1, $c.lit(" and %s %s."), await otense(otmp, $c.lit("fall")), gg.gate_str);
+            $c.sprintf(eos(new $c.Ptr(xbuf, 0)), $c.lit(" and %s %s."), await otense(otmp, $c.lit("fall")), gg.gate_str);
         }
         await pline($c.lit("%s%s"), new $c.Ptr(obuf, 0), new $c.Ptr(xbuf, 0));
     } else if (!nodrop) {

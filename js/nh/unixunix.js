@@ -97,7 +97,7 @@ export async function getlock() {   // unixunix.c:103
        'a','b',&c below; override the default and use <uid><charname>
        if we aren't restricting the number of simultaneous games */
     if (!gl.locknum) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(gl.lock, 0), 0, 46, $c.lit("%u%s"), $c.getuid(), new $c.Ptr(svp.plname, 0));
+        $c.sprintf(new $c.Ptr(gl.lock, 0), $c.lit("%u%s"), $c.getuid(), new $c.Ptr(svp.plname, 0));
     }
     regularize(new $c.Ptr(gl.lock, 0));
     set_levelfile_name(new $c.Ptr(gl.lock, 0), 0);

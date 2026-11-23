@@ -336,7 +336,7 @@ export async function poisoned(reason, typ, pkiller, fatal, thrown_weapon) {   /
     }
     if (u.uhp < 1) {
         svk.killer.format = kprefix;
-        $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), pkiller, 256);
+        $c.strcpy(new $c.Ptr(svk.killer.name, 0), pkiller);
         /* "Poisoned by a poisoned ___" is redundant */
         await done(strstri(pkiller, $c.lit("poison")) ? DIED : POISONING);
     }
@@ -869,26 +869,26 @@ export async function from_what(propidx) {   // attrib.c:905
              * takes priority over knight's innate but limited jumping.
              */
             if (propidx === BLINDED && u.uroleplay.blind || propidx === DEAF && u.uroleplay.deaf) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(from_what$buf, 0), 0, 256, $c.lit(" from birth"));
+                $c.sprintf(new $c.Ptr(from_what$buf, 0), $c.lit(" from birth"));
             } else if (innateness === FROM_ROLE || innateness === FROM_RACE) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(from_what$buf, 0), $c.lit(" innately"), 256);
+                $c.strcpy(new $c.Ptr(from_what$buf, 0), $c.lit(" innately"));
             } else if (innateness === FROM_INTR) {   /* [].intrinsic & FROMOUTSIDE */
-                $c.__builtin___strcpy_chk(new $c.Ptr(from_what$buf, 0), $c.lit(" intrinsically"), 256);
+                $c.strcpy(new $c.Ptr(from_what$buf, 0), $c.lit(" intrinsically"));
             } else if (innateness === FROM_EXP) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(from_what$buf, 0), $c.lit(" because of your experience"), 256);
+                $c.strcpy(new $c.Ptr(from_what$buf, 0), $c.lit(" because of your experience"));
             } else if (innateness === FROM_LYCN) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(from_what$buf, 0), $c.lit(" due to your lycanthropy"), 256);
+                $c.strcpy(new $c.Ptr(from_what$buf, 0), $c.lit(" due to your lycanthropy"));
             } else if (innateness === FROM_FORM) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(from_what$buf, 0), $c.lit(" from your creature form"), 256);
+                $c.strcpy(new $c.Ptr(from_what$buf, 0), $c.lit(" from your creature form"));
             } else if (propidx === FAST && Very_fast()) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(from_what$buf, 0), 0, 256, new $c.Ptr(from_what$because_of, 0), $c.and64(u.uprops[FAST].intrinsic, TIMEOUT) !== 0 ? $c.lit("a potion or spell") : $c.and64(u.uprops[FAST].extrinsic, W.ARMF) !== 0 && $G.uarmf.dknown | 0 && objects[$G.uarmf.otyp].oc_name_known | 0 ? await ysimple_name($G.uarmf) : u.uprops[FAST].extrinsic ? $c.lit("worn equipment") : c_common_strings.c_something);
+                $c.sprintf(new $c.Ptr(from_what$buf, 0), new $c.Ptr(from_what$because_of, 0), $c.and64(u.uprops[FAST].intrinsic, TIMEOUT) !== 0 ? $c.lit("a potion or spell") : $c.and64(u.uprops[FAST].extrinsic, W.ARMF) !== 0 && $G.uarmf.dknown | 0 && objects[$G.uarmf.otyp].oc_name_known | 0 ? await ysimple_name($G.uarmf) : u.uprops[FAST].extrinsic ? $c.lit("worn equipment") : c_common_strings.c_something);
             } else if (wizard() && (obj = what_gives(new $c.FieldRef(u.uprops[propidx], "extrinsic", "i64"))) !== null) {
                 /* speed boots */
-                $c.__builtin___sprintf_chk(new $c.Ptr(from_what$buf, 0), 0, 256, new $c.Ptr(from_what$because_of, 0), obj.oartifact ? await bare_artifactname(obj) : await ysimple_name(obj));
+                $c.sprintf(new $c.Ptr(from_what$buf, 0), new $c.Ptr(from_what$because_of, 0), obj.oartifact ? await bare_artifactname(obj) : await ysimple_name(obj));
             } else if (propidx === BLINDED && Blindfolded_only()) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(from_what$buf, 0), 0, 256, new $c.Ptr(from_what$because_of, 0), await ysimple_name($G.ublindf));
+                $c.sprintf(new $c.Ptr(from_what$buf, 0), new $c.Ptr(from_what$because_of, 0), await ysimple_name($G.ublindf));
             } else if (propidx === BLINDED && u.ucreamed && BlindedTimeout() === u.ucreamed && !EBlinded() && !$c.and64(u.uprops[BLINDED].intrinsic, ~TIMEOUT)) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(from_what$buf, 0), 0, 256, $c.lit("due to goop covering your %s"), await body_part(FACE));
+                $c.sprintf(new $c.Ptr(from_what$buf, 0), $c.lit("due to goop covering your %s"), await body_part(FACE));
             }
             /* remove some verbosity and/or redundancy */
             if ((p = strstri(new $c.Ptr(from_what$buf, 0), $c.lit(" pair of "))) !== null) {
@@ -904,18 +904,18 @@ export async function from_what(propidx) {   // attrib.c:905
                 case BLINDED:
                     /* wearing the Eyes of the Overworld overrides blindness */
                     if (BBlinded() && is_art($G.ublindf, ART.EYES_OF_THE_OVERWORLD)) {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(from_what$buf, 0), 0, 256, new $c.Ptr(from_what$because_of, 0), await bare_artifactname($G.ublindf));
+                        $c.sprintf(new $c.Ptr(from_what$buf, 0), new $c.Ptr(from_what$because_of, 0), await bare_artifactname($G.ublindf));
                     }
                     break;
                 case INVIS:
                     if ($c.and64(u.uprops[INVIS].blocked, W.ARMC)) {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(from_what$buf, 0), 0, 256, new $c.Ptr(from_what$because_of, 0), await ysimple_name($G.uarmc));
+                        $c.sprintf(new $c.Ptr(from_what$buf, 0), new $c.Ptr(from_what$because_of, 0), await ysimple_name($G.uarmc));
                     }
                     /* mummy wrapping */
                     break;
                 case CLAIRVOYANT:
                     if (wizard() && $c.and64(u.uprops[CLAIRVOYANT].blocked, W.ARMH)) {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(from_what$buf, 0), 0, 256, new $c.Ptr(from_what$because_of, 0), await ysimple_name($G.uarmh));
+                        $c.sprintf(new $c.Ptr(from_what$buf, 0), new $c.Ptr(from_what$because_of, 0), await ysimple_name($G.uarmh));
                     }
                     /* cornuthaum */
                     break;

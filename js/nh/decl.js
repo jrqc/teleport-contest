@@ -364,13 +364,13 @@ export async function decl_globals_init() {   // decl.c:1080
         }
     } while (0);
     gs.subrooms = $c.relem(svr.rooms, MAXNROFROOMS + 1);
-    $c.__builtin___memset_chk(flags, 0, 208, 208);
-    $c.__builtin___memset_chk(iflags, 0, 424, 424);
-    $c.__builtin___memset_chk(a11y, 0, 16, 16);
-    $c.__builtin___memset_chk(disp, 0, 3, 3);
-    $c.__builtin___memset_chk(u, 0, 2760, 2760);
-    $c.__builtin___memset_chk(new $c.FieldRef($G, "ubirthday", "i64"), 0, 8, 8);
-    $c.__builtin___memset_chk(urealtime, 0, 24, 24);
+    $c.memset(flags, 0, 208);
+    $c.memset(iflags, 0, 424);
+    $c.memset(a11y, 0, 16);
+    $c.memset(disp, 0, 3);
+    $c.memset(u, 0, 2760);
+    $c.memset(new $c.FieldRef($G, "ubirthday", "i64"), 0, 8);
+    $c.memset(urealtime, 0, 24);
     $G.uwep = $G.uarm = $G.uswapwep = $G.uquiver = $G.uarmu = $G.uskin = $G.uarmc = null;
     $G.uarmh = $G.uarms = $G.uarmg = $G.uarmf = $G.uamul = $G.uright = $G.uleft = null;
     $G.ublindf = $G.uchain = $G.uball = null;

@@ -48,7 +48,7 @@ export function version_string(buf, bufsz) {   // version.c:22
 /* fill and return the given buffer with the long nethack version string */
 export function getversionstring(buf, bufsz) {   // version.c:35
     let c = 0, p = null, dotoff = 0, $t1, $t2;
-    $c.__builtin___strcpy_chk(buf, nomakedefs.version_id, -1);
+    $c.strcpy(buf, nomakedefs.version_id);
     {
         c = 0;
         p = eos(buf);
@@ -56,7 +56,7 @@ export function getversionstring(buf, bufsz) {   // version.c:35
         if (dotoff) {
             p = p.add(-1);
         }
-        $c.__builtin___strcpy_chk(p, $c.lit(" ("), -1);
+        $c.strcpy(p, $c.lit(" ("));
         if (nomakedefs.git_sha) {
             nh_snprintf($c.lit("getversionstring"), 58, eos(buf), $c.subu64($c.subu64(bufsz, $c.strlen(buf)), 1), $c.lit("%s%s"), ($t1 = c, c = $t1 + 1 | 0, $t1) ? $c.lit(",") : $c.lit(""), nomakedefs.git_sha);
         }
@@ -180,7 +180,7 @@ export async function doextversion() {   // version.c:169
         f = $c.fopen($c.lit("options"), $c.lit("r"));
         if (!f) {
             await putstr()(win, 0, $c.lit(""));
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("[Configuration '%s' not available?]"), $c.lit("options"));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("[Configuration '%s' not available?]"), $c.lit("options"));
             await putstr()(win, 0, new $c.Ptr(buf, 0));
             done_dlb = TRUE;
         }
@@ -216,7 +216,7 @@ export async function doextversion() {   // version.c:169
                 done_rt = TRUE;
                 continue;
             }
-            $c.__builtin___strncpy_chk(new $c.Ptr(buf, 0), rtbuf, BUFSZ - 1, 256);
+            $c.strncpy(new $c.Ptr(buf, 0), rtbuf, BUFSZ - 1);
             buf[BUFSZ - 1] = 0;
         } else {
             break;
@@ -328,7 +328,7 @@ export function get_feature_notice_ver(str) {   // version.c:431
     if (!str) {
         return 0;
     }
-    str = $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), str, 256);
+    str = $c.strcpy(new $c.Ptr(buf, 0), str);
     istr[j] = str;
     while (str.get(0)) {
         if (str.get(0) === 46) {

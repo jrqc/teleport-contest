@@ -512,7 +512,7 @@ async function doc_extcmd_flagstr(menuwin, efp) {   // cmd.c:524
        has been bound to some other key */
     if (!efp) {
         await add_menu_str(menuwin, $c.lit("[A] Command autocompletes"));
-        $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("[m] Command accepts '%s' prefix"), visctrl(cmd_from_func(do_reqmenu)));
+        $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("[m] Command accepts '%s' prefix"), visctrl(cmd_from_func(do_reqmenu)));
         await add_menu_str(menuwin, new $c.Ptr(qbuf, 0));
         return null;
     } else {
@@ -552,7 +552,7 @@ export async function doextlist() {   // cmd.c:562
         await start_menu()(menuwin, MENU.BEHAVE_STANDARD);
         await add_menu_str(menuwin, $c.lit("Extended Commands List"));
         await add_menu_str(menuwin, $c.lit(""));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Switch to %s commands that don't autocomplete"), menumode ? $c.lit("including") : $c.lit("excluding"));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Switch to %s commands that don't autocomplete"), menumode ? $c.lit("including") : $c.lit("excluding"));
         any.a_int = 1;
         await add_menu(menuwin, nul_glyphinfo, any, 97, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
         if (!new $c.Ptr(searchbuf, 0).get(0)) {
@@ -564,9 +564,9 @@ export async function doextlist() {   // cmd.c:562
                menu behavior for it; we retain 's' as a group accelerator */
             await add_menu(menuwin, nul_glyphinfo, any, 58, 115, ATR.NONE, clr, $c.lit("Search extended commands"), MENU.ITEMFLAGS_NONE);
         } else {
-            $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("Switch back from search"), 256);
+            $c.strcpy(new $c.Ptr(buf, 0), $c.lit("Switch back from search"));
             if ($c.addu64($c.addu64($c.strlen(new $c.Ptr(buf, 0)), $c.strlen(new $c.Ptr(searchbuf, 0))), $c.strlen($c.lit(" (\"\")"))) < QBUFSZ) {
-                $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" (\"%s\")"), new $c.Ptr(searchbuf, 0));
+                $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit(" (\"%s\")"), new $c.Ptr(searchbuf, 0));
             }
             any.a_int = 3;
             /* specifying ':' as a group accelerator here is mostly a
@@ -613,7 +613,7 @@ export async function doextlist() {   // cmd.c:562
                    doesn't apply during the current game */
                 /* minor optimization */
                 if (!wizard() && !discover() && (efp.flags & GENERALCMD) >>> 0 !== 0 && strstri(cmd_desc, $c.lit("extinct"))) {
-                    cmd_desc = strsubst($c.__builtin___strcpy_chk(new $c.Ptr(descbuf, 0), cmd_desc, 256), $c.lit(" been genocided or become extinct"), $c.lit(" been genocided"));
+                    cmd_desc = strsubst($c.strcpy(new $c.Ptr(descbuf, 0), cmd_desc), $c.lit(" been genocided or become extinct"), $c.lit(" been genocided"));
                 }
                 /* if searching, skip this command if it doesn't match */
                 /* first try case-insensitive substring match */
@@ -627,13 +627,13 @@ export async function doextlist() {   // cmd.c:562
                    heading with no subordinate entries on the search
                    results menu. */
                 if (!menushown[pass]) {
-                    $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), doextlist$headings[pass], 256);
+                    $c.strcpy(new $c.Ptr(buf, 0), doextlist$headings[pass]);
                     await add_menu_heading(menuwin, new $c.Ptr(buf, 0));
                     menushown[pass] = 1;
                 }
                 /* longest ef_txt at present is "wizrumorcheck" (13 chars);
                    2nd field will be "    " or " [A]" or " [m]" or "[mA]" */
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit(" %-14s %4s %s"), efp.ef_txt, await doc_extcmd_flagstr(menuwin, efp), cmd_desc);
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit(" %-14s %4s %s"), efp.ef_txt, await doc_extcmd_flagstr(menuwin, efp), cmd_desc);
                 await add_menu_str(menuwin, new $c.Ptr(buf, 0));
                 n = n + 1 | 0;
             }
@@ -679,8 +679,8 @@ export async function doextlist() {   // cmd.c:562
             searchbuf[0] = 0;
         }
         if (search) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(promptbuf, 0), $c.lit("Extended command list search phrase"), 128);
-            $c.__builtin___strcat_chk(new $c.Ptr(promptbuf, 0), $c.lit("?"), 128);
+            $c.strcpy(new $c.Ptr(promptbuf, 0), $c.lit("Extended command list search phrase"));
+            $c.strcat(new $c.Ptr(promptbuf, 0), $c.lit("?"));
             await getlin(new $c.Ptr(promptbuf, 0), new $c.Ptr(searchbuf, 0));
             mungspaces(new $c.Ptr(searchbuf, 0));
             if (searchbuf[0] === 27) {
@@ -744,7 +744,7 @@ export async function extcmd_via_menu() {   // cmd.c:752
         /* otherwise... */
         win = await create_nhwindow()(NHW.MENU);
         await start_menu()(win, MENU.BEHAVE_STANDARD);
-        $c.__builtin___sprintf_chk(new $c.Ptr(fmtstr, 0), 0, 20, $c.lit("%%-%ds"), biggest + 15 | 0);
+        $c.sprintf(new $c.Ptr(fmtstr, 0), $c.lit("%%-%ds"), biggest + 15 | 0);
         prompt[0] = 0;
         wastoolong = FALSE;
         /* True => had to wrap due to line width
@@ -764,7 +764,7 @@ export async function extcmd_via_menu() {   // cmd.c:752
             if (accelerator !== prevaccelerator || one_per_line || acount >= 2 && $c.addu64($c.addu64($c.strlen(new $c.Ptr(prompt, 0)), 4), $c.strlen(choices[i].ef_txt)) >= 74) {
                 if (acount) {
                     /* flush extended cmds for that letter already in buf */
-                    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(fmtstr, 0), new $c.Ptr(prompt, 0));
+                    $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(fmtstr, 0), new $c.Ptr(prompt, 0));
                     any.a_char = $c.i8(prevaccelerator);
                     await add_menu(win, nul_glyphinfo, any, any.a_char, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
                     acount = 0;
@@ -775,18 +775,18 @@ export async function extcmd_via_menu() {   // cmd.c:752
             }
             prevaccelerator = accelerator;
             if (!acount || one_per_line) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(prompt, 0), 0, 128, $c.lit("%s%s [%s]"), wastoolong ? $c.lit("or ") : $c.lit(""), choices[i].ef_txt, choices[i].ef_desc);
+                $c.sprintf(new $c.Ptr(prompt, 0), $c.lit("%s%s [%s]"), wastoolong ? $c.lit("or ") : $c.lit(""), choices[i].ef_txt, choices[i].ef_desc);
             } else if (acount === 1) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(prompt, 0), 0, 128, $c.lit("%s%s or %s"), wastoolong ? $c.lit("or ") : $c.lit(""), choices[i - 1 | 0].ef_txt, choices[i].ef_txt);
+                $c.sprintf(new $c.Ptr(prompt, 0), $c.lit("%s%s or %s"), wastoolong ? $c.lit("or ") : $c.lit(""), choices[i - 1 | 0].ef_txt, choices[i].ef_txt);
             } else {
-                $c.__builtin___strcat_chk(new $c.Ptr(prompt, 0), $c.lit(" or "), 128);
-                $c.__builtin___strcat_chk(new $c.Ptr(prompt, 0), choices[i].ef_txt, 128);
+                $c.strcat(new $c.Ptr(prompt, 0), $c.lit(" or "));
+                $c.strcat(new $c.Ptr(prompt, 0), choices[i].ef_txt);
             }
             acount = acount + 1 | 0;
         }
         if (acount) {
             /* flush buf */
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(fmtstr, 0), new $c.Ptr(prompt, 0));
+            $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(fmtstr, 0), new $c.Ptr(prompt, 0));
             any.a_char = $c.i8(prevaccelerator);
             await add_menu(win, nul_glyphinfo, any, any.a_char, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
         }
@@ -934,7 +934,7 @@ export async function makemap_prepost(pre, wiztower) {   // cmd.c:986
         maybe_reset_pick(null);
         /* reset interrupted digging if it was taking place on this level */
         if (on_level(svc.context.digging.level, u.uz)) {
-            $c.__builtin___memset_chk(svc.context.digging, 0, 32, 608);
+            $c.memset(svc.context.digging, 0, 32);
         }
         /* reset cached targets */
         $t1 = iflags.travelcc.y = 0, iflags.travelcc.x = $t1;   /* travel destination */
@@ -942,8 +942,8 @@ export async function makemap_prepost(pre, wiztower) {   // cmd.c:986
         /* escape from trap */
         await reset_utrap(FALSE);
         await check_special_room(TRUE);   /* room exit */
-        $c.__builtin___memset_chk(svd.dndest, 0, 16, 998);
-        $c.__builtin___memset_chk(svu.updest, 0, 16, 16);
+        $c.memset(svd.dndest, 0, 16);
+        $c.memset(svu.updest, 0, 16);
         u.ustuck = null;
         $t2 = u.uswldtim = 0, u.uswallow = ($t2) & 1;
         await set_uinwater(0);   /* u.uinwater = 0 */
@@ -1490,7 +1490,7 @@ export function count_bind_keys() {   // cmd.c:2208
     let bind = null, i = 0, nbinds = 0, keys = new Uint8Array(256);
     bind = gc.Cmd.cmdbinds;
     nbinds = 0;
-    $c.__builtin___memset_chk(new $c.Ptr(keys, 0), 0, 256, 256);
+    $c.memset(new $c.Ptr(keys, 0), 0, 256);
     /* commands bound to different key */
     while (bind) {
         keys[bind.key] = 1;
@@ -1512,7 +1512,7 @@ export async function get_changed_key_binds(sbuf) {   // cmd.c:2235
     let win = 0, i = 0, buf = new Int8Array(256), buf2 = new Int8Array(128), bind = null, keys = new Uint8Array(256), ec = null;
     win = WIN_ERR;
     bind = gc.Cmd.cmdbinds;
-    $c.__builtin___memset_chk(new $c.Ptr(keys, 0), 0, 256, 256);
+    $c.memset(new $c.Ptr(keys, 0), 0, 256);
     if (!sbuf) {
         win = await create_nhwindow()(NHW.TEXT);
     }
@@ -1521,9 +1521,9 @@ export async function get_changed_key_binds(sbuf) {   // cmd.c:2235
         keys[bind.key] = 1;
         if (bind.userbind && bind.cmd && bind.cmd.key !== bind.key) {
             if ((bind.cmd.flags & CMD_PARAM) >>> 0 !== 0) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("BIND=%s:%s(%s)%s"), key2txt(bind.key, new $c.Ptr(buf2, 0)), bind.cmd.ef_txt, bind.param, sbuf ? $c.lit("\n") : $c.lit(""));
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("BIND=%s:%s(%s)%s"), key2txt(bind.key, new $c.Ptr(buf2, 0)), bind.cmd.ef_txt, bind.param, sbuf ? $c.lit("\n") : $c.lit(""));
             } else {
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("BIND=%s:%s%s"), key2txt(bind.key, new $c.Ptr(buf2, 0)), bind.cmd.ef_txt, sbuf ? $c.lit("\n") : $c.lit(""));
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("BIND=%s:%s%s"), key2txt(bind.key, new $c.Ptr(buf2, 0)), bind.cmd.ef_txt, sbuf ? $c.lit("\n") : $c.lit(""));
             }
             if (sbuf) {
                 await strbuf_append(sbuf, new $c.Ptr(buf, 0));
@@ -1537,7 +1537,7 @@ export async function get_changed_key_binds(sbuf) {   // cmd.c:2235
     for (i = 0; i < extcmdlist_length; i = i + 1 | 0) {
         ec = $c.relem(extcmdlist, i);
         if (ec.key && !keys[ec.key]) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("BIND=%s:nothing%s"), key2txt(ec.key, new $c.Ptr(buf2, 0)), sbuf ? $c.lit("\n") : $c.lit(""));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("BIND=%s:nothing%s"), key2txt(ec.key, new $c.Ptr(buf2, 0)), sbuf ? $c.lit("\n") : $c.lit(""));
             if (sbuf) {
                 await strbuf_append(sbuf, new $c.Ptr(buf, 0));
             } else {
@@ -1569,9 +1569,9 @@ async function handler_rebind_keys_add(keyfirst) {   // cmd.c:2291
     if (key) {
         bind = cmdbind_get(key);
         if (bind && bind.cmd) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Key '%s' is currently bound to \"%s\"."), key2txt(key, new $c.Ptr(buf2, 0)), bind.cmd.ef_txt);
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Key '%s' is currently bound to \"%s\"."), key2txt(key, new $c.Ptr(buf2, 0)), bind.cmd.ef_txt);
         } else {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Key '%s' is not bound to anything."), key2txt(key, new $c.Ptr(buf2, 0)));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Key '%s' is not bound to anything."), key2txt(key, new $c.Ptr(buf2, 0)));
         }
         await add_menu_str(win, new $c.Ptr(buf, 0));
         await add_menu_str(win, $c.lit(""));
@@ -1585,13 +1585,13 @@ async function handler_rebind_keys_add(keyfirst) {   // cmd.c:2291
             continue;
         }
         any.a_int = i + 1 | 0;
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s: %s"), ec.ef_txt, ec.ef_desc);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s: %s"), ec.ef_txt, ec.ef_desc);
         await add_menu(win, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
     }
     if (key) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Bind '%s' to what command?"), key2txt(key, new $c.Ptr(buf2, 0)));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Bind '%s' to what command?"), key2txt(key, new $c.Ptr(buf2, 0)));
     } else {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Bind what command?"));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Bind what command?"));
     }
     await end_menu()(win, new $c.Ptr(buf, 0));
     npick = await select_menu(win, PICK.ONE, new $c.Ptr(picks, 0));
@@ -1602,19 +1602,19 @@ async function handler_rebind_keys_add(keyfirst) {   // cmd.c:2291
         bindit$: {
             if (i === -1) {
                 ec = null;
-                $c.__builtin___strcat_chk(new $c.Ptr(cmdstr, 0), $c.lit("nothing"), 256);
+                $c.strcat(new $c.Ptr(cmdstr, 0), $c.lit("nothing"));
                 break bindit$;
             } else {
                 ec = $c.relem(extcmdlist, i - 1 | 0);
                 if ((ec.flags & CMD_PARAM) >>> 0 !== 0) {
                     parambuf[0] = 0;
-                    $c.__builtin___sprintf_chk(new $c.Ptr(querybuf, 0), 0, 256, $c.lit("Command %s requires a parameter:"), ec.ef_txt);
+                    $c.sprintf(new $c.Ptr(querybuf, 0), $c.lit("Command %s requires a parameter:"), ec.ef_txt);
                     await getlin(new $c.Ptr(querybuf, 0), new $c.Ptr(parambuf, 0));
                     mungspaces(new $c.Ptr(parambuf, 0));
                     nh_snprintf($c.lit("handler_rebind_keys_add"), 2376, new $c.Ptr(cmdstr, 0), BUFSZ - 1, $c.lit("%s(%s)"), ec.ef_txt, new $c.Ptr(parambuf, 0));
                     cmdstr[BUFSZ - 1] = 0;
                 } else {
-                    $c.__builtin___strcat_chk(new $c.Ptr(cmdstr, 0), ec.ef_txt, 256);
+                    $c.strcat(new $c.Ptr(cmdstr, 0), ec.ef_txt);
                 }
             }
         }
@@ -1685,7 +1685,7 @@ export async function handler_change_autocompletions() {   // cmd.c:2449
             continue;
         }
         any.a_int = i + 1 | 0;
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%c %s: %s"), (ec.flags & AUTOCOMP_ADJ) >>> 0 ? 42 : 32, ec.ef_txt, ec.ef_desc);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%c %s: %s"), (ec.flags & AUTOCOMP_ADJ) >>> 0 ? 42 : 32, ec.ef_txt, ec.ef_desc);
         await add_menu(win, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), (ec.flags & AUTOCOMPLETE) >>> 0 ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     }
     await end_menu()(win, $c.lit("Which commands autocomplete?"));
@@ -1700,7 +1700,7 @@ export async function handler_change_autocompletions() {   // cmd.c:2449
             if ($c.strlen(ec.ef_txt) < 2) {
                 continue;
             }
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s"), ec.ef_txt);
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s"), ec.ef_txt);
             for (j = 0; j < n; j = j + 1 | 0) {
                 if ($c.peq(ec, $c.relem(extcmdlist, $c.radd(picks[0], j).item.a_int - 1 | 0))) {
                     await parseautocomplete(new $c.Ptr(buf, 0), TRUE);
@@ -1769,20 +1769,20 @@ export function key2extcmddesc(key) {   // cmd.c:2561
        that match !number_pad movement (like 'j' for "jump") */
     key2extcmddesc$key2cmdbuf[0] = 0;
     if (movecmd($c.i8(k = key), MV.WALK)) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(key2extcmddesc$key2cmdbuf, 0), $c.lit("move"), 128);   /* "move or attack"? */
+        $c.strcpy(new $c.Ptr(key2extcmddesc$key2cmdbuf, 0), $c.lit("move"));   /* "move or attack"? */
     } else if (movecmd($c.i8(k = key), MV.RUSH)) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(key2extcmddesc$key2cmdbuf, 0), $c.lit("rush"), 128);
+        $c.strcpy(new $c.Ptr(key2extcmddesc$key2cmdbuf, 0), $c.lit("rush"));
     } else if (movecmd($c.i8(k = key), MV.RUN)) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(key2extcmddesc$key2cmdbuf, 0), $c.lit("run"), 128);
+        $c.strcpy(new $c.Ptr(key2extcmddesc$key2cmdbuf, 0), $c.lit("run"));
     }
     if (digit($c.i8(key)) || gc.Cmd.num_pad && digit($c.i8(unmeta(key)))) {
         key2extcmddesc$key2cmdbuf[0] = 0;
         if (!gc.Cmd.num_pad) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(key2extcmddesc$key2cmdbuf, 0), $c.lit("start of, or continuation of, a count"), 128);
+            $c.strcpy(new $c.Ptr(key2extcmddesc$key2cmdbuf, 0), $c.lit("start of, or continuation of, a count"));
         } else if (key === 53 || key === M_5) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(key2extcmddesc$key2cmdbuf, 0), 0, 128, $c.lit("%s prefix"), (!!gc.Cmd.pcHack_compat ? 1 : 0) ^ (key === M_5 ? 1 : 0) ? $c.lit("run") : $c.lit("rush"));
+            $c.sprintf(new $c.Ptr(key2extcmddesc$key2cmdbuf, 0), $c.lit("%s prefix"), (!!gc.Cmd.pcHack_compat ? 1 : 0) ^ (key === M_5 ? 1 : 0) ? $c.lit("run") : $c.lit("rush"));
         } else if (key === 48 || gc.Cmd.pcHack_compat && key === M_0) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(key2extcmddesc$key2cmdbuf, 0), $c.lit("synonym for 'i'"), 128);
+            $c.strcpy(new $c.Ptr(key2extcmddesc$key2cmdbuf, 0), $c.lit("synonym for 'i'"));
         }
         if (new $c.Ptr(key2extcmddesc$key2cmdbuf, 0).get(0)) {
             return new $c.Ptr(key2extcmddesc$key2cmdbuf, 0);
@@ -1800,7 +1800,7 @@ export function key2extcmddesc(key) {   // cmd.c:2561
     }
     /* finally, check whether 'key' is a command */
     if ((cmdbind = cmdbind_get(key)) !== null && cmdbind.cmd && (txt = cmdbind.cmd.ef_txt) !== null) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(key2extcmddesc$key2cmdbuf, 0), 0, 128, $c.lit("%s (#%s)"), cmdbind.cmd.ef_desc, txt);
+        $c.sprintf(new $c.Ptr(key2extcmddesc$key2cmdbuf, 0), $c.lit("%s (#%s)"), cmdbind.cmd.ef_desc, txt);
         /* special case: for reqmenu prefix (normally 'm'), replace
            "prefix: request menu or modify command (#reqmenu)"
            with two-line "movement prefix:...\nnon-movement prefix:..." */
@@ -1851,7 +1851,7 @@ export async function bind_key(key, command, user) {   // cmd.c:2662
     /* copy command to buf for modification */
     len = $c.i64($c.addu64($c.strlen(command), 1));
     buf = $c.asArr(await alloc($c.u32(len)), Int8Array);
-    $c.__builtin___strncpy_chk(buf, command, $c.u64(len), -1);
+    $c.strncpy(buf, command, $c.u64(len));
     /* does buf have a parameter in parenthesis? */
     if ((p = $c.strchr(buf, 40)) !== null && (lastp = $c.strrchr(buf, 41)) !== null && $c.pcmp(lastp, p) > 0) {
         p.set(0, 0);
@@ -1877,7 +1877,7 @@ export async function bind_key(key, command, user) {   // cmd.c:2662
                     await config_error_add($c.lit("Required parameter cannot be empty"));
                 } else {
                     $t1 = $c.asArr(await alloc(maxlen >>> 0), Int8Array), bind.param = $t1;
-                    $c.__builtin___strncpy_chk(bind.param, p, $c.u64(maxlen), -1);
+                    $c.strncpy(bind.param, p, $c.u64(maxlen));
                     bind.param.set(maxlen - 1 | 0, 0);
                 }
             }
@@ -1971,9 +1971,9 @@ async function keylist_putcmds(datawin, docount, incl_flags, excl_flags, keys_us
                 continue;
             }
             if ((bind.cmd.flags & CMD_PARAM) >>> 0 !== 0) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%-7s %-13s %s \"%s\""), key2txt(key, new $c.Ptr(buf2, 0)), bind.cmd.ef_txt, bind.cmd.ef_desc, bind.param);
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%-7s %-13s %s \"%s\""), key2txt(key, new $c.Ptr(buf2, 0)), bind.cmd.ef_txt, bind.cmd.ef_desc, bind.param);
             } else {
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%-7s %-13s %s"), key2txt(key, new $c.Ptr(buf2, 0)), bind.cmd.ef_txt, bind.cmd.ef_desc);
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%-7s %-13s %s"), key2txt(key, new $c.Ptr(buf2, 0)), bind.cmd.ef_txt, bind.cmd.ef_desc);
             }
             await putstr()(datawin, 0, new $c.Ptr(buf, 0));
             keys_used.set(i, TRUE);
@@ -1998,7 +1998,7 @@ async function keylist_putcmds(datawin, docount, incl_flags, excl_flags, keys_us
             continue;
         }
         /* '#'+20 for one column here == 7+' '+13 for two columns above */
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("#%-20s %s"), extcmd.ef_txt, extcmd.ef_desc);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("#%-20s %s"), extcmd.ef_txt, extcmd.ef_desc);
         await putstr()(datawin, 0, new $c.Ptr(buf, 0));
     }
     return count;
@@ -2006,15 +2006,15 @@ async function keylist_putcmds(datawin, docount, incl_flags, excl_flags, keys_us
 /* list all keys and their bindings, like dat/hh but dynamic */
 export async function dokeylist() {   // cmd.c:2867
     let extcmd = null, datawin = 0, buf = new Int8Array(256), buf2 = new Int8Array(256), key = 0, spkey_gap = 0, keys_used = new Int8Array(256), mov_seen = new Int8Array(256), i = 0, j = 0, pfx_seen = new Int32Array(256);
-    $c.__builtin___memset_chk(new $c.Ptr(keys_used, 0), 0, 256, 256);
-    $c.__builtin___memset_chk(new $c.Ptr(pfx_seen, 0), 0, 1024, 1024);
+    $c.memset(new $c.Ptr(keys_used, 0), 0, 256);
+    $c.memset(new $c.Ptr(pfx_seen, 0), 0, 1024);
     /* this is actually ambiguous; tty raw mode will override SIGINT;
        when enabled, treat it like a movement command since assigning
        other commands to this keystroke would be unwise... */
     key = 3;
     keys_used[key] = TRUE;
     /* movement keys have been flagged in keys_used[]; clone them */
-    $c.__builtin___memcpy_chk(new $c.Ptr(mov_seen, 0), new $c.Ptr(keys_used, 0), 256, 256);
+    $c.memcpy(new $c.Ptr(mov_seen, 0), new $c.Ptr(keys_used, 0), 256);
     spkey_gap = FALSE;
     for (i = 0; misc_keys[i].desc; i = i + 1 | 0) {
         if (misc_keys[i].numpad && !iflags.num_pad) {
@@ -2031,11 +2031,11 @@ export async function dokeylist() {   // cmd.c:2867
     }
     datawin = await create_nhwindow()(NHW.TEXT);
     await putstr()(datawin, 0, $c.lit(""));
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%7s %s"), $c.lit(""), $c.lit("    Full Current Key Bindings List"));
+    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%7s %s"), $c.lit(""), $c.lit("    Full Current Key Bindings List"));
     await putstr()(datawin, 0, new $c.Ptr(buf, 0));
     for (extcmd = $c.relem(extcmdlist, 0); extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
         if (spkey_gap || !keylist_func_has_key(extcmd, new $c.Ptr(keys_used, 0))) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%7s %s"), $c.lit(""), $c.lit("(also commands with no key assignment)"));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%7s %s"), $c.lit(""), $c.lit("(also commands with no key assignment)"));
             await putstr()(datawin, 0, new $c.Ptr(buf, 0));
             break;
         }
@@ -2047,17 +2047,17 @@ export async function dokeylist() {   // cmd.c:2867
     if (!iflags.num_pad) {
         await putstr()(datawin, 0, $c.lit(""));
         await putstr()(datawin, 0, $c.lit("Ctrl+<direction> will run in specified direction until something very"));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%7s %s"), $c.lit(""), $c.lit("interesting is seen."));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%7s %s"), $c.lit(""), $c.lit("interesting is seen."));
         await putstr()(datawin, 0, new $c.Ptr(buf, 0));
-        $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("Shift"), 256);   /* append the rest below */
+        $c.strcpy(new $c.Ptr(buf, 0), $c.lit("Shift"));   /* append the rest below */
     } else {
         /* num_pad */
         await putstr()(datawin, 0, $c.lit(""));
-        $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("Meta"), 256);   /* append the rest next */
+        $c.strcpy(new $c.Ptr(buf, 0), $c.lit("Meta"));   /* append the rest next */
     }
-    $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit("+<direction> will run in specified direction until you encounter"), 256);
+    $c.strcat(new $c.Ptr(buf, 0), $c.lit("+<direction> will run in specified direction until you encounter"));
     await putstr()(datawin, 0, new $c.Ptr(buf, 0));
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%7s %s"), $c.lit(""), $c.lit("an obstacle."));
+    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%7s %s"), $c.lit(""), $c.lit("an obstacle."));
     await putstr()(datawin, 0, new $c.Ptr(buf, 0));
     await putstr()(datawin, 0, $c.lit(""));
     await putstr()(datawin, 0, $c.lit("Miscellaneous keys:"));
@@ -2068,16 +2068,16 @@ export async function dokeylist() {   // cmd.c:2867
         j = misc_keys[i].nhkf;
         key = $c.u8(gc.Cmd.spkeys[j]);
         if (key && !mov_seen[key] && pfx_seen[key] === j) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%-7s %s"), key2txt(key, new $c.Ptr(buf2, 0)), misc_keys[i].desc);
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%-7s %s"), key2txt(key, new $c.Ptr(buf2, 0)), misc_keys[i].desc);
             await putstr()(datawin, 0, new $c.Ptr(buf, 0));
         }
     }
     /* (see above) */
     key = 3;
     /* last of the special keys */
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%-7s"), key2txt(key, new $c.Ptr(buf2, 0)));
+    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%-7s"), key2txt(key, new $c.Ptr(buf2, 0)));
     /* first of the keyless commands */
-    $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit(" interrupt: break out of NetHack (SIGINT)"), 256);
+    $c.strcat(new $c.Ptr(buf, 0), $c.lit(" interrupt: break out of NetHack (SIGINT)"));
     await putstr()(datawin, 0, new $c.Ptr(buf, 0));
     /* keyless special key commands, if any */
     if (spkey_gap) {
@@ -2088,7 +2088,7 @@ export async function dokeylist() {   // cmd.c:2867
             j = misc_keys[i].nhkf;
             key = $c.u8(gc.Cmd.spkeys[j]);
             if (!key || pfx_seen[key] !== j) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf2, 0), 0, 256, $c.lit("[%s]"), spkey_name(j));
+                $c.sprintf(new $c.Ptr(buf2, 0), $c.lit("[%s]"), spkey_name(j));
                 /* lines up with the other unassigned commands which use
                    "#%-20s ", but not with the other special keys */
                 nh_snprintf($c.lit("dokeylist"), 2976, new $c.Ptr(buf, 0), 256, $c.lit("%-21s %s"), new $c.Ptr(buf2, 0), misc_keys[i].desc);
@@ -2166,9 +2166,9 @@ export async function cmd_from_ecname(ecname) {   // cmd.c:3071
         if (!$c.strcmp(extcmd.ef_txt, ecname)) {
             key = cmd_from_func(extcmd.ef_funct);
             if (key) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(cmd_from_ecname$cmdnamebuf, 0), 0, 128, $c.lit("%s"), visctrl(key));
+                $c.sprintf(new $c.Ptr(cmd_from_ecname$cmdnamebuf, 0), $c.lit("%s"), visctrl(key));
             } else {
-                $c.__builtin___sprintf_chk(new $c.Ptr(cmd_from_ecname$cmdnamebuf, 0), 0, 128, $c.lit("#%s"), ecname);
+                $c.sprintf(new $c.Ptr(cmd_from_ecname$cmdnamebuf, 0), $c.lit("#%s"), ecname);
             }
             return new $c.Ptr(cmd_from_ecname$cmdnamebuf, 0);
         }
@@ -2208,7 +2208,7 @@ export async function cmdname_from_func(fn, outbuf, fullname) {   // cmd.c:3106
         outbuf.set(0, 0);
     } else if (fullname) {
         /* easy; the entire command name */
-        res = $c.__builtin___strcpy_chk(outbuf, res, -1);
+        res = $c.strcpy(outbuf, res);
     } else {
         matchcmd = $c.relem(extcmdlist, 0);
         len = 0;
@@ -2274,15 +2274,15 @@ export function key2txt(c, txt) {   // cmd.c:3225
     /* should probably switch to "SPC", "ESC", "RET"
        since nethack's documentation uses ESC for <escape> */
     if (c === 32) {
-        $c.__builtin___sprintf_chk(txt, 0, -1, $c.lit("<space>"));
+        $c.sprintf(txt, $c.lit("<space>"));
     } else if (c === 27) {
-        $c.__builtin___sprintf_chk(txt, 0, -1, $c.lit("<esc>"));   /* "<escape>" won't fit */
+        $c.sprintf(txt, $c.lit("<esc>"));   /* "<escape>" won't fit */
     } else if (c === 10) {
-        $c.__builtin___sprintf_chk(txt, 0, -1, $c.lit("<enter>"));   /* "<return>" won't fit */
+        $c.sprintf(txt, $c.lit("<enter>"));   /* "<return>" won't fit */
     } else if (c === 127) {
-        $c.__builtin___sprintf_chk(txt, 0, -1, $c.lit("<del>"));   /* "<delete>" won't fit */
+        $c.sprintf(txt, $c.lit("<del>"));   /* "<delete>" won't fit */
     } else {
-        $c.__builtin___strcpy_chk(txt, visctrl($c.i8(c)), -1);
+        $c.strcpy(txt, visctrl($c.i8(c)));
     }
     return txt;
 }
@@ -2333,7 +2333,7 @@ export async function all_options_autocomplete(sbuf) {   // cmd.c:3296
     let efp = null, buf = new Int8Array(256);
     for (efp = $c.relem(extcmdlist, 0); efp.ef_txt; efp = $c.radd(efp, 1)) {
         if ((efp.flags & AUTOCOMP_ADJ) >>> 0 !== 0) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("AUTOCOMPLETE=%s%s\n"), (efp.flags & AUTOCOMPLETE) >>> 0 ? $c.lit("") : $c.lit("!"), efp.ef_txt);
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("AUTOCOMPLETE=%s%s\n"), (efp.flags & AUTOCOMPLETE) >>> 0 ? $c.lit("") : $c.lit("!"), efp.ef_txt);
             await strbuf_append(sbuf, new $c.Ptr(buf, 0));
         }
     }
@@ -2989,7 +2989,7 @@ export async function getdir(s) {   // cmd.c:3958
                  * locations relative to each other so ruin the memory aid of
                  * "," being left of ".".)
                  */
-                $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("desired location, then type '%s' for left click, '%s' for right"), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_PICK_Q]), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_PICK]));
+                $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("desired location, then type '%s' for left click, '%s' for right"), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_PICK_Q]), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_PICK]));
                 /* visctrl() cycles through several static buffers for its
                    return value so using two in the same expression is ok */
                 /* ',' */
@@ -3073,22 +3073,22 @@ async function show_direction_keys(win, centerchar, nodiag) {   // cmd.c:4122
         centerchar = 32;
     }
     if (nodiag) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("             %s   "), visctrl(cmd_from_func(do_move_north)));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("             %s   "), visctrl(cmd_from_func(do_move_north)));
         await putstr()(win, 0, new $c.Ptr(buf, 0));
         await putstr()(win, 0, $c.lit("             |   "));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("          %s- %c -%s"), visctrl(cmd_from_func(do_move_west)), centerchar, visctrl(cmd_from_func(do_move_east)));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("          %s- %c -%s"), visctrl(cmd_from_func(do_move_west)), centerchar, visctrl(cmd_from_func(do_move_east)));
         await putstr()(win, 0, new $c.Ptr(buf, 0));
         await putstr()(win, 0, $c.lit("             |   "));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("             %s   "), visctrl(cmd_from_func(do_move_south)));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("             %s   "), visctrl(cmd_from_func(do_move_south)));
         await putstr()(win, 0, new $c.Ptr(buf, 0));
     } else {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("          %s  %s  %s"), visctrl(cmd_from_func(do_move_northwest)), visctrl(cmd_from_func(do_move_north)), visctrl(cmd_from_func(do_move_northeast)));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("          %s  %s  %s"), visctrl(cmd_from_func(do_move_northwest)), visctrl(cmd_from_func(do_move_north)), visctrl(cmd_from_func(do_move_northeast)));
         await putstr()(win, 0, new $c.Ptr(buf, 0));
         await putstr()(win, 0, $c.lit("           \\ | / "));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("          %s- %c -%s"), visctrl(cmd_from_func(do_move_west)), centerchar, visctrl(cmd_from_func(do_move_east)));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("          %s- %c -%s"), visctrl(cmd_from_func(do_move_west)), centerchar, visctrl(cmd_from_func(do_move_east)));
         await putstr()(win, 0, new $c.Ptr(buf, 0));
         await putstr()(win, 0, $c.lit("           / | \\ "));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("          %s  %s  %s"), visctrl(cmd_from_func(do_move_southwest)), visctrl(cmd_from_func(do_move_south)), visctrl(cmd_from_func(do_move_southeast)));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("          %s  %s  %s"), visctrl(cmd_from_func(do_move_southwest)), visctrl(cmd_from_func(do_move_south)), visctrl(cmd_from_func(do_move_southeast)));
         await putstr()(win, 0, new $c.Ptr(buf, 0));
     }
 }
@@ -3133,7 +3133,7 @@ async function help_dir(sym, spkey, msg) {   // cmd.c:4171
         await putstr()(win, 0, new $c.Ptr(buf, 0));
         await putstr()(win, 0, $c.lit(""));
     } else if (msg) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("cmdassist: %s"), msg);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("cmdassist: %s"), msg);
         await putstr()(win, 0, new $c.Ptr(buf, 0));
         await putstr()(win, 0, $c.lit(""));
     }
@@ -3142,18 +3142,18 @@ async function help_dir(sym, spkey, msg) {   // cmd.c:4171
         sym = highc(sym);   /* @A-Z[ (note: letter() accepts '@') */
         ctrl = $c.i8((sym - 65 | 0) + 1 | 0);   /* 0-27 (note: 28-31 aren't applicable) */
         if ((explain = dowhatdoes_core(ctrl, new $c.Ptr(buf2, 0))) !== null && (!$c.strchr(new $c.Ptr(help_dir$wiz_only_list, 0), sym) || wizard())) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Are you trying to use ^%c%s?"), sym, $c.strchr(new $c.Ptr(help_dir$wiz_only_list, 0), sym) ? $c.lit("") : $c.lit(" as specified in the Guidebook"));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Are you trying to use ^%c%s?"), sym, $c.strchr(new $c.Ptr(help_dir$wiz_only_list, 0), sym) ? $c.lit("") : $c.lit(" as specified in the Guidebook"));
             await putstr()(win, 0, new $c.Ptr(buf, 0));
             await putstr()(win, 0, $c.lit(""));
             await putstr()(win, 0, explain);
             await putstr()(win, 0, $c.lit(""));
             await putstr()(win, 0, $c.lit("To use that command, hold down the <Ctrl> key as a shift"));
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("and press the <%c> key."), sym);
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("and press the <%c> key."), sym);
             await putstr()(win, 0, new $c.Ptr(buf, 0));
             await putstr()(win, 0, $c.lit(""));
         }
     }
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Valid direction keys%s%s%s are:"), prefixhandling ? $c.lit(" to ") : $c.lit(""), prefixhandling ? dothat : $c.lit(""), u.umonnum === PM.GRID_BUG ? $c.lit(" in your current form") : $c.lit(""));
+    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Valid direction keys%s%s%s are:"), prefixhandling ? $c.lit(" to ") : $c.lit(""), prefixhandling ? dothat : $c.lit(""), u.umonnum === PM.GRID_BUG ? $c.lit(" in your current form") : $c.lit(""));
     await putstr()(win, 0, new $c.Ptr(buf, 0));
     await show_direction_keys(win, $c.i8(!prefixhandling ? 46 : 32), $c.i8(NODIAG(u.umonnum)));
     if (!prefixhandling) {
@@ -3166,7 +3166,7 @@ async function help_dir(sym, spkey, msg) {   // cmd.c:4171
         await putstr()(win, 0, $c.lit("          >  down"));
         if (!prefixhandling) {
             selfi = gc.Cmd.num_pad ? NHKF.GETDIR_SELF2 : NHKF.GETDIR_SELF;
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("       %4s  direct at yourself"), visctrl(gc.Cmd.spkeys[selfi]));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("       %4s  direct at yourself"), visctrl(gc.Cmd.spkeys[selfi]));
             await putstr()(win, 0, new $c.Ptr(buf, 0));
         }
     }
@@ -3253,7 +3253,7 @@ async function there_cmd_menu_self(win, x, y, act) {   // cmd.c:4435
         return K;
     }
     if ((IS_FOUNTAIN(typ) || IS_SINK(typ)) && can_reach_floor(FALSE)) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Drink from the %s"), defsyms[typ === FOUNTAIN ? S.fountain : S.sink].explanation);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Drink from the %s"), defsyms[typ === FOUNTAIN ? S.fountain : S.sink].explanation);
         await mcmd_addmenu(win, MCMD.QUAFF, new $c.Ptr(buf, 0)), K = K + 1 | 0;
     }
     if (IS_FOUNTAIN(typ) && can_reach_floor(FALSE)) {
@@ -3266,31 +3266,31 @@ async function there_cmd_menu_self(win, x, y, act) {   // cmd.c:4435
         await mcmd_addmenu(win, MCMD.OFFER, $c.lit("Sacrifice something on the altar")), K = K + 1 | 0;
     }
     if (stway && stway.up) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Go up the %s"), stway.isladder ? $c.lit("ladder") : $c.lit("stairs"));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Go up the %s"), stway.isladder ? $c.lit("ladder") : $c.lit("stairs"));
         await mcmd_addmenu(win, MCMD.UP, new $c.Ptr(buf, 0)), K = K + 1 | 0;
     }
     if (stway && !stway.up) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Go down the %s"), stway.isladder ? $c.lit("ladder") : $c.lit("stairs"));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Go down the %s"), stway.isladder ? $c.lit("ladder") : $c.lit("stairs"));
         await mcmd_addmenu(win, MCMD.DOWN, new $c.Ptr(buf, 0)), K = K + 1 | 0;
     }
     if (u.usteed) {
         /* another movement choice */
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Dismount %s"), await x_monnam(u.usteed, ARTICLE.THE, null, SUPPRESS.SADDLE, FALSE));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Dismount %s"), await x_monnam(u.usteed, ARTICLE.THE, null, SUPPRESS.SADDLE, FALSE));
         await mcmd_addmenu(win, MCMD.DISMOUNT, new $c.Ptr(buf, 0)), K = K + 1 | 0;
     }
     /* before objects */
     if (OBJ_AT(x, y)) {
         otmp = svl.level.objects[x][y];
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Pick up %s"), otmp.v.v_nexthere ? $c.lit("items") : await doname(otmp));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Pick up %s"), otmp.v.v_nexthere ? $c.lit("items") : await doname(otmp));
         await mcmd_addmenu(win, MCMD.PICKUP, new $c.Ptr(buf, 0)), K = K + 1 | 0;
         if (Is_container(otmp)) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Loot %s"), await doname(otmp));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Loot %s"), await doname(otmp));
             await mcmd_addmenu(win, MCMD.LOOT, new $c.Ptr(buf, 0)), K = K + 1 | 0;
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Tip %s"), await doname(otmp));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Tip %s"), await doname(otmp));
             await mcmd_addmenu(win, MCMD.TIP, new $c.Ptr(buf, 0)), K = K + 1 | 0;
         }
         if (otmp.oclass === FOOD_CLASS) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Eat %s"), await doname(otmp));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Eat %s"), await doname(otmp));
             await mcmd_addmenu(win, MCMD.EAT, new $c.Ptr(buf, 0)), K = K + 1 | 0;
         }
     }
@@ -3328,7 +3328,7 @@ async function there_cmd_menu_next2u(win, x, y, mod, act) {   // cmd.c:4524
             key_or_pick = $c.i8(carrying(SKELETON_KEY) || carrying(LOCK_PICK) ? 1 : 0);
             card = $c.i8(carrying(CREDIT_CARD) !== null ? 1 : 0);
             if (key_or_pick || card) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%sunlock the door"), key_or_pick ? $c.lit("lock or ") : $c.lit(""));
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%sunlock the door"), key_or_pick ? $c.lit("lock or ") : $c.lit(""));
                 await mcmd_addmenu(win, MCMD.LOCK_DOOR, upstart(new $c.Ptr(buf, 0))), K = K + 1 | 0;
             }
             /* unfortunately there's no tknown flag for doors (or chests)
@@ -3360,26 +3360,26 @@ async function there_cmd_menu_next2u(win, x, y, mod, act) {   // cmd.c:4524
     if (mtmp && await which_armor(mtmp, W.SADDLE)) {
         mnam = await x_monnam(mtmp, ARTICLE.THE, null, SUPPRESS.SADDLE, FALSE);
         if (!u.usteed) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Ride %s"), mnam);
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Ride %s"), mnam);
             await mcmd_addmenu(win, MCMD.RIDE, new $c.Ptr(buf, 0)), K = K + 1 | 0;
         }
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Remove saddle from %s"), mnam);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Remove saddle from %s"), mnam);
         await mcmd_addmenu(win, MCMD.REMOVE_SADDLE, new $c.Ptr(buf, 0)), K = K + 1 | 0;
     }
     if (mtmp && can_saddle(mtmp) && !await which_armor(mtmp, W.SADDLE) && carrying(SADDLE)) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Put saddle on %s"), await mon_nam(mtmp));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Put saddle on %s"), await mon_nam(mtmp));
         await mcmd_addmenu(win, MCMD.APPLY_SADDLE, new $c.Ptr(buf, 0)), K = K + 1 | 0;
     }
     if (mtmp && (mtmp.mpeaceful | 0 || mtmp.mtame)) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Talk to %s"), await mon_nam(mtmp));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Talk to %s"), await mon_nam(mtmp));
         await mcmd_addmenu(win, MCMD.TALK, new $c.Ptr(buf, 0)), K = K + 1 | 0;
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Swap places with %s"), await mon_nam(mtmp));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Swap places with %s"), await mon_nam(mtmp));
         await mcmd_addmenu(win, MCMD.MOVE_DIR, new $c.Ptr(buf, 0)), K = K + 1 | 0;
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s %s"), !(mtmp.mextra && mtmp.mextra.mgivenname) ? $c.lit("Name") : $c.lit("Rename"), await mon_nam(mtmp));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s %s"), !(mtmp.mextra && mtmp.mextra.mgivenname) ? $c.lit("Name") : $c.lit("Rename"), await mon_nam(mtmp));
         await mcmd_addmenu(win, MCMD.NAME, new $c.Ptr(buf, 0)), K = K + 1 | 0;
     }
     if (mtmp && !(mtmp.mpeaceful | 0 || mtmp.mtame) || glyph_at(x, y) === GLYPH_INVISIBLE) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Attack %s"), mtmp ? await mon_nam(mtmp) : $c.lit("unseen creature"));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Attack %s"), mtmp ? await mon_nam(mtmp) : $c.lit("unseen creature"));
         await mcmd_addmenu(win, MCMD.ATTACK_NEXT2U, new $c.Ptr(buf, 0)), K = K + 1 | 0;
         /* attacking overrides any other automatic action */
         act.set(0, MCMD.ATTACK_NEXT2U);
@@ -3798,9 +3798,9 @@ export async function get_count(allowchars, inkey, maxcount, count, gc_flags) { 
         if (cnt > 9 || backspaced || echoalways) {
             await clear_nhwindow()($G.WIN_MESSAGE);
             if (backspaced && !cnt && !showzero) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Count: "));
+                $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("Count: "));
             } else {
-                $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Count: %ld"), cnt);
+                $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("Count: %ld"), cnt);
                 backspaced = FALSE;
             }
             await custompline(SUPPRESS_HISTORY, $c.lit("%s"), new $c.Ptr(qbuf, 0));
@@ -3808,7 +3808,7 @@ export async function get_count(allowchars, inkey, maxcount, count, gc_flags) { 
         }
     }
     if (historicmsg || conditionalmsg && count.get(0) !== first) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Count: %ld "), count.get(0));
+        $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("Count: %ld "), count.get(0));
         key2txt($c.u8(key), eos(new $c.Ptr(qbuf, 0)));
         await putmsghistory()(new $c.Ptr(qbuf, 0), FALSE);
     }
@@ -4124,8 +4124,8 @@ export async function yn_function(query, resp, def, addcmdq) {   // cmd.c:5471
     if ($c.strlen(query) >= QBUFSZ) {
         /* caller shouldn't have passed anything this long */
         paniclog($c.lit("Query truncated: "), query);
-        $c.__builtin___strncpy_chk(new $c.Ptr(qbuf, 0), query, QBUFSZ - 1 - 3, 128);
-        $c.__builtin___strcpy_chk(new $c.Ptr(qbuf, QBUFSZ - 1 - 3), $c.lit("..."), 4);
+        $c.strncpy(new $c.Ptr(qbuf, 0), query, QBUFSZ - 1 - 3);
+        $c.strcpy(new $c.Ptr(qbuf, QBUFSZ - 1 - 3), $c.lit("..."));
         query = new $c.Ptr(qbuf, 0);
     }
     if (addcmdq && (cmdq = cmdq_pop()) !== null) {
@@ -4173,7 +4173,7 @@ export async function yn_function(query, resp, def, addcmdq) {   // cmd.c:5471
         /* when idx is still the same as gs.saved_pline_index, the interface
            didn't put the prompt into gs.saved_plines[]; we put a simplified
            version in there now (without response choices or default) */
-        $c.__builtin___sprintf_chk(new $c.Ptr(dumplog_buf, 0), 0, 144, $c.lit("%s "), query);
+        $c.sprintf(new $c.Ptr(dumplog_buf, 0), $c.lit("%s "), query);
         key2txt($c.u8(res[0]), eos(new $c.Ptr(dumplog_buf, 0)));
         await dumplogmsg(new $c.Ptr(dumplog_buf, 0));
     }
@@ -4231,7 +4231,7 @@ export async function paranoid_ynq(be_paranoid, prompt, accept_q) {   // cmd.c:5
             k = $c.i32($c.addu64($c.addu64($c.strlen(promptprefix), 1), $c.strlen(responsetype)));
             if (($c.i32($c.strlen(new $c.Ptr(pbuf, 0))) + k | 0) > QBUFSZ - 1) {
                 /* chop off some at the end */
-                $c.__builtin___strcpy_chk(new $c.Ptr(pbuf, 0).add(QBUFSZ - 1).add(-k).add(-4), $c.lit("...?"), -1);   /* -4: "...?" */
+                $c.strcpy(new $c.Ptr(pbuf, 0).add(QBUFSZ - 1).add(-k).add(-4), $c.lit("...?"));   /* -4: "...?" */
             }
             nh_snprintf($c.lit("paranoid_ynq"), 5624, new $c.Ptr(qbuf, 0), 128, $c.lit("%s%s %s"), promptprefix, new $c.Ptr(pbuf, 0), responsetype);
             new $c.Ptr(ans, 0).set(0, 0);

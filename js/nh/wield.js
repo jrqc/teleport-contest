@@ -111,7 +111,7 @@ async function cant_wield_corpse(obj) {   // wield.c:138
     }
     /* Prevent wielding cockatrice when not wearing gloves --KAA */
     await You($c.lit("wield %s in your bare %s."), await corpse_xname(obj, null, CXN.PFX_THE), await makeplural(await body_part(HAND)));
-    $c.__builtin___sprintf_chk(new $c.Ptr(kbuf, 0), 0, 256, $c.lit("wielding %s bare-handed"), await killer_xname(obj));
+    $c.sprintf(new $c.Ptr(kbuf, 0), $c.lit("wielding %s bare-handed"), await killer_xname(obj));
     await instapetrify(new $c.Ptr(kbuf, 0));
     return TRUE;
 }
@@ -324,7 +324,7 @@ export async function dowield() {   // wield.c:355
             } else if ($c.peq(wep, $G.uquiver)) {
                 /* offer to split stack if multiple are quivered */
                 if ($G.uquiver.quan > 1 && inv_cnt(FALSE) < invlet_basic && await splittable($G.uquiver)) {
-                    $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("You have %ld %s readied.  Wield one?"), $G.uquiver.quan, await simpleonames($G.uquiver));
+                    $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("You have %ld %s readied.  Wield one?"), $G.uquiver.quan, await simpleonames($G.uquiver));
                     switch (await ynq(new $c.Ptr(qbuf, 0))) {
                         case 113:
                             return ECMD.OK;
@@ -336,10 +336,10 @@ export async function dowield() {   // wield.c:355
                         default:
                             break;
                     }
-                    $c.__builtin___strcpy_chk(new $c.Ptr(qbuf, 0), $c.lit("Wield all of them instead?"), 128);
+                    $c.strcpy(new $c.Ptr(qbuf, 0), $c.lit("Wield all of them instead?"));
                 } else {
                     use_plural = $c.i8($G.uquiver.quan !== 1 || $G.uquiver.oartifact === ART.EYES_OF_THE_OVERWORLD && !undiscovered_artifact(ART.EYES_OF_THE_OVERWORLD) || pair_of($G.uquiver) ? 1 : 0);
-                    $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("You have %s readied.  Wield %s instead?"), !use_plural ? $c.lit("that") : $c.lit("those"), !use_plural ? $c.lit("it") : $c.lit("them"));
+                    $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("You have %s readied.  Wield %s instead?"), !use_plural ? $c.lit("that") : $c.lit("those"), !use_plural ? $c.lit("it") : $c.lit("them"));
                 }
                 /* require confirmation to wield the quivered weapon */
                 if (await ynq(new $c.Ptr(qbuf, 0)) !== 121) {
@@ -475,7 +475,7 @@ export async function doquiver_core(verb) {   // wield.c:512
                 }
                 /* offer to split stack if wielding more than 1 */
                 if ($G.uwep.quan > 1 && inv_cnt(FALSE) < invlet_basic && await splittable($G.uwep)) {
-                    $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("You are wielding %ld %s.  Ready %ld of them?"), $G.uwep.quan, await simpleonames($G.uwep), $c.sub64($G.uwep.quan, 1));
+                    $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("You are wielding %ld %s.  Ready %ld of them?"), $G.uwep.quan, await simpleonames($G.uwep), $c.sub64($G.uwep.quan, 1));
                     switch (await ynq(new $c.Ptr(qbuf, 0))) {
                         case 113:
                             return ECMD.OK;
@@ -487,10 +487,10 @@ export async function doquiver_core(verb) {   // wield.c:512
                         default:
                             break;
                     }
-                    $c.__builtin___strcpy_chk(new $c.Ptr(qbuf, 0), $c.lit("Ready all of them instead?"), 128);
+                    $c.strcpy(new $c.Ptr(qbuf, 0), $c.lit("Ready all of them instead?"));
                 } else {
                     use_plural = $c.i8($G.uwep.quan !== 1 || $G.uwep.oartifact === ART.EYES_OF_THE_OVERWORLD && !undiscovered_artifact(ART.EYES_OF_THE_OVERWORLD) || pair_of($G.uwep) ? 1 : 0);
-                    $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("You are wielding %s.  Ready %s instead?"), !use_plural ? $c.lit("that") : $c.lit("those"), !use_plural ? $c.lit("it") : $c.lit("them"));
+                    $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("You are wielding %s.  Ready %s instead?"), !use_plural ? $c.lit("that") : $c.lit("those"), !use_plural ? $c.lit("it") : $c.lit("them"));
                 }
                 /* require confirmation to ready the main weapon */
                 if (await ynq(new $c.Ptr(qbuf, 0)) !== 121) {
@@ -504,7 +504,7 @@ export async function doquiver_core(verb) {   // wield.c:512
                 was_uwep = TRUE;
             } else if ($c.peq(newquiver, $G.uswapwep)) {
                 if ($G.uswapwep.quan > 1 && inv_cnt(FALSE) < invlet_basic && await splittable($G.uswapwep)) {
-                    $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("%s %ld %s.  Ready %ld of them?"), u.twoweap ? $c.lit("You are dual wielding") : $c.lit("Your alternate weapon is"), $G.uswapwep.quan, await simpleonames($G.uswapwep), $c.sub64($G.uswapwep.quan, 1));
+                    $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("%s %ld %s.  Ready %ld of them?"), u.twoweap ? $c.lit("You are dual wielding") : $c.lit("Your alternate weapon is"), $G.uswapwep.quan, await simpleonames($G.uswapwep), $c.sub64($G.uswapwep.quan, 1));
                     switch (await ynq(new $c.Ptr(qbuf, 0))) {
                         case 113:
                             return ECMD.OK;
@@ -516,10 +516,10 @@ export async function doquiver_core(verb) {   // wield.c:512
                         default:
                             break;
                     }
-                    $c.__builtin___strcpy_chk(new $c.Ptr(qbuf, 0), $c.lit("Ready all of them instead?"), 128);
+                    $c.strcpy(new $c.Ptr(qbuf, 0), $c.lit("Ready all of them instead?"));
                 } else {
                     use_plural$2 = $c.i8($G.uswapwep.quan !== 1 || $G.uswapwep.oartifact === ART.EYES_OF_THE_OVERWORLD && !undiscovered_artifact(ART.EYES_OF_THE_OVERWORLD) || pair_of($G.uswapwep) ? 1 : 0);
-                    $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("%s your %s weapon.  Ready %s instead?"), !use_plural$2 ? $c.lit("That is") : $c.lit("Those are"), u.twoweap ? $c.lit("second") : $c.lit("alternate"), !use_plural$2 ? $c.lit("it") : $c.lit("them"));
+                    $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("%s your %s weapon.  Ready %s instead?"), !use_plural$2 ? $c.lit("That is") : $c.lit("Those are"), u.twoweap ? $c.lit("second") : $c.lit("alternate"), !use_plural$2 ? $c.lit("it") : $c.lit("them"));
                 }
                 /* require confirmation to ready the alternate weapon */
                 if (await ynq(new $c.Ptr(qbuf, 0)) !== 121) {
@@ -684,7 +684,7 @@ export async function drop_uswapwep() {   // wield.c:809
        dual-wielded, or to get this far attempting to achieve that,
        uswapwep must be one-handed; since it's secondary, the hand must
        be the left one */
-    $c.__builtin___sprintf_chk(new $c.Ptr(left_hand, 0), 0, 128, $c.lit("left %s"), await body_part(HAND));
+    $c.sprintf(new $c.Ptr(left_hand, 0), $c.lit("left %s"), await body_part(HAND));
     if (!obj.cursed) {   /* attempting to two-weapon while Glib */
         await pline($c.lit("%s from your %s!"), await Yobjnam2(obj, $c.lit("slip")), new $c.Ptr(left_hand, 0));
     } else if (!u.twoweap) {   /* attempting to two-weapon when uswapwep is cursed */
@@ -772,16 +772,16 @@ export async function chwepon(otmp, amount) {   // wield.c:918
         if (amount >= 0 && $G.uwep && will_weld($G.uwep)) {
             /* cursed tin opener */
             if (!Blind()) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s with %s aura."), await Yobjnam2($G.uwep, $c.lit("glow")), await an(hcolor(c_color_names.c_amber)));
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s with %s aura."), await Yobjnam2($G.uwep, $c.lit("glow")), await an(hcolor(c_color_names.c_amber)));
                 $G.uwep.bknown = ((!Hallucination() ? 1 : 0) >>> 0) & 1;   /* ok to bypass set_bknown() */
             } else {
                 /* cursed tin opener is wielded in right hand */
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Your right %s tingles."), await body_part(HAND));
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Your right %s tingles."), await body_part(HAND));
             }
             await uncurse($G.uwep);
             await update_inventory();
         } else {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Your %s %s."), await makeplural(await body_part(HAND)), amount >= 0 ? $c.lit("twitch") : $c.lit("itch"));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Your %s %s."), await makeplural(await body_part(HAND)), amount >= 0 ? $c.lit("twitch") : $c.lit("itch"));
         }
         await strange_feeling(otmp, new $c.Ptr(buf, 0));   /* pline()+docall()+useup() */
         await exercise(A.DEX, $c.i8(amount >= 0 ? 1 : 0));

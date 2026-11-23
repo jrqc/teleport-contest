@@ -393,7 +393,7 @@ export async function copy_oextra(obj2, obj1) {   // mkobj.c:417
             await newomonst(obj2);
         }
         (!(obj2.oextra && obj2.oextra.omonst) ? 1 : 0) ? $c.__assert_rtn($c.lit("copy_oextra"), $c.lit("mkobj.c"), 429, $c.lit("has_omonst(obj2)")) : 0;
-        $c.__builtin___memcpy_chk(obj2.oextra.omonst, obj1.oextra.omonst, 192, -1);
+        $c.memcpy(obj2.oextra.omonst, obj1.oextra.omonst, 192);
         obj2.oextra.omonst.mextra = null;
         obj2.oextra.omonst.nmon = null;
         if (obj1.oextra.omonst.mextra) {
@@ -1441,7 +1441,7 @@ export async function shrink_glob(arg, expire_time) {   // mkobj.c:1500
        doname() rather than inserting that itself; ask xname() to add
        that when appropriate */
     iflags.partly_eaten_hack = TRUE;
-    $c.__builtin___strcpy_chk(new $c.Ptr(globnambuf, 0), await Yname2(obj), 256);
+    $c.strcpy(new $c.Ptr(globnambuf, 0), await Yname2(obj));
     iflags.partly_eaten_hack = FALSE;
     if (obj.owt > 0) {
         /* sanity precaution */
@@ -1569,9 +1569,9 @@ export async function maybe_adjust_light(obj, old_range) {   // mkobj.c:1704
         if (!Blind() && get_obj_location(obj, new $c.Ptr(ox, 0), new $c.Ptr(oy, 0), 0)) {
             new $c.Ptr(buf, 0).set(0, 0);
             if (iflags.last_msg === PLNMSG.OBJ_GLOWS) {   /* we just saw "The <obj> glows <color>." from dipping */
-                $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), obj.quan === 1 ? $c.lit("It") : $c.lit("They"), 256);
+                $c.strcpy(new $c.Ptr(buf, 0), obj.quan === 1 ? $c.lit("It") : $c.lit("They"));
             } else if (carried(obj) || cansee(ox[0], oy[0])) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await Yname2(obj), 256);
+                $c.strcpy(new $c.Ptr(buf, 0), await Yname2(obj));
             }
             if (new $c.Ptr(buf, 0).get(0)) {
                 /* initial activation says "dimly" if cursed,
@@ -2675,17 +2675,17 @@ export async function obj_sanity_check() {   // mkobj.c:2949
             for (obj = otop; obj; prevo = obj, obj = prevo.v.v_nexthere) {
                 /* <ox,oy> should match <x,y>; <0,*> should always be empty */
                 if (obj.where !== OBJ.FLOOR || x === 0 || obj.ox !== x || obj.oy !== y) {
-                    $c.__builtin___sprintf_chk(new $c.Ptr(at_fmt, 0), 0, 256, $c.lit("%%s obj@<%d,%d> %%s %%s: %%s@<%d,%d>"), x, y, obj.ox, obj.oy);
+                    $c.sprintf(new $c.Ptr(at_fmt, 0), $c.lit("%%s obj@<%d,%d> %%s %%s: %%s@<%d,%d>"), x, y, obj.ox, obj.oy);
                     await insane_object(obj, new $c.Ptr(at_fmt, 0), $c.lit("location sanity"), null);
                     /* when one or more boulders are present, they should always
                        be at the top of their pile; also never in water or lava */
                 } else if (obj.otyp === BOULDER) {
                     if (prevo && prevo.otyp !== BOULDER) {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(at_fmt, 0), 0, 256, $c.lit("%%s boulder@<%d,%d> %%s %%s: not on top"), x, y);
+                        $c.sprintf(new $c.Ptr(at_fmt, 0), $c.lit("%%s boulder@<%d,%d> %%s %%s: not on top"), x, y);
                         await insane_object(obj, new $c.Ptr(at_fmt, 0), $c.lit("boulder sanity"), null);
                     }
                     if (is_pool_or_lava(x, y)) {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(at_fmt, 0), 0, 256, $c.lit("%%s boulder@<%d,%d> %%s %%s: on/in %s"), x, y, is_pool(x, y) ? $c.lit("water") : $c.lit("lava"));
+                        $c.sprintf(new $c.Ptr(at_fmt, 0), $c.lit("%%s boulder@<%d,%d> %%s %%s: on/in %s"), x, y, is_pool(x, y) ? $c.lit("water") : $c.lit("lava"));
                         await insane_object(obj, new $c.Ptr(at_fmt, 0), $c.lit("boulder sanity"), null);
                     }
                 }
@@ -2733,7 +2733,7 @@ async function objlist_sanity(objlist, wheretype, mesg) {   // mkobj.c:3032
         }
         if (obj.where === OBJ.INVENT && (obj.how_lost | 0) !== LOST.NONE) {
             /* %d: bitfield is unsigned but narrow, so promotes to int */
-            $c.__builtin___sprintf_chk(new $c.Ptr(lostbuf, 0), 0, 40, $c.lit("how_lost=%d obj in inventory!"), obj.how_lost | 0);
+            $c.sprintf(new $c.Ptr(lostbuf, 0), $c.lit("how_lost=%d obj in inventory!"), obj.how_lost | 0);
             await insane_object(obj, new $c.Ptr(ofmt0, 0), new $c.Ptr(lostbuf, 0), null);
         }
         if (Has_contents(obj)) {
@@ -2765,7 +2765,7 @@ async function objlist_sanity(objlist, wheretype, mesg) {   // mkobj.c:3032
                     if (!$c.peq(obj, $G.uchain) && !$c.peq(obj, $G.uball) || !bc_ok) {
                         /* discovered an object not in inventory which
                            erroneously has worn mask set */
-                        $c.__builtin___sprintf_chk(new $c.Ptr(maskbuf, 0), 0, 40, $c.lit("worn mask 0x%08lx"), obj.owornmask);
+                        $c.sprintf(new $c.Ptr(maskbuf, 0), $c.lit("worn mask 0x%08lx"), obj.owornmask);
                         await insane_object(obj, new $c.Ptr(ofmt0, 0), new $c.Ptr(maskbuf, 0), null);
                     }
                     break;
@@ -2776,12 +2776,12 @@ async function objlist_sanity(objlist, wheretype, mesg) {   // mkobj.c:3032
             if (obj.where === OBJ.INVENT) {
                 if (!mtmp) {
                     /* found leash with phantom mon */
-                    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("leashmon=%u no monst,"), obj.corpsenm >>> 0);
+                    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("leashmon=%u no monst,"), obj.corpsenm >>> 0);
                     await insane_object(obj, new $c.Ptr(ofmt0, 0), new $c.Ptr(buf, 0), null);
                 } else if (!mtmp.mleashed) {
                     /* found leashed mon
                      * not flagged as leashed */
-                    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("leashmon=%u %s not leashed,"), obj.corpsenm >>> 0, mon_pmname(mtmp));
+                    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("leashmon=%u %s not leashed,"), obj.corpsenm >>> 0, mon_pmname(mtmp));
                     await insane_object(obj, new $c.Ptr(ofmt0, 0), new $c.Ptr(buf, 0), null);
                 }
                 /* have to explicitly exclude migrating_objs because the
@@ -2792,11 +2792,11 @@ async function objlist_sanity(objlist, wheretype, mesg) {   // mkobj.c:3032
                 mtmp2 = obj.where === OBJ.MINVENT ? obj.v.v_ocarry : null;
                 if (mtmp) {
                     /* found monst leashed by non-invent leash */
-                    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("leashmon:%u %s leashed by %s leash,"), obj.corpsenm >>> 0, mon_pmname(mtmp), where_name(obj));
+                    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("leashmon:%u %s leashed by %s leash,"), obj.corpsenm >>> 0, mon_pmname(mtmp), where_name(obj));
                     await insane_object(obj, new $c.Ptr(ofmt0, 0), new $c.Ptr(buf, 0), mtmp2);
                 } else {
                     /* found non-invent leash with m_id of phantom mon */
-                    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("leashmon:%u no monst for %s leash,"), obj.corpsenm >>> 0, where_name(obj));
+                    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("leashmon:%u no monst for %s leash,"), obj.corpsenm >>> 0, where_name(obj));
                     await insane_object(obj, new $c.Ptr(ofmt0, 0), new $c.Ptr(buf, 0), mtmp2);
                 }
             }
@@ -2933,7 +2933,7 @@ async function insane_obj_bits(obj, mon) {   // mkobj.c:3249
        boulders and should be reset by time of next sanity check */
     o_boulder = (obj.otyp === BOULDER && obj.corpsenm ? 1 : 0) >>> 0;
     if (o_in_use || o_bypass || o_nomerge || o_boulder) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(infobuf, 0), 0, 128, $c.lit("flagged%s%s%s%s"), o_in_use ? $c.lit(" in_use") : $c.lit(""), o_bypass ? $c.lit(" bypass") : $c.lit(""), o_nomerge ? $c.lit(" nomerge") : $c.lit(""), o_boulder ? $c.lit(" nxtbldr") : $c.lit(""));
+        $c.sprintf(new $c.Ptr(infobuf, 0), $c.lit("flagged%s%s%s%s"), o_in_use ? $c.lit(" in_use") : $c.lit(""), o_bypass ? $c.lit(" bypass") : $c.lit(""), o_nomerge ? $c.lit(" nomerge") : $c.lit(""), o_boulder ? $c.lit(" nxtbldr") : $c.lit(""));
         await insane_object(obj, new $c.Ptr(ofmt0, 0), new $c.Ptr(infobuf, 0), mon);
     }
 }
@@ -2954,7 +2954,7 @@ function where_name(obj) {   // mkobj.c:3296
     }
     where = obj.where;
     if (where < 0 || where >= NOBJ_STATES || !obj_state_names[where]) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(where_name$unknown, 0), 0, 32, $c.lit("unknown[%d]"), where);
+        $c.sprintf(new $c.Ptr(where_name$unknown, 0), $c.lit("unknown[%d]"), where);
         return new $c.Ptr(where_name$unknown, 0);
     }
     return obj_state_names[where];
@@ -2968,7 +2968,7 @@ async function insane_object(obj, fmt, mesg, mon) {   // mkobj.c:3314
         iflags.override_ID = iflags.override_ID - 1 | 0;
     }
     if (mon || strstri(mesg, $c.lit("minvent")) && !strstri(mesg, $c.lit("contained"))) {
-        $c.__builtin___strcat_chk($c.__builtin___strcpy_chk(new $c.Ptr(altfmt, 0), fmt, 256), $c.lit(" held by mon %s (%s)"), -1);
+        $c.strcat($c.strcpy(new $c.Ptr(altfmt, 0), fmt), $c.lit(" held by mon %s (%s)"));
         if (mon) {
             monnm = await x_monnam(mon, ARTICLE.A, null, EXACT_NAME, TRUE);
         }
@@ -3014,7 +3014,7 @@ async function check_contained(container, mesg) {   // mkobj.c:3374
     /* change "invent sanity" to "contained invent sanity"
        but leave "nested contained invent sanity" as is */
     if (!strstri(mesg, $c.lit("contained"))) {
-        mesg = $c.__builtin___strcat_chk($c.__builtin___strcpy_chk(new $c.Ptr(mesgbuf, 0), $c.lit("contained "), 40), mesg, -1);
+        mesg = $c.strcat($c.strcpy(new $c.Ptr(mesgbuf, 0), $c.lit("contained ")), mesg);
     }
     for (obj = container.cobj; obj; obj = obj.nobj) {
         /* catch direct cycle to avoid unbounded recursion */
@@ -3038,7 +3038,7 @@ async function check_contained(container, mesg) {   // mkobj.c:3374
             }
             /* change "contained... sanity" to "nested contained... sanity"
                and "nested contained..." to "nested nested contained..." */
-            $c.__builtin___strcpy_chk(new $c.Ptr(nestedmesg, 0), $c.lit("nested "), 120);
+            $c.strcpy(new $c.Ptr(nestedmesg, 0), $c.lit("nested "));
             copynchars(eos(new $c.Ptr(nestedmesg, 0)), mesg, (120 - $c.i32($c.strlen(new $c.Ptr(nestedmesg, 0))) | 0) - 1 | 0);
             /* recursively check contents */
             await check_contained(obj, new $c.Ptr(nestedmesg, 0));
@@ -3055,8 +3055,8 @@ async function check_glob(obj, mesg) {   // mkobj.c:3420
     /* a partially eaten glob could have any non-zero weight but an
        intact one should weigh an exact multiple of base weight (20) */
     if (obj.quan !== 1 || obj.owt === 0 || obj.otyp < LOWEST_GLOB || obj.otyp > HIGHEST_GLOB) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(globbuf, 0), 0, 128, $c.lit(" glob %d,quan=%ld,owt=%u "), obj.otyp, obj.quan, obj.owt);
-        mesg = strsubst($c.__builtin___strcpy_chk(new $c.Ptr(mesgbuf, 0), mesg, 256), $c.lit(" obj "), new $c.Ptr(globbuf, 0));
+        $c.sprintf(new $c.Ptr(globbuf, 0), $c.lit(" glob %d,quan=%ld,owt=%u "), obj.otyp, obj.quan, obj.owt);
+        mesg = strsubst($c.strcpy(new $c.Ptr(mesgbuf, 0), mesg), $c.lit(" obj "), new $c.Ptr(globbuf, 0));
         await insane_object(obj, new $c.Ptr(ofmt0, 0), mesg, obj.where === OBJ.MINVENT ? obj.v.v_ocarry : null);
     }
 }
@@ -3096,12 +3096,12 @@ async function sanity_check_worn(obj) {   // mkobj.c:3447
     }
     if (n > 1) {
         /* multiple bits set */
-        $c.__builtin___sprintf_chk(new $c.Ptr(maskbuf, 0), 0, 60, $c.lit("worn mask (multiple) 0x%08lx"), obj.owornmask);
+        $c.sprintf(new $c.Ptr(maskbuf, 0), $c.lit("worn mask (multiple) 0x%08lx"), obj.owornmask);
         await insane_object(obj, new $c.Ptr(ofmt0, 0), new $c.Ptr(maskbuf, 0), null);
     }
     if ($c.andu64(owornmask, $c.notu64(allmask)) !== 0 || carried(obj) && $c.andu64(owornmask, W.SADDLE) !== 0) {
         /* non-wearable bit(s) set */
-        $c.__builtin___sprintf_chk(new $c.Ptr(maskbuf, 0), 0, 60, $c.lit("worn mask (bogus)) 0x%08lx"), obj.owornmask);
+        $c.sprintf(new $c.Ptr(maskbuf, 0), $c.lit("worn mask (bogus)) 0x%08lx"), obj.owornmask);
         await insane_object(obj, new $c.Ptr(ofmt0, 0), new $c.Ptr(maskbuf, 0), null);
     }
     if (n === 1 && (carried(obj) || $c.andu64(owornmask, W.BALL | W.CHAIN) !== 0)) {
@@ -3194,7 +3194,7 @@ async function sanity_check_worn(obj) {   // mkobj.c:3447
                 break;
         }
         if (what) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(maskbuf, 0), 0, 60, $c.lit("worn mask 0x%08lx != %s"), obj.owornmask, what);
+            $c.sprintf(new $c.Ptr(maskbuf, 0), $c.lit("worn mask 0x%08lx != %s"), obj.owornmask, what);
             await insane_object(obj, new $c.Ptr(ofmt0, 0), new $c.Ptr(maskbuf, 0), null);
         }
     }
@@ -3249,8 +3249,8 @@ async function sanity_check_worn(obj) {   // mkobj.c:3447
             mon = mcarried(obj) ? obj.v.v_ocarry : null;
             /* if we've found a potion worn in the amulet slot,
                this yields "worn (potion amulet)" */
-            $c.__builtin___strcpy_chk(new $c.Ptr(oclassname, 0), def_oc_syms[$c.u8(obj.oclass)].name, 30);
-            $c.__builtin___sprintf_chk(new $c.Ptr(maskbuf, 0), 0, 60, $c.lit("worn (%s %s)"), await makesingular(new $c.Ptr(oclassname, 0)), what);
+            $c.strcpy(new $c.Ptr(oclassname, 0), def_oc_syms[$c.u8(obj.oclass)].name);
+            $c.sprintf(new $c.Ptr(maskbuf, 0), $c.lit("worn (%s %s)"), await makesingular(new $c.Ptr(oclassname, 0)), what);
             await insane_object(obj, new $c.Ptr(ofmt0, 0), new $c.Ptr(maskbuf, 0), mon);
         }
     }

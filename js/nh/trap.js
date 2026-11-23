@@ -158,7 +158,7 @@ export async function burnarmor(victim) {   // trap.c:88
                 item = hitting_u ? $G.uarmh : await which_armor(victim, W.ARMH);
                 if (item) {
                     mat_idx = objects[item.otyp].oc_material | 0;
-                    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s %s"), materialnm[mat_idx], helm_simple_name(item));
+                    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s %s"), materialnm[mat_idx], helm_simple_name(item));
                 }
                 if (!await erode_obj(item, item ? new $c.Ptr(buf, 0) : $c.lit("helmet"), ERODE.BURN, EF.GREASE)) {
                     continue L1;
@@ -323,9 +323,9 @@ export async function erode_obj(otmp, ostr, type, ef_flags) {   // trap.c:171
         otmp.in_use = (1) & 1;   /* in case of hangup during message w/ --More-- */
         if (uvictim || vismon || visobj) {
             if (!crackers) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(actbuf, 0), 0, 256, $c.lit("%s away"), await vtense(ostr, erode_obj$action[type]));
+                $c.sprintf(new $c.Ptr(actbuf, 0), $c.lit("%s away"), await vtense(ostr, erode_obj$action[type]));
             } else {
-                $c.__builtin___sprintf_chk(new $c.Ptr(actbuf, 0), 0, 256, $c.lit("shatters"));
+                $c.sprintf(new $c.Ptr(actbuf, 0), $c.lit("shatters"));
             }
             /* visobj */
             await pline($c.lit("%s %s %s!"), uvictim ? $c.lit("Your") : !vismon ? $c.lit("The") : s_suffix(await Monnam(victim)), ostr, new $c.Ptr(actbuf, 0));
@@ -472,7 +472,7 @@ export async function maketrap(x, y, typ) {   // trap.c:456
     } else {
         oldplace = FALSE;
         ttmp = await newtrap();
-        $c.__builtin___memset_chk(ttmp, 0, 32, -1);
+        $c.memset(ttmp, 0, 32);
         ttmp.ntrap = null;
         ttmp.tx = x;
         ttmp.ty = y;
@@ -647,7 +647,7 @@ export async function fall_through(td, ftflags) {   // trap.c:602
         }
     }
     if (!td) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(msgbuf, 0), 0, 256, $c.lit("The hole in the %s above you closes up."), ceiling(u.ux, u.uy));
+        $c.sprintf(new $c.Ptr(msgbuf, 0), $c.lit("The hole in the %s above you closes up."), ceiling(u.ux, u.uy));
     }
     await schedule_goto(dtmp, !((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) ? UTOTYPE.FALLING : UTOTYPE.NONE, null, !td ? new $c.Ptr(msgbuf, 0) : null);
 }
@@ -756,7 +756,7 @@ export async function animate_statue(statue, x, y, cause, fail_reason) {   // tr
     if (u_at(x, y) || cause === ANIMATE.SPELL) {
         /* "the|your|Manlobbi's statue [of a wombat]" */
         shkp = await shop_keeper(in_rooms(mon.mx, mon.my, SHOPBASE).get(0));
-        $c.__builtin___sprintf_chk(new $c.Ptr(statuename, 0), 0, 256, $c.lit("%s%s"), await shk_your(new $c.Ptr(tmpbuf, 0), statue), cause === ANIMATE.SPELL && (!$c.peq(mon, shkp) || statue.where === OBJ.INVENT) ? await xname(statue) : $c.lit("statue"));
+        $c.sprintf(new $c.Ptr(statuename, 0), $c.lit("%s%s"), await shk_your(new $c.Ptr(tmpbuf, 0), statue), cause === ANIMATE.SPELL && (!$c.peq(mon, shkp) || statue.where === OBJ.INVENT) ? await xname(statue) : $c.lit("statue"));
         /* avoid "of a shopkeeper" if it's Manlobbi himself
            (if carried, it can't be unpaid--hence won't be
            described as "Manlobbi's statue"--because there
@@ -767,9 +767,9 @@ export async function animate_statue(statue, x, y, cause, fail_reason) {   // tr
         await pline_The($c.lit("%s suddenly seems more animated."), await rndmonnam(null));
     } else if (cause === ANIMATE.SHATTER) {
         if (cansee(x, y)) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(statuename, 0), 0, 256, $c.lit("%s%s"), await shk_your(new $c.Ptr(tmpbuf, 0), statue), await xname(statue));
+            $c.sprintf(new $c.Ptr(statuename, 0), $c.lit("%s%s"), await shk_your(new $c.Ptr(tmpbuf, 0), statue), await xname(statue));
         } else {
-            $c.__builtin___strcpy_chk(new $c.Ptr(statuename, 0), $c.lit("a statue"), 256);
+            $c.strcpy(new $c.Ptr(statuename, 0), $c.lit("a statue"));
         }
         await pline($c.lit("Instead of shattering, %s suddenly %s!"), new $c.Ptr(statuename, 0), comes_to_life);
     } else {
@@ -1650,9 +1650,9 @@ async function trapeffect_pit(mtmp, trap, trflags) {   // trap.c:1825
             new $c.Ptr(verbbuf, 0).set(0, 0);
             if (u.usteed) {
                 if ((trflags & RECURSIVETRAP) >>> 0 !== 0) {
-                    $c.__builtin___sprintf_chk(new $c.Ptr(verbbuf, 0), 0, 256, $c.lit("and %s fall"), await x_monnam(u.usteed, steed_article, null, SUPPRESS.SADDLE, FALSE));
+                    $c.sprintf(new $c.Ptr(verbbuf, 0), $c.lit("and %s fall"), await x_monnam(u.usteed, steed_article, null, SUPPRESS.SADDLE, FALSE));
                 } else {
-                    $c.__builtin___sprintf_chk(new $c.Ptr(verbbuf, 0), 0, 256, $c.lit("lead %s"), await x_monnam(u.usteed, steed_article, $c.lit("poor"), SUPPRESS.SADDLE, FALSE));
+                    $c.sprintf(new $c.Ptr(verbbuf, 0), $c.lit("lead %s"), await x_monnam(u.usteed, steed_article, $c.lit("poor"), SUPPRESS.SADDLE, FALSE));
                 }
             } else if (iflags.menu_requested && already_known) {
                 await You($c.lit("carefully %s into the pit."), u_locomotion($c.lit("lower yourself")));
@@ -1662,7 +1662,7 @@ async function trapeffect_pit(mtmp, trap, trflags) {   // trap.c:1825
             } else if (adj_pit) {
                 await You($c.lit("stumble over debris%s."), !rn2(5) ? $c.lit(" between the pits") : $c.lit(""));
             } else {
-                $c.__builtin___strcpy_chk(new $c.Ptr(verbbuf, 0), !plunged ? $c.lit("fall") : (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked ? $c.lit("dive") : $c.lit("plunge"), 256);
+                $c.strcpy(new $c.Ptr(verbbuf, 0), !plunged ? $c.lit("fall") : (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked ? $c.lit("dive") : $c.lit("plunge"));
             }
             if (new $c.Ptr(verbbuf, 0).get(0)) {
                 await You($c.lit("%s into %s pit!"), new $c.Ptr(verbbuf, 0), a_your[trap.madeby_u]);
@@ -1860,11 +1860,11 @@ async function trapeffect_web(mtmp, trap, trflags) {   // trap.c:2106
         }
         if (webmsgok) {
             if (forcetrap || viasitting) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(verbbuf, 0), $c.lit("are caught by"), 256);
+                $c.strcpy(new $c.Ptr(verbbuf, 0), $c.lit("are caught by"));
             } else if (u.usteed) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(verbbuf, 0), 0, 256, $c.lit("lead %s into"), await x_monnam(u.usteed, steed_article, $c.lit("poor"), SUPPRESS.SADDLE, FALSE));
+                $c.sprintf(new $c.Ptr(verbbuf, 0), $c.lit("lead %s into"), await x_monnam(u.usteed, steed_article, $c.lit("poor"), SUPPRESS.SADDLE, FALSE));
             } else {
-                $c.__builtin___sprintf_chk(new $c.Ptr(verbbuf, 0), 0, 256, $c.lit("%s into"), u_locomotion($c.lit("stumble")));
+                $c.sprintf(new $c.Ptr(verbbuf, 0), $c.lit("%s into"), u_locomotion($c.lit("stumble")));
             }
             await You($c.lit("%s %s spider web!"), new $c.Ptr(verbbuf, 0), a_your[trap.madeby_u]);
         }
@@ -2158,11 +2158,11 @@ async function trapeffect_poly_trap(mtmp, trap, trflags) {   // trap.c:2453
         }
         await seetrap(trap);
         if (viasitting) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(verbbuf, 0), $c.lit("trigger"), 256);   /* follows "You sit down." */
+            $c.strcpy(new $c.Ptr(verbbuf, 0), $c.lit("trigger"));   /* follows "You sit down." */
         } else if (u.usteed) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(verbbuf, 0), 0, 256, $c.lit("lead %s onto"), await x_monnam(u.usteed, steed_article, null, SUPPRESS.SADDLE, FALSE));
+            $c.sprintf(new $c.Ptr(verbbuf, 0), $c.lit("lead %s onto"), await x_monnam(u.usteed, steed_article, null, SUPPRESS.SADDLE, FALSE));
         } else {
-            $c.__builtin___sprintf_chk(new $c.Ptr(verbbuf, 0), 0, 256, $c.lit("%s onto"), u_locomotion($c.lit("step")));
+            $c.sprintf(new $c.Ptr(verbbuf, 0), $c.lit("%s onto"), u_locomotion($c.lit("step")));
         }
         await You($c.lit("%s a polymorph trap!"), new $c.Ptr(verbbuf, 0));
         if (await wearing_iron_shoes(mtmp)) {
@@ -2389,11 +2389,11 @@ async function trapeffect_vibrating_square(mtmp, trap, trflags) {   // trap.c:27
                 monnm = await mon_nam(mtmp);
                 if (nolimbs(mtmp.data) || m_in_air(mtmp)) {
                     /* just "beneath <mon>" */
-                    $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), monnm, 256);
+                    $c.strcpy(new $c.Ptr(buf, 0), monnm);
                 } else {
-                    $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), s_suffix(monnm), 256);
-                    p = eos($c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit(" "), 256));
-                    $c.__builtin___strcpy_chk(p, await makeplural(await mbodypart(mtmp, FOOT)), -1);
+                    $c.strcpy(new $c.Ptr(buf, 0), s_suffix(monnm));
+                    p = eos($c.strcat(new $c.Ptr(buf, 0), $c.lit(" ")));
+                    $c.strcpy(p, await makeplural(await mbodypart(mtmp, FOOT)));
                     /* avoid "beneath 'rear paws'" or 'rear hooves' */
                     strsubst(p, $c.lit("rear "), $c.lit(""));
                 }
@@ -2677,7 +2677,7 @@ function trapnote(trap, noprefix) {   // trap.c:3063
     if (!noprefix) {
         just_an(new $c.Ptr(trapnote$tnbuf, 0), tn);
     }
-    return $c.__builtin___strcat_chk(new $c.Ptr(trapnote$tnbuf, 0), tn, 12);
+    return $c.strcat(new $c.Ptr(trapnote$tnbuf, 0), tn);
 }
 /* choose a note not used by any trap on current level,
    ignoring ttmp; if all are in use, pick a random one */
@@ -2875,7 +2875,7 @@ export async function launch_obj(otyp, x1, y1, x2, y2, style) {   // trap.c:3260
        the next dig attempt never thinks that you're resuming
        the previous effort */
     if ((otyp === BOULDER || otyp === STATUE) && singleobj[0].ox === svc.context.digging.pos.x && singleobj[0].oy === svc.context.digging.pos.y) {
-        $c.__builtin___memset_chk(svc.context.digging, 0, 32, 608);
+        $c.memset(svc.context.digging, 0, 32);
     }
     dist = distmin(x1, y1, x2, y2);
     x = gb.bhitpos.x = x1;
@@ -3359,7 +3359,7 @@ export async function instapetrify(str) {   // trap.c:3844
     await urgent_pline($c.lit("You turn to stone..."));
     svk.killer.format = KILLED.BY;
     if (!$c.peq(str, new $c.Ptr(svk.killer.name, 0))) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), str ? str : $c.lit(""), 256);
+        $c.strcpy(new $c.Ptr(svk.killer.name, 0), str ? str : $c.lit(""));
     }
     await done(STONING);
 }
@@ -3392,7 +3392,7 @@ export async function selftouch(arg) {   // trap.c:3883
     if ($G.uwep && $G.uwep.otyp === CORPSE && touch_petrifies($c.relem(mons, $G.uwep.corpsenm)) && !Stone_resistance()) {
         corpse_pmname = await obj_pmname($G.uwep);
         await pline($c.lit("%s touch the %s corpse."), arg, corpse_pmname);
-        $c.__builtin___sprintf_chk(new $c.Ptr(kbuf, 0), 0, 256, $c.lit("%s corpse"), await an(corpse_pmname));
+        $c.sprintf(new $c.Ptr(kbuf, 0), $c.lit("%s corpse"), await an(corpse_pmname));
         await instapetrify(new $c.Ptr(kbuf, 0));
         /* life-saved; unwield the corpse if we can't handle it */
         if (!$G.uarmg && !Stone_resistance()) {
@@ -3404,7 +3404,7 @@ export async function selftouch(arg) {   // trap.c:3883
     if (u.twoweap && $G.uswapwep && $G.uswapwep.otyp === CORPSE && touch_petrifies($c.relem(mons, $G.uswapwep.corpsenm)) && !Stone_resistance()) {
         corpse_pmname = await obj_pmname($G.uswapwep);
         await pline($c.lit("%s touch the %s corpse."), arg, corpse_pmname);
-        $c.__builtin___sprintf_chk(new $c.Ptr(kbuf, 0), 0, 256, $c.lit("%s corpse"), await an(corpse_pmname));
+        $c.sprintf(new $c.Ptr(kbuf, 0), $c.lit("%s corpse"), await an(corpse_pmname));
         await instapetrify(new $c.Ptr(kbuf, 0));
         /* life-saved; unwield the corpse */
         if (!$G.uarmg && !Stone_resistance()) {
@@ -4556,7 +4556,7 @@ export async function drown() {   // trap.c:5059
             /* avoid "drowned in _a_ limitless water" on Plane of Water */
             svk.killer.format = KILLED.BY;
         }
-        $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), pool_of_water, 256);
+        $c.strcpy(new $c.Ptr(svk.killer.name, 0), pool_of_water);
         await done(DROWNING);
         /* oops, we're still alive.  better get out of the water. */
         if (await safe_teleds(TELEDS.ALLOW_DRAG | TELEDS.TELEPORT)) {
@@ -4626,17 +4626,17 @@ export async function could_untrap(verbosely, check_floor) {   // trap.c:5258
     let buf = new Int8Array(256);
     buf[0] = 0;
     if (near_capacity() >= HVY_ENCUMBER) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("You're too strained to do that."), 256);
+        $c.strcpy(new $c.Ptr(buf, 0), $c.lit("You're too strained to do that."));
     } else if (nohands(gy.youmonst.data) && !webmaker(gy.youmonst.data) || !gy.youmonst.data.mmove) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("And just how do you expect to do that?"), 256);
+        $c.strcpy(new $c.Ptr(buf, 0), $c.lit("And just how do you expect to do that?"));
     } else if (u.ustuck && sticks(gy.youmonst.data)) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("You'll have to let go of %s first."), await mon_nam(u.ustuck));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("You'll have to let go of %s first."), await mon_nam(u.ustuck));
     } else if (u.ustuck || await welded($G.uwep) && bimanual($G.uwep)) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Your %s seem to be too busy for that."), await makeplural(await body_part(HAND)));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Your %s seem to be too busy for that."), await makeplural(await body_part(HAND)));
     } else if (check_floor && !can_reach_floor(FALSE)) {
         /* only checked here for autounlock of chest/box and that will
            be !verbosely so precise details of the message don't matter */
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("You can't reach the %s."), surface(u.ux, u.uy));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("You can't reach the %s."), surface(u.ux, u.uy));
     }
     if (buf[0]) {
         if (verbosely) {
@@ -5036,7 +5036,7 @@ async function help_monster_out(mtmp, ttmp) {   // trap.c:5700
         if (poly_when_stoned(gy.youmonst.data) && await polymon(PM.STONE_GOLEM)) {
             await display_nhwindow()($G.WIN_MESSAGE, FALSE);
         } else {
-            $c.__builtin___sprintf_chk(new $c.Ptr(kbuf, 0), 0, 256, $c.lit("trying to help %s out of a pit"), await an(mtmp_pmname));
+            $c.sprintf(new $c.Ptr(kbuf, 0), $c.lit("trying to help %s out of a pit"), await an(mtmp_pmname));
             await instapetrify(new $c.Ptr(kbuf, 0));
             return 1;
         }
@@ -5178,13 +5178,13 @@ export async function untrap(force, rx, ry, container) {   // trap.c:5848
     } else if (!deal_with_floor_trap) {
         new $c.Ptr(the_trap, 0).set(0, 0);
         if (ttmp) {
-            $c.__builtin___strcat_chk(new $c.Ptr(the_trap, 0), await an(trapdescr), 256);
+            $c.strcat(new $c.Ptr(the_trap, 0), await an(trapdescr));
         }
         if (ttmp && boxcnt) {
-            $c.__builtin___strcat_chk(new $c.Ptr(the_trap, 0), $c.lit(" and "), 256);
+            $c.strcat(new $c.Ptr(the_trap, 0), $c.lit(" and "));
         }
         if (boxcnt) {
-            $c.__builtin___strcat_chk(new $c.Ptr(the_trap, 0), boxcnt === 1 ? $c.lit("a container") : $c.lit("containers"), 256);
+            $c.strcat(new $c.Ptr(the_trap, 0), boxcnt === 1 ? $c.lit("a container") : $c.lit("containers"));
         }
         useplural = $c.i8(ttmp && boxcnt > 0 || boxcnt > 1 ? 1 : 0);
         /* note: boxcnt and useplural will always be 0 for !here case */
@@ -5195,7 +5195,7 @@ export async function untrap(force, rx, ry, container) {   // trap.c:5848
     } else {
         /* deal_with_floor_trap */
         if (ttmp) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(the_trap, 0), await the(trapdescr), 256);
+            $c.strcpy(new $c.Ptr(the_trap, 0), await the(trapdescr));
             if (boxcnt) {
                 if (is_pit(ttmp.ttyp)) {
                     await You_cant($c.lit("do much about %s%s."), new $c.Ptr(the_trap, 0), u.utrap ? $c.lit(" that you're stuck in") : $c.lit(" while standing on the edge of it"));
@@ -5373,7 +5373,7 @@ export async function openholdingtrap(mon, noticed) {   // trap.c:6101
            conversely, there might be an unrelated trap at that spot */
         if (!t) {
             t = tdummy;
-            $c.__builtin___memset_chk(t, 0, 32, -1), t.ntrap = null;
+            $c.memset(t, 0, 32), t.ntrap = null;
             /* fallback 't' is now nonNull, t->tseen and t->madeby_u are 0 */
         }
         which = c_common_strings.c_the_your[!t || !t.tseen || !t.madeby_u ? 0 : 1];
@@ -5413,7 +5413,7 @@ export async function openholdingtrap(mon, noticed) {   // trap.c:6101
     }
     (!(which !== null) ? 1 : 0) ? $c.__assert_rtn($c.lit("openholdingtrap"), $c.lit("trap.c"), 6163, $c.lit("which != 0")) : 0;
     if (which.get(0)) {
-        which = $c.__builtin___strcat_chk($c.__builtin___strcpy_chk(new $c.Ptr(whichbuf, 0), which, 20), $c.lit(" "), -1);
+        which = $c.strcat($c.strcpy(new $c.Ptr(whichbuf, 0), which), $c.lit(" "));
     }
     if (ishero) {
         if (!u.utrap) {
@@ -5421,11 +5421,11 @@ export async function openholdingtrap(mon, noticed) {   // trap.c:6101
         }
         noticed.set(0, TRUE);
         if (!u.usteed) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("You are"), 256);
+            $c.strcpy(new $c.Ptr(buf, 0), $c.lit("You are"));
         } else if (u.utraptype === TT.BURIEDBALL) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("You and %s are"), await y_monnam(u.usteed));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("You and %s are"), await y_monnam(u.usteed));
         } else {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s is"), await noit_Monnam(u.usteed));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s is"), await noit_Monnam(u.usteed));
         }
         /* give release message before untrap in case it triggers a message */
         await pline($c.lit("%s released from %s%s."), new $c.Ptr(buf, 0), which, trapdescr);
@@ -5449,7 +5449,7 @@ export async function openholdingtrap(mon, noticed) {   // trap.c:6101
                 await pline($c.lit("%s is released from %s%s."), c_common_strings.c_Something, which, trapdescr);
             } else {
                 /* BEAR_TRAP */
-                await pline($c.lit("%s%s opens."), upstart($c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), which, 256)), trapdescr);
+                await pline($c.lit("%s%s opens."), upstart($c.strcpy(new $c.Ptr(buf, 0), which)), trapdescr);
             }
         }
         /* might pacify monster if adjacent */
@@ -5605,7 +5605,7 @@ export async function chest_trap(obj, bodypart, disarm) {   // trap.c:6294
                     costly = $c.i8(await costly_spot(ox, oy) && (shkp = await shop_keeper(in_rooms(ox, oy, SHOPBASE).get(0))) !== null ? 1 : 0);
                     insider = $c.i8(new $c.Ptr(u.ushops, 0).get(0) && inside_shop(u.ux, u.uy) && in_rooms(ox, oy, SHOPBASE).get(0) === new $c.Ptr(u.ushops, 0).get(0) ? 1 : 0);
                     await pline($c.lit("%s!"), await Tobjnam(obj, $c.lit("explode")));
-                    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 80, $c.lit("exploding %s"), await xname(obj));
+                    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("exploding %s"), await xname(obj));
                     if (costly) {
                         loss = $c.add64(loss, await stolen_value(obj, ox, oy, $c.i8(shkp.mpeaceful), TRUE));
                     }
@@ -6072,7 +6072,7 @@ export async function lava_effects() {   // trap.c:6794
                 /* killer format and name are reconstructed every iteration
                    because lifesaving resets them */
                 svk.killer.format = KILLED.BY;
-                $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), new $c.Ptr(lava_killer, 0), 256);
+                $c.strcpy(new $c.Ptr(svk.killer.name, 0), new $c.Ptr(lava_killer, 0));
                 await urgent_pline($c.lit("You %s..."), boil_away ? $c.lit("boil away") : $c.lit("burn to a crisp"));
                 await done(BURNING);
                 if (await safe_teleds(TELEDS.ALLOW_DRAG | TELEDS.TELEPORT)) {
@@ -6143,7 +6143,7 @@ export async function sink_into_lava() {   // trap.c:6991
         u.utrap = u.utrap - 256 >>> 0;
         if (u.utrap < 256) {
             svk.killer.format = KILLED.BY;
-            $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), $c.lit("molten lava"), 256);
+            $c.strcpy(new $c.Ptr(svk.killer.name, 0), $c.lit("molten lava"));
             await urgent_pline($c.lit("You sink below the surface and die."));
             await burn_away_slime();   /* add insult to injury? */
             await done(DISSOLVED);
@@ -6232,7 +6232,7 @@ export function trapname(ttyp, override) {   // trap.c:7100
             fem = $c.i8(Upolyd() ? u.mfemale | 0 : flags.female);
             /* inspired by "tourist trap" */
             copynchars(new $c.Ptr(trapname$roletrap, 0), rn2(3) ? fem && gu.urole.name.f ? gu.urole.name.f : gu.urole.name.m : rank_of(u.ulevel, gu.urole.mnum, fem), 27);
-            $c.__builtin___strcat_chk(new $c.Ptr(trapname$roletrap, 0), $c.lit(" trap"), 33);
+            $c.strcat(new $c.Ptr(trapname$roletrap, 0), $c.lit(" trap"));
             return lcase(new $c.Ptr(trapname$roletrap, 0));
         } else if (nameidx >= TRAPNUM) {
             nameidx = nameidx - TRAPNUM | 0;

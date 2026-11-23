@@ -299,7 +299,7 @@ async function l_obj_new_readobjnam(L) {   // nhlobj.c:350
     let argc = 0, buf = new Int8Array(256), otmp = null, id = 0, class_ = 0, otmp$2 = null;
     argc = lua_gettop(L);
     if (argc === 1 && lua_type(L, 1) === LUA.TSTRING) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s"), await luaL_checklstring(L, 1, null));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s"), await luaL_checklstring(L, 1, null));
         await lua_settop(L, -2);
         if ($c.peq(otmp = await readobjnam(new $c.Ptr(buf, 0), null), hands_obj)) {
             otmp = null;

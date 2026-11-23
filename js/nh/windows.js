@@ -136,7 +136,7 @@ export async function choose_windows(s) {   // windows.c:267
        (config file options can't get that big; they're truncated at 1023) */
     if ($c.strlen(s) >= WINDOW_TYPE_MAXLEN) {
         tmps = $c.asArr(await alloc(WINDOW_TYPE_MAXLEN), Int8Array);
-        $c.__builtin___strncpy_chk(tmps, s, WINDOW_TYPE_MAXLEN - 1, -1);
+        $c.strncpy(tmps, s, WINDOW_TYPE_MAXLEN - 1);
         tmps.set(WINDOW_TYPE_MAXLEN - 1, 0);
         s = tmps;
     }
@@ -152,7 +152,7 @@ export async function choose_windows(s) {   // windows.c:267
             if (45 === winchoices[i].procs.name.get(0)) {
                 continue;
             }
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%s%s"), first ? $c.lit("") : $c.lit(", "), winchoices[i].procs.name);
+            $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("%s%s"), first ? $c.lit("") : $c.lit(", "), winchoices[i].procs.name);
             first = 0;
         }
         await config_error_add($c.lit("Window type %s not recognized.  Choices are:  %s"), s, new $c.Ptr(buf, 0));
@@ -282,7 +282,7 @@ function hup_nh_poskey(x, y, mod) {   // windows.c:676
 }
 /*ARGSUSED*/
 function hup_getlin(prompt, outbuf) {   // windows.c:683
-    $c.__builtin___strcpy_chk(outbuf, $c.lit("\x1b"), -1);
+    $c.strcpy(outbuf, $c.lit("\x1b"));
 }
 /*ARGSUSED*/
 function hup_init_nhwindows(argc_p, argv) {   // windows.c:690
@@ -417,47 +417,47 @@ export async function genl_status_update(idx, ptr, chg, percent, color, colormas
                 nb = status_vals[idx];
                 nb.set(0, 0);
                 if ($c.and64(cond, BL_MASK.STONE)) {
-                    $c.__builtin___strcpy_chk(nb = eos(nb), $c.lit(" Stone"), -1);
+                    $c.strcpy(nb = eos(nb), $c.lit(" Stone"));
                 }
                 if ($c.and64(cond, BL_MASK.SLIME)) {
-                    $c.__builtin___strcpy_chk(nb = eos(nb), $c.lit(" Slime"), -1);
+                    $c.strcpy(nb = eos(nb), $c.lit(" Slime"));
                 }
                 if ($c.and64(cond, BL_MASK.STRNGL)) {
-                    $c.__builtin___strcpy_chk(nb = eos(nb), $c.lit(" Strngl"), -1);
+                    $c.strcpy(nb = eos(nb), $c.lit(" Strngl"));
                 }
                 if ($c.and64(cond, BL_MASK.FOODPOIS)) {
-                    $c.__builtin___strcpy_chk(nb = eos(nb), $c.lit(" FoodPois"), -1);
+                    $c.strcpy(nb = eos(nb), $c.lit(" FoodPois"));
                 }
                 if ($c.and64(cond, BL_MASK.TERMILL)) {
-                    $c.__builtin___strcpy_chk(nb = eos(nb), $c.lit(" TermIll"), -1);
+                    $c.strcpy(nb = eos(nb), $c.lit(" TermIll"));
                 }
                 if ($c.and64(cond, BL_MASK.BLIND)) {
-                    $c.__builtin___strcpy_chk(nb = eos(nb), $c.lit(" Blind"), -1);
+                    $c.strcpy(nb = eos(nb), $c.lit(" Blind"));
                 }
                 if ($c.and64(cond, BL_MASK.DEAF)) {
-                    $c.__builtin___strcpy_chk(nb = eos(nb), $c.lit(" Deaf"), -1);
+                    $c.strcpy(nb = eos(nb), $c.lit(" Deaf"));
                 }
                 if ($c.and64(cond, BL_MASK.STUN)) {
-                    $c.__builtin___strcpy_chk(nb = eos(nb), $c.lit(" Stun"), -1);
+                    $c.strcpy(nb = eos(nb), $c.lit(" Stun"));
                 }
                 if ($c.and64(cond, BL_MASK.CONF)) {
-                    $c.__builtin___strcpy_chk(nb = eos(nb), $c.lit(" Conf"), -1);
+                    $c.strcpy(nb = eos(nb), $c.lit(" Conf"));
                 }
                 if ($c.and64(cond, BL_MASK.HALLU)) {
-                    $c.__builtin___strcpy_chk(nb = eos(nb), $c.lit(" Hallu"), -1);
+                    $c.strcpy(nb = eos(nb), $c.lit(" Hallu"));
                 }
                 if ($c.and64(cond, BL_MASK.LEV)) {
-                    $c.__builtin___strcpy_chk(nb = eos(nb), $c.lit(" Lev"), -1);
+                    $c.strcpy(nb = eos(nb), $c.lit(" Lev"));
                 }
                 if ($c.and64(cond, BL_MASK.FLY)) {
-                    $c.__builtin___strcpy_chk(nb = eos(nb), $c.lit(" Fly"), -1);
+                    $c.strcpy(nb = eos(nb), $c.lit(" Fly"));
                 }
                 if ($c.and64(cond, BL_MASK.RIDE)) {
-                    $c.__builtin___strcpy_chk(nb = eos(nb), $c.lit(" Ride"), -1);
+                    $c.strcpy(nb = eos(nb), $c.lit(" Ride"));
                 }
                 break;
             default:
-                $c.__builtin___sprintf_chk(status_vals[idx], 0, -1, status_fieldfmt[idx] ? status_fieldfmt[idx] : $c.lit("%s"), text ? text : $c.lit(""));
+                $c.sprintf(status_vals[idx], status_fieldfmt[idx] ? status_fieldfmt[idx] : $c.lit("%s"), text ? text : $c.lit(""));
                 break;
         }
         return;   /* processed one field other than BL_FLUSH */
@@ -475,7 +475,7 @@ export async function genl_status_update(idx, ptr, chg, percent, color, colormas
        negative (illegal) index, but this should be fine */
     for (i = 0; (idx1 = genl_status_update$fieldorder[0][i]) !== BL.FLUSH; i = i + 1 | 0) {
         if (status_activefields[idx1]) {
-            $c.__builtin___strcpy_chk(nb = eos(nb), status_vals[idx1], -1);
+            $c.strcpy(nb = eos(nb), status_vals[idx1]);
         }
     }
     /* if '$' is encoded, buffer length of \GXXXXNNNN is 9 greater than
@@ -499,13 +499,13 @@ export async function genl_status_update(idx, ptr, chg, percent, color, colormas
                     case BL.TIME:
                         /* for pass 4, Hp comes first; mungspaces()
                            will strip the unwanted leading spaces */
-                        $c.__builtin___strcpy_chk(nb = eos(nb), $c.lit(" "), -1);
+                        $c.strcpy(nb = eos(nb), $c.lit(" "));
                         break;
                     case BL.LEVELDESC:
                         /* leveldesc has no leading space, so if we've moved
                            it past the first position, provide one */
                         if (i !== 0) {
-                            $c.__builtin___strcpy_chk(nb = eos(nb), $c.lit(" "), -1);
+                            $c.strcpy(nb = eos(nb), $c.lit(" "));
                         }
                         break;
                     case BL.HUNGER:
@@ -521,7 +521,7 @@ export async function genl_status_update(idx, ptr, chg, percent, color, colormas
                         /* hunger==" " - keep it, end up with " ";
                            hunger!=" " - insert space and get "  hunger" */
                         if ($c.strcmp(val, $c.lit(" "))) {
-                            $c.__builtin___strcpy_chk(nb = eos(nb), $c.lit(" "), -1);
+                            $c.strcpy(nb = eos(nb), $c.lit(" "));
                         }
                         break;
                     case BL.CAP:
@@ -534,7 +534,7 @@ export async function genl_status_update(idx, ptr, chg, percent, color, colormas
                     default:
                         break;
                 }
-                $c.__builtin___strcpy_chk(nb = eos(nb), val, -1);   /* status_vals[idx2] */
+                $c.strcpy(nb = eos(nb), val);   /* status_vals[idx2] */
             }   /* status_activefields[idx2] */
             if (idx2 === BL.CONDITION && pass < 4 && $c.subu64($c.strlen(new $c.Ptr(newbot2, 0)), lndelta) > COLNO) {
                 break;   /* switch to next order */
@@ -685,7 +685,7 @@ export function glyph2symidx(glyph) {   // windows.c:1419
 }
 export function encglyph(glyph) {   // windows.c:1428
     /* 10+1 would suffice */
-    $c.__builtin___sprintf_chk(new $c.Ptr(encglyph$encbuf, 0), 0, 20, $c.lit("\\G%04X%04X"), svc.context.rndencode, glyph);
+    $c.sprintf(new $c.Ptr(encglyph$encbuf, 0), $c.lit("\\G%04X%04X"), svc.context.rndencode, glyph);
     return new $c.Ptr(encglyph$encbuf, 0);
 }
 /* hexdd[] is defined in decl.c */
@@ -721,7 +721,7 @@ export function decode_mixed(buf, str) {   // windows.c:1466
     put = buf;
     glyphinfo.$copyFrom(nul_glyphinfo);
     if (!str) {
-        return $c.__builtin___strcpy_chk(buf, $c.lit(""), -1);
+        return $c.strcpy(buf, $c.lit(""));
     }
     L1: while (str.get(0)) {
         if (str.get(0) === 92) {
@@ -899,7 +899,7 @@ export async function choose_classes_menu(prompt, category, way, class_list, cla
                 }
                 text = def_monsyms[idx].explain;
                 accelerator = class_list.get(0);
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s"), text);
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s"), text);
                 break;
             case 1:
                 idx = def_char_to_objclass(class_list.get(0));
@@ -909,7 +909,7 @@ export async function choose_classes_menu(prompt, category, way, class_list, cla
                 }
                 text = def_oc_syms[idx].explain;
                 accelerator = next_accelerator;
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%c  %s"), class_list.get(0), text);
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%c  %s"), class_list.get(0), text);
                 break;
             default:
                 await panic($c.lit("choose_classes_menu: invalid category %d"), category);
@@ -939,7 +939,7 @@ export async function choose_classes_menu(prompt, category, way, class_list, cla
         await add_menu_str(win, $c.lit(""));
         any.$copyFrom(cg.zeroany);
         any.a_int = 32;
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%c  %s"), $c.i8(any.a_int), $c.lit("All classes of objects"));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%c  %s"), $c.i8(any.a_int), $c.lit("All classes of objects"));
         /* we won't preselect this even if the incoming list is empty;
            having it selected means that it would have to be explicitly
            de-selected in order to select anything else */

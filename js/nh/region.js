@@ -80,7 +80,7 @@ export function inside_region(reg, x, y) {   // region.c:63
 export async function create_region(rects, nrect) {   // region.c:79
     let i = 0, reg = null, $t1;
     reg = $c.asRec(await alloc(96), $T.NhRegion, 96);
-    $c.__builtin___memset_chk(reg, 0, 96, -1);
+    $c.memset(reg, 0, 96);
     /* Determines bounding box */
     if (nrect > 0) {
         reg.bounding_box.$copyFrom($c.radd(rects, 0));
@@ -134,7 +134,7 @@ export async function add_rect_to_reg(reg, rect) {   // region.c:133
     let tmp_rect = null;
     tmp_rect = $c.asRec(await alloc($c.u32($c.mulu64($c.u64(reg.nrects + 1 | 0), 8))), $T.nhrect, 8);
     if (reg.nrects > 0) {
-        $c.__builtin___memcpy_chk(tmp_rect, reg.rects, $c.mulu64($c.u64(reg.nrects), 8), -1);
+        $c.memcpy(tmp_rect, reg.rects, $c.mulu64($c.u64(reg.nrects), 8));
         $c.free(reg.rects);
     }
     $c.radd(tmp_rect, reg.nrects).$copyFrom(rect);
@@ -245,7 +245,7 @@ export async function add_region(reg) {   // region.c:284
         tmp_reg = gr.regions;
         $t1 = $c.asArr(await alloc($c.u32($c.mulu64($c.u64(gm.max_regions + 10 | 0), 8))), 'ptr'), gr.regions = $t1;
         if (gm.max_regions > 0) {
-            $c.__builtin___memcpy_chk(gr.regions, tmp_reg, $c.mulu64($c.u64(gm.max_regions), 8), -1);
+            $c.memcpy(gr.regions, tmp_reg, $c.mulu64($c.u64(gm.max_regions), 8));
             $c.free(tmp_reg);
         }
         gm.max_regions = gm.max_regions + 10 | 0;
@@ -582,15 +582,15 @@ export async function visible_region_summary(win) {   // region.c:674
            since time-to-live has already been decremented, regions
            which are due to timeout on the next turn have ttl==0;
            adding 1 is intended to make the display be less confusing */
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%5ld"), $c.add64(reg.ttl, 1));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%5ld"), $c.add64(reg.ttl, 1));
         damg = reg.arg.a_int;
         if (damg) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(typbuf, 0), 0, 128, $c.lit("poison gas (%d)"), damg);
+            $c.sprintf(new $c.Ptr(typbuf, 0), $c.lit("poison gas (%d)"), damg);
         } else {
-            $c.__builtin___strcpy_chk(new $c.Ptr(typbuf, 0), $c.lit("vapor"), 128);
+            $c.strcpy(new $c.Ptr(typbuf, 0), $c.lit("vapor"));
         }
-        $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%s%-16s"), fldsep, new $c.Ptr(typbuf, 0));
-        $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%s@[%d,%d..%d,%d]"), fldsep, reg.bounding_box.lx, reg.bounding_box.ly, reg.bounding_box.hx, reg.bounding_box.hy);
+        $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("%s%-16s"), fldsep, new $c.Ptr(typbuf, 0));
+        $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("%s@[%d,%d..%d,%d]"), fldsep, reg.bounding_box.lx, reg.bounding_box.ly, reg.bounding_box.hx, reg.bounding_box.hy);
         await putstr()(win, 0, new $c.Ptr(buf, 0));
     }
 }
@@ -764,7 +764,7 @@ export async function rest_regions(nhfp) {   // region.c:799
 export function region_stats(hdrfmt, hdrbuf, count, size) {   // region.c:899
     let rg = null, i = 0, $t1, $t2;
     /* other stats formats take one parameter; this takes two */
-    $c.__builtin___sprintf_chk(hdrbuf, 0, -1, hdrfmt, 96, 8);
+    $c.sprintf(hdrbuf, hdrfmt, 96, 8);
     count.set(0, svn.n_regions);   /* might be 0 even tho max_regions isn't */
     size.set(0, $c.mul64(gm.max_regions, 96));
     for (i = 0; i < svn.n_regions; i = i + 1 | 0) {

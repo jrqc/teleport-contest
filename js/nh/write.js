@@ -126,7 +126,7 @@ export async function dowrite(pen) {   // write.c:74
     }
     await discover_object(SCR_BLANK_PAPER, TRUE, TRUE, TRUE);
     /* what to write */
-    $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("What type of %s do you want to write?"), typeword);
+    $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("What type of %s do you want to write?"), typeword);
     await getlin(new $c.Ptr(qbuf, 0), new $c.Ptr(namebuf, 0));
     mungspaces(new $c.Ptr(namebuf, 0));   /* remove any excess whitespace */
     if (namebuf[0] === 27 || !namebuf[0]) {
@@ -142,7 +142,7 @@ export async function dowrite(pen) {   // write.c:74
         nm = nm.add(3);
     }
     if ((bp = strstri(nm, $c.lit(" armour"))) !== null) {
-        $c.__builtin___memcpy_chk(bp, $c.lit(" armor "), 7, -1);
+        $c.memcpy(bp, $c.lit(" armor "), 7);
         mungspaces(bp.add(1));   /* remove the extra space */
     }
     deferred = real = 0;   /* not any scroll or book */
@@ -307,10 +307,10 @@ export async function dowrite(pen) {   // write.c:74
             await update_inventory();   /* pen charges */
         } else {
             if (by_descr) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(namebuf, 0), obj_descr[objects[new_obj.otyp].oc_descr_idx].oc_descr, 256);
+                $c.strcpy(new $c.Ptr(namebuf, 0), obj_descr[objects[new_obj.otyp].oc_descr_idx].oc_descr);
                 wipeout_text(new $c.Ptr(namebuf, 0), $c.div32(6 + MAXULEV - u.ulevel | 0, 6), 0);
             } else {
-                $c.__builtin___sprintf_chk(new $c.Ptr(namebuf, 0), 0, 256, $c.lit("%s was here!"), new $c.Ptr(svp.plname, 0));
+                $c.sprintf(new $c.Ptr(namebuf, 0), $c.lit("%s was here!"), new $c.Ptr(svp.plname, 0));
             }
             await You($c.lit("write \"%s\" and the scroll disappears."), new $c.Ptr(namebuf, 0));
             await useup(paper);
@@ -375,7 +375,7 @@ function new_book_description(booktype, outbuf) {   // write.c:395
             break;
         }
     }
-    $c.__builtin___sprintf_chk(outbuf, 0, -1, $c.lit("%s%s"), comp_p.get(0) ? $c.lit("into ") : $c.lit(""), descr);
+    $c.sprintf(outbuf, $c.lit("%s%s"), comp_p.get(0) ? $c.lit("into ") : $c.lit(""), descr);
     return outbuf;
 }
 

@@ -326,7 +326,7 @@ export async function remove_worn_item(obj, unchain_ball) {   // steal.c:213
 /* during theft of a worn item: remove_worn_item(), prefaced by a message */
 async function worn_item_removal(mon, obj) {   // steal.c:294
     let objbuf = new Int8Array(256), article = new Int8Array(20), p = null, verb = null, strip_art = 0;
-    $c.__builtin___strcpy_chk(new $c.Ptr(objbuf, 0), await doname(obj), 256);
+    $c.strcpy(new $c.Ptr(objbuf, 0), await doname(obj));
     /* massage the object description */
     strip_art = !$c.strncmp(new $c.Ptr(objbuf, 0), $c.lit("the "), 4) ? 4 : !$c.strncmp(new $c.Ptr(objbuf, 0), $c.lit("an "), 3) ? 3 : !$c.strncmp(new $c.Ptr(objbuf, 0), $c.lit("a "), 2) ? 2 : 0;
     if (strip_art) {
@@ -383,7 +383,7 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
                hero being able to see via wearing the Eyes of the Overworld and
                having those stolen; remember the name as it is now; if unseen,
                nymphs will be "Someone" and monkeys will be "Something" */
-            $c.__builtin___strcpy_chk(new $c.Ptr(Monnambuf, 0), await Some_Monnam(mtmp), 256);
+            $c.strcpy(new $c.Ptr(Monnambuf, 0), await Some_Monnam(mtmp));
             /* food being eaten might already be used up but will not have
                been removed from inventory yet; we don't want to steal that,
                so this will cause it to be removed now */
@@ -577,7 +577,7 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
                 /* hero's blindfold might have just been stolen; if so, replace
                    cached "Someone" or "Something" with Monnam */
                 if (!seen && canspotmon(mtmp)) {
-                    $c.__builtin___strcpy_chk(new $c.Ptr(Monnambuf, 0), await Monnam(mtmp), 256);
+                    $c.strcpy(new $c.Ptr(Monnambuf, 0), await Monnam(mtmp));
                 }
             } else if (otmp.owornmask) {
                 /* weapon or ball&chain */
@@ -598,7 +598,7 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
             }
             /* do this before removing it from inventory */
             if (objnambuf) {
-                $c.__builtin___strcpy_chk(objnambuf, await yname(otmp), -1);
+                $c.strcpy(objnambuf, await yname(otmp));
             }
             /* usually set mavenge bit so knights won't suffer an alignment penalty
                during retaliation; not applicable for removing attached iron ball */
@@ -778,7 +778,7 @@ export async function stealamulet(mtmp) {   // steal.c:689
             await subfrombill(otmp, await shop_keeper(new $c.Ptr(u.ushops, 0).get(0)));
         }
         await freeinv(otmp);
-        $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await doname(otmp), 256);
+        $c.strcpy(new $c.Ptr(buf, 0), await doname(otmp));
         await mpickobj(mtmp, otmp);   /* could merge and free otmp but won't */
         await pline($c.lit("%s steals %s!"), await Some_Monnam(mtmp), new $c.Ptr(buf, 0));
         if (can_teleport(mtmp.data) && !await tele_restrict(mtmp)) {

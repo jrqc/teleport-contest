@@ -578,13 +578,13 @@ export async function savebones(how, when, corpse) {   // bones.c:403
     newbones = $c.asRec(await alloc(184), $T.cemetery, 184);
     /* entries are '\0' terminated but have fixed length allocations,
        so pre-fill with spaces to initialize any excess room */
-    $c.__builtin___memset_chk(newbones, 32, 184, -1);
+    $c.memset(newbones, 32, 184);
     /* format name+role,&c, death reason, and date+time;
        gender and alignment reflect final values rather than what the
        character started out as, same as topten and logfile entries */
-    $c.__builtin___sprintf_chk(new $c.Ptr(newbones.who, 0), 0, 49, $c.lit("%s-%.3s-%.3s-%.3s-%.3s"), new $c.Ptr(svp.plname, 0), gu.urole.filecode, gu.urace.filecode, genders[flags.female].filecode, aligns[1 - u.ualign.type | 0].filecode);
+    $c.sprintf(new $c.Ptr(newbones.who, 0), $c.lit("%s-%.3s-%.3s-%.3s-%.3s"), new $c.Ptr(svp.plname, 0), gu.urole.filecode, gu.urace.filecode, genders[flags.female].filecode, aligns[1 - u.ualign.type | 0].filecode);
     await formatkiller(new $c.Ptr(newbones.how, 0), 101, how, TRUE);
-    $c.__builtin___strcpy_chk(new $c.Ptr(newbones.when, 0), yyyymmddhhmmss(when), 15);
+    $c.strcpy(new $c.Ptr(newbones.when, 0), yyyymmddhhmmss(when));
     /* final resting place, used to decide when bones are discovered */
     newbones.frpx = u.ux0, newbones.frpy = u.uy0;
     newbones.bonesknown = FALSE;
@@ -696,7 +696,7 @@ export async function getbones() {   // bones.c:630
             return 0;
         }
         if ($c.strcmp(bonesid[0], new $c.Ptr(oldbonesid, 0)) !== 0) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(errbuf, 0), 0, 256, $c.lit("This is bones level '%s', not '%s'!"), new $c.Ptr(oldbonesid, 0), bonesid[0]);
+            $c.sprintf(new $c.Ptr(errbuf, 0), $c.lit("This is bones level '%s', not '%s'!"), new $c.Ptr(oldbonesid, 0), bonesid[0]);
             if (wizard()) {
                 await pline1(new $c.Ptr(errbuf, 0));
                 ok = FALSE;   /* won't die of trickery */
@@ -764,8 +764,8 @@ export function bones_include_name(name) {   // bones.c:762
     let bp = null, len = 0, buf = new Int8Array(256);
     /* prepare buffer by appending terminal hyphen to name, to avoid partial
      * matches producing false positives */
-    $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), name, 256);
-    $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit("-"), 256);
+    $c.strcpy(new $c.Ptr(buf, 0), name);
+    $c.strcat(new $c.Ptr(buf, 0), $c.lit("-"));
     len = $c.strlen(new $c.Ptr(buf, 0));
     for (bp = svl.level.bonesinfo; bp; bp = bp.next) {
         if (!$c.strncmp(new $c.Ptr(bp.who, 0), new $c.Ptr(buf, 0), len)) {
@@ -809,7 +809,7 @@ export async function newebones(mtmp) {   // bones.c:818
     }
     if (!EBONES(mtmp)) {
         $t2 = $c.asRec(await alloc(28), $T.ebones, 28), mtmp.mextra.ebones = $t2;
-        $c.__builtin___memset_chk(mtmp.mextra.ebones, 0, 28, -1);
+        $c.memset(mtmp.mextra.ebones, 0, 28);
         mtmp.mextra.ebones.parentmid = mtmp.m_id;
     }
 }

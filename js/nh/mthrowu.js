@@ -118,8 +118,8 @@ export async function thitu(tlev, dam, objp, name) {   // mthrowu.c:75
         if (!obj) {
             await panic($c.lit("thitu: name & obj both null?"));
         }
-        name = $c.__builtin___strcpy_chk(new $c.Ptr(onmbuf, 0), obj.quan > 1 ? await doname(obj) : await mshot_xname(obj), 256);
-        knm = $c.__builtin___strcpy_chk(new $c.Ptr(knmbuf, 0), await killer_xname(obj), 256);
+        name = $c.strcpy(new $c.Ptr(onmbuf, 0), obj.quan > 1 ? await doname(obj) : await mshot_xname(obj));
+        knm = $c.strcpy(new $c.Ptr(knmbuf, 0), await killer_xname(obj));
         kprefix = KILLED.BY;   /* killer_name supplies "an" if warranted */
     } else {
         knm = name;
@@ -136,7 +136,7 @@ export async function thitu(tlev, dam, objp, name) {   // mthrowu.c:75
             await pline($c.lit("It misses."));
         } else if ((u.uac + tlev | 0) <= (dieroll - 2 | 0)) {
             if (!$c.peq(onm, new $c.Ptr(onmbuf, 0))) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(onmbuf, 0), onm, 256);   /* [modifiable buffer for upstart()] */
+                $c.strcpy(new $c.Ptr(onmbuf, 0), onm);   /* [modifiable buffer for upstart()] */
             }
             await pline($c.lit("%s %s you."), upstart(new $c.Ptr(onmbuf, 0)), await vtense(new $c.Ptr(onmbuf, 0), $c.lit("miss")));
         } else {
@@ -277,7 +277,7 @@ async function monshoot(mtmp, otmp, mwep) {   // mthrowu.c:262
         if (multishot > 1) {
             /* "N arrows"; multishot > 1 implies otmp->quan > 1, so
                xname()'s result will already be pluralized */
-            $c.__builtin___sprintf_chk(new $c.Ptr(onmbuf, 0), 0, 256, $c.lit("%d %s"), multishot, await xname(otmp));
+            $c.sprintf(new $c.Ptr(onmbuf, 0), $c.lit("%d %s"), multishot, await xname(otmp));
             onm = new $c.Ptr(onmbuf, 0);
         } else {
             /* "an arrow" */
@@ -285,7 +285,7 @@ async function monshoot(mtmp, otmp, mwep) {   // mthrowu.c:262
             onm = obj_is_pname(otmp) ? await the(onm) : await an(onm);
         }
         gm.m_shot.s = $c.i8(ammo_and_launcher(otmp, mwep) ? TRUE : FALSE);
-        $c.__builtin___strcpy_chk(new $c.Ptr(trgbuf, 0), mtarg ? await some_mon_nam(mtarg) : $c.lit(""), 256);
+        $c.strcpy(new $c.Ptr(trgbuf, 0), mtarg ? await some_mon_nam(mtarg) : $c.lit(""));
         set_msg_xy(mtmp.mx, mtmp.my);
         await pline($c.lit("%s %s %s%s%s!"), await Monnam(mtmp), gm.m_shot.s ? $c.lit("shoots") : $c.lit("throws"), onm, mtarg ? $c.lit(" at ") : $c.lit(""), new $c.Ptr(trgbuf, 0));
         gm.m_shot.o = otmp.otyp;
@@ -381,9 +381,9 @@ export async function ohitmon(mtmp, otmp, range, verbose) {   // mthrowu.c:321
                 await pline($c.lit("Splat!  %s is hit with %s egg!"), await Monnam(mtmp), otmp.known | 0 ? await an(mons[otmp.corpsenm].pmnames[NEUTRAL]) : $c.lit("an"));
             } else {
                 if (!harmless) {
-                    $c.__builtin___strcpy_chk(new $c.Ptr(how, 0), exclam(damage), 256);   /* "!" or "." */
+                    $c.strcpy(new $c.Ptr(how, 0), exclam(damage));   /* "!" or "." */
                 } else {
-                    $c.__builtin___sprintf_chk(new $c.Ptr(how, 0), 0, 256, $c.lit(" but passes harmlessly through %.9s."), genders[pronoun_gender(mtmp, PRONOUN.HALLU)].him);
+                    $c.sprintf(new $c.Ptr(how, 0), $c.lit(" but passes harmlessly through %.9s."), genders[pronoun_gender(mtmp, PRONOUN.HALLU)].him);
                 }
                 await hit(await distant_name(otmp, mshot_xname), mtmp, new $c.Ptr(how, 0));
             }
@@ -412,7 +412,7 @@ export async function ohitmon(mtmp, otmp, range, verbose) {   // mthrowu.c:321
             if (vis) {
                 m_name = await mon_nam(mtmp);
                 if (flesh) {   /* s_suffix returns a modifiable buffer */
-                    m_name = $c.__builtin___strcat_chk(s_suffix(m_name), $c.lit(" flesh"), -1);
+                    m_name = $c.strcat(s_suffix(m_name), $c.lit(" flesh"));
                 }
                 await pline_The($c.lit("silver sears %s!"), m_name);
             } else if (verbose && !gm.mtarget) {
@@ -692,8 +692,8 @@ export async function m_throw(mon, x, y, dx, dy, range, obj) {   // mthrowu.c:57
                     }
             }
             if (hitu && singleobj[0].otrapped | 0 && (singleobj[0].oclass === WEAPON_CLASS && objects[singleobj[0].otyp].oc_subtyp >= -P.SHURIKEN && objects[singleobj[0].otyp].oc_subtyp <= -P.BOW || permapoisoned(singleobj[0]))) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(onmbuf, 0), await xname(singleobj[0]), 256);
-                $c.__builtin___strcpy_chk(new $c.Ptr(knmbuf, 0), await killer_xname(singleobj[0]), 256);
+                $c.strcpy(new $c.Ptr(onmbuf, 0), await xname(singleobj[0]));
+                $c.strcpy(new $c.Ptr(knmbuf, 0), await killer_xname(singleobj[0]));
                 /* if damage triggered life-saving,
                    poison is limited to attrib loss */
                 await poisoned(new $c.Ptr(onmbuf, 0), A.STR, new $c.Ptr(knmbuf, 0), u.umortality > oldumort ? 0 : 10, TRUE);

@@ -58,17 +58,17 @@ function luai_makeseed(L) {   // lstate.c:71
         p = 0;
         {
             $h.st64($fp + 32, L);   /* heap variable */
-            $hl.__builtin___memcpy_chk($fp + p, $fp + 32, 8, -1);
+            $hl.memcpy($fp + p, $fp + 32, 8);
             p = $c.i32($c.addu64($c.u64(p), 8));
         }
         {
             $h.st64($fp + 40, $fp + 24);   /* local variable */
-            $hl.__builtin___memcpy_chk($fp + p, $fp + 40, 8, -1);
+            $hl.memcpy($fp + p, $fp + 40, 8);
             p = $c.i32($c.addu64($c.u64(p), 8));
         }
         {
             $h.st64($fp + 48, $h.fn(lua_newstate));   /* public function */
-            $hl.__builtin___memcpy_chk($fp + p, $fp + 48, 8, -1);
+            $hl.memcpy($fp + p, $fp + 48, 8);
             p = $c.i32($c.addu64($c.u64(p), 8));
         }
         0;
@@ -317,7 +317,7 @@ export async function lua_newthread(L) {   // lstate.c:288
     $h.stp(L1 + 160, $h.u32[(L + 160) >>> 2]);
     $h.i32[(L1 + 188) >>> 2] = $h.i32[(L1 + 184) >>> 2];
     /* initialize L1 extra space */
-    $hl.__builtin___memcpy_chk(L1 + -$c.idx(8), $h.u32[(g + 264) >>> 2] + -$c.idx(8), 8, -1);
+    $hl.memcpy(L1 + -$c.idx(8), $h.u32[(g + 264) >>> 2] + -$c.idx(8), 8);
     L;
     await stack_init(L1, L);   /* init stack */
     0;

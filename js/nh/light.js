@@ -52,7 +52,7 @@ async function new_light_core(x, y, range, type, id) {   // light.c:69
         return null;
     }
     ls = $c.asRec(await alloc(32), $T.ls_t, 32);
-    $c.__builtin___memset_chk(ls, 0, 32, -1);
+    $c.memset(ls, 0, 32);
     ls.next = gl.light_base;
     ls.x = x;
     ls.y = y;
@@ -117,7 +117,7 @@ async function delete_ls(ls) {   // light.c:142
     }
     if (curr) {
         (!$c.peq(curr, ls) ? 1 : 0) ? $c.__assert_rtn($c.lit("delete_ls"), $c.lit("light.c"), 157, $c.lit("curr == ls")) : 0;
-        $c.__builtin___memset_chk(ls, 0, 32, -1);
+        $c.memset(ls, 0, 32);
         $c.free(ls);
         gv.vision_full_recalc = 1;
     } else {
@@ -413,7 +413,7 @@ export async function save_light_sources(nhfp, range) {   // light.c:421
             /* if global and not doing local, or vice versa, remove it */
             if (is_global ^ (range === RANGE.LEVEL ? 1 : 0)) {
                 prev.set(0, curr.next);
-                $c.__builtin___memset_chk(curr, 0, 32, -1);
+                $c.memset(curr, 0, 32);
                 $c.free(curr);
             } else {
                 prev = new $c.FieldRef(prev.get(0), "next", "ptr");
@@ -441,7 +441,7 @@ export async function restore_light_sources(nhfp) {   // light.c:479
 /* to support '#stats' wizard-mode command */
 export function light_stats(hdrfmt, hdrbuf, count, size) {   // light.c:501
     let ls = null, $t1;
-    $c.__builtin___sprintf_chk(hdrbuf, 0, -1, hdrfmt, 32);
+    $c.sprintf(hdrbuf, hdrfmt, 32);
     $t1 = size.set(0, 0), count.set(0, $t1);
     for (ls = gl.light_base; ls; ls = ls.next) {
         count.set(0, $c.add64(count.get(0), 1));
@@ -809,14 +809,14 @@ export async function wiz_light_sources() {   // light.c:935
     if (win === WIN_ERR) {
         return ECMD.OK;
     }
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Mobile light sources: hero @ (%2d,%2d)"), u.ux, u.uy);
+    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Mobile light sources: hero @ (%2d,%2d)"), u.ux, u.uy);
     await putstr()(win, 0, new $c.Ptr(buf, 0));
     await putstr()(win, 0, $c.lit(""));
     if (gl.light_base) {
         await putstr()(win, 0, $c.lit("location range flags  type    id"));
         await putstr()(win, 0, $c.lit("-------- ----- ------ ----  -------"));
         for (ls = gl.light_base; ls; ls = ls.next) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("  %2d,%2d   %2d   0x%04x  %s  %s"), ls.x, ls.y, ls.range, ls.flags, ls.type === LS_OBJECT ? $c.lit("obj") : ls.type === LS_MONSTER ? ls.id.a_monst.mx > 0 ? $c.lit("mon") : $c.peq(ls.id.a_monst, gy.youmonst) ? $c.lit("you") : $c.lit("<m>") : $c.lit("???"), fmt_ptr(ls.id.a_void));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("  %2d,%2d   %2d   0x%04x  %s  %s"), ls.x, ls.y, ls.range, ls.flags, ls.type === LS_OBJECT ? $c.lit("obj") : ls.type === LS_MONSTER ? ls.id.a_monst.mx > 0 ? $c.lit("mon") : $c.peq(ls.id.a_monst, gy.youmonst) ? $c.lit("you") : $c.lit("<m>") : $c.lit("???"), fmt_ptr(ls.id.a_void));
             /* migrating monster */
             await putstr()(win, 0, new $c.Ptr(buf, 0));
         }

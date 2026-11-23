@@ -443,7 +443,7 @@ async function moverock_core(sx, sy) {   // hack.c:348
                     await map_invisible(rx, ry);
                 }
                 if (flags.verbose) {
-                    $c.__builtin___strcpy_chk(new $c.Ptr(you_or_steed, 0), u.usteed ? await y_monnam(u.usteed) : $c.lit("you"), 256);
+                    $c.strcpy(new $c.Ptr(you_or_steed, 0), u.usteed ? await y_monnam(u.usteed) : $c.lit("you"));
                     await pline($c.lit("%s%s cannot move %s."), deliver_part1 ? $c.lit("Perhaps that's why ") : $c.lit(""), deliver_part1 ? new $c.Ptr(you_or_steed, 0) : upstart(new $c.Ptr(you_or_steed, 0)), deliver_part1 ? $c.lit("it") : await the(await xname(otmp)));
                 }
                 return await cannot_push(otmp, sx, sy);
@@ -602,7 +602,7 @@ export async function still_chewing(x, y) {   // hack.c:647
     digtxt = null;
     dmgtxt = null;
     if (svc.context.digging.down) {   /* not continuing prev dig (w/ pick-axe) */
-        $c.__builtin___memset_chk(svc.context.digging, 0, 32, 608);
+        $c.memset(svc.context.digging, 0, 32);
     }
     /* may_dig() checks W_NONDIGGABLE but doesn't handle iron bars */
     if (!boulder && (IS_OBSTRUCTED(lev.typ) && !may_dig(x, y) || lev.typ === IRONBARS && (lev.flags | 0) & W.NONDIGGABLE)) {
@@ -652,7 +652,7 @@ export async function still_chewing(x, y) {   // hack.c:647
         if (IS_OBSTRUCTED(lev.typ) || closed_door(x, y) || sobj_at(BOULDER, x, y)) {
             block_point(x, y);   /* delobj will unblock the point */
             /* reset dig state */
-            $c.__builtin___memset_chk(svc.context.digging, 0, 32, 608);
+            $c.memset(svc.context.digging, 0, 32);
             return 1;
         }
     } else if (IS_WALL(lev.typ)) {
@@ -720,7 +720,7 @@ export async function still_chewing(x, y) {   // hack.c:647
     if (dmgtxt) {
         await pay_for_damage(dmgtxt, FALSE);
     }
-    $c.__builtin___memset_chk(svc.context.digging, 0, 32, 608);
+    $c.memset(svc.context.digging, 0, 32);
     return 0;
 }
 export async function movobj(obj, ox, oy) {   // hack.c:825
@@ -910,11 +910,11 @@ export async function test_move(ux, uy, dx, dy, mode) {   // hack.c:991
                     glyph = await back_to_glyph(x, y);
                     sym = glyph_is_cmap(glyph) ? glyph_to_cmap(glyph) : -1;
                     if (sym === S.stone) {
-                        $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("solid stone"), 256);
+                        $c.strcpy(new $c.Ptr(buf, 0), $c.lit("solid stone"));
                     } else if (sym >= 0) {
-                        $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await an(defsyms[sym].explanation), 256);
+                        $c.strcpy(new $c.Ptr(buf, 0), await an(defsyms[sym].explanation));
                     } else {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("impossible [background glyph=%d]"), glyph);
+                        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("impossible [background glyph=%d]"), glyph);
                     }
                     await pline_dir(xytodir(dx, dy), $c.lit("It's %s."), new $c.Ptr(buf, 0));
                 }
@@ -1154,7 +1154,7 @@ async function findtravelpath(mode) {   // hack.c:1266
                 uy = u.uy;
             }
             noguess$: for (;;) {
-                $c.__builtin___memset_chk(new $c.Ptr(travel, 0), 0, 3360, 3360);
+                $c.memset(new $c.Ptr(travel, 0), 0, 3360);
                 travelstepx[0][0] = tx;
                 travelstepy[0][0] = ty;
                 while (n !== 0) {
@@ -1776,8 +1776,8 @@ async function domove_fight_web(x, y) {   // hack.c:2021
             scndstr = null;
             /* when dual wielding, second weapon will only be mentioned
                if it has a different type description from primary */
-            $c.__builtin___strcpy_chk(new $c.Ptr(uwepbuf, 0), await weapon_descr($G.uwep), 256);
-            $c.__builtin___strcpy_chk(new $c.Ptr(scndbuf, 0), u.twoweap ? await weapon_descr($G.uswapwep) : $c.lit(""), 256);
+            $c.strcpy(new $c.Ptr(uwepbuf, 0), await weapon_descr($G.uwep));
+            $c.strcpy(new $c.Ptr(scndbuf, 0), u.twoweap ? await weapon_descr($G.uswapwep) : $c.lit(""));
             onewep = $c.i8(!new $c.Ptr(scndbuf, 0).get(0) || !$c.strcmp(new $c.Ptr(uwepbuf, 0), new $c.Ptr(scndbuf, 0)) ? 1 : 0);
             if (!strncmpi(new $c.Ptr(uwepbuf, 0), $c.lit("armor"), -1) || !strncmpi(new $c.Ptr(uwepbuf, 0), $c.lit("food"), -1) || !strncmpi(new $c.Ptr(uwepbuf, 0), $c.lit("venom"), -1)) {
                 /* as-is */
@@ -1944,7 +1944,7 @@ async function domove_fight_empty(x, y) {   // hack.c:2229
         futile$: {
             if (off_edge) {
                 /* treat as if solid rock, even on planes' levels */
-                $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), new $c.Ptr(domove_fight_empty$unknown_obstacle, 0), 256);
+                $c.strcpy(new $c.Ptr(buf, 0), new $c.Ptr(domove_fight_empty$unknown_obstacle, 0));
                 break futile$;
             }
             if (!Underwater()) {
@@ -1973,13 +1973,13 @@ async function domove_fight_empty(x, y) {   // hack.c:2229
             glyph = glyph_at(x, y);   /* might have just changed */
             nhUse(glyph);
             if (boulder) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await ansimpleoname(boulder), 256);
+                $c.strcpy(new $c.Ptr(buf, 0), await ansimpleoname(boulder));
             } else if ((u.uinwater | 0) && !is_pool(x, y)) {
                 /* Underwater, targeting non-water; the map just shows blank
                    because you don't see remembered terrain while underwater;
                    although the hero can attack an adjacent monster this way,
                    assume he can't reach out far enough to distinguish terrain */
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s"), (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) && svl.level.locations[x][y].typ === AIR ? $c.lit("an air bubble") : $c.lit("nothing"));
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s"), (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) && svl.level.locations[x][y].typ === AIR ? $c.lit("an air bubble") : $c.lit("nothing"));
             } else if (solid) {
                 /* glyph might indicate unseen terrain if hero is blind;
                    unlike searching, this won't reveal what that terrain is;
@@ -1988,15 +1988,15 @@ async function domove_fight_empty(x, y) {   // hack.c:2229
                    on arboreal levels) */
                 if (svl.level.locations[x][y].seenv || svl.level.locations[x][y].typ <= DBWALL || svl.level.locations[x][y].typ === SDOOR || svl.level.locations[x][y].typ === SCORR) {
                     glyph = await back_to_glyph(x, y);
-                    $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await the(defsyms[glyph_to_cmap(glyph)].explanation), 256);
+                    $c.strcpy(new $c.Ptr(buf, 0), await the(defsyms[glyph_to_cmap(glyph)].explanation));
                 } else {
-                    $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), new $c.Ptr(domove_fight_empty$unknown_obstacle, 0), 256);
+                    $c.strcpy(new $c.Ptr(buf, 0), new $c.Ptr(domove_fight_empty$unknown_obstacle, 0));
                 }
                 /* note: 'solid' is misleadingly named and catches pools
                    of water and lava as well as rock and walls;
                    5.0: furniture too */
             } else {
-                $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("thin air"), 256);
+                $c.strcpy(new $c.Ptr(buf, 0), $c.lit("thin air"));
             }
         }
         await You($c.lit("%s%s %s."), !(boulder || solid) ? $c.lit("") : !explo ? $c.lit("harmlessly ") : $c.lit("futilely "), explo ? $c.lit("explode at") : $c.lit("attack"), new $c.Ptr(buf, 0));
@@ -2623,11 +2623,11 @@ export async function invocation_message() {   // hack.c:3064
         otmp = carrying(CANDELABRUM_OF_INVOCATION);
         nomul(0);   /* stop running or travelling */
         if (u.usteed) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("beneath %s"), await y_monnam(u.usteed));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("beneath %s"), await y_monnam(u.usteed));
         } else if (Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("beneath you"), 256);
+            $c.strcpy(new $c.Ptr(buf, 0), $c.lit("beneath you"));
         } else {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("under your %s"), await makeplural(await body_part(FOOT)));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("under your %s"), await makeplural(await body_part(FOOT)));
         }
         await You_feel($c.lit("a strange vibration %s."), new $c.Ptr(buf, 0));
         u.uevent.uvibrated = (1) & 1;
@@ -3083,17 +3083,17 @@ export function in_town(x, y) {   // hack.c:3564
 }
 function move_update(newlev) {   // hack.c:3588
     let c = 0, ptr1 = null, ptr2 = null, ptr3 = null, ptr4 = null, $t1, $t2, $t3, $t4;
-    $c.__builtin___strcpy_chk(new $c.Ptr(u.urooms0, 0), new $c.Ptr(u.urooms, 0), 5);
-    $c.__builtin___strcpy_chk(new $c.Ptr(u.ushops0, 0), new $c.Ptr(u.ushops, 0), 5);
+    $c.strcpy(new $c.Ptr(u.urooms0, 0), new $c.Ptr(u.urooms, 0));
+    $c.strcpy(new $c.Ptr(u.ushops0, 0), new $c.Ptr(u.ushops, 0));
     if (newlev) {
-        $c.__builtin___memset_chk(new $c.Ptr(u.urooms, 0), 0, 5, 2692);
-        $c.__builtin___memset_chk(new $c.Ptr(u.uentered, 0), 0, 5, 2682);
-        $c.__builtin___memset_chk(new $c.Ptr(u.ushops, 0), 0, 5, 2677);
-        $c.__builtin___memset_chk(new $c.Ptr(u.ushops_entered, 0), 0, 5, 2667);
-        $c.__builtin___strcpy_chk(new $c.Ptr(u.ushops_left, 0), new $c.Ptr(u.ushops0, 0), 5);
+        $c.memset(new $c.Ptr(u.urooms, 0), 0, 5);
+        $c.memset(new $c.Ptr(u.uentered, 0), 0, 5);
+        $c.memset(new $c.Ptr(u.ushops, 0), 0, 5);
+        $c.memset(new $c.Ptr(u.ushops_entered, 0), 0, 5);
+        $c.strcpy(new $c.Ptr(u.ushops_left, 0), new $c.Ptr(u.ushops0, 0));
         return;
     }
-    $c.__builtin___strcpy_chk(new $c.Ptr(u.urooms, 0), in_rooms(u.ux, u.uy, 0), 5);
+    $c.strcpy(new $c.Ptr(u.urooms, 0), in_rooms(u.ux, u.uy, 0));
     for (ptr1 = new $c.Ptr(u.urooms, 0), ptr2 = new $c.Ptr(u.uentered, 0), ptr3 = new $c.Ptr(u.ushops, 0), ptr4 = new $c.Ptr(u.ushops_entered, 0); ptr1.get(0); ptr1 = ptr1.add(1)) {
         c = ptr1.get(0);
         if (!$c.strchr(new $c.Ptr(u.urooms0, 0), c)) {
@@ -3733,7 +3733,7 @@ export async function losehp(n, knam, k_format) {   // hack.c:4256
     if (u.uhp < 1) {
         svk.killer.format = k_format;
         if (!$c.peq(new $c.Ptr(svk.killer.name, 0), knam)) {   /* the thing that killed you */
-            $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), knam ? knam : $c.lit(""), 256);
+            $c.strcpy(new $c.Ptr(svk.killer.name, 0), knam ? knam : $c.lit(""));
         }
         await urgent_pline($c.lit("You die..."));
         await done(DIED);
@@ -3874,7 +3874,7 @@ export async function dump_weights() {   // hack.c:4421
             $c.radd(weightlist, cnt).wtyp = 2;
             $c.radd(weightlist, cnt).unique = $c.i8((objects[i].oc_unique | 0) !== 0 ? 1 : 0);
             objects[i].oc_name_known = (1) & 1;
-            $c.__builtin___strcpy_chk(new $c.Ptr(nmbufbase, 0), await simple_typename(i), 256);
+            $c.strcpy(new $c.Ptr(nmbufbase, 0), await simple_typename(i));
             nh_snprintf($c.lit("dump_weights"), 4463, new $c.Ptr(nmbuf, 0), 256, $c.lit("%07u%s"), wt, $c.radd(weightlist, cnt).unique ? await the(new $c.Ptr(nmbufbase, 0)) : await an(new $c.Ptr(nmbufbase, 0)));
             $t2 = await dupstr(new $c.Ptr(nmbuf, 0)), $c.radd(weightlist, cnt).nm = $t2;
             cnt = cnt + 1 | 0;

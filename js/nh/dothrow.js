@@ -200,7 +200,7 @@ async function throw_obj(obj, shotlimit) {   // dothrow.c:87
             /* throwing with one hand, but pluralize since the
                expression "with your bare hands" sounds better */
             await You($c.lit("throw %s with your bare %s."), await corpse_xname(obj, null, CXN.PFX_THE), await makeplural(await body_part(HAND)));
-            $c.__builtin___sprintf_chk(new $c.Ptr(svk.killer.name, 0), 0, 256, $c.lit("throwing %s bare-handed"), await killer_xname(obj));
+            $c.sprintf(new $c.Ptr(svk.killer.name, 0), $c.lit("throwing %s bare-handed"), await killer_xname(obj));
             await instapetrify(new $c.Ptr(svk.killer.name, 0));
         }
         if (await welded(obj)) {
@@ -833,7 +833,7 @@ export async function hurtle_step(arg, x, y) {   // dothrow.c:773
         await setmangry(mon, FALSE);
         /* this is a bodily collision, so check for body armor */
         if (touch_petrifies(mon.data) && !$G.uarmu && !$G.uarm && !$G.uarmc) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(svk.killer.name, 0), 0, 256, $c.lit("bumping into %s"), await an(pmname(mon.data, NEUTRAL)));
+            $c.sprintf(new $c.Ptr(svk.killer.name, 0), $c.lit("bumping into %s"), await an(pmname(mon.data, NEUTRAL)));
             await instapetrify(new $c.Ptr(svk.killer.name, 0));
         }
         if (touch_petrifies(gy.youmonst.data) && !await which_armor(mon, W.ARMU | W.ARM | W.ARMC)) {
@@ -1323,7 +1323,7 @@ async function toss_up(obj, hitsroof) {   // dothrow.c:1256
                             $goto = null;   // petrify:
                             svk.killer.format = KILLED.BY;
                             /* what goes up... */
-                            $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), $c.lit("elementary physics"), 256);
+                            $c.strcpy(new $c.Ptr(svk.killer.name, 0), $c.lit("elementary physics"));
                             await You($c.lit("turn to stone."));
                             if (obj) {
                                 await dropy(obj);   /* bypass most of hitfloor() */
@@ -2118,7 +2118,7 @@ export async function thitmonst(mon, obj) {   // dothrow.c:2011
                 }
             }
         }
-        $c.__builtin___strcpy_chk(new $c.Ptr(trail, 0), dmgtype_fromattack(md, AD.DGST, AT.ENGL) !== null ? $c.lit(" entrails") : md.mlet === S.VORTEX || $c.peq(md, $c.relem(mons, PM.AIR_ELEMENTAL)) ? $c.lit(" currents") : $c.lit(""), 256);
+        $c.strcpy(new $c.Ptr(trail, 0), dmgtype_fromattack(md, AD.DGST, AT.ENGL) !== null ? $c.lit(" entrails") : md.mlet === S.VORTEX || $c.peq(md, $c.relem(mons, PM.AIR_ELEMENTAL)) ? $c.lit(" currents") : $c.lit(""));
         monname = await mon_nam(mon);
         if (new $c.Ptr(trail, 0).get(0)) {
             monname = s_suffix(monname);
@@ -2134,7 +2134,7 @@ async function gem_accept(mon, obj) {   // dothrow.c:2309
     is_buddy = $c.i8(sgn(mon.data.maligntyp) === sgn(u.ualign.type) ? 1 : 0);
     is_gem = $c.i8((objects[obj.otyp].oc_material | 0) === GEMSTONE ? 1 : 0);
     ret = 0;
-    $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await Monnam(mon), 256);
+    $c.strcpy(new $c.Ptr(buf, 0), await Monnam(mon));
     mon.mpeaceful = (1) & 1;
     mon.mavenge = (0) & 1;
     nopick$: {
@@ -2142,45 +2142,45 @@ async function gem_accept(mon, obj) {   // dothrow.c:2309
         if (obj.dknown | 0 && objects[obj.otyp].oc_name_known | 0) {
             if (is_gem) {
                 if (is_buddy) {
-                    $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), new $c.Ptr(gem_accept$addluck, 0), 256);
+                    $c.strcat(new $c.Ptr(buf, 0), new $c.Ptr(gem_accept$addluck, 0));
                     change_luck(5);
                 } else {
-                    $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), new $c.Ptr(gem_accept$maybeluck, 0), 256);
+                    $c.strcat(new $c.Ptr(buf, 0), new $c.Ptr(gem_accept$maybeluck, 0));
                     change_luck($c.i8(rn2(7) - 3 | 0));
                 }
             } else {
-                $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), new $c.Ptr(gem_accept$nogood, 0), 256);
+                $c.strcat(new $c.Ptr(buf, 0), new $c.Ptr(gem_accept$nogood, 0));
                 break nopick$;
             }
             /* making guesses */
         } else if (has_oname(obj) || objects[obj.otyp].oc_uname) {
             if (is_gem) {
                 if (is_buddy) {
-                    $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), new $c.Ptr(gem_accept$addluck, 0), 256);
+                    $c.strcat(new $c.Ptr(buf, 0), new $c.Ptr(gem_accept$addluck, 0));
                     change_luck(2);
                 } else {
-                    $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), new $c.Ptr(gem_accept$maybeluck, 0), 256);
+                    $c.strcat(new $c.Ptr(buf, 0), new $c.Ptr(gem_accept$maybeluck, 0));
                     change_luck($c.i8(rn2(3) - 1 | 0));
                 }
             } else {
-                $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), new $c.Ptr(gem_accept$nogood, 0), 256);
+                $c.strcat(new $c.Ptr(buf, 0), new $c.Ptr(gem_accept$nogood, 0));
                 break nopick$;
             }
             /* value completely unknown to @ */
         } else {
             if (is_gem) {
                 if (is_buddy) {
-                    $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), new $c.Ptr(gem_accept$addluck, 0), 256);
+                    $c.strcat(new $c.Ptr(buf, 0), new $c.Ptr(gem_accept$addluck, 0));
                     change_luck(1);
                 } else {
-                    $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), new $c.Ptr(gem_accept$maybeluck, 0), 256);
+                    $c.strcat(new $c.Ptr(buf, 0), new $c.Ptr(gem_accept$maybeluck, 0));
                     change_luck($c.i8(rn2(3) - 1 | 0));
                 }
             } else {
-                $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), new $c.Ptr(gem_accept$noluck, 0), 256);
+                $c.strcat(new $c.Ptr(buf, 0), new $c.Ptr(gem_accept$noluck, 0));
             }
         }
-        $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), new $c.Ptr(gem_accept$acceptgift, 0), 256);
+        $c.strcat(new $c.Ptr(buf, 0), new $c.Ptr(gem_accept$acceptgift, 0));
         if (new $c.Ptr(u.ushops, 0).get(0) || obj.unpaid | 0) {
             await check_shop_obj(obj, mon.mx, mon.my, TRUE);
         }
@@ -2464,7 +2464,7 @@ async function throw_gold(obj$in) {   // dothrow.c:2656
     if (u.uswallow) {
         swallower = await mon_nam(u.ustuck);
         if (dmgtype_fromattack(u.ustuck.data, AD.DGST, AT.ENGL) !== null) {   /* note: s_suffix() returns a modifiable buffer */
-            swallower = $c.__builtin___strcat_chk(s_suffix(swallower), $c.lit(" entrails"), -1);
+            swallower = $c.strcat(s_suffix(swallower), $c.lit(" entrails"));
         }
         await pline_The($c.lit("gold disappears into %s."), swallower);
         await add_to_minv(u.ustuck, obj[0]);

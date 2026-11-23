@@ -605,7 +605,7 @@ async function do_improvisation(instr) {   // music.c:503
                 break;
             } else if (!u.dx && !u.dy && !u.dz) {
                 if ((damage = await zapyourself(instr, TRUE)) !== 0) {
-                    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("using a magical horn on %sself"), genders[flags.female ? 1 : 0].him);
+                    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("using a magical horn on %sself"), genders[flags.female ? 1 : 0].him);
                     await losehp(damage, new $c.Ptr(buf, 0), KILLED.BY);   /* fire or frost damage */
                 }
             } else {
@@ -750,7 +750,7 @@ export async function do_play_instrument(instr) {   // music.c:759
         if (c === 113) {
             break nevermind$;
         } else if (c === 121) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), new $c.Ptr(svt.tune, 0), 256);
+            $c.strcpy(new $c.Ptr(buf, 0), new $c.Ptr(svt.tune, 0));
         } else {
             await getlin($c.lit("What tune are you playing? [5 notes, A-G]"), new $c.Ptr(buf, 0));
             mungspaces(new $c.Ptr(buf, 0));

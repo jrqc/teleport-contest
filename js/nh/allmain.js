@@ -828,12 +828,12 @@ export async function welcome(new_game) {   // allmain.c:854
      *  message."
      */
     if (new_game || u.ualignbase[A.ORIGINAL] !== u.ualignbase[A.CURRENT] || adrift) {
-        $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" %s%s"), adrift ? $c.lit("adrift ") : $c.lit(""), adrift ? align_str(u.ualign.type) : align_str(u.ualignbase[A.CURRENT]));
+        $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit(" %s%s"), adrift ? $c.lit("adrift ") : $c.lit(""), adrift ? align_str(u.ualign.type) : align_str(u.ualignbase[A.CURRENT]));
     }
     if (!gu.urole.name.f && (new_game ? (gu.urole.allow & ROLE_GENDMASK) === (ROLE_MALE | ROLE_FEMALE) : currentgend !== flags.initgend)) {
-        $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" %s"), genders[currentgend].adj);
+        $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit(" %s"), genders[currentgend].adj);
     }
-    $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" %s %s"), gu.urace.adj, currentgend && gu.urole.name.f ? gu.urole.name.f : gu.urole.name.m);
+    $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit(" %s %s"), gu.urace.adj, currentgend && gu.urole.name.f ? gu.urole.name.f : gu.urole.name.m);
     await pline(new_game ? $c.lit("%s %s, welcome to NetHack!  You are a%s.") : $c.lit("%s %s, the%s, welcome back to NetHack!"), Hello(null), new $c.Ptr(svp.plname, 0), new $c.Ptr(buf, 0));
     if (new_game) {
         /* guarantee that 'major' event category is never empty */

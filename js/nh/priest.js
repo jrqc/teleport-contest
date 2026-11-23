@@ -75,7 +75,7 @@ export async function newepri(mtmp) {   // priest.c:16
     }
     if (!EPRI(mtmp)) {
         $t2 = $c.asRec(await alloc(56), $T.epri, 56), mtmp.mextra.epri = $t2;
-        $c.__builtin___memset_chk(mtmp.mextra.epri, 0, 56, -1);
+        $c.memset(mtmp.mextra.epri, 0, 56);
         mtmp.mextra.epri.parentmid = mtmp.m_id;
     }
 }
@@ -312,7 +312,7 @@ export async function priestname(mon, article, reveal_high_priest, pname) {   //
     whatcode[0] = 0;
     what = do_hallu ? await rndmonnam(new $c.Ptr(whatcode, 0)) : mon_pmname(mon);
     if (!mon.ispriest && !mon.isminion) {   /* should never happen...  */
-        return $c.__builtin___strcpy_chk(pname, what, -1);   /* caller must be confused */
+        return $c.strcpy(pname, what);   /* caller must be confused */
     }
     /* for high priest(ess), "high" (or "grand" for poohbah) will be inserted
        [this was done near the end but we want 'what' to be updated sooner] */
@@ -325,11 +325,11 @@ export async function priestname(mon, article, reveal_high_priest, pname) {   //
             article = ARTICLE.THE;
         }
         if (article === ARTICLE.THE) {
-            $c.__builtin___strcpy_chk(pname, $c.lit("the "), -1);
+            $c.strcpy(pname, $c.lit("the "));
         } else if (!$c.strcmp(what, $c.lit("Angel"))) {
             /* bypass just_an(); it would yield "" due to treating capital A
                as indicating a personal name */
-            $c.__builtin___strcpy_chk(pname, $c.lit("an "), -1);
+            $c.strcpy(pname, $c.lit("an "));
         } else {
             just_an(pname, what);
         }
@@ -338,31 +338,31 @@ export async function priestname(mon, article, reveal_high_priest, pname) {   //
     if (mon.minvis) {
         /* avoid "a invisible priest" */
         if (!$c.strcmp(pname, $c.lit("a "))) {
-            $c.__builtin___strcpy_chk(pname, $c.lit("an "), -1);
+            $c.strcpy(pname, $c.lit("an "));
         }
-        $c.__builtin___strcat_chk(pname, $c.lit("invisible "), -1);
+        $c.strcat(pname, $c.lit("invisible "));
     }
     if (mon.isminion | 0 && mon.mextra.emin.renegade) {
         /* avoid "an renegade Angel" */
         if (!$c.strcmp(pname, $c.lit("an ")) && !mon.minvis) {
-            $c.__builtin___strcpy_chk(pname, $c.lit("a "), -1);
+            $c.strcpy(pname, $c.lit("a "));
         }
-        $c.__builtin___strcat_chk(pname, $c.lit("renegade "), -1);
+        $c.strcat(pname, $c.lit("renegade "));
     }
     if (mon.ispriest | 0 || aligned_priest) {
         if (high_priest) {
-            $c.__builtin___strcat_chk(pname, do_hallu ? $c.lit("grand ") : $c.lit("high "), -1);
+            $c.strcat(pname, do_hallu ? $c.lit("grand ") : $c.lit("high "));
         }
     } else {
         if (mon.mtame && !strncmpi(what, $c.lit("Angel"), -1)) {
-            $c.__builtin___strcat_chk(pname, $c.lit("guardian "), -1);
+            $c.strcat(pname, $c.lit("guardian "));
         }
     }
-    $c.__builtin___strcat_chk(pname, what, -1);
+    $c.strcat(pname, what);
     /* same as distant_monnam(), more or less... */
     if (do_hallu || !high_priest || reveal_high_priest || !((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level)) || dist2(mon.mx, mon.my, u.ux, u.uy) <= 2 || program_state.gameover) {
-        $c.__builtin___strcat_chk(pname, $c.lit(" of "), -1);
-        $c.__builtin___strcat_chk(pname, await halu_gname(mon_aligntyp(mon)), -1);
+        $c.strcat(pname, $c.lit(" of "));
+        $c.strcat(pname, await halu_gname(mon_aligntyp(mon)));
     }
     return pname;
 }
@@ -436,7 +436,7 @@ export async function intemple(roomno) {   // priest.c:410
                 msg1 = $c.lit("You desecrate this place by your presence!");
             }
         } else if (svm.moves >= epri_p.enter_time) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Pilgrim, you enter a %s place!"), !shrined ? $c.lit("desecrated") : $c.lit("sacred"));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Pilgrim, you enter a %s place!"), !shrined ? $c.lit("desecrated") : $c.lit("sacred"));
             msg1 = new $c.Ptr(buf, 0);
         }
         if (msg1 && can_speak && !Deaf()) {
@@ -588,7 +588,7 @@ export async function priest_talk(priest) {   // priest.c:558
         if (quan < 1) {
             quan = 1;
         }
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("How much will you offer (suggested: %ld or %ld)?"), $c.mul64(suggested, quan), $c.mul64($c.mul64(suggested, quan), 2));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("How much will you offer (suggested: %ld or %ld)?"), $c.mul64(suggested, quan), $c.mul64($c.mul64(suggested, quan), 2));
         if (flags.debug) {
             await pline($c.lit("%s asks you for a contribution for the temple (base %ld)."), await Monnam(priest), suggested);
         } else {

@@ -73,19 +73,19 @@ function get_mplname(mtmp, nam) {   // mplayer.c:72
     fmlkind = $c.i8(is_female(mtmp.data));
     devnam = dev_name();
     if (!devnam) {
-        $c.__builtin___strcpy_chk(nam, fmlkind ? $c.lit("Eve") : $c.lit("Adam"), -1);
+        $c.strcpy(nam, fmlkind ? $c.lit("Eve") : $c.lit("Adam"));
     } else if (fmlkind && !!$c.strcmp(devnam, $c.lit("Janet"))) {
-        $c.__builtin___strcpy_chk(nam, rn2(2) ? $c.lit("Maud") : $c.lit("Eve"), -1);
+        $c.strcpy(nam, rn2(2) ? $c.lit("Maud") : $c.lit("Eve"));
     } else {
-        $c.__builtin___strcpy_chk(nam, devnam, -1);
+        $c.strcpy(nam, devnam);
     }
     if (fmlkind || !$c.strcmp(nam, $c.lit("Janet"))) {
         mtmp.female = (1) & 1;
     } else {
         mtmp.female = (0) & 1;
     }
-    $c.__builtin___strcat_chk(nam, $c.lit(" the "), -1);
-    $c.__builtin___strcat_chk(nam, rank_of(mtmp.m_lev, $c.i16(mtmp.data.pmidx), $c.i8(mtmp.female)), -1);
+    $c.strcat(nam, $c.lit(" the "));
+    $c.strcat(nam, rank_of(mtmp.m_lev, $c.i16(mtmp.data.pmidx), $c.i8(mtmp.female)));
 }
 async function mk_mplayer_armor(mon, typ) {   // mplayer.c:95
     let obj = null, $t1, $t2;

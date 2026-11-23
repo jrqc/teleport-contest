@@ -915,7 +915,7 @@ async function peffect_sickness(otmp) {   // potion.c:964
             await pline($c.lit("Fortunately, you have been immunized."));
         } else {
             typ = rn2(A.MAX);
-            $c.__builtin___sprintf_chk(new $c.Ptr(contaminant, 0), 0, 256, $c.lit("%s%s"), u.uprops[POISON_RES].intrinsic || u.uprops[POISON_RES].extrinsic ? $c.lit("mildly ") : $c.lit(""), otmp.corpsenm ? $c.lit("contaminated tap water") : $c.lit("contaminated potion"));
+            $c.sprintf(new $c.Ptr(contaminant, 0), $c.lit("%s%s"), u.uprops[POISON_RES].intrinsic || u.uprops[POISON_RES].extrinsic ? $c.lit("mildly ") : $c.lit(""), otmp.corpsenm ? $c.lit("contaminated tap water") : $c.lit("contaminated potion"));
             if (!Fixed_abil()) {
                 await poisontell(typ, FALSE);
                 await adjattrib(typ, Poison_resistance() ? -1 : -(rn2(4) + 3 | 0) | 0, 1);
@@ -1512,11 +1512,11 @@ export async function potionhit(mon, obj, how) {   // potion.c:1625
         } else {
             mnam = await mon_nam(mon);
             if (hit_saddle && saddle) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s saddle"), s_suffix(await x_monnam(mon, ARTICLE.THE, null, SUPPRESS.IT | SUPPRESS.SADDLE, FALSE)));
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s saddle"), s_suffix(await x_monnam(mon, ARTICLE.THE, null, SUPPRESS.IT | SUPPRESS.SADDLE, FALSE)));
             } else if (has_head(mon.data)) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s %s"), s_suffix(mnam), gn.notonhead ? $c.lit("body") : $c.lit("head"));
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s %s"), s_suffix(mnam), gn.notonhead ? $c.lit("body") : $c.lit("head"));
             } else {
-                $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), mnam, 256);
+                $c.strcpy(new $c.Ptr(buf, 0), mnam);
             }
             await pline_The($c.lit("%s crashes on %s and breaks into shards."), botlnam, new $c.Ptr(buf, 0));
         }
@@ -1553,7 +1553,7 @@ export async function potionhit(mon, obj, how) {   // potion.c:1625
         affected = FALSE;
         useeit = $c.i8(!Blind() && canseemon(mon) && cansee(tx, ty) ? 1 : 0);
         mnam$2 = await x_monnam(mon, ARTICLE.THE, null, SUPPRESS.IT | SUPPRESS.SADDLE, FALSE);
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf$2, 0), 0, 256, $c.lit("%s"), upstart(s_suffix(mnam$2)));
+        $c.sprintf(new $c.Ptr(buf$2, 0), $c.lit("%s"), upstart(s_suffix(mnam$2)));
         switch (obj.otyp) {
             case POT_WATER:
                 nh_snprintf($c.lit("potionhit"), 1718, new $c.Ptr(saddle_glows, 0), 256, $c.lit("%s %s"), new $c.Ptr(buf$2, 0), await aobjnam(saddle, $c.lit("glow")));
@@ -2138,7 +2138,7 @@ export async function dodip() {   // potion.c:2267
     if (is_hands) {
         nh_snprintf($c.lit("dodip"), 2299, new $c.Ptr(obuf, 0), 128, $c.lit("your %s"), await makeplural(await body_part(HAND)));
     } else {
-        $c.__builtin___strcpy_chk(new $c.Ptr(obuf, 0), await short_oname(obj, doname, thesimpleoname, 50), 128);
+        $c.strcpy(new $c.Ptr(obuf, 0), await short_oname(obj, doname, thesimpleoname, 50));
         /* 128 - (24 + 54 + 1) leaves 49 for
            <object> */
     }
@@ -2318,7 +2318,7 @@ async function potion_dip(obj, potion) {   // potion.c:2442
         amt = $c.i32(obj.quan);
         mixture = mixtype(obj, potion);
         magic = $c.i8(mixture !== STRANGE_OBJECT ? objects[mixture].oc_magic | 0 : objects[obj.otyp].oc_magic | 0 || objects[potion.otyp].oc_magic | 0 ? 1 : 0);
-        $c.__builtin___strcpy_chk(new $c.Ptr(qbuf, 0), $c.lit("The"), 128);   /* assume full stack */
+        $c.strcpy(new $c.Ptr(qbuf, 0), $c.lit("The"));   /* assume full stack */
         if (amt > (obj.oeroded | 0 ? 2 : magic ? 3 : 7)) {
             /* Trying to dip multiple potions will usually affect only a
                subset; pick an amount between 3 and 8, inclusive, for magic
@@ -2337,7 +2337,7 @@ async function potion_dip(obj, potion) {   // potion.c:2442
             }
             if (amt < obj.quan) {
                 obj = await splitobj(obj, amt);
-                $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("%ld of the"), obj.quan);
+                $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("%ld of the"), obj.quan);
             }
         }
         /* [N of] the {obj(s)} mix(es) with [one of] {the potion}... */
@@ -2412,9 +2412,9 @@ async function potion_dip(obj, potion) {   // potion.c:2442
     if (is_poisonable(obj)) {
         if (potion.otyp === POT_SICKNESS && !obj.otrapped) {
             if (potion.quan > 1) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("One of %s"), await the(await xname(potion)));
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("One of %s"), await the(await xname(potion)));
             } else {
-                $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await The(await xname(potion)), 256);
+                $c.strcpy(new $c.Ptr(buf, 0), await The(await xname(potion)));
             }
             await pline($c.lit("%s forms a coating on %s."), new $c.Ptr(buf, 0), await the(await xname(obj)));
             obj.otrapped = (TRUE) & 1;
@@ -2520,7 +2520,7 @@ async function potion_dip(obj, potion) {   // potion.c:2442
         oldbuf[0] = 0;
         if (potion.dknown) {
             old_dknown = TRUE;
-            $c.__builtin___sprintf_chk(new $c.Ptr(oldbuf, 0), 0, 256, $c.lit("%s "), hcolor(obj_descr[objects[potion.otyp].oc_descr_idx].oc_descr));
+            $c.sprintf(new $c.Ptr(oldbuf, 0), $c.lit("%s "), hcolor(obj_descr[objects[potion.otyp].oc_descr_idx].oc_descr));
         }
         /* with multiple merged potions, split off one and
            just clear it */
@@ -2545,9 +2545,9 @@ async function potion_dip(obj, potion) {   // potion.c:2442
             }
             new $c.Ptr(newbuf, 0).set(0, 0);
             if (mixture === POT_WATER && singlepotion.dknown | 0) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(newbuf, 0), 0, 256, $c.lit("clears"));
+                $c.sprintf(new $c.Ptr(newbuf, 0), $c.lit("clears"));
             } else if (!Blind()) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(newbuf, 0), 0, 256, $c.lit("turns %s"), hcolor(obj_descr[objects[mixture].oc_descr_idx].oc_descr));
+                $c.sprintf(new $c.Ptr(newbuf, 0), $c.lit("turns %s"), hcolor(obj_descr[objects[mixture].oc_descr_idx].oc_descr));
             }
             if (new $c.Ptr(newbuf, 0).get(0)) {
                 await pline_The($c.lit("%spotion%s %s."), new $c.Ptr(oldbuf, 0), more_than_one ? $c.lit(" that you dipped into") : $c.lit(""), new $c.Ptr(newbuf, 0));
@@ -2646,7 +2646,7 @@ export async function split_mon(mon, mtmp) {   // potion.c:2873
     /* optional attacker whose heat triggered it */
     reason[0] = 0;
     if (mtmp) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(reason, 0), 0, 256, $c.lit(" from %s heat"), $c.peq(mtmp, gy.youmonst) ? c_common_strings.c_the_your[1] : s_suffix(await mon_nam(mtmp)));
+        $c.sprintf(new $c.Ptr(reason, 0), $c.lit(" from %s heat"), $c.peq(mtmp, gy.youmonst) ? c_common_strings.c_the_your[1] : s_suffix(await mon_nam(mtmp)));
     }
     if ($c.peq(mon, gy.youmonst)) {
         if (u.mh > u.mhmax) {   /* sanity precaution */

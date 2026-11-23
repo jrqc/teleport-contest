@@ -318,28 +318,28 @@ export function strcasecpy(dst, src) {   // hacklib.c:387
 }
 /* return a name converted to possessive */
 export function s_suffix(s) {   // hacklib.c:409
-    $c.__builtin___strcpy_chk(new $c.Ptr(s_suffix$buf, 0), s, 256);
+    $c.strcpy(new $c.Ptr(s_suffix$buf, 0), s);
     if (!strncmpi(new $c.Ptr(s_suffix$buf, 0), $c.lit("it"), -1)) {   /* it -> its */
-        $c.__builtin___strcat_chk(new $c.Ptr(s_suffix$buf, 0), $c.lit("s"), 256);
+        $c.strcat(new $c.Ptr(s_suffix$buf, 0), $c.lit("s"));
     } else if (!strncmpi(new $c.Ptr(s_suffix$buf, 0), $c.lit("you"), -1)) {   /* you -> your */
-        $c.__builtin___strcat_chk(new $c.Ptr(s_suffix$buf, 0), $c.lit("r"), 256);
+        $c.strcat(new $c.Ptr(s_suffix$buf, 0), $c.lit("r"));
     } else if (eos(new $c.Ptr(s_suffix$buf, 0)).add(-1).get(0) === 115) {   /* Xs -> Xs' */
-        $c.__builtin___strcat_chk(new $c.Ptr(s_suffix$buf, 0), $c.lit("'"), 256);
+        $c.strcat(new $c.Ptr(s_suffix$buf, 0), $c.lit("'"));
     } else {
         /* X -> X's */
-        $c.__builtin___strcat_chk(new $c.Ptr(s_suffix$buf, 0), $c.lit("'s"), 256);
+        $c.strcat(new $c.Ptr(s_suffix$buf, 0), $c.lit("'s"));
     }
     return new $c.Ptr(s_suffix$buf, 0);
 }
 /* construct a gerund (a verb formed by appending "ing" to a noun) */
 export function ing_suffix(s) {   // hacklib.c:427
     let onoff = new Int8Array(10), p = null, $t1, $t2;
-    $c.__builtin___strcpy_chk(new $c.Ptr(ing_suffix$buf, 0), s, 256);
+    $c.strcpy(new $c.Ptr(ing_suffix$buf, 0), s);
     p = eos(new $c.Ptr(ing_suffix$buf, 0));
     $t2 = ($t1 = p.add(1).set(0, 0), p.set(0, $t1)), onoff[0] = $t2;
     if ($c.pcmp(p, new $c.Ptr(ing_suffix$buf, 3)) >= 0 && !strncmpi(p.add(-3), $c.lit(" on"), -1) || $c.pcmp(p, new $c.Ptr(ing_suffix$buf, 4)) >= 0 && !strncmpi(p.add(-4), $c.lit(" off"), -1) || $c.pcmp(p, new $c.Ptr(ing_suffix$buf, 5)) >= 0 && !strncmpi(p.add(-5), $c.lit(" with"), -1)) {
         p = $c.strrchr(new $c.Ptr(ing_suffix$buf, 0), 32);
-        $c.__builtin___strcpy_chk(new $c.Ptr(onoff, 0), p, 10);
+        $c.strcpy(new $c.Ptr(onoff, 0), p);
         p.set(0, 0);
     }
     if ($c.pcmp(p, new $c.Ptr(ing_suffix$buf, 2)) >= 0 && !strncmpi(p.add(-2), $c.lit("er"), -1)) {
@@ -356,9 +356,9 @@ export function ing_suffix(s) {   // hacklib.c:427
     } else if ($c.pcmp(p, new $c.Ptr(ing_suffix$buf, 1)) >= 0 && p.add(-1).get(0) === 101) {   /* grease -> greas + ing */
         p.add(-1).set(0, 0);
     }
-    $c.__builtin___strcat_chk(new $c.Ptr(ing_suffix$buf, 0), $c.lit("ing"), 256);
+    $c.strcat(new $c.Ptr(ing_suffix$buf, 0), $c.lit("ing"));
     if (onoff[0]) {
-        $c.__builtin___strcat_chk(new $c.Ptr(ing_suffix$buf, 0), new $c.Ptr(onoff, 0), 256);
+        $c.strcat(new $c.Ptr(ing_suffix$buf, 0), new $c.Ptr(onoff, 0));
     }
     return new $c.Ptr(ing_suffix$buf, 0);
 }
@@ -419,7 +419,7 @@ export function tabexpand(sbuf) {   // hacklib.c:493
         }
     }
     bp.set(0, 0);
-    return $c.__builtin___strcpy_chk(sbuf, new $c.Ptr(buf, 0), -1);
+    return $c.strcpy(sbuf, new $c.Ptr(buf, 0));
 }
 /* make a displayable string from a character */
 export function visctrl(c) {   // hacklib.c:533
@@ -479,9 +479,9 @@ export function strsubst(bp, orig, replacement) {   // hacklib.c:600
     /* [this could be replaced by strNsubst(bp, orig, replacement, 1)] */
     found = $c.strstr(bp, orig);
     if (found) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), found.add($c.idx($c.strlen(orig))), 256);
-        $c.__builtin___strcpy_chk(found, replacement, -1);
-        $c.__builtin___strcat_chk(bp, new $c.Ptr(buf, 0), -1);
+        $c.strcpy(new $c.Ptr(buf, 0), found.add($c.idx($c.strlen(orig))));
+        $c.strcpy(found, replacement);
+        $c.strcat(bp, new $c.Ptr(buf, 0));
     }
     return bp;
 }
@@ -525,7 +525,7 @@ export function strNsubst(inoutbuf, orig, replacement, n) {   // hacklib.c:621
     }
     if (rcount) {
         op.set(0, 0);
-        $c.__builtin___strcpy_chk(inoutbuf, new $c.Ptr(workbuf, 0), -1);
+        $c.strcpy(inoutbuf, new $c.Ptr(workbuf, 0));
     }
     return rcount;
 }
@@ -562,7 +562,7 @@ export function ordin(n) {   // hacklib.c:689
    result of ?: for format string */
 /* make a signed digit string from a number */
 export function sitoa(n) {   // hacklib.c:702
-    $c.__builtin___sprintf_chk(new $c.Ptr(sitoa$buf, 0), 0, 13, n < 0 ? $c.lit("%d") : $c.lit("+%d"), n);
+    $c.sprintf(new $c.Ptr(sitoa$buf, 0), n < 0 ? $c.lit("%d") : $c.lit("+%d"), n);
     return new $c.Ptr(sitoa$buf, 0);
 }
 /* return the sign of a number: -1, 0, or 1 */
@@ -740,7 +740,7 @@ export function swapbits(val, bita, bitb) {   // hacklib.c:896
 export function nh_snprintf(func, line, str, size, fmt, ...$va) {   // hacklib.c:918
     let ap = null, n = 0;
     ap = new $c.VaList($va);
-    n = $c.__builtin___vsnprintf_chk(str, size, 0, -1, fmt, ap);
+    n = $c.vsnprintf(str, size, fmt, ap);
     void 0;
     if (n < 0 || $c.u64(n) >= size) {
         /* is there a problem? */

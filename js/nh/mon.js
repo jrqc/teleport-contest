@@ -1358,9 +1358,9 @@ export async function meatobj(mtmp) {   // mon.c:1533
                the result won't be printed */
             otmpname = await distant_name(otmp, doname);
             if (ecount === 1) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s engulfs %s."), await Monnam(mtmp), otmpname);
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s engulfs %s."), await Monnam(mtmp), otmpname);
             } else if (ecount === 2) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s engulfs several objects."), await Monnam(mtmp));
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s engulfs several objects."), await Monnam(mtmp));
             }
             await obj_extract_self(otmp);
             await mpickobj(mtmp, otmp);   /* slurp */
@@ -1540,7 +1540,7 @@ export async function mon_givit(mtmp, ptr) {   // mon.c:1778
          * able to have pets gain intrinsics from eating corpses.
          */
         if (!mtmp.perminvis || mtmp.invis_blkd | 0) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(mtmpbuf, 0), await Monnam(mtmp), 256);
+            $c.strcpy(new $c.Ptr(mtmpbuf, 0), await Monnam(mtmp));
             await mon_set_minvis(mtmp, FALSE);
             if (vis) {
                 await pline_mon(mtmp, $c.lit("%s %s."), new $c.Ptr(mtmpbuf, 0), !canspotmon(mtmp) ? $c.lit("vanishes") : mtmp.invis_blkd | 0 ? $c.lit("seems to flicker") : $c.lit("becomes invisible"));
@@ -1847,7 +1847,7 @@ export async function mfndpos(mon, data, flag) {   // mon.c:2140
     x = mon.mx;
     y = mon.my;
     nowtyp = $c.u8(svl.level.locations[x][y].typ);
-    $c.__builtin___memset_chk(data, 0, 112, -1);
+    $c.memset(data, 0, 112);
     nodiag = $c.i8(NODIAG($c.rdiff(mdat, $c.relem(mons, 0))));
     wantpool = $c.i8(mdat.mlet === S.EEL ? 1 : 0);
     poolok = $c.i8(!((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && m_in_air(mon) || is_swimmer(mdat) && !wantpool ? 1 : 0);
@@ -2242,7 +2242,7 @@ export async function copy_mextra(mtmp2, mtmp1) {   // mon.c:2597
     }
     if (MGIVENNAME(mtmp1)) {
         await new_mgivenname(mtmp2, $c.i32($c.strlen(mtmp1.mextra.mgivenname)) + 1 | 0);
-        $c.__builtin___strcpy_chk(mtmp2.mextra.mgivenname, mtmp1.mextra.mgivenname, -1);
+        $c.strcpy(mtmp2.mextra.mgivenname, mtmp1.mextra.mgivenname);
     }
     if (EGD(mtmp1)) {
         if (!EGD(mtmp2)) {
@@ -2648,7 +2648,7 @@ async function logdeadmon(mtmp, mndx) {   // mon.c:2997
             }
             xtra[0] = 0;
             if (howmany > 1) {   /* "(2nd time)" or "(50th time)" */
-                $c.__builtin___sprintf_chk(new $c.Ptr(xtra, 0), 0, 40, $c.lit(" (%d%s time)"), howmany, ordin(howmany));
+                $c.sprintf(new $c.Ptr(xtra, 0), $c.lit(" (%d%s time)"), howmany, ordin(howmany));
             }
             mkilled = nonliving(mtmp.data) ? $c.lit("destroyed") : $c.lit("killed");
             /* hero is responsible: "killed <monst>" */
@@ -2788,7 +2788,7 @@ export async function corpse_chance(mon, magr, was_swallowed) {   // mon.c:3181
                    engulfer; suppress usual explosion since it's contained */
                 if ($c.peq(magr, gy.youmonst)) {
                     await There($c.lit("is an explosion in your %s!"), await body_part(STOMACH));
-                    $c.__builtin___sprintf_chk(new $c.Ptr(svk.killer.name, 0), 0, 256, $c.lit("%s explosion"), s_suffix(pmname(mdat, Mgender(mon))));
+                    $c.sprintf(new $c.Ptr(svk.killer.name, 0), $c.lit("%s explosion"), s_suffix(pmname(mdat, Mgender(mon))));
                     await losehp(Maybe_Half_Phys(tmp), new $c.Ptr(svk.killer.name, 0), KILLED.BY_AN);
                 } else {
                     await You_hear($c.lit("an explosion."));
@@ -3268,7 +3268,7 @@ export async function vamp_stone(mtmp) {   // mon.c:3766
         /* this only happens if shapeshifted */
         if (mndx >= LOW_PM && mndx !== mtmp.data.pmidx && !(svm.mvitals[mndx].mvflags & G_GENOD)) {
             /* construct a format string before transformation */
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("The lapidifying %s %s %s"), await x_monnam(mtmp, ARTICLE.NONE, null, SUPPRESS.SADDLE | SUPPRESS.HALLUCINATION | SUPPRESS.INVISIBLE | SUPPRESS.IT, FALSE), $c.andu64(mtmp.data.mflags1, M1.AMORPHOUS) !== 0 ? $c.lit("coalesces on the") : $c.andu64(mtmp.data.mflags1, M1.FLY) !== 0 ? $c.lit("drops to the") : $c.lit("writhes on the"), surface(x, y));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("The lapidifying %s %s %s"), await x_monnam(mtmp, ARTICLE.NONE, null, SUPPRESS.SADDLE | SUPPRESS.HALLUCINATION | SUPPRESS.INVISIBLE | SUPPRESS.IT, FALSE), $c.andu64(mtmp.data.mflags1, M1.AMORPHOUS) !== 0 ? $c.lit("coalesces on the") : $c.andu64(mtmp.data.mflags1, M1.FLY) !== 0 ? $c.lit("drops to the") : $c.lit("writhes on the"), surface(x, y));
             mtmp.mcanmove = (1) & 1;
             mtmp.mfrozen = (0) & 127;
             set_mon_min_mhpmax(mtmp, 10);   /* mtmp->mhpmax=max(m_lev+1,10) */
@@ -3629,10 +3629,10 @@ async function peacefuls_respond(mtmp) {   // mon.c:4163
                         gasp = maybe_gasp(mon);
                         if (gasp) {
                             if (!strncmpi(gasp, $c.lit("gasp"), 4)) {
-                                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s gasps"), await Monnam(mon));
+                                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s gasps"), await Monnam(mon));
                                 needpunct = TRUE;
                             } else {
-                                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s exclaims \"%s\""), await Monnam(mon), gasp);
+                                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s exclaims \"%s\""), await Monnam(mon), gasp);
                             }
                             exclaimed = TRUE;
                         }
@@ -3653,7 +3653,7 @@ async function peacefuls_respond(mtmp) {   // mon.c:4163
                         await monflee(mon, rn2(50) + 25 | 0, TRUE, $c.i8(!exclaimed ? 1 : 0));
                         if (exclaimed) {
                             if (flags.verbose && !alreadyfleeing) {
-                                $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit(" and then turns to flee."), 256);
+                                $c.strcat(new $c.Ptr(buf, 0), $c.lit(" and then turns to flee."));
                                 needpunct = FALSE;
                             }
                         } else {
@@ -4195,7 +4195,7 @@ export async function mon_animal_list(construct) {   // mon.c:4829
         }
         /* if (n == 0) animal_temp[n++] = NON_PM; */
         $t2 = $c.asArr(await alloc($c.u32($c.mulu64($c.u64(n), 2))), Int16Array), ga.animal_list = $t2;
-        $c.__builtin___memcpy_chk(ga.animal_list, new $c.Ptr(animal_temp, 0), $c.mulu64($c.u64(n), 2), -1);
+        $c.memcpy(ga.animal_list, new $c.Ptr(animal_temp, 0), $c.mulu64($c.u64(n), 2));
         ga.animal_list_count = n;
     } else {
         /* release */
@@ -4403,8 +4403,8 @@ async function wiz_force_cham_form(mon) {   // mon.c:5078
     let pprompt = new Int8Array(256), parttwo = new Int8Array(128), buf = new Int8Array(256), prevbuf = new Int8Array(256), monclass = 0, len = 0, tryct = 0, mndx = Int32Array.of(0), $t1;
     mndx[0] = NON_PM;
     /* construct prompt in pieces */
-    $c.__builtin___sprintf_chk(new $c.Ptr(pprompt, 0), 0, 256, $c.lit("Change %s"), await noit_mon_nam(mon));
-    $c.__builtin___sprintf_chk(new $c.Ptr(parttwo, 0), 0, 128, $c.lit(" @ %s into what?"), coord_desc($c.i16(mon.mx), $c.i16(mon.my), new $c.Ptr(buf, 0), $c.i8(iflags.getpos_coords !== 110 ? iflags.getpos_coords : 109)));
+    $c.sprintf(new $c.Ptr(pprompt, 0), $c.lit("Change %s"), await noit_mon_nam(mon));
+    $c.sprintf(new $c.Ptr(parttwo, 0), $c.lit(" @ %s into what?"), coord_desc($c.i16(mon.mx), $c.i16(mon.my), new $c.Ptr(buf, 0), $c.i8(iflags.getpos_coords !== 110 ? iflags.getpos_coords : 109)));
     /* combine the two parts, not exceeding QBUFSZ-1 in overall length;
        if combined length is too long it has to be due to monster's
        name so we'll chop enough of that off to fit the second part */
@@ -4414,7 +4414,7 @@ async function wiz_force_cham_form(mon) {   // mon.c:5078
     if ((len = $c.i32($c.strlen(new $c.Ptr(pprompt, 0))) + $c.i32($c.strlen(new $c.Ptr(parttwo, 0))) | 0) >= QBUFSZ) {
         eos(new $c.Ptr(pprompt, 0)).add(-(len - (QBUFSZ - 1) | 0)).set(0, 0);
     }
-    $c.__builtin___strcat_chk(new $c.Ptr(pprompt, 0), new $c.Ptr(parttwo, 0), 256);
+    $c.strcat(new $c.Ptr(pprompt, 0), new $c.Ptr(parttwo, 0));
     $t1 = prevbuf[0] = 0, buf[0] = $t1;   /* clear buffer for EDIT_GETLIN */
     tryct = TRYLIMIT;
     do {
@@ -4422,7 +4422,7 @@ async function wiz_force_cham_form(mon) {   // mon.c:5078
             /* first retry */
             /* change "into what?" to "into what kind of monster?" */
             if ($c.subu64($c.addu64($c.strlen(new $c.Ptr(pprompt, 0)), 17), 1) < QBUFSZ) {
-                $c.__builtin___strcpy_chk(eos(new $c.Ptr(pprompt, 0)).add(-1), $c.lit(" kind of monster?"), -1);
+                $c.strcpy(eos(new $c.Ptr(pprompt, 0)).add(-1), $c.lit(" kind of monster?"));
             }
         }
         monclass = 0;
@@ -4617,12 +4617,12 @@ export async function newcham(mtmp, mdat, ncflags) {   // mon.c:5278
         }
     }
     if (msg) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(oldname, 0), await x_monnam(mtmp, mtmp.mtame ? ARTICLE.YOUR : ARTICLE.THE, null, SUPPRESS.SADDLE, FALSE), 256);
+        $c.strcpy(new $c.Ptr(oldname, 0), await x_monnam(mtmp, mtmp.mtame ? ARTICLE.YOUR : ARTICLE.THE, null, SUPPRESS.SADDLE, FALSE));
         /* like YMonnam() but never mention saddle */
         $t2 = highc(oldname[0]), oldname[0] = $t2;
     }
     /* we need this one whether msg is true or not */
-    $c.__builtin___strcpy_chk(new $c.Ptr(l_oldname, 0), await x_monnam(mtmp, ARTICLE.THE, null, mtmp.mextra && mtmp.mextra.mgivenname ? SUPPRESS.SADDLE : 0, FALSE), 256);
+    $c.strcpy(new $c.Ptr(l_oldname, 0), await x_monnam(mtmp, ARTICLE.THE, null, mtmp.mextra && mtmp.mextra.mgivenname ? SUPPRESS.SADDLE : 0, FALSE));
     /* mdat = 0 -> caller wants a random monster shape */
     if (mdat === null) {
         /* select_newcham_form() loops when resorting to random but
@@ -4723,9 +4723,9 @@ export async function newcham(mtmp, mdat, ncflags) {   // mon.c:5278
                 /* Does mdat care? */
                 if (!noncorporeal(mdat) && !is_whirly(mdat) && !(amorphous(mdat) || mdat.mlet === S.LIGHT)) {
                     if (is_vampshifter(mtmp)) {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(msgtrail, 0), 0, 256, $c.lit(" which was a shapeshifted %s"), await noname_monnam(mtmp, ARTICLE.NONE));
+                        $c.sprintf(new $c.Ptr(msgtrail, 0), $c.lit(" which was a shapeshifted %s"), await noname_monnam(mtmp, ARTICLE.NONE));
                     } else if (digests(mdat)) {
-                        $c.__builtin___strcpy_chk(new $c.Ptr(msgtrail, 0), $c.lit("'s stomach"), 256);
+                        $c.strcpy(new $c.Ptr(msgtrail, 0), $c.lit("'s stomach"));
                     } else {
                         msgtrail[0] = 0;
                     }
@@ -5006,19 +5006,19 @@ export async function angry_guards(silent) {   // mon.c:5711
             /* do we want pline msgs? */
             if (slct) {
                 /* sleeping guard(s) */
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("guard%s"), slct === 1 ? $c.lit("") : $c.lit("s"));
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("guard%s"), slct === 1 ? $c.lit("") : $c.lit("s"));
                 await pline_The($c.lit("%s %s up."), new $c.Ptr(buf, 0), await vtense(new $c.Ptr(buf, 0), $c.lit("wake")));
             }
             if (nct) {
                 /* seen/sensed adjacent guard(s) */
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("guard%s"), nct === 1 ? $c.lit("") : $c.lit("s"));
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("guard%s"), nct === 1 ? $c.lit("") : $c.lit("s"));
                 await pline_The($c.lit("%s %s angry!"), new $c.Ptr(buf, 0), await vtense(new $c.Ptr(buf, 0), $c.lit("get")));
             } else if (sct) {
                 /* seen/sensed non-adjacent guard(s) */
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("guard%s"), sct === 1 ? $c.lit("") : $c.lit("s"));
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("guard%s"), sct === 1 ? $c.lit("") : $c.lit("s"));
                 await pline($c.lit("%s %s %s approaching!"), sct === 1 ? $c.lit("An angry") : $c.lit("Angry"), new $c.Ptr(buf, 0), await vtense(new $c.Ptr(buf, 0), $c.lit("are")));
             } else {
-                $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), ct === 1 ? $c.lit("a guard's") : $c.lit("guards'"), 256);
+                $c.strcpy(new $c.Ptr(buf, 0), ct === 1 ? $c.lit("a guard's") : $c.lit("guards'"));
                 await You_hear($c.lit("the shrill sound of %s whistle%s."), new $c.Ptr(buf, 0), plur(ct));
             }
         }

@@ -14,7 +14,7 @@ import { eos, strsubst } from './hacklib.js';
 export async function stairway_add(x, y, up, isladder, dest) {   // stairs.c:8
     let tmp = null;
     tmp = $c.asRec(await alloc(24), $T.stairway, 24);
-    $c.__builtin___memset_chk(tmp, 0, 24, -1);
+    $c.memset(tmp, 0, 24);
     tmp.sx = x;
     tmp.sy = y;
     tmp.up = up;
@@ -157,22 +157,22 @@ export function stairs_description(sway, outbuf, stcase) {   // stairs.c:187
     updown = sway.up ? $c.lit("up") : $c.lit("down");
     if (!known_branch_stairs(sway)) {
         /* ordinary stairs or branch stairs to not-yet-visited branch */
-        $c.__builtin___sprintf_chk(outbuf, 0, -1, $c.lit("%s %s"), stairs, updown);
+        $c.sprintf(outbuf, $c.lit("%s %s"), stairs, updown);
         if (sway.u_traversed) {
             specialdepth = $c.i8(tolev.dnum === svd.dungeon_topology.d_quest_dnum || single_level_branch(tolev) ? 1 : 0);   /* knox */
             to_dlev = specialdepth ? dunlev(tolev) : depth(tolev);
-            $c.__builtin___sprintf_chk(eos(outbuf), 0, -1, $c.lit(" to level %d"), to_dlev);
+            $c.sprintf(eos(outbuf), $c.lit(" to level %d"), to_dlev);
         }
     } else if (u.uz.dnum === 0 && u.uz.dlevel === 1 && sway.up) {
         /* stairs up from level one are a special case; they are marked
            as having been traversed because the hero obviously started
            the game by coming down them, but the remote side varies
            depending on whether the Amulet is being carried */
-        $c.__builtin___sprintf_chk(outbuf, 0, -1, $c.lit("%s%s %s %s"), !u.uhave.amulet ? $c.lit("") : $c.lit("branch "), stairs, updown, !u.uhave.amulet ? $c.lit("out of the dungeon") : on_level(tolev, svd.dungeon_topology.d_earth_level) || on_level(tolev, svd.dungeon_topology.d_air_level) || on_level(tolev, svd.dungeon_topology.d_fire_level) || on_level(tolev, svd.dungeon_topology.d_water_level) ? $c.lit("to the Elemental Planes") : $c.lit("to the end game"));
+        $c.sprintf(outbuf, $c.lit("%s%s %s %s"), !u.uhave.amulet ? $c.lit("") : $c.lit("branch "), stairs, updown, !u.uhave.amulet ? $c.lit("out of the dungeon") : on_level(tolev, svd.dungeon_topology.d_earth_level) || on_level(tolev, svd.dungeon_topology.d_air_level) || on_level(tolev, svd.dungeon_topology.d_fire_level) || on_level(tolev, svd.dungeon_topology.d_water_level) ? $c.lit("to the Elemental Planes") : $c.lit("to the end game"));
         /* minimize our expectations about what comes next */
     } else {
         /* known branch stairs; tacking on destination level is too verbose */
-        $c.__builtin___sprintf_chk(outbuf, 0, -1, $c.lit("branch %s %s to %s"), stairs, updown, new $c.Ptr(svd.dungeons[tolev.dnum].dname, 0));
+        $c.sprintf(outbuf, $c.lit("branch %s %s to %s"), stairs, updown, new $c.Ptr(svd.dungeons[tolev.dnum].dname, 0));
         /* dungeons[].dname is capitalized; undo that for "The <Branch>" */
         strsubst(outbuf, $c.lit("The "), $c.lit("the "));
     }

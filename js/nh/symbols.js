@@ -602,7 +602,7 @@ export async function savedsym_strbuf(sbuf) {   // symbols.c:757
     let tmp = null, buf = new Int8Array(256);
     tmp = $G.saved_symbols;
     while (tmp) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%sSYMBOLS=%s:%s\n"), tmp.which_set === ROGUESET ? $c.lit("ROGUE") : $c.lit(""), tmp.name, tmp.val);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%sSYMBOLS=%s:%s\n"), tmp.which_set === ROGUESET ? $c.lit("ROGUE") : $c.lit(""), tmp.name, tmp.val);
         await strbuf_append(sbuf, new $c.Ptr(buf, 0));
         tmp = tmp.next;
     }
@@ -770,7 +770,7 @@ export async function do_symset(rogueflag) {   // symbols.c:909
             await There($c.lit("are no appropriate %s symbol sets available."), rogueflag ? $c.lit("rogue level") : $c.lit("primary"));
             return TRUE;
         }
-        $c.__builtin___sprintf_chk(new $c.Ptr(fmtstr, 0), 0, 20, $c.lit("%%-%ds %%s"), biggest + 2 | 0);
+        $c.sprintf(new $c.Ptr(fmtstr, 0), $c.lit("%%-%ds %%s"), biggest + 2 | 0);
         tmpwin = await create_nhwindow()(NHW.MENU);
         await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
         any.$copyFrom(cg.zeroany);
@@ -795,11 +795,11 @@ export async function do_symset(rogueflag) {   // symbols.c:909
                 if (symset_name && !strncmpi(sl.name, symset_name, -1)) {
                     defindx = any.a_int;
                 }
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(fmtstr, 0), sl.name, sl.desc ? sl.desc : $c.lit(""));
+                $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(fmtstr, 0), sl.name, sl.desc ? sl.desc : $c.lit(""));
                 await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), any.a_int === defindx ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
             }
         }
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Select %ssymbol set:"), rogueflag ? $c.lit("rogue level ") : $c.lit(""));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Select %ssymbol set:"), rogueflag ? $c.lit("rogue level ") : $c.lit(""));
         await end_menu()(tmpwin, new $c.Ptr(buf, 0));
         n = await select_menu(tmpwin, PICK.ONE, new $c.Ptr(symset_pick, 0));
         if (n > 0) {

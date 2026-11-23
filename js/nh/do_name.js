@@ -188,12 +188,12 @@ export async function christen_monst(mtmp, name) {   // do_name.c:133
     lth = name && name.get(0) ? $c.i32($c.strlen(name)) + 1 | 0 : 0;
     if (lth > PL.PSIZ) {
         lth = PL.PSIZ;
-        name = $c.__builtin___strncpy_chk(new $c.Ptr(buf, 0), name, PL.PSIZ - 1, 63);
+        name = $c.strncpy(new $c.Ptr(buf, 0), name, PL.PSIZ - 1);
         buf[PL.PSIZ - 1] = 0;
     }
     await new_mgivenname(mtmp, lth);   /* removes old name if one is present */
     if (lth) {
-        $c.__builtin___strcpy_chk(mtmp.mextra.mgivenname, name, -1);
+        $c.strcpy(mtmp.mextra.mgivenname, name);
     }
     /* if 'mtmp' is leashed, persistent inventory window needs updating */
     if (mtmp.mleashed) {
@@ -219,7 +219,7 @@ async function alreadynamed(mtmp, monnambuf, usrbuf) {   // do_name.c:158
             /* avoid gendered pronoun for riders */
             await pline($c.lit("%s is already called that."), upstart(monnambuf));
         } else {
-            await pline($c.lit("%s is already called %s."), upstart($c.__builtin___strcpy_chk(new $c.Ptr(pronounbuf, 0), genders[pronoun_gender(mtmp, PRONOUN.HALLU)].he, 10)), monnambuf);
+            await pline($c.lit("%s is already called %s."), upstart($c.strcpy(new $c.Ptr(pronounbuf, 0), genders[pronoun_gender(mtmp, PRONOUN.HALLU)].he)), monnambuf);
         }
         return TRUE;
     } else if ($c.peq(mtmp.data, $c.relem(mons, PM.JUIBLEX)) && strstri(monnambuf, $c.lit("Juiblex")) && !strncmpi(usrbuf, $c.lit("Jubilex"), -1)) {
@@ -266,7 +266,7 @@ async function do_mgivenname() {   // do_name.c:199
         return;
     }
     /* special case similar to the one in lookat() */
-    $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("What do you want to call %s?"), await distant_monnam(mtmp, ARTICLE.THE, new $c.Ptr(monnambuf, 0)));
+    $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("What do you want to call %s?"), await distant_monnam(mtmp, ARTICLE.THE, new $c.Ptr(monnambuf, 0)));
     /* use getlin() to get a name string from the player */
     if (!await name_from_player(new $c.Ptr(buf, 0), new $c.Ptr(qbuf, 0), has_mgivenname(mtmp) ? mtmp.mextra.mgivenname : null)) {
         return;
@@ -308,7 +308,7 @@ async function do_oname(obj) {   // do_name.c:290
         await pline($c.lit("%s already has a published name."), await Ysimple_name2(obj));
         return;
     }
-    $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("What do you want to name %s "), obj.quan !== 1 || obj.oartifact === ART.EYES_OF_THE_OVERWORLD && !undiscovered_artifact(ART.EYES_OF_THE_OVERWORLD) ? $c.lit("these") : $c.lit("this"));
+    $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("What do you want to name %s "), obj.quan !== 1 || obj.oartifact === ART.EYES_OF_THE_OVERWORLD && !undiscovered_artifact(ART.EYES_OF_THE_OVERWORLD) ? $c.lit("these") : $c.lit("this"));
     await safe_qbuf(new $c.Ptr(qbuf, 0), new $c.Ptr(qbuf, 0), $c.lit("?"), obj, xname, simpleonames, $c.lit("item"));
     /* use getlin() to get a name string from the player */
     if (!await name_from_player(new $c.Ptr(buf, 0), new $c.Ptr(qbuf, 0), safe_oname(obj))) {
@@ -334,7 +334,7 @@ async function do_oname(obj) {   // do_name.c:290
     /* relax restrictions over proper capitalization for artifacts */
     if ((aname = artifact_name(new $c.Ptr(buf, 0), new $c.Ptr(objtyp, 0), TRUE)) !== null && (restrict_name(obj, aname) || exist_artifact(obj.otyp, aname))) {
         /* substitute canonical spelling before slippage */
-        $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), aname, 256);
+        $c.strcpy(new $c.Ptr(buf, 0), aname);
         /* this used to change one letter, substituting a value
            of 'a' through 'y' (due to an off by one error, 'z'
            would never be selected) and then force that to
@@ -346,7 +346,7 @@ async function do_oname(obj) {   // do_name.c:290
            it targeting spaces so failing to make any change
            (we know that it must eventually target a nonspace
            because buf[] matches a valid artifact name) */
-        $c.__builtin___strcpy_chk(new $c.Ptr(bufcpy, 0), new $c.Ptr(buf, 0), 256);
+        $c.strcpy(new $c.Ptr(bufcpy, 0), new $c.Ptr(buf, 0));
         /* for "the Foo of Bar", only scuff "Foo of Bar" part */
         bufp = !strncmpi(new $c.Ptr(buf, 0), $c.lit("the "), 4) ? new $c.Ptr(buf, 0).add(4) : new $c.Ptr(buf, 0);
         do {
@@ -364,7 +364,7 @@ async function do_oname(obj) {   // do_name.c:290
         /* artifact_name() found a match and restrict_name() didn't reject
            it; since 'obj' is the right type, naming will change it into an
            artifact so use canonical capitalization (Sting or Orcrist) */
-        $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), aname, 256);
+        $c.strcpy(new $c.Ptr(buf, 0), aname);
     }
     obj = await oname(obj, new $c.Ptr(buf, 0), ONAME_VIA_NAMING | ONAME_KNOW_ARTI);
     nhUse(obj);
@@ -379,7 +379,7 @@ export async function oname(obj, name, oflgs) {   // do_name.c:372
     lth = name.get(0) ? $c.i32($c.addu64($c.strlen(name), 1)) : 0;
     if (lth > PL.PSIZ) {
         lth = PL.PSIZ;
-        name = $c.__builtin___strncpy_chk(new $c.Ptr(buf, 0), name, PL.PSIZ - 1, 63);
+        name = $c.strncpy(new $c.Ptr(buf, 0), name, PL.PSIZ - 1);
         buf[PL.PSIZ - 1] = 0;
     }
     /* If named artifact exists in the game, do not create another.
@@ -391,7 +391,7 @@ export async function oname(obj, name, oflgs) {   // do_name.c:372
     }
     await new_oname(obj, lth);   /* removes old name if one is present */
     if (lth) {
-        $c.__builtin___strcpy_chk(obj.oextra.oname, name, -1);
+        $c.strcpy(obj.oextra.oname, name);
     }
     if (lth) {
         await artifact_exists(obj, name, TRUE, oflgs);
@@ -611,7 +611,7 @@ export async function docall(obj) {   // do_name.c:636
     }
     await flush_screen(1);   /* buffered updates might matter to player's response */
     if (obj.oclass === POTION_CLASS && obj.corpsenm) {   /* fromsink: kludge, meaning it's sink water */
-        $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Call a stream of %s fluid:"), obj_descr[objects[obj.otyp].oc_descr_idx].oc_descr);
+        $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("Call a stream of %s fluid:"), obj_descr[objects[obj.otyp].oc_descr_idx].oc_descr);
     } else {
         await safe_qbuf(new $c.Ptr(qbuf, 0), $c.lit("Call "), $c.lit(":"), obj, docall_xname, simpleonames, $c.lit("thing"));
     }
@@ -648,7 +648,7 @@ async function namefloorobj() {   // do_name.c:679
     /* "dot for under/over you" only makes sense when the cursor hasn't
        been moved off the hero's '@' yet, but there's no way to adjust
        the help text once getpos() has started */
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("object on map (or '.' for one %s you)"), u.uundetected | 0 && $c.andu64(gy.youmonst.data.mflags1, M1.CONCEAL) !== 0 ? $c.lit("over") : $c.lit("under"));
+    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("object on map (or '.' for one %s you)"), u.uundetected | 0 && $c.andu64(gy.youmonst.data.mflags1, M1.CONCEAL) !== 0 ? $c.lit("over") : $c.lit("under"));
     if (await getpos(cc, FALSE, new $c.Ptr(buf, 0)) < 0 || cc.x <= 0) {
         return;
     }
@@ -671,7 +671,7 @@ async function namefloorobj() {   // do_name.c:679
        would yield "glorkum" so we need to handle it explicitly; it will
        always fail the Hallucination test and pass the !callable test,
        resulting in the "can't be assigned a type name" message */
-    $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), obj[0].otyp !== STRANGE_OBJECT ? await simpleonames(obj[0]) : obj_descr[STRANGE_OBJECT].oc_name, 256);
+    $c.strcpy(new $c.Ptr(buf, 0), obj[0].otyp !== STRANGE_OBJECT ? await simpleonames(obj[0]) : obj_descr[STRANGE_OBJECT].oc_name);
     use_plural = $c.i8(obj[0].quan > 1 ? 1 : 0);
     if (Hallucination()) {
         /* straight role name */
@@ -759,7 +759,7 @@ export async function x_monnam(mtmp, article, adjective, suppress, called) {   /
     mdat = mtmp.data;
     mappear_as_mon = $c.i8(M_AP_TYPE(mtmp) === M_AP.MONSTER ? 1 : 0);
     if ($c.peq(mtmp, gy.youmonst)) {
-        return $c.__builtin___strcpy_chk(buf, $c.lit("you"), -1);   /* ignore article, "invisible", &c */
+        return $c.strcpy(buf, $c.lit("you"));   /* ignore article, "invisible", &c */
     }
     if (program_state.gameover) {
         suppress = suppress | SUPPRESS.HALLUCINATION;
@@ -791,7 +791,7 @@ export async function x_monnam(mtmp, article, adjective, suppress, called) {   /
     if (do_it) {
         /* !is_animal excludes all Y; !mindless excludes Z, M, \' */
         s_one = $c.i8(humanoid(mdat) && !is_animal(mdat) && !mindless(mdat) ? 1 : 0);
-        $c.__builtin___strcpy_chk(buf, !augment_it ? $c.lit("it") : (!do_hallu ? s_one : !rn2(2)) ? $c.lit("someone") : $c.lit("something"), -1);
+        $c.strcpy(buf, !augment_it ? $c.lit("it") : (!do_hallu ? s_one : !rn2(2)) ? $c.lit("someone") : $c.lit("something"));
         return buf;
     }
     /* priests and minions: don't even use this function */
@@ -812,7 +812,7 @@ export async function x_monnam(mtmp, article, adjective, suppress, called) {   /
         if (article === ARTICLE.NONE && !$c.strncmp(name, $c.lit("the "), 4)) {
             name = name.add(4);
         }
-        return $c.__builtin___strcpy_chk(buf, name, -1);
+        return $c.strcpy(buf, name);
     }
     /* 'pm_name' is the base part of most names */
     if (do_mappear) {
@@ -830,69 +830,69 @@ export async function x_monnam(mtmp, article, adjective, suppress, called) {   /
         if (adjective && article === ARTICLE.THE) {
             /* pathological case: "the angry Asidonhopo the blue dragon"
                sounds silly */
-            $c.__builtin___strcpy_chk(buf, $c.lit("the "), -1);
-            $c.__builtin___strcat_chk($c.__builtin___strcat_chk(buf, adjective, -1), $c.lit(" "), -1);
-            $c.__builtin___strcat_chk(buf, await shkname(mtmp), -1);
+            $c.strcpy(buf, $c.lit("the "));
+            $c.strcat($c.strcat(buf, adjective), $c.lit(" "));
+            $c.strcat(buf, await shkname(mtmp));
         } else {
-            $c.__builtin___strcat_chk(buf, await shkname(mtmp), -1);
+            $c.strcat(buf, await shkname(mtmp));
             if (!$c.peq(mdat, $c.relem(mons, PM.SHOPKEEPER)) || do_invis) {
-                $c.__builtin___strcat_chk(buf, $c.lit(" the "), -1);
+                $c.strcat(buf, $c.lit(" the "));
                 if (do_invis) {
-                    $c.__builtin___strcat_chk(buf, $c.lit("invisible "), -1);
+                    $c.strcat(buf, $c.lit("invisible "));
                 }
-                $c.__builtin___strcat_chk(buf, pm_name, -1);
+                $c.strcat(buf, pm_name);
             }
         }
         return buf;
     }
     /* Put the adjectives in the buffer */
     if (adjective) {
-        $c.__builtin___strcat_chk($c.__builtin___strcat_chk(buf, adjective, -1), $c.lit(" "), -1);
+        $c.strcat($c.strcat(buf, adjective), $c.lit(" "));
     }
     if (do_invis) {
-        $c.__builtin___strcat_chk(buf, $c.lit("invisible "), -1);
+        $c.strcat(buf, $c.lit("invisible "));
     }
     if (do_saddle && $c.and64(mtmp.misc_worn_check, W.SADDLE) && !Blind() && !Hallucination()) {
-        $c.__builtin___strcat_chk(buf, $c.lit("saddled "), -1);
+        $c.strcat(buf, $c.lit("saddled "));
     }
     has_adjectives = $c.i8(buf.get(0) !== 0 ? 1 : 0);
     /* Put the actual monster name or type into the buffer now.
        Remember whether the buffer starts with a personal name. */
     if (do_hallu) {
         rname = await rndmonnam(new $c.Ptr(rnamecode, 0));
-        $c.__builtin___strcat_chk(buf, rname, -1);
+        $c.strcat(buf, rname);
         name_at_start = bogon_is_pname(rnamecode[0]);
     } else if (do_name && has_mgivenname(mtmp)) {
         name$2 = mtmp.mextra.mgivenname;
         /* hardfought */
         if ($c.peq(mdat, $c.relem(mons, PM.GHOST))) {
-            $c.__builtin___sprintf_chk(eos(buf), 0, -1, $c.lit("%s ghost"), s_suffix(name$2));
+            $c.sprintf(eos(buf), $c.lit("%s ghost"), s_suffix(name$2));
             name_at_start = TRUE;
         } else if (called) {
-            $c.__builtin___sprintf_chk(eos(buf), 0, -1, $c.lit("%s called %s"), pm_name, name$2);
+            $c.sprintf(eos(buf), $c.lit("%s called %s"), pm_name, name$2);
             name_at_start = $c.i8(type_is_pname(mdat));
         } else if (is_mplayer(mdat) && (bp = strstri(name$2, $c.lit(" the "))) !== null) {
             /* <name> the <adjective> <invisible> <saddled> <rank> */
-            $c.__builtin___strcpy_chk(new $c.Ptr(pbuf, 0), name$2, 256);
+            $c.strcpy(new $c.Ptr(pbuf, 0), name$2);
             pbuf[$c.idx($c.add64($c.pdiff(bp, name$2), 5))] = 0;   /* adjectives right after " the " */
             if (has_adjectives) {
-                $c.__builtin___strcat_chk(new $c.Ptr(pbuf, 0), buf, 256);
+                $c.strcat(new $c.Ptr(pbuf, 0), buf);
             }
-            $c.__builtin___strcat_chk(new $c.Ptr(pbuf, 0), bp.add(5), 256);   /* append the rest of the name */
-            $c.__builtin___strcpy_chk(buf, new $c.Ptr(pbuf, 0), -1);
+            $c.strcat(new $c.Ptr(pbuf, 0), bp.add(5));   /* append the rest of the name */
+            $c.strcpy(buf, new $c.Ptr(pbuf, 0));
             article = ARTICLE.NONE;
             name_at_start = TRUE;
         } else {
-            $c.__builtin___strcat_chk(buf, name$2, -1);
+            $c.strcat(buf, name$2);
             name_at_start = TRUE;
         }
         /* hardfought */
     } else if (is_mplayer(mdat) && !In_endgame(u.uz)) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(pbuf$2, 0), rank_of(mtmp.m_lev, $c.i16(mdat.pmidx), $c.i8(mtmp.female)), 256);
-        $c.__builtin___strcat_chk(buf, lcase(new $c.Ptr(pbuf$2, 0)), -1);
+        $c.strcpy(new $c.Ptr(pbuf$2, 0), rank_of(mtmp.m_lev, $c.i16(mdat.pmidx), $c.i8(mtmp.female)));
+        $c.strcat(buf, lcase(new $c.Ptr(pbuf$2, 0)));
         name_at_start = FALSE;
     } else {
-        $c.__builtin___strcat_chk(buf, pm_name, -1);
+        $c.strcat(buf, pm_name);
         name_at_start = $c.i8(type_is_pname(mdat));
     }
     if (name_at_start && (article === ARTICLE.YOUR || !has_adjectives)) {
@@ -908,10 +908,10 @@ export async function x_monnam(mtmp, article, adjective, suppress, called) {   /
     buf2[0] = 0;   /* lint suppression */
     switch (article) {
         case ARTICLE.YOUR:
-            $c.__builtin___strcpy_chk(new $c.Ptr(buf2, 0), $c.lit("your "), 256);
+            $c.strcpy(new $c.Ptr(buf2, 0), $c.lit("your "));
             break;
         case ARTICLE.THE:
-            $c.__builtin___strcpy_chk(new $c.Ptr(buf2, 0), $c.lit("the "), 256);
+            $c.strcpy(new $c.Ptr(buf2, 0), $c.lit("the "));
             break;
         case ARTICLE.A:
             /* avoid an() here */
@@ -923,8 +923,8 @@ export async function x_monnam(mtmp, article, adjective, suppress, called) {   /
             break;
     }
     if (insertbuf2) {
-        $c.__builtin___strcat_chk(new $c.Ptr(buf2, 0), buf, 256);   /* buf2[] isn't viable to return,  */
-        $c.__builtin___strcpy_chk(buf, new $c.Ptr(buf2, 0), -1);   /* so transfer the result to buf[] */
+        $c.strcat(new $c.Ptr(buf2, 0), buf);   /* buf2[] isn't viable to return,  */
+        $c.strcpy(buf, new $c.Ptr(buf2, 0));   /* so transfer the result to buf[] */
     }
     return buf;
 }
@@ -1012,10 +1012,10 @@ export async function distant_monnam(mon, article, outbuf) {   // do_name.c:1170
        unless you're adjacent (overridden for hallucination which does
        its own obfuscation) */
     if ($c.peq(mon.data, $c.relem(mons, PM.HIGH_CLERIC)) && !Hallucination() && ((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level)) && !(dist2(mon.mx, mon.my, u.ux, u.uy) <= 2)) {
-        $c.__builtin___strcpy_chk(outbuf, article === ARTICLE.THE ? $c.lit("the ") : $c.lit(""), -1);
-        $c.__builtin___strcat_chk(outbuf, mon.female | 0 ? $c.lit("high priestess") : $c.lit("high priest"), -1);
+        $c.strcpy(outbuf, article === ARTICLE.THE ? $c.lit("the ") : $c.lit(""));
+        $c.strcat(outbuf, mon.female | 0 ? $c.lit("high priestess") : $c.lit("high priest"));
     } else {
-        $c.__builtin___strcpy_chk(outbuf, await x_monnam(mon, article, null, 0, TRUE), -1);
+        $c.strcpy(outbuf, await x_monnam(mon, article, null, 0, TRUE));
     }
     return outbuf;
 }
@@ -1029,18 +1029,18 @@ export async function mon_nam_too(mon, other_mon) {   // do_name.c:1191
         outbuf = nextmbuf();
         switch (pronoun_gender(mon, PRONOUN.HALLU)) {
             case 0:
-                $c.__builtin___strcpy_chk(outbuf, $c.lit("himself"), -1);
+                $c.strcpy(outbuf, $c.lit("himself"));
                 break;
             case 1:
-                $c.__builtin___strcpy_chk(outbuf, $c.lit("herself"), -1);
+                $c.strcpy(outbuf, $c.lit("herself"));
                 break;
             default:
             case 2:
-                $c.__builtin___strcpy_chk(outbuf, $c.lit("itself"), -1);
+                $c.strcpy(outbuf, $c.lit("itself"));
                 break;
             case 3:
                 /* could happen when hallucinating */
-                $c.__builtin___strcpy_chk(outbuf, $c.lit("themselves"), -1);
+                $c.strcpy(outbuf, $c.lit("themselves"));
                 break;
         }
     }
@@ -1053,7 +1053,7 @@ export async function monverbself(mon, monnamtext, verb, othertext) {   // do_na
     /* modifiable 'mbuf' with adequate room at end */
     /* sizeof "themselves" suffices */
     /* "himself"/"herself"/"itself", maybe "themselves" if hallucinating */
-    $c.__builtin___strcpy_chk(new $c.Ptr(selfbuf, 0), await mon_nam_too(mon, mon), 40);
+    $c.strcpy(new $c.Ptr(selfbuf, 0), await mon_nam_too(mon, mon));
     /* verb starts plural; this will yield singular except for "themselves" */
     verbs = await vtense(new $c.Ptr(selfbuf, 0), verb);
     if (!$c.strcmp(verb, verbs)) {
@@ -1062,17 +1062,17 @@ export async function monverbself(mon, monnamtext, verb, othertext) {   // do_na
         /* for "it", makeplural() produces "them" but we want "they" */
         if (!strncmpi(monnamtext, genders[3].he, -1)) {
             capitaliz = $c.i8(monnamtext.get(0) === highc(monnamtext.get(0)) ? 1 : 0);
-            $c.__builtin___strcpy_chk(monnamtext, genders[3].him, -1);
+            $c.strcpy(monnamtext, genders[3].him);
             if (capitaliz) {
                 $t1 = highc(monnamtext.get(0)), monnamtext.set(0, $t1);
             }
         }
     }
-    $c.__builtin___strcat_chk($c.__builtin___strcat_chk(monnamtext, $c.lit(" "), -1), verbs, -1);
+    $c.strcat($c.strcat(monnamtext, $c.lit(" ")), verbs);
     if (othertext && othertext.get(0)) {
-        $c.__builtin___strcat_chk($c.__builtin___strcat_chk(monnamtext, $c.lit(" "), -1), othertext, -1);
+        $c.strcat($c.strcat(monnamtext, $c.lit(" ")), othertext);
     }
-    $c.__builtin___strcat_chk($c.__builtin___strcat_chk(monnamtext, $c.lit(" "), -1), new $c.Ptr(selfbuf, 0), -1);
+    $c.strcat($c.strcat(monnamtext, $c.lit(" ")), new $c.Ptr(selfbuf, 0));
     return monnamtext;
 }
 /* for debugging messages, where data might be suspect and we aren't
@@ -1081,19 +1081,19 @@ export function minimal_monnam(mon, ckloc) {   // do_name.c:1254
     let ptr = null, outbuf = null;
     outbuf = nextmbuf();
     if (!mon) {
-        $c.__builtin___strcpy_chk(outbuf, $c.lit("[Null monster]"), -1);
+        $c.strcpy(outbuf, $c.lit("[Null monster]"));
     } else if ((ptr = mon.data) === null) {
-        $c.__builtin___strcpy_chk(outbuf, $c.lit("[Null mon->data]"), -1);
+        $c.strcpy(outbuf, $c.lit("[Null mon->data]"));
     } else if ($c.pcmp(ptr, $c.relem(mons, 0)) < 0) {
-        $c.__builtin___sprintf_chk(outbuf, 0, -1, $c.lit("[Invalid mon->data %s < %s]"), fmt_ptr(mon.data), fmt_ptr($c.relem(mons, 0)));
+        $c.sprintf(outbuf, $c.lit("[Invalid mon->data %s < %s]"), fmt_ptr(mon.data), fmt_ptr($c.relem(mons, 0)));
     } else if ($c.pcmp(ptr, $c.relem(mons, NUMMONS)) >= 0) {
-        $c.__builtin___sprintf_chk(outbuf, 0, -1, $c.lit("[Invalid mon->data %s >= %s]"), fmt_ptr(mon.data), fmt_ptr($c.relem(mons, NUMMONS)));
+        $c.sprintf(outbuf, $c.lit("[Invalid mon->data %s >= %s]"), fmt_ptr(mon.data), fmt_ptr($c.relem(mons, NUMMONS)));
     } else if (ckloc && $c.peq(ptr, $c.relem(mons, PM.LONG_WORM)) && mon.mx && !$c.peq(svl.level.monsters[mon.mx][mon.my], mon)) {
-        $c.__builtin___sprintf_chk(outbuf, 0, -1, $c.lit("%s <%d,%d>"), pmname($c.relem(mons, PM.LONG_WORM_TAIL), Mgender(mon)), mon.mx, mon.my);
+        $c.sprintf(outbuf, $c.lit("%s <%d,%d>"), pmname($c.relem(mons, PM.LONG_WORM_TAIL), Mgender(mon)), mon.mx, mon.my);
     } else {
-        $c.__builtin___sprintf_chk(outbuf, 0, -1, $c.lit("%s%s <%d,%d>"), mon.mtame ? $c.lit("tame ") : mon.mpeaceful | 0 ? $c.lit("peaceful ") : $c.lit(""), mon_pmname(mon), mon.mx, mon.my);
+        $c.sprintf(outbuf, $c.lit("%s%s <%d,%d>"), mon.mtame ? $c.lit("tame ") : mon.mpeaceful | 0 ? $c.lit("peaceful ") : $c.lit(""), mon_pmname(mon), mon.mx, mon.my);
         if (mon.cham !== NON_PM) {
-            $c.__builtin___sprintf_chk(eos(outbuf), 0, -1, $c.lit("{%s}"), pmname($c.relem(mons, mon.cham), Mgender(mon)));
+            $c.sprintf(eos(outbuf), $c.lit("{%s}"), pmname($c.relem(mons, mon.cham), Mgender(mon)));
         }
     }
     return outbuf;
@@ -1161,7 +1161,7 @@ export async function bogusmon(buf, code) {   // do_name.c:1369
     /* might fail (return empty buf[]) if the file isn't available */
     await get_rnd_text($c.lit("bogusmon"), buf, rn2_on_display_rng, MD_PAD.BOGONS);
     if (!mnam.get(0)) {
-        $c.__builtin___strcpy_chk(buf, $c.lit("bogon"), -1);
+        $c.strcpy(buf, $c.lit("bogon"));
     } else if ($c.strchr(new $c.Ptr(bogon_codes, 0), mnam.get(0))) {
         /* strip prefix if present */
         if (code) {
@@ -1184,7 +1184,7 @@ export async function rndmonnam(code) {   // do_name.c:1389
     if (name >= SPECIAL_PM) {
         mnam = await bogusmon(new $c.Ptr(rndmonnam$buf, 0), code);
     } else {
-        mnam = $c.__builtin___strcpy_chk(new $c.Ptr(rndmonnam$buf, 0), pmname($c.relem(mons, name), rn2_on_display_rng(2)), 256);
+        mnam = $c.strcpy(new $c.Ptr(rndmonnam$buf, 0), pmname($c.relem(mons, name), rn2_on_display_rng(2)));
     }
     return mnam;
 }
@@ -1240,7 +1240,7 @@ export function hliquid(liquidpref) {   // do_name.c:1493
 }
 export async function coyotename(mtmp, buf) {   // do_name.c:1526
     if (mtmp && buf) {
-        $c.__builtin___sprintf_chk(buf, 0, -1, $c.lit("%s - %s"), await x_monnam(mtmp, ARTICLE.NONE, null, 0, TRUE), mtmp.mcan | 0 ? coynames[21] : coynames[$c.remu32(mtmp.m_id, 21)]);
+        $c.sprintf(buf, $c.lit("%s - %s"), await x_monnam(mtmp, ARTICLE.NONE, null, 0, TRUE), mtmp.mcan | 0 ? coynames[21] : coynames[$c.remu32(mtmp.m_id, 21)]);
     }
     return buf;
 }
@@ -1252,7 +1252,7 @@ export function rndorcname(s) {   // do_name.c:1538
         s.set(0, 0);
         for (i = 0; i < iend; i = i + 1 | 0) {
             vstart = 1 - vstart | 0;   /* 0 -> 1, 1 -> 0 */
-            $c.__builtin___sprintf_chk(eos(s), 0, -1, $c.lit("%s%s"), i > 0 && !rn2(30) ? $c.lit("-") : $c.lit(""), vstart ? rndorcname$v[rn2(4)] : rndorcname$snd[rn2(11)]);
+            $c.sprintf(eos(s), $c.lit("%s%s"), i > 0 && !rn2(30) ? $c.lit("-") : $c.lit(""), vstart ? rndorcname$v[rn2(4)] : rndorcname$snd[rn2(11)]);
         }
     }
     return s;
@@ -1271,10 +1271,10 @@ export async function christen_orc(mtmp, gang, other) {   // do_name.c:1557
     if (sz < BUFSZ) {
         nameit = FALSE;
         if (gang) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s of %s"), upstart(orcname), upstart($c.__builtin___strcpy_chk(new $c.Ptr(gbuf, 0), gang, 256)));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s of %s"), upstart(orcname), upstart($c.strcpy(new $c.Ptr(gbuf, 0), gang)));
             nameit = TRUE;
         } else if (other) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%s"), upstart(orcname), other);
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s%s"), upstart(orcname), other);
             nameit = TRUE;
         }
         if (nameit) {

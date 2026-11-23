@@ -857,7 +857,7 @@ export async function trickery(reason) {   // restore.c:1035
     await pline($c.lit("Strange, this map is not as I remember it."));
     await pline($c.lit("Somebody is trying some trickery here..."));
     await pline($c.lit("This game is void."));
-    $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), reason ? reason : $c.lit(""), 256);
+    $c.strcpy(new $c.Ptr(svk.killer.name, 0), reason ? reason : $c.lit(""));
     await done(TRICKED);
 }
 /* !SFCTOOL */
@@ -885,9 +885,9 @@ export async function getlev(nhfp, pid, lev) {   // restore.c:1046
     await sfi_xint8(nhfp, new $c.Ptr(dlvl, 0), $c.lit("gamestate-dlvl"));
     if (pid && pid !== hpid[0] || lev && dlvl[0] !== lev) {
         if (pid && pid !== hpid[0]) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(trickbuf, 0), 0, 256, $c.lit("PID (%d) doesn't match saved PID (%d)!"), hpid[0], pid);
+            $c.sprintf(new $c.Ptr(trickbuf, 0), $c.lit("PID (%d) doesn't match saved PID (%d)!"), hpid[0], pid);
         } else {
-            $c.__builtin___sprintf_chk(new $c.Ptr(trickbuf, 0), 0, 256, $c.lit("This is level %d, not %d!"), dlvl[0], lev);
+            $c.sprintf(new $c.Ptr(trickbuf, 0), $c.lit("This is level %d, not %d!"), dlvl[0], lev);
         }
         if (wizard()) {
             await pline1(new $c.Ptr(trickbuf, 0));
@@ -1121,7 +1121,7 @@ export async function get_plname_from_file(nhfp, outbuf, name_only) {   // resto
     }
     /* not simple strcpy(); playmode is in the last slot and could (probably
        will) be preceded by NULs */
-    $c.__builtin___memcpy_chk(outbuf, new $c.Ptr(plbuf, 0), PL_NSIZ_PLUS, -1);
+    $c.memcpy(outbuf, new $c.Ptr(plbuf, 0), PL_NSIZ_PLUS);
     return;
 }
 /* restore Plane of Water's air bubbles and Plane of Air's clouds */
@@ -1297,9 +1297,9 @@ export async function restore_menu(bannerwin) {   // restore.c:1536
             next = saved.get(k);
             mode = next.get(PL_NSIZ_PLUS - 1);
             if (all_normal) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(menutext, 0), 0, 256, $c.lit("%.*s"), PL_NSIZ_PLUS - 1, next);
+                $c.sprintf(new $c.Ptr(menutext, 0), $c.lit("%.*s"), PL_NSIZ_PLUS - 1, next);
             } else {
-                $c.__builtin___sprintf_chk(new $c.Ptr(menutext, 0), 0, 256, $c.lit("%c %.*s"), mode, PL_NSIZ_PLUS - 1, next);
+                $c.sprintf(new $c.Ptr(menutext, 0), $c.lit("%c %.*s"), mode, PL_NSIZ_PLUS - 1, next);
             }
             await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(menutext, 0), MENU.ITEMFLAGS_SKIPMENUCOLORS);
         }
@@ -1316,7 +1316,7 @@ export async function restore_menu(bannerwin) {   // restore.c:1536
         if (await select_menu(tmpwin, PICK.ONE, new $c.Ptr(chosen_game, 0)) > 0) {
             ch = chosen_game[0].item.a_int;
             if (ch > 0) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(svp.plname, 0), saved.get(ch - 1 | 0), 32);
+                $c.strcpy(new $c.Ptr(svp.plname, 0), saved.get(ch - 1 | 0));
             } else if (ch < 0) {
                 ch = ch + 1 | 0;   /* -1 -> 0 (new game), -2 -> -1 (quit) */
             }

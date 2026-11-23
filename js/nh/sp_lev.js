@@ -2881,9 +2881,9 @@ export async function lspo_message(L) {   // sp_lev.c:3076
         levmsg.set(old_n - 1 | 0, 10);
     }
     if (gl.lev_message) {
-        $c.__builtin___memcpy_chk(levmsg, gl.lev_message, $c.u64(old_n - 1 | 0), -1);
+        $c.memcpy(levmsg, gl.lev_message, $c.u64(old_n - 1 | 0));
     }
-    $c.__builtin___memcpy_chk(levmsg.add(old_n), msg, $c.u64(n), -1);
+    $c.memcpy(levmsg.add(old_n), msg, $c.u64(n));
     levmsg.set(old_n + n | 0, 0);
     do {
         if (gl.lev_message) {
@@ -3169,11 +3169,11 @@ async function get_table_int_or_random(L, name, rndval) {   // sp_lev.c:3407
             await lua_settop(L, -2);
             return rndval;
         }
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Expected integer or \"random\" for \"%s\", got "), name);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Expected integer or \"random\" for \"%s\", got "), name);
         if (tmp) {
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("\"%s\""), tmp);
+            $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("\"%s\""), tmp);
         } else {
-            $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit("<Null>"), 256);
+            $c.strcat(new $c.Ptr(buf, 0), $c.lit("<Null>"));
         }
         await nhl_error(L, new $c.Ptr(buf, 0));
         /*NOTREACHED*/
@@ -3492,7 +3492,7 @@ export async function lspo_level_flags(L) {   // sp_lev.c:3759
         } else if (!strncmpi(s, $c.lit("stormy"), -1)) {
             svl.level.flags.stormy = (1) & 1;
         } else {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Unknown level flag %s"), s);
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Unknown level flag %s"), s);
             await nhl_error(L, new $c.Ptr(buf, 0));
         }
     }
@@ -4550,7 +4550,7 @@ async function get_table_intarray_entry(L, tableidx, entrynum) {   // sp_lev.c:5
     if (lua_isnumber(L, -1)) {
         ret = lua_tointegerx(L, -1, null);
     } else {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Array entry #%i is %s, expected number"), 1, lua_typename(L, lua_type(L, -1)));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Array entry #%i is %s, expected number"), 1, lua_typename(L, lua_type(L, -1)));
         await nhl_error(L, new $c.Ptr(buf, 0));
     }
     await lua_settop(L, -2);
@@ -4635,7 +4635,7 @@ async function levregion_add(lregion) {   // sp_lev.c:5371
     if (gn.num_lregions) {
         /* realloc the lregion space to add the new one */
         newl = $c.asRec(await alloc($c.u32($c.mulu64(32, (1 + gn.num_lregions | 0) >>> 0))), $T.lev_region, 32);
-        $c.__builtin___memcpy_chk(newl, gl.lregions, $c.mulu64(32, $c.u64(gn.num_lregions)), -1);
+        $c.memcpy(newl, gl.lregions, $c.mulu64(32, $c.u64(gn.num_lregions)));
         do {
             if (gl.lregions) {
                 $c.free(gl.lregions);
@@ -4647,7 +4647,7 @@ async function levregion_add(lregion) {   // sp_lev.c:5371
         gn.num_lregions = 1;
         $t1 = $c.asRec(await alloc(32), $T.lev_region, 32), gl.lregions = $t1;
     }
-    $c.__builtin___memcpy_chk($c.radd(gl.lregions, gn.num_lregions - 1 | 0), lregion, 32, -1);
+    $c.memcpy($c.radd(gl.lregions, gn.num_lregions - 1 | 0), lregion, 32);
 }
 /* get params from topmost lua hash:
    - region = {x1,y1,x2,y2}
@@ -5401,7 +5401,7 @@ async function sp_level_coder_init() {   // sp_lev.c:6336
     }
     container_idx = 0;
     invent_carrying_monster = null;
-    $c.__builtin___memset_chk(new $c.Ptr(SpLev_Map, 0), 0, 1680, 1680);
+    $c.memset(new $c.Ptr(SpLev_Map, 0), 0, 1680);
     svl.level.flags.is_maze_lev = (0) & 1;
     $t1 = $c.i8(In_hell(u.uz) ? 1 : 0), svl.level.flags.temperature = $t1;
     svl.level.flags.rndmongen = (1) & 1;

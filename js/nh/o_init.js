@@ -500,11 +500,11 @@ async function sortloot_descr(otyp, outbuf) {   // o_init.c:567
     if (otyp === SLIME_MOLD) {
         o.spe = $c.i8(svc.context.current_fruit);
     }
-    $c.__builtin___memset_chk(sl_cookie, 0, 24, 24);
+    $c.memset(sl_cookie, 0, 24);
     sl_cookie.obj = null;
     sl_cookie.str = null;
     await loot_classify(sl_cookie, o);
-    $c.__builtin___sprintf_chk(outbuf, 0, -1, $c.lit("%02d%02d%1d "), sl_cookie.orderclass, sl_cookie.subclass, sl_cookie.disco);
+    $c.sprintf(outbuf, $c.lit("%02d%02d%1d "), sl_cookie.orderclass, sl_cookie.subclass, sl_cookie.disco);
     return outbuf;
 }
 export async function choose_disco_sort(mode) {   // o_init.c:611
@@ -554,13 +554,13 @@ async function disco_typename(otyp) {   // o_init.c:661
         if (!actualn) {
             /* won't happen; used to pacify static analyzer */
         } else if (strstri(result, $c.lit(" called"))) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit(" [%s] called"), actualn);
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit(" [%s] called"), actualn);
             strsubst(result, $c.lit(" called"), new $c.Ptr(buf, 0));
         } else if (strstri(result, $c.lit(" ("))) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit(" [%s] ("), actualn);
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit(" [%s] ("), actualn);
             strsubst(result, $c.lit(" ("), new $c.Ptr(buf, 0));
         } else {
-            $c.__builtin___sprintf_chk(eos(result), 0, -1, $c.lit(" [%s]"), actualn);
+            $c.sprintf(eos(result), $c.lit(" [%s]"), actualn);
         }
     }
     return result;
@@ -574,32 +574,32 @@ async function disco_append_typename(buf, dis) {   // o_init.c:694
     typnm_len = $c.strlen(typnm);
     if ($c.addu64(len, typnm_len) < BUFSZ) {
         /* ordinary */
-        $c.__builtin___strcat_chk(buf, typnm, -1);
+        $c.strcat(buf, typnm);
         eos[0] = buf.add($c.idx(len)).add($c.idx(typnm_len));
     } else if ((p = $c.strrchr(typnm, 40)) !== null && $c.pcmp(p, typnm) > 0 && p.get(-1) === 32 && $c.strchr(p, 41) !== null) {
         /* typename() returned "really long user-applied name (actual type)"
            and we want to truncate from "really long user-applied name" while
            keeping " (actual type)" intact */
         p = p.add(-1);   /* back up to space in front of open paren */
-        $c.__builtin___strncat_chk(buf, typnm, $c.subu64(BUFSZ - 1, $c.addu64(len, $c.u32($c.strlen(p)))), -1);
-        $c.__builtin___strcat_chk(buf, p, -1);
+        $c.strncat(buf, typnm, $c.subu64(BUFSZ - 1, $c.addu64(len, $c.u32($c.strlen(p)))));
+        $c.strcat(buf, p);
         eos[0] = buf.add($c.idx($c.strlen(buf)));
     } else {
         /* unexpected; just truncate from end of typename */
-        $c.__builtin___strncat_chk(buf, typnm, $c.subu64(BUFSZ - 1, len), -1);
+        $c.strncat(buf, typnm, $c.subu64(BUFSZ - 1, len));
         eos[0] = buf.add($c.idx($c.strlen(buf)));
     }
     append_price_quote(buf, new $c.Ptr(eos, 0), dis);
 }
 /* minor fixup for Book of the Dead needed in more than one place */
 function disco_fmt_uniq(uidx, outbuf) {   // o_init.c:725
-    $c.__builtin___sprintf_chk(outbuf, 0, -1, $c.lit("  %s"), objects[uidx].oc_name_known | 0 ? obj_descr[objects[uidx].oc_name_idx].oc_name : obj_descr[objects[uidx].oc_descr_idx].oc_descr);
+    $c.sprintf(outbuf, $c.lit("  %s"), objects[uidx].oc_name_known | 0 ? obj_descr[objects[uidx].oc_name_idx].oc_name : obj_descr[objects[uidx].oc_descr_idx].oc_descr);
     /* in the spellbooks section of main discoveries list, encountered
        but not fully discovered Book of the Dead is shown as
        "spellbook (papyrus)" like other encountered but not discovered books;
        in the unique/relics section we want "papyrus spellbook" instead */
     if (!objects[uidx].oc_name_known && objects[uidx].oc_class === SPBOOK_CLASS) {
-        $c.__builtin___strcat_chk(outbuf, $c.lit(" spellbook"), -1);
+        $c.strcat(outbuf, $c.lit(" spellbook"));
     }
 }
 /* sort and output sorted_lines to window and free the lines */
@@ -636,7 +636,7 @@ export async function dodiscovered() {   // o_init.c:764
     lootsort = $c.i8(flags.discosort === 115 ? 1 : 0);
     sortindx = $c.pdiff($c.strchr(new $c.Ptr(disco_order_let, 0), flags.discosort), new $c.Ptr(disco_order_let, 0));
     tmpwin = await create_nhwindow()(NHW.TEXT);
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Discoveries, %s"), disco_orders_descr[$c.idx(sortindx)]);
+    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Discoveries, %s"), disco_orders_descr[$c.idx(sortindx)]);
     await putstr()(tmpwin, 0, new $c.Ptr(buf, 0));
     await putstr()(tmpwin, 0, $c.lit(""));
     /*
@@ -661,7 +661,7 @@ export async function dodiscovered() {   // o_init.c:764
     /* display any known artifacts as another pseudo-class */
     arti_ct = await disp_artifact_discoveries(tmpwin);
     /* several classes are omitted from packorder; one is of interest here */
-    $c.__builtin___strcpy_chk(new $c.Ptr(classes, 0), new $c.Ptr(flags.inv_order, 0), 18);
+    $c.strcpy(new $c.Ptr(classes, 0), new $c.Ptr(flags.inv_order, 0));
     if (!$c.strchr(new $c.Ptr(classes, 0), VENOM_CLASS)) {
         strkitten(new $c.Ptr(classes, 0), VENOM_CLASS);   /* append char to string */
     }
@@ -685,7 +685,7 @@ export async function dodiscovered() {   // o_init.c:764
                         prev_class = oclass;
                     }
                 }
-                $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), objects[dis].oc_encountered | 0 ? $c.lit("  ") : $c.lit("* "), 256);
+                $c.strcpy(new $c.Ptr(buf, 0), objects[dis].oc_encountered | 0 ? $c.lit("  ") : $c.lit("* "));
                 if (lootsort) {
                     await sortloot_descr(dis, new $c.Ptr(buf, 2));
                 }
@@ -719,7 +719,7 @@ export async function dodiscovered() {   // o_init.c:764
 /* lower case let_to_name() output, which differs from def_oc_syms[].name */
 async function oclass_to_name(oclass, buf) {   // o_init.c:877
     let s = null, $t1;
-    $c.__builtin___strcpy_chk(buf, await let_to_name(oclass, FALSE, FALSE), -1);
+    $c.strcpy(buf, await let_to_name(oclass, FALSE, FALSE));
     for (s = buf; s.get(0); s = s.add(1)) {
         $t1 = lowc(s.get(0)), s.set(0, $t1);
     }
@@ -764,7 +764,7 @@ export async function doclassdisco() {   // o_init.c:891
     for (i = 0; i < 4; i = i + 1 | 0) {
         uidx = uniq_objs[i];
         if (objects[uidx].oc_name_known | 0 || objects[uidx].oc_encountered | 0 && uidx !== AMULET_OF_YENDOR) {
-            $c.__builtin___strcat_chk(new $c.Ptr(discosyms, 0), $c.lit("u"), 22);
+            $c.strcat(new $c.Ptr(discosyms, 0), $c.lit("u"));
             if (!traditional) {
                 any.a_int = 117;
                 /* FIXME: having 'r' as an accelerator to provide an unseen
@@ -777,7 +777,7 @@ export async function doclassdisco() {   // o_init.c:891
     }
     /* check whether we've discovered any artifacts */
     if (await disp_artifact_discoveries(WIN_ERR) > 0) {
-        $c.__builtin___strcat_chk(new $c.Ptr(discosyms, 0), $c.lit("a"), 22);
+        $c.strcat(new $c.Ptr(discosyms, 0), $c.lit("a"));
         if (!traditional) {
             any.a_int = 97;
             await add_menu(tmpwin, nul_glyphinfo, any, ($t2 = menulet, menulet = $c.i8($t2 + 1), $t2), 0, ATR.NONE, clr, new $c.Ptr(doclassdisco$artifact_items, 0), MENU.ITEMFLAGS_NONE);
@@ -785,7 +785,7 @@ export async function doclassdisco() {   // o_init.c:891
     }
     /* collect classes with discoveries, in packorder ordering; several
        classes are omitted from packorder and one is of interest here */
-    $c.__builtin___strcpy_chk(new $c.Ptr(allclasses, 0), new $c.Ptr(flags.inv_order, 0), 18);
+    $c.strcpy(new $c.Ptr(allclasses, 0), new $c.Ptr(flags.inv_order, 0));
     if (!$c.strchr(new $c.Ptr(allclasses, 0), VENOM_CLASS)) {
         strkitten(new $c.Ptr(allclasses, 0), VENOM_CLASS);   /* append char to string */
     }
@@ -819,7 +819,7 @@ export async function doclassdisco() {   // o_init.c:891
         /* we'll prompt even if there's only one viable class; we add all
            nonviable classes as unseen acceptable choices so player can ask
            for discoveries of any class whether it has discoveries or not */
-        $c.__builtin___sprintf_chk(new $c.Ptr(allclasses_plustwo, 0), 0, 21, $c.lit("%s%c%c%c"), new $c.Ptr(allclasses, 0), 97, 117, 114);
+        $c.sprintf(new $c.Ptr(allclasses_plustwo, 0), $c.lit("%s%c%c%c"), new $c.Ptr(allclasses, 0), 97, 117, 114);
         for (s = new $c.Ptr(allclasses_plustwo, 0), xtras = 0; s.get(0); s = s.add(1)) {
             c = $c.i8($c.strchr($c.lit("aur"), s.get(0)) ? s.get(0) : def_oc_syms[s.get(0)].sym);
             if (!$c.strchr(new $c.Ptr(discosyms, 0), c)) {
@@ -863,7 +863,7 @@ export async function doclassdisco() {   // o_init.c:891
     switch (c) {
         case 117:
         case 114:
-            await putstr()(tmpwin, iflags.menu_headings.attr, upstart($c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), new $c.Ptr(doclassdisco$unique_items, 0), 256)));
+            await putstr()(tmpwin, iflags.menu_headings.attr, upstart($c.strcpy(new $c.Ptr(buf, 0), new $c.Ptr(doclassdisco$unique_items, 0))));
             for (i = 0; i < 4; i = i + 1 | 0) {
                 uidx = uniq_objs[i];
                 if (objects[uidx].oc_name_known | 0 || objects[uidx].oc_encountered | 0 && uidx !== AMULET_OF_YENDOR) {
@@ -898,13 +898,13 @@ export async function doclassdisco() {   // o_init.c:891
             if (oclass === MAXOCLASSES) {
                 await impossible($c.lit("doclassdisco: invalid object class '%s'"), visctrl(c));
             }
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Discovered %s in %s"), await let_to_name(oclass, FALSE, FALSE), flags.discosort === 111 ? $c.lit("order of discovery") : flags.discosort === 115 ? $c.lit("'sortloot' order") : $c.lit("alphabetical order"));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Discovered %s in %s"), await let_to_name(oclass, FALSE, FALSE), flags.discosort === 111 ? $c.lit("order of discovery") : flags.discosort === 115 ? $c.lit("'sortloot' order") : $c.lit("alphabetical order"));
             await putstr()(tmpwin, 0, new $c.Ptr(buf, 0));   /* skip iflags.menu_headings */
             sorted_ct = 0;
             for (i = svb.bases[oclass]; i <= (svb.bases[oclass + 1 | 0] - 1 | 0); i = i + 1 | 0) {
                 if ((dis = svd.disco[i]) !== 0 && interesting_to_discover(dis)) {
                     ct = ct + 1 | 0;
-                    $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), objects[dis].oc_encountered | 0 ? $c.lit("  ") : $c.lit("* "), 256);
+                    $c.strcpy(new $c.Ptr(buf, 0), objects[dis].oc_encountered | 0 ? $c.lit("  ") : $c.lit("* "));
                     if (lootsort) {
                         await sortloot_descr(dis, new $c.Ptr(buf, 2));
                     }
@@ -1012,9 +1012,9 @@ export function get_sortdisco(opts, cnf) {   // o_init.c:1210
         flags.discosort = 111, p = new $c.Ptr(disco_order_let, 0);
     }
     if (cnf) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%c"), flags.discosort);
+        $c.sprintf(opts, $c.lit("%c"), flags.discosort);
     } else {
-        $c.__builtin___strcpy_chk(opts, disco_orders_descr[$c.idx($c.pdiff(p, new $c.Ptr(disco_order_let, 0)))], -1);
+        $c.strcpy(opts, disco_orders_descr[$c.idx($c.pdiff(p, new $c.Ptr(disco_order_let, 0)))]);
     }
 }
 

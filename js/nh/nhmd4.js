@@ -145,10 +145,10 @@ export function nhmd4_update(ctx, data, size) {   // nhmd4.c:196
     if (used) {
         free = $c.subu64(64, used);
         if (size < free) {
-            $c.__builtin___memcpy_chk(new $c.Ptr(ctx.buffer, $c.idx(used)), data, size, -1);
+            $c.memcpy(new $c.Ptr(ctx.buffer, $c.idx(used)), data, size);
             return;
         }
-        $c.__builtin___memcpy_chk(new $c.Ptr(ctx.buffer, $c.idx(used)), data, free, -1);
+        $c.memcpy(new $c.Ptr(ctx.buffer, $c.idx(used)), data, free);
         data = data.add($c.idx(free));
         size = $c.subu64(size, free);
         nhmd4_body(ctx, new $c.Ptr(ctx.buffer, 0), 64);
@@ -157,7 +157,7 @@ export function nhmd4_update(ctx, data, size) {   // nhmd4.c:196
         data = nhmd4_body(ctx, data, $c.andu64(size, 18446744073709551552n));
         size = $c.andu64(size, 63);
     }
-    $c.__builtin___memcpy_chk(new $c.Ptr(ctx.buffer, 0), data, size, -1);
+    $c.memcpy(new $c.Ptr(ctx.buffer, 0), data, size);
 }
 export function nhmd4_final(ctx, result) {   // nhmd4.c:235
     let used = 0, free = 0, $t1;
@@ -166,12 +166,12 @@ export function nhmd4_final(ctx, result) {   // nhmd4.c:235
     ctx.buffer[$c.idx(($t1 = used, used = $c.addu64($t1, 1), $t1))] = 128;
     free = $c.subu64(64, used);
     if (free < 8) {
-        $c.__builtin___memset_chk(new $c.Ptr(ctx.buffer, $c.idx(used)), 0, free, -1);
+        $c.memset(new $c.Ptr(ctx.buffer, $c.idx(used)), 0, free);
         nhmd4_body(ctx, new $c.Ptr(ctx.buffer, 0), 64);
         used = 0;
         free = 64;
     }
-    $c.__builtin___memset_chk(new $c.Ptr(ctx.buffer, $c.idx(used)), 0, $c.subu64(free, 8), -1);
+    $c.memset(new $c.Ptr(ctx.buffer, $c.idx(used)), 0, $c.subu64(free, 8));
     ctx.lo = ctx.lo << 3 >>> 0;
     ctx.buffer[56] = $c.u8(ctx.lo);
     ctx.buffer[57] = $c.u8(ctx.lo >>> 8);
@@ -198,7 +198,7 @@ export function nhmd4_final(ctx, result) {   // nhmd4.c:235
     result.set(13, $c.u8(ctx.d >>> 8));
     result.set(14, $c.u8(ctx.d >>> 16));
     result.set(15, $c.u8(ctx.d >>> 24));
-    $c.__builtin___memset_chk(ctx, 0, 152, -1);
+    $c.memset(ctx, 0, 152);
 }
 
 export function $init() {

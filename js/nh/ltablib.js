@@ -232,8 +232,8 @@ function l_randomizePivot() {   // ltablib.c:246
         $h.st64($fp, $c.missing("clock")());
         $h.st64($fp + 8, $c.time($h.PI64(0)));
         rnd = 0;
-        $hl.__builtin___memcpy_chk($fp + 16, $fp, 8, -1);
-        $hl.__builtin___memcpy_chk($fp + 16 + $c.idx(2) * 4, $fp + 8, 8, -1);
+        $hl.memcpy($fp + 16, $fp, 8);
+        $hl.memcpy($fp + 16 + $c.idx(2) * 4, $fp + 8, 8);
         for (i = 0; i < 4; i = i + 1 >>> 0) {
             rnd = rnd + $h.u32[($fp + 16 + i * 4) >>> 2] >>> 0;
         }

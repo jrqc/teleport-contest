@@ -63,13 +63,13 @@ export async function main(argc$in, argv$in) {   // unixmain.c:58
             mac_tmp_len = $c.i32($c.addu64($c.mulu64($c.strlen(mac_exe), 2), $c.strlen($c.lit(".app/Contents/MacOS/"))));
             if (mac_tmp_len <= arg0_len) {
                 mac_tmp = $c.asArr($c.malloc($c.u64(mac_tmp_len + 1 | 0)), Int8Array);
-                $c.__builtin___sprintf_chk(mac_tmp, 0, -1, $c.lit("%s%s%s"), mac_exe, $c.lit(".app/Contents/MacOS/"), mac_exe);
+                $c.sprintf(mac_tmp, $c.lit("%s%s%s"), mac_exe, $c.lit(".app/Contents/MacOS/"), mac_exe);
                 if (!$c.strcmp(argv[0].get(0).add(arg0_len - mac_tmp_len | 0), mac_tmp)) {
                     mac_lhs_len = $c.i32($c.addu64($c.addu64($c.u64(arg0_len - mac_tmp_len | 0), $c.strlen(mac_exe)), 5));
                     if (mac_lhs_len > (mac_tmp_len - 1 | 0)) {
                         mac_tmp = $c.asArr($c.realloc(mac_tmp, $c.u64(mac_lhs_len)), Int8Array);
                     }
-                    $c.__builtin___strncpy_chk(mac_tmp, argv[0].get(0), $c.u64(mac_lhs_len), -1);
+                    $c.strncpy(mac_tmp, argv[0].get(0), $c.u64(mac_lhs_len));
                     mac_tmp.set(mac_lhs_len, 0);
                     $c.chdir(mac_tmp);
                 }
@@ -296,12 +296,12 @@ async function process_options(argc, argv) {   // unixmain.c:330
                 break;
             case 117:
                 if (arg.get(2)) {
-                    $c.__builtin___strncpy_chk(new $c.Ptr(svp.plname, 0), arg.add(2), 31, 32);
+                    $c.strncpy(new $c.Ptr(svp.plname, 0), arg.add(2), 31);
                     gp.plnamelen = 0;   /* plname[] might have -role-race attached */
                 } else if (argc > 1) {
                     argc = argc - 1 | 0;
                     argv = argv.add(1);
-                    $c.__builtin___strncpy_chk(new $c.Ptr(svp.plname, 0), argv.get(0), 31, 32);
+                    $c.strncpy(new $c.Ptr(svp.plname, 0), argv.get(0), 31);
                     gp.plnamelen = 0;
                 } else {
                     await config_error_add($c.lit("Character name expected after -u"));
@@ -445,7 +445,7 @@ export function whoami() {   // unixmain.c:558
             s = $c.getlogin();
         }
         if (s && s.get(0)) {
-            $c.__builtin___strncpy_chk(new $c.Ptr(svp.plname, 0), s, 31, 32);
+            $c.strncpy(new $c.Ptr(svp.plname, 0), s, 31);
             if ($c.strchr(new $c.Ptr(svp.plname, 0), 45)) {
                 return TRUE;
             }
@@ -461,7 +461,7 @@ export function sethanguphandler(handler) {   // unixmain.c:590
      * and a signal occurs, the game won't do anything until the read
      * succeeds (or the stream returns EOF, which might not happen if
      * reading from, say, a window manager). */
-    $c.__builtin___memset_chk(sact, 0, 16, 16);
+    $c.memset(sact, 0, 16);
     sact.__sigaction_u.__sa_handler = handler;
     $c.sigaction(1, sact, null);
     $c.sigaction(24, sact, null);
@@ -598,7 +598,7 @@ export function get_login_name() {   // unixmain.c:764
     pw = get_unix_pw();
     get_login_name$buf[0] = 0;
     if (pw) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(get_login_name$buf, 0), pw.pw_name, 256);
+        $c.strcpy(new $c.Ptr(get_login_name$buf, 0), pw.pw_name);
     }
     return new $c.Ptr(get_login_name$buf, 0);
 }

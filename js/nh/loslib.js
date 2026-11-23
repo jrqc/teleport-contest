@@ -119,7 +119,7 @@ async function os_tmpname(L) {   // loslib.c:171
     const $sp0 = $h.st.sp, $fp = $h.enter(32);
     try {
         {
-            $hl.__builtin___strcpy_chk($fp, $h.lit("/tmp/lua_XXXXXX"), -1);
+            $hl.strcpy($fp, $h.lit("/tmp/lua_XXXXXX"));
             err = $c.missing("mkstemp")($fp);
             if (err !== -1) {
                 $c.close(err);
@@ -221,7 +221,7 @@ async function checkoption(L, conv, convlen, buff) {   // loslib.c:274
             oplen = oplen + 1 | 0;   /* will check options with next length (+1) */
         } else if ($hl.memcmp(conv, option, $c.u64(oplen)) === 0) {
             /* match? */
-            $hl.__builtin___memcpy_chk(buff, conv, $c.u64(oplen), -1);   /* copy valid option to buffer */
+            $hl.memcpy(buff, conv, $c.u64(oplen));   /* copy valid option to buffer */
             $h.i8[buff + oplen] = 0;
             return conv + oplen;   /* return next item */
         }

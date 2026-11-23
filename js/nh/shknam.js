@@ -125,7 +125,7 @@ function veggy_item(obj, otyp) {   // shknam.c:380
 async function shkveg() {   // shknam.c:408
     let i = 0, j = 0, maxprob = 0, prob = 0, oclass = 0, ok = new Int32Array(481), $t1;
     oclass = FOOD_CLASS;
-    $c.__builtin___memset_chk(new $c.Ptr(ok, 0), 0, 1924, 1924);   /* lint suppression */
+    $c.memset(new $c.Ptr(ok, 0), 0, 1924);   /* lint suppression */
     j = maxprob = 0;
     for (i = svb.bases[oclass]; i < NUM_OBJECTS; i = i + 1 | 0) {
         if (objects[i].oc_class !== oclass) {
@@ -248,7 +248,7 @@ function nameshk(shk, nlp) {   // shknam.c:487
             }
         }
     }
-    $c.__builtin___strncpy_chk(new $c.Ptr(shk.mextra.eshk.shknam, 0), shname, PL.NSIZ, -1);
+    $c.strncpy(new $c.Ptr(shk.mextra.eshk.shknam, 0), shname, PL.NSIZ);
     shk.mextra.eshk.shknam[PL.NSIZ - 1] = 0;
 }
 export async function neweshk(mtmp) {   // shknam.c:557
@@ -259,7 +259,7 @@ export async function neweshk(mtmp) {   // shknam.c:557
     if (!ESHK(mtmp)) {
         $t2 = $c.asRec(await alloc(4960), $T.eshk, 4960), mtmp.mextra.eshk = $t2;
     }
-    $c.__builtin___memset_chk(mtmp.mextra.eshk, 0, 4960, -1);
+    $c.memset(mtmp.mextra.eshk, 0, 4960);
     mtmp.mextra.eshk.parentmid = mtmp.m_id;
     mtmp.mextra.eshk.bill_p = null;
 }
@@ -421,7 +421,7 @@ export async function stock_room(shp_indx, sroom) {   // shknam.c:718
         } else if (inside_shop($c.i16(sx), $c.i16(sy - 1 | 0))) {
             n = n + 1 | 0;
         }
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Closed for inventory"));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Closed for inventory"));
         await make_engr_at($c.i16(m), $c.i16(n), new $c.Ptr(buf, 0), null, 0, DUST);
         if (svl.level.locations[m][n].typ !== CORR && svl.level.locations[m][n].typ !== ROOM) {
             $t1 = $c.i8(Is_special(u.uz) || in_rooms($c.i16(m), $c.i16(n), 0).get(0) ? ROOM : CORR), svl.level.locations[m][n].typ = $t1;
@@ -540,7 +540,7 @@ export async function shkname(mtmp) {   // shknam.c:856
         if (!letter(shknm.get(0))) {
             shknm = shknm.add(1);
         }
-        $c.__builtin___strcpy_chk(nam, shknm, -1);
+        $c.strcpy(nam, shknm);
     }
     return nam;
 }

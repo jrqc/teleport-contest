@@ -391,13 +391,13 @@ export async function gold_detect(sobj) {   // detect.c:335
             /* no gold found on floor or monster's inventory.
                adjust message if you have gold in your inventory */
             if ($c.peq(gy.youmonst.data, $c.relem(mons, PM.GOLD_GOLEM))) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("You feel like a million %s!"), await currency(2));
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("You feel like a million %s!"), await currency(2));
             } else if (money_cnt(gi.invent) || hidden_gold(TRUE)) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("You feel worried about your future financial situation."), 256);
+                $c.strcpy(new $c.Ptr(buf, 0), $c.lit("You feel worried about your future financial situation."));
             } else if (steedgold) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("You feel interested in %s financial situation."), s_suffix(await x_monnam(u.usteed, u.usteed.mtame ? ARTICLE.YOUR : ARTICLE.THE, null, SUPPRESS.SADDLE, FALSE)));
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("You feel interested in %s financial situation."), s_suffix(await x_monnam(u.usteed, u.usteed.mtame ? ARTICLE.YOUR : ARTICLE.THE, null, SUPPRESS.SADDLE, FALSE)));
             } else {
-                $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("You feel materially poor."), 256);
+                $c.strcpy(new $c.Ptr(buf, 0), $c.lit("You feel materially poor."));
             }
             await strange_feeling(sobj, new $c.Ptr(buf, 0));
             return 1;
@@ -520,7 +520,7 @@ export async function food_detect(sobj) {   // detect.c:479
                 u.uedibility = (1) & 1;
             }
         } else if (sobj) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Your %s twitches%s."), await body_part(NOSE), sobj.blessed | 0 && !u.uedibility ? $c.lit(" then starts to tingle") : $c.lit(""));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Your %s twitches%s."), await body_part(NOSE), sobj.blessed | 0 && !u.uedibility ? $c.lit(" then starts to tingle") : $c.lit(""));
             if (sobj.blessed | 0 && !u.uedibility) {
                 savebeginner = flags.beginner;
                 flags.beginner = FALSE;   /* prevent non-delivery of message */
@@ -620,12 +620,12 @@ export async function object_detect(detector, class_) {   // detect.c:603
         boulder = ROCK_CLASS;
     }
     if (Hallucination() || u.uprops[CONFUSION].intrinsic && class_ === SCROLL_CLASS) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(stuff, 0), c_common_strings.c_something, 256);
+        $c.strcpy(new $c.Ptr(stuff, 0), c_common_strings.c_something);
     } else {
-        $c.__builtin___strcpy_chk(new $c.Ptr(stuff, 0), class_ ? def_oc_syms[class_].name : $c.lit("objects"), 256);
+        $c.strcpy(new $c.Ptr(stuff, 0), class_ ? def_oc_syms[class_].name : $c.lit("objects"));
     }
     if (boulder && class_ !== ROCK_CLASS) {
-        $c.__builtin___strcat_chk(new $c.Ptr(stuff, 0), $c.lit(" and/or large stones"), 256);
+        $c.strcat(new $c.Ptr(stuff, 0), $c.lit(" and/or large stones"));
     }
     if (do_dknown) {
         for (obj = gi.invent; obj; obj = obj.nobj) {
@@ -1033,7 +1033,7 @@ export async function trap_detect(sobj) {   // detect.c:1011
         }
     }
     if (!found) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Your %s stop itching."), await makeplural(await body_part(TOE)));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Your %s stop itching."), await makeplural(await body_part(TOE)));
         await strange_feeling(sobj, new $c.Ptr(buf, 0));
         return 1;
     }
@@ -1700,28 +1700,28 @@ export async function findit() {   // detect.c:1792
         return 0;
     }
     /* _COUNT > 0 doesn't need to init tmp_at() */
-    $c.__builtin___memset_chk(found, 0, 12, 12);
+    $c.memset(found, 0, 12);
     await do_clear_area(u.ux, u.uy, BOLT_LIM, findone, found);
     /* count that controls "reveal" punctuation; 0..4 */
     k = (((!!found.num_sdoors ? 1 : 0) + (!!found.num_scorrs ? 1 : 0) | 0) + (!!found.num_traps ? 1 : 0) | 0) + (!!found.num_mons ? 1 : 0) | 0;
     buf[0] = 0;
     if (found.num_sdoors) {
         if (found.num_sdoors > 1) {
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%d secret doors"), found.num_sdoors);
+            $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("%d secret doors"), found.num_sdoors);
         } else {
-            $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit("a secret door"), 256);
+            $c.strcat(new $c.Ptr(buf, 0), $c.lit("a secret door"));
         }
         num = num + found.num_sdoors | 0;
     }
     /* note: non-\0 *buf implies that at least one previous type is present */
     if (found.num_scorrs) {
         if (new $c.Ptr(buf, 0).get(0)) {   /* "doors and corrs" or "doors, corrs ..." */
-            $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), k === 2 ? $c.lit(" and ") : $c.lit(", "), 256);
+            $c.strcat(new $c.Ptr(buf, 0), k === 2 ? $c.lit(" and ") : $c.lit(", "));
         }
         if (found.num_scorrs > 1) {
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%d secret corridors"), found.num_scorrs);
+            $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("%d secret corridors"), found.num_scorrs);
         } else {
-            $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit("a secret corridor"), 256);
+            $c.strcat(new $c.Ptr(buf, 0), $c.lit("a secret corridor"));
         }
         num = num + found.num_scorrs | 0;
     }
@@ -1729,24 +1729,24 @@ export async function findit() {   // detect.c:1792
         /* "doors, corrs, and traps" or "{doors|corrs} and traps"
          * or "..., traps ..." */
         if (new $c.Ptr(buf, 0).get(0)) {
-            $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), k === 3 && !found.num_mons ? $c.lit(", and ") : k === 2 ? $c.lit(" and ") : $c.lit(", "), 256);
+            $c.strcat(new $c.Ptr(buf, 0), k === 3 && !found.num_mons ? $c.lit(", and ") : k === 2 ? $c.lit(" and ") : $c.lit(", "));
         }
         if (found.num_traps > 1) {
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%d traps"), found.num_traps);
+            $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("%d traps"), found.num_traps);
         } else {
-            $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit("a trap"), 256);
+            $c.strcat(new $c.Ptr(buf, 0), $c.lit("a trap"));
         }
         num = num + found.num_traps | 0;
     }
     /* sdoors, scorrs, and traps call tmp_at() */
     if (found.num_mons) {
         if (new $c.Ptr(buf, 0).get(0)) {
-            $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), k > 2 ? $c.lit(", and ") : $c.lit(" and "), 256);
+            $c.strcat(new $c.Ptr(buf, 0), k > 2 ? $c.lit(", and ") : $c.lit(" and "));
         }
         if (found.num_mons > 1) {
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%d hidden monsters"), found.num_mons);
+            $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("%d hidden monsters"), found.num_mons);
         } else {
-            $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit("a hidden monster"), 256);
+            $c.strcat(new $c.Ptr(buf, 0), $c.lit("a hidden monster"));
         }
         num = num + found.num_mons | 0;
     }
@@ -1755,9 +1755,9 @@ export async function findit() {   // detect.c:1792
     }
     if (found.num_invis) {
         if (found.num_invis > 1) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%d%s unseen monsters"), found.num_invis, found.num_kept_invis ? $c.lit(" other") : $c.lit(""));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%d%s unseen monsters"), found.num_invis, found.num_kept_invis ? $c.lit(" other") : $c.lit(""));
         } else {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s unseen monster"), found.num_kept_invis ? $c.lit("another") : $c.lit("an"));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s unseen monster"), found.num_kept_invis ? $c.lit("another") : $c.lit("an"));
         }
         await You($c.lit("detect %s!"), new $c.Ptr(buf, 0));
         num = num + found.num_invis | 0;
@@ -2150,17 +2150,17 @@ export async function reveal_terrain(which_subset) {   // detect.c:2356
            cursor there, and after moving it anywhere '@' moves it back */
         await flush_screen(1);
         if (full) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("underlying terrain"), 256);
+            $c.strcpy(new $c.Ptr(buf, 0), $c.lit("underlying terrain"));
         } else {
-            $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("known terrain"), 256);
+            $c.strcpy(new $c.Ptr(buf, 0), $c.lit("known terrain"));
             if (keep_traps) {
-                $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%s traps"), keep_objs || keep_mons ? $c.lit(",") : $c.lit(" and"));
+                $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("%s traps"), keep_objs || keep_mons ? $c.lit(",") : $c.lit(" and"));
             }
             if (keep_objs) {
-                $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%s%s objects"), keep_traps || keep_mons ? $c.lit(",") : $c.lit(""), keep_mons ? $c.lit("") : $c.lit(" and"));
+                $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("%s%s objects"), keep_traps || keep_mons ? $c.lit(",") : $c.lit(""), keep_mons ? $c.lit("") : $c.lit(" and"));
             }
             if (keep_mons) {
-                $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%s and monsters"), keep_traps || keep_objs ? $c.lit(",") : $c.lit(""));
+                $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("%s and monsters"), keep_traps || keep_objs ? $c.lit(",") : $c.lit(""));
             }
         }
         await pline($c.lit("Showing %s only..."), new $c.Ptr(buf, 0));

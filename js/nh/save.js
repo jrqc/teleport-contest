@@ -224,7 +224,7 @@ export async function dosave0() {   // save.c:74
                 await close_nhfile(nhfp);
                 await delete_savefile();
                 if (!program_state.done_hup) {
-                    $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), new $c.Ptr(whynot, 0), 256);
+                    $c.strcpy(new $c.Ptr(svk.killer.name, 0), new $c.Ptr(whynot, 0));
                 }
                 if (!program_state.done_hup) {
                     await done(TRICKED);
@@ -349,7 +349,7 @@ export async function tricked_fileremoved(nhfp, whynot) {   // save.c:337
     if (!nhfp) {
         await pline1(whynot);
         await pline($c.lit("Probably someone removed it."));
-        $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), whynot, 256);
+        $c.strcpy(new $c.Ptr(svk.killer.name, 0), whynot);
         await done(TRICKED);
         return TRUE;
     }
@@ -387,7 +387,7 @@ export async function savestateinlock() {   // save.c:351
                 }
                 await sfi_int(nhfp, new $c.Ptr(hpid, 0), $c.lit("gamestate-hackpid"));
                 if (svh.hackpid !== hpid[0]) {
-                    $c.__builtin___sprintf_chk(new $c.Ptr(whynot, 0), 0, 256, $c.lit("Level #0 pid (%d) doesn't match ours (%d)!"), hpid[0], svh.hackpid);
+                    $c.sprintf(new $c.Ptr(whynot, 0), $c.lit("Level #0 pid (%d) doesn't match ours (%d)!"), hpid[0], svh.hackpid);
                     $goto = "giveup"; continue D1;
                 }
                 await close_nhfile(nhfp);
@@ -400,7 +400,7 @@ export async function savestateinlock() {   // save.c:351
                             await pline1(new $c.Ptr(whynot, 0));
                         case "giveup":
                             $goto = null;   // giveup:
-                            $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), new $c.Ptr(whynot, 0), 256);
+                            $c.strcpy(new $c.Ptr(svk.killer.name, 0), new $c.Ptr(whynot, 0));
                             /* done(TRICKED) will return when running in wizard mode;
                                clear the display-update-suppression flag before rather
                                than after so that screen updating behaves normally;
@@ -560,7 +560,7 @@ async function savelev_core(nhfp, lev$in) {   // save.c:452
         await clear_level_structures();
         gf.ftrap = null;
         gb.billobjs = null;
-        $c.__builtin___memset_chk($c.relem(svr.rooms, 0), 0, 18368, 18368);
+        $c.memset($c.relem(svr.rooms, 0), 0, 18368);
     }
     return;
 }
@@ -958,7 +958,7 @@ export async function store_plname_in_file(nhfp) {   // save.c:999
     let hero = new Int8Array(49), plsiztmp = Int32Array.of(0);
     /* [PL_NSIZ + 4*(1+3) + 1] */
     plsiztmp[0] = 49;
-    $c.__builtin___memset_chk(new $c.Ptr(hero, 0), 0, 49, 49);
+    $c.memset(new $c.Ptr(hero, 0), 0, 49);
     /* augment svp.plname[]; the gender and alignment values reflect those
        in effect at time of saving rather than at start of game */
     nh_snprintf($c.lit("store_plname_in_file"), 1010, new $c.Ptr(hero, 0), 49, $c.lit("%s-%.3s-%.3s-%.3s-%.3s"), new $c.Ptr(svp.plname, 0), gu.urole.filecode, gu.urace.filecode, genders[flags.female].filecode, aligns[1 - u.ualign.type | 0].filecode);

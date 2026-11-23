@@ -718,7 +718,7 @@ function copy2buff(top, n, buff) {   // lvm.c:631
     do {
         st = $h.u32[(top + -n * 16) >>> 2];
         l = $h.u8[st + 11] !== 255 ? $h.u8[st + 11] : $h.ldu64(st + 16);   /* length of string being copied */
-        $hl.__builtin___memcpy_chk(buff + $c.idx(tl), st + 24, $c.mulu64(l, 1), -1);
+        $hl.memcpy(buff + $c.idx(tl), st + 24, $c.mulu64(l, 1));
         tl = $c.addu64(tl, l);
     } while ((n = n - 1 | 0) > 0);
 }
@@ -2714,7 +2714,7 @@ export async function luaV_execute(L, ci) {   // lvm.c:1154
                                            these values (starting at 'ra + 4')
                                         */
                                         /* push function, state, and control variable */
-                                        $hl.__builtin___memcpy_chk(ra$76 + 64, ra$76, 48, -1);
+                                        $hl.memcpy(ra$76 + 64, ra$76, 48);
                                         $h.stp(L + 16, ra$76 + 64 + 48);
                                         $h.stp(ci + 32, pc), await luaD_call(L, ra$76 + 64, (i >>> 24 & 255) >>> 0 | 0), trap = $h.i32[(ci + 32 + 8) >>> 2];   /* do the call */
                                         {

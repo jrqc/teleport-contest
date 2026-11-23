@@ -107,7 +107,7 @@ export async function use_saddle(otmp) {   // steed.c:36
     if (touch_petrifies(ptr) && !$G.uarmg && !Stone_resistance()) {
         await You($c.lit("touch %s."), await mon_nam(mtmp));
         if (!(poly_when_stoned(gy.youmonst.data) && await polymon(PM.STONE_GOLEM))) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(kbuf, 0), 0, 256, $c.lit("attempting to saddle %s"), await an(pmname(mtmp.data, Mgender(mtmp))));
+            $c.sprintf(new $c.Ptr(kbuf, 0), $c.lit("attempting to saddle %s"), await an(pmname(mtmp.data, Mgender(mtmp))));
             await instapetrify(new $c.Ptr(kbuf, 0));
         }
     }
@@ -248,7 +248,7 @@ export async function mount_steed(mtmp, force) {   // steed.c:197
      */
     if (Wounded_legs()) {
         await legs_in_no_shape($c.lit("riding"), FALSE);
-        $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Heal your leg%s?"), $c.and64(u.uprops[WOUNDED_LEGS].intrinsic, BOTH_SIDES) === BOTH_SIDES ? $c.lit("s") : $c.lit(""));
+        $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("Heal your leg%s?"), $c.and64(u.uprops[WOUNDED_LEGS].intrinsic, BOTH_SIDES) === BOTH_SIDES ? $c.lit("s") : $c.lit(""));
         if (force && wizard() && await y_n(new $c.Ptr(qbuf, 0)) === 121) {
             await heal_legs(0);
         } else {
@@ -294,7 +294,7 @@ export async function mount_steed(mtmp, force) {   // steed.c:197
     ptr = mtmp.data;
     if (touch_petrifies(ptr) && !Stone_resistance()) {
         await You($c.lit("touch %s."), await mon_nam(mtmp));
-        $c.__builtin___sprintf_chk(new $c.Ptr(kbuf, 0), 0, 256, $c.lit("attempting to ride %s"), await an(pmname(mtmp.data, Mgender(mtmp))));
+        $c.sprintf(new $c.Ptr(kbuf, 0), $c.lit("attempting to ride %s"), await an(pmname(mtmp.data, Mgender(mtmp))));
         await instapetrify(new $c.Ptr(kbuf, 0));
     }
     if (!mtmp.mtame || mtmp.isminion | 0) {
@@ -338,7 +338,7 @@ export async function mount_steed(mtmp, force) {   // steed.c:197
             return FALSE;
         }
         await You($c.lit("slip while trying to get on %s."), await mon_nam(mtmp));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("slipped while mounting %s"), await x_monnam(mtmp, ARTICLE.A, null, SUPPRESS.IT | SUPPRESS.INVISIBLE | SUPPRESS.HALLUCINATION, TRUE));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("slipped while mounting %s"), await x_monnam(mtmp, ARTICLE.A, null, SUPPRESS.IT | SUPPRESS.INVISIBLE | SUPPRESS.HALLUCINATION, TRUE));
         /* "a saddled mumak" or "a saddled pony called Dobbin" */
         await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32((rn2(5) + 10 | 0) + 1 | 0, 2) : rn2(5) + 10 | 0, new $c.Ptr(buf, 0), NO_KILLER_PREFIX);
         return FALSE;
@@ -395,7 +395,7 @@ export async function kick_steed() {   // steed.c:402
         /* We assume a message has just been output of the form
          * "You kick <steed>."
          */
-        $c.__builtin___strcpy_chk(new $c.Ptr(He, 0), genders[pronoun_gender(u.usteed, PRONOUN.HALLU)].he, 256);
+        $c.strcpy(new $c.Ptr(He, 0), genders[pronoun_gender(u.usteed, PRONOUN.HALLU)].he);
         $t1 = highc(new $c.Ptr(He, 0).get(0)), new $c.Ptr(He, 0).set(0, $t1);
         if ((u.usteed.mcanmove | 0 || u.usteed.mfrozen | 0) && !rn2(2)) {
             if (u.usteed.mcanmove) {
@@ -446,7 +446,7 @@ async function landing_spot(spot, reason, forceit) {   // steed.c:460
     /* landing position (we fill it in) */
     /* 8: the 8 spots adjacent to the hero's spot */
     min_distance = -1;
-    $c.__builtin___memset_chk($c.relem(try_, 0), 0, 32, 32);
+    $c.memset($c.relem(try_, 0), 0, 32);
     n = 0;
     j = xytodir(u.dx, u.dy);
     if (reason === DISMOUNT.KNOCKED && j !== DIR.ERR) {
@@ -808,7 +808,7 @@ export async function poly_steed(steed, oldshape) {   // steed.c:852
            before newcham() calls us */
         await dismount_steed(DISMOUNT.FELL);
     } else {
-        $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await x_monnam(steed, ARTICLE.YOUR, null, SUPPRESS.SADDLE, FALSE), 256);
+        $c.strcpy(new $c.Ptr(buf, 0), await x_monnam(steed, ARTICLE.YOUR, null, SUPPRESS.SADDLE, FALSE));
         if (!$c.peq(oldshape, steed.data)) {
             strsubst(new $c.Ptr(buf, 0), $c.lit("your "), $c.lit("your new "));
         }

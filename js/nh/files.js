@@ -110,7 +110,7 @@ export function nh_basename(fname, keep_suffix) {   // files.c:199
            if "name" part of "name.suffix" is too long for 'basebuf[]',
            just return that as-is without stripping off ".suffix" */
         if (ln < 80) {
-            $c.__builtin___strncpy_chk(new $c.Ptr(nh_basename$basebuf, 0), fname, ln, 80);
+            $c.strncpy(new $c.Ptr(nh_basename$basebuf, 0), fname, ln);
             nh_basename$basebuf[$c.idx(ln)] = 0;
             fname = new $c.Ptr(nh_basename$basebuf, 0);
         }
@@ -153,7 +153,7 @@ export function fname_encode(legal, quotechar, s, callerbuf, bufsz) {   // files
             return callerbuf;
         }
         if (sp.get(0) === quotechar) {
-            $c.__builtin___sprintf_chk(op, 0, -1, $c.lit("%c%02X"), quotechar, sp.get(0));
+            $c.sprintf(op, $c.lit("%c%02X"), quotechar, sp.get(0));
             op = op.add(3);
             cnt = cnt + 3 | 0;
         } else if ($c.strchr(legal, sp.get(0)) !== null || $c.strchr(new $c.Ptr(fname_encode$hexdigits, 0), sp.get(0)) !== null) {
@@ -161,7 +161,7 @@ export function fname_encode(legal, quotechar, s, callerbuf, bufsz) {   // files
             op.set(0, 0);
             cnt = cnt + 1 | 0;
         } else {
-            $c.__builtin___sprintf_chk(op, 0, -1, $c.lit("%c%02X"), quotechar, sp.get(0));
+            $c.sprintf(op, $c.lit("%c%02X"), quotechar, sp.get(0));
             op = op.add(3);
             cnt = cnt + 3 | 0;
         }
@@ -278,7 +278,7 @@ export async function init_nhfile(nhfp) {   // files.c:461
 async function new_nhfile() {   // files.c:496
     let nhfp = null;
     nhfp = $c.asRec(await alloc(88), $T.nh_file, 88);
-    $c.__builtin___memset_chk(nhfp, 0, 88, -1);
+    $c.memset(nhfp, 0, 88);
     await init_nhfile(nhfp);
     return nhfp;
 }
@@ -367,7 +367,7 @@ export function set_levelfile_name(file, lev) {   // files.c:606
     if (!tf) {
         tf = eos(file);
     }
-    $c.__builtin___sprintf_chk(tf, 0, -1, $c.lit(".%d"), lev);
+    $c.sprintf(tf, $c.lit(".%d"), lev);
     return;
 }
 export async function create_levelfile(lev, errbuf) {   // files.c:621
@@ -398,7 +398,7 @@ export async function create_levelfile(lev, errbuf) {   // files.c:621
         if (nhfp.fd >= 0) {
             svl.level_info[lev].flags = $c.u8(svl.level_info[lev].flags | LFILE_EXISTS);
         } else if (errbuf) {   /* failure explanation */
-            $c.__builtin___sprintf_chk(errbuf, 0, -1, $c.lit("Cannot create file \"%s\" for level %d (errno %d)."), new $c.Ptr(gl.lock, 0), lev, $c.__error().get(0));
+            $c.sprintf(errbuf, $c.lit("Cannot create file \"%s\" for level %d (errno %d)."), new $c.Ptr(gl.lock, 0), lev, $c.__error().get(0));
         }
     }
     nhfp = await viable_nhfile(nhfp);
@@ -431,7 +431,7 @@ export async function open_levelfile(lev, errbuf) {   // files.c:673
            settle for `lock' instead of `fq_lock' because the latter
            might end up being too big for nethack's BUFSZ */
         if (nhfp.fd < 0 && errbuf) {
-            $c.__builtin___sprintf_chk(errbuf, 0, -1, $c.lit("Cannot open file \"%s\" for level %d (errno %d)."), new $c.Ptr(gl.lock, 0), lev, $c.__error().get(0));
+            $c.sprintf(errbuf, $c.lit("Cannot open file \"%s\" for level %d (errno %d)."), new $c.Ptr(gl.lock, 0), lev, $c.__error().get(0));
         }
     }
     nhfp = await viable_nhfile(nhfp);
@@ -485,20 +485,20 @@ function set_bonesfile_name(file, lev) {   // files.c:769
      * to manually move a bones file from one pool to another by
      * renaming it.
      */
-    $c.__builtin___strcpy_chk(file, $c.lit("bon"), -1);
+    $c.strcpy(file, $c.lit("bon"));
     if (sysopt.bones_pools > 1) {
         poolnum = sysopt.bones_pools >>> 0 < 10 ? sysopt.bones_pools >>> 0 : 10;
         poolnum = $c.remu32($c.u32($G.ubirthday), poolnum);   /* 0..9 */
-        $c.__builtin___sprintf_chk(eos(file), 0, -1, $c.lit("%u"), poolnum);
+        $c.sprintf(eos(file), $c.lit("%u"), poolnum);
     }
     dptr = eos(file);
     /* when this naming scheme was adopted, 'filecode' was one letter;
        3.3.0 turned it into a three letter string for quest levels */
-    $c.__builtin___sprintf_chk(dptr, 0, -1, $c.lit("%c%s"), svd.dungeons[lev.dnum].boneid, In_quest(lev) ? gu.urole.filecode : $c.lit("0"));
+    $c.sprintf(dptr, $c.lit("%c%s"), svd.dungeons[lev.dnum].boneid, In_quest(lev) ? gu.urole.filecode : $c.lit("0"));
     if ((sptr = Is_special(lev)) !== null) {
-        $c.__builtin___sprintf_chk(eos(dptr), 0, -1, $c.lit(".%c"), sptr.boneid);
+        $c.sprintf(eos(dptr), $c.lit(".%c"), sptr.boneid);
     } else {
-        $c.__builtin___sprintf_chk(eos(dptr), 0, -1, $c.lit(".%d"), lev.dlevel);
+        $c.sprintf(eos(dptr), $c.lit(".%d"), lev.dlevel);
     }
     return dptr;
 }
@@ -514,7 +514,7 @@ function set_bonestemp_name() {   // files.c:818
     if (!tf) {
         tf = eos(new $c.Ptr(gl.lock, 0));
     }
-    $c.__builtin___sprintf_chk(tf, 0, -1, $c.lit(".bn"));
+    $c.sprintf(tf, $c.lit(".bn"));
     return new $c.Ptr(gl.lock, 0);
 }
 export async function create_bonesfile(lev, bonesid, errbuf) {   // files.c:833
@@ -557,7 +557,7 @@ export async function create_bonesfile(lev, bonesid, errbuf) {   // files.c:833
             }
         }
         if (failed && errbuf) {   /* failure explanation */
-            $c.__builtin___sprintf_chk(errbuf, 0, -1, $c.lit("Cannot create bones \"%s\", id %s (errno %d)."), new $c.Ptr(gl.lock, 0), bonesid.get(0), $c.__error().get(0));
+            $c.sprintf(errbuf, $c.lit("Cannot create bones \"%s\", id %s (errno %d)."), new $c.Ptr(gl.lock, 0), bonesid.get(0), $c.__error().get(0));
         }
     }
     /*
@@ -641,7 +641,7 @@ export function set_savefile_name(regularize_it) {   // files.c:1020
     postappend = null;
     sfindicator = null;
     /* skip '*' wildcard character */
-    $c.__builtin___sprintf_chk(new $c.Ptr(gs.SAVEF, 0), 0, 54, $c.lit("save/%d%s"), $c.getuid() | 0, new $c.Ptr(svp.plname, 0));
+    $c.sprintf(new $c.Ptr(gs.SAVEF, 0), $c.lit("save/%d%s"), $c.getuid() | 0, new $c.Ptr(svp.plname, 0));
     regoffset = 5;
     indicator_spot = 2;
     /* svp.plname has to share space with gs.SAVEP and ".sav" */
@@ -651,7 +651,7 @@ export function set_savefile_name(regularize_it) {   // files.c:1020
     }
     if (indicator_spot === 1 && sfindicator && !overflow) {
         if ($c.addu64($c.strlen(new $c.Ptr(gs.SAVEF, 0)), $c.strlen(sfindicator)) < 53) {
-            $c.__builtin___strcat_chk(new $c.Ptr(gs.SAVEF, 0), sfindicator, 54);
+            $c.strcat(new $c.Ptr(gs.SAVEF, 0), sfindicator);
         } else {
             overflow = 2;
         }
@@ -661,21 +661,21 @@ export function set_savefile_name(regularize_it) {   // files.c:1020
        FALSE at compile-time). Done to appease clang's -Wunreachable-code */
     if ($c.strlen($c.lit("")) > 0 && !overflow) {
         if ($c.addu64($c.strlen(new $c.Ptr(gs.SAVEF, 0)), $c.strlen($c.lit(""))) < 53) {
-            $c.__builtin___strcat_chk(new $c.Ptr(gs.SAVEF, 0), $c.lit(""), 54);
+            $c.strcat(new $c.Ptr(gs.SAVEF, 0), $c.lit(""));
         } else {
             overflow = 3;
         }
     }
     if (indicator_spot === 2 && sfindicator && !overflow) {
         if ($c.addu64($c.strlen(new $c.Ptr(gs.SAVEF, 0)), $c.strlen(sfindicator)) < 53) {
-            $c.__builtin___strcat_chk(new $c.Ptr(gs.SAVEF, 0), sfindicator, 54);
+            $c.strcat(new $c.Ptr(gs.SAVEF, 0), sfindicator);
         } else {
             overflow = 4;
         }
     }
     if (postappend && !overflow) {
         if ($c.addu64($c.strlen(new $c.Ptr(gs.SAVEF, 0)), $c.strlen(postappend)) < 53) {
-            $c.__builtin___strcat_chk(new $c.Ptr(gs.SAVEF, 0), postappend, 54);
+            $c.strcat(new $c.Ptr(gs.SAVEF, 0), postappend);
         } else {
             overflow = 5;
         }
@@ -686,7 +686,7 @@ export async function save_savefile_name(nhfp) {   // files.c:1128
 }
 /* change pre-existing savefile name to indicate an error savefile */
 export function set_error_savefile() {   // files.c:1137
-    $c.__builtin___strcat_chk(new $c.Ptr(gs.SAVEF, 0), $c.lit(".e"), 54);
+    $c.strcat(new $c.Ptr(gs.SAVEF, 0), $c.lit(".e"));
 }
 /* create save file, overwriting one if it already exists */
 export async function create_savefile() {   // files.c:1159
@@ -804,8 +804,8 @@ export async function check_panic_save() {   // files.c:1312
      */
     ln = $c.u32($c.addu64($c.strlen(savef), $c.strlen($c.lit(".Z"))));
     cfn = $c.asArr(await alloc(ln + 1 >>> 0), Int8Array);
-    $c.__builtin___strcpy_chk(cfn, savef, -1);
-    $c.__builtin___strcat_chk(cfn, $c.lit(".Z"), -1);
+    $c.strcpy(cfn, savef);
+    $c.strcat(cfn, $c.lit(".Z"));
     if (!$c.peq(cf = $c.fopen(cfn, $c.lit("r")), $c.asRec(null, $T.__sFILE, 152))) {
         $c.fclose(cf);
         result = 1;
@@ -827,7 +827,7 @@ export async function plname_from_file(filename, without_wait_synch_per_file) { 
     let nhfp = null, ln = 0, result = null, sfstatus = 0, sln = 0, xln = 0;
     result = null;
     sfstatus = 0;
-    $c.__builtin___strcpy_chk(new $c.Ptr(gs.SAVEF, 0), filename, 54);
+    $c.strcpy(new $c.Ptr(gs.SAVEF, 0), filename);
     {
         /* if COMPRESS_EXTENSION is present, strip it off */
         sln = $c.i32($c.strlen(new $c.Ptr(gs.SAVEF, 0)));
@@ -842,7 +842,7 @@ export async function plname_from_file(filename, without_wait_synch_per_file) { 
             /* room for "name+role+race+gend+algn X" where the space before
                X is actually NUL and X is playmode: one of '-', 'X', or 'D' */
             ln = PL_NSIZ_PLUS;
-            result = $c.asArr($c.__builtin___memset_chk(await alloc(ln), 0, ln, -1), Int8Array);
+            result = $c.asArr($c.memset(await alloc(ln), 0, ln), Int8Array);
             await get_plname_from_file(nhfp, result, 0);
         }
         await close_nhfile(nhfp);
@@ -876,7 +876,7 @@ export async function get_saved_games() {   // files.c:1399
                 return null;
             }
             result = $c.asArr(await alloc($c.u32($c.mulu64($c.u64(n + 1 | 0), 8))), 'ptr');   /* at most */
-            $c.__builtin___memset_chk(result, 0, $c.mulu64($c.u64(n + 1 | 0), 8), -1);
+            $c.memset(result, 0, $c.mulu64($c.u64(n + 1 | 0), 8));
             for (i = 0, j = 0; i < n; i = i + 1 | 0) {
                 /* more than PL_NSIZ+1 */
                 entry = $c.readdir(dir);
@@ -885,7 +885,7 @@ export async function get_saved_games() {   // files.c:1399
                 }
                 if ($c.sscanf(new $c.Ptr(entry.d_name, 0), $c.lit("%d%63s"), new $c.Ptr(uid, 0), new $c.Ptr(name, 0)) === 2) {
                     if (uid[0] === myuid) {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(filename, 0), 0, 256, $c.lit("save/%d%s"), uid[0], new $c.Ptr(name, 0));
+                        $c.sprintf(new $c.Ptr(filename, 0), $c.lit("save/%d%s"), uid[0], new $c.Ptr(name, 0));
                         r = await plname_from_file(new $c.Ptr(filename, 0), 0);
                         if (r) {
                             result.set(($t1 = j, j = $t1 + 1 | 0, $t1), r);
@@ -1030,8 +1030,8 @@ async function make_converted_name(filename) {   // files.c:2090
     xtra = $c.lit(".exportascii");
     ln = ln + $c.u32($c.strlen(xtra)) >>> 0;
     converted_filename = $c.asArr(await alloc(ln + 1 >>> 0), Int8Array);
-    $c.__builtin___strcpy_chk(converted_filename, unconverted_filename, -1);
-    $c.__builtin___strcat_chk(converted_filename, xtra, -1);
+    $c.strcpy(converted_filename, unconverted_filename);
+    $c.strcat(converted_filename, xtra);
     return 1;
 }
 /* delete converted savefile as a normal course of action */
@@ -1144,7 +1144,7 @@ async function fopen_wizkit_file() {   // files.c:2465
     let fp = null, tmp_wizkit = new Int8Array(256), envp = null;
     envp = nh_getenv($c.lit("WIZKIT"));
     if (envp && envp.get(0)) {
-        $c.__builtin___strncpy_chk(new $c.Ptr(gw.wizkit, 0), envp, WIZKIT_MAX - 1, 128);
+        $c.strncpy(new $c.Ptr(gw.wizkit, 0), envp, WIZKIT_MAX - 1);
     }
     if (!gw.wizkit[0]) {
         return null;
@@ -1169,9 +1169,9 @@ async function fopen_wizkit_file() {   // files.c:2465
     /* should be only UNIX left */
     envp = nh_getenv($c.lit("HOME"));
     if (envp) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(tmp_wizkit, 0), 0, 256, $c.lit("%s/%s"), envp, new $c.Ptr(gw.wizkit, 0));
+        $c.sprintf(new $c.Ptr(tmp_wizkit, 0), $c.lit("%s/%s"), envp, new $c.Ptr(gw.wizkit, 0));
     } else {
-        $c.__builtin___strcpy_chk(new $c.Ptr(tmp_wizkit, 0), new $c.Ptr(gw.wizkit, 0), 256);
+        $c.strcpy(new $c.Ptr(tmp_wizkit, 0), new $c.Ptr(gw.wizkit, 0));
     }
     if ((fp = $c.fopen(new $c.Ptr(tmp_wizkit, 0), $c.lit("r"))) !== null) {
         return fp;
@@ -1346,9 +1346,9 @@ export function testinglog(filenm, type, reason) {   // files.c:2836
     if (!filenm) {
         return;
     }
-    $c.__builtin___strcpy_chk(new $c.Ptr(fnbuf, 0), filenm, 256);
+    $c.strcpy(new $c.Ptr(fnbuf, 0), filenm);
     if ($c.strchr(new $c.Ptr(fnbuf, 0), 46) === null) {
-        $c.__builtin___strcat_chk(new $c.Ptr(fnbuf, 0), $c.lit(".log"), 256);
+        $c.strcat(new $c.Ptr(fnbuf, 0), $c.lit(".log"));
     }
     lfile = fopen_datafile(new $c.Ptr(fnbuf, 0), $c.lit("a"), TROUBLEPREFIX);
     if (lfile) {
@@ -1515,7 +1515,7 @@ export async function reveal_paths(code) {   // files.c:3175
     buf[0] = 0;
     if ((envp = nh_getenv($c.lit("HOME"))) !== null) {
         copynchars(new $c.Ptr(buf, 0), envp, 254);
-        $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit("/"), 256);
+        $c.strcat(new $c.Ptr(buf, 0), $c.lit("/"));
     }
     endp = eos(new $c.Ptr(buf, 0));
     copynchars(endp, get_default_configfile(), $c.i32($c.subu64(255, $c.strlen(new $c.Ptr(buf, 0)))));
@@ -1721,7 +1721,7 @@ export async function read_tribute(tribsection, tribtitle, tribpassage, nowin_bu
                             /* outputting multi-line passage to text window */
                             await putstr()(tribwin, 0, new $c.Ptr(line, 0));
                             if (new $c.Ptr(line, 0).get(0)) {
-                                $c.__builtin___strcpy_chk(new $c.Ptr(lastline, 0), new $c.Ptr(line, 0), 256);
+                                $c.strcpy(new $c.Ptr(lastline, 0), new $c.Ptr(line, 0));
                             }
                         } else {
                             /* fetching one-line passage into buffer */
@@ -1750,10 +1750,10 @@ export async function read_tribute(tribsection, tribtitle, tribpassage, nowin_bu
                     mungspaces(new $c.Ptr(lastline, 0));   /* to remove leading spaces */
                 } else {
                     /* construct one if necessary */
-                    $c.__builtin___sprintf_chk(new $c.Ptr(lastline, 0), 0, 256, $c.lit("[%s, by Terry Pratchett]"), tribtitle);
+                    $c.sprintf(new $c.Ptr(lastline, 0), $c.lit("[%s, by Terry Pratchett]"), tribtitle);
                 }
                 if ((p = $c.strrchr(new $c.Ptr(lastline, 0), 93)) !== null) {
-                    $c.__builtin___sprintf_chk(p, 0, -1, $c.lit("; passage #%d]"), targetpassage);
+                    $c.sprintf(p, $c.lit("; passage #%d]"), targetpassage);
                 }
                 await putmsghistory()(new $c.Ptr(lastline, 0), 0);
                 grasped = 1;

@@ -137,7 +137,7 @@ export function rn2(x) {   // rnd.c:199
     let result = 0, buf = new Int8Array(32);
     result = RND(x);
     if (rng_logfile) {
-        $c.__builtin___snprintf_chk(new $c.Ptr(buf, 0), 32, 0, 32, $c.lit("%d"), x);
+        $c.snprintf(new $c.Ptr(buf, 0), 32, $c.lit("%d"), x);
         rng_log_write($c.lit("rn2"), new $c.Ptr(buf, 0), result);
     }
     return result;
@@ -176,7 +176,7 @@ export function rnl(x) {   // rnd.c:220
         }
     }
     if (rng_logfile) {
-        $c.__builtin___snprintf_chk(new $c.Ptr(buf, 0), 32, 0, 32, $c.lit("%d"), x);
+        $c.snprintf(new $c.Ptr(buf, 0), 32, $c.lit("%d"), x);
         rng_log_write($c.lit("rnl"), new $c.Ptr(buf, 0), i);
     }
     return i;
@@ -186,7 +186,7 @@ export function rnd(x) {   // rnd.c:270
     let result = 0, buf = new Int8Array(32);
     result = RND(x) + 1 | 0;
     if (rng_logfile) {
-        $c.__builtin___snprintf_chk(new $c.Ptr(buf, 0), 32, 0, 32, $c.lit("%d"), x);
+        $c.snprintf(new $c.Ptr(buf, 0), 32, $c.lit("%d"), x);
         rng_log_write($c.lit("rnd"), new $c.Ptr(buf, 0), result);
     }
     return result;
@@ -203,7 +203,7 @@ export function d(n, x) {   // rnd.c:296
         tmp = tmp + RND(x) | 0;
     }
     if (rng_logfile) {
-        $c.__builtin___snprintf_chk(new $c.Ptr(buf, 0), 64, 0, 64, $c.lit("%d,%d"), orig_n, x);
+        $c.snprintf(new $c.Ptr(buf, 0), 64, $c.lit("%d,%d"), orig_n, x);
         rng_log_write($c.lit("d"), new $c.Ptr(buf, 0), tmp);
     }
     return tmp;   /* Alea iacta est. -- J.C. */
@@ -219,7 +219,7 @@ export function rne(x) {   // rnd.c:319
         tmp = tmp + 1 | 0;
     }
     if (rng_logfile) {
-        $c.__builtin___snprintf_chk(new $c.Ptr(buf, 0), 32, 0, 32, $c.lit("%d"), x);
+        $c.snprintf(new $c.Ptr(buf, 0), 32, $c.lit("%d"), x);
         rng_log_write($c.lit("rne"), new $c.Ptr(buf, 0), tmp);
     }
     return tmp;
@@ -249,7 +249,7 @@ export function rnz(i) {   // rnd.c:348
         x = $c.div64(x, tmp);
     }
     if (rng_logfile) {
-        $c.__builtin___snprintf_chk(new $c.Ptr(buf, 0), 32, 0, 32, $c.lit("%d"), i);
+        $c.snprintf(new $c.Ptr(buf, 0), 32, $c.lit("%d"), i);
         rng_log_write($c.lit("rnz"), new $c.Ptr(buf, 0), $c.i32(x));
     }
     return $c.i32(x);

@@ -181,9 +181,9 @@ export async function boulder_hits_pool(otmp, rx, ry, pushing) {   // do.c:50
             await bury_objs(rx, ry);
             await newsym(rx, ry);
             if (pushing) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(whobuf, 0), $c.lit("you"), 256);
+                $c.strcpy(new $c.Ptr(whobuf, 0), $c.lit("you"));
                 if (u.usteed) {
-                    $c.__builtin___strcpy_chk(new $c.Ptr(whobuf, 0), await y_monnam(u.usteed), 256);
+                    $c.strcpy(new $c.Ptr(whobuf, 0), await y_monnam(u.usteed));
                 }
                 await pline($c.lit("%s %s %s into the %s."), upstart(new $c.Ptr(whobuf, 0)), await vtense(new $c.Ptr(whobuf, 0), $c.lit("push")), await the(await xname(otmp)), what);
                 if (flags.verbose && !Blind()) {
@@ -759,7 +759,7 @@ async function drop(obj) {   // do.c:714
             mnam_p = await mon_nam(u.ustuck);
             /* doname can call s_suffix, reusing its buffer */
             if (dmgtype_fromattack(u.ustuck.data, AD.DGST, AT.ENGL) !== null) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(monbuf, 0), 0, 256, $c.lit("%s %s"), s_suffix(mnam_p), await mbodypart(u.ustuck, STOMACH));
+                $c.sprintf(new $c.Ptr(monbuf, 0), $c.lit("%s %s"), s_suffix(mnam_p), await mbodypart(u.ustuck, STOMACH));
                 mnam_p = new $c.Ptr(monbuf, 0);
             }
             onam_p = is_unpaid(obj) ? await yobjnam(obj, null) : await doname(obj);
@@ -1231,7 +1231,7 @@ export async function dodown() {   // do.c:1131
         actn = u_locomotion($c.lit("jump"));
         if (gy.youmonst.data.msize >= MZ.HUGE) {
             await You($c.lit("don't fit %s easily."), down_or_thru);
-            $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Try to squeeze %s?"), down_or_thru);
+            $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("Try to squeeze %s?"), down_or_thru);
             if (await y_n(new $c.Ptr(qbuf, 0)) === 121) {
                 if (!rn2(3)) {
                     actn = $c.lit("manage to squeeze");
@@ -1393,7 +1393,7 @@ async function familiar_level_msg() {   // do.c:1448
         mesg = familiar_level_msg$fam_msgs[which];
     }
     if (mesg && $c.strchr(mesg, 37)) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, mesg, !((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) ? $c.lit("looks") : $c.lit("seems"));
+        $c.sprintf(new $c.Ptr(buf, 0), mesg, !((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) ? $c.lit("looks") : $c.lit("seems"));
         mesg = new $c.Ptr(buf, 0);
     }
     if (mesg) {
@@ -1611,8 +1611,8 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
     stairway_free_all();
     /* set default level change destination areas */
     /* the special level code may override these */
-    $c.__builtin___memset_chk(svu.updest, 0, 16, 16);
-    $c.__builtin___memset_chk(svd.dndest, 0, 16, 998);
+    $c.memset(svu.updest, 0, 16);
+    $c.memset(svd.dndest, 0, 16);
     if (!(svl.level_info[new_ledger].flags & LFILE_EXISTS)) {
         /* entering this level for first time; make it now */
         if (svl.level_info[new_ledger].flags & VISITED) {
@@ -2002,7 +2002,7 @@ export async function revive_corpse(corpse) {   // do.c:2111
     is_zomb = $c.i8(mons[montype].mlet === S.ZOMBIE || where === OBJ.BURIED && is_reviver($c.relem(mons, montype)) ? 1 : 0);
     is_uwep = $c.i8($c.peq(corpse, $G.uwep) ? 1 : 0);
     chewed = $c.i8(corpse.oeaten !== 0 ? 1 : 0);
-    $c.__builtin___strcpy_chk(new $c.Ptr(cname, 0), await corpse_xname(corpse, chewed ? $c.lit("bite-covered") : null, CXN.SINGULAR), 256);
+    $c.strcpy(new $c.Ptr(cname, 0), await corpse_xname(corpse, chewed ? $c.lit("bite-covered") : null, CXN.SINGULAR));
     mcarry = where === OBJ.MINVENT ? corpse.v.v_ocarry : null;
     /* mcarry is NULL for (where == OBJ_BURIED and OBJ_CONTAINED) now */
     get_obj_location(corpse, new $c.Ptr(corpsex, 0), new $c.Ptr(corpsey, 0), CONTAINED_TOO | BURIED_TOO);
@@ -2062,10 +2062,10 @@ export async function revive_corpse(corpse) {   // do.c:2111
                     } else if (mcarry && canseemon(mcarry)) {
                         await pline($c.lit("%s writhes out of %s!"), mnam, await yname(container));
                     } else if (container_where[0] === OBJ.INVENT) {
-                        $c.__builtin___strcpy_chk(new $c.Ptr(sackname, 0), await an(await xname(container)), 256);
+                        $c.strcpy(new $c.Ptr(sackname, 0), await an(await xname(container)));
                         await pline($c.lit("%s %s out of %s in your pack!"), mnam, locomotion(mtmp.data, $c.lit("writhes")), new $c.Ptr(sackname, 0));
                     } else if (container_where[0] === OBJ.FLOOR && cansee(corpsex[0], corpsey[0])) {
-                        $c.__builtin___strcpy_chk(new $c.Ptr(sackname, 0), await an(await xname(container)), 256);
+                        $c.strcpy(new $c.Ptr(sackname, 0), await an(await xname(container)));
                         await pline($c.lit("%s escapes from %s!"), mnam, new $c.Ptr(sackname, 0));
                     }
                     break;
@@ -2166,7 +2166,7 @@ export async function cmd_safety_prevention(ucverb, cmddesc, act, flagcounter) {
     if (flags.safe_wait && !iflags.menu_requested && !gm.multi) {
         buf[0] = 0;
         if (iflags.cmdassist || !($t1 = flagcounter.get(0), flagcounter.set(0, $t1 + 1 | 0), $t1)) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 128, $c.lit("  Use '%s' prefix to force %s."), visctrl(cmd_from_func(do_reqmenu)), cmddesc);
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("  Use '%s' prefix to force %s."), visctrl(cmd_from_func(do_reqmenu)), cmddesc);
         }
         if (monster_nearby()) {
             await Norep($c.lit("%s%s"), act, new $c.Ptr(buf, 0));
@@ -2216,7 +2216,7 @@ async function wipeoff() {   // do.c:2361
 /* the #wipe command - wipe off your face */
 export async function dowipe() {   // do.c:2390
     if (u.ucreamed) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(dowipe$buf, 0), 0, 39, $c.lit("wiping off your %s"), await body_part(FACE));
+        $c.sprintf(new $c.Ptr(dowipe$buf, 0), $c.lit("wiping off your %s"), await body_part(FACE));
         set_occupation(wipeoff, new $c.Ptr(dowipe$buf, 0), 0);
         /* Not totally correct; what if they change back after now
          * but before they're finished wiping?

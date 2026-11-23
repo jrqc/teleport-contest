@@ -21,7 +21,7 @@ export async function strbuf_append(strbuf, str) {   // strutil.c:17
     let len = 0;
     len = $c.i32($c.strlen(str)) + 1 | 0;
     await strbuf_reserve(strbuf, len + (strbuf.str ? $c.i32($c.strlen(strbuf.str)) : 0) | 0);
-    $c.__builtin___strcat_chk(strbuf.str, str, -1);
+    $c.strcat(strbuf.str, str);
 }
 /* strbuf_reserve() ensure strbuf->str has storage for len characters */
 export async function strbuf_reserve(strbuf, len) {   // strutil.c:28
@@ -35,7 +35,7 @@ export async function strbuf_reserve(strbuf, len) {   // strutil.c:28
         oldbuf = strbuf.str;
         strbuf.len = len + 256 | 0;
         $t1 = $c.asArr(await alloc(strbuf.len >>> 0), Int8Array), strbuf.str = $t1;
-        $c.__builtin___strcpy_chk(strbuf.str, oldbuf, -1);
+        $c.strcpy(strbuf.str, oldbuf);
         if (!$c.peq(oldbuf, new $c.Ptr(strbuf.buf, 0))) {
             $c.free(oldbuf);
         }

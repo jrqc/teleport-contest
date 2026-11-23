@@ -792,11 +792,11 @@ export async function dipsink(obj) {   // fountain.c:716
 export async function sink_backs_up(x, y) {   // fountain.c:805
     let buf = new Int8Array(256);
     if (!Blind()) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("Muddy waste pops up from the drain"), 256);
+        $c.strcpy(new $c.Ptr(buf, 0), $c.lit("Muddy waste pops up from the drain"));
     } else if (!Deaf()) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("You hear a sloshing sound"), 256);   /* Deaf-aware */
+        $c.strcpy(new $c.Ptr(buf, 0), $c.lit("You hear a sloshing sound"));   /* Deaf-aware */
     } else {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Something splashes you in the %s"), await body_part(FACE));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Something splashes you in the %s"), await body_part(FACE));
     }
     await pline($c.lit("%s%s."), !Deaf() ? $c.lit("Flupp!  ") : $c.lit(""), new $c.Ptr(buf, 0));
     if (!((svl.level.locations[x][y].flags | 0) & S.LRING)) {

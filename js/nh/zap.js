@@ -439,7 +439,7 @@ export async function bhitm(mtmp, otmp) {   // zap.c:160
                     await seemimic(mtmp);
                 }
                 /* format monster's name before altering its visibility */
-                $c.__builtin___strcpy_chk(new $c.Ptr(nambuf, 0), await Monnam(mtmp), 256);
+                $c.strcpy(new $c.Ptr(nambuf, 0), await Monnam(mtmp));
                 await mon_set_minvis(mtmp, FALSE);
                 if (!oldinvis && knowninvisible(mtmp)) {
                     await pline($c.lit("%s turns transparent!"), new $c.Ptr(nambuf, 0));
@@ -503,10 +503,10 @@ export async function bhitm(mtmp, otmp) {   // zap.c:160
                     await abuse_dog(mtmp);
                 }
             } else if ((obj = await which_armor(mtmp, W.SADDLE)) !== null) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s %s"), s_suffix(await Monnam(mtmp)), await distant_name(obj, xname));
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s %s"), s_suffix(await Monnam(mtmp)), await distant_name(obj, xname));
                 if (cansee(mtmp.mx, mtmp.my)) {
                     if (!canspotmon(mtmp)) {
-                        $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await An(await distant_name(obj, xname)), 256);
+                        $c.strcpy(new $c.Ptr(buf, 0), await An(await distant_name(obj, xname)));
                     }
                     await pline($c.lit("%s falls to the %s."), new $c.Ptr(buf, 0), surface(mtmp.mx, mtmp.my));
                 } else if (canspotmon(mtmp)) {
@@ -689,9 +689,9 @@ export async function release_hold() {   // zap.c:578
         /* held but not swallowed */
         await unstuck(u.ustuck);
         if (!nohands(mtmp.data)) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(relbuf, 0), 0, 256, $c.lit("from %s grasp"), s_suffix(await mon_nam(mtmp)));
+            $c.sprintf(new $c.Ptr(relbuf, 0), $c.lit("from %s grasp"), s_suffix(await mon_nam(mtmp)));
         } else {
-            $c.__builtin___sprintf_chk(new $c.Ptr(relbuf, 0), 0, 256, $c.lit("by %s"), await mon_nam(mtmp));
+            $c.sprintf(new $c.Ptr(relbuf, 0), $c.lit("by %s"), await mon_nam(mtmp));
         }
         await You($c.lit("are released %s."), new $c.Ptr(relbuf, 0));
     }
@@ -1071,7 +1071,7 @@ export async function revive(corpse, by_hero) {   // zap.c:884
             shkp = await shop_keeper(in_rooms(x[0], y[0], SHOPBASE).get(0));
         }
         if (cansee(x[0], y[0])) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), one_of ? $c.lit("one of ") : $c.lit(""), 256);
+            $c.strcpy(new $c.Ptr(buf, 0), one_of ? $c.lit("one of ") : $c.lit(""));
             /* shk_your: "the " or "your " or "<mon>'s " or "<Shk>'s ".
                If the result is "Shk's " then it will be ambiguous:
                is Shk the mon carrying it, or does Shk's shop own it?
@@ -1080,7 +1080,7 @@ export async function revive(corpse, by_hero) {   // zap.c:884
             if (one_of) {
                 corpse.quan = $c.add64(corpse.quan, 1);   /* force plural */
             }
-            $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), await corpse_xname(corpse, null, CXN.NO_PFX), 256);
+            $c.strcat(new $c.Ptr(buf, 0), await corpse_xname(corpse, null, CXN.NO_PFX));
             if (one_of) {   /* could be simplified to ''corpse->quan = 1L;'' */
                 corpse.quan = $c.sub64(corpse.quan, 1);
             }
@@ -1199,10 +1199,10 @@ export async function unturn_dead(mon) {   // zap.c:1156
         }
         /* save the name; the object is liable to go away */
         if (youseeit) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(corpse, 0), await corpse_xname(otmp, null, CXN.NORMAL), 256);
+            $c.strcpy(new $c.Ptr(corpse, 0), await corpse_xname(otmp, null, CXN.NORMAL));
             /* shk_your/Shk_Your produces a value with a trailing space */
             if (otmp.quan > 1) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(owner, 0), $c.lit("One of "), 256);
+                $c.strcpy(new $c.Ptr(owner, 0), $c.lit("One of "));
                 await shk_your(eos(new $c.Ptr(owner, 0)), otmp);
             } else {
                 await Shk_Your(new $c.Ptr(owner, 0), otmp);
@@ -1225,7 +1225,7 @@ export async function unturn_dead(mon) {   // zap.c:1156
                    and owner names to say "It comes alive" [note: we did
                    earlier setup because corpse gets used up but need to
                    do the override here after revive() sets 'last_msg'] */
-                $c.__builtin___strcpy_chk(new $c.Ptr(corpse, 0), $c.lit("It"), 256);
+                $c.strcpy(new $c.Ptr(corpse, 0), $c.lit("It"));
                 owner[0] = 0;
             }
             if (youseeit) {
@@ -2591,7 +2591,7 @@ export async function dozap() {   // zap.c:2627
         /* make him pay for knowing !NODIR */
     } else if (need_dir && !u.dx && !u.dy && !u.dz) {
         if ((damage = await zapyourself(obj, TRUE)) !== 0) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("zapped %sself with %s"), genders[flags.female ? 1 : 0].him, await killer_xname(obj));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("zapped %sself with %s"), genders[flags.female ? 1 : 0].him, await killer_xname(obj));
             await losehp(Maybe_Half_Phys(damage), new $c.Ptr(buf, 0), NO_KILLER_PREFIX);
         }
     } else {
@@ -2805,7 +2805,7 @@ export async function zapyourself(obj, ordinary) {   // zap.c:2705
                 break;
             }
             learn_it[0] = TRUE;
-            $c.__builtin___sprintf_chk(new $c.Ptr(svk.killer.name, 0), 0, 256, $c.lit("shot %sself with a death ray"), genders[flags.female ? 1 : 0].him);
+            $c.sprintf(new $c.Ptr(svk.killer.name, 0), $c.lit("shot %sself with a death ray"), genders[flags.female ? 1 : 0].him);
             svk.killer.format = NO_KILLER_PREFIX;
             /* probably don't need these to be urgent; player just gave input
                without subsequent opportunity to dismiss --More-- with ESC */
@@ -2957,7 +2957,7 @@ export async function lightdamage(obj, ordinary, amt) {   // zap.c:3026
             ordinary = FALSE;   /* say blasted rather than zapped */
         }
         how = obj.oclass === SPBOOK_CLASS ? $c.lit("spell of light") : !obj.oartifact ? await ansimpleoname(obj) : await bare_artifactname(obj);
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s %sself with %s"), ordinary ? $c.lit("zapped") : $c.lit("blasted"), genders[flags.female ? 1 : 0].him, how);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s %sself with %s"), ordinary ? $c.lit("zapped") : $c.lit("blasted"), genders[flags.female ? 1 : 0].him, how);
         /* might rehumanize(); could be fatal, but only for Unchanging */
         await losehp(Maybe_Half_Phys(dmg), new $c.Ptr(buf, 0), NO_KILLER_PREFIX);
     }
@@ -4305,7 +4305,7 @@ async function zhitu(type, nd, fltxt, sx, sy) {   // zap.c:4401
             }
             monstunseesu(M_SEEN.MAGR);
             svk.killer.format = KILLED.BY_AN;
-            $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), fltxt ? fltxt : $c.lit(""), 256);
+            $c.strcpy(new $c.Ptr(svk.killer.name, 0), fltxt ? fltxt : $c.lit(""));
             /* when killed by disintegration breath, don't leave corpse */
             u.ugrave_arise = type === -(20 + ZT_DEATH) ? -3 : NON_PM;
             await done(DIED);
@@ -4380,7 +4380,7 @@ async function zhitu(type, nd, fltxt, sx, sy) {   // zap.c:4401
             /* FIXME: "zapped by herself" is suitable for a rebound;
                "zapped at herself" would be better if player explicitly
                targeted hero */
-            $c.__builtin___sprintf_chk(new $c.Ptr(kbuf, 0), 0, 256, $c.lit("%s %s by %sself"), fltxt, verb, genders[flags.female ? 1 : 0].him);
+            $c.sprintf(new $c.Ptr(kbuf, 0), $c.lit("%s %s by %sself"), fltxt, verb, genders[flags.female ? 1 : 0].him);
         }
         /* Half_spell_damage protection yields half-damage for wands & spells,
            including hero's own ricochets; breath attacks do full damage */
@@ -4416,9 +4416,9 @@ export async function burn_floor_objects(x, y, give_feedback, u_caused) {   // z
                 /* save name before potential delobj() */
                 if (give_feedback) {
                     obj.quan = 1;
-                    $c.__builtin___strcpy_chk(new $c.Ptr(buf1, 0), x === u.ux && y === u.uy ? await xname(obj) : await distant_name(obj, xname), 256);
+                    $c.strcpy(new $c.Ptr(buf1, 0), x === u.ux && y === u.uy ? await xname(obj) : await distant_name(obj, xname));
                     obj.quan = 2;
-                    $c.__builtin___strcpy_chk(new $c.Ptr(buf2, 0), x === u.ux && y === u.uy ? await xname(obj) : await distant_name(obj, xname), 256);
+                    $c.strcpy(new $c.Ptr(buf2, 0), x === u.ux && y === u.uy ? await xname(obj) : await distant_name(obj, xname));
                     obj.quan = scrquan;
                 }
                 /* useupf(), which charges, only if hero caused damage */
@@ -4998,7 +4998,7 @@ export async function zap_over_floor(x, y, type, shopdamage, ignoremon, explodin
                     }
                     rangemod = rangemod - 1000 | 0;   /* stop */
                 } else {
-                    $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), waterbody_name(x, y), 256);   /* for MOAT */
+                    $c.strcpy(new $c.Ptr(buf, 0), waterbody_name(x, y));   /* for MOAT */
                     rangemod = rangemod - 3 | 0;
                     if (lev.typ === DRAWBRIDGE_UP) {
                         lev.flags = (((lev.flags | 0) & ~DB.UNDER) >>> 0) & 31;   /* clear lava */
@@ -5470,7 +5470,7 @@ export async function item_what(dmgtyp) {   // zap.c:5722
         /* format the output to be ready for enl_msg() to append it to
            "Your items {are,were} protected against <damage-type>" */
         if (what) {   /* strlen(what) will be less than 30 */
-            $c.__builtin___sprintf_chk(new $c.Ptr(item_what$whatbuf, 0), 0, 50, $c.lit(" by your %.40s"), what);
+            $c.sprintf(new $c.Ptr(item_what$whatbuf, 0), $c.lit(" by your %.40s"), what);
         }
     }
     return new $c.Ptr(item_what$whatbuf, 0);
@@ -5819,7 +5819,7 @@ async function wishcmdassist(triesleft) {   // zap.c:6165
         await putstr()(win, 0, new $c.Ptr(wishcmdassist$preserve_wishless, 0));
     }
     await putstr()(win, 0, $c.lit(""));
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(wishcmdassist$retry_info, 0), triesleft >= 0 && triesleft < 6 ? wishcmdassist$cardinals[triesleft] : new $c.Ptr(wishcmdassist$too_many, 0), triesleft < MAXWISHTRY ? $c.lit(" more") : $c.lit(""), triesleft === 1 ? $c.lit("") : $c.lit("s"));
+    $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(wishcmdassist$retry_info, 0), triesleft >= 0 && triesleft < 6 ? wishcmdassist$cardinals[triesleft] : new $c.Ptr(wishcmdassist$too_many, 0), triesleft < MAXWISHTRY ? $c.lit(" more") : $c.lit(""), triesleft === 1 ? $c.lit("") : $c.lit("s"));
     await putstr()(win, 0, new $c.Ptr(buf, 0));
     await putstr()(win, 0, new $c.Ptr(wishcmdassist$retry_too, 0));
     await putstr()(win, 0, $c.lit(""));
@@ -5850,7 +5850,7 @@ export async function wish_history_add(buf) {   // zap.c:6227
             $c.free(wish_history[idx$2]);
         }
         $t1 = $c.asArr(await alloc($c.u32($c.addu64($c.strlen(buf), 1))), Int8Array), wish_history[idx$2] = $t1;
-        $c.__builtin___strcpy_chk(wish_history[idx$2], buf, -1);
+        $c.strcpy(wish_history[idx$2], buf);
         wish_history_idx = $c.rem32(wish_history_idx + 1 | 0, MAX_WISH_HISTORY);
     }
     /* DEBUG */
@@ -5889,7 +5889,7 @@ async function wish_history_menu(buf) {   // zap.c:6275
         i = i - 1 | 0;
         idx = $c.rem32(wish_history_idx + i | 0, MAX_WISH_HISTORY);
         if (wish_history[idx]) {
-            $c.__builtin___strcpy_chk(buf, wish_history[idx], -1);
+            $c.strcpy(buf, wish_history[idx]);
         }
     }
     /* DEBUG */
@@ -5907,11 +5907,11 @@ export async function makewish() {   // zap.c:6314
         await You($c.lit("may wish for an object."));
     }
     retry$: for (;;) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(promptbuf, 0), $c.lit("For what do you wish"), 128);
+        $c.strcpy(new $c.Ptr(promptbuf, 0), $c.lit("For what do you wish"));
         if (iflags.cmdassist && tries > 0) {
-            $c.__builtin___strcat_chk(new $c.Ptr(promptbuf, 0), $c.lit(" (enter 'help' for assistance)"), 128);
+            $c.strcat(new $c.Ptr(promptbuf, 0), $c.lit(" (enter 'help' for assistance)"));
         }
-        $c.__builtin___strcat_chk(new $c.Ptr(promptbuf, 0), $c.lit("?"), 128);
+        $c.strcat(new $c.Ptr(promptbuf, 0), $c.lit("?"));
         if (iflags.menu_requested && wish_history[0] && tries === 0) {
             await wish_history_menu(new $c.Ptr(buf, 0));
         } else {
@@ -5937,7 +5937,7 @@ export async function makewish() {   // zap.c:6314
          *  denied. Wishing for "nothing" requires a separate value to remain
          *  distinct.
          */
-        $c.__builtin___strcpy_chk(new $c.Ptr(bufcpy, 0), new $c.Ptr(buf, 0), 256);
+        $c.strcpy(new $c.Ptr(bufcpy, 0), new $c.Ptr(buf, 0));
         otmp = await readobjnam(new $c.Ptr(buf, 0), nothing);
         if (!otmp) {
             await pline($c.lit("Nothing fitting that description exists in the game."));
@@ -5999,9 +5999,9 @@ export function flash_str(typ, nohallu) {   // zap.c:6429
         /* always return "blast of foo" for simplicity;
            this could be extended with hallucinatory rays, but probably
            not worth it at this time */
-        $c.__builtin___sprintf_chk(new $c.Ptr(flash_str$fltxt, 0), 0, 256, $c.lit("blast of %s"), rnd_hallublast());
+        $c.sprintf(new $c.Ptr(flash_str$fltxt, 0), $c.lit("blast of %s"), rnd_hallublast());
     } else {
-        $c.__builtin___strcpy_chk(new $c.Ptr(flash_str$fltxt, 0), flash_types[typ], 256);
+        $c.strcpy(new $c.Ptr(flash_str$fltxt, 0), flash_types[typ]);
     }
     return new $c.Ptr(flash_str$fltxt, 0);
 }

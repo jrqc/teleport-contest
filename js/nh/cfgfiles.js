@@ -75,7 +75,7 @@ export async function do_write_config_file() {   // cfgfiles.c:169
         await pline($c.lit("All manual customization and comments are removed from the file!"));
         await wait_synch()();
     }
-    $c.__builtin___sprintf_chk(new $c.Ptr(tmp, 0), 0, 256, $c.lit("Overwrite config file %.*s?"), 226, new $c.Ptr(configfile, 0));
+    $c.sprintf(new $c.Ptr(tmp, 0), $c.lit("Overwrite config file %.*s?"), 226, new $c.Ptr(configfile, 0));
     if (!await paranoid_query(TRUE, new $c.Ptr(tmp, 0))) {
         return ECMD.OK;
     }
@@ -97,7 +97,7 @@ export async function do_write_config_file() {   // cfgfiles.c:169
 /* remember the name of the file we're accessing;
    if may be used in option reject messages */
 export function set_configfile_name(fname) {   // cfgfiles.c:216
-    $c.__builtin___strncpy_chk(new $c.Ptr(configfile, 0), fname, 255, 256);
+    $c.strncpy(new $c.Ptr(configfile, 0), fname, 255);
     configfile[$c.idx(255)] = 0;
 }
 async function fopen_config_file(filename, src) {   // cfgfiles.c:223
@@ -150,9 +150,9 @@ async function fopen_config_file(filename, src) {   // cfgfiles.c:223
     /* should be only UNIX left */
     envp = nh_getenv($c.lit("HOME"));
     if (!envp) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(tmp_config, 0), $c.lit(".nethackrc"), 256);
+        $c.strcpy(new $c.Ptr(tmp_config, 0), $c.lit(".nethackrc"));
     } else {
-        $c.__builtin___sprintf_chk(new $c.Ptr(tmp_config, 0), 0, 256, $c.lit("%s/%s"), envp, $c.lit(".nethackrc"));
+        $c.sprintf(new $c.Ptr(tmp_config, 0), $c.lit("%s/%s"), envp, $c.lit(".nethackrc"));
     }
     set_configfile_name(new $c.Ptr(tmp_config, 0));
     if ((fp = $c.fopen(new $c.Ptr(configfile, 0), $c.lit("r"))) !== null) {
@@ -469,7 +469,7 @@ function cnf_line_TROUBLEDIR(bufp) {   // cfgfiles.c:750
     return TRUE;
 }
 function cnf_line_NAME(bufp) {   // cfgfiles.c:761
-    $c.__builtin___strncpy_chk(new $c.Ptr(svp.plname, 0), bufp, PL.NSIZ - 1, 32);
+    $c.strncpy(new $c.Ptr(svp.plname, 0), bufp, PL.NSIZ - 1);
     return TRUE;
 }
 async function cnf_line_ROLE(bufp) {   // cfgfiles.c:768
@@ -480,11 +480,11 @@ async function cnf_line_ROLE(bufp) {   // cfgfiles.c:768
     return TRUE;
 }
 function cnf_line_dogname(bufp) {   // cfgfiles.c:778
-    $c.__builtin___strncpy_chk(new $c.Ptr(gd.dogname, 0), bufp, PL.PSIZ - 1, 63);
+    $c.strncpy(new $c.Ptr(gd.dogname, 0), bufp, PL.PSIZ - 1);
     return TRUE;
 }
 function cnf_line_catname(bufp) {   // cfgfiles.c:785
-    $c.__builtin___strncpy_chk(new $c.Ptr(gc.catname, 0), bufp, PL.PSIZ - 1, 63);
+    $c.strncpy(new $c.Ptr(gc.catname, 0), bufp, PL.PSIZ - 1);
     return TRUE;
 }
 /* SFCTOOL */
@@ -792,7 +792,7 @@ async function cnf_line_SYMBOLS(bufp) {   // cfgfiles.c:1202
     return FALSE;
 }
 function cnf_line_WIZKIT(bufp) {   // cfgfiles.c:1214
-    $c.__builtin___strncpy_chk(new $c.Ptr(gw.wizkit, 0), bufp, WIZKIT_MAX - 1, 128);
+    $c.strncpy(new $c.Ptr(gw.wizkit, 0), bufp, WIZKIT_MAX - 1);
     return TRUE;
 }
 /*USER_SOUNDS*/
@@ -819,7 +819,7 @@ export async function parse_config_line(origbuf) {   // cfgfiles.c:1389
     while (origbuf.get(0) === 32 || origbuf.get(0) === 9) {   /* skip leading whitespace */
         origbuf = origbuf.add(1);   /* (caller probably already did this) */
     }
-    $c.__builtin___strncpy_chk(new $c.Ptr(buf, 0), origbuf, 1023, 1024);
+    $c.strncpy(new $c.Ptr(buf, 0), origbuf, 1023);
     buf[$c.idx(1023)] = 0;   /* strncpy not guaranteed to NUL terminate */
     /* convert any tab to space, condense consecutive spaces into one,
        remove leading and trailing spaces (exception: if there is nothing
@@ -864,7 +864,7 @@ export async function config_error_init(from_file, sourcename, secure) {   // cf
     tmp.secure = secure;
     tmp.origline[0] = 0;
     if (sourcename && sourcename.get(0)) {
-        $c.__builtin___strncpy_chk(new $c.Ptr(tmp.source, 0), sourcename, 255, 256);
+        $c.strncpy(new $c.Ptr(tmp.source, 0), sourcename, 255);
         tmp.source[$c.idx(255)] = 0;
     } else {
         tmp.source[0] = 0;
@@ -885,7 +885,7 @@ function config_error_nextline(line) {   // cfgfiles.c:1493
     ced.line_num = ced.line_num + 1 | 0;
     ced.origline_shown = FALSE;
     if (line && line.get(0)) {
-        $c.__builtin___strncpy_chk(new $c.Ptr(ced.origline, 0), line, 1023, 1024);
+        $c.strncpy(new $c.Ptr(ced.origline, 0), line, 1023);
         ced.origline[$c.idx(1023)] = 0;
     } else {
         ced.origline[0] = 0;
@@ -944,7 +944,7 @@ export async function config_erradd(buf) {   // cfgfiles.c:1544
         config_error_data.origline_shown = TRUE;
     }
     if (config_error_data.line_num > 0 && !config_error_data.secure) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(lineno, 0), 0, 128, $c.lit("Line %d: "), config_error_data.line_num);
+        $c.sprintf(new $c.Ptr(lineno, 0), $c.lit("Line %d: "), config_error_data.line_num);
     } else {
         lineno[0] = 0;
     }
@@ -1004,7 +1004,7 @@ async function cnf_parser_init(parser) {   // cfgfiles.c:1662
     $t2 = $c.asArr(await alloc(parser.inbufsz), Int8Array), parser.inbuf = $t2;
     parser.cont = FALSE;
     parser.pbreak = FALSE;
-    $c.__builtin___memset_chk(parser.inbuf, 0, parser.inbufsz, -1);
+    $c.memset(parser.inbuf, 0, parser.inbufsz);
 }
 /* caller has finished with 'parser' (except for 'rv' so leave that intact) */
 function cnf_parser_done(parser) {   // cfgfiles.c:1677
@@ -1087,10 +1087,10 @@ async function parse_conf_buf(p, proc) {   // cfgfiles.c:1693
                 tmpbuf = $c.asArr(await alloc(len >>> 0), Int8Array);
                 tmpbuf.set(0, 0);
                 if (p.buf) {
-                    $c.__builtin___strcat_chk($c.__builtin___strcpy_chk(tmpbuf, p.buf, -1), $c.lit(" "), -1);
+                    $c.strcat($c.strcpy(tmpbuf, p.buf), $c.lit(" "));
                     $c.free(p.buf), p.buf = null;
                 }
-                $t5 = $c.__builtin___strcat_chk(tmpbuf, p.ep, -1), p.buf = $t5;
+                $t5 = $c.strcat(tmpbuf, p.ep), p.buf = $t5;
                 if ($c.strlen(p.buf) >= p.inbufsz) {
                     p.buf.set(p.inbufsz - 1 >>> 0, 0);
                 }
@@ -1187,7 +1187,7 @@ async function vconfig_error_add(str, the_args) {   // cfgfiles.c:1875
     /* start of vconf...() or of nested block in USE_OLDARG's conf...() */
     vlen = 0;
     /* will be chopped down to BUFSZ-1 if longer */
-    vlen = $c.__builtin___vsnprintf_chk(new $c.Ptr(buf, 0), 1280, 0, 1280, str, the_args);
+    vlen = $c.vsnprintf(new $c.Ptr(buf, 0), 1280, str, the_args);
     nhUse(vlen);
     buf[BUFSZ - 1] = 0;
     await config_erradd(new $c.Ptr(buf, 0));

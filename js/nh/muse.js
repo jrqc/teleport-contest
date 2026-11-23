@@ -267,7 +267,7 @@ async function mplayhorn(mtmp, otmp, self) {   // muse.c:195
         if ($c.strlen(objnamp) >= QBUFSZ) {
             objnamp = await simpleonames(otmp);
         }
-        $c.__builtin___sprintf_chk(new $c.Ptr(objbuf, 0), 0, 256, $c.lit("a %s directed at"), objnamp);
+        $c.sprintf(new $c.Ptr(objbuf, 0), $c.lit("a %s directed at"), objnamp);
         /* "<mon> plays a <horn> directed at himself!" */
         await pline($c.lit("%s!"), await monverbself(mtmp, await Monnam(mtmp), $c.lit("play"), new $c.Ptr(objbuf, 0)));
         await discover_object(otmp.otyp, TRUE, TRUE, TRUE);   /* (wands handle this slightly differently) */
@@ -295,7 +295,7 @@ async function mreadmsg(mtmp, otmp) {   // muse.c:238
         return;   /* no feedback */
     }
     await observe_object(otmp);   /* seeing/hearing scroll read reveals its label */
-    $c.__builtin___strcpy_chk(new $c.Ptr(onambuf, 0), await singular(otmp, vismon ? doname : ansimpleoname), 256);
+    $c.strcpy(new $c.Ptr(onambuf, 0), await singular(otmp, vismon ? doname : ansimpleoname));
     if (vismon) {
         /* directly see the monster reading the scroll */
         await pline_mon(mtmp, $c.lit("%s reads %s!"), await Monnam(mtmp), new $c.Ptr(onambuf, 0));
@@ -2145,7 +2145,7 @@ async function mloot_container(mon, container, vismon) {   // muse.c:2264
     if (vismon) {
         /* do this once so that when hallucinating it won't change
            from one item to the next */
-        $c.__builtin___strcpy_chk(new $c.Ptr(mpronounbuf, 0), genders[pronoun_gender(mon, PRONOUN.HALLU)].he, 20);
+        $c.strcpy(new $c.Ptr(mpronounbuf, 0), genders[pronoun_gender(mon, PRONOUN.HALLU)].he);
     }
     for (takeout_indx = 0; takeout_indx < takeout_count; takeout_indx = takeout_indx + 1 | 0) {
         if (!Has_contents(container)) {   /* might have removed all items */
@@ -2176,7 +2176,7 @@ async function mloot_container(mon, container, vismon) {   // muse.c:2264
         if (!new $c.Ptr(contnr_nam, 0).get(0)) {
             /* xname sets dknown, distant_name might depending on its own
                idea about nearness */
-            $c.__builtin___strcpy_chk(new $c.Ptr(contnr_nam, 0), await an(nearby ? await xname(container) : await distant_name(container, xname)), 256);
+            $c.strcpy(new $c.Ptr(contnr_nam, 0), await an(nearby ? await xname(container) : await distant_name(container, xname)));
         }
         /* this was originally just 'can_carry(mon, xobj)' which
            covers objects a monster shouldn't pick up but also
@@ -2295,7 +2295,7 @@ export async function use_misc(mtmp) {   // muse.c:2383
                 await mquaffmsg(mtmp, otmp);
             }
             /* format monster's name before altering its visibility */
-            $c.__builtin___strcpy_chk(new $c.Ptr(nambuf, 0), await mon_nam(mtmp), 256);
+            $c.strcpy(new $c.Ptr(nambuf, 0), await mon_nam(mtmp));
             await mon_set_minvis(mtmp, $c.i8(!otmp.cursed ? FALSE : TRUE));
             if (vismon && mtmp.minvis | 0) {
                 /* was seen, now invisible */
@@ -2413,12 +2413,12 @@ export async function use_misc(mtmp) {   // muse.c:2383
                 if (!obj) {
                     break;   /* shouldn't happen after find_misc() */
                 }
-                $c.__builtin___strcpy_chk(new $c.Ptr(the_weapon, 0), await the(await xname(obj)), 256);
+                $c.strcpy(new $c.Ptr(the_weapon, 0), await the(await xname(obj)));
                 hand = await body_part(HAND);
                 if (bimanual(obj)) {
                     hand = await makeplural(hand);
                 }
-                $c.__builtin___strncpy_chk(new $c.Ptr(hand_buf, 0), hand, 255, 256);
+                $c.strncpy(new $c.Ptr(hand_buf, 0), hand, 255);
                 hand_buf[$c.idx(255)] = 0;
                 if (vismon) {
                     await pline_mon(mtmp, $c.lit("%s flicks a bullwhip towards your %s!"), await Monnam(mtmp), new $c.Ptr(hand_buf, 0));
@@ -2968,7 +2968,7 @@ async function muse_unslime(mon, obj, trap, by_you) {   // muse.c:3104
             if (!Unaware()) {
                 await observe_object(obj);   /* hero is watching mon drink obj */
             }
-            await pline($c.lit("%s quaffs a burning %s"), saw_lit ? upstart($c.__builtin___strcpy_chk(new $c.Ptr(Pronoun, 0), genders[pronoun_gender(mon, PRONOUN.HALLU)].he, 40)) : await Monnam(mon), await simpleonames(obj));
+            await pline($c.lit("%s quaffs a burning %s"), saw_lit ? upstart($c.strcpy(new $c.Ptr(Pronoun, 0), genders[pronoun_gender(mon, PRONOUN.HALLU)].he)) : await Monnam(mon), await simpleonames(obj));
             await discover_object(POT_OIL, TRUE, TRUE, TRUE);
         }
         dmg = d(3, 4);   /* [**TEMP** (different from hero)] */

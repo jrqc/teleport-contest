@@ -22,7 +22,7 @@ const utpnt = Int32Array.of(0);   // address taken
 const utrack = $c.recArray($T.nhcoord, 100);
 export function initrack() {   // track.c:15
     utcnt[0] = utpnt[0] = 0;
-    $c.__builtin___memset_chk(new $c.Ptr([utrack], 0), 0, 400, 400);
+    $c.memset(new $c.Ptr([utrack], 0), 0, 400);
 }
 /* add to track */
 export function settrack() {   // track.c:24

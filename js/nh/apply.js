@@ -275,7 +275,7 @@ async function its_dead(rx, ry, resp) {   // apply.c:198
     } else if (Hallucination()) {
         if (!corpse) {
             /* it's a statue */
-            $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("You're both stoned"), 256);
+            $c.strcpy(new $c.Ptr(buf, 0), $c.lit("You're both stoned"));
         } else if (corpse.quan === 1 && !more_corpses) {
             gndr = 2;   /* neuter: "it" */
             mtmp = await get_mtraits(corpse, FALSE);
@@ -292,11 +292,11 @@ async function its_dead(rx, ry, resp) {   // apply.c:198
                     gndr = 0;
                 }
             }
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s's dead"), genders[gndr].he);   /* "he"/"she"/"it" */
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s's dead"), genders[gndr].he);   /* "he"/"she"/"it" */
             $t1 = highc(buf[0]), buf[0] = $t1;
         } else {
             /* plural */
-            $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("They're dead"), 256);
+            $c.strcpy(new $c.Ptr(buf, 0), $c.lit("They're dead"));
         }
         /* variations on "He's dead, Jim." (Star Trek's Dr McCoy) */
         await You_hear($c.lit("a voice say, \"%s, Jim.\""), new $c.Ptr(buf, 0));
@@ -328,7 +328,7 @@ async function its_dead(rx, ry, resp) {   // apply.c:198
         mptr = $c.relem(mons, statue.corpsenm);
         if (Blind()) {
             /* ignore statue->dknown; it'll always be set */
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s %s"), rx === u.ux && ry === u.uy ? $c.lit("This") : $c.lit("That"), $c.andu64(mptr.mflags1, M1.HUMANOID) !== 0 ? $c.lit("person") : $c.lit("creature"));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s %s"), rx === u.ux && ry === u.uy ? $c.lit("This") : $c.lit("That"), $c.andu64(mptr.mflags1, M1.HUMANOID) !== 0 ? $c.lit("person") : $c.lit("creature"));
             what = new $c.Ptr(buf, 0);
         } else {
             what = await obj_pmname(statue);
@@ -602,16 +602,16 @@ async function magic_whistled(obj) {   // apply.c:518
                 mnam = await y_monnam(mtmp);
                 if (oseen) {
                     if ((shift = shift + 1 | 0) === 1) {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(shiftbuf, 0), 0, 272, $c.lit("%s shifts location"), mnam);
+                        $c.sprintf(new $c.Ptr(shiftbuf, 0), $c.lit("%s shifts location"), mnam);
                     }
                 } else {
                     if ((appear = appear + 1 | 0) === 1) {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(appearbuf, 0), 0, 264, $c.lit("%s appears"), mnam);
+                        $c.sprintf(new $c.Ptr(appearbuf, 0), $c.lit("%s appears"), mnam);
                     }
                 }
             } else if (oseen) {
                 if ((disappear = disappear + 1 | 0) === 1) {
-                    $c.__builtin___sprintf_chk(new $c.Ptr(disappearbuf, 0), 0, 267, $c.lit("%s disappears"), mnam);
+                    $c.sprintf(new $c.Ptr(disappearbuf, 0), $c.lit("%s disappears"), mnam);
                 }
             }
         }
@@ -649,7 +649,7 @@ async function magic_whistled(obj) {   // apply.c:518
            construct a message now and issue it below */
         if (shift > 0) {
             if (shift > 1) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(shiftbuf, 0), 0, 272, $c.lit("%s creatures shift locations"), shift < 2 ? $c.lit("sqrt(-1)") : shift === 2 ? $c.lit("two") : shift === 3 ? $c.lit("three") : shift === 4 ? $c.lit("four") : shift <= 7 ? $c.lit("several") : $c.lit("many"));
+                $c.sprintf(new $c.Ptr(shiftbuf, 0), $c.lit("%s creatures shift locations"), shift < 2 ? $c.lit("sqrt(-1)") : shift === 2 ? $c.lit("two") : shift === 3 ? $c.lit("three") : shift === 4 ? $c.lit("four") : shift <= 7 ? $c.lit("several") : $c.lit("many"));
             }
             copynchars(new $c.Ptr(buf, 0), upstart(new $c.Ptr(shiftbuf, 0)), 255);
         }
@@ -658,7 +658,7 @@ async function magic_whistled(obj) {   // apply.c:518
                shift==1: Foo shifts location and N other creatures appear;
                shift >1: M creatures shift locations and N others appear */
             if (appear > 1) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(appearbuf, 0), 0, 264, $c.lit("%s %s appear"), appear < 2 ? $c.lit("sqrt(-1)") : appear === 2 ? $c.lit("two") : appear === 3 ? $c.lit("three") : appear === 4 ? $c.lit("four") : appear <= 7 ? $c.lit("several") : $c.lit("many"), shift === 0 ? $c.lit("creatures") : shift === 1 ? $c.lit("other creatures") : $c.lit("others"));
+                $c.sprintf(new $c.Ptr(appearbuf, 0), $c.lit("%s %s appear"), appear < 2 ? $c.lit("sqrt(-1)") : appear === 2 ? $c.lit("two") : appear === 3 ? $c.lit("three") : appear === 4 ? $c.lit("four") : appear <= 7 ? $c.lit("several") : $c.lit("many"), shift === 0 ? $c.lit("creatures") : shift === 1 ? $c.lit("other creatures") : $c.lit("others"));
             }
             if (shift === 0) {
                 copynchars(new $c.Ptr(buf, 0), upstart(new $c.Ptr(appearbuf, 0)), 255);
@@ -672,7 +672,7 @@ async function magic_whistled(obj) {   // apply.c:518
         }
         if (disappear > 0) {
             if (disappear > 1) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(disappearbuf, 0), 0, 267, $c.lit("%s %s disappear"), disappear < 2 ? $c.lit("sqrt(-1)") : disappear === 2 ? $c.lit("two") : disappear === 3 ? $c.lit("three") : disappear === 4 ? $c.lit("four") : disappear <= 7 ? $c.lit("several") : $c.lit("many"), shift === 0 && appear === 0 ? $c.lit("creatures") : shift < 2 && appear < 2 ? $c.lit("other creatures") : $c.lit("others"));
+                $c.sprintf(new $c.Ptr(disappearbuf, 0), $c.lit("%s %s disappear"), disappear < 2 ? $c.lit("sqrt(-1)") : disappear === 2 ? $c.lit("two") : disappear === 3 ? $c.lit("three") : disappear === 4 ? $c.lit("four") : disappear <= 7 ? $c.lit("several") : $c.lit("many"), shift === 0 && appear === 0 ? $c.lit("creatures") : shift < 2 && appear < 2 ? $c.lit("other creatures") : $c.lit("others"));
             }
             if ((shift + appear | 0) === 0) {
                 copynchars(new $c.Ptr(buf, 0), upstart(new $c.Ptr(disappearbuf, 0)), 255);
@@ -802,7 +802,7 @@ async function use_leash_core(obj, mtmp, cc, spotmon) {   // apply.c:821
         } else if (!leashable(mtmp)) {
             lmonnam = await l_monnam(mtmp);
             if (cc.x !== mtmp.mx || cc.y !== mtmp.my) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(lmonbuf, 0), 0, 256, $c.lit("%s tail"), s_suffix(lmonnam));
+                $c.sprintf(new $c.Ptr(lmonbuf, 0), $c.lit("%s tail"), s_suffix(lmonnam));
                 lmonnam = new $c.Ptr(lmonbuf, 0);
             }
             await pline($c.lit("The leash won't fit onto %s%s."), spotmon ? $c.lit("your ") : $c.lit(""), lmonnam);
@@ -1080,7 +1080,7 @@ async function use_mirror(obj$in) {   // apply.c:1018
             /* "She" or "He" */
             /* "<mon> admires self in your mirror " */
             await pline($c.lit("%s in your %s."), await monverbself(mtmp, await Monnam(mtmp), $c.lit("admire"), null), mirror);
-            await pline($c.lit("%s takes it!"), upstart($c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), genders[pronoun_gender(mtmp, PRONOUN.HALLU)].he, 256)));
+            await pline($c.lit("%s takes it!"), upstart($c.strcpy(new $c.Ptr(buf, 0), genders[pronoun_gender(mtmp, PRONOUN.HALLU)].he)));
         } else {
             await pline($c.lit("It steals your %s!"), mirror);
         }
@@ -1293,12 +1293,12 @@ async function use_candle(optr) {   // apply.c:1387
         return;
     }
     /* first, minimal candelabrum suffix for formatting candles */
-    $c.__builtin___sprintf_chk(new $c.Ptr(qsfx, 0), 0, 128, $c.lit(" to\x1b%s?"), await thesimpleoname(otmp));
+    $c.sprintf(new $c.Ptr(qsfx, 0), $c.lit(" to\x1b%s?"), await thesimpleoname(otmp));
     /* next, format the candles as a prefix for the candelabrum */
     await safe_qbuf(new $c.Ptr(qbuf, 0), $c.lit("Attach "), new $c.Ptr(qsfx, 0), obj, yname, thesimpleoname, s);
     /* strip temporary candelabrum suffix */
     if ((q = strstri(new $c.Ptr(qbuf, 0), $c.lit(" to\x1b"))) !== null) {
-        $c.__builtin___strcpy_chk(q, $c.lit(" to "), -1);
+        $c.strcpy(q, $c.lit(" to "));
     }
     /* last, format final "attach candles to candelabrum?" query */
     if (await yn_function(await safe_qbuf(new $c.Ptr(qbuf, 0), new $c.Ptr(qbuf, 0), $c.lit("?"), otmp, yname, thesimpleoname, $c.lit("it")), new $c.Ptr(ynchars, 0), 110, TRUE) === 110) {
@@ -1979,7 +1979,7 @@ async function use_tinning_kit(obj) {   // apply.c:2177
             kbuf[0] = 0;
         } else {
             await pline($c.lit("Tinning %s without wearing gloves is a fatal mistake..."), corpse_name);
-            $c.__builtin___sprintf_chk(new $c.Ptr(kbuf, 0), 0, 256, $c.lit("trying to tin %s without gloves"), corpse_name);
+            $c.sprintf(new $c.Ptr(kbuf, 0), $c.lit("trying to tin %s without gloves"), corpse_name);
         }
         await instapetrify(new $c.Ptr(kbuf, 0));
     }
@@ -2173,18 +2173,18 @@ export async function fig_transform(arg, timeout) {   // apply.c:2398
     if (mtmp) {
         mshelter = svl.level.objects[mtmp.mx][mtmp.my];
         /* [m_monnam() yields accurate mon type, overriding hallucination] */
-        $c.__builtin___sprintf_chk(new $c.Ptr(monnambuf, 0), 0, 256, $c.lit("%s"), await an(await m_monnam(mtmp)));
+        $c.sprintf(new $c.Ptr(monnambuf, 0), $c.lit("%s"), await an(await m_monnam(mtmp)));
         and_vanish[0] = 0;
         if (mtmp.minvis | 0 && !See_invisible() || mtmp.data.mlet === S.MIMIC && M_AP_TYPE(mtmp) !== M_AP.NOTHING) {
             suppress_see = TRUE;
         }
         if (mtmp.mundetected) {
             if (hides_under(mtmp.data) && mshelter) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(and_vanish, 0), 0, 256, $c.lit(" and %s under %s"), locomotion(mtmp.data, $c.lit("crawl")), await doname(mshelter));
+                $c.sprintf(new $c.Ptr(and_vanish, 0), $c.lit(" and %s under %s"), locomotion(mtmp.data, $c.lit("crawl")), await doname(mshelter));
             } else if (mtmp.data.mlet === S.MIMIC || mtmp.data.mlet === S.EEL) {
                 suppress_see = TRUE;
             } else {
-                $c.__builtin___strcpy_chk(new $c.Ptr(and_vanish, 0), $c.lit(" and vanish"), 256);
+                $c.strcpy(new $c.Ptr(and_vanish, 0), $c.lit(" and vanish"));
             }
         }
         switch (figurine.where) {
@@ -2211,11 +2211,11 @@ export async function fig_transform(arg, timeout) {   // apply.c:2398
                     mon = figurine.v.v_ocarry;
                     /* figurine carrying monster might be invisible */
                     if (canseemon(figurine.v.v_ocarry) && (!mon.wormno || cansee(mon.mx, mon.my))) {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(carriedby, 0), 0, 256, $c.lit("%s pack"), s_suffix(await a_monnam(mon)));
+                        $c.sprintf(new $c.Ptr(carriedby, 0), $c.lit("%s pack"), s_suffix(await a_monnam(mon)));
                     } else if (is_pool(mon.mx, mon.my)) {
-                        $c.__builtin___strcpy_chk(new $c.Ptr(carriedby, 0), $c.lit("empty water"), 256);
+                        $c.strcpy(new $c.Ptr(carriedby, 0), $c.lit("empty water"));
                     } else {
-                        $c.__builtin___strcpy_chk(new $c.Ptr(carriedby, 0), $c.lit("thin air"), 256);
+                        $c.strcpy(new $c.Ptr(carriedby, 0), $c.lit("thin air"));
                     }
                     await You_see($c.lit("%s %s out of %s%s!"), new $c.Ptr(monnambuf, 0), locomotion(mtmp.data, $c.lit("drop")), new $c.Ptr(carriedby, 0), new $c.Ptr(and_vanish, 0));
                 }
@@ -2383,7 +2383,7 @@ async function use_stone(tstone) {   // apply.c:2680
         await observe_object(tstone);
     }
     known = $c.i8(tstone.otyp === TOUCHSTONE && tstone.dknown | 0 && objects[TOUCHSTONE].oc_name_known | 0 ? 1 : 0);
-    $c.__builtin___sprintf_chk(new $c.Ptr(stonebuf, 0), 0, 128, $c.lit("rub on the stone%s"), tstone.quan === 1 ? $c.lit("") : $c.lit("s"));
+    $c.sprintf(new $c.Ptr(stonebuf, 0), $c.lit("rub on the stone%s"), tstone.quan === 1 ? $c.lit("") : $c.lit("s"));
     /* when the touchstone is fully known, don't bother listing extra
        junk as likely candidates for rubbing */
     if ((obj = await getobj(new $c.Ptr(stonebuf, 0), known ? touchstone_ok : any_obj_ok, GETOBJ_PROMPT)) === null) {
@@ -2477,7 +2477,7 @@ async function use_stone(tstone) {   // apply.c:2680
             }
             break;   /* default oclass */
     }
-    $c.__builtin___sprintf_chk(new $c.Ptr(stonebuf, 0), 0, 128, $c.lit("stone%s"), tstone.quan === 1 ? $c.lit("") : $c.lit("s"));
+    $c.sprintf(new $c.Ptr(stonebuf, 0), $c.lit("stone%s"), tstone.quan === 1 ? $c.lit("") : $c.lit("s"));
     if (do_scratch) {
         await You($c.lit("make %s%sscratch marks on the %s."), streak_color ? streak_color : $c.lit(""), streak_color ? $c.lit(" ") : $c.lit(""), new $c.Ptr(stonebuf, 0));
     } else if (streak_color) {
@@ -2550,7 +2550,7 @@ async function use_trap(otmp) {   // apply.c:2821
             chance = $c.i8(rnl(10) > 5 ? 1 : 0);
         }
         await You($c.lit("aren't very skilled at reaching from %s."), await mon_nam(u.usteed));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Continue your attempt to set %s?"), await the(trapname(ttyp, FALSE)));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Continue your attempt to set %s?"), await the(trapname(ttyp, FALSE)));
         if (await y_n(new $c.Ptr(buf, 0)) === 121) {
             if (chance) {
                 switch (ttyp) {
@@ -2714,7 +2714,7 @@ export async function use_whip(obj) {   // apply.c:2955
                     dam = 1;
                 }
                 await You($c.lit("hit your %s with your bullwhip."), await body_part(FOOT));
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("killed %sself with %s bullwhip"), genders[flags.female ? 1 : 0].him, genders[flags.female ? 1 : 0].his);
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("killed %sself with %s bullwhip"), genders[flags.female ? 1 : 0].him, genders[flags.female ? 1 : 0].his);
                 await losehp(Maybe_Half_Phys(dam), new $c.Ptr(buf, 0), NO_KILLER_PREFIX);
                 return ECMD.TIME;
             } else if ($goto !== "whipattack" && ((Fumbling() || Glib()) && !rn2(5))) {
@@ -2747,7 +2747,7 @@ export async function use_whip(obj) {   // apply.c:2955
                        monster is present, or an unseen big one, use the boulder
                        or furniture if available, otherwise attack */
                     if (bigmonst(mtmp.data) && canspotmon(mtmp)) {
-                        wrapped_what = $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await mon_nam(mtmp), 256);
+                        wrapped_what = $c.strcpy(new $c.Ptr(buf, 0), await mon_nam(mtmp));
                     }
                     if (!wrapped_what) {
                         $goto = "whipattack"; continue D1;
@@ -2800,7 +2800,7 @@ export async function use_whip(obj) {   // apply.c:2955
                 }
                 if (otmp) {
                     gotit = $c.i8(proficient && (!Fumbling() || !rn2(10)) ? 1 : 0);
-                    $c.__builtin___strcpy_chk(new $c.Ptr(onambuf, 0), await cxname(otmp), 256);
+                    $c.strcpy(new $c.Ptr(onambuf, 0), await cxname(otmp));
                     if (gotit) {
                         mon_hand = await mbodypart(mtmp, HAND);
                         if (bimanual(otmp)) {
@@ -2834,7 +2834,7 @@ export async function use_whip(obj) {   // apply.c:2955
                                 /* right into your inventory */
                                 await You($c.lit("snatch %s!"), await yname(otmp));
                                 if (otmp.otyp === CORPSE && touch_petrifies($c.relem(mons, otmp.corpsenm)) && !$G.uarmg && !Stone_resistance() && !(poly_when_stoned(gy.youmonst.data) && await polymon(PM.STONE_GOLEM))) {
-                                    $c.__builtin___strcpy_chk(new $c.Ptr(kbuf, 0), otmp.quan === 1 ? await an(new $c.Ptr(onambuf, 0)) : new $c.Ptr(onambuf, 0), 256);
+                                    $c.strcpy(new $c.Ptr(kbuf, 0), otmp.quan === 1 ? await an(new $c.Ptr(onambuf, 0)) : new $c.Ptr(onambuf, 0));
                                     await pline($c.lit("Snatching %s is a fatal mistake."), new $c.Ptr(kbuf, 0));
                                     /* corpse probably has a rot timer but is now
                                        OBJ_FREE; end of game cleanup will panic if
@@ -3306,12 +3306,12 @@ async function use_grapple(obj) {   // apply.c:3729
         any.a_int = 1;   /* use index+1 (can't use 0) as identifier */
         await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
         any.a_int = any.a_int + 1 | 0;
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("an object on the %s"), surface(cc.x, cc.y));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("an object on the %s"), surface(cc.x, cc.y));
         await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
         any.a_int = any.a_int + 1 | 0;
         await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, $c.lit("a monster"), MENU.ITEMFLAGS_NONE);
         any.a_int = any.a_int + 1 | 0;
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("the %s"), surface(cc.x, cc.y));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("the %s"), surface(cc.x, cc.y));
         await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
         await end_menu()(tmpwin, $c.lit("Aim for what?"));
         tohit = rn2(4);
@@ -3601,7 +3601,7 @@ async function do_break_wand(obj) {   // apply.c:3909
             }
             damage = await zapyourself(obj, FALSE);
             if (damage) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("killed %sself by breaking a wand"), genders[flags.female ? 1 : 0].him);
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("killed %sself by breaking a wand"), genders[flags.female ? 1 : 0].him);
                 await losehp(Maybe_Half_Phys(damage), new $c.Ptr(buf, 0), NO_KILLER_PREFIX);
             }
             if (disp.botl) {

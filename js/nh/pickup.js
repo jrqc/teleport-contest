@@ -231,7 +231,7 @@ async function query_classes(oclasses, one_at_a_time, everything, action, objs, 
             oclasses.set(oclassct = 0, 0);
             $t15 = everything.set(0, FALSE), one_at_a_time.set(0, $t15);
             not_everything = filtered = FALSE;
-            $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("What kinds of thing do you want to %s? [%s]"), action, new $c.Ptr(ilets, 0));
+            $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("What kinds of thing do you want to %s? [%s]"), action, new $c.Ptr(ilets, 0));
             await getlin(new $c.Ptr(qbuf, 0), new $c.Ptr(inbuf, 0));
             if (new $c.Ptr(inbuf, 0).get(0) === 27) {
                 return FALSE;
@@ -397,18 +397,18 @@ async function describe_decor() {   // pickup.c:353
         res = FALSE;
     } else if (dfeature) {
         if (waterhere) {
-            dfeature = $c.__builtin___strcpy_chk(new $c.Ptr(fbuf, 0), waterbody_name(u.ux, u.uy), 128);
+            dfeature = $c.strcpy(new $c.Ptr(fbuf, 0), waterbody_name(u.ux, u.uy));
         }
         if ($c.strcmp(dfeature, $c.lit("swamp")) && ltyp !== ICE) {
             dfeature = await an(dfeature);
         }
         if (flags.verbose) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(outbuf, 0), 0, 256, $c.lit("There is %s here."), dfeature);
+            $c.sprintf(new $c.Ptr(outbuf, 0), $c.lit("There is %s here."), dfeature);
         } else {
             if (!$c.peq(dfeature, new $c.Ptr(fbuf, 0))) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(fbuf, 0), dfeature, 128);
+                $c.strcpy(new $c.Ptr(fbuf, 0), dfeature);
             }
-            $c.__builtin___sprintf_chk(new $c.Ptr(outbuf, 0), 0, 256, $c.lit("%s."), upstart(new $c.Ptr(fbuf, 0)));
+            $c.sprintf(new $c.Ptr(outbuf, 0), $c.lit("%s."), upstart(new $c.Ptr(fbuf, 0)));
         }
         if (ltyp === ICE && flags.mention_decor) {
             await Norep($c.lit("%s"), new $c.Ptr(outbuf, 0));
@@ -715,7 +715,7 @@ export async function pickup(what) {   // pickup.c:672
                         traverse_how = traverse_how | (AUTOSELECT_SINGLE | (flags.sortpack ? INVORDER_SORT : 0));
                         if (count) {
                             /* looking for N of something */
-                            $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Pick %d of what?"), count);
+                            $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("Pick %d of what?"), count);
                             gv.val_for_n_or_more = count;   /* set up callback selector */
                             n = await query_objlist(new $c.Ptr(qbuf, 0), objchain_p, traverse_how, new $c.Ptr(pick_list, 0), PICK.ONE, n_or_more);
                             /* correct counts, if any given */
@@ -1011,7 +1011,7 @@ export async function query_objlist(qstr, olist_p, qflags, pick_list, how, allow
      * each type so we can group them.  The allow function was
      * called by sortloot() and will be called once per item here.
      */
-    pack = $c.__builtin___strcpy_chk(new $c.Ptr(packbuf, 0), new $c.Ptr(flags.inv_order, 0), 19);
+    pack = $c.strcpy(new $c.Ptr(packbuf, 0), new $c.Ptr(flags.inv_order, 0));
     if (qflags & INCLUDE_VENOM) {
         strkitten(pack, VENOM_CLASS);   /* venom is not in inv_order */
     }
@@ -1049,7 +1049,7 @@ export async function query_objlist(qstr, olist_p, qflags, pick_list, how, allow
     if (engulfer) {
         any.$copyFrom(cg.zeroany);
         if (sorted && n > 1) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s Creatures"), dmgtype_fromattack(u.ustuck.data, AD.DGST, AT.ENGL) !== null ? $c.lit("Swallowed") : $c.lit("Engulfed"));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s Creatures"), dmgtype_fromattack(u.ustuck.data, AD.DGST, AT.ENGL) !== null ? $c.lit("Swallowed") : $c.lit("Engulfed"));
             await add_menu_heading(win, new $c.Ptr(buf, 0));
         }
         fake_hero_object.$copyFrom(cg.zeroobj);
@@ -1199,7 +1199,7 @@ export async function query_category(qstr, olist, qflags, pick_list, how) {   //
     }
     win = await create_nhwindow()(NHW.MENU);
     await start_menu()(win, MENU.BEHAVE_STANDARD);
-    pack = $c.__builtin___strcpy_chk(new $c.Ptr(packbuf, 0), new $c.Ptr(flags.inv_order, 0), 19);
+    pack = $c.strcpy(new $c.Ptr(packbuf, 0), new $c.Ptr(flags.inv_order, 0));
     if ((qflags & INCLUDE_VENOM) !== 0) {
         strkitten(pack, VENOM_CLASS);   /* venom is not in inv_order */
     }
@@ -1301,9 +1301,9 @@ export async function query_category(qstr, olist, qflags, pick_list, how) {   //
         }
         if (num_justpicked) {
             if (num_justpicked === 1) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(tmpbuf, 0), 0, 256, $c.lit("Just picked up: %s"), await doname(find_justpicked(olist)));
+                $c.sprintf(new $c.Ptr(tmpbuf, 0), $c.lit("Just picked up: %s"), await doname(find_justpicked(olist)));
             } else {
-                $c.__builtin___strcpy_chk(new $c.Ptr(tmpbuf, 0), $c.lit("Items you just picked up"), 256);
+                $c.strcpy(new $c.Ptr(tmpbuf, 0), $c.lit("Items you just picked up"));
             }
             invlet = 80;
             any.$copyFrom(cg.zeroany);
@@ -1508,12 +1508,12 @@ async function carry_count(obj, container, count, telekinesis, wt_before, wt_aft
     obj.owt = saveowt;
     if (qq < count) {
         /* some message will be given */
-        $c.__builtin___strcpy_chk(new $c.Ptr(obj_nambuf, 0), await doname(obj), 256);
+        $c.strcpy(new $c.Ptr(obj_nambuf, 0), await doname(obj));
         if (container) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(where, 0), 0, 256, $c.lit("in %s"), await the(await xname(container)));
+            $c.sprintf(new $c.Ptr(where, 0), $c.lit("in %s"), await the(await xname(container)));
             verb = $c.lit("carry");
         } else {
-            $c.__builtin___strcpy_chk(new $c.Ptr(where, 0), $c.lit("lying here"), 256);
+            $c.strcpy(new $c.Ptr(where, 0), $c.lit("lying here"));
             verb = telekinesis ? $c.lit("acquire") : $c.lit("lift");
         }
     } else {
@@ -1530,7 +1530,7 @@ async function carry_count(obj, container, count, telekinesis, wt_before, wt_aft
         return qq;
     }
     if (!container) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(where, 0), $c.lit("here"), 256);   /* slightly shorter form */
+        $c.strcpy(new $c.Ptr(where, 0), $c.lit("here"));   /* slightly shorter form */
     }
     if (gi.invent || umoney) {
         prefx1 = $c.lit("you cannot ");
@@ -1595,7 +1595,7 @@ async function lift_object(obj, container, cnt_p, telekinesis) {   // pickup.c:1
             } else {
                 savequan = obj.quan;
                 obj.quan = cnt_p.get(0);
-                $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 256, $c.lit("%s %s "), next_encumbr >= EXT_ENCUMBER ? new $c.Ptr(overloadpfx, 0) : next_encumbr >= HVY_ENCUMBER ? new $c.Ptr(nearloadpfx, 0) : next_encumbr >= MOD_ENCUMBER ? new $c.Ptr(moderateloadpfx, 0) : new $c.Ptr(slightloadpfx, 0), !container ? $c.lit("lifting") : $c.lit("removing"));
+                $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("%s %s "), next_encumbr >= EXT_ENCUMBER ? new $c.Ptr(overloadpfx, 0) : next_encumbr >= HVY_ENCUMBER ? new $c.Ptr(nearloadpfx, 0) : next_encumbr >= MOD_ENCUMBER ? new $c.Ptr(moderateloadpfx, 0) : new $c.Ptr(slightloadpfx, 0), !container ? $c.lit("lifting") : $c.lit("removing"));
                 await safe_qbuf(new $c.Ptr(qbuf, 0), new $c.Ptr(qbuf, 0), $c.lit(".  Continue?"), obj, doname, ansimpleoname, c_common_strings.c_something);
                 obj.quan = savequan;
                 switch (await ynq(new $c.Ptr(qbuf, 0))) {
@@ -1731,13 +1731,13 @@ export async function pick_obj(otmp) {   // pickup.c:1897
         /* addtobill cares about your location rather than the object's;
            usually they'll be the same, but not when using telekinesis
            (if ever implemented) or a grappling hook */
-        $c.__builtin___strcpy_chk(new $c.Ptr(saveushops, 0), new $c.Ptr(u.ushops, 0), 5);
+        $c.strcpy(new $c.Ptr(saveushops, 0), new $c.Ptr(u.ushops, 0));
         $t1 = in_rooms(ox[0], oy[0], SHOPBASE).get(0), fakeshop[0] = $t1;
         fakeshop[1] = 0;
-        $c.__builtin___strcpy_chk(new $c.Ptr(u.ushops, 0), new $c.Ptr(fakeshop, 0), 5);
+        $c.strcpy(new $c.Ptr(u.ushops, 0), new $c.Ptr(fakeshop, 0));
         /* sets obj->unpaid if necessary */
         await addtobill(otmp, TRUE, FALSE, FALSE);
-        $c.__builtin___strcpy_chk(new $c.Ptr(u.ushops, 0), new $c.Ptr(saveushops, 0), 5);
+        $c.strcpy(new $c.Ptr(u.ushops, 0), new $c.Ptr(saveushops, 0));
         robshop = $c.i8(otmp.unpaid | 0 && !$c.strchr(new $c.Ptr(u.ushops, 0), new $c.Ptr(fakeshop, 0).get(0)) ? 1 : 0);
     }
     result = await addinv(otmp);
@@ -1761,7 +1761,7 @@ async function pickup_prinv(obj, count, verb) {   // pickup.c:1948
         gp.pickup_encumbrance = nearload;
     }
     if (prefix) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(pbuf, 0), 0, 128, $c.lit("%s %s"), prefix, verb);
+        $c.sprintf(new $c.Ptr(pbuf, 0), $c.lit("%s %s"), prefix, verb);
     }
     await prinv(new $c.Ptr(pbuf, 0), obj, count);
 }
@@ -2185,7 +2185,7 @@ export async function loot_mon(mtmp, passed_info, prev_loot) {   // pickup.c:243
         if (passed_info) {
             passed_info.set(0, 1);
         }
-        $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Do you want to remove the saddle from %s?"), await x_monnam(mtmp, ARTICLE.THE, null, SUPPRESS.SADDLE, FALSE));
+        $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("Do you want to remove the saddle from %s?"), await x_monnam(mtmp, ARTICLE.THE, null, SUPPRESS.SADDLE, FALSE));
         if ((c = await yn_function(new $c.Ptr(qbuf, 0), new $c.Ptr(ynqchars, 0), 110, TRUE)) === 121) {
             if (nolimbs(gy.youmonst.data)) {
                 await You_cant($c.lit("do that without limbs."));   /* not body_part(HAND) */
@@ -2330,7 +2330,7 @@ async function in_container(obj) {   // pickup.c:2558
     /* boxes, boulders, and big statues can't fit into any container */
     if (obj.otyp === ICE_BOX || Is_box(obj) || obj.otyp === BOULDER || obj.otyp === STATUE && bigmonst($c.relem(mons, obj.corpsenm))) {
         /* consumes multiple obufs but not enough to overwrite the result */
-        $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await the(await xname(obj)), 256);
+        $c.strcpy(new $c.Ptr(buf, 0), await the(await xname(obj)));
         await You($c.lit("cannot fit %s into %s."), new $c.Ptr(buf, 0), await the(await xname(gc.current_container)));
         return 0;
     }
@@ -2401,7 +2401,7 @@ async function in_container(obj) {   // pickup.c:2558
         gc.current_container = null;   /* baggone = TRUE; */
     }
     if (gc.current_container) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await the(await xname(gc.current_container)), 256);
+        $c.strcpy(new $c.Ptr(buf, 0), await the(await xname(gc.current_container)));
         await You($c.lit("put %s into %s."), await doname(obj), new $c.Ptr(buf, 0));
         /* gold in container always needs to be added to credit */
         if (floor_container && obj.oclass === COIN_CLASS) {
@@ -2674,7 +2674,7 @@ export async function use_container(objp, held, more_containers) {   // pickup.c
     /* might take something out if container isn't empty */
     outokay = $c.i8(Has_contents(gc.current_container));
     if (!outokay) {   /* preformat the empty-container message */
-        $c.__builtin___sprintf_chk(new $c.Ptr(emptymsg, 0), 0, 256, $c.lit("%s is %sempty."), await Ysimple_name2(gc.current_container), quantum_cat || cursed_mbag ? $c.lit("now ") : $c.lit(""));
+        $c.sprintf(new $c.Ptr(emptymsg, 0), $c.lit("%s is %sempty."), await Ysimple_name2(gc.current_container), quantum_cat || cursed_mbag ? $c.lit("now ") : $c.lit(""));
     }
     /*
      * What-to-do prompt's list of possible actions:
@@ -2723,23 +2723,23 @@ export async function use_container(objp, held, more_containers) {   // pickup.c
         } else {
             /* TRADITIONAL or COMBINATION */
             xbuf[0] = 0;   /* list of extra acceptable responses */
-            $c.__builtin___strcpy_chk(new $c.Ptr(pbuf, 0), $c.lit(":"), 128);   /* look inside */
-            $c.__builtin___strcat_chk(outmaybe ? new $c.Ptr(pbuf, 0) : new $c.Ptr(xbuf, 0), $c.lit("o"), -1);   /* take out */
-            $c.__builtin___strcat_chk(inokay ? new $c.Ptr(pbuf, 0) : new $c.Ptr(xbuf, 0), $c.lit("i"), -1);   /* put in */
-            $c.__builtin___strcat_chk(outmaybe ? new $c.Ptr(pbuf, 0) : new $c.Ptr(xbuf, 0), $c.lit("b"), -1);   /* both */
-            $c.__builtin___strcat_chk(inokay ? new $c.Ptr(pbuf, 0) : new $c.Ptr(xbuf, 0), $c.lit("rs"), -1);   /* reversed, stash */
-            $c.__builtin___strcat_chk(new $c.Ptr(pbuf, 0), $c.lit(" "), 128);   /* separator */
-            $c.__builtin___strcat_chk(more_containers ? new $c.Ptr(pbuf, 0) : new $c.Ptr(xbuf, 0), $c.lit("n"), -1);   /* next container */
-            $c.__builtin___strcat_chk(new $c.Ptr(pbuf, 0), $c.lit("q"), 128);   /* quit */
+            $c.strcpy(new $c.Ptr(pbuf, 0), $c.lit(":"));   /* look inside */
+            $c.strcat(outmaybe ? new $c.Ptr(pbuf, 0) : new $c.Ptr(xbuf, 0), $c.lit("o"));   /* take out */
+            $c.strcat(inokay ? new $c.Ptr(pbuf, 0) : new $c.Ptr(xbuf, 0), $c.lit("i"));   /* put in */
+            $c.strcat(outmaybe ? new $c.Ptr(pbuf, 0) : new $c.Ptr(xbuf, 0), $c.lit("b"));   /* both */
+            $c.strcat(inokay ? new $c.Ptr(pbuf, 0) : new $c.Ptr(xbuf, 0), $c.lit("rs"));   /* reversed, stash */
+            $c.strcat(new $c.Ptr(pbuf, 0), $c.lit(" "));   /* separator */
+            $c.strcat(more_containers ? new $c.Ptr(pbuf, 0) : new $c.Ptr(xbuf, 0), $c.lit("n"));   /* next container */
+            $c.strcat(new $c.Ptr(pbuf, 0), $c.lit("q"));   /* quit */
             /* this unintentionally allows user to answer with 'o' or
                'r'; fortunately, those are already valid choices here */
             if (iflags.cmdassist) {
-                $c.__builtin___strcat_chk(new $c.Ptr(pbuf, 0), $c.lit(" or ?"), 128);   /* help */
+                $c.strcat(new $c.Ptr(pbuf, 0), $c.lit(" or ?"));   /* help */
             } else {
-                $c.__builtin___strcat_chk(new $c.Ptr(xbuf, 0), $c.lit("?"), 128);
+                $c.strcat(new $c.Ptr(xbuf, 0), $c.lit("?"));
             }
             if (new $c.Ptr(xbuf, 0).get(0)) {
-                $c.__builtin___strcat_chk($c.__builtin___strcat_chk(new $c.Ptr(pbuf, 0), $c.lit("\x1b"), 128), new $c.Ptr(xbuf, 0), -1);
+                $c.strcat($c.strcat(new $c.Ptr(pbuf, 0), $c.lit("\x1b")), new $c.Ptr(xbuf, 0));
             }
             c = await yn_function(new $c.Ptr(qbuf, 0), new $c.Ptr(pbuf, 0), $c.i8(more_containers ? 110 : 113), TRUE);
         }   /* PARTIAL|FULL vs other modes */
@@ -2901,7 +2901,7 @@ async function menu_loot(retry, put_in) {   // pickup.c:3265
         all_categories = $c.i8(retry === -2 ? 1 : 0);
     } else if (flags.menu_style === MENU.FULL) {
         all_categories = FALSE;
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s what type of objects?"), action);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s what type of objects?"), action);
         mflags = ALL_TYPES | UNPAID_TYPES | BUCX_TYPES | CHOOSE_ALL | JUSTPICKED;
         n = await query_category(new $c.Ptr(buf, 0), put_in ? gi.invent : gc.current_container.cobj, mflags, new $c.Ptr(pick_list, 0), PICK.ANY);
         /* when paranoid_confirm:A is set, 'A' by itself implies
@@ -2976,7 +2976,7 @@ async function menu_loot(retry, put_in) {   // pickup.c:3265
         if (!put_in) {
             gc.current_container.cknown = (1) & 1;
         }
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s what?"), action);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s what?"), action);
         n = await query_objlist(new $c.Ptr(buf, 0), put_in ? new $c.FieldRef(gi, "invent", "ptr") : new $c.FieldRef(gc.current_container, "cobj", "ptr"), mflags, new $c.Ptr(pick_list, 0), PICK.ANY, all_categories ? allow_all : allow_category);
         if (n) {
             n_looted = n;
@@ -3020,29 +3020,29 @@ async function in_or_out_menu(prompt, obj, outokay, inokay, alreadyused, more_co
     win = await create_nhwindow()(NHW.MENU);
     await start_menu()(win, MENU.BEHAVE_STANDARD);
     any.a_int = 1;   /* ':' */
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Look inside %s"), await thesimpleoname(obj));
+    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Look inside %s"), await thesimpleoname(obj));
     await add_menu(win, nul_glyphinfo, any, menuselector.get(any.a_int), 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
     if (outokay) {
         any.a_int = 2;   /* 'o' */
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("take %s out"), c_common_strings.c_something);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("take %s out"), c_common_strings.c_something);
         await add_menu(win, nul_glyphinfo, any, menuselector.get(any.a_int), 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
     }
     if (inokay) {
         any.a_int = 3;   /* 'i' */
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("put %s in"), c_common_strings.c_something);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("put %s in"), c_common_strings.c_something);
         await add_menu(win, nul_glyphinfo, any, menuselector.get(any.a_int), 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
     }
     if (outokay) {
         any.a_int = 4;   /* 'b' */
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%stake out, then put in"), inokay ? $c.lit("both; ") : $c.lit(""));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%stake out, then put in"), inokay ? $c.lit("both; ") : $c.lit(""));
         await add_menu(win, nul_glyphinfo, any, menuselector.get(any.a_int), 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
     }
     if (inokay) {
         any.a_int = 5;   /* 'r' */
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%sput in, then take out"), outokay ? $c.lit("both reversed; ") : $c.lit(""));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%sput in, then take out"), outokay ? $c.lit("both reversed; ") : $c.lit(""));
         await add_menu(win, nul_glyphinfo, any, menuselector.get(any.a_int), 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
         any.a_int = 6;   /* 's' */
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("stash one item into %s"), await thesimpleoname(obj));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("stash one item into %s"), await thesimpleoname(obj));
         await add_menu(win, nul_glyphinfo, any, menuselector.get(any.a_int), 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
     }
     await add_menu_str(win, $c.lit(""));
@@ -3051,7 +3051,7 @@ async function in_or_out_menu(prompt, obj, outokay, inokay, alreadyused, more_co
         await add_menu(win, nul_glyphinfo, any, menuselector.get(any.a_int), 0, ATR.NONE, clr, $c.lit("loot next container"), MENU.ITEMFLAGS_SELECTED);
     }
     any.a_int = 8;   /* 'q' */
-    $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), alreadyused ? $c.lit("done") : $c.lit("do nothing"), 256);
+    $c.strcpy(new $c.Ptr(buf, 0), alreadyused ? $c.lit("done") : $c.lit("do nothing"));
     await add_menu(win, nul_glyphinfo, any, menuselector.get(any.a_int), 0, ATR.NONE, clr, new $c.Ptr(buf, 0), more_containers ? MENU.ITEMFLAGS_NONE : MENU.ITEMFLAGS_SELECTED);
     await end_menu()(win, prompt);
     n = await select_menu(win, PICK.ONE, new $c.Ptr(pick_list, 0));
@@ -3156,7 +3156,7 @@ export async function dotip() {   // pickup.c:3562
     /* this is iffy for menustyle:traditional; 'm' prefix is ambiguous
        for it: skip floor vs handle multiple containers via menu */
     if (boxes > 0 && (!iflags.menu_requested || flags.menu_style === MENU.TRADITIONAL && boxes > 1)) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("You can't tip %s while carrying so much."), !flags.verbose ? $c.lit("a container") : boxes > 1 ? $c.lit("one") : $c.lit("it"));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("You can't tip %s while carrying so much."), !flags.verbose ? $c.lit("a container") : boxes > 1 ? $c.lit("one") : $c.lit("it"));
         if (!await check_capacity(new $c.Ptr(buf, 0)) && await able_to_loot(cc.x, cc.y, FALSE)) {
             if (boxes > 1) {
                 /* pick one container via menu or ... */
@@ -3213,9 +3213,9 @@ export async function dotip() {   // pickup.c:3562
     if (spillage) {
         buf[0] = 0;
         if (is_pool(u.ux, u.uy)) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit(" and gradually %s"), await vtense(spillage, $c.lit("dissipate")));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit(" and gradually %s"), await vtense(spillage, $c.lit("dissipate")));
         } else if (is_lava(u.ux, u.uy)) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit(" and immediately %s away"), await vtense(spillage, $c.lit("burn")));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit(" and immediately %s away"), await vtense(spillage, $c.lit("burn")));
         }
         await pline($c.lit("Some %s %s onto the %s%s."), spillage, await vtense(spillage, $c.lit("spill")), surface(u.ux, u.uy), new $c.Ptr(buf, 0));
         /* shop usage message comes after the spill message */
@@ -3425,10 +3425,10 @@ async function tipcontainer_gettarget(box, cancelled) {   // pickup.c:3871
         exclude_it = $c.i8(!hands_available || otmp.olocked | 0 && otmp.lknown | 0 ? 1 : 0);
         any.$copyFrom(cg.zeroany);
         any.a_obj = !exclude_it ? otmp : null;
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%s"), !exclude_it ? $c.lit("") : $c.lit("    "), await doname(otmp));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s%s"), !exclude_it ? $c.lit("") : $c.lit("    "), await doname(otmp));
         await add_menu(win, nul_glyphinfo, any, $c.i8(!exclude_it ? otmp.invlet : 0), 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
     }
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Where to tip the contents of %s"), await doname(box));
+    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Where to tip the contents of %s"), await doname(box));
     await end_menu()(win, new $c.Ptr(buf, 0));
     n = await select_menu(win, PICK.ONE, new $c.Ptr(pick_list, 0));
     await destroy_nhwindow()(win);

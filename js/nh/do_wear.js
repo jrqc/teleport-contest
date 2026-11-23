@@ -115,7 +115,7 @@ async function on_msg(otmp) {   // do_wear.c:76
         otmp_name = await xname(otmp);
         how[0] = 0;
         if (otmp.otyp === TOWEL) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(how, 0), 0, 256, $c.lit(" around your %s"), await body_part(HEAD));
+            $c.sprintf(new $c.Ptr(how, 0), $c.lit(" around your %s"), await body_part(HEAD));
         }
         await You($c.lit("are now wearing %s%s."), obj_is_pname(otmp) ? await the(otmp_name) : await an(otmp_name), new $c.Ptr(how, 0));
     }
@@ -595,9 +595,9 @@ export async function wielding_corpse(obj, how, voluntary) {   // do_wear.c:608
         /* "removing" ought to be "taking off" but that makes the
            tombstone text more likely to be truncated */
         if (how) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(hbuf, 0), 0, 256, $c.lit("%s %s"), voluntary ? $c.lit("removing") : $c.lit("losing"), how.oclass === ARMOR_CLASS && objects[how.otyp].oc_subtyp === ARM_GLOVES ? gloves_simple_name(how) : strsubst(await simpleonames(how), $c.lit("set of "), $c.lit("")));
+            $c.sprintf(new $c.Ptr(hbuf, 0), $c.lit("%s %s"), voluntary ? $c.lit("removing") : $c.lit("losing"), how.oclass === ARMOR_CLASS && objects[how.otyp].oc_subtyp === ARM_GLOVES ? gloves_simple_name(how) : strsubst(await simpleonames(how), $c.lit("set of "), $c.lit("")));
         } else {
-            $c.__builtin___strcpy_chk(new $c.Ptr(hbuf, 0), $c.lit("resistance timing out"), 256);
+            $c.strcpy(new $c.Ptr(hbuf, 0), $c.lit("resistance timing out"));
         }
         nh_snprintf($c.lit("wielding_corpse"), 636, new $c.Ptr(kbuf, 0), 256, $c.lit("%s while wielding %s"), new $c.Ptr(hbuf, 0), await killer_xname(obj));
         await instapetrify(new $c.Ptr(kbuf, 0));
@@ -1595,7 +1595,7 @@ export async function stop_donning(stolenobj) {   // do_wear.c:1688
        by unmul() since the on or off action isn't completing */
     ga.afternmv = null;
     if (putting_on || !$c.peq(otmp, stolenobj)) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("You stop %s %s."), putting_on ? $c.lit("putting on") : $c.lit("taking off"), await thesimpleoname(otmp));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("You stop %s %s."), putting_on ? $c.lit("putting on") : $c.lit("taking off"), await thesimpleoname(otmp));
     } else {
         buf[0] = 0;   /* silently stop doffing stolenobj */
         result = $c.i32($c.neg64(gm.multi));   /* remember this before calling unmul() */
@@ -1708,17 +1708,17 @@ async function armor_or_accessory_off(obj) {   // do_wear.c:1771
         $t1 = what[0] = 0, why[0] = $t1;
         if (!$c.peq(obj, $G.uskin)) {
             if ($G.uarmc) {
-                $c.__builtin___strcat_chk(new $c.Ptr(what, 0), cloak_simple_name($G.uarmc), 128);
+                $c.strcat(new $c.Ptr(what, 0), cloak_simple_name($G.uarmc));
             }
             if ($c.peq(obj, $G.uarmu) && $G.uarm) {
                 if ($G.uarmc) {
-                    $c.__builtin___strcat_chk(new $c.Ptr(what, 0), $c.lit(" and "), 128);
+                    $c.strcat(new $c.Ptr(what, 0), $c.lit(" and "));
                 }
-                $c.__builtin___strcat_chk(new $c.Ptr(what, 0), suit_simple_name($G.uarm), 128);
+                $c.strcat(new $c.Ptr(what, 0), suit_simple_name($G.uarm));
             }
             nh_snprintf($c.lit("armor_or_accessory_off"), 1792, new $c.Ptr(why, 0), 128, $c.lit(" without taking off your %s first"), new $c.Ptr(what, 0));
         } else {
-            $c.__builtin___strcpy_chk(new $c.Ptr(why, 0), $c.lit("; it's embedded"), 128);
+            $c.strcpy(new $c.Ptr(why, 0), $c.lit("; it's embedded"));
         }
         await You_cant($c.lit("take that off%s."), new $c.Ptr(why, 0));
         return ECMD.OK;
@@ -2160,7 +2160,7 @@ async function accessory_or_armor_on(obj$in) {   // do_wear.c:2209
                 mask[0] = W.RINGL;
             } else {
                 do {
-                    $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Which %s%s, Right or Left?"), $c.andu64(gy.youmonst.data.mflags1, M1.HUMANOID) !== 0 ? $c.lit("ring-") : $c.lit(""), await body_part(FINGER));
+                    $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("Which %s%s, Right or Left?"), $c.andu64(gy.youmonst.data.mflags1, M1.HUMANOID) !== 0 ? $c.lit("ring-") : $c.lit(""), await body_part(FINGER));
                     answer = await yn_function(new $c.Ptr(qbuf, 0), new $c.Ptr(rightleftchars, 0), 0, TRUE);
                     switch (answer) {
                         case 0:
@@ -2561,10 +2561,10 @@ async function select_off(otmp) {   // do_wear.c:2696
         glibdummy.$copyFrom(cg.zeroobj);
         why = null;   /* the item which prevents ring removal */
         if (await welded($G.uwep) && ($c.peq(otmp, RING_ON_PRIMARY()) || bimanual($G.uwep))) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("free a weapon %s"), await body_part(HAND));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("free a weapon %s"), await body_part(HAND));
             why = $G.uwep;
         } else if ($G.uarmg && ($G.uarmg.cursed | 0 || Glib())) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("take off your %s%s"), u.uprops[GLIB].intrinsic ? $c.lit("slippery ") : $c.lit(""), gloves_simple_name($G.uarmg));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("take off your %s%s"), u.uprops[GLIB].intrinsic ? $c.lit("slippery ") : $c.lit(""), gloves_simple_name($G.uarmg));
             why = !Glib() ? $G.uarmg : glibdummy;
         }
         if (why) {
@@ -2602,13 +2602,13 @@ async function select_off(otmp) {   // do_wear.c:2696
     if ($c.peq(otmp, $G.uarm) || $c.peq(otmp, $G.uarmu)) {
         why = null;   /* the item which prevents disrobing */
         if ($G.uarmc && $G.uarmc.cursed | 0) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("remove your %s"), cloak_simple_name($G.uarmc));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("remove your %s"), cloak_simple_name($G.uarmc));
             why = $G.uarmc;
         } else if ($c.peq(otmp, $G.uarmu) && $G.uarm && $G.uarm.cursed | 0) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("remove your %s"), new $c.Ptr(c_suit, 0));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("remove your %s"), new $c.Ptr(c_suit, 0));
             why = $G.uarm;
         } else if (await welded($G.uwep) && bimanual($G.uwep)) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("release your %s"), $G.uwep.oclass === WEAPON_CLASS && objects[$G.uwep.otyp].oc_subtyp >= P.SHORT_SWORD && objects[$G.uwep.otyp].oc_subtyp <= P.SABER ? new $c.Ptr(c_sword, 0) : $G.uwep.otyp === BATTLE_AXE ? new $c.Ptr(c_axe, 0) : new $c.Ptr(c_weapon, 0));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("release your %s"), $G.uwep.oclass === WEAPON_CLASS && objects[$G.uwep.otyp].oc_subtyp >= P.SHORT_SWORD && objects[$G.uwep.otyp].oc_subtyp <= P.SABER ? new $c.Ptr(c_sword, 0) : $G.uwep.otyp === BATTLE_AXE ? new $c.Ptr(c_axe, 0) : new $c.Ptr(c_weapon, 0));
             why = $G.uwep;
         }
         if (why) {
@@ -2866,7 +2866,7 @@ export async function doddoremarm() {   // do_wear.c:3022
         await menu_remarm(result);
     }
     if (svc.context.takeoff.mask) {
-        $c.__builtin___strncpy_chk(new $c.Ptr(svc.context.takeoff.disrobing, 0), $c.and64(svc.context.takeoff.mask, ~W_WEAPONS) !== 0 ? $c.lit("disrobing") : $c.lit("disarming"), CONTEXTVERBSZ, 31);
+        $c.strncpy(new $c.Ptr(svc.context.takeoff.disrobing, 0), $c.and64(svc.context.takeoff.mask, ~W_WEAPONS) !== 0 ? $c.lit("disrobing") : $c.lit("disarming"), CONTEXTVERBSZ);
         /* default activity for armor and/or accessories,
            possibly combined with weapons */
         /* specific activity when handling weapons only */
@@ -3149,7 +3149,7 @@ export async function inaccessible_equipment(obj, verb, only_if_known_cursed) { 
     /* check for suit covered by cloak */
     if ($c.peq(obj, $G.uarm) && $G.uarmc && (anycovering || $G.uarmc.cursed | 0 && $G.uarmc.bknown | 0)) {
         if (verb) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await yname($G.uarmc), 256);
+            $c.strcpy(new $c.Ptr(buf, 0), await yname($G.uarmc));
             await You(new $c.Ptr(inaccessible_equipment$need_to_take_off_outer_armor, 0), new $c.Ptr(buf, 0), verb, await yname(obj));
         }
         return TRUE;
@@ -3163,13 +3163,13 @@ export async function inaccessible_equipment(obj, verb, only_if_known_cursed) { 
             sameprefix = $c.i8($G.uarm && $G.uarmc && !$c.strcmp(await shk_your(new $c.Ptr(cloaktmp, 0), $G.uarmc), await shk_your(new $c.Ptr(suittmp, 0), $G.uarm)) ? 1 : 0);
             new $c.Ptr(buf, 0).set(0, 0);
             if ($G.uarmc) {
-                $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), await yname($G.uarmc), 256);
+                $c.strcat(new $c.Ptr(buf, 0), await yname($G.uarmc));
             }
             if ($G.uarm && $G.uarmc) {
-                $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit(" and "), 256);
+                $c.strcat(new $c.Ptr(buf, 0), $c.lit(" and "));
             }
             if ($G.uarm) {
-                $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), sameprefix ? await xname($G.uarm) : await yname($G.uarm), 256);
+                $c.strcat(new $c.Ptr(buf, 0), sameprefix ? await xname($G.uarm) : await yname($G.uarm));
             }
             await You(new $c.Ptr(inaccessible_equipment$need_to_take_off_outer_armor, 0), new $c.Ptr(buf, 0), verb, await yname(obj));
         }
@@ -3178,7 +3178,7 @@ export async function inaccessible_equipment(obj, verb, only_if_known_cursed) { 
     /* check for ring covered by gloves */
     if (($c.peq(obj, $G.uleft) || $c.peq(obj, $G.uright)) && $G.uarmg && (anycovering || $G.uarmg.cursed | 0 && $G.uarmg.bknown | 0)) {
         if (verb) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await yname($G.uarmg), 256);
+            $c.strcpy(new $c.Ptr(buf, 0), await yname($G.uarmg));
             await You(new $c.Ptr(inaccessible_equipment$need_to_take_off_outer_armor, 0), new $c.Ptr(buf, 0), verb, await yname(obj));
         }
         return TRUE;

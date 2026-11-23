@@ -151,7 +151,7 @@ function erode_obj_text(otmp, buf) {   // read.c:89
 }
 export function tshirt_text(tshirt, buf) {   // read.c:100
     /* Scott Bigham */
-    $c.__builtin___strcpy_chk(buf, tshirt_text$shirt_msgs[$c.remu32(tshirt.o_id, 70)], -1);
+    $c.strcpy(buf, tshirt_text$shirt_msgs[$c.remu32(tshirt.o_id, 70)]);
     return erode_obj_text(tshirt, buf);
 }
 export function hawaiian_motif(shirt, buf) {   // read.c:190
@@ -160,7 +160,7 @@ export function hawaiian_motif(shirt, buf) {   // read.c:190
     /* a tourist's starting shirt always has the same o_id; we need some
        additional randomness or else its design will never differ */
     motif = (shirt.o_id ^ $c.u32($G.ubirthday)) >>> 0;
-    $c.__builtin___strcpy_chk(buf, hawaiian_motif$hawaiian_motifs[$c.remu32(motif, 16)], -1);
+    $c.strcpy(buf, hawaiian_motif$hawaiian_motifs[$c.remu32(motif, 16)]);
     return buf;
 }
 async function hawaiian_design(shirt, buf) {   // read.c:224
@@ -170,11 +170,11 @@ async function hawaiian_design(shirt, buf) {   // read.c:224
        using the same formula in both cases may lead to some shirt combos
        never appearing, if the sizes of the two lists have common factors. */
     bg = (shirt.o_id ^ $c.u32($c.not64($G.ubirthday))) >>> 0;
-    $c.__builtin___sprintf_chk(buf, 0, -1, $c.lit("%s on %s background"), await makeplural(hawaiian_motif(shirt, buf)), await an(hawaiian_design$hawaiian_bgs[$c.remu32(bg, 11)]));
+    $c.sprintf(buf, $c.lit("%s on %s background"), await makeplural(hawaiian_motif(shirt, buf)), await an(hawaiian_design$hawaiian_bgs[$c.remu32(bg, 11)]));
     return buf;
 }
 export function apron_text(apron, buf) {   // read.c:254
-    $c.__builtin___strcpy_chk(buf, apron_text$apron_msgs[$c.remu32(apron.o_id, 10)], -1);
+    $c.strcpy(buf, apron_text$apron_msgs[$c.remu32(apron.o_id, 10)]);
     return erode_obj_text(apron, buf);
 }
 /* return the text of a candy bar's wrapper */
@@ -326,7 +326,7 @@ export async function doread() {   // read.c:330
         if (flags.verbose) {
             await pline($c.lit("It reads:"));
         }
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf$2, 0), 0, 256, $c.lit("%s"), pmname(pm, NEUTRAL));
+        $c.sprintf(new $c.Ptr(buf$2, 0), $c.lit("%s"), pmname(pm, NEUTRAL));
         await pline($c.lit("\"Magic Marker(TM) %s Red Ink Marker Pen.  Water Soluble.\""), upwords(new $c.Ptr(buf$2, 0)));
         if (!($t5 = u.uconduct.literate, u.uconduct.literate = $c.add64($t5, 1), $t5)) {
             await livelog_printf(LL.CONDUCT, $c.lit("became literate by reading a magic marker"));
@@ -1630,7 +1630,7 @@ async function seffect_earth(sobjp) {   // read.c:1919
                 await pline_The($c.lit("%s rumbles %s you!"), ceiling(u.ux, u.uy), sblessed ? $c.lit("around") : $c.lit("above"));
             } else {
                 avalanche = $c.lit("avalanche");
-                $c.__builtin___sprintf_chk(new $c.Ptr(matbuf, 0), 0, 256, $c.lit("%s"), sblessed ? await makeplural(avalanche) : await an(avalanche));
+                $c.sprintf(new $c.Ptr(matbuf, 0), $c.lit("%s"), sblessed ? await makeplural(avalanche) : await an(avalanche));
                 await pline($c.lit("%s of boulders %s %s you!"), upstart(new $c.Ptr(matbuf, 0)), await vtense(new $c.Ptr(matbuf, 0), $c.lit("materialize")), sblessed ? $c.lit("around") : $c.lit("above"));
             }
         }
@@ -2265,7 +2265,7 @@ async function do_class_genocide() {   // read.c:2638
             await pline($c.lit("%s"), c_common_strings.c_thats_enough_tries);
             return;
         }
-        $c.__builtin___strcpy_chk(new $c.Ptr(promptbuf, 0), $c.lit("What class of monsters do you want to genocide?"), 128);
+        $c.strcpy(new $c.Ptr(promptbuf, 0), $c.lit("What class of monsters do you want to genocide?"));
         if (j > 0) {
             nh_snprintf($c.lit("do_class_genocide"), 2657, eos(new $c.Ptr(promptbuf, 0)), $c.subu64(128, $c.strlen(new $c.Ptr(promptbuf, 0))), $c.lit(" [enter %s]"), iflags.cmdassist ? $c.lit("the symbol or name representing a class, or '?'") : $c.lit("'?' to see previous genocides"));
         }
@@ -2330,7 +2330,7 @@ async function do_class_genocide() {   // read.c:2638
         }
         for (i = LOW_PM; i < NUMMONS; i = i + 1 | 0) {
             if (mons[i].mlet === class_) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(nam, 0), await makeplural(mons[i].pmnames[NEUTRAL]), 256);
+                $c.strcpy(new $c.Ptr(nam, 0), await makeplural(mons[i].pmnames[NEUTRAL]));
                 /* Although "genus" is Latin for race, the hero benefits
                  * from both race and role; thus genocide affects either.
                  */
@@ -2406,7 +2406,7 @@ async function do_class_genocide() {   // read.c:2638
         }
         if (gameover || u.uhp === -1) {
             svk.killer.format = KILLED.BY_AN;
-            $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), $c.lit("scroll of genocide"), 256);
+            $c.strcpy(new $c.Ptr(svk.killer.name, 0), $c.lit("scroll of genocide"));
             if (gameover) {
                 await done(GENOCIDED);
             }
@@ -2424,7 +2424,7 @@ export async function do_genocide(how) {   // read.c:2826
     if (how & PLAYER) {
         mndx = u.umonster;   /* non-polymorphed mon num */
         ptr = $c.relem(mons, mndx);
-        $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), pmname(ptr, (u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0), 256);
+        $c.strcpy(new $c.Ptr(buf, 0), pmname(ptr, (u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0));
         killplayer = killplayer + 1 | 0;
     } else {
         buf[0] = 0;   /* init for EDIT_GETLIN */
@@ -2437,7 +2437,7 @@ export async function do_genocide(how) {   // read.c:2826
                 await pline($c.lit("%s"), c_common_strings.c_thats_enough_tries);
                 return;
             }
-            $c.__builtin___strcpy_chk(new $c.Ptr(promptbuf, 0), $c.lit("What type of monster do you want to genocide?"), 128);
+            $c.strcpy(new $c.Ptr(promptbuf, 0), $c.lit("What type of monster do you want to genocide?"));
             if (i > 0) {
                 nh_snprintf($c.lit("do_genocide"), 2861, eos(new $c.Ptr(promptbuf, 0)), $c.subu64(128, $c.strlen(new $c.Ptr(promptbuf, 0))), $c.lit(" [enter %s]"), iflags.cmdassist ? $c.lit("the name of a type of monster, or '?'") : $c.lit("'?' to see previous genocides"));
             }
@@ -2511,18 +2511,18 @@ export async function do_genocide(how) {   // read.c:2826
         mndx = ptr.pmidx;   /* needed for the 'no free pass' cases */
     }
     which = $c.lit("all ");
-    $c.__builtin___strcpy_chk(new $c.Ptr(realbuf, 0), ptr.pmnames[NEUTRAL], 256);   /* standard singular */
+    $c.strcpy(new $c.Ptr(realbuf, 0), ptr.pmnames[NEUTRAL]);   /* standard singular */
     if (Hallucination()) {
         /* hallucinate hero's type */
         if (Upolyd()) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), pmname(gy.youmonst.data, flags.female ? FEMALE : MALE), 256);
+            $c.strcpy(new $c.Ptr(buf, 0), pmname(gy.youmonst.data, flags.female ? FEMALE : MALE));
         } else {
-            $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), flags.female && gu.urole.name.f ? gu.urole.name.f : gu.urole.name.m, 256);
+            $c.strcpy(new $c.Ptr(buf, 0), flags.female && gu.urole.name.f ? gu.urole.name.f : gu.urole.name.m);
             $t1 = lowc(buf[0]), buf[0] = $t1;
         }
     } else {
         /* use actual type */
-        $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), new $c.Ptr(realbuf, 0), 256);
+        $c.strcpy(new $c.Ptr(buf, 0), new $c.Ptr(realbuf, 0));
         if (ptr.geno & G_UNIQ && !$c.peq(ptr, $c.relem(mons, PM.HIGH_CLERIC))) {
             which = !type_is_pname(ptr) ? $c.lit("the ") : $c.lit("");
         }
@@ -2540,15 +2540,15 @@ export async function do_genocide(how) {   // read.c:2826
             u.uhp = -1;
             if (how & PLAYER) {
                 svk.killer.format = KILLED.BY;
-                $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), $c.lit("genocidal confusion"), 256);
+                $c.strcpy(new $c.Ptr(svk.killer.name, 0), $c.lit("genocidal confusion"));
             } else if (how & ONTHRONE) {
                 /* player selected while on a throne */
                 svk.killer.format = KILLED.BY_AN;
-                $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), $c.lit("imperious order"), 256);
+                $c.strcpy(new $c.Ptr(svk.killer.name, 0), $c.lit("imperious order"));
             } else {
                 /* selected player deliberately, not confused */
                 svk.killer.format = KILLED.BY_AN;
-                $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), $c.lit("scroll of genocide"), 256);
+                $c.strcpy(new $c.Ptr(svk.killer.name, 0), $c.lit("scroll of genocide"));
             }
             /* Polymorphed characters will die as soon as they're rehumanized.
                KMH -- Unchanging prevents rehumanization. */
@@ -2713,29 +2713,29 @@ async function create_particular_parse(str, d) {   // read.c:3137
     /* gear -- extremely limited number of possibilities supported */
     if ((tmpp = strstri(bufp, $c.lit("saddled "))) !== null) {
         d.saddled = TRUE;
-        $c.__builtin___memset_chk(tmpp, 32, 8, -1);
+        $c.memset(tmpp, 32, 8);
     }
     /* state -- limited number of possibilities supported */
     if ((tmpp = strstri(bufp, $c.lit("sleeping "))) !== null) {
         d.sleeping = TRUE;
-        $c.__builtin___memset_chk(tmpp, 32, 9, -1);
+        $c.memset(tmpp, 32, 9);
     }
     if ((tmpp = strstri(bufp, $c.lit("invisible "))) !== null) {
         d.invisible = TRUE;
-        $c.__builtin___memset_chk(tmpp, 32, 10, -1);
+        $c.memset(tmpp, 32, 10);
     }
     if ((tmpp = strstri(bufp, $c.lit("hidden "))) !== null) {
         d.hidden = TRUE;
-        $c.__builtin___memset_chk(tmpp, 32, 7, -1);
+        $c.memset(tmpp, 32, 7);
     }
     /* check "female" before "male" to avoid false hit mid-word */
     if ((tmpp = strstri(bufp, $c.lit("female "))) !== null) {
         d.fem = 1;
-        $c.__builtin___memset_chk(tmpp, 32, 7, -1);
+        $c.memset(tmpp, 32, 7);
     }
     if ((tmpp = strstri(bufp, $c.lit("male "))) !== null) {
         d.fem = 0;
-        $c.__builtin___memset_chk(tmpp, 32, 5, -1);
+        $c.memset(tmpp, 32, 5);
     }
     bufp = mungspaces(bufp);   /* after potential memset(' ') */
     /* allow the initial disposition to be specified */
@@ -2805,7 +2805,7 @@ async function create_particular_creation(d) {   // read.c:3252
         firstchoice = d.which;
         if (cant_revive(new $c.FieldRef(d, "which", "i32"), FALSE, null) && firstchoice !== PM.LONG_WORM_TAIL) {
             /* wizard mode can override handling of special monsters */
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Creating %s instead; force %s?"), mons[d.which].pmnames[NEUTRAL], mons[firstchoice].pmnames[NEUTRAL]);
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Creating %s instead; force %s?"), mons[d.which].pmnames[NEUTRAL], mons[firstchoice].pmnames[NEUTRAL]);
             if (await y_n(new $c.Ptr(buf, 0)) === 121) {
                 d.which = firstchoice;
             }
@@ -2906,7 +2906,7 @@ export async function create_particular() {   // read.c:3372
     tryct = CP_TRYLIM;
     altmsg = 0;
     buf[0] = 0;   /* for EDIT_GETLIN */
-    $c.__builtin___strcpy_chk(new $c.Ptr(prompt, 0), $c.lit("Create what kind of monster?"), 128);
+    $c.strcpy(new $c.Ptr(prompt, 0), $c.lit("Create what kind of monster?"));
     do {
         await getlin(new $c.Ptr(prompt, 0), new $c.Ptr(buf, 0));
         bufp = mungspaces(new $c.Ptr(buf, 0));
@@ -2925,7 +2925,7 @@ export async function create_particular() {   // read.c:3372
         }
         /* when a second try is needed, expand the prompt */
         if (tryct === CP_TRYLIM) {
-            $c.__builtin___strcat_chk(new $c.Ptr(prompt, 0), $c.lit(" [type name or symbol]"), 128);
+            $c.strcat(new $c.Ptr(prompt, 0), $c.lit(" [type name or symbol]"));
         }
     } while ((tryct = tryct - 1 | 0) > 0);
     if (!tryct) {

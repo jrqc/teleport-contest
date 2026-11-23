@@ -89,7 +89,7 @@ export function tre_mem_new_impl(provided, provided_block) {   // tre-mem.c:29
     let mem = 0;
     if (provided) {
         mem = provided_block;
-        $h.A($c.__builtin___memset_chk($h.P(mem), 0, 48, -1));
+        $hl.memset(mem, 0, 48);
     } else {
         mem = $hl.calloc(1, 48);
     }
@@ -173,7 +173,7 @@ export function tre_mem_alloc_impl(mem, provided, provided_block, zero, size) { 
     $h.st64(mem + 24, $c.subu64($h.ldu64(mem + 24), size));
     /* Set to zero if needed. */
     if (zero) {
-        $h.A($c.__builtin___memset_chk($h.P(ptr), 0, size, -1));
+        $hl.memset(ptr, 0, size);
     }
     return ptr;
 }

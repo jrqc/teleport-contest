@@ -34,7 +34,7 @@ export async function selection_new() {   // selvar.c:15
     tmps.bounds.ly = ROWNO;
     $t1 = tmps.bounds.hy = 0, tmps.bounds.hx = $t1;
     $t2 = $c.asArr(await alloc(COLNO * ROWNO + 1), Int8Array), tmps.map = $t2;
-    $c.__builtin___memset_chk(tmps.map, 1, COLNO * ROWNO, -1);
+    $c.memset(tmps.map, 1, COLNO * ROWNO);
     tmps.map.set(COLNO * ROWNO, 0);
     return tmps;
 }
@@ -47,14 +47,14 @@ export function selection_free(sel, freesel) {   // selvar.c:33
         if (freesel) {
             $c.free(sel);
         } else {
-            $c.__builtin___memset_chk(sel, 0, 32, -1);
+            $c.memset(sel, 0, 32);
         }
     }
 }
 /* clear selection, setting all locations to value val */
 export function selection_clear(sel, val) {   // selvar.c:48
     let $t1;
-    $c.__builtin___memset_chk(sel.map, 1 + val | 0, COLNO * ROWNO, -1);
+    $c.memset(sel.map, 1 + val | 0, COLNO * ROWNO);
     if (val) {
         sel.bounds.lx = 0;
         sel.bounds.ly = 0;
@@ -743,7 +743,7 @@ export function selection_size_description(sel, buf) {   // selvar.c:764
     selection_getbounds(sel, rect);
     dx = $c.i16((rect.hx - rect.lx | 0) + 1 | 0);
     dy = $c.i16((rect.hy - rect.ly | 0) + 1 | 0);
-    $c.__builtin___sprintf_chk(buf, 0, -1, $c.lit("%s %i by %i"), selection_is_irregular(sel) ? $c.lit("irregularly shaped") : dx === dy ? $c.lit("square") : $c.lit("rectangular"), dx, dy);
+    $c.sprintf(buf, $c.lit("%s %i by %i"), selection_is_irregular(sel) ? $c.lit("irregularly shaped") : dx === dy ? $c.lit("square") : $c.lit("rectangular"), dx, dy);
     return buf;
 }
 export async function selection_from_mkroom(croom) {   // selvar.c:781

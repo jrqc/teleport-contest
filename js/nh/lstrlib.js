@@ -175,15 +175,15 @@ async function str_rep(L) {   // lstrlib.c:150
             p = await luaL_buffinitsize(L, $fp + 16, totallen);
             while (($t1 = n, n = $c.sub64($t1, 1), $t1) > 1) {
                 /* first n-1 copies (followed by separator) */
-                $hl.__builtin___memcpy_chk(p, s, $c.mulu64($h.ldu64($fp), 1), -1);
+                $hl.memcpy(p, s, $c.mulu64($h.ldu64($fp), 1));
                 p = p + $c.idx($h.ldu64($fp));
                 if ($h.ldu64($fp + 8) > 0) {
                     /* empty 'memcpy' is not that cheap */
-                    $hl.__builtin___memcpy_chk(p, sep, $c.mulu64($h.ldu64($fp + 8), 1), -1);
+                    $hl.memcpy(p, sep, $c.mulu64($h.ldu64($fp + 8), 1));
                     p = p + $c.idx($h.ldu64($fp + 8));
                 }
             }
-            $hl.__builtin___memcpy_chk(p, s, $c.mulu64($h.ldu64($fp), 1), -1);   /* last copy (not followed by separator) */
+            $hl.memcpy(p, s, $c.mulu64($h.ldu64($fp), 1));   /* last copy (not followed by separator) */
             await luaL_pushresultsize($fp + 16, totallen);
         }
         return 1;
@@ -1057,9 +1057,9 @@ async function addquoted(b, s, len) {   // lstrlib.c:1122
                 $h.ldu64(b + 16) < $h.ldu64(b + 8) || await luaL_prepbuffsize(b, 1), $h.i8[$h.u32[b >>> 2] + $c.idx(($t4 = $h.ldu64(b + 16), $h.st64(b + 16, $c.addu64($t4, 1)), $t4))] = $h.i8[s];
             } else if ($c.iscntrl($c.u8($h.i8[s]))) {
                 if (!$c.isdigit($c.u8($h.i8[s + 1]))) {
-                    $c.__builtin___snprintf_chk($h.P($fp), 10, 0, -1, $h.P($h.lit("\\%d")), $c.u8($h.i8[s]));
+                    $c.snprintf($h.P($fp), 10, $h.P($h.lit("\\%d")), $c.u8($h.i8[s]));
                 } else {
-                    $c.__builtin___snprintf_chk($h.P($fp), 10, 0, -1, $h.P($h.lit("\\%03d")), $c.u8($h.i8[s]));
+                    $c.snprintf($h.P($fp), 10, $h.P($h.lit("\\%03d")), $c.u8($h.i8[s]));
                 }
                 await luaL_addstring(b, $fp);
             } else {
@@ -1087,7 +1087,7 @@ function quotefloat(L, buff, n) {   // lstrlib.c:1151
         s = $h.lit("(0/0)");
     } else {
         /* format number as hexadecimal */
-        nb = (L, $c.__builtin___snprintf_chk($h.P(buff), 120, 0, -1, $h.P($h.lit("%a")), n));
+        nb = (L, $c.snprintf($h.P(buff), 120, $h.P($h.lit("%a")), n));
         /* ensures that 'buff' string uses a dot as the radix character */
         if ($hl.memchr(buff, 46, $c.u64(nb)) === 0) {
             /* no dot? */
@@ -1100,7 +1100,7 @@ function quotefloat(L, buff, n) {   // lstrlib.c:1151
         return nb;
     }
     /* for the fixed representations */
-    return $c.__builtin___snprintf_chk($h.P(buff), 120, 0, -1, $h.P($h.lit("%s")), $h.P(s));
+    return $c.snprintf($h.P(buff), 120, $h.P($h.lit("%s")), $h.P(s));
 }
 async function addliteral(L, b, arg) {   // lstrlib.c:1175
     let s = 0, buff = 0, nb = 0, n = 0, format = 0;
@@ -1124,7 +1124,7 @@ async function addliteral(L, b, arg) {   // lstrlib.c:1175
                         /* corner case? */
                         /* use hex */
                         format = n === -9223372036854775808n ? $h.lit("0x%llx") : $h.lit("%lld");   /* else use default format */
-                        nb = $c.__builtin___snprintf_chk($h.P(buff), 120, 0, -1, $h.P(format), n);
+                        nb = $c.snprintf($h.P(buff), 120, $h.P(format), n);
                     }
                     $h.st64(b + 16, $c.addu64($h.ldu64(b + 16), $c.u64(nb)));
                     break;
@@ -1188,7 +1188,7 @@ async function getformat(L, strfrmt, form) {   // lstrlib.c:1245
         await luaL_error(L, $h.lit("invalid format (too long)"));
     }
     $h.i8[($t1 = form, form = $t1 + 1, $t1)] = 37;
-    $hl.__builtin___memcpy_chk(form, strfrmt, $c.mulu64(len, 1), -1);
+    $hl.memcpy(form, strfrmt, $c.mulu64(len, 1));
     $h.i8[form + $c.idx(len)] = 0;
     return strfrmt + $c.idx(len) - 1;
 }
@@ -1200,7 +1200,7 @@ function addlenmod(form, lenmod) {   // lstrlib.c:1263
     l = $hl.strlen(form);
     lm = $hl.strlen(lenmod);
     spec = $h.i8[form + $c.idx($c.subu64(l, 1))];
-    $hl.__builtin___strcpy_chk(form + $c.idx(l) - 1, lenmod, -1);
+    $hl.strcpy(form + $c.idx(l) - 1, lenmod);
     $h.i8[form + $c.idx($c.subu64($c.addu64(l, lm), 1))] = spec;
     $h.i8[form + $c.idx($c.addu64(l, lm))] = 0;
 }
@@ -1233,7 +1233,7 @@ async function str_format(L) {   // lstrlib.c:1273
                         case 99:
                             {
                                 await checkformat(L, $fp + 1064, $h.lit("-"), 0);
-                                nb = $c.__builtin___snprintf_chk($h.P(buff), $c.u64(maxitem), 0, -1, $h.P($fp + 1064), $c.i32(await luaL_checkinteger(L, arg)));
+                                nb = $c.snprintf($h.P(buff), $c.u64(maxitem), $h.P($fp + 1064), $c.i32(await luaL_checkinteger(L, arg)));
                                 break;
                             }
                         case 100:
@@ -1253,14 +1253,14 @@ async function str_format(L) {   // lstrlib.c:1273
                                 n = await luaL_checkinteger(L, arg);
                                 await checkformat(L, $fp + 1064, flags, 1);
                                 addlenmod($fp + 1064, $h.lit("ll"));
-                                nb = $c.__builtin___snprintf_chk($h.P(buff), $c.u64(maxitem), 0, -1, $h.P($fp + 1064), n);
+                                nb = $c.snprintf($h.P(buff), $c.u64(maxitem), $h.P($fp + 1064), n);
                                 break;
                             }
                         case 97:
                         case 65:
                             await checkformat(L, $fp + 1064, $h.lit("-+#0 "), 1);
                             addlenmod($fp + 1064, $h.lit(""));
-                            nb = (L, $c.__builtin___snprintf_chk($h.P(buff), $c.u64(maxitem), 0, -1, $h.P($fp + 1064), await luaL_checknumber(L, arg)));
+                            nb = (L, $c.snprintf($h.P(buff), $c.u64(maxitem), $h.P($fp + 1064), await luaL_checknumber(L, arg)));
                             break;
                         case 102:
                             maxitem = 418;   /* extra space for '%f' */
@@ -1274,7 +1274,7 @@ async function str_format(L) {   // lstrlib.c:1273
                                 n$2 = await luaL_checknumber(L, arg);
                                 await checkformat(L, $fp + 1064, $h.lit("-+#0 "), 1);
                                 addlenmod($fp + 1064, $h.lit(""));
-                                nb = $c.__builtin___snprintf_chk($h.P(buff), $c.u64(maxitem), 0, -1, $h.P($fp + 1064), n$2);
+                                nb = $c.snprintf($h.P(buff), $c.u64(maxitem), $h.P($fp + 1064), n$2);
                                 break;
                             }
                         case 112:
@@ -1286,7 +1286,7 @@ async function str_format(L) {   // lstrlib.c:1273
                                     p = $h.lit("(null)");   /* result */
                                     $h.i8[$fp + 1064 + $c.idx($c.subu64($hl.strlen($fp + 1064), 1))] = 115;   /* format it as a string */
                                 }
-                                nb = $c.__builtin___snprintf_chk($h.P(buff), $c.u64(maxitem), 0, -1, $h.P($fp + 1064), $h.P(p));
+                                nb = $c.snprintf($h.P(buff), $c.u64(maxitem), $h.P($fp + 1064), $h.P(p));
                                 break;
                             }
                         case 113:
@@ -1310,7 +1310,7 @@ async function str_format(L) {   // lstrlib.c:1273
                                         await luaL_addvalue($fp + 8);   /* keep entire string */
                                     } else {
                                         /* format the string into 'buff' */
-                                        nb = $c.__builtin___snprintf_chk($h.P(buff), $c.u64(maxitem), 0, -1, $h.P($fp + 1064), $h.P(s));
+                                        nb = $c.snprintf($h.P(buff), $c.u64(maxitem), $h.P($fp + 1064), $h.P(s));
                                         await lua_settop(L, -2);   /* remove result from 'luaL_tolstring' */
                                     }
                                 }
@@ -1524,7 +1524,7 @@ async function packint(b, n, islittle, size, neg) {   // lstrlib.c:1568
 function copywithendian(dest, src, size, islittle) {   // lstrlib.c:1589
     let $t1, $t2, $t3, $t4, $t5;
     if (islittle === $h.i8[nativeendian]) {
-        $hl.__builtin___memcpy_chk(dest, src, $c.u64(size), -1);
+        $hl.memcpy(dest, src, $c.u64(size));
     } else {
         dest = dest + (size - 1 | 0);
         while (($t1 = size, size = $t1 - 1 | 0, $t1) !== 0) {

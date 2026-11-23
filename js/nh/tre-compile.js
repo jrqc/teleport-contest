@@ -1218,7 +1218,7 @@ function tre_add_tags(mem, stack, tree, tnfa) {   // tre-compile.c:394
                         $h.u32[(new_tag_directions + $h.i32[(to_reorder + i$5 * 4) >>> 2] * 4) >>> 2] = $h.u32[($h.u32[(tnfa + 32) >>> 2] + i$5 * 4) >>> 2];
                     }
                     /* TRE_DEBUG */
-                    $hl.__builtin___memcpy_chk($h.u32[(tnfa + 32) >>> 2], new_tag_directions, $c.mulu64(4, num_tags), -1);
+                    $hl.memcpy($h.u32[(tnfa + 32) >>> 2], new_tag_directions, $c.mulu64(4, num_tags));
                     $hl.free(new_tag_directions);
                     do {
                     } while (0, 0);
@@ -2613,7 +2613,7 @@ function tre_make_trans(p1, p2, transitions, counts, offs) {   // tre-compile.c:
                     if ($h.u32[(trans + 48) >>> 2] === 0) {
                         return 12;
                     }
-                    $hl.__builtin___memcpy_chk($h.u32[(trans + 48) >>> 2], $h.u32[(p1 + 32) >>> 2], $c.addu64(8, $c.mulu64(8, $c.u64($h.i32[($h.u32[(p1 + 32) >>> 2]) >>> 2]))), -1);
+                    $hl.memcpy($h.u32[(trans + 48) >>> 2], $h.u32[(p1 + 32) >>> 2], $c.addu64(8, $c.mulu64(8, $c.u64($h.i32[($h.u32[(p1 + 32) >>> 2]) >>> 2]))));
                 }
                 /* Find out how many tags this transition has. */
                 i = 0;
@@ -2786,7 +2786,7 @@ export function tre_compile(preg, regex, n, cflags, loc) {   // tre-compile.c:29
             return 12;
         }
         /* Parse the regexp. */
-        $h.A($c.__builtin___memset_chk($h.P($fp + 8), 0, 136, -1));
+        $hl.memset($fp + 8, 0, 136);
         $h.stp($fp + 8, mem);
         $h.stp($fp + 8 + 8, stack);
         $h.stp($fp + 8 + 24, regex);
@@ -2879,7 +2879,7 @@ export function tre_compile(preg, regex, n, cflags, loc) {   // tre-compile.c:29
                         } while (0, 0);
                     }
                     $h.stp(tnfa + 32, tag_directions);
-                    $h.A($c.__builtin___memset_chk($h.P(tag_directions), -1, $c.mulu64(4, $c.u64($h.i32[(tnfa + 80) >>> 2] + 1 | 0)), -1));
+                    $hl.memset(tag_directions, -1, $c.mulu64(4, $c.u64($h.i32[(tnfa + 80) >>> 2] + 1 | 0)));
                 }
                 $t2 = $hl.calloc((Math.imul($h.i32[(tnfa + 80) >>> 2] >>> 0, 2) >>> 0) + 3 >>> 0, 4), $h.stp(tnfa + 40, $t2);
                 if ($h.u32[(tnfa + 40) >>> 2] === 0) {
@@ -3071,7 +3071,7 @@ export function tre_compile(preg, regex, n, cflags, loc) {   // tre-compile.c:29
                             }
                         } while (0, 0);
                     }
-                    $hl.__builtin___memcpy_chk($h.u32[(initial + i * 56 + 24) >>> 2], $h.u32[(p + 16) >>> 2], $c.mulu64(4, $c.u64(j$2 + 1 | 0)), -1);
+                    $hl.memcpy($h.u32[(initial + i * 56 + 24) >>> 2], $h.u32[(p + 16) >>> 2], $c.mulu64(4, $c.u64(j$2 + 1 | 0)));
                 }
                 $h.stp(initial + i * 56 + 32, 0);
                 if ($h.u32[(p + 48) >>> 2]) {
@@ -3084,7 +3084,7 @@ export function tre_compile(preg, regex, n, cflags, loc) {   // tre-compile.c:29
                             }
                         } while (0, 0);
                     }
-                    $hl.__builtin___memcpy_chk($h.u32[(initial + i * 56 + 32) >>> 2], $h.u32[(p + 48) >>> 2], 36, -1);
+                    $hl.memcpy($h.u32[(initial + i * 56 + 32) >>> 2], $h.u32[(p + 48) >>> 2], 36);
                 }
                 $h.i32[(initial + i * 56 + 40) >>> 2] = $h.i32[(p + 24) >>> 2];
                 i = i + 1 | 0;

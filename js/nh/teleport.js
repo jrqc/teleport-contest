@@ -505,13 +505,13 @@ export async function teleds(nux, nuy, teleds_flags) {   // teleport.c:448
        and vault code depends upon that value, so we need to fake it */
     if (vault_guard) {
         /* [sizeof u.urooms] */
-        $c.__builtin___strcpy_chk(new $c.Ptr(save_urooms, 0), new $c.Ptr(u.urooms, 0), 5);
-        $c.__builtin___strcpy_chk(new $c.Ptr(u.urooms, 0), in_rooms(u.ux, u.uy, VAULT), 5);
+        $c.strcpy(new $c.Ptr(save_urooms, 0), new $c.Ptr(u.urooms, 0));
+        $c.strcpy(new $c.Ptr(u.urooms, 0), in_rooms(u.ux, u.uy, VAULT));
         /* if hero has left vault, make guard notice */
         if (!vault_occupied(new $c.Ptr(u.urooms, 0))) {
             await uleftvault(vault_guard);
         }
-        $c.__builtin___strcpy_chk(new $c.Ptr(u.urooms, 0), new $c.Ptr(save_urooms, 0), 5);   /* reset prior to spoteffects() */
+        $c.strcpy(new $c.Ptr(u.urooms, 0), new $c.Ptr(save_urooms, 0));   /* reset prior to spoteffects() */
     }
     /* possible shop entry message comes after guard's shrill whistle */
     await spoteffects(TRUE);
@@ -827,9 +827,9 @@ export async function scrolltele(scroll) {   // teleport.c:849
         if (unconscious()) {
             await pline($c.lit("Being unconscious, you cannot control your teleport."));
         } else {
-            $c.__builtin___strcpy_chk(new $c.Ptr(whobuf, 0), $c.lit("you"), 256);
+            $c.strcpy(new $c.Ptr(whobuf, 0), $c.lit("you"));
             if (u.usteed) {
-                $c.__builtin___sprintf_chk(eos(new $c.Ptr(whobuf, 0)), 0, -1, $c.lit(" and %s"), await mon_nam(u.usteed));
+                $c.sprintf(eos(new $c.Ptr(whobuf, 0)), $c.lit(" and %s"), await mon_nam(u.usteed));
             }
             await pline($c.lit("Where do %s want to be teleported?"), new $c.Ptr(whobuf, 0));
             if (scroll) {
@@ -1085,7 +1085,7 @@ export async function level_tele() {   // teleport.c:1165
         case "random_levtport":
             if ($goto !== "random_levtport" && (Teleport_control() && !u.uprops[STUNNED].intrinsic || wizard())) {
                 trycnt = 0;
-                $c.__builtin___strcpy_chk(new $c.Ptr(qbuf, 0), $c.lit("To what level do you want to teleport?"), 256);
+                $c.strcpy(new $c.Ptr(qbuf, 0), $c.lit("To what level do you want to teleport?"));
                 do {
                     D2: for (;;) {
                         switch ($goto) {
@@ -1100,9 +1100,9 @@ export async function level_tele() {   // teleport.c:1165
                             }
                             if ((trycnt = trycnt + 1 | 0) === 2) {
                                 if (wizard()) {
-                                    $c.__builtin___strcat_chk(new $c.Ptr(qbuf, 0), $c.lit(" [type a number, name, or ? for a menu]"), 256);
+                                    $c.strcat(new $c.Ptr(qbuf, 0), $c.lit(" [type a number, name, or ? for a menu]"));
                                 } else {
-                                    $c.__builtin___strcat_chk(new $c.Ptr(qbuf, 0), $c.lit(" [type a number or name]"), 256);
+                                    $c.strcat(new $c.Ptr(qbuf, 0), $c.lit(" [type a number or name]"));
                                 }
                             }
                             new $c.Ptr(buf, 0).set(0, 0);
@@ -1169,7 +1169,7 @@ export async function level_tele() {   // teleport.c:1165
                         await Your($c.lit("possessions land on the %s with a thud."), surface(u.ux, u.uy));
                     }
                     svk.killer.format = NO_KILLER_PREFIX;
-                    $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), $c.lit("committed suicide"), 256);
+                    $c.strcpy(new $c.Ptr(svk.killer.name, 0), $c.lit("committed suicide"));
                     await done(DIED);
                     await pline($c.lit("An energized cloud of dust begins to coalesce."));
                     await Your($c.lit("body rematerializes%s."), gi.invent ? $c.lit(", and you gather up all your possessions") : $c.lit(""));
@@ -1238,7 +1238,7 @@ export async function level_tele() {   // teleport.c:1165
                     await You($c.lit("arrive in heaven."));
                     await verbalize($c.lit("Thou art early, but we'll admit thee."));
                     svk.killer.format = NO_KILLER_PREFIX;
-                    $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), $c.lit("went to heaven prematurely"), 256);
+                    $c.strcpy(new $c.Ptr(svk.killer.name, 0), $c.lit("went to heaven prematurely"));
                 } else if (newlev === -9) {
                     await You_feel($c.lit("deliriously happy."));
                     await pline($c.lit("(In fact, you're on Cloud 9!)"));
@@ -1255,7 +1255,7 @@ export async function level_tele() {   // teleport.c:1165
                 } else {
                     await pline($c.lit("Unfortunately, you don't know how to fly."));
                     await You($c.lit("plummet a few thousand feet to your death."));
-                    $c.__builtin___sprintf_chk(new $c.Ptr(svk.killer.name, 0), 0, 256, $c.lit("teleported out of the dungeon and fell to %s death"), genders[flags.female ? 1 : 0].his);
+                    $c.sprintf(new $c.Ptr(svk.killer.name, 0), $c.lit("teleported out of the dungeon and fell to %s death"), genders[flags.female ? 1 : 0].his);
                     svk.killer.format = NO_KILLER_PREFIX;
                 }
             }
@@ -1406,10 +1406,10 @@ export async function level_tele_trap(trap, trflags) {   // teleport.c:1538
     let verbbuf = new Int8Array(256), intentional = 0;
     intentional = FALSE;
     if ((trflags & (VIASITTING | FORCETRAP)) >>> 0 !== 0) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(verbbuf, 0), $c.lit("trigger"), 256);   /* follows "You sit down." */
+        $c.strcpy(new $c.Ptr(verbbuf, 0), $c.lit("trigger"));   /* follows "You sit down." */
         intentional = TRUE;
     } else {
-        $c.__builtin___sprintf_chk(new $c.Ptr(verbbuf, 0), 0, 256, $c.lit("%s onto"), u_locomotion($c.lit("step")));
+        $c.sprintf(new $c.Ptr(verbbuf, 0), $c.lit("%s onto"), u_locomotion($c.lit("step")));
     }
     await You($c.lit("%s a level teleport trap!"), new $c.Ptr(verbbuf, 0));
     if (Antimagic() && !intentional) {
@@ -1722,13 +1722,13 @@ export async function control_mon_tele(mon, cc_p, rlocflags, via_rloc) {   // te
     }
     await pline($c.lit("Teleport %s @ <%d,%d> where?"), await noit_mon_nam(mon), mon.mx, mon.my);
     /* getpos '?' will show "Move the cursor to <where to teleport Foo>:" */
-    $c.__builtin___sprintf_chk(new $c.Ptr(tcbuf, 0), 0, 256, $c.lit("where to teleport %s"), await noit_mon_nam(mon));
+    $c.sprintf(new $c.Ptr(tcbuf, 0), $c.lit("where to teleport %s"), await noit_mon_nam(mon));
     if (await getpos(cc_p, FALSE, new $c.Ptr(tcbuf, 0)) >= 0 && !(cc_p.x === u.ux && cc_p.y === u.uy)) {
         if (via_rloc ? rloc_pos_ok(cc_p.x, cc_p.y, mon) : goodpos(cc_p.x, cc_p.y, mon, rlocflags)) {
             return TRUE;
         }
         if (!iflags.debug_fuzzer) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(tcbuf, 0), 0, 256, $c.lit("<%d,%d> is not considered viable; force anyway?"), mon.mx, mon.my);
+            $c.sprintf(new $c.Ptr(tcbuf, 0), $c.lit("<%d,%d> is not considered viable; force anyway?"), mon.mx, mon.my);
             if (await y_n(new $c.Ptr(tcbuf, 0)) === 121) {
                 return TRUE;
             }

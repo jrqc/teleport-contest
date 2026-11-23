@@ -299,14 +299,14 @@ export async function expels(mtmp, mdat, message) {   // mhitu.c:264
                 if (is_whirly(mdat)) {
                     switch (attk.adtyp) {
                         case AD.ELEC:
-                            $c.__builtin___strcpy_chk(new $c.Ptr(blast, 0), $c.lit(" in a shower of sparks"), 40);
+                            $c.strcpy(new $c.Ptr(blast, 0), $c.lit(" in a shower of sparks"));
                             break;
                         case AD.COLD:
-                            $c.__builtin___strcpy_chk(new $c.Ptr(blast, 0), $c.lit(" in a blast of frost"), 40);
+                            $c.strcpy(new $c.Ptr(blast, 0), $c.lit(" in a blast of frost"));
                             break;
                     }
                 } else {
-                    $c.__builtin___strcpy_chk(new $c.Ptr(blast, 0), $c.lit(" with a squelch"), 40);
+                    $c.strcpy(new $c.Ptr(blast, 0), $c.lit(" with a squelch"));
                 }
                 await You($c.lit("get expelled from %s%s!"), await mon_nam(mtmp), new $c.Ptr(blast, 0));
             }
@@ -650,7 +650,7 @@ export async function mattacku(mtmp) {   // mhitu.c:491
         }
         if (gm.multi < 0) {
             /* this should always be the case */
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("You appear to be %s again."), u.umonnum !== u.umonster ? await an(pmname(gy.youmonst.data, flags.female)) : $c.lit("yourself"));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("You appear to be %s again."), u.umonnum !== u.umonster ? await an(pmname(gy.youmonst.data, flags.female)) : $c.lit("yourself"));
             await unmul(new $c.Ptr(buf, 0));   /* immediately stop mimicking */
         }
         return 0;
@@ -938,7 +938,7 @@ async function summonmu(mtmp, youseeit) {   // mhitu.c:956
         /* maybe summon compatible critters;
            not blocked by Protection_from_shape_changers */
         if (!rn2(10)) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(genericwere, 0), $c.lit("creature"), 256);
+            $c.strcpy(new $c.Ptr(genericwere, 0), $c.lit("creature"));
             if (youseeit) {
                 await pline_mon(mtmp, $c.lit("%s summons help!"), await Monnam(mtmp));
             }
@@ -963,9 +963,9 @@ async function summonmu(mtmp, youseeit) {   // mhitu.c:956
                         await You_feel($c.lit("hemmed in."));
                     } else {
                         if (numseen[0] === 1) {
-                            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s appears"), await an(new $c.Ptr(genericwere, 0)));
+                            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s appears"), await an(new $c.Ptr(genericwere, 0)));
                         } else {
-                            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s appear"), await makeplural(new $c.Ptr(genericwere, 0)));
+                            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s appear"), await makeplural(new $c.Ptr(genericwere, 0)));
                         }
                         await pline($c.lit("%s%s!"), upstart(new $c.Ptr(buf, 0)), from_nowhere);
                     }
@@ -1090,10 +1090,10 @@ async function hitmu(mtmp, mattk) {   // mhitu.c:1144
                 } else {
                     what = await doname(obj);
                 }
-                $c.__builtin___strcpy_chk(new $c.Ptr(Amonbuf, 0), await Amonnam(mtmp), 256);
+                $c.strcpy(new $c.Ptr(Amonbuf, 0), await Amonnam(mtmp));
                 /* mtmp might be invisible with hero unable to see same */
                 if (!$c.strcmp(new $c.Ptr(Amonbuf, 0), $c.lit("It"))) {   /* note: not strcmpi() */
-                    $c.__builtin___strcpy_chk(new $c.Ptr(Amonbuf, 0), c_common_strings.c_Something, 256);
+                    $c.strcpy(new $c.Ptr(Amonbuf, 0), c_common_strings.c_Something);
                 }
                 await pline($c.lit("%s was hidden under %s!"), new $c.Ptr(Amonbuf, 0), what);
             }
@@ -1217,7 +1217,7 @@ async function gulpmu(mtmp, mattk) {   // mhitu.c:1289
         await newsym(mtmp.mx, mtmp.my);
         /* 5.0: dismount for all engulfers, not just for purple worms */
         if (u.usteed) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await mon_nam(u.usteed), 256);
+            $c.strcpy(new $c.Ptr(buf, 0), await mon_nam(u.usteed));
             /* 't', purple 'w' */
             /* 'v', air 'E' */
             /* none (some 'v', already whirling) */
@@ -1612,7 +1612,7 @@ export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
                 }
                 await urgent_pline($c.lit("You turn to stone..."));
                 svk.killer.format = KILLED.BY;
-                $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), pmname(mtmp.data, Mgender(mtmp)), 256);
+                $c.strcpy(new $c.Ptr(svk.killer.name, 0), pmname(mtmp.data, Mgender(mtmp)));
                 await done(STONING);
             }
             break;
@@ -1822,7 +1822,7 @@ export async function doseduce(mon) {   // mhitu.c:1985
         await You_feel($c.lit("very attracted to %s."), await mon_nam(mon));
     }
     /* cache the seducer's name in a local buffer */
-    $c.__builtin___strcpy_chk(new $c.Ptr(Who, 0), !seewho ? fem ? $c.lit("She") : $c.lit("He") : await Monnam(mon), 128);
+    $c.strcpy(new $c.Ptr(Who, 0), !seewho ? fem ? $c.lit("She") : $c.lit("He") : await Monnam(mon));
     /* if in the process of putting armor on or taking armor off,
        interrupt that activity now */
     await stop_donning(null);
@@ -2124,12 +2124,12 @@ async function mayberem(mon, seducer, obj, str) {   // mhitu.c:2309
         await pline($c.lit("%s takes off your %s."), seducer, str);
     } else if (rn2(20) < ACURR(A.CHA)) {
         /* y_n aka yn_function is set up for this */
-        $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("\"Shall I remove your %s, %s?\""), str, !rn2(2) ? $c.lit("lover") : !rn2(2) ? $c.lit("dear") : $c.lit("sweetheart"));
+        $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("\"Shall I remove your %s, %s?\""), str, !rn2(2) ? $c.lit("lover") : !rn2(2) ? $c.lit("dear") : $c.lit("sweetheart"));
         if (await y_n(new $c.Ptr(qbuf, 0)) === 110) {
             return;
         }
     } else {
-        $c.__builtin___sprintf_chk(new $c.Ptr(hairbuf, 0), 0, 256, $c.lit("let me run my fingers through your %s"), await body_part(HAIR));
+        $c.sprintf(new $c.Ptr(hairbuf, 0), $c.lit("let me run my fingers through your %s"), await body_part(HAIR));
         /* obj == uarmh */
         await verbalize($c.lit("Take off your %s; %s."), str, $c.peq(obj, $G.uarm) ? $c.lit("let's get a little closer") : $c.peq(obj, $G.uarmc) || $c.peq(obj, $G.uarms) ? $c.lit("it's in the way") : $c.peq(obj, $G.uarmf) ? $c.lit("let me rub your feet") : $c.peq(obj, $G.uarmg) ? $c.lit("they're too clumsy") : $c.peq(obj, $G.uarmu) ? $c.lit("let me massage you") : new $c.Ptr(hairbuf, 0));
     }

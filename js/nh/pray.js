@@ -629,14 +629,14 @@ async function fix_worst_trouble(trouble) {   // pray.c:373
                     if (eyecount(gy.youmonst.data) !== 1) {
                         eyes = await makeplural(eyes);
                     }
-                    $c.__builtin___sprintf_chk(new $c.Ptr(msgbuf, 0), 0, 256, $c.lit("Your %s %s better"), eyes, await vtense(eyes, $c.lit("feel")));
+                    $c.sprintf(new $c.Ptr(msgbuf, 0), $c.lit("Your %s %s better"), eyes, await vtense(eyes, $c.lit("feel")));
                     u.ucreamed = 0;
                     await make_blinded(0, FALSE);
                 }
                 if (cure_deaf) {
                     await make_deaf(0, FALSE);
                     if (!Deaf()) {
-                        $c.__builtin___sprintf_chk(eos(new $c.Ptr(msgbuf, 0)), 0, -1, $c.lit("%s can hear again"), !new $c.Ptr(msgbuf, 0).get(0) ? $c.lit("You") : $c.lit(" and you"));
+                        $c.sprintf(eos(new $c.Ptr(msgbuf, 0)), $c.lit("%s can hear again"), !new $c.Ptr(msgbuf, 0).get(0) ? $c.lit("You") : $c.lit(" and you"));
                     }
                 }
                 if (new $c.Ptr(msgbuf, 0).get(0)) {
@@ -756,7 +756,7 @@ async function god_zaps_you(resp_god) {   // pray.c:610
 async function fry_by_god(resp_god, via_disintegration) {   // pray.c:694
     await You($c.lit("%s!"), !via_disintegration ? $c.lit("fry to a crisp") : $c.lit("disintegrate into a pile of dust"));
     svk.killer.format = KILLED.BY;
-    $c.__builtin___sprintf_chk(new $c.Ptr(svk.killer.name, 0), 0, 256, $c.lit("the wrath of %s"), await align_gname(resp_god));
+    $c.sprintf(new $c.Ptr(svk.killer.name, 0), $c.lit("the wrath of %s"), await align_gname(resp_god));
     await done(DIED);
 }
 async function angrygods(resp_god) {   // pray.c:704
@@ -886,7 +886,7 @@ async function gcrownu() {   // pray.c:805
         /* get book type before dropping (don't think that could destroy
            the book because we need to be on an altar in order to become
            crowned, but be paranoid about it) */
-        $c.__builtin___strcpy_chk(new $c.Ptr(bbuf, 0), await actualoname(obj), 256);
+        $c.strcpy(new $c.Ptr(bbuf, 0), await actualoname(obj));
         /* for livelog; "spellbook of <foo>"
          * even if hero doesn't know book */
         await bless(obj);
@@ -909,7 +909,7 @@ async function gcrownu() {   // pray.c:805
             if (class_gift !== STRANGE_OBJECT) {
                 /* already got bonus above */
             } else if (obj && obj.otyp === LONG_SWORD && !obj.oartifact) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(lbuf, 0), await simpleonames(obj), 256);   /* before transformation */
+                $c.strcpy(new $c.Ptr(lbuf, 0), await simpleonames(obj));   /* before transformation */
                 if (!Blind()) {
                     await Your($c.lit("sword shines brightly for a moment."));
                 }
@@ -948,7 +948,7 @@ async function gcrownu() {   // pray.c:805
             break;
         case A.CHAOTIC:
             {
-                $c.__builtin___sprintf_chk(new $c.Ptr(swordbuf, 0), 0, 256, $c.lit("%s sword"), hcolor(c_color_names.c_black));
+                $c.sprintf(new $c.Ptr(swordbuf, 0), $c.lit("%s sword"), hcolor(c_color_names.c_black));
                 if (class_gift !== STRANGE_OBJECT) {
                     /* already got bonus above */
                 } else if (obj && in_hand) {
@@ -1152,7 +1152,7 @@ async function pleased(g_align) {   // pray.c:1071
                 if ($G.uwep && (await welded($G.uwep) || $G.uwep.oclass === WEAPON_CLASS || is_weptool($G.uwep))) {
                     new $c.Ptr(repair_buf, 0).set(0, 0);
                     if ($G.uwep.oeroded | 0 || $G.uwep.oeroded2 | 0) {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(repair_buf, 0), 0, 256, $c.lit(" and %s now as good as new"), await otense($G.uwep, $c.lit("are")));
+                        $c.sprintf(new $c.Ptr(repair_buf, 0), $c.lit(" and %s now as good as new"), await otense($G.uwep, $c.lit("are")));
                     }
                     if ($G.uwep.cursed) {
                         if (!Blind()) {
@@ -1449,7 +1449,7 @@ export async function desecrate_altar(highaltar, altaralign) {   // pray.c:1501
     }
     await You_feel($c.lit("the air around you grow charged..."));
     await pline($c.lit("Suddenly, you realize that %s has noticed you..."), await align_gname(altaralign));
-    $c.__builtin___sprintf_chk(new $c.Ptr(gvbuf, 0), 0, 256, $c.lit("So, mortal!  You dare desecrate my %s!"), highaltar ? $c.lit("High Temple") : $c.lit("altar"));
+    $c.sprintf(new $c.Ptr(gvbuf, 0), $c.lit("So, mortal!  You dare desecrate my %s!"), highaltar ? $c.lit("High Temple") : $c.lit("altar"));
     await godvoice(altaralign, new $c.Ptr(gvbuf, 0));
     /* Throw everything we have at the player */
     await god_zaps_you(altaralign);
@@ -1477,7 +1477,7 @@ async function offer_real_amulet(otmp, altaralign) {   // pray.c:1529
         /*[apparently shrug/snarl can be sensed without being seen]*/
         await pline($c.lit("%s shrugs and retains dominion over %s,"), Moloch, await u_gname());
         await pline($c.lit("then mercilessly snuffs out your life."));
-        $c.__builtin___sprintf_chk(new $c.Ptr(svk.killer.name, 0), 0, 256, $c.lit("%s indifference"), s_suffix(Moloch));
+        $c.sprintf(new $c.Ptr(svk.killer.name, 0), $c.lit("%s indifference"), s_suffix(Moloch));
         svk.killer.format = KILLED.BY;
         await done(DIED);
         /* life-saved (or declined to die in wizard/explore mode) */
@@ -1632,9 +1632,9 @@ async function sacrifice_your_race(otmp, highaltar, altaralign) {   // pray.c:16
             demonless_msg = $c.lit("blood coagulates");
         }
         if ((pm = await dlord(altaralign)) !== NON_PM && (dmon = await makemon($c.relem(mons, pm), u.ux, u.uy, MM.NOMSG)) !== null) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(dbuf, 0), await a_monnam(dmon), 256);
+            $c.strcpy(new $c.Ptr(dbuf, 0), await a_monnam(dmon));
             if (!strncmpi(new $c.Ptr(dbuf, 0), $c.lit("it"), -1)) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(dbuf, 0), $c.lit("something dreadful"), 256);
+                $c.strcpy(new $c.Ptr(dbuf, 0), $c.lit("something dreadful"));
             } else {
                 dmon.mstrategy = $c.andu64(dmon.mstrategy, 18446744071562067967n);
             }
@@ -1693,9 +1693,9 @@ async function bestow_artifact(max_giftvalue) {   // pray.c:1781
                 await uncurse(otmp);
             }
             otmp.oerodeproof = (TRUE) & 1;
-            $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? $c.lit("a doodad") : (u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked ? $c.lit("an object") : await ansimpleoname(otmp), 256);
+            $c.strcpy(new $c.Ptr(buf, 0), u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? $c.lit("a doodad") : (u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked ? $c.lit("an object") : await ansimpleoname(otmp));
             if (!Blind()) {
-                $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" named %s"), await bare_artifactname(otmp));
+                $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit(" named %s"), await bare_artifactname(otmp));
             }
             await at_your_feet(upstart(new $c.Ptr(buf, 0)));
             await dropy(otmp);

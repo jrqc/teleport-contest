@@ -122,7 +122,7 @@ async function stoned_dialogue() {   // timeout.c:137
     let i = 0, buf = new Int8Array(256);
     i = $c.and64(u.uprops[STONED].intrinsic, TIMEOUT);
     if (i > 0 && i <= 5) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), stoned_texts[$c.idx($c.sub64(5, i))], 256);
+        $c.strcpy(new $c.Ptr(buf, 0), stoned_texts[$c.idx($c.sub64(5, i))]);
         if (nolimbs(gy.youmonst.data) && strstri(new $c.Ptr(buf, 0), $c.lit("limbs"))) {
             strsubst(new $c.Ptr(buf, 0), $c.lit("limbs"), $c.lit("extremities"));
         }
@@ -189,7 +189,7 @@ async function vomiting_dialogue() {   // timeout.c:197
         case 11:
             txt = vomiting_texts[1];
             if (strstri(txt, $c.lit(" confused")) && u.uprops[CONFUSION].intrinsic) {
-                txt = strsubst($c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), txt, 256), $c.lit(" confused"), $c.lit(" more confused"));
+                txt = strsubst($c.strcpy(new $c.Ptr(buf, 0), txt), $c.lit(" confused"), $c.lit(" more confused"));
             }
             break;
         case 6:
@@ -207,7 +207,7 @@ async function vomiting_dialogue() {   // timeout.c:197
         case 8:
             txt = vomiting_texts[2];
             if (strstri(txt, $c.lit(" think")) && u.uprops[STUNNED].intrinsic) {
-                txt = strsubst($c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), txt, 256), $c.lit("can't seem to "), $c.lit("can't "));
+                txt = strsubst($c.strcpy(new $c.Ptr(buf, 0), txt), $c.lit("can't seem to "), $c.lit("can't "));
             }
             break;
         case 5:
@@ -279,15 +279,15 @@ async function sickness_dialogue() {   // timeout.c:323
     j = $c.and64(u.uprops[SICK].intrinsic, TIMEOUT);
     i = $c.div64(j, 2);
     if (i > 0 && i <= 3 && $c.rem64(j, 2) !== 0) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), sickness_texts[$c.idx($c.sub64(3, i))], 256);
+        $c.strcpy(new $c.Ptr(buf, 0), sickness_texts[$c.idx($c.sub64(3, i))]);
         /* change the message slightly for food poisoning */
         if (((u.usick_type | 0) & SICK_NONVOMITABLE) === 0) {
             strsubst(new $c.Ptr(buf, 0), $c.lit("illness"), $c.lit("sickness"));
         }
         if (Hallucination() && strstri(new $c.Ptr(buf, 0), $c.lit("Death's door"))) {
             /* youmonst: for Hallucination, mhe()'s mon argument isn't used */
-            $c.__builtin___strcpy_chk(new $c.Ptr(pronounbuf, 0), genders[pronoun_gender(gy.youmonst, PRONOUN.HALLU)].he, 40);
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("  %s %s inviting you in."), upstart(new $c.Ptr(pronounbuf, 0)), await vtense(new $c.Ptr(pronounbuf, 0), $c.lit("are")));
+            $c.strcpy(new $c.Ptr(pronounbuf, 0), genders[pronoun_gender(gy.youmonst, PRONOUN.HALLU)].he);
+            $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("  %s %s inviting you in."), upstart(new $c.Ptr(pronounbuf, 0)), await vtense(new $c.Ptr(pronounbuf, 0), $c.lit("are")));
             /* upstart() modifies its argument but vtense() doesn't
                care whether or not that has already happened */
         }
@@ -331,7 +331,7 @@ async function slime_dialogue() {   // timeout.c:389
         await newsym(u.ux, u.uy);
     }
     if ($c.rem64(t, 2) !== 0 && i >= 0 && i < 5) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), slime_texts[$c.idx($c.sub64($c.sub64(5, i), 1))], 256);
+        $c.strcpy(new $c.Ptr(buf, 0), slime_texts[$c.idx($c.sub64($c.sub64(5, i), 1))]);
         if (nolimbs(gy.youmonst.data) && strstri(new $c.Ptr(buf, 0), $c.lit("limbs"))) {
             strsubst(new $c.Ptr(buf, 0), $c.lit("limbs"), $c.lit("extremities"));
         }
@@ -391,10 +391,10 @@ async function slimed_to_death(kptr) {   // timeout.c:457
     /* more sure killer reason is set up */
     if (kptr && kptr.name[0]) {
         svk.killer.format = kptr.format;
-        $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), new $c.Ptr(kptr.name, 0), 256);
+        $c.strcpy(new $c.Ptr(svk.killer.name, 0), new $c.Ptr(kptr.name, 0));
     } else {
         svk.killer.format = NO_KILLER_PREFIX;
-        $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), $c.lit("turned into green slime"), 256);
+        $c.strcpy(new $c.Ptr(svk.killer.name, 0), $c.lit("turned into green slime"));
     }
     await dealloc_killer(kptr);
     /*
@@ -422,10 +422,10 @@ async function slimed_to_death(kptr) {   // timeout.c:457
        player may have genocided green slimes after being infected */
     if ((svm.mvitals[PM.GREEN_SLIME].mvflags & G_GENOD) !== 0) {
         svk.killer.format = KILLED.BY;
-        $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), $c.lit("slimicide"), 256);
+        $c.strcpy(new $c.Ptr(svk.killer.name, 0), $c.lit("slimicide"));
         /* vary the message depending upon whether life-save was due to
            amulet or due to declining to die in explore or wizard mode */
-        $c.__builtin___strcpy_chk(new $c.Ptr(slimebuf, 0), $c.lit("green slime has been genocided..."), 256);
+        $c.strcpy(new $c.Ptr(slimebuf, 0), $c.lit("green slime has been genocided..."));
         if (iflags.last_msg === PLNMSG.OK_DONT_DIE) {   /* follows "OK, so you don't die." and arg is second sentence */
             await urgent_pline($c.lit("Yes, you do.  %s"), upstart(new $c.Ptr(slimebuf, 0)));
         } else {
@@ -569,10 +569,10 @@ export async function nh_timeout() {   // timeout.c:588
                 case STONED:
                     if (kptr && kptr.name[0]) {
                         svk.killer.format = kptr.format;
-                        $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), new $c.Ptr(kptr.name, 0), 256);
+                        $c.strcpy(new $c.Ptr(svk.killer.name, 0), new $c.Ptr(kptr.name, 0));
                     } else {
                         svk.killer.format = NO_KILLER_PREFIX;
-                        $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), $c.lit("killed by petrification"), 256);
+                        $c.strcpy(new $c.Ptr(svk.killer.name, 0), $c.lit("killed by petrification"));
                     }
                     await dealloc_killer(kptr);
                     /* (unlike sliming, you aren't changing form here) */
@@ -597,7 +597,7 @@ export async function nh_timeout() {   // timeout.c:588
                     await urgent_pline($c.lit("You die from your illness."));
                     if (kptr && kptr.name[0]) {
                         svk.killer.format = kptr.format;
-                        $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), new $c.Ptr(kptr.name, 0), 256);
+                        $c.strcpy(new $c.Ptr(svk.killer.name, 0), new $c.Ptr(kptr.name, 0));
                     } else {
                         svk.killer.format = KILLED.BY_AN;
                         svk.killer.name[0] = 0;   /* take the default */
@@ -607,7 +607,7 @@ export async function nh_timeout() {   // timeout.c:588
                         if (type_is_pname($c.relem(mons, m_idx))) {
                             svk.killer.format = KILLED.BY;
                         } else if (mons[m_idx].geno & G_UNIQ) {
-                            $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), await the(new $c.Ptr(svk.killer.name, 0)), 256);
+                            $c.strcpy(new $c.Ptr(svk.killer.name, 0), await the(new $c.Ptr(svk.killer.name, 0)));
                             svk.killer.format = KILLED.BY;
                         }
                     }
@@ -789,7 +789,7 @@ export async function nh_timeout() {   // timeout.c:588
                     break;
                 case STRANGLED:
                     svk.killer.format = KILLED.BY;
-                    $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), u.uburied | 0 ? $c.lit("suffocation") : $c.lit("strangulation"), 256);
+                    $c.strcpy(new $c.Ptr(svk.killer.name, 0), u.uburied | 0 ? $c.lit("suffocation") : $c.lit("strangulation"));
                     await done_timeout(DIED, STRANGLED);
                     /* must be declining to die in explore|wizard mode;
                        treat like being cured of strangulation by prayer */
@@ -968,7 +968,7 @@ export async function hatch_egg(arg, timeout) {   // timeout.c:1017
         if (cansee_hatchspot) {
             /* [bug?  m_monnam() yields accurate monster type
                regardless of hallucination] */
-            $c.__builtin___sprintf_chk(new $c.Ptr(monnambuf, 0), 0, 256, $c.lit("%s%s"), siblings ? $c.lit("some ") : $c.lit(""), siblings ? await makeplural(await m_monnam(mon)) : await an(await m_monnam(mon)));
+            $c.sprintf(new $c.Ptr(monnambuf, 0), $c.lit("%s%s"), siblings ? $c.lit("some ") : $c.lit(""), siblings ? await makeplural(await m_monnam(mon)) : await an(await m_monnam(mon)));
             /* we don't learn the egg type here because learning
                an egg type requires either seeing the egg hatch
                or being familiar with the egg already,
@@ -1002,12 +1002,12 @@ export async function hatch_egg(arg, timeout) {   // timeout.c:1017
                     /* egg carrying monster might be invisible */
                     mon2 = egg.v.v_ocarry;
                     if (canseemon(mon2) && (!mon2.wormno || cansee(mon2.mx, mon2.my))) {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(carriedby, 0), 0, 256, $c.lit("%s pack"), s_suffix(await a_monnam(mon2)));
+                        $c.sprintf(new $c.Ptr(carriedby, 0), $c.lit("%s pack"), s_suffix(await a_monnam(mon2)));
                         knows_egg = TRUE;
                     } else if (is_pool(mon.mx, mon.my)) {
-                        $c.__builtin___strcpy_chk(new $c.Ptr(carriedby, 0), $c.lit("empty water"), 256);
+                        $c.strcpy(new $c.Ptr(carriedby, 0), $c.lit("empty water"));
                     } else {
-                        $c.__builtin___strcpy_chk(new $c.Ptr(carriedby, 0), $c.lit("thin air"), 256);
+                        $c.strcpy(new $c.Ptr(carriedby, 0), $c.lit("thin air"));
                     }
                     await You_see($c.lit("%s %s out of %s!"), new $c.Ptr(monnambuf, 0), locomotion(mon.data, $c.lit("drop")), new $c.Ptr(carriedby, 0));
                 }
@@ -1082,14 +1082,14 @@ async function slip_or_trip() {   // timeout.c:1222
         */
         what = iflags.last_msg === PLNMSG.ONE_ITEM_HERE ? otmp.quan === 1 ? $c.lit("it") : Hallucination() ? $c.lit("they") : $c.lit("them") : otmp.dknown | 0 || !Blind() ? await doname(otmp) : (otmp2 = sobj_at(ROCK, u.ux, u.uy)) === null ? c_common_strings.c_something : otmp2.quan === 1 ? $c.lit("a rock") : $c.lit("some rocks");
         if (Hallucination()) {
-            what = $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), what, 256);
+            what = $c.strcpy(new $c.Ptr(buf, 0), what);
             $t1 = highc(buf[0]), buf[0] = $t1;
             await pline($c.lit("Egads!  %s bite%s your %s!"), what, !otmp || otmp.quan === 1 ? $c.lit("s") : $c.lit(""), await body_part(FOOT));
         } else {
             await You($c.lit("trip over %s."), what);
         }
         if (!$G.uarmf && otmp.otyp === CORPSE && touch_petrifies($c.relem(mons, otmp.corpsenm)) && !Stone_resistance()) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(svk.killer.name, 0), 0, 256, $c.lit("tripping over %s corpse"), await an(mons[otmp.corpsenm].pmnames[NEUTRAL]));
+            $c.sprintf(new $c.Ptr(svk.killer.name, 0), $c.lit("tripping over %s corpse"), await an(mons[otmp.corpsenm].pmnames[NEUTRAL]));
             await instapetrify(new $c.Ptr(svk.killer.name, 0));
         }
     } else if ($c.and64(u.uprops[FUMBLING].intrinsic, FROMOUTSIDE) || is_ice(u.ux, u.uy) && !rn2(3)) {
@@ -1674,7 +1674,7 @@ async function print_queue(win, base) {   // timeout.c:2014
     } else {
         await putstr()(win, 0, $c.lit("timeout  id   kind   call"));
         for (curr = base; curr; curr = curr.next) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit(" %4ld   %4ld  %-6s %s(%s)"), curr.timeout, $c.i64(curr.tid), await kind_name(curr.kind), timeout_funcs[curr.func_index].name, fmt_ptr(curr.arg.a_void));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit(" %4ld   %4ld  %-6s %s(%s)"), curr.timeout, $c.i64(curr.tid), await kind_name(curr.kind), timeout_funcs[curr.func_index].name, fmt_ptr(curr.arg.a_void));
             await putstr()(win, 0, new $c.Ptr(buf, 0));
         }
     }
@@ -1687,7 +1687,7 @@ export async function wiz_timeout_queue() {   // timeout.c:2041
     if (win === WIN_ERR) {
         return ECMD.OK;
     }
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Current time = %ld."), svm.moves);
+    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Current time = %ld."), svm.moves);
     await putstr()(win, 0, new $c.Ptr(buf, 0));
     await putstr()(win, 0, $c.lit(""));
     await putstr()(win, 0, $c.lit("Active timeout queue:"));
@@ -1729,7 +1729,7 @@ export async function wiz_timeout_queue() {   // timeout.c:2041
                    width of 4 digits should result in values lining up
                    almost all the time (if/when they don't, it won't
                    look nice but the information will still be accurate) */
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit(" %*s %4ld"), -longestlen | 0, propname, $c.and64(intrinsic, TIMEOUT));
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit(" %*s %4ld"), -longestlen | 0, propname, $c.and64(intrinsic, TIMEOUT));
                 await putstr()(win, 0, new $c.Ptr(buf, 0));
             }
         }
@@ -1738,12 +1738,12 @@ export async function wiz_timeout_queue() {   // timeout.c:2041
         await putstr()(win, 0, $c.lit(""));
         /* decremented when engulfer makes a move, so can last longer than
            the number of turns reported if engulfer is slow */
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Swallow countdown is %u."), u.uswldtim);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Swallow countdown is %u."), u.uswldtim);
         await putstr()(win, 0, new $c.Ptr(buf, 0));
     }
     if (u.uinvault) {
         await putstr()(win, 0, $c.lit(""));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Vault counter is %d."), u.uinvault);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Vault counter is %d."), u.uinvault);
         await putstr()(win, 0, new $c.Ptr(buf, 0));
     }
     if (any_visible_region()) {
@@ -1751,7 +1751,7 @@ export async function wiz_timeout_queue() {   // timeout.c:2041
     }
     if (svl.level.flags.stasis_until >= svm.moves) {
         await putstr()(win, 0, $c.lit(""));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Level is no-teleport for %ld %s."), $c.add64($c.sub64(svl.level.flags.stasis_until, svm.moves), 1), $c.sub64(svl.level.flags.stasis_until, svm.moves) > 0 ? $c.lit("turns") : $c.lit("more turn"));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Level is no-teleport for %ld %s."), $c.add64($c.sub64(svl.level.flags.stasis_until, svm.moves), 1), $c.sub64(svl.level.flags.stasis_until, svm.moves) > 0 ? $c.lit("turns") : $c.lit("more turn"));
         await putstr()(win, 0, new $c.Ptr(buf, 0));
     }
     await display_nhwindow()(win, FALSE);
@@ -1847,7 +1847,7 @@ export async function run_timers() {   // timeout.c:2222
             curr.arg.a_obj.timed = $c.i16(curr.arg.a_obj.timed - 1);
         }
         await timeout_funcs[curr.func_index].f(curr.arg, curr.timeout);
-        $c.__builtin___memset_chk(curr, 0, 48, -1);
+        $c.memset(curr, 0, 48);
         $c.free(curr);
     }
 }
@@ -1866,12 +1866,12 @@ export async function start_timer(when, kind, func_index, arg) {   // timeout.c:
         }
     }
     if (dup) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(idbuf, 0), 0, 128, $c.lit("%s timer"), timeout_funcs[func_index].name);
+        $c.sprintf(new $c.Ptr(idbuf, 0), $c.lit("%s timer"), timeout_funcs[func_index].name);
         await impossible($c.lit("Attempted to start duplicate %s, aborted."), new $c.Ptr(idbuf, 0));
         return FALSE;
     }
     gnu = $c.asRec(await alloc(48), $T.fe, 48);
-    $c.__builtin___memset_chk(gnu, 0, 48, -1);
+    $c.memset(gnu, 0, 48);
     gnu.next = null;
     $t2 = ($t1 = svt.timer_id, svt.timer_id = $c.addu64($t1, 1), $t1), gnu.tid = $t2;
     gnu.timeout = $c.add64(svm.moves, when);
@@ -1900,7 +1900,7 @@ export async function stop_timer(func_index, arg) {   // timeout.c:2299
         if ((cleanup_func = timeout_funcs[doomed.func_index].cleanup) !== null) {
             await cleanup_func(arg, timeout);
         }
-        $c.__builtin___memset_chk(doomed, 0, 48, -1);
+        $c.memset(doomed, 0, 48);
         $c.free(doomed);
         return $c.sub64(timeout, svm.moves);
     }
@@ -1966,7 +1966,7 @@ export async function obj_stop_timers(obj) {   // timeout.c:2377
             if ((cleanup_func = timeout_funcs[curr.func_index].cleanup) !== null) {
                 await cleanup_func(curr.arg, curr.timeout);
             }
-            $c.__builtin___memset_chk(curr, 0, 48, -1);
+            $c.memset(curr, 0, 48);
             $c.free(curr);
         } else {
             prev = curr;
@@ -2001,7 +2001,7 @@ export async function spot_stop_timers(x, y, func_index) {   // timeout.c:2416
             if ((cleanup_func = timeout_funcs[curr.func_index].cleanup) !== null) {
                 await cleanup_func(curr.arg, curr.timeout);
             }
-            $c.__builtin___memset_chk(curr, 0, 48, -1);
+            $c.memset(curr, 0, 48);
             $c.free(curr);
         } else {
             prev = curr;
@@ -2220,7 +2220,7 @@ export async function save_timers(nhfp, range) {   // timeout.c:2668
                 } else {
                     gt.timer_base = curr.next;
                 }
-                $c.__builtin___memset_chk(curr, 0, 48, -1);
+                $c.memset(curr, 0, 48);
                 $c.free(curr);
                 /* prev stays the same */
             } else {
@@ -2255,7 +2255,7 @@ export async function restore_timers(nhfp, range, adjust) {   // timeout.c:2707
 /* to support '#stats' wizard-mode command */
 export function timer_stats(hdrfmt, hdrbuf, count, size) {   // timeout.c:2735
     let te = null, $t1;
-    $c.__builtin___sprintf_chk(hdrbuf, 0, -1, hdrfmt, 48);
+    $c.sprintf(hdrbuf, hdrfmt, 48);
     $t1 = size.set(0, 0), count.set(0, $t1);
     for (te = gt.timer_base; te; te = te.next) {
         count.set(0, $c.add64(count.get(0), 1));

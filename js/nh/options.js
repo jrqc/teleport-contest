@@ -525,7 +525,7 @@ function petname_optfn(optidx, req, negated, opts, op) {   // options.c:848
         sanitize_name(petname);
     } else if (req === get_val || req === get_cnf_val) {
         failsafe[0] = 0;
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), petname.get(0) ? petname : req === get_cnf_val ? $c.lit("none") : new $c.Ptr(none, 0));
+        $c.sprintf(opts, $c.lit("%s"), petname.get(0) ? petname : req === get_cnf_val ? $c.lit("none") : new $c.Ptr(none, 0));
     }
     return optn_ok;
 }
@@ -557,12 +557,12 @@ async function optfn_alignment(optidx, req, negated, opts, op$in) {   // options
         return optn_ok;
     }
     if (req === get_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), flags.initalign >= 0 ? aligns[flags.initalign].adj : flags.initalign === ROLE_RANDOM ? new $c.Ptr(randomrole, 0) : new $c.Ptr(none, 0));
+        $c.sprintf(opts, $c.lit("%s"), flags.initalign >= 0 ? aligns[flags.initalign].adj : flags.initalign === ROLE_RANDOM ? new $c.Ptr(randomrole, 0) : new $c.Ptr(none, 0));
         return optn_ok;
     }
     if (req === get_cnf_val) {
         op[0] = await get_cnf_role_opt(optidx);
-        $c.__builtin___strcpy_chk(opts, op[0] ? op[0] : $c.lit("none"), -1);
+        $c.strcpy(opts, op[0] ? op[0] : $c.lit("none"));
         return optn_ok;
     }
     return optn_ok;
@@ -596,7 +596,7 @@ async function optfn_align_message(optidx, req, negated, opts, op) {   // option
     }
     if (req === get_val || req === get_cnf_val) {
         which = iflags.wc_align_message;
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), which === ALIGN.TOP ? $c.lit("top") : which === ALIGN.LEFT ? $c.lit("left") : which === ALIGN.BOTTOM ? $c.lit("bottom") : which === ALIGN.RIGHT ? $c.lit("right") : new $c.Ptr(defopt, 0));
+        $c.sprintf(opts, $c.lit("%s"), which === ALIGN.TOP ? $c.lit("top") : which === ALIGN.LEFT ? $c.lit("left") : which === ALIGN.BOTTOM ? $c.lit("bottom") : which === ALIGN.RIGHT ? $c.lit("right") : new $c.Ptr(defopt, 0));
         return optn_ok;
     }
     if (req === do_handler) {
@@ -633,7 +633,7 @@ async function optfn_align_status(optidx, req, negated, opts, op) {   // options
     }
     if (req === get_val || req === get_cnf_val) {
         which = iflags.wc_align_status;
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), which === ALIGN.TOP ? $c.lit("top") : which === ALIGN.LEFT ? $c.lit("left") : which === ALIGN.BOTTOM ? $c.lit("bottom") : which === ALIGN.RIGHT ? $c.lit("right") : new $c.Ptr(defopt, 0));
+        $c.sprintf(opts, $c.lit("%s"), which === ALIGN.TOP ? $c.lit("top") : which === ALIGN.LEFT ? $c.lit("left") : which === ALIGN.BOTTOM ? $c.lit("bottom") : which === ALIGN.RIGHT ? $c.lit("right") : new $c.Ptr(defopt, 0));
         return optn_ok;
     }
     if (req === do_handler) {
@@ -727,21 +727,21 @@ async function optfn_autounlock(optidx, req, negated, opts, op) {   // options.c
     }
     if (req === get_val || req === get_cnf_val) {
         if (!flags.autounlock) {
-            $c.__builtin___strcpy_chk(opts, $c.lit("none"), -1);
+            $c.strcpy(opts, $c.lit("none"));
         } else {
             p = $c.lit("");
             opts.set(0, 0);
             if ((flags.autounlock & AUTOUNLOCK.UNTRAP) >>> 0) {
-                $c.__builtin___sprintf_chk(eos(opts), 0, -1, $c.lit("%s%s"), p, unlocktypes[0][0]), p = new $c.Ptr(optfn_autounlock$plus, 0);
+                $c.sprintf(eos(opts), $c.lit("%s%s"), p, unlocktypes[0][0]), p = new $c.Ptr(optfn_autounlock$plus, 0);
             }
             if ((flags.autounlock & AUTOUNLOCK.APPLY_KEY) >>> 0) {
-                $c.__builtin___sprintf_chk(eos(opts), 0, -1, $c.lit("%s%s"), p, unlocktypes[1][0]), p = new $c.Ptr(optfn_autounlock$plus, 0);
+                $c.sprintf(eos(opts), $c.lit("%s%s"), p, unlocktypes[1][0]), p = new $c.Ptr(optfn_autounlock$plus, 0);
             }
             if ((flags.autounlock & AUTOUNLOCK.KICK) >>> 0) {
-                $c.__builtin___sprintf_chk(eos(opts), 0, -1, $c.lit("%s%s"), p, unlocktypes[2][0]), p = new $c.Ptr(optfn_autounlock$plus, 0);
+                $c.sprintf(eos(opts), $c.lit("%s%s"), p, unlocktypes[2][0]), p = new $c.Ptr(optfn_autounlock$plus, 0);
             }
             if ((flags.autounlock & AUTOUNLOCK.FORCE) >>> 0) {
-                $c.__builtin___sprintf_chk(eos(opts), 0, -1, $c.lit("%s%s"), p, unlocktypes[3][0]);   /*no more p*/
+                $c.sprintf(eos(opts), $c.lit("%s%s"), p, unlocktypes[3][0]);   /*no more p*/
             }
         }
         return optn_ok;
@@ -801,7 +801,7 @@ async function optfn_boulder(optidx, req, negated, opts, op) {   // options.c:11
     }
     if (req === get_val || req === get_cnf_val) {
         opts.set(0, 0);
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%c"), go.ov_primary_syms[SYM.BOULDER + SYM_OFF_X] ? go.ov_primary_syms[SYM.BOULDER + SYM_OFF_X] : gs.showsyms[objects[BOULDER].oc_class + SYM_OFF_O | 0]);
+        $c.sprintf(opts, $c.lit("%c"), go.ov_primary_syms[SYM.BOULDER + SYM_OFF_X] ? go.ov_primary_syms[SYM.BOULDER + SYM_OFF_X] : gs.showsyms[objects[BOULDER].oc_class + SYM_OFF_O | 0]);
         return optn_ok;
     }
     return optn_ok;
@@ -829,7 +829,7 @@ async function optfn_crash_email(optidx, req, negated, opts, op) {   // options.
             return optn_err;
         }
         if (gc.crash_email) {
-            $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), gc.crash_email);
+            $c.sprintf(opts, $c.lit("%s"), gc.crash_email);
         }
         return optn_ok;
     }
@@ -855,7 +855,7 @@ async function optfn_crash_name(optidx, req, negated, opts, op) {   // options.c
             return optn_err;
         }
         if (gc.crash_name) {
-            $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), gc.crash_name);
+            $c.sprintf(opts, $c.lit("%s"), gc.crash_name);
         }
         return optn_ok;
     }
@@ -883,7 +883,7 @@ async function optfn_crash_urlmax(optidx, req, negated, opts, op) {   // options
         if (!opts) {
             return optn_err;
         }
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%d"), gc.crash_urlmax);
+        $c.sprintf(opts, $c.lit("%d"), gc.crash_urlmax);
         return optn_ok;
     }
     return optn_ok;
@@ -1041,7 +1041,7 @@ function optfn_dungeon(optidx, req, negated, opts, op) {   // options.c:1572
         return optn_ok;
     }
     if (req === get_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), new $c.Ptr(to_be_done, 0));
+        $c.sprintf(opts, $c.lit("%s"), new $c.Ptr(to_be_done, 0));
         return optn_ok;
     }
     if (req === get_cnf_val) {
@@ -1058,7 +1058,7 @@ function optfn_effects(optidx, req, negated, opts, op) {   // options.c:1594
         return optn_ok;
     }
     if (req === get_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), new $c.Ptr(to_be_done, 0));
+        $c.sprintf(opts, $c.lit("%s"), new $c.Ptr(to_be_done, 0));
         return optn_ok;
     }
     if (req === get_cnf_val) {
@@ -1169,7 +1169,7 @@ async function optfn_fruit(optidx, req, negated, opts, op) {   // options.c:1706
         return optn_ok;
     }
     if (req === get_val || req === get_cnf_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), new $c.Ptr(svp.pl_fruit, 0));
+        $c.sprintf(opts, $c.lit("%s"), new $c.Ptr(svp.pl_fruit, 0));
         return optn_ok;
     }
     return optn_ok;
@@ -1196,12 +1196,12 @@ async function optfn_gender(optidx, req, negated, opts, op$in) {   // options.c:
         return optn_ok;
     }
     if (req === get_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), flags.initgend >= 0 ? genders[flags.initgend].adj : flags.initgend === ROLE_RANDOM ? new $c.Ptr(randomrole, 0) : new $c.Ptr(none, 0));
+        $c.sprintf(opts, $c.lit("%s"), flags.initgend >= 0 ? genders[flags.initgend].adj : flags.initgend === ROLE_RANDOM ? new $c.Ptr(randomrole, 0) : new $c.Ptr(none, 0));
         return optn_ok;
     }
     if (req === get_cnf_val) {
         op[0] = await get_cnf_role_opt(optidx);
-        $c.__builtin___strcpy_chk(opts, op[0] ? op[0] : $c.lit("none"), -1);
+        $c.strcpy(opts, op[0] ? op[0] : $c.lit("none"));
         return optn_ok;
     }
     return optn_ok;
@@ -1230,7 +1230,7 @@ async function optfn_glyph(optidx, req, negated, opts, op) {   // options.c:1815
         return optn_ok;
     }
     if (req === get_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), new $c.Ptr(to_be_done, 0));
+        $c.sprintf(opts, $c.lit("%s"), new $c.Ptr(to_be_done, 0));
         return optn_ok;
     }
     if (req === get_cnf_val) {
@@ -1261,7 +1261,7 @@ async function optfn_hilite_status(optidx, req, negated, opts, op) {   // option
     if (req === get_val || req === get_cnf_val) {
         opts.set(0, 0);
         if (req === get_val) {
-            $c.__builtin___strcpy_chk(opts, await count_status_hilites() ? $c.lit("(see \"status highlight rules\" below)") : $c.lit("(none)"), -1);
+            $c.strcpy(opts, await count_status_hilites() ? $c.lit("(see \"status highlight rules\" below)") : $c.lit("(none)"));
         }
         return optn_ok;
     }
@@ -1371,7 +1371,7 @@ async function optfn_map_mode(optidx, req, negated, opts, op) {   // options.c:1
     }
     if (req === get_val || req === get_cnf_val) {
         i = iflags.wc_map_mode;
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), i === MAP_MODE.TILES ? $c.lit("tiles") : i === MAP_MODE.ASCII4x6 ? $c.lit("ascii4x6") : i === MAP_MODE.ASCII6x8 ? $c.lit("ascii6x8") : i === MAP_MODE.ASCII8x8 ? $c.lit("ascii8x8") : i === MAP_MODE.ASCII16x8 ? $c.lit("ascii16x8") : i === MAP_MODE.ASCII7x12 ? $c.lit("ascii7x12") : i === MAP_MODE.ASCII8x12 ? $c.lit("ascii8x12") : i === MAP_MODE.ASCII16x12 ? $c.lit("ascii16x12") : i === MAP_MODE.ASCII12x16 ? $c.lit("ascii12x16") : i === MAP_MODE.ASCII10x18 ? $c.lit("ascii10x18") : i === MAP_MODE.ASCII_FIT_TO_SCREEN ? $c.lit("fit_to_screen") : new $c.Ptr(defopt, 0));
+        $c.sprintf(opts, $c.lit("%s"), i === MAP_MODE.TILES ? $c.lit("tiles") : i === MAP_MODE.ASCII4x6 ? $c.lit("ascii4x6") : i === MAP_MODE.ASCII6x8 ? $c.lit("ascii6x8") : i === MAP_MODE.ASCII8x8 ? $c.lit("ascii8x8") : i === MAP_MODE.ASCII16x8 ? $c.lit("ascii16x8") : i === MAP_MODE.ASCII7x12 ? $c.lit("ascii7x12") : i === MAP_MODE.ASCII8x12 ? $c.lit("ascii8x12") : i === MAP_MODE.ASCII16x12 ? $c.lit("ascii16x12") : i === MAP_MODE.ASCII12x16 ? $c.lit("ascii12x16") : i === MAP_MODE.ASCII10x18 ? $c.lit("ascii10x18") : i === MAP_MODE.ASCII_FIT_TO_SCREEN ? $c.lit("fit_to_screen") : new $c.Ptr(defopt, 0));
         return optn_ok;
     }
     return optn_ok;
@@ -1391,7 +1391,7 @@ async function shared_menu_optfn(optidx, req, negated, opts, op) {   // options.
         return await spcfn_misc_menu_cmd(res, req, negated, opts, op);
     }
     if (req === get_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), new $c.Ptr(to_be_done, 0));
+        $c.sprintf(opts, $c.lit("%s"), new $c.Ptr(to_be_done, 0));
         return optn_ok;
     }
     if (req === get_cnf_val) {
@@ -1464,10 +1464,10 @@ async function optfn_menu_headings(optidx, req, negated, opts, op) {   // option
         return optn_ok;
     }
     if (req === get_val || req === get_cnf_val) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(ca_buf, 0), color_attr_to_str(iflags.menu_headings), 256);
+        $c.strcpy(new $c.Ptr(ca_buf, 0), color_attr_to_str(iflags.menu_headings));
         /* change "no color" to "no-color" or "light blue" to "light-blue" */
         strNsubst(new $c.Ptr(ca_buf, 0), $c.lit(" "), $c.lit("-"), 0);
-        $c.__builtin___strcpy_chk(opts, new $c.Ptr(ca_buf, 0), -1);
+        $c.strcpy(opts, new $c.Ptr(ca_buf, 0));
         return optn_ok;
     }
     if (req === do_handler) {
@@ -1521,7 +1521,7 @@ async function optfn_menu_objsyms(optidx, req, negated, opts, op) {   // options
         return optn_ok;
     }
     if (req === get_val || req === get_cnf_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), objsymvals[iflags.menuobjsyms].nam);
+        $c.sprintf(opts, $c.lit("%s"), objsymvals[iflags.menuobjsyms].nam);
         return optn_ok;
     }
     if (req === do_handler) {
@@ -1547,7 +1547,7 @@ async function optfn_menuinvertmode(optidx, req, negated, opts, op) {   // optio
         return optn_ok;
     }
     if (req === get_val || req === get_cnf_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%d"), iflags.menuinvertmode);
+        $c.sprintf(opts, $c.lit("%d"), iflags.menuinvertmode);
         return optn_ok;
     }
     return optn_ok;
@@ -1600,7 +1600,7 @@ async function optfn_menustyle(optidx, req, negated, opts, op) {   // options.c:
         return optn_ok;
     }
     if (req === get_val || req === get_cnf_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), menutype[flags.menu_style][0]);
+        $c.sprintf(opts, $c.lit("%s"), menutype[flags.menu_style][0]);
         return optn_ok;
     }
     if (req === do_handler) {
@@ -1650,12 +1650,12 @@ async function optfn_mouse_support(optidx, req, negated, opts, op) {   // option
     if (req === get_val) {
         ms = iflags.wc_mouse_support;
         if (ms >= 0 && ms <= 2) {
-            $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s%s"), optfn_mouse_support$mousemodes[ms][0], optfn_mouse_support$mousemodes[ms][1]);
+            $c.sprintf(opts, $c.lit("%s%s"), optfn_mouse_support$mousemodes[ms][0], optfn_mouse_support$mousemodes[ms][1]);
         }
         return optn_ok;
     }
     if (req === get_cnf_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%i"), iflags.wc_mouse_support);
+        $c.sprintf(opts, $c.lit("%i"), iflags.wc_mouse_support);
         return optn_ok;
     }
     return optn_ok;
@@ -1703,7 +1703,7 @@ async function optfn_msg_window(optidx, req, negated, opts, op) {   // options.c
                 tmp = iflags.prevmsg_window = 114;
             }
         }
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), tmp === 115 ? $c.lit("single") : tmp === 99 ? $c.lit("combination") : tmp === 102 ? $c.lit("full") : $c.lit("reversed"));
+        $c.sprintf(opts, $c.lit("%s"), tmp === 115 ? $c.lit("single") : tmp === 99 ? $c.lit("combination") : tmp === 102 ? $c.lit("full") : $c.lit("reversed"));
         return optn_ok;
     }
     if (req === do_handler) {
@@ -1727,7 +1727,7 @@ async function optfn_msghistory(optidx, req, negated, opts, op) {   // options.c
         return optn_ok;
     }
     if (req === get_val || req === get_cnf_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%u"), iflags.msg_history);
+        $c.sprintf(opts, $c.lit("%u"), iflags.msg_history);
         return optn_ok;
     }
     return optn_ok;
@@ -1746,7 +1746,7 @@ async function optfn_name(optidx, req, negated, opts, op) {   // options.c:2549
         return optn_ok;
     }
     if (req === get_val || req === get_cnf_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), new $c.Ptr(svp.plname, 0));
+        $c.sprintf(opts, $c.lit("%s"), new $c.Ptr(svp.plname, 0));
         return optn_ok;
     }
     return optn_ok;
@@ -1799,9 +1799,9 @@ async function optfn_number_pad(optidx, req, negated, opts, op) {   // options.c
     if (req === get_val || req === get_cnf_val) {
         indx = gc.Cmd.num_pad ? gc.Cmd.phone_layout ? gc.Cmd.pcHack_compat ? 4 : 3 : gc.Cmd.pcHack_compat ? 2 : 1 : gc.Cmd.swap_yz ? 5 : 0;
         if (req === get_val) {
-            $c.__builtin___strcpy_chk(opts, optfn_number_pad$numpadmodes[indx], -1);
+            $c.strcpy(opts, optfn_number_pad$numpadmodes[indx]);
         } else {
-            $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%i"), indx === 5 ? -1 : indx);
+            $c.sprintf(opts, $c.lit("%i"), indx === 5 ? -1 : indx);
         }
         return optn_ok;
     }
@@ -1818,7 +1818,7 @@ function optfn_objects(optidx, req, negated, opts, op) {   // options.c:2648
         return optn_ok;
     }
     if (req === get_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), new $c.Ptr(to_be_done, 0));
+        $c.sprintf(opts, $c.lit("%s"), new $c.Ptr(to_be_done, 0));
         return optn_ok;
     }
     if (req === get_cnf_val) {
@@ -1843,7 +1843,7 @@ async function optfn_packorder(optidx, req, negated, opts, op) {   // options.c:
     }
     if (req === get_val || req === get_cnf_val) {
         await oc_to_str(new $c.Ptr(flags.inv_order, 0), new $c.Ptr(ocl, 0));
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), new $c.Ptr(ocl, 0));
+        $c.sprintf(opts, $c.lit("%s"), new $c.Ptr(ocl, 0));
         return optn_ok;
     }
     return optn_ok;
@@ -1912,7 +1912,7 @@ async function optfn_paranoid_confirmation(optidx, req, opt_negated, opts, op) {
             /* keep going */
             /* convert prayconfirm to paranoid_confirm:+pray and
                !prayconfirm to paranoid_confirm:-pray */
-            $c.__builtin___sprintf_chk(new $c.Ptr(prayconfirm, 0), 0, 6, $c.lit("%cpray"), opt_negated ? 45 : 43);
+            $c.sprintf(new $c.Ptr(prayconfirm, 0), $c.lit("%cpray"), opt_negated ? 45 : 43);
             op = new $c.Ptr(prayconfirm, 0);
             /* possibly changing !prayconfirm to paranoid_confirm:-pray
                which clears a paranoia bit but isn't a negated option */
@@ -2052,7 +2052,7 @@ async function optfn_paranoid_confirmation(optidx, req, opt_negated, opts, op) {
         }
         /* note: always leaves enough room for caller to tack on '\n' */
         opts.set(0, 0);
-        $c.__builtin___strncat_chk(opts, tmpbuf[0] ? new $c.Ptr(tmpbuf, 1) : $c.lit("none"), BUFSZ - 1, -1);
+        $c.strncat(opts, tmpbuf[0] ? new $c.Ptr(tmpbuf, 1) : $c.lit("none"), BUFSZ - 1);
         return optn_ok;
     }
     if (req === do_handler) {
@@ -2117,7 +2117,7 @@ async function optfn_perminv_mode(optidx, req, negated, opts, op) {   // options
     } else if (req === get_val) {
         /* value shown when examining current option settings; enclosed
            within square brackets for 'O', shown as-is when setting value */
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), perminv_modes[iflags.perminv_mode][2]);
+        $c.sprintf(opts, $c.lit("%s"), perminv_modes[iflags.perminv_mode][2]);
         /* 'op' is Null when called by handler_perminv_mode() while
            setting, non-Null when 'm O' shows current option values */
         if (iflags.perminv_mode !== InvOptNone && !iflags.perm_invent && op) {
@@ -2128,10 +2128,10 @@ async function optfn_perminv_mode(optidx, req, negated, opts, op) {   // options
             } else {
                 strsubst(opts, $c.lit(" inventory"), $c.lit(" invent"));
             }
-            $c.__builtin___strcat_chk(opts, (iflags.perminv_mode & InvSparse) !== 0 ? $c.lit(" (Off)") : $c.lit(" ('perm_invent' is Off)"), -1);
+            $c.strcat(opts, (iflags.perminv_mode & InvSparse) !== 0 ? $c.lit(" (Off)") : $c.lit(" ('perm_invent' is Off)"));
         }
     } else if (req === get_cnf_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), perminv_modes[iflags.perminv_mode][0]);
+        $c.sprintf(opts, $c.lit("%s"), perminv_modes[iflags.perminv_mode][0]);
     }
     return retval;
 }
@@ -2168,13 +2168,13 @@ async function optfn_petattr(optidx, req, negated, opts, op) {   // options.c:31
     }
     if (req === get_val || req === get_cnf_val) {
         if (windowprocs.wp_id === wp_tty || windowprocs.wp_id === wp_curses) {
-            $c.__builtin___strcpy_chk(opts, attr2attrname(iflags.wc2_petattr), -1);
+            $c.strcpy(opts, attr2attrname(iflags.wc2_petattr));
         } else if (iflags.wc2_petattr !== 0) {
-            $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("0x%08x"), iflags.wc2_petattr);
+            $c.sprintf(opts, $c.lit("0x%08x"), iflags.wc2_petattr);
         } else if (req === get_cnf_val) {
             opts.set(0, 0);
         } else {
-            $c.__builtin___strcpy_chk(opts, new $c.Ptr(defopt, 0), -1);
+            $c.strcpy(opts, new $c.Ptr(defopt, 0));
         }
     }
     if (req === do_handler) {
@@ -2228,12 +2228,12 @@ async function optfn_pettype(optidx, req, negated, opts, op) {   // options.c:31
         return optn_ok;
     }
     if (req === get_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), gp.preferred_pet === 99 ? $c.lit("cat") : gp.preferred_pet === 100 ? $c.lit("dog") : gp.preferred_pet === 104 ? $c.lit("horse") : gp.preferred_pet === 110 ? $c.lit("none") : $c.lit("random"));
+        $c.sprintf(opts, $c.lit("%s"), gp.preferred_pet === 99 ? $c.lit("cat") : gp.preferred_pet === 100 ? $c.lit("dog") : gp.preferred_pet === 104 ? $c.lit("horse") : gp.preferred_pet === 110 ? $c.lit("none") : $c.lit("random"));
         return optn_ok;
     }
     if (req === get_cnf_val) {
         if (gp.preferred_pet) {
-            $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%c"), gp.preferred_pet);
+            $c.sprintf(opts, $c.lit("%c"), gp.preferred_pet);
         } else {
             opts.set(0, 0);
         }
@@ -2284,7 +2284,7 @@ async function optfn_pickup_burden(optidx, req, negated, opts, op) {   // option
         return optn_ok;
     }
     if (req === get_val || req === get_cnf_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), burdentype[flags.pickup_burden]);
+        $c.sprintf(opts, $c.lit("%s"), burdentype[flags.pickup_burden]);
         return optn_ok;
     }
     if (req === do_handler) {
@@ -2316,7 +2316,7 @@ async function optfn_pickup_types(optidx, req, negated, opts, op) {   // options
             use_menu = TRUE;
             if (flags.menu_style === MENU.TRADITIONAL || flags.menu_style === MENU.COMBINATION) {
                 use_menu = FALSE;
-                $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("New %s: [%s am] (%s)"), allopt[optidx].name, new $c.Ptr(ocl, 0), new $c.Ptr(tbuf, 0).get(0) ? new $c.Ptr(tbuf, 0) : $c.lit("all"));
+                $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("New %s: [%s am] (%s)"), allopt[optidx].name, new $c.Ptr(ocl, 0), new $c.Ptr(tbuf, 0).get(0) ? new $c.Ptr(tbuf, 0) : $c.lit("all"));
                 abuf[0] = 0;
                 await getlin(new $c.Ptr(qbuf, 0), new $c.Ptr(abuf, 0));
                 wasspace = $c.i8(abuf[0] === 32 ? 1 : 0);   /* before mungspaces */
@@ -2368,7 +2368,7 @@ async function optfn_pickup_types(optidx, req, negated, opts, op) {   // options
     }
     if (req === get_val || req === get_cnf_val) {
         await oc_to_str(new $c.Ptr(flags.pickup_types, 0), new $c.Ptr(ocl, 0));
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), ocl[0] ? new $c.Ptr(ocl, 0) : $c.lit("all"));
+        $c.sprintf(opts, $c.lit("%s"), ocl[0] ? new $c.Ptr(ocl, 0) : $c.lit("all"));
         return optn_ok;
     }
     if (req === do_handler) {
@@ -2402,7 +2402,7 @@ async function optfn_pile_limit(optidx, req, negated, opts, op) {   // options.c
         return optn_ok;
     }
     if (req === get_val || req === get_cnf_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%d"), flags.pile_limit);
+        $c.sprintf(opts, $c.lit("%d"), flags.pile_limit);
         return optn_ok;
     }
     return optn_ok;
@@ -2427,7 +2427,7 @@ async function optfn_player_selection(optidx, req, negated, opts, op) {   // opt
         return optn_ok;
     }
     if (req === get_val || req === get_cnf_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), iflags.wc_player_selection ? $c.lit("prompts") : $c.lit("dialog"));
+        $c.sprintf(opts, $c.lit("%s"), iflags.wc_player_selection ? $c.lit("prompts") : $c.lit("dialog"));
         return optn_ok;
     }
     return optn_ok;
@@ -2458,7 +2458,7 @@ async function optfn_playmode(optidx, req, negated, opts, op) {   // options.c:3
         return optn_ok;
     }
     if (req === get_val || req === get_cnf_val) {
-        $c.__builtin___strcpy_chk(opts, flags.debug ? $c.lit("debug") : flags.explore ? $c.lit("explore") : $c.lit("normal"), -1);
+        $c.strcpy(opts, flags.debug ? $c.lit("debug") : flags.explore ? $c.lit("explore") : $c.lit("normal"));
         return optn_ok;
     }
     return optn_ok;
@@ -2485,12 +2485,12 @@ async function optfn_race(optidx, req, negated, opts, op$in) {   // options.c:35
         return optn_ok;
     }
     if (req === get_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), flags.initrace >= 0 ? races[flags.initrace].noun : flags.initrace === ROLE_RANDOM ? new $c.Ptr(randomrole, 0) : new $c.Ptr(none, 0));
+        $c.sprintf(opts, $c.lit("%s"), flags.initrace >= 0 ? races[flags.initrace].noun : flags.initrace === ROLE_RANDOM ? new $c.Ptr(randomrole, 0) : new $c.Ptr(none, 0));
         return optn_ok;
     }
     if (req === get_cnf_val) {
         op[0] = await get_cnf_role_opt(optidx);
-        $c.__builtin___strcpy_chk(opts, op[0] ? op[0] : $c.lit("none"), -1);
+        $c.strcpy(opts, op[0] ? op[0] : $c.lit("none"));
         return optn_ok;
     }
     return optn_ok;
@@ -2523,9 +2523,9 @@ async function optfn_roguesymset(optidx, req, negated, opts, op) {   // options.
         return optn_ok;
     }
     if (req === get_val || req === get_cnf_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), gs.symset[ROGUESET].name ? gs.symset[ROGUESET].name : $c.lit("default"));
+        $c.sprintf(opts, $c.lit("%s"), gs.symset[ROGUESET].name ? gs.symset[ROGUESET].name : $c.lit("default"));
         if (gc.currentgraphics === ROGUESET && gs.symset[ROGUESET].name) {
-            $c.__builtin___strcat_chk(opts, $c.lit(", active"), -1);
+            $c.strcat(opts, $c.lit(", active"));
         }
         return optn_ok;
     }
@@ -2556,12 +2556,12 @@ async function optfn_role(optidx, req, negated, opts, op$in) {   // options.c:35
         return optn_ok;
     }
     if (req === get_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), flags.initrole >= 0 ? roles[flags.initrole].name.m : flags.initrole === ROLE_RANDOM ? new $c.Ptr(randomrole, 0) : new $c.Ptr(none, 0));
+        $c.sprintf(opts, $c.lit("%s"), flags.initrole >= 0 ? roles[flags.initrole].name.m : flags.initrole === ROLE_RANDOM ? new $c.Ptr(randomrole, 0) : new $c.Ptr(none, 0));
         return optn_ok;
     }
     if (req === get_cnf_val) {
         op[0] = await get_cnf_role_opt(optidx);
-        $c.__builtin___strcpy_chk(opts, op[0] ? op[0] : $c.lit("none"), -1);
+        $c.strcpy(opts, op[0] ? op[0] : $c.lit("none"));
         return optn_ok;
     }
     return optn_ok;
@@ -2593,7 +2593,7 @@ async function optfn_runmode(optidx, req, negated, opts, op) {   // options.c:36
         return optn_ok;
     }
     if (req === get_val || req === get_cnf_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), runmodes[flags.runmode]);
+        $c.sprintf(opts, $c.lit("%s"), runmodes[flags.runmode]);
         return optn_ok;
     }
     if (req === do_handler) {
@@ -2675,16 +2675,16 @@ async function optfn_scores(optidx, req, negated, opts, op) {   // options.c:366
     if (req === get_val || req === get_cnf_val) {
         opts.set(0, 0);
         if (flags.end_top > 0) {
-            $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%d top"), flags.end_top);
+            $c.sprintf(opts, $c.lit("%d top"), flags.end_top);
         }
         if (flags.end_around > 0) {
-            $c.__builtin___sprintf_chk(eos(opts), 0, -1, $c.lit("%s%d around"), flags.end_top > 0 ? $c.lit("/") : $c.lit(""), flags.end_around);
+            $c.sprintf(eos(opts), $c.lit("%s%d around"), flags.end_top > 0 ? $c.lit("/") : $c.lit(""), flags.end_around);
         }
         if (flags.end_own) {
-            $c.__builtin___sprintf_chk(eos(opts), 0, -1, $c.lit("%sown"), flags.end_top > 0 || flags.end_around > 0 ? $c.lit("/") : $c.lit(""));
+            $c.sprintf(eos(opts), $c.lit("%sown"), flags.end_top > 0 || flags.end_around > 0 ? $c.lit("/") : $c.lit(""));
         }
         if (!opts.get(0)) {
-            $c.__builtin___strcpy_chk(opts, $c.lit("none"), -1);
+            $c.strcpy(opts, $c.lit("none"));
         }
         return optn_ok;
     }
@@ -2708,9 +2708,9 @@ async function optfn_scroll_amount(optidx, req, negated, opts, op) {   // option
     }
     if (req === get_val || req === get_cnf_val) {
         if (iflags.wc_scroll_amount) {
-            $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%d"), iflags.wc_scroll_amount);
+            $c.sprintf(opts, $c.lit("%d"), iflags.wc_scroll_amount);
         } else {
-            $c.__builtin___strcpy_chk(opts, new $c.Ptr(defopt, 0), -1);
+            $c.strcpy(opts, new $c.Ptr(defopt, 0));
         }
         return optn_ok;
     }
@@ -2734,9 +2734,9 @@ async function optfn_scroll_margin(optidx, req, negated, opts, op) {   // option
     }
     if (req === get_val || req === get_cnf_val) {
         if (iflags.wc_scroll_margin) {
-            $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%d"), iflags.wc_scroll_margin);
+            $c.sprintf(opts, $c.lit("%d"), iflags.wc_scroll_margin);
         } else {
-            $c.__builtin___strcpy_chk(opts, new $c.Ptr(defopt, 0), -1);
+            $c.strcpy(opts, new $c.Ptr(defopt, 0));
         }
         return optn_ok;
     }
@@ -2768,7 +2768,7 @@ async function optfn_soundlib(optidx, req, negated, opts, op) {   // options.c:3
     }
     if (req === get_val || req === get_cnf_val) {
         await get_soundlib_name(new $c.Ptr(soundlibbuf, 0), WINTYPELEN);
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), new $c.Ptr(soundlibbuf, 0));
+        $c.sprintf(opts, $c.lit("%s"), new $c.Ptr(soundlibbuf, 0));
         return optn_ok;
     }
     return optn_ok;
@@ -2853,7 +2853,7 @@ async function optfn_sortloot(optidx, req, negated, opts, op) {   // options.c:3
     if (req === get_val || req === get_cnf_val) {
         for (i = 0; i < 3; i = i + 1 | 0) {
             if (flags.sortloot === sortltype[i].get(0)) {
-                $c.__builtin___strcpy_chk(opts, sortltype[i], -1);
+                $c.strcpy(opts, sortltype[i]);
                 break;
             }
         }
@@ -2893,9 +2893,9 @@ async function optfn_sortvanquished(optidx, req, negated, opts, op) {   // optio
         return optn_ok;
     }
     if (req === get_val || req === get_cnf_val) {
-        $c.__builtin___strcpy_chk(opts, vanqorders[flags.vanq_sortmode][0], -1);
+        $c.strcpy(opts, vanqorders[flags.vanq_sortmode][0]);
         if (req === get_val) {
-            $c.__builtin___sprintf_chk(eos(opts), 0, -1, $c.lit(": %s"), vanqorders[flags.vanq_sortmode][1]);
+            $c.sprintf(eos(opts), $c.lit(": %s"), vanqorders[flags.vanq_sortmode][1]);
         }
         return optn_ok;
     }
@@ -2931,14 +2931,14 @@ async function optfn_statushilites(optidx, req, negated, opts, op) {   // option
     }
     if (req === get_val) {
         if (!iflags.hilite_delta) {
-            $c.__builtin___strcpy_chk(opts, $c.lit("0 (off: don't highlight status fields)"), -1);
+            $c.strcpy(opts, $c.lit("0 (off: don't highlight status fields)"));
         } else {
-            $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%ld (on: highlight status for %ld turns)"), iflags.hilite_delta, iflags.hilite_delta);
+            $c.sprintf(opts, $c.lit("%ld (on: highlight status for %ld turns)"), iflags.hilite_delta, iflags.hilite_delta);
         }
         return optn_ok;
     }
     if (req === get_cnf_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%ld"), iflags.hilite_delta);
+        $c.sprintf(opts, $c.lit("%ld"), iflags.hilite_delta);
     }
     return optn_ok;
 }
@@ -2973,9 +2973,9 @@ async function optfn_statuslines(optidx, req, negated, opts, op) {   // options.
     }
     if (req === get_val || req === get_cnf_val) {
         if (wc2_supported(allopt[optidx].name)) {
-            $c.__builtin___strcpy_chk(opts, iflags.wc2_statuslines < 3 ? $c.lit("2") : $c.lit("3"), -1);
+            $c.strcpy(opts, iflags.wc2_statuslines < 3 ? $c.lit("2") : $c.lit("3"));
         } else {
-            $c.__builtin___strcpy_chk(opts, $c.lit("unknown"), -1);
+            $c.strcpy(opts, $c.lit("unknown"));
         }
         return optn_ok;
     }
@@ -2999,9 +2999,9 @@ async function optfn_suppress_alert(optidx, req, negated, opts, op) {   // optio
         if (req === get_cnf_val && flags.suppress_alert === 0) {
             opts.set(0, 0);
         } else if (flags.suppress_alert === 0) {
-            $c.__builtin___strcpy_chk(opts, new $c.Ptr(none, 0), -1);
+            $c.strcpy(opts, new $c.Ptr(none, 0));
         } else {
-            $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%lu.%lu.%lu"), $c.shru64(flags.suppress_alert, 24), $c.shru64($c.andu64(16711680, flags.suppress_alert), 16), $c.shru64($c.andu64(65280, flags.suppress_alert), 8));
+            $c.sprintf(opts, $c.lit("%lu.%lu.%lu"), $c.shru64(flags.suppress_alert, 24), $c.shru64($c.andu64(16711680, flags.suppress_alert), 16), $c.shru64($c.andu64(65280, flags.suppress_alert), 8));
         }
         return optn_ok;
     }
@@ -3036,17 +3036,17 @@ async function optfn_symset(optidx, req, negated, opts, op) {   // options.c:416
         return optn_ok;
     }
     if (req === get_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), gs.symset[PRIMARYSET].name ? gs.symset[PRIMARYSET].name : $c.lit("default"));
+        $c.sprintf(opts, $c.lit("%s"), gs.symset[PRIMARYSET].name ? gs.symset[PRIMARYSET].name : $c.lit("default"));
         if (gc.currentgraphics === PRIMARYSET && gs.symset[PRIMARYSET].name) {
-            $c.__builtin___strcat_chk(opts, $c.lit(", active"), -1);
+            $c.strcat(opts, $c.lit(", active"));
         }
         if (gs.symset[PRIMARYSET].handling) {
-            $c.__builtin___sprintf_chk(eos(opts), 0, -1, $c.lit(", handler=%s"), known_handling[gs.symset[PRIMARYSET].handling]);
+            $c.sprintf(eos(opts), $c.lit(", handler=%s"), known_handling[gs.symset[PRIMARYSET].handling]);
         }
         return optn_ok;
     }
     if (req === get_cnf_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), gs.symset[PRIMARYSET].name ? gs.symset[PRIMARYSET].name : $c.lit("default"));
+        $c.sprintf(opts, $c.lit("%s"), gs.symset[PRIMARYSET].name ? gs.symset[PRIMARYSET].name : $c.lit("default"));
         return optn_ok;
     }
     if (req === do_handler) {
@@ -3087,11 +3087,11 @@ async function optfn_term_cols(optidx, req, negated, opts, op) {   // options.c:
     }
     if (req === get_val || req === get_cnf_val) {
         if (iflags.wc2_term_cols) {
-            $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%d"), iflags.wc2_term_cols);
+            $c.sprintf(opts, $c.lit("%d"), iflags.wc2_term_cols);
         } else if (req === get_cnf_val) {
             opts.set(0, 0);
         } else {
-            $c.__builtin___strcpy_chk(opts, new $c.Ptr(defopt, 0), -1);
+            $c.strcpy(opts, new $c.Ptr(defopt, 0));
         }
         return optn_ok;
     }
@@ -3121,11 +3121,11 @@ async function optfn_term_rows(optidx, req, negated, opts, op) {   // options.c:
     }
     if (req === get_val || req === get_cnf_val) {
         if (iflags.wc2_term_rows) {
-            $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%d"), iflags.wc2_term_rows);
+            $c.sprintf(opts, $c.lit("%d"), iflags.wc2_term_rows);
         } else if (req === get_cnf_val) {
             opts.set(0, 0);
         } else {
-            $c.__builtin___strcpy_chk(opts, new $c.Ptr(defopt, 0), -1);
+            $c.strcpy(opts, new $c.Ptr(defopt, 0));
         }
         return optn_ok;
     }
@@ -3149,12 +3149,12 @@ async function optfn_tile_file(optidx, req, negated, opts, op) {   // options.c:
         return optn_ok;
     }
     if (req === get_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), iflags.wc_tile_file ? iflags.wc_tile_file : new $c.Ptr(defopt, 0));
+        $c.sprintf(opts, $c.lit("%s"), iflags.wc_tile_file ? iflags.wc_tile_file : new $c.Ptr(defopt, 0));
         return optn_ok;
     }
     if (req === get_cnf_val) {
         if (iflags.wc_tile_file) {
-            $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), iflags.wc_tile_file);
+            $c.sprintf(opts, $c.lit("%s"), iflags.wc_tile_file);
         } else {
             opts.set(0, 0);
         }
@@ -3180,11 +3180,11 @@ async function optfn_tile_height(optidx, req, negated, opts, op) {   // options.
     }
     if (req === get_val || req === get_cnf_val) {
         if (iflags.wc_tile_height) {
-            $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%d"), iflags.wc_tile_height);
+            $c.sprintf(opts, $c.lit("%d"), iflags.wc_tile_height);
         } else if (req === get_cnf_val) {
             opts.set(0, 0);
         } else {
-            $c.__builtin___strcpy_chk(opts, new $c.Ptr(defopt, 0), -1);
+            $c.strcpy(opts, new $c.Ptr(defopt, 0));
         }
         return optn_ok;
     }
@@ -3208,11 +3208,11 @@ async function optfn_tile_width(optidx, req, negated, opts, op) {   // options.c
     }
     if (req === get_val || req === get_cnf_val) {
         if (iflags.wc_tile_width) {
-            $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%d"), iflags.wc_tile_width);
+            $c.sprintf(opts, $c.lit("%d"), iflags.wc_tile_width);
         } else if (req === get_cnf_val) {
             opts.set(0, 0);
         } else {
-            $c.__builtin___strcpy_chk(opts, new $c.Ptr(defopt, 0), -1);
+            $c.strcpy(opts, new $c.Ptr(defopt, 0));
         }
         return optn_ok;
     }
@@ -3226,7 +3226,7 @@ function optfn_traps(optidx, req, negated, opts, op) {   // options.c:4418
         return optn_ok;
     }
     if (req === get_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), new $c.Ptr(to_be_done, 0));
+        $c.sprintf(opts, $c.lit("%s"), new $c.Ptr(to_be_done, 0));
         return optn_ok;
     }
     if (req === get_cnf_val) {
@@ -3253,11 +3253,11 @@ async function optfn_vary_msgcount(optidx, req, negated, opts, op) {   // option
     }
     if (req === get_val || req === get_cnf_val) {
         if (iflags.wc_vary_msgcount) {
-            $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%d"), iflags.wc_vary_msgcount);
+            $c.sprintf(opts, $c.lit("%d"), iflags.wc_vary_msgcount);
         } else if (req === get_cnf_val) {
             opts.set(0, 0);
         } else {
-            $c.__builtin___strcpy_chk(opts, new $c.Ptr(defopt, 0), -1);
+            $c.strcpy(opts, new $c.Ptr(defopt, 0));
         }
         return optn_ok;
     }
@@ -3302,9 +3302,9 @@ async function optfn_versinfo(optidx, req, negated, opts, op) {   // options.c:4
         g = $c.i8((vi & VI.NAME) >>> 0 !== 0 ? 1 : 0);
         b = $c.i8((vi & VI.BRANCH) >>> 0 !== 0 ? 1 : 0);
         n = $c.i8((vi & VI.NUMBER) >>> 0 !== 0 ? 1 : 0);
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%u: %s%s%s%s%s (%.99s)"), flags.versinfo, g ? $c.lit("name") : $c.lit(""), b && g ? $c.lit("+") : $c.lit(""), b ? $c.lit("branch") : $c.lit(""), n && (b || g) ? $c.lit("+") : $c.lit(""), n ? $c.lit("number") : $c.lit(""), status_version(new $c.Ptr(vbuf, 0), 128, FALSE));
+        $c.sprintf(opts, $c.lit("%u: %s%s%s%s%s (%.99s)"), flags.versinfo, g ? $c.lit("name") : $c.lit(""), b && g ? $c.lit("+") : $c.lit(""), b ? $c.lit("branch") : $c.lit(""), n && (b || g) ? $c.lit("+") : $c.lit(""), n ? $c.lit("number") : $c.lit(""), status_version(new $c.Ptr(vbuf, 0), 128, FALSE));
     } else if (req === get_cnf_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%u"), flags.versinfo);
+        $c.sprintf(opts, $c.lit("%u"), flags.versinfo);
     }
     if (flags.versinfo !== vi && !go.opt_initial) {
         go.opt_need_redraw = TRUE;
@@ -3357,7 +3357,7 @@ async function optfn_whatis_coord(optidx, req, negated, opts, op) {   // options
         return optn_ok;
     }
     if (req === get_val || req === get_cnf_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), iflags.getpos_coords === 109 ? $c.lit("map") : iflags.getpos_coords === 99 ? $c.lit("compass") : iflags.getpos_coords === 102 ? $c.lit("full compass") : iflags.getpos_coords === 115 ? $c.lit("screen") : $c.lit("none"));
+        $c.sprintf(opts, $c.lit("%s"), iflags.getpos_coords === 109 ? $c.lit("map") : iflags.getpos_coords === 99 ? $c.lit("compass") : iflags.getpos_coords === 102 ? $c.lit("full compass") : iflags.getpos_coords === 115 ? $c.lit("screen") : $c.lit("none"));
         return optn_ok;
     }
     if (req === do_handler) {
@@ -3398,7 +3398,7 @@ async function optfn_whatis_filter(optidx, req, negated, opts, op) {   // option
         return optn_ok;
     }
     if (req === get_val || req === get_cnf_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), iflags.getloc_filter === GFILTER_VIEW ? $c.lit("view") : iflags.getloc_filter === GFILTER_AREA ? $c.lit("area") : $c.lit("none"));
+        $c.sprintf(opts, $c.lit("%s"), iflags.getloc_filter === GFILTER_VIEW ? $c.lit("view") : iflags.getloc_filter === GFILTER_AREA ? $c.lit("area") : $c.lit("none"));
         return optn_ok;
     }
     if (req === do_handler) {
@@ -3438,11 +3438,11 @@ async function optfn_windowborders(optidx, req, negated, opts, op) {   // option
         return retval;
     }
     if (req === get_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), iflags.wc2_windowborders === 0 ? $c.lit("0=off") : iflags.wc2_windowborders === 1 ? $c.lit("1=on") : iflags.wc2_windowborders === 2 ? $c.lit("2=auto") : iflags.wc2_windowborders === 3 ? $c.lit("3=on, except off for perm_invent") : iflags.wc2_windowborders === 4 ? $c.lit("4=auto, except off for perm_invent") : new $c.Ptr(defopt, 0));
+        $c.sprintf(opts, $c.lit("%s"), iflags.wc2_windowborders === 0 ? $c.lit("0=off") : iflags.wc2_windowborders === 1 ? $c.lit("1=on") : iflags.wc2_windowborders === 2 ? $c.lit("2=auto") : iflags.wc2_windowborders === 3 ? $c.lit("3=on, except off for perm_invent") : iflags.wc2_windowborders === 4 ? $c.lit("4=auto, except off for perm_invent") : new $c.Ptr(defopt, 0));
         return optn_ok;
     }
     if (req === get_cnf_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%i"), iflags.wc2_windowborders);
+        $c.sprintf(opts, $c.lit("%i"), iflags.wc2_windowborders);
         return optn_ok;
     }
     if (req === do_handler) {
@@ -3483,7 +3483,7 @@ async function optfn_windowcolors(optidx, req, negated, opts, op) {   // options
             if (bg && (!bg.get(0) || !$c.strcmp(bg, new $c.Ptr(defbrief, 0)))) {
                 bg = null;
             }
-            $c.__builtin___sprintf_chk(eos(opts), 0, -1, $c.lit("%s%s %s/%s"), !wccount ? $c.lit("") : $c.lit(" "), fg || bg ? wcnames[wccount] : wcshortnames[wccount], fg ? fg : new $c.Ptr(defbrief, 0), bg ? bg : new $c.Ptr(defbrief, 0));
+            $c.sprintf(eos(opts), $c.lit("%s%s %s/%s"), !wccount ? $c.lit("") : $c.lit(" "), fg || bg ? wcnames[wccount] : wcshortnames[wccount], fg ? fg : new $c.Ptr(defbrief, 0), bg ? bg : new $c.Ptr(defbrief, 0));
         }
         return optn_ok;
     }
@@ -3524,7 +3524,7 @@ async function optfn_windowtype(optidx, req, negated, opts, op) {   // options.c
         return optn_ok;
     }
     if (req === get_val || req === get_cnf_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), windowprocs.name);
+        $c.sprintf(opts, $c.lit("%s"), windowprocs.name);
         return optn_ok;
     }
     return optn_ok;
@@ -3642,44 +3642,44 @@ async function pfxfn_font(optidx, req, negated, opts, op) {   // options.c:5039
     }
     if (req === get_val || req === get_cnf_val) {
         if (optidx === opt_font_map) {
-            $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), iflags.wc_font_map ? iflags.wc_font_map : new $c.Ptr(defopt, 0));
+            $c.sprintf(opts, $c.lit("%s"), iflags.wc_font_map ? iflags.wc_font_map : new $c.Ptr(defopt, 0));
         } else if (optidx === opt_font_message) {
-            $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), iflags.wc_font_message ? iflags.wc_font_message : new $c.Ptr(defopt, 0));
+            $c.sprintf(opts, $c.lit("%s"), iflags.wc_font_message ? iflags.wc_font_message : new $c.Ptr(defopt, 0));
         } else if (optidx === opt_font_status) {
-            $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), iflags.wc_font_status ? iflags.wc_font_status : new $c.Ptr(defopt, 0));
+            $c.sprintf(opts, $c.lit("%s"), iflags.wc_font_status ? iflags.wc_font_status : new $c.Ptr(defopt, 0));
         } else if (optidx === opt_font_menu) {
-            $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), iflags.wc_font_menu ? iflags.wc_font_menu : new $c.Ptr(defopt, 0));
+            $c.sprintf(opts, $c.lit("%s"), iflags.wc_font_menu ? iflags.wc_font_menu : new $c.Ptr(defopt, 0));
         } else if (optidx === opt_font_text) {
-            $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), iflags.wc_font_text ? iflags.wc_font_text : new $c.Ptr(defopt, 0));
+            $c.sprintf(opts, $c.lit("%s"), iflags.wc_font_text ? iflags.wc_font_text : new $c.Ptr(defopt, 0));
         } else if (optidx === opt_font_size_map) {
             if (iflags.wc_fontsiz_map) {
-                $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%d"), iflags.wc_fontsiz_map);
+                $c.sprintf(opts, $c.lit("%d"), iflags.wc_fontsiz_map);
             } else {
-                $c.__builtin___strcpy_chk(opts, new $c.Ptr(defopt, 0), -1);
+                $c.strcpy(opts, new $c.Ptr(defopt, 0));
             }
         } else if (optidx === opt_font_size_message) {
             if (iflags.wc_fontsiz_message) {
-                $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%d"), iflags.wc_fontsiz_message);
+                $c.sprintf(opts, $c.lit("%d"), iflags.wc_fontsiz_message);
             } else {
-                $c.__builtin___strcpy_chk(opts, new $c.Ptr(defopt, 0), -1);
+                $c.strcpy(opts, new $c.Ptr(defopt, 0));
             }
         } else if (optidx === opt_font_size_status) {
             if (iflags.wc_fontsiz_status) {
-                $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%d"), iflags.wc_fontsiz_status);
+                $c.sprintf(opts, $c.lit("%d"), iflags.wc_fontsiz_status);
             } else {
-                $c.__builtin___strcpy_chk(opts, new $c.Ptr(defopt, 0), -1);
+                $c.strcpy(opts, new $c.Ptr(defopt, 0));
             }
         } else if (optidx === opt_font_size_menu) {
             if (iflags.wc_fontsiz_menu) {
-                $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%d"), iflags.wc_fontsiz_menu);
+                $c.sprintf(opts, $c.lit("%d"), iflags.wc_fontsiz_menu);
             } else {
-                $c.__builtin___strcpy_chk(opts, new $c.Ptr(defopt, 0), -1);
+                $c.strcpy(opts, new $c.Ptr(defopt, 0));
             }
         } else if (optidx === opt_font_size_text) {
             if (iflags.wc_fontsiz_text) {
-                $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%d"), iflags.wc_fontsiz_text);
+                $c.sprintf(opts, $c.lit("%d"), iflags.wc_fontsiz_text);
             } else {
-                $c.__builtin___strcpy_chk(opts, new $c.Ptr(defopt, 0), -1);
+                $c.strcpy(opts, new $c.Ptr(defopt, 0));
             }
         }
         return optn_ok;
@@ -3980,11 +3980,11 @@ async function handler_menustyle() {   // options.c:5544
     await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < 4; i = i + 1 | 0) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%-12.12s%c%.60s"), menutype[i][0], sep, menutype[i][1]);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%-12.12s%c%.60s"), menutype[i][0], sep, menutype[i][1]);
         any.a_int = i + 1 | 0;
         await add_menu(tmpwin, nul_glyphinfo, any, new $c.Ptr(buf, 0).get(0), 0, ATR.NONE, clr, new $c.Ptr(buf, 0), i === flags.menu_style ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
         /* second line is prefixed by spaces that "c - " would use */
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%4s%-12.12s%c%.60s"), $c.lit(""), $c.lit(""), sep, menutype[i][2]);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%4s%-12.12s%c%.60s"), $c.lit(""), $c.lit(""), sep, menutype[i][2]);
         await add_menu_str(tmpwin, new $c.Ptr(buf, 0));
     }
     await end_menu()(tmpwin, $c.lit("Select menustyle:"));
@@ -4020,7 +4020,7 @@ async function handler_align_misc(optidx) {   // options.c:5586
     await add_menu(tmpwin, nul_glyphinfo, any, 108, 0, ATR.NONE, clr, $c.lit("left"), MENU.ITEMFLAGS_NONE);
     any.a_int = ALIGN.RIGHT;
     await add_menu(tmpwin, nul_glyphinfo, any, 114, 0, ATR.NONE, clr, $c.lit("right"), MENU.ITEMFLAGS_NONE);
-    $c.__builtin___sprintf_chk(new $c.Ptr(abuf, 0), 0, 256, $c.lit("Select %s window placement relative to the map:"), optidx === opt_align_message ? $c.lit("message") : $c.lit("status"));
+    $c.sprintf(new $c.Ptr(abuf, 0), $c.lit("Select %s window placement relative to the map:"), optidx === opt_align_message ? $c.lit("message") : $c.lit("status"));
     await end_menu()(tmpwin, new $c.Ptr(abuf, 0));
     if (await select_menu(tmpwin, PICK.ONE, new $c.Ptr(window_pick, 0)) > 0) {
         if (optidx === opt_align_message) {
@@ -4045,12 +4045,12 @@ async function handler_autounlock(optidx) {   // options.c:5624
     await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < 4; i = i + 1 | 0) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%-10.10s%c%.40s"), unlocktypes[i][0], sep, unlocktypes[i][1]);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%-10.10s%c%.40s"), unlocktypes[i][0], sep, unlocktypes[i][1]);
         presel = (flags.autounlock & 1 << i >>> 0) >>> 0 | 0;
         any.a_int = i + 1 | 0;
         await add_menu(tmpwin, nul_glyphinfo, any, unlocktypes[i][0].get(0), 0, ATR.NONE, clr, new $c.Ptr(buf, 0), presel ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     }
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Select '%.20s' actions:"), optname);
+    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Select '%.20s' actions:"), optname);
     await end_menu()(tmpwin, new $c.Ptr(buf, 0));
     n = await select_menu(tmpwin, PICK.ANY, new $c.Ptr(window_pick, 0));
     if (n > 0) {
@@ -4085,7 +4085,7 @@ async function handler_disclose() {   // options.c:5675
     await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i = i + 1 | 0) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%-12s[%c%c]"), handler_disclose$disclosure_names[i], flags.end_disclose[i], disclosure_options[i]);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%-12s[%c%c]"), handler_disclose$disclosure_names[i], flags.end_disclose[i], disclosure_options[i]);
         any.a_int = i + 1 | 0;
         await add_menu(tmpwin, nul_glyphinfo, any, disclosure_options[i], 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
         disc_cat[i] = 0;
@@ -4104,7 +4104,7 @@ async function handler_disclose() {   // options.c:5675
     for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i = i + 1 | 0) {
         if (disc_cat[i]) {
             c = flags.end_disclose[i];
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Disclosure options for %s:"), handler_disclose$disclosure_names[i]);
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Disclosure options for %s:"), handler_disclose$disclosure_names[i]);
             tmpwin = await create_nhwindow()(NHW.MENU);
             await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
             any.$copyFrom(cg.zeroany);
@@ -4197,11 +4197,11 @@ async function handler_msg_window() {   // options.c:5832
             if (i < 2 && is_curses) {
                 continue;
             }
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%-12.12s%c%.60s"), msgwind[i][0], sep, msgwind[i][1]);
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%-12.12s%c%.60s"), msgwind[i][0], sep, msgwind[i][1]);
             $t1 = c = msgwind[i][0].get(0), any.a_char = $t1;
             await add_menu(tmpwin, nul_glyphinfo, any, new $c.Ptr(buf, 0).get(0), 0, ATR.NONE, clr, new $c.Ptr(buf, 0), c === iflags.prevmsg_window ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
             /* second line is prefixed by spaces that "c - " would use */
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%4s%-12.12s%c%.60s"), $c.lit(""), $c.lit(""), sep, msgwind[i][2]);
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%4s%-12.12s%c%.60s"), $c.lit(""), $c.lit(""), sep, msgwind[i][2]);
             await add_menu_str(tmpwin, new $c.Ptr(buf, 0));
         }
         await end_menu()(tmpwin, $c.lit("Select message history display type:"));
@@ -4292,16 +4292,16 @@ async function handler_paranoid_confirmation() {   // options.c:5953
         if (strstri(explain, $c.lit("'m'")) && (mkey = cmd_from_func(do_reqmenu)) !== 109) {
             if (mkey) {
                 /* key for 'm' prefix */
-                $c.__builtin___sprintf_chk(new $c.Ptr(mbuf, 0), 0, 128, $c.lit("'%.9s'"), visctrl(mkey));   /* .5 is enough */
+                $c.sprintf(new $c.Ptr(mbuf, 0), $c.lit("'%.9s'"), visctrl(mkey));   /* .5 is enough */
             } else {
                 /* extended command name for 'm' prefix */
                 cmdnm = await cmdname_from_func(do_reqmenu, new $c.Ptr(cbuf, 0), TRUE);
                 if (!cmdnm) {
                     cmdnm = $c.lit("reqmenu");
                 }
-                $c.__builtin___sprintf_chk(new $c.Ptr(mbuf, 0), 0, 128, $c.lit("'%s%.31s'"), cmdnm.get(0) !== 35 ? $c.lit("#") : $c.lit(""), cmdnm);
+                $c.sprintf(new $c.Ptr(mbuf, 0), $c.lit("'%s%.31s'"), cmdnm.get(0) !== 35 ? $c.lit("#") : $c.lit(""), cmdnm);
             }
-            explain = strsubst($c.__builtin___strcpy_chk(new $c.Ptr(ebuf, 0), explain, 256), $c.lit("'m'"), new $c.Ptr(mbuf, 0));
+            explain = strsubst($c.strcpy(new $c.Ptr(ebuf, 0), explain), $c.lit("'m'"), new $c.Ptr(mbuf, 0));
         }
         any.a_int = paranoia[i].flagmask;
         await add_menu(tmpwin, nul_glyphinfo, any, paranoia[i].argname.get(0), 0, ATR.NONE, clr, explain, (flags.paranoia_bits & paranoia[i].flagmask >>> 0) >>> 0 ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
@@ -4341,11 +4341,11 @@ async function handler_perminv_mode() {   // options.c:6011
         pi1 = perminv_modes[i][1];
         if (!iflags.menu_tab_sep) {
             numspaces = widest - $c.i32($c.strlen(pi0)) | 0;
-            $c.__builtin___sprintf_chk(new $c.Ptr(sepbuf, 0), 0, 10, $c.lit("%*s"), numspaces > 1 ? numspaces : 1, $c.lit(" "));
+            $c.sprintf(new $c.Ptr(sepbuf, 0), $c.lit("%*s"), numspaces > 1 ? numspaces : 1, $c.lit(" "));
         } else {
-            $c.__builtin___strcpy_chk(new $c.Ptr(sepbuf, 0), $c.lit("\t"), 10);
+            $c.strcpy(new $c.Ptr(sepbuf, 0), $c.lit("\t"));
         }
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%s%s"), pi0, new $c.Ptr(sepbuf, 0), perminv_modes[i][2]);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s%s%s"), pi0, new $c.Ptr(sepbuf, 0), perminv_modes[i][2]);
         let_ = $c.i8((i & InvSparse) !== 0 ? highc(pi1.get(0)) : pi0.get(0));
         any.a_int = i + 1 | 0;
         await add_menu(tmpwin, nul_glyphinfo, any, let_, $c.i8(48 + i | 0), ATR.NONE, NO_COLOR, new $c.Ptr(buf, 0), i === old_pi ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
@@ -4406,7 +4406,7 @@ async function handler_pickup_burden() {   // options.c:6086
 async function handler_pickup_types() {   // options.c:6114
     let buf = new Int8Array(256);
     /* parseoptions will prompt for the list of types */
-    await parseoptions($c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("pickup_types"), 256), FALSE, FALSE);
+    await parseoptions($c.strcpy(new $c.Ptr(buf, 0), $c.lit("pickup_types")), FALSE, FALSE);
     return optn_ok;
 }
 async function handler_runmode() {   // options.c:6124
@@ -4489,12 +4489,12 @@ async function handler_whatis_coord() {   // options.c:6206
     any.a_char = GPCOORDS_NONE;
     await add_menu(tmpwin, nul_glyphinfo, any, GPCOORDS_NONE, 0, ATR.NONE, clr, $c.lit("none (no coordinates displayed)"), gpc === 110 ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     await add_menu_str(tmpwin, $c.lit(""));
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("map: upper-left: <%d,%d>, lower-right: <%d,%d>%s"), 1, 0, COLNO - 1, ROWNO - 1, flags.verbose ? $c.lit("; column 0 unused, off left edge") : $c.lit(""));
+    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("map: upper-left: <%d,%d>, lower-right: <%d,%d>%s"), 1, 0, COLNO - 1, ROWNO - 1, flags.verbose ? $c.lit("; column 0 unused, off left edge") : $c.lit(""));
     await add_menu_str(tmpwin, new $c.Ptr(buf, 0));
     if ($c.strcmp(windowprocs.name, $c.lit("tty"))) {   /* only show for non-tty */
         await add_menu_str(tmpwin, $c.lit("screen: row is offset to accommodate tty interface's use of top line"));
     }
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("screen: upper-left: [%02d,%02d], lower-right: [%d,%d]%s"), 2, 1, ROWNO - 1 + 2, COLNO - 1, flags.verbose ? $c.lit("; column 80 is not used") : $c.lit(""));
+    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("screen: upper-left: [%02d,%02d], lower-right: [%d,%d]%s"), 2, 1, ROWNO - 1 + 2, COLNO - 1, flags.verbose ? $c.lit("; column 80 is not used") : $c.lit(""));
     await add_menu_str(tmpwin, new $c.Ptr(buf, 0));
     await add_menu_str(tmpwin, $c.lit(""));
     await end_menu()(tmpwin, $c.lit("Select coordinate display when auto-describing a map position:"));
@@ -4570,7 +4570,7 @@ async function handler_autopickup_exception() {   // options.c:6331
                    -2 is good enough for apebuf[] but -3 makes
                    sure the whole thing fits within normal BUFSZ */
                 apebuf[$c.idx(256)] = 0;
-                $c.__builtin___strcat_chk(new $c.Ptr(apebuf, 0), $c.lit("\""), 258);
+                $c.strcat(new $c.Ptr(apebuf, 0), $c.lit("\""));
                 await add_autopickup_exception(new $c.Ptr(apebuf, 0));
             }
             continue ape_again$;
@@ -4587,12 +4587,12 @@ async function handler_autopickup_exception() {   // options.c:6331
                     any.a_void = opt_idx === 1 ? null : ape;
                     /* length of pattern plus quotes (plus '<'/'>') is
                        less than BUFSZ */
-                    $c.__builtin___sprintf_chk(new $c.Ptr(apebuf, 0), 0, 258, $c.lit("\"%c%s\""), ape.grab ? 60 : 62, ape.pattern);
+                    $c.sprintf(new $c.Ptr(apebuf, 0), $c.lit("\"%c%s\""), ape.grab ? 60 : 62, ape.pattern);
                     await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(apebuf, 0), MENU.ITEMFLAGS_NONE);
                     ape = ape.next;
                 }
             }
-            $c.__builtin___sprintf_chk(new $c.Ptr(apebuf, 0), 0, 258, $c.lit("%s autopickup exceptions"), opt_idx === 1 ? $c.lit("List of") : $c.lit("Remove which"));
+            $c.sprintf(new $c.Ptr(apebuf, 0), $c.lit("%s autopickup exceptions"), opt_idx === 1 ? $c.lit("List of") : $c.lit("Remove which"));
             await end_menu()(tmpwin, new $c.Ptr(apebuf, 0));
             pick_cnt = await select_menu(tmpwin, opt_idx === 1 ? PICK.NONE : PICK.ANY, new $c.Ptr(pick_list, 0));
             if (pick_cnt > 0) {
@@ -4656,25 +4656,25 @@ async function handler_menu_colors() {   // options.c:6407
                 mc_idx = 0;
                 while (tmp) {
                     sattr = attr2attrname(tmp.attr);
-                    sclr = $c.__builtin___strcpy_chk(new $c.Ptr(clrbuf, 0), clr2colorname(tmp.color), 128);
+                    sclr = $c.strcpy(new $c.Ptr(clrbuf, 0), clr2colorname(tmp.color));
                     strNsubst(new $c.Ptr(clrbuf, 0), $c.lit(" "), $c.lit("-"), 0);
                     $t1 = mc_idx = mc_idx + 1 | 0, any.a_int = $t1;
                     /* construct suffix */
-                    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("\"\"=%s%s%s"), sclr, tmp.attr !== ATR.NONE ? $c.lit("&") : $c.lit(""), tmp.attr !== ATR.NONE ? sattr : $c.lit(""));
+                    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("\"\"=%s%s%s"), sclr, tmp.attr !== ATR.NONE ? $c.lit("&") : $c.lit(""), tmp.attr !== ATR.NONE ? sattr : $c.lit(""));
                     /* now main string */
                     ln = $c.u32($c.subu64($c.subu64(256, await Strlen_(new $c.Ptr(buf, 0), $c.lit("handler_menu_colors"), 6470)), 1));   /* length available */
-                    $c.__builtin___strcpy_chk(new $c.Ptr(mcbuf, 0), $c.lit("\""), 256);
+                    $c.strcpy(new $c.Ptr(mcbuf, 0), $c.lit("\""));
                     if ($c.strlen(tmp.origstr) > ln) {
-                        $c.__builtin___strcat_chk($c.__builtin___strncat_chk(new $c.Ptr(mcbuf, 0), tmp.origstr, ln - 3 >>> 0, 256), $c.lit("..."), -1);
+                        $c.strcat($c.strncat(new $c.Ptr(mcbuf, 0), tmp.origstr, ln - 3 >>> 0), $c.lit("..."));
                     } else {
-                        $c.__builtin___strcat_chk(new $c.Ptr(mcbuf, 0), tmp.origstr, 256);
+                        $c.strcat(new $c.Ptr(mcbuf, 0), tmp.origstr);
                     }
                     /* combine main string and suffix */
-                    $c.__builtin___strcat_chk(new $c.Ptr(mcbuf, 0), new $c.Ptr(buf, 1), 256);   /* skip buf[]'s initial quote */
+                    $c.strcat(new $c.Ptr(mcbuf, 0), new $c.Ptr(buf, 1));   /* skip buf[]'s initial quote */
                     await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(mcbuf, 0), MENU.ITEMFLAGS_NONE);
                     tmp = tmp.next;
                 }
-                $c.__builtin___sprintf_chk(new $c.Ptr(mcbuf, 0), 0, 256, $c.lit("%s menu colors"), opt_idx === 1 ? $c.lit("List of") : $c.lit("Remove which"));
+                $c.sprintf(new $c.Ptr(mcbuf, 0), $c.lit("%s menu colors"), opt_idx === 1 ? $c.lit("List of") : $c.lit("Remove which"));
                 await end_menu()(tmpwin, new $c.Ptr(mcbuf, 0));
                 pick_cnt = await select_menu(tmpwin, opt_idx === 1 ? PICK.NONE : PICK.ANY, new $c.Ptr(pick_list, 0));
                 if (pick_cnt > 0) {
@@ -4725,17 +4725,17 @@ async function handler_msgtype() {   // options.c:6502
             while (tmp) {
                 mtype = msgtype2name(tmp.msgtype);
                 $t1 = mt_idx = mt_idx + 1 | 0, any.a_int = $t1;
-                $c.__builtin___sprintf_chk(new $c.Ptr(mtbuf, 0), 0, 256, $c.lit("%-5s \""), mtype);
+                $c.sprintf(new $c.Ptr(mtbuf, 0), $c.lit("%-5s \""), mtype);
                 ln = $c.u32($c.subu64($c.subu64(256, await Strlen_(new $c.Ptr(mtbuf, 0), $c.lit("handler_msgtype"), 6544)), 2));
                 if ($c.strlen(tmp.pattern) > ln) {
-                    $c.__builtin___strcat_chk($c.__builtin___strncat_chk(new $c.Ptr(mtbuf, 0), tmp.pattern, ln - 3 >>> 0, 256), $c.lit("...\""), -1);
+                    $c.strcat($c.strncat(new $c.Ptr(mtbuf, 0), tmp.pattern, ln - 3 >>> 0), $c.lit("...\""));
                 } else {
-                    $c.__builtin___strcat_chk($c.__builtin___strcat_chk(new $c.Ptr(mtbuf, 0), tmp.pattern, 256), $c.lit("\""), -1);
+                    $c.strcat($c.strcat(new $c.Ptr(mtbuf, 0), tmp.pattern), $c.lit("\""));
                 }
                 await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(mtbuf, 0), MENU.ITEMFLAGS_NONE);
                 tmp = tmp.next;
             }
-            $c.__builtin___sprintf_chk(new $c.Ptr(mtbuf, 0), 0, 256, $c.lit("%s message types"), opt_idx === 1 ? $c.lit("List of") : $c.lit("Remove which"));
+            $c.sprintf(new $c.Ptr(mtbuf, 0), $c.lit("%s message types"), opt_idx === 1 ? $c.lit("List of") : $c.lit("Remove which"));
             await end_menu()(tmpwin, new $c.Ptr(mtbuf, 0));
             pick_cnt = await select_menu(tmpwin, opt_idx === 1 ? PICK.NONE : PICK.ANY, new $c.Ptr(pick_list, 0));
             if (pick_cnt > 0) {
@@ -4921,7 +4921,7 @@ async function complain_about_duplicate(optidx) {   // options.c:6790
     /* !MACOS9 */
     buf[0] = 0;
     if (using_alias) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit(" (via alias: %s)"), allopt[optidx].alias);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit(" (via alias: %s)"), allopt[optidx].alias);
     }
     await config_error_add($c.lit("%s option specified multiple times: %s%s"), allopt[optidx].opttyp === CompOpt ? $c.lit("compound") : $c.lit("boolean"), allopt[optidx].name, new $c.Ptr(buf, 0));
     /* ?MACOS9 */
@@ -5270,7 +5270,7 @@ export async function initoptions_init() {   // options.c:7119
         gw.warnsyms[i] = def_warnsyms[i].sym;
     }
     /* assert( sizeof flags.inv_order == sizeof def_inv_order ); */
-    $c.__builtin___memcpy_chk(new $c.Ptr(flags.inv_order, 0), new $c.Ptr(def_inv_order, 0), 18, 109);
+    $c.memcpy(new $c.Ptr(flags.inv_order, 0), new $c.Ptr(def_inv_order, 0), 18);
     flags.pickup_types[0] = 0;
     flags.pickup_burden = MOD_ENCUMBER;
     flags.sortloot = 108;   /* sort only loot by default */
@@ -5429,7 +5429,7 @@ export async function initoptions_finish() {   // options.c:7324
 export async function allopt_array_init() {   // options.c:7405
     let i = 0;
     if (!allopt_array_init$options_array_inited_already) {
-        $c.__builtin___memcpy_chk($c.relem(allopt, 0), $c.relem(allopt_init, 0), 22672, 22672);
+        $c.memcpy($c.relem(allopt, 0), $c.relem(allopt_init, 0), 22672);
         await determine_ambiguities();
         for (i = 0; allopt[i].name; i = i + 1 | 0) {
             if (allopt[i].addr) {
@@ -5520,7 +5520,7 @@ async function change_inv_order(op) {   // options.c:7466
         }
     }
     buf[MAXOCLASSES - 1] = 0;
-    $c.__builtin___strcpy_chk(new $c.Ptr(flags.inv_order, 0), new $c.Ptr(buf, 0), 18);
+    $c.strcpy(new $c.Ptr(flags.inv_order, 0), new $c.Ptr(buf, 0));
     return retval;
 }
 /*
@@ -5573,7 +5573,7 @@ async function feature_alert_opts(op, optn) {   // options.c:7558
     }
     flags.suppress_alert = fnv;
     if (!go.opt_initial) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%lu.%lu.%lu"), $c.shru64(flags.suppress_alert, 24), $c.shru64($c.andu64(16711680, flags.suppress_alert), 16), $c.shru64($c.andu64(65280, flags.suppress_alert), 8));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%lu.%lu.%lu"), $c.shru64(flags.suppress_alert, 24), $c.shru64($c.andu64(16711680, flags.suppress_alert), 16), $c.shru64($c.andu64(65280, flags.suppress_alert), 8));
         await pline($c.lit("Feature change alerts disabled for NetHack %s features and prior."), new $c.Ptr(buf, 0));
     }
     return 1;
@@ -6022,7 +6022,7 @@ export function collect_menu_keys(outbuf, scrollmask, printable) {   // options.
         if ((scrollmask & collect_menu_keys$scroll_keys[i].maskindx) >>> 0) {
             c = get_menu_cmd_key(collect_menu_keys$scroll_keys[i].cmdkey);
             if (printable) {
-                $c.__builtin___strcat_chk(outbuf, visctrl(c), -1);
+                $c.strcat(outbuf, visctrl(c));
             } else {
                 strkitten(outbuf, c);
             }
@@ -6079,8 +6079,8 @@ export async function fruitadd(str, replace_fruit) {   // options.c:8170
                are case sensitive; "glob of foo" is caught by 'found'
                if 'foo' is a valid glob; when not valid, allow it as-is */
             if (found || numeric || !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $c.lit("cursed "), 7) || !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $c.lit("uncursed "), 9) || !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $c.lit("blessed "), 8) || !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $c.lit("partly eaten "), 13) || !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $c.lit("tin of "), 7) && (!$c.strcmp(new $c.Ptr(svp.pl_fruit, 0).add(7), $c.lit("spinach")) || await name_to_mon(new $c.Ptr(svp.pl_fruit, 0).add(7), null) >= LOW_PM && await name_to_mon(new $c.Ptr(svp.pl_fruit, 0).add(7), null) < NUMMONS) || !$c.strcmp(new $c.Ptr(svp.pl_fruit, 0), $c.lit("empty tin")) || (!$c.strcmp(new $c.Ptr(svp.pl_fruit, 0), $c.lit("glob")) || globpfx > 0 && !$c.strcmp($c.lit("glob"), new $c.Ptr(svp.pl_fruit, globpfx))) || (str_end_is(new $c.Ptr(svp.pl_fruit, 0), $c.lit(" corpse")) || str_end_is(new $c.Ptr(svp.pl_fruit, 0), $c.lit(" egg"))) && (await name_to_mon(new $c.Ptr(svp.pl_fruit, 0), null) >= LOW_PM && await name_to_mon(new $c.Ptr(svp.pl_fruit, 0), null) < NUMMONS)) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), new $c.Ptr(svp.pl_fruit, 0), 32);
-                $c.__builtin___strcpy_chk(new $c.Ptr(svp.pl_fruit, 0), $c.lit("candied "), 32);
+                $c.strcpy(new $c.Ptr(buf, 0), new $c.Ptr(svp.pl_fruit, 0));
+                $c.strcpy(new $c.Ptr(svp.pl_fruit, 0), $c.lit("candied "));
                 nmcpy(new $c.Ptr(svp.pl_fruit, 0).add(8), new $c.Ptr(buf, 0), PL.FSIZ - 8);
             }
             new $c.Ptr(altname, 0).set(0, 0);
@@ -6119,7 +6119,7 @@ export async function fruitadd(str, replace_fruit) {   // options.c:8170
             return rnd(127);
         }
         f = await newfruit();
-        $c.__builtin___memset_chk(f, 0, 48, -1);
+        $c.memset(f, 0, 48);
         copynchars(new $c.Ptr(f.fname, 0), new $c.Ptr(altname, 0).get(0) ? new $c.Ptr(altname, 0) : str, PL.FSIZ - 1);
         $t1 = highest_fruit_id[0] = highest_fruit_id[0] + 1 | 0, f.fid = $t1;
         /* we used to go out of our way to add it at the end of the list,
@@ -6151,7 +6151,7 @@ async function optfn_o_autopickup_exceptions(optidx, req, negated, opts, op) {  
         if (!opts) {
             return optn_err;
         }
-        $c.__builtin___sprintf_chk(opts, 0, -1, new $c.Ptr(n_currently_set, 0), count_apes());
+        $c.sprintf(opts, new $c.Ptr(n_currently_set, 0), count_apes());
         return optn_ok;
     }
     if (req === do_handler) {
@@ -6169,7 +6169,7 @@ async function optfn_o_bind_keys(optidx, req, negated, opts, op) {   // options.
         if (!opts) {
             return optn_err;
         }
-        $c.__builtin___sprintf_chk(opts, 0, -1, new $c.Ptr(n_currently_set, 0), count_bind_keys());
+        $c.sprintf(opts, new $c.Ptr(n_currently_set, 0), count_bind_keys());
         return optn_ok;
     }
     if (req === do_handler) {
@@ -6187,7 +6187,7 @@ async function optfn_o_autocomplete(optidx, req, negated, opts, op) {   // optio
         if (!opts) {
             return optn_err;
         }
-        $c.__builtin___sprintf_chk(opts, 0, -1, new $c.Ptr(n_currently_set, 0), count_autocompletions());
+        $c.sprintf(opts, new $c.Ptr(n_currently_set, 0), count_autocompletions());
         return optn_ok;
     }
     if (req === do_handler) {
@@ -6205,7 +6205,7 @@ async function optfn_o_menu_colors(optidx, req, negated, opts, op) {   // option
         if (!opts) {
             return optn_err;
         }
-        $c.__builtin___sprintf_chk(opts, 0, -1, new $c.Ptr(n_currently_set, 0), count_menucolors());
+        $c.sprintf(opts, new $c.Ptr(n_currently_set, 0), count_menucolors());
         return optn_ok;
     }
     if (req === do_handler) {
@@ -6223,7 +6223,7 @@ async function optfn_o_message_types(optidx, req, negated, opts, op) {   // opti
         if (!opts) {
             return optn_err;
         }
-        $c.__builtin___sprintf_chk(opts, 0, -1, new $c.Ptr(n_currently_set, 0), msgtype_count());
+        $c.sprintf(opts, new $c.Ptr(n_currently_set, 0), msgtype_count());
         return optn_ok;
     }
     if (req === do_handler) {
@@ -6242,7 +6242,7 @@ async function optfn_o_status_cond(optidx, req, negated, opts, op) {   // option
         if (!opts) {   /* opts[] is used as an output argument */
             return optn_err;
         }
-        $c.__builtin___sprintf_chk(opts, 0, -1, new $c.Ptr(n_currently_set, 0), count_cond());
+        $c.sprintf(opts, new $c.Ptr(n_currently_set, 0), count_cond());
         return optn_ok;
     }
     if (req === get_cnf_val) {
@@ -6266,7 +6266,7 @@ async function optfn_o_status_hilites(optidx, req, negated, opts, op) {   // opt
         if (!opts) {
             return optn_err;
         }
-        $c.__builtin___sprintf_chk(opts, 0, -1, new $c.Ptr(n_currently_set, 0), await count_status_hilites());
+        $c.sprintf(opts, new $c.Ptr(n_currently_set, 0), await count_status_hilites());
         return optn_ok;
     }
     if (req === do_handler) {
@@ -6290,7 +6290,7 @@ export async function get_option_value(optname, cnfvalid) {   // options.c:8481
     for (i = 0; allopt[i].name !== null; i = i + 1 | 0) {
         if (!$c.strcmp(optname, allopt[i].name)) {
             if (allopt[i].opttyp === BoolOpt && (bool_p = allopt[i].addr) !== null) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(get_option_value$retbuf, 0), 0, 256, $c.lit("%s"), bool_p.get(0) ? $c.lit("true") : $c.lit("false"));
+                $c.sprintf(new $c.Ptr(get_option_value$retbuf, 0), $c.lit("%s"), bool_p.get(0) ? $c.lit("true") : $c.lit("false"));
                 return new $c.Ptr(get_option_value$retbuf, 0);
             } else if (allopt[i].opttyp === CompOpt && allopt[i].optfn) {
                 reslt = optn_err;
@@ -6337,9 +6337,9 @@ async function doset_simple_menu() {   // options.c:8536
        in case 'menu_tab_sep' ever gets included in the simple menu so
        becomes subject to being changed while doset_simple() is running */
     if (!iflags.menu_tab_sep) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(fmtstr_doset_simple, 0), 0, 14, $c.lit("%%-%us [%%s]"), await longest_option_name(set_gameview, set_in_game));
+        $c.sprintf(new $c.Ptr(fmtstr_doset_simple, 0), $c.lit("%%-%us [%%s]"), await longest_option_name(set_gameview, set_in_game));
     } else {
-        $c.__builtin___strcpy_chk(new $c.Ptr(fmtstr_doset_simple, 0), new $c.Ptr(doset_simple_menu$fmtstr_tab_doset_simple, 0), 14);
+        $c.strcpy(new $c.Ptr(fmtstr_doset_simple, 0), new $c.Ptr(doset_simple_menu$fmtstr_tab_doset_simple, 0));
     }
     fmtstr = new $c.Ptr(fmtstr_doset_simple, 0);
     redo_opt_help$: for (;;) {
@@ -6351,7 +6351,7 @@ async function doset_simple_menu() {   // options.c:8536
                and show that, or whether #reqmenu and #options are both still
                bound to keys and show those, but if meta keys are involved
                the player might not know how to type them; keep this simple */
-            $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("Use command '#optionsfull' to get the complete options list."), 256);
+            $c.strcpy(new $c.Ptr(buf, 0), $c.lit("Use command '#optionsfull' to get the complete options list."));
             await add_menu_str(tmpwin, new $c.Ptr(buf, 0));
         }
         any.$copyFrom(cg.zeroany);
@@ -6360,7 +6360,7 @@ async function doset_simple_menu() {   // options.c:8536
         for (section = OptS.General; section < OptS.Advanced; section = section + 1 >>> 0) {
             any.$copyFrom(cg.zeroany);
             await add_menu_str(tmpwin, $c.lit(""));
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit(" %-30s "), OptS_type[section]);
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit(" %-30s "), OptS_type[section]);
             await add_menu_heading(tmpwin, new $c.Ptr(buf, 0));
             L1: for (i = 0; (name = allopt[i].name) !== null; i = i + 1 | 0) {
                 if (allopt[i].section !== section) {
@@ -6379,7 +6379,7 @@ async function doset_simple_menu() {   // options.c:8536
                         if (iflags.wc_tiled_map && allopt[i].idx === opt_color) {
                             continue L1;
                         }
-                        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, fmtstr, name, bool_p.get(0) ? $c.lit("X") : $c.lit(" "));
+                        $c.sprintf(new $c.Ptr(buf, 0), fmtstr, name, bool_p.get(0) ? $c.lit("X") : $c.lit(" "));
                         break;
                     case CompOpt:
                     case OthrOpt:
@@ -6394,20 +6394,20 @@ async function doset_simple_menu() {   // options.c:8536
                         if (allopt[k].optfn) {
                             reslt = await allopt[k].optfn(allopt[k].idx, get_val, FALSE, new $c.Ptr(buf2, 0), new $c.Ptr(empty_optstr, 0));
                         }
-                        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, fmtstr, name, reslt === optn_ok && buf2[0] ? new $c.Ptr(buf2, 0) : $c.lit("unknown"));
+                        $c.sprintf(new $c.Ptr(buf, 0), fmtstr, name, reslt === optn_ok && buf2[0] ? new $c.Ptr(buf2, 0) : $c.lit("unknown"));
                         break;
                     default:
-                        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("ERROR"));
+                        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("ERROR"));
                         break;
                 }
                 /* pickup_types is separated from autopickup due to the
                    spelling of their names; emphasize what it means */
                 if (allopt[i].idx === opt_pickup_types || allopt[i].idx === opt_pickup_thrown || allopt[i].idx === opt_pickup_stolen || allopt[i].idx === opt_dropped_nopick) {
-                    $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit("  (for autopickup)"), 256);
+                    $c.strcat(new $c.Ptr(buf, 0), $c.lit("  (for autopickup)"));
                 }
                 await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, NO_COLOR, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
                 if (gs.simple_options_help && allopt[i].descr) {
-                    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("    %s"), allopt[i].descr);
+                    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("    %s"), allopt[i].descr);
                     await add_menu_str(tmpwin, new $c.Ptr(buf, 0));
                     await add_menu_str(tmpwin, $c.lit(""));
                 }
@@ -6430,7 +6430,7 @@ async function doset_simple_menu() {   // options.c:8536
                 toggled_help = TRUE;
             } else if (allopt[k].opttyp === BoolOpt) {
                 /* boolean option */
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%s"), allopt[k].addr.get(0) ? $c.lit("!") : $c.lit(""), allopt[k].name);
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s%s"), allopt[k].addr.get(0) ? $c.lit("!") : $c.lit(""), allopt[k].name);
                 await parseoptions(new $c.Ptr(buf, 0), FALSE, FALSE);
             } else {
                 /* compound option */
@@ -6441,11 +6441,11 @@ async function doset_simple_menu() {   // options.c:8536
                         opt_set_in_config[k] = TRUE;
                     }
                 } else {
-                    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Set %s to what?"), allopt[k].name);
+                    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Set %s to what?"), allopt[k].name);
                     await getlin(new $c.Ptr(buf, 0), new $c.Ptr(abuf, 0));
                     if (abuf[0] !== 27) {
                         /* ESC */
-                        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s:"), allopt[k].name);
+                        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s:"), allopt[k].name);
                         copynchars(eos(new $c.Ptr(buf, 0)), new $c.Ptr(abuf, 0), $c.i32($c.subu64(255, $c.strlen(new $c.Ptr(buf, 0)))));
                         /* pass the buck */
                         await parseoptions(new $c.Ptr(buf, 0), FALSE, FALSE);
@@ -6534,7 +6534,7 @@ export async function doset() {   // options.c:8758
             any.$copyFrom(cg.zeroany);
             for (i = 0; i < 5; i = i + 1 | 0) {
                 if (doset$helptext[i]) {
-                    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%4s%.75s"), $c.lit(""), doset$helptext[i]);
+                    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%4s%.75s"), $c.lit(""), doset$helptext[i]);
                     await add_menu_str(tmpwin, new $c.Ptr(buf, 0));
                 } else {
                     any.a_int = HELP_IDX + 1;   /* handling pick_list subtracts 1 */
@@ -6548,9 +6548,9 @@ export async function doset() {   // options.c:8758
         startpass = set_gameview;
         endpass = flags.debug ? set_wiznofuz : set_in_game;
         if (!iflags.menu_tab_sep) {   /* initial "%s" is for indentation of non-selectable items */
-            $c.__builtin___sprintf_chk(new $c.Ptr(fmtstr_doset, 0), 0, 16, $c.lit("%%s%%-%us [%%s]"), await longest_option_name(startpass, endpass));
+            $c.sprintf(new $c.Ptr(fmtstr_doset, 0), $c.lit("%%s%%-%us [%%s]"), await longest_option_name(startpass, endpass));
         } else {
-            $c.__builtin___strcpy_chk(new $c.Ptr(fmtstr_doset, 0), new $c.Ptr(doset$fmtstr_tab_doset, 0), 16);
+            $c.strcpy(new $c.Ptr(fmtstr_doset, 0), new $c.Ptr(doset$fmtstr_tab_doset, 0));
         }
         indexoffset = 1;
         any.$copyFrom(cg.zeroany);
@@ -6574,7 +6574,7 @@ export async function doset() {   // options.c:8758
                     }
                     any.a_int = pass === 0 ? 0 : (i + 1 | 0) + indexoffset | 0;
                     indent = pass === 0 && !iflags.menu_tab_sep ? $c.lit("    ") : $c.lit("");
-                    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(fmtstr_doset, 0), indent, name, term_for_boolean(i, bool_p));
+                    $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(fmtstr_doset, 0), indent, name, term_for_boolean(i, bool_p));
                     if (pass === 0) {
                         enhance_menu_text(new $c.Ptr(buf, 0), 256, pass, bool_p, $c.relem(allopt, i));
                     }
@@ -6636,7 +6636,7 @@ export async function doset() {   // options.c:8758
                 (!(opt_indx >= 0 && opt_indx < 218) ? 1 : 0) ? $c.__assert_rtn($c.lit("doset"), $c.lit("options.c"), 8924, $c.lit("IndexOk(opt_indx, allopt)")) : 0;
                 if (allopt[opt_indx].opttyp === BoolOpt) {
                     /* boolean option */
-                    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%s"), allopt[opt_indx].addr.get(0) ? $c.lit("!") : $c.lit(""), allopt[opt_indx].name);
+                    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s%s"), allopt[opt_indx].addr.get(0) ? $c.lit("!") : $c.lit(""), allopt[opt_indx].name);
                     await parseoptions(new $c.Ptr(buf, 0), FALSE, FALSE);
                 } else {
                     /* compound option */
@@ -6648,14 +6648,14 @@ export async function doset() {   // options.c:8758
                             opt_set_in_config[k] = TRUE;
                         }
                     } else {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Set %s to what?"), allopt[opt_indx].name);
+                        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Set %s to what?"), allopt[opt_indx].name);
                         abuf[0] = 0;
                         await getlin(new $c.Ptr(buf, 0), new $c.Ptr(abuf, 0));
                         if (abuf[0] === 27) {
                             continue;
                         }
-                        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s:"), allopt[opt_indx].name);
-                        $c.__builtin___strncat_chk(eos(new $c.Ptr(buf, 0)), new $c.Ptr(abuf, 0), $c.subu64(255, $c.strlen(new $c.Ptr(buf, 0))), -1);
+                        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s:"), allopt[opt_indx].name);
+                        $c.strncat(eos(new $c.Ptr(buf, 0)), new $c.Ptr(abuf, 0), $c.subu64(255, $c.strlen(new $c.Ptr(buf, 0))));
                         /* pass the buck */
                         await parseoptions(new $c.Ptr(buf, 0), FALSE, FALSE);
                     }
@@ -6740,13 +6740,13 @@ async function doset_add_menu(win, option, fmtstr, idx, indexoffset) {   // opti
            (with a zero value, so it can't be selected). */
         any.a_int = 0;
         if (!buf2[0]) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(buf2, 0), $c.lit("unknown"), 256);
+            $c.strcpy(new $c.Ptr(buf2, 0), $c.lit("unknown"));
         }
         value = new $c.Ptr(buf2, 0);
     }
     /* "    " replaces "a - " -- assumes menus follow that style */
     indent = !any.a_int ? $c.lit("    ") : $c.lit("");
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, fmtstr, indent, option, value);
+    $c.sprintf(new $c.Ptr(buf, 0), fmtstr, indent, option, value);
     await add_menu(win, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_SKIPINVERT);
 }
 /* display keys for menu actions; used by cmd.c '?i' and pager.c '?k' */
@@ -6766,7 +6766,7 @@ export async function show_menu_controls(win, dolist) {   // options.c:9070
             if ((ch === 125 || ch === 123) && !has_menu_shift) {
                 continue;
             }
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, fmt, visctrl(get_menu_cmd_key(ch)), default_menu_cmd_info[i].desc);
+            $c.sprintf(new $c.Ptr(buf, 0), fmt, visctrl(get_menu_cmd_key(ch)), default_menu_cmd_info[i].desc);
             await putstr()(win, 0, new $c.Ptr(buf, 0));
         }
         /* no separator before hardcoded */
@@ -6775,33 +6775,33 @@ export async function show_menu_controls(win, dolist) {   // options.c:9070
     } else {
         /* menu controls help: '?k' */
         await putstr()(win, 0, $c.lit(""));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_altfmt, 0), $c.lit(""), $c.lit("Whole"), $c.lit("Current"));
+        $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(show_menu_controls$mc_altfmt, 0), $c.lit(""), $c.lit("Whole"), $c.lit("Current"));
         await putstr()(win, 0, new $c.Ptr(buf, 0));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_altfmt, 0), $c.lit(""), $c.lit(" Menu"), $c.lit(" Page"));
+        $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(show_menu_controls$mc_altfmt, 0), $c.lit(""), $c.lit(" Menu"), $c.lit(" Page"));
         await putstr()(win, 0, new $c.Ptr(buf, 0));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit("Select"), visctrl(get_menu_cmd_key(MENU_SELECT_ALL)), visctrl(get_menu_cmd_key(MENU_SELECT_PAGE)));
+        $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit("Select"), visctrl(get_menu_cmd_key(MENU_SELECT_ALL)), visctrl(get_menu_cmd_key(MENU_SELECT_PAGE)));
         await putstr()(win, 0, new $c.Ptr(buf, 0));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit("Invert"), visctrl(get_menu_cmd_key(MENU_INVERT_ALL)), visctrl(get_menu_cmd_key(MENU_INVERT_PAGE)));
+        $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit("Invert"), visctrl(get_menu_cmd_key(MENU_INVERT_ALL)), visctrl(get_menu_cmd_key(MENU_INVERT_PAGE)));
         await putstr()(win, 0, new $c.Ptr(buf, 0));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit("Deselect"), visctrl(get_menu_cmd_key(MENU_UNSELECT_ALL)), visctrl(get_menu_cmd_key(MENU_UNSELECT_PAGE)));
+        $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit("Deselect"), visctrl(get_menu_cmd_key(MENU_UNSELECT_ALL)), visctrl(get_menu_cmd_key(MENU_UNSELECT_PAGE)));
         await putstr()(win, 0, new $c.Ptr(buf, 0));
         await putstr()(win, 0, $c.lit(""));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit("Go to"), visctrl(get_menu_cmd_key(MENU_NEXT_PAGE)), $c.lit("Next page"));
+        $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit("Go to"), visctrl(get_menu_cmd_key(MENU_NEXT_PAGE)), $c.lit("Next page"));
         await putstr()(win, 0, new $c.Ptr(buf, 0));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit(""), visctrl(get_menu_cmd_key(MENU_PREVIOUS_PAGE)), $c.lit("Previous page"));
+        $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit(""), visctrl(get_menu_cmd_key(MENU_PREVIOUS_PAGE)), $c.lit("Previous page"));
         await putstr()(win, 0, new $c.Ptr(buf, 0));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit(""), visctrl(get_menu_cmd_key(MENU_FIRST_PAGE)), $c.lit("First page"));
+        $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit(""), visctrl(get_menu_cmd_key(MENU_FIRST_PAGE)), $c.lit("First page"));
         await putstr()(win, 0, new $c.Ptr(buf, 0));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit(""), visctrl(get_menu_cmd_key(MENU_LAST_PAGE)), $c.lit("Last page"));
+        $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit(""), visctrl(get_menu_cmd_key(MENU_LAST_PAGE)), $c.lit("Last page"));
         await putstr()(win, 0, new $c.Ptr(buf, 0));
         if (has_menu_shift) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit("Pan view"), visctrl(get_menu_cmd_key(MENU_SHIFT_RIGHT)), $c.lit("Right (perm_invent only)"));
+            $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit("Pan view"), visctrl(get_menu_cmd_key(MENU_SHIFT_RIGHT)), $c.lit("Right (perm_invent only)"));
             await putstr()(win, 0, new $c.Ptr(buf, 0));
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit(""), visctrl(get_menu_cmd_key(MENU_SHIFT_LEFT)), $c.lit("Left"));
+            $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit(""), visctrl(get_menu_cmd_key(MENU_SHIFT_LEFT)), $c.lit("Left"));
             await putstr()(win, 0, new $c.Ptr(buf, 0));
         }
         await putstr()(win, 0, $c.lit(""));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit("Search"), visctrl(get_menu_cmd_key(MENU_SEARCH)), $c.lit("Exter a target string and invert all matching entries"));
+        $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit("Search"), visctrl(get_menu_cmd_key(MENU_SEARCH)), $c.lit("Exter a target string and invert all matching entries"));
         await putstr()(win, 0, new $c.Ptr(buf, 0));
         /* separator before hardcoded */
         await putstr()(win, 0, $c.lit(""));
@@ -6809,7 +6809,7 @@ export async function show_menu_controls(win, dolist) {   // options.c:9070
         arg = $c.lit("Other ");   /* prefix for first hardcoded[] entry, then reset */
     }
     for (xcp = $c.relem(show_menu_controls$hardcoded, 0); xcp.key; xcp = $c.radd(xcp, 1)) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, fmt, arg, xcp.key, xcp.desc);
+        $c.sprintf(new $c.Ptr(buf, 0), fmt, arg, xcp.key, xcp.desc);
         await putstr()(win, 0, new $c.Ptr(buf, 0));
         arg = $c.lit("");
     }
@@ -6848,7 +6848,7 @@ async function handle_add_list_remove(optname, numtotal) {   // options.c:9208
         if (!numtotal && (i === 1 || i === 2)) {
             continue;
         }
-        $c.__builtin___sprintf_chk(new $c.Ptr(tmpbuf, 0), 0, 256, handle_add_list_remove$action_titles[i].desc, i === 1 ? await makeplural(optname) : optname);
+        $c.sprintf(new $c.Ptr(tmpbuf, 0), handle_add_list_remove$action_titles[i].desc, i === 1 ? await makeplural(optname) : optname);
         await add_menu(tmpwin, nul_glyphinfo, any, handle_add_list_remove$action_titles[i].letr, 0, ATR.NONE, clr, new $c.Ptr(tmpbuf, 0), i === 3 ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     }
     await end_menu()(tmpwin, $c.lit("Do what?"));
@@ -6869,9 +6869,9 @@ export async function dotogglepickup() {   // options.c:9256
     flags.pickup = $c.i8(!flags.pickup ? 1 : 0);
     if (flags.pickup) {
         await oc_to_str(new $c.Ptr(flags.pickup_types, 0), new $c.Ptr(ocl, 0));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("ON, for %s objects%s"), ocl[0] ? new $c.Ptr(ocl, 0) : $c.lit("all"), ga.apelist ? count_apes() === 1 ? $c.lit(", with one exception") : $c.lit(", with some exceptions") : $c.lit(""));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("ON, for %s objects%s"), ocl[0] ? new $c.Ptr(ocl, 0) : $c.lit("all"), ga.apelist ? count_apes() === 1 ? $c.lit(", with one exception") : $c.lit(", with some exceptions") : $c.lit(""));
     } else {
-        $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("OFF"), 256);
+        $c.strcpy(new $c.Ptr(buf, 0), $c.lit("OFF"));
     }
     await pline($c.lit("Autopickup: %s."), new $c.Ptr(buf, 0));
     return ECMD.OK;
@@ -6882,7 +6882,7 @@ export async function toggle_bool_option(p) {   // options.c:9278
     ret = ECMD.FAIL;
     for (i = 0; i < OPTCOUNT; i = i + 1 | 0) {
         if (!strncmpi(allopt[i].name, p, $c.i32($c.strlen(p))) && allopt[i].opttyp === BoolOpt && allopt[i].setwhere === set_in_game && allopt[i].addr !== null) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%s"), allopt[i].addr.get(0) ? $c.lit("!") : $c.lit(""), allopt[i].name);
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s%s"), allopt[i].addr.get(0) ? $c.lit("!") : $c.lit(""), allopt[i].name);
             if (await parseoptions(new $c.Ptr(buf, 0), FALSE, FALSE)) {
                 ret = ECMD.OK;
             }
@@ -6979,7 +6979,7 @@ export function sym_val(strval) {   // options.c:9385
                strip closing quote and let escapes() deal with it */
         } else {
             /* +1: skip opening single quote */
-            $c.__builtin___strncpy_chk(new $c.Ptr(tmp, 0), strval.add(1), 127, 128);
+            $c.strncpy(new $c.Ptr(tmp, 0), strval.add(1), 127);
             tmp[$c.idx(127)] = 0;
             if ((p = $c.strrchr(new $c.Ptr(tmp, 0), 39)) !== null) {
                 p.set(0, 0);
@@ -6988,7 +6988,7 @@ export function sym_val(strval) {   // options.c:9385
         }
     } else {
         /* not lone char nor single quote */
-        $c.__builtin___strncpy_chk(new $c.Ptr(tmp, 0), strval, 127, 128);
+        $c.strncpy(new $c.Ptr(tmp, 0), strval, 127);
         tmp[$c.idx(127)] = 0;
         escapes(new $c.Ptr(tmp, 0), new $c.Ptr(buf, 0));
     }
@@ -7030,7 +7030,7 @@ export async function option_help() {   // options.c:9462
         if (is_wc_option(optname) && !wc_supported(optname) || is_wc2_option(optname) && !wc2_supported(optname)) {
             continue;
         }
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf2, 0), 0, 256, $c.lit("`%s'"), optname);
+        $c.sprintf(new $c.Ptr(buf2, 0), $c.lit("`%s'"), optname);
         nh_snprintf($c.lit("option_help"), 9507, new $c.Ptr(buf, 0), 256, $c.lit("%-20s - %s%c"), new $c.Ptr(buf2, 0), allopt[i].descr, allopt[i + 1 | 0].name ? 44 : 46);
         await putstr()(datawin, 0, new $c.Ptr(buf, 0));
     }
@@ -7041,7 +7041,7 @@ export async function option_help() {   // options.c:9462
         if (allopt[i].opttyp !== OthrOpt) {
             continue;
         }
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit(" %s"), allopt[i].name);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit(" %s"), allopt[i].name);
         await putstr()(datawin, 0, new $c.Ptr(buf, 0));
     }
     await putstr()(datawin, 0, $c.lit(""));
@@ -7084,19 +7084,19 @@ async function all_options_conds(sbuf) {   // options.c:9556
         /* 75: room for about 5 conditions, with enough space for player
            to edit resulting file manually and insert '!' in front of them */
         if (idx === 0) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("OPTIONS="), 256);
+            $c.strcpy(new $c.Ptr(buf, 0), $c.lit("OPTIONS="));
         } else if ((await Strlen_(new $c.Ptr(buf, 0), $c.lit("all_options_conds"), 9568) + 1 >>> 0) + await Strlen_(new $c.Ptr(nextcond, 0), $c.lit("all_options_conds"), 9568) >>> 0 >= 75) {
             /* finish off previous line */
-            $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit(",\\\n"), 256);   /* comma and backslash+newline */
+            $c.strcat(new $c.Ptr(buf, 0), $c.lit(",\\\n"));   /* comma and backslash+newline */
             await strbuf_append(sbuf, new $c.Ptr(buf, 0));
             /* indent continuation line */
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%8s"), $c.lit(" "));   /* 8: strlen("OPTIONS=") */
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%8s"), $c.lit(" "));   /* 8: strlen("OPTIONS=") */
         } else if (nextcond[0] && gotone) {
-            $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit(","), 256);
+            $c.strcat(new $c.Ptr(buf, 0), $c.lit(","));
         }
         if (nextcond[0]) {
             gotone = TRUE;
-            $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), new $c.Ptr(nextcond, 0), 256);
+            $c.strcat(new $c.Ptr(buf, 0), new $c.Ptr(nextcond, 0));
         }
         idx = idx + 1 | 0;
     }
@@ -7105,7 +7105,7 @@ async function all_options_conds(sbuf) {   // options.c:9556
        default values--which will produce "OPTIONS=" with nothing after the
        equals sign; only add to the output when there is more present */
     if ($c.strcmp(new $c.Ptr(buf, 0), $c.lit("OPTIONS="))) {
-        $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit("\n"), 256);
+        $c.strcat(new $c.Ptr(buf, 0), $c.lit("\n"));
         await strbuf_append(sbuf, new $c.Ptr(buf, 0));
     }
 }
@@ -7129,7 +7129,7 @@ async function all_options_menucolors(sbuf) {   // options.c:9595
         tmp = arr.get(i - 1 | 0);
         sattr = attr2attrname(tmp.attr);
         sclr = clr2colorname(tmp.color);
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 512, $c.lit("MENUCOLOR=\"%s\"=%s%s%s\n"), tmp.origstr, sclr, tmp.attr !== ATR.NONE ? $c.lit("&") : $c.lit(""), tmp.attr !== ATR.NONE ? sattr : $c.lit(""));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("MENUCOLOR=\"%s\"=%s%s%s\n"), tmp.origstr, sclr, tmp.attr !== ATR.NONE ? $c.lit("&") : $c.lit(""), tmp.attr !== ATR.NONE ? sattr : $c.lit(""));
         await strbuf_append(sbuf, new $c.Ptr(buf, 0));
     }
     $c.free(arr);
@@ -7139,7 +7139,7 @@ async function all_options_msgtypes(sbuf) {   // options.c:9628
     tmp = gp.plinemsg_types;
     while (tmp) {
         mtype = msgtype2name(tmp.msgtype);
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("MSGTYPE=%s \"%s\"\n"), mtype, tmp.pattern);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("MSGTYPE=%s \"%s\"\n"), mtype, tmp.pattern);
         await strbuf_append(sbuf, new $c.Ptr(buf, 0));
         tmp = tmp.next;
     }
@@ -7148,7 +7148,7 @@ async function all_options_apes(sbuf) {   // options.c:9643
     let tmp = null, buf = new Int8Array(256);
     tmp = ga.apelist;
     while (tmp) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("autopickup_exception=\"%c%s\"\n"), tmp.grab ? 60 : 62, tmp.pattern);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("autopickup_exception=\"%c%s\"\n"), tmp.grab ? 60 : 62, tmp.pattern);
         await strbuf_append(sbuf, new $c.Ptr(buf, 0));
         tmp = tmp.next;
     }
@@ -7158,7 +7158,7 @@ async function all_options_apes(sbuf) {   // options.c:9643
 export async function all_options_strbuf(sbuf) {   // options.c:9678
     let name = null, tmp = new Int8Array(256), buf2 = null, bool_p = null, i = 0;
     strbuf_init(sbuf);
-    $c.__builtin___sprintf_chk(new $c.Ptr(tmp, 0), 0, 256, $c.lit("# NetHack config, saved %s\n#\n"), yyyymmddhhmmss(0));
+    $c.sprintf(new $c.Ptr(tmp, 0), $c.lit("# NetHack config, saved %s\n#\n"), yyyymmddhhmmss(0));
     await strbuf_append(sbuf, new $c.Ptr(tmp, 0));
     for (i = 0; (name = allopt[i].name) !== null; i = i + 1 | 0) {
         if (!opt_set_in_config[i]) {
@@ -7171,7 +7171,7 @@ export async function all_options_strbuf(sbuf) {   // options.c:9678
                     break;   /* obsolete */
                 }
                 if (bool_p.get(0) !== allopt[i].initval) {
-                    $c.__builtin___sprintf_chk(new $c.Ptr(tmp, 0), 0, 256, $c.lit("OPTIONS=%s%s\n"), bool_p.get(0) ? $c.lit("") : $c.lit("!"), name);
+                    $c.sprintf(new $c.Ptr(tmp, 0), $c.lit("OPTIONS=%s%s\n"), bool_p.get(0) ? $c.lit("") : $c.lit("!"), name);
                     await strbuf_append(sbuf, new $c.Ptr(tmp, 0));
                 }
                 break;
@@ -7185,7 +7185,7 @@ export async function all_options_strbuf(sbuf) {   // options.c:9678
                 buf2 = await get_option_value(name, TRUE);
                 if (buf2) {
                     nh_snprintf($c.lit("all_options_strbuf"), 9714, new $c.Ptr(tmp, 0), 255, $c.lit("OPTIONS=%s:%s"), name, buf2);
-                    $c.__builtin___strcat_chk(new $c.Ptr(tmp, 0), $c.lit("\n"), 256);   /* guaranteed to fit */
+                    $c.strcat(new $c.Ptr(tmp, 0), $c.lit("\n"));   /* guaranteed to fit */
                     await strbuf_append(sbuf, new $c.Ptr(tmp, 0));
                 }
                 break;
@@ -7208,7 +7208,7 @@ export async function all_options_strbuf(sbuf) {   // options.c:9678
     await all_options_autocomplete(sbuf);
     await all_options_statushilites(sbuf);
     if (gw.wizkit[0]) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(tmp, 0), 0, 256, $c.lit("WIZKIT=%s\n"), new $c.Ptr(gw.wizkit, 0));
+        $c.sprintf(new $c.Ptr(tmp, 0), $c.lit("WIZKIT=%s\n"), new $c.Ptr(gw.wizkit, 0));
         await strbuf_append(sbuf, new $c.Ptr(tmp, 0));
     }
 }
@@ -7236,8 +7236,8 @@ export async function next_opt(datawin, str) {   // options.c:9755
         next_opt$buf.set(0, 0);
     }
     if (str.get(0)) {
-        $c.__builtin___strcat_chk(next_opt$buf, str, -1);
-        $c.__builtin___strcat_chk(next_opt$buf, $c.lit(", "), -1);
+        $c.strcat(next_opt$buf, str);
+        $c.strcat(next_opt$buf, $c.lit(", "));
     } else {
         await putstr()(datawin, 0, str);
         $c.free(next_opt$buf), next_opt$buf = null;
@@ -7390,7 +7390,7 @@ async function wc_set_window_colors(op) {   // options.c:10023
      *  menu white/black message green/yellow status white/blue text
      * white/black
      */
-    $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), op, 256);
+    $c.strcpy(new $c.Ptr(buf, 0), op);
     newop = mungspaces(new $c.Ptr(buf, 0));
     while (newop.get(0)) {
         wn = tfg = tbg = null;
@@ -7493,7 +7493,7 @@ export function set_playmode() {   // options.c:10134
     let $t1, $t2;
     if (wizard()) {
         if (authorize_wizard_mode()) {
-            $t1 = $c.i32($c.strlen($c.__builtin___strcpy_chk(new $c.Ptr(svp.plname, 0), $c.lit("wizard"), 32))), gp.plnamelen = $t1;
+            $t1 = $c.i32($c.strlen($c.strcpy(new $c.Ptr(svp.plname, 0), $c.lit("wizard")))), gp.plnamelen = $t1;
         } else {
             flags.debug = FALSE;   /* not allowed or not available */
         }

@@ -194,22 +194,22 @@ export async function done_in_by(mtmp, how) {   // end.c:186
        "killed by the high priest" alone isn't */
     if ((mptr.geno & G_UNIQ) !== 0 && !(imitator && !mimicker) && !($c.peq(mptr, $c.relem(mons, PM.HIGH_CLERIC)) && !mtmp.ispriest)) {
         if (!type_is_pname(mptr)) {
-            $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit("the "), 256);
+            $c.strcat(new $c.Ptr(buf, 0), $c.lit("the "));
         }
         svk.killer.format = KILLED.BY;
     }
     /* _the_ <invisible> <distorted> ghost of Dudley */
     /* hardfought */
     if ($c.peq(mptr, $c.relem(mons, PM.GHOST)) && has_mgivenname(mtmp)) {
-        $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit("the "), 256);
+        $c.strcat(new $c.Ptr(buf, 0), $c.lit("the "));
         svk.killer.format = KILLED.BY;
     }
     monhealthdescr(mtmp, 1, eos(new $c.Ptr(buf, 0)));
     if (mtmp.minvis) {
-        $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit("invisible "), 256);
+        $c.strcat(new $c.Ptr(buf, 0), $c.lit("invisible "));
     }
     if (distorted) {
-        $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit("hallucinogen-distorted "), 256);
+        $c.strcat(new $c.Ptr(buf, 0), $c.lit("hallucinogen-distorted "));
     }
     if (imitator) {
         realnm = pmname(champtr, Mgender(mtmp));
@@ -229,38 +229,38 @@ export async function done_in_by(mtmp, how) {   // end.c:186
            pname and the_unique should also have s_suffix() applied,
            but vampires don't take on any shapes which warrant that */
         if (alt || type_is_pname(mptr)) {   /* no article */
-            $c.__builtin___strcpy_chk(new $c.Ptr(shape, 0), fakenm, 256);
+            $c.strcpy(new $c.Ptr(shape, 0), fakenm);
         } else if (the_unique_pm(mptr)) {   /* "the"; don't use the() here */
-            $c.__builtin___sprintf_chk(new $c.Ptr(shape, 0), 0, 256, $c.lit("the %s"), fakenm);
+            $c.sprintf(new $c.Ptr(shape, 0), $c.lit("the %s"), fakenm);
         } else {
             /* "a"/"an" */
-            $c.__builtin___strcpy_chk(new $c.Ptr(shape, 0), await an(fakenm), 256);
+            $c.strcpy(new $c.Ptr(shape, 0), await an(fakenm));
         }
         /* omit "called" to avoid excessive verbosity */
-        $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, alt ? $c.lit("%s in %s form") : mimicker ? $c.lit("%s disguised as %s") : $c.lit("%s imitating %s"), realnm, new $c.Ptr(shape, 0));
+        $c.sprintf(eos(new $c.Ptr(buf, 0)), alt ? $c.lit("%s in %s form") : mimicker ? $c.lit("%s disguised as %s") : $c.lit("%s imitating %s"), realnm, new $c.Ptr(shape, 0));
         mptr = mtmp.data;   /* reset for mimicker case */
         /* hardfought */
     } else if ($c.peq(mptr, $c.relem(mons, PM.GHOST))) {
-        $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit("ghost"), 256);
+        $c.strcat(new $c.Ptr(buf, 0), $c.lit("ghost"));
         if (has_mgivenname(mtmp)) {
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" of %s"), mtmp.mextra.mgivenname);
+            $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit(" of %s"), mtmp.mextra.mgivenname);
         }
     } else if (mtmp.isshk) {
         shknm = await shkname(mtmp);
         honorific = shkname_is_pname(mtmp) ? $c.lit("") : mtmp.female | 0 ? $c.lit("Ms. ") : $c.lit("Mr. ");
-        $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%s%s, the shopkeeper"), honorific, shknm);
+        $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("%s%s, the shopkeeper"), honorific, shknm);
         svk.killer.format = KILLED.BY;
     } else if (mtmp.ispriest | 0 || mtmp.isminion | 0) {
         /* m_monnam() suppresses "the" prefix plus "invisible", and
            it overrides the effect of Hallucination on priestname() */
-        $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), await m_monnam(mtmp), 256);
+        $c.strcat(new $c.Ptr(buf, 0), await m_monnam(mtmp));
     } else {
-        $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), pmname(mptr, Mgender(mtmp)), 256);
+        $c.strcat(new $c.Ptr(buf, 0), pmname(mptr, Mgender(mtmp)));
         if (has_mgivenname(mtmp)) {
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" %s %s"), mtmp.mextra && mtmp.mextra.ebones ? $c.lit("of") : $c.lit("called"), mtmp.mextra.mgivenname);
+            $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit(" %s %s"), mtmp.mextra && mtmp.mextra.ebones ? $c.lit("of") : $c.lit("called"), mtmp.mextra.mgivenname);
         }
     }
-    $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), new $c.Ptr(buf, 0), 256);
+    $c.strcpy(new $c.Ptr(svk.killer.name, 0), new $c.Ptr(buf, 0));
     /* might need to fix up multi_reason if 'mtmp' caused the reason */
     if (gm.multi_reason && $c.pcmp(gm.multi_reason, new $c.Ptr(gm.multireasonbuf, 0)) > 0 && $c.pcmp(gm.multi_reason, new $c.Ptr(gm.multireasonbuf, 0).add($c.idx(128)).add(-1)) < 0) {
         reasonmid[0] = 0;
@@ -381,7 +381,7 @@ export async function panic(str, ...$va) {   // end.c:395
             }
         }
         /* !MICRO */
-        $c.__builtin___vsnprintf_chk(new $c.Ptr(buf, 0), 256, 0, 256, str, the_args);
+        $c.vsnprintf(new $c.Ptr(buf, 0), 256, str, the_args);
         await raw_print()(new $c.Ptr(buf, 0));
         paniclog($c.lit("panic"), new $c.Ptr(buf, 0));
         await NH_abort(new $c.Ptr(buf, 0));   /* generate core dump */
@@ -452,9 +452,9 @@ async function disclose(how, taken) {   // end.c:620
     ask = 0;
     if (gi.invent && !program_state.stopprint) {
         if (taken) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Do you want to see what you had when you %s?"), how === QUIT ? $c.lit("quit") : $c.lit("died"));
+            $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("Do you want to see what you had when you %s?"), how === QUIT ? $c.lit("quit") : $c.lit("died"));
         } else {
-            $c.__builtin___strcpy_chk(new $c.Ptr(qbuf, 0), $c.lit("Do you want your possessions identified?"), 128);
+            $c.strcpy(new $c.Ptr(qbuf, 0), $c.lit("Do you want your possessions identified?"));
         }
         ask = await should_query_disclose_option(105, new $c.Ptr(defquery, 0));
         c = $c.i8(ask ? await yn_function(new $c.Ptr(qbuf, 0), new $c.Ptr(ynqchars, 0), defquery[0], 1) : defquery[0]);
@@ -490,7 +490,7 @@ async function disclose(how, taken) {   // end.c:620
     if (!program_state.stopprint) {
         if (await should_query_disclose_option(99, new $c.Ptr(defquery, 0))) {
             acnt = count_achievements();
-            $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Do you want to see your conduct%s?"), acnt > 0 ? $c.lit(" and achievements") : $c.lit(""));
+            $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("Do you want to see your conduct%s?"), acnt > 0 ? $c.lit(" and achievements") : $c.lit(""));
             /* this was distinguishing between one achievement and
                multiple achievements, but "conduct and achievement"
                looked strange if multiple conducts got shown (which
@@ -705,7 +705,7 @@ async function artifact_score(list, counting, endwin) {   // end.c:908
                 /* not observe_object; dead characters don't observe */
                 $t3 = ($t2 = ($t1 = otmp.rknown = (1) & 1, otmp.bknown = ($t1) & 1), otmp.dknown = ($t2) & 1), otmp.known = ($t3) & 1;
                 /* assumes artifacts don't have quan > 1 */
-                $c.__builtin___sprintf_chk(new $c.Ptr(pbuf, 0), 0, 256, $c.lit("%s%s (worth %ld %s and %ld points)"), the_unique_obj(otmp) ? $c.lit("The ") : $c.lit(""), otmp.oartifact ? artiname(otmp.oartifact) : obj_descr[objects[otmp.otyp].oc_name_idx].oc_name, value, await currency(value), points);
+                $c.sprintf(new $c.Ptr(pbuf, 0), $c.lit("%s%s (worth %ld %s and %ld points)"), the_unique_obj(otmp) ? $c.lit("The ") : $c.lit(""), otmp.oartifact ? artiname(otmp.oartifact) : obj_descr[objects[otmp.otyp].oc_name_idx].oc_name, value, await currency(value), points);
                 await putstr()(endwin, 0, new $c.Ptr(pbuf, 0));
             }
         }
@@ -827,7 +827,7 @@ export async function done(how) {   // end.c:1021
         svk.killer.format = KILLED.BY;
     }
     if (!svk.killer.name[0] || how >= PANICKED) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), deaths[how], 256);
+        $c.strcpy(new $c.Ptr(svk.killer.name, 0), deaths[how]);
     }
     if (how < PANICKED) {
         u.umortality = u.umortality + 1 | 0;
@@ -965,7 +965,7 @@ async function really_done(how) {   // end.c:1132
         if (u.uhp < 1) {
             how = DIED;
             u.umortality = u.umortality + 1 | 0;   /* skipped above when how==QUIT */
-            $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), $c.lit("quit while already on Charon's boat"), 256);
+            $c.strcpy(new $c.Ptr(svk.killer.name, 0), $c.lit("quit while already on Charon's boat"));
         }
     }
     if (how === ESCAPED || how === PANICKED) {
@@ -1022,7 +1022,7 @@ async function really_done(how) {   // end.c:1132
            excluded by active livelog */
         await formatkiller(new $c.Ptr(pbuf, 0), 256, how, 1);
         if (!new $c.Ptr(pbuf, 0).get(0)) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(pbuf, 0), deaths[how], 256);
+            $c.strcpy(new $c.Ptr(pbuf, 0), deaths[how]);
         }
         await livelog_printf(LL.DUMP, $c.lit("%s"), new $c.Ptr(pbuf, 0));
         dump_everything(how, endtime);
@@ -1046,7 +1046,7 @@ async function really_done(how) {   // end.c:1132
         mnum = !Upolyd() ? gu.urace.mnum : u.umonnum;
         was_already_grave = svl.level.locations[u.ux][u.uy].typ === GRAVE ? 1 : 0;
         corpse = await mk_named_object(CORPSE, $c.relem(mons, mnum), u.ux, u.uy, new $c.Ptr(svp.plname, 0));
-        $c.__builtin___sprintf_chk(new $c.Ptr(pbuf, 0), 0, 256, $c.lit("%s, "), new $c.Ptr(svp.plname, 0));
+        $c.sprintf(new $c.Ptr(pbuf, 0), $c.lit("%s, "), new $c.Ptr(svp.plname, 0));
         await formatkiller(eos(new $c.Ptr(pbuf, 0)), $c.u32($c.subu64(256, await Strlen_(new $c.Ptr(pbuf, 0), $c.lit("really_done"), 1317))), how, 1);
         await make_grave(u.ux, u.uy, new $c.Ptr(pbuf, 0));
         if (svl.level.locations[u.ux][u.uy].typ === GRAVE && !was_already_grave) {
@@ -1125,16 +1125,16 @@ async function really_done(how) {   // end.c:1132
     /* 'how' reasons beyond genocide shouldn't show tombstone;
        for normal end of game, genocide doesn't either */
     if (u.uhave.amulet) {
-        $c.__builtin___strcat_chk(new $c.Ptr(svk.killer.name, 0), $c.lit(" (with the Amulet)"), 256);
+        $c.strcat(new $c.Ptr(svk.killer.name, 0), $c.lit(" (with the Amulet)"));
     } else if (how === ESCAPED) {
         if ((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level)) {   /* offered Amulet to wrong deity */
-            $c.__builtin___strcat_chk(new $c.Ptr(svk.killer.name, 0), $c.lit(" (in celestial disgrace)"), 256);
+            $c.strcat(new $c.Ptr(svk.killer.name, 0), $c.lit(" (in celestial disgrace)"));
         } else if (carrying(FAKE_AMULET_OF_YENDOR)) {
-            $c.__builtin___strcat_chk(new $c.Ptr(svk.killer.name, 0), $c.lit(" (with a fake Amulet)"), 256);
+            $c.strcat(new $c.Ptr(svk.killer.name, 0), $c.lit(" (with a fake Amulet)"));
         }
         /* don't bother counting to see whether it should be plural */
     }
-    $c.__builtin___sprintf_chk(new $c.Ptr(pbuf, 0), 0, 256, $c.lit("%s %s the %s..."), Goodbye(), new $c.Ptr(svp.plname, 0), how !== ASCENDED ? flags.female && gu.urole.name.f ? gu.urole.name.f : gu.urole.name.m : flags.female ? $c.lit("Demigoddess") : $c.lit("Demigod"));
+    $c.sprintf(new $c.Ptr(pbuf, 0), $c.lit("%s %s the %s..."), Goodbye(), new $c.Ptr(svp.plname, 0), how !== ASCENDED ? flags.female && gu.urole.name.f ? gu.urole.name.f : gu.urole.name.m : flags.female ? $c.lit("Demigoddess") : $c.lit("Demigod"));
     await dump_forward_putstr(endwin, 0, new $c.Ptr(pbuf, 0), program_state.stopprint);
     await dump_forward_putstr(endwin, 0, $c.lit(""), program_state.stopprint);
     if (how === ESCAPED || how === ASCENDED) {
@@ -1157,10 +1157,10 @@ async function really_done(how) {   // end.c:1132
         await artifact_score(gi.invent, 1, endwin);
         gv.viz_array.get(0).set(0, $c.u8(gv.viz_array.get(0).get(0) | IN_SIGHT));   /* need visibility for naming */
         mtmp = gm.mydogs;
-        $c.__builtin___strcpy_chk(new $c.Ptr(pbuf, 0), $c.lit("You"), 256);
+        $c.strcpy(new $c.Ptr(pbuf, 0), $c.lit("You"));
         if (mtmp || Schroedingers_cat) {
             while (mtmp) {
-                $c.__builtin___sprintf_chk(eos(new $c.Ptr(pbuf, 0)), 0, -1, $c.lit(" and %s"), await mon_nam(mtmp));
+                $c.sprintf(eos(new $c.Ptr(pbuf, 0)), $c.lit(" and %s"), await mon_nam(mtmp));
                 if (mtmp.mtame) {
                     u.urexp = nowrap_add(u.urexp, mtmp.mhp);
                 }
@@ -1172,14 +1172,14 @@ async function really_done(how) {   // end.c:1132
                 m_lev = await adj_lev($c.relem(mons, PM.HOUSECAT));
                 mhp = d(m_lev, 8);
                 u.urexp = nowrap_add(u.urexp, mhp);
-                $c.__builtin___strcat_chk(eos(new $c.Ptr(pbuf, 0)), $c.lit(" and Schroedinger's cat"), -1);
+                $c.strcat(eos(new $c.Ptr(pbuf, 0)), $c.lit(" and Schroedinger's cat"));
             }
             await dump_forward_putstr(endwin, 0, new $c.Ptr(pbuf, 0), program_state.stopprint);
             pbuf[0] = 0;
         } else {
-            $c.__builtin___strcat_chk(new $c.Ptr(pbuf, 0), $c.lit(" "), 256);
+            $c.strcat(new $c.Ptr(pbuf, 0), $c.lit(" "));
         }
-        $c.__builtin___sprintf_chk(eos(new $c.Ptr(pbuf, 0)), 0, -1, $c.lit("%s with %ld point%s,"), how === ASCENDED ? $c.lit("went to your reward") : $c.lit("escaped from the dungeon"), u.urexp, u.urexp === 1 ? $c.lit("") : $c.lit("s"));
+        $c.sprintf(eos(new $c.Ptr(pbuf, 0)), $c.lit("%s with %ld point%s,"), how === ASCENDED ? $c.lit("went to your reward") : $c.lit("escaped from the dungeon"), u.urexp, u.urexp === 1 ? $c.lit("") : $c.lit("s"));
         await dump_forward_putstr(endwin, 0, new $c.Ptr(pbuf, 0), program_state.stopprint);
         if (!program_state.stopprint) {
             await artifact_score(gi.invent, 0, endwin);   /* list artifacts */
@@ -1203,10 +1203,10 @@ async function really_done(how) {   // end.c:1132
                         free_oname(otmp);
                     }
                     otmp.quan = count;
-                    $c.__builtin___sprintf_chk(new $c.Ptr(pbuf, 0), 0, 256, $c.lit("%8ld %s (worth %ld %s),"), count, await xname(otmp), $c.mul64(count, objects[typ].oc_cost), await currency(2));
+                    $c.sprintf(new $c.Ptr(pbuf, 0), $c.lit("%8ld %s (worth %ld %s),"), count, await xname(otmp), $c.mul64(count, objects[typ].oc_cost), await currency(2));
                     await obfree(otmp, null);
                 } else {
-                    $c.__builtin___sprintf_chk(new $c.Ptr(pbuf, 0), 0, 256, $c.lit("%8ld worthless piece%s of colored glass,"), count, count === 1 ? $c.lit("") : $c.lit("s"));
+                    $c.sprintf(new $c.Ptr(pbuf, 0), $c.lit("%8ld worthless piece%s of colored glass,"), count, count === 1 ? $c.lit("") : $c.lit("s"));
                 }
                 await dump_forward_putstr(endwin, 0, new $c.Ptr(pbuf, 0), 0);
             }
@@ -1216,24 +1216,24 @@ async function really_done(how) {   // end.c:1132
         if (u.uz.dnum === 0 && u.uz.dlevel <= 0) {
             /* level teleported out of the dungeon; `how' is DIED,
                due to falling or to "arriving at heaven prematurely" */
-            $c.__builtin___sprintf_chk(new $c.Ptr(pbuf, 0), 0, 256, $c.lit("You %s beyond the confines of the dungeon"), u.uz.dlevel < 0 ? $c.lit("passed away") : ends[how]);
+            $c.sprintf(new $c.Ptr(pbuf, 0), $c.lit("You %s beyond the confines of the dungeon"), u.uz.dlevel < 0 ? $c.lit("passed away") : ends[how]);
         } else {
             /* more conventional demise */
             where = new $c.Ptr(svd.dungeons[u.uz.dnum].dname, 0);
             if ((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level)) {
                 where = $c.lit("The Astral Plane");
             }
-            $c.__builtin___sprintf_chk(new $c.Ptr(pbuf, 0), 0, 256, $c.lit("You %s in %s"), ends[how], where);
+            $c.sprintf(new $c.Ptr(pbuf, 0), $c.lit("You %s in %s"), ends[how], where);
             if (!In_endgame(u.uz) && !single_level_branch(u.uz)) {
-                $c.__builtin___sprintf_chk(eos(new $c.Ptr(pbuf, 0)), 0, -1, $c.lit(" on dungeon level %d"), In_quest(u.uz) ? dunlev(u.uz) : depth(u.uz));
+                $c.sprintf(eos(new $c.Ptr(pbuf, 0)), $c.lit(" on dungeon level %d"), In_quest(u.uz) ? dunlev(u.uz) : depth(u.uz));
             }
         }
-        $c.__builtin___sprintf_chk(eos(new $c.Ptr(pbuf, 0)), 0, -1, $c.lit(" with %ld point%s,"), u.urexp, u.urexp === 1 ? $c.lit("") : $c.lit("s"));
+        $c.sprintf(eos(new $c.Ptr(pbuf, 0)), $c.lit(" with %ld point%s,"), u.urexp, u.urexp === 1 ? $c.lit("") : $c.lit("s"));
         await dump_forward_putstr(endwin, 0, new $c.Ptr(pbuf, 0), program_state.stopprint);
     }
-    $c.__builtin___sprintf_chk(new $c.Ptr(pbuf, 0), 0, 256, $c.lit("and %ld piece%s of gold, after %ld move%s."), umoney, umoney === 1 ? $c.lit("") : $c.lit("s"), svm.moves, svm.moves === 1 ? $c.lit("") : $c.lit("s"));
+    $c.sprintf(new $c.Ptr(pbuf, 0), $c.lit("and %ld piece%s of gold, after %ld move%s."), umoney, umoney === 1 ? $c.lit("") : $c.lit("s"), svm.moves, svm.moves === 1 ? $c.lit("") : $c.lit("s"));
     await dump_forward_putstr(endwin, 0, new $c.Ptr(pbuf, 0), program_state.stopprint);
-    $c.__builtin___sprintf_chk(new $c.Ptr(pbuf, 0), 0, 256, $c.lit("You were level %d with a maximum of %d hit point%s when you %s."), u.ulevel, u.uhpmax, u.uhpmax === 1 ? $c.lit("") : $c.lit("s"), ends[how]);
+    $c.sprintf(new $c.Ptr(pbuf, 0), $c.lit("You were level %d with a maximum of %d hit point%s when you %s."), u.ulevel, u.uhpmax, u.uhpmax === 1 ? $c.lit("") : $c.lit("s"), ends[how]);
     await dump_forward_putstr(endwin, 0, new $c.Ptr(pbuf, 0), program_state.stopprint);
     await dump_forward_putstr(endwin, 0, $c.lit(""), program_state.stopprint);
     if (!program_state.stopprint) {
@@ -1300,7 +1300,7 @@ export async function container_contents(list, identified, all_containers, repor
                    a cat corpse inside the box; either way, inventory
                    reports the box as containing "1 item" */
                 cat = $c.i8(SchroedingersBox(box));
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Contents of %s:"), await the(await xname(box)));
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Contents of %s:"), await the(await xname(box)));
                 await putstr()(tmpwin, 0, new $c.Ptr(buf, 0));
                 if (!dumping) {
                     await putstr()(tmpwin, 0, $c.lit(""));
@@ -1318,12 +1318,12 @@ export async function container_contents(list, identified, all_containers, repor
                                 $t4 = obj.lknown = (1) & 1, obj.cknown = ($t4) & 1;
                             }
                         }
-                        $c.__builtin___strcpy_chk(new $c.Ptr(buf, 2), await doname_with_price(obj), 254);
+                        $c.strcpy(new $c.Ptr(buf, 2), await doname_with_price(obj));
                         await putstr()(tmpwin, 0, new $c.Ptr(buf, 0));
                     }
                     unsortloot(new $c.Ptr(sortedcobj, 0));
                 } else if (cat) {
-                    $c.__builtin___strcpy_chk(new $c.Ptr(buf, 2), $c.lit("Schroedinger's cat!"), 254);
+                    $c.strcpy(new $c.Ptr(buf, 2), $c.lit("Schroedinger's cat!"));
                     await putstr()(tmpwin, 0, new $c.Ptr(buf, 0));
                 }
                 if (dumping) {
@@ -1380,13 +1380,13 @@ export async function delayed_killer(id, format, killername) {   // end.c:1721
     if (!k) {
         /* no match, add a new delayed killer to the list */
         k = $c.asRec(await alloc(272), $T.kinfo, 272);
-        $c.__builtin___memset_chk(k, 0, 272, -1);
+        $c.memset(k, 0, 272);
         k.id = id;
         k.next = svk.killer.next;
         svk.killer.next = k;
     }
     k.format = format;
-    $c.__builtin___strcpy_chk(new $c.Ptr(k.name, 0), killername ? killername : $c.lit(""), -1);
+    $c.strcpy(new $c.Ptr(k.name, 0), killername ? killername : $c.lit(""));
     svk.killer.name[0] = 0;
 }
 export function find_delayed_killer(id) {   // end.c:1740
@@ -1501,15 +1501,15 @@ export async function build_english_list(in_) {   // end.c:1837
             if (words === 2) {
                 /* "first or second" */
                 bel_copy1(new $c.Ptr(p, 0), out);
-                $c.__builtin___strcat_chk(out, $c.lit(" "), -1);
+                $c.strcat(out, $c.lit(" "));
             } else {
                 /* "first, second, or third */
                 do {
                     bel_copy1(new $c.Ptr(p, 0), out);
-                    $c.__builtin___strcat_chk(out, $c.lit(", "), -1);
+                    $c.strcat(out, $c.lit(", "));
                 } while ((words = words - 1 | 0) > 1);
             }
-            $c.__builtin___strcat_chk(out, $c.lit("or "), -1);
+            $c.strcat(out, $c.lit("or "));
             bel_copy1(new $c.Ptr(p, 0), out);
             break;
     }

@@ -69,7 +69,7 @@ export async function luaZ_read(z, b, n) {   // lzio.c:48
             }
         }
         m = n <= $h.ldu64(z) ? n : $h.ldu64(z);   /* min. between n and z->n */
-        $hl.__builtin___memcpy_chk(b, $h.u32[(z + 8) >>> 2], m, -1);
+        $hl.memcpy(b, $h.u32[(z + 8) >>> 2], m);
         $h.st64(z, $c.subu64($h.ldu64(z), m));
         $h.stp(z + 8, $h.u32[(z + 8) >>> 2] + $c.idx(m));
         b = b + $c.idx(m);

@@ -610,13 +610,13 @@ export async function failed_grab(magr, mdef, mattk) {   // mhitm.c:597
                mon_nam(x_monnam) calls s_suffix() for named ghosts and
                s_suffix() uses a single static buffer; make copies of both
                names to overcome that [note: comment predates 'tailmiss'] */
-            $c.__builtin___strcpy_chk(new $c.Ptr(magrnam, 0), $c.peq(magr, gy.youmonst) ? $c.lit("Your") : s_suffix(await Monnam(magr)), 256);
+            $c.strcpy(new $c.Ptr(magrnam, 0), $c.peq(magr, gy.youmonst) ? $c.lit("Your") : s_suffix(await Monnam(magr)));
             if (!tailmiss) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(mdefnam, 0), $c.peq(mdef, gy.youmonst) ? $c.lit("you") : await mon_nam(mdef), 256);
+                $c.strcpy(new $c.Ptr(mdefnam, 0), $c.peq(mdef, gy.youmonst) ? $c.lit("you") : await mon_nam(mdef));
             } else {
                 /* hero poly'd into long worm can't grow tail
                    so no 'youmonst' handling is needed here */
-                $c.__builtin___sprintf_chk(new $c.Ptr(mdefnam, 0), 0, 256, $c.lit("%s tail"), s_suffix(await some_mon_nam(mdef)));
+                $c.sprintf(new $c.Ptr(mdefnam, 0), $c.lit("%s tail"), s_suffix(await some_mon_nam(mdef)));
             }
             /* unsolid grab misses are actually somewhat iffy--how come
                ordinary attacks don't also pass right through? */
@@ -637,7 +637,7 @@ async function hitmm(magr, mdef, mattk, mwep, dieroll) {   // mhitm.c:644
         return M_ATTK.MISS;   /* bypass mdamagem() */
     }
     if (gv.vis) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(magr_name, 0), await Monnam(magr), 256);
+        $c.strcpy(new $c.Ptr(magr_name, 0), await Monnam(magr));
         if (compat) {
             nh_snprintf($c.lit("hitmm"), 669, new $c.Ptr(buf, 0), 256, $c.lit("%s %s"), new $c.Ptr(magr_name, 0), mdef.mcansee | 0 ? $c.lit("smiles at") : $c.lit("talks to"));
             await pline($c.lit("%s %s %s."), new $c.Ptr(buf, 0), await mon_nam(mdef), compat === 2 ? $c.lit("engagingly") : $c.lit("seductively"));
@@ -679,7 +679,7 @@ async function hitmm(magr, mdef, mattk, mwep, dieroll) {   // mhitm.c:644
                 /* note: mon_nam_too returns a modifiable buffer; so
                    does s_suffix, but it returns a single static buffer
                    and we might be calling it twice for this message */
-                $c.__builtin___strcpy_chk(new $c.Ptr(magr_name, 0), s_suffix(new $c.Ptr(magr_name, 0)), 256);
+                $c.strcpy(new $c.Ptr(magr_name, 0), s_suffix(new $c.Ptr(magr_name, 0)));
                 if (!noncorporeal(mdef.data) && !amorphous(mdef.data)) {
                     if (!$c.peq(mdef, magr)) {
                         mdef_name = s_suffix(mdef_name);
@@ -688,7 +688,7 @@ async function hitmm(magr, mdef, mattk, mwep, dieroll) {   // mhitm.c:644
                         strsubst(mdef_name, $c.lit("herself"), $c.lit("her own"));
                         strsubst(mdef_name, $c.lit("itself"), $c.lit("its own"));
                     }
-                    $c.__builtin___strcat_chk(mdef_name, $c.lit(" flesh"), -1);
+                    $c.strcat(mdef_name, $c.lit(" flesh"));
                 }
                 /* s_suffix(magr_name), */
                 await pline($c.lit("%s %s sears %s!"), new $c.Ptr(magr_name, 0), await simpleonames(mwep), mdef_name);
@@ -712,7 +712,7 @@ async function gazemm(magr, mdef, mattk) {   // mhitm.c:736
     }
     mdef.mundetected = (0) & 1;
     if (gv.vis) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s gazes %s"), altmesg ? await Adjmonnam(magr, $c.lit("blinded")) : await Monnam(magr), altmesg ? $c.lit("toward") : $c.lit("at"));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s gazes %s"), altmesg ? await Adjmonnam(magr, $c.lit("blinded")) : await Monnam(magr), altmesg ? $c.lit("toward") : $c.lit("at"));
         await pline($c.lit("%s %s..."), new $c.Ptr(buf, 0), canspotmon(mdef) ? await mon_nam(mdef) : $c.lit("something"));
     }
     if (magr.mcan | 0 || !mdef.mcansee || (archon ? await resists_blnd(mdef) : !magr.mcansee) || magr.minvis | 0 && !perceives(mdef.data) || mdef.msleeping | 0) {
@@ -1041,7 +1041,7 @@ export async function mon_poly(magr, mdef, dmg) {   // mhitm.c:1122
             dmg = 0;
         }
     } else {
-        $c.__builtin___strcpy_chk(new $c.Ptr(Before, 0), await Monnam(mdef), 256);
+        $c.strcpy(new $c.Ptr(Before, 0), await Monnam(mdef));
         if (resists_magm(mdef)) {
             /* Magic resistance */
             if (gv.vis) {
@@ -1196,7 +1196,7 @@ async function passivemm(magr, mdef, mhitb, mdead, mwep) {   // mhitm.c:1304
         switch (mddat.mattk[i].adtyp) {
             case AD.ACID:
                 if (mhitb && !rn2(2)) {
-                    $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await Monnam(magr), 256);
+                    $c.strcpy(new $c.Ptr(buf, 0), await Monnam(magr));
                     if (canseemon(magr)) {
                         await pline($c.lit("%s is splashed by %s %s!"), new $c.Ptr(buf, 0), s_suffix(await mon_nam(mdef)), hliquid($c.lit("acid")));
                     }
@@ -1243,13 +1243,13 @@ async function passivemm(magr, mdef, mhitb, mdead, mwep) {   // mhitm.c:1304
                         }
                         if (magr.mcansee | 0 && haseyes(madat) && mdef.mcansee | 0 && (perceives(madat) || !mdef.minvis)) {
                             /* construct format string; guard against '%' in Monnam */
-                            $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), s_suffix(await Monnam(mdef)), 256);
+                            $c.strcpy(new $c.Ptr(buf, 0), s_suffix(await Monnam(mdef)));
                             strNsubst(new $c.Ptr(buf, 0), $c.lit("%"), $c.lit("%%"), 0);
-                            $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit(" gaze is reflected by %s %s."), 256);
+                            $c.strcat(new $c.Ptr(buf, 0), $c.lit(" gaze is reflected by %s %s."));
                             if (await mon_reflects(magr, canseemon(magr) ? new $c.Ptr(buf, 0) : null)) {
                                 return mdead | mhit;
                             }
-                            $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await Monnam(magr), 256);
+                            $c.strcpy(new $c.Ptr(buf, 0), await Monnam(magr));
                             if (canseemon(magr)) {
                                 await pline($c.lit("%s is frozen by %s gaze!"), new $c.Ptr(buf, 0), s_suffix(await mon_nam(mdef)));
                             }
@@ -1258,7 +1258,7 @@ async function passivemm(magr, mdef, mhitb, mdead, mwep) {   // mhitm.c:1304
                         }
                     } else {
                         /* gelatinous cube */
-                        $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await Monnam(magr), 256);
+                        $c.strcpy(new $c.Ptr(buf, 0), await Monnam(magr));
                         if (canseemon(magr)) {
                             await pline($c.lit("%s is frozen by %s."), new $c.Ptr(buf, 0), await mon_nam(mdef));
                         }

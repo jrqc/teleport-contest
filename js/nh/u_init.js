@@ -476,10 +476,10 @@ export async function u_init_misc() {   // u_init.c:944
     flags.beginner = TRUE;
     /* zero u, including pointer values --
      * necessary when aborting from a failed restore */
-    $c.__builtin___memset_chk(u, 0, 2760, 2760);
+    $c.memset(u, 0, 2760);
     u.ustuck = null;
-    $c.__builtin___memset_chk(new $c.FieldRef($G, "ubirthday", "i64"), 0, 8, 8);
-    $c.__builtin___memset_chk(urealtime, 0, 24, 24);
+    $c.memset(new $c.FieldRef($G, "ubirthday", "i64"), 0, 8);
+    $c.memset(urealtime, 0, 24);
     u.uroleplay.$copyFrom(tmpuroleplay);   /* restore options set via rcfile */
     /* documentation of more zero values as desirable */
     /* bypass set_twoweap() */

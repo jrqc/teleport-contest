@@ -733,7 +733,7 @@ export async function domonnoise(mtmp) {   // sounds.c:679
             } else {
                 /* approximation of GEICO's advertising slogan (it actually
                    concludes with "save you 15% or more on car insurance.") */
-                $c.__builtin___sprintf_chk(new $c.Ptr(verbuf, 0), 0, 256, $c.lit("15 minutes could save you 15 %s."), await currency(15));
+                $c.sprintf(new $c.Ptr(verbuf, 0), $c.lit("15 minutes could save you 15 %s."), await currency(15));
                 /* "zorkmids" */
                 verbl_msg = new $c.Ptr(verbuf, 0);
             }
@@ -748,18 +748,18 @@ export async function domonnoise(mtmp) {   // sounds.c:679
                 racenoun = flags.female && gu.urace.individual.f ? gu.urace.individual.f : gu.urace.individual.m ? gu.urace.individual.m : gu.urace.noun;
                 if (mtmp.mtame) {
                     if (kindred) {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(verbuf, 0), 0, 256, $c.lit("Good %s to you Master%s"), isnight ? $c.lit("evening") : $c.lit("day"), isnight ? $c.lit("!") : $c.lit(".  Why do we not rest?"));
+                        $c.sprintf(new $c.Ptr(verbuf, 0), $c.lit("Good %s to you Master%s"), isnight ? $c.lit("evening") : $c.lit("day"), isnight ? $c.lit("!") : $c.lit(".  Why do we not rest?"));
                         verbl_msg = new $c.Ptr(verbuf, 0);
                     } else {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(verbuf, 0), 0, 256, $c.lit("%s%s"), nightchild ? $c.lit("Child of the night, ") : $c.lit(""), midnight() ? $c.lit("I can stand this craving no longer!") : isnight ? $c.lit("I beg you, help me satisfy this growing craving!") : $c.lit("I find myself growing a little weary."));
+                        $c.sprintf(new $c.Ptr(verbuf, 0), $c.lit("%s%s"), nightchild ? $c.lit("Child of the night, ") : $c.lit(""), midnight() ? $c.lit("I can stand this craving no longer!") : isnight ? $c.lit("I beg you, help me satisfy this growing craving!") : $c.lit("I find myself growing a little weary."));
                         verbl_msg = new $c.Ptr(verbuf, 0);
                     }
                 } else if (mtmp.mpeaceful) {
                     if (kindred && isnight) {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(verbuf, 0), 0, 256, $c.lit("Good feeding %s!"), flags.female ? $c.lit("sister") : $c.lit("brother"));
+                        $c.sprintf(new $c.Ptr(verbuf, 0), $c.lit("Good feeding %s!"), flags.female ? $c.lit("sister") : $c.lit("brother"));
                         verbl_msg = new $c.Ptr(verbuf, 0);
                     } else if (nightchild && isnight) {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(verbuf, 0), 0, 256, $c.lit("How nice to hear you, child of the night!"));
+                        $c.sprintf(new $c.Ptr(verbuf, 0), $c.lit("How nice to hear you, child of the night!"));
                         verbl_msg = new $c.Ptr(verbuf, 0);
                     } else {
                         verbl_msg = $c.lit("I only drink... potions.");
@@ -770,15 +770,15 @@ export async function domonnoise(mtmp) {   // sounds.c:679
                         verbl_msg = $c.lit("This is my hunting ground that you dare to prowl!");
                     } else if ($c.peq(gy.youmonst.data, $c.relem(mons, PM.SILVER_DRAGON)) || $c.peq(gy.youmonst.data, $c.relem(mons, PM.BABY_SILVER_DRAGON))) {
                         /* Silver dragons are silver in color, not made of silver */
-                        $c.__builtin___sprintf_chk(new $c.Ptr(verbuf, 0), 0, 256, $c.lit("%s!  Your silver sheen does not frighten me!"), $c.peq(gy.youmonst.data, $c.relem(mons, PM.SILVER_DRAGON)) ? $c.lit("Fool") : $c.lit("Young Fool"));
+                        $c.sprintf(new $c.Ptr(verbuf, 0), $c.lit("%s!  Your silver sheen does not frighten me!"), $c.peq(gy.youmonst.data, $c.relem(mons, PM.SILVER_DRAGON)) ? $c.lit("Fool") : $c.lit("Young Fool"));
                         verbl_msg = new $c.Ptr(verbuf, 0);
                     } else {
                         vampindex = rn2(2);
                         if (vampindex === 0) {
-                            $c.__builtin___sprintf_chk(new $c.Ptr(verbuf, 0), 0, 256, domonnoise$vampmsg[vampindex], await body_part(BLOOD));
+                            $c.sprintf(new $c.Ptr(verbuf, 0), domonnoise$vampmsg[vampindex], await body_part(BLOOD));
                             verbl_msg = new $c.Ptr(verbuf, 0);
                         } else if (vampindex === 1) {
-                            $c.__builtin___sprintf_chk(new $c.Ptr(verbuf, 0), 0, 256, domonnoise$vampmsg[vampindex], u.umonnum !== u.umonster ? await an(pmname($c.relem(mons, u.umonnum), flags.female ? FEMALE : MALE)) : await an(racenoun));
+                            $c.sprintf(new $c.Ptr(verbuf, 0), domonnoise$vampmsg[vampindex], u.umonnum !== u.umonster ? await an(pmname($c.relem(mons, u.umonnum), flags.female ? FEMALE : MALE)) : await an(racenoun));
                             verbl_msg = new $c.Ptr(verbuf, 0);
                         } else {
                             verbl_msg = domonnoise$vampmsg[vampindex];
@@ -1106,10 +1106,10 @@ export async function domonnoise(mtmp) {   // sounds.c:679
                 /* 3.6 tribute */
                 if (ms_Death && !svc.context.tribute.Deathnotice && (book = u_have_novel()) !== null) {
                     if ((tribtitle = noveltitle(new $c.FieldRef(book, "corpsenm", "i32"))) !== null) {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(verbuf, 0), 0, 256, $c.lit("Ah, so you have a copy of /%s/."), tribtitle);
+                        $c.sprintf(new $c.Ptr(verbuf, 0), $c.lit("Ah, so you have a copy of /%s/."), tribtitle);
                         /* no Death featured in these two, so exclude them */
                         if (strncmpi(tribtitle, $c.lit("Snuff"), -1) && strncmpi(tribtitle, $c.lit("The Wee Free Men"), -1)) {
-                            $c.__builtin___strcat_chk(new $c.Ptr(verbuf, 0), $c.lit("  I may have been misquoted there."), 256);
+                            $c.strcat(new $c.Ptr(verbuf, 0), $c.lit("  I may have been misquoted there."));
                         }
                         verbl_msg = new $c.Ptr(verbuf, 0);
                     }
@@ -1134,7 +1134,7 @@ export async function domonnoise(mtmp) {   // sounds.c:679
         if ($c.peq(ptr, $c.relem(mons, PM.DEATH))) {
             /* Death talks in CAPITAL LETTERS
                and without quotation marks */
-            await pline($c.lit("%s"), ucase($c.__builtin___strcpy_chk(new $c.Ptr(tmpbuf, 0), verbl_msg, 256)));
+            await pline($c.lit("%s"), ucase($c.strcpy(new $c.Ptr(tmpbuf, 0), verbl_msg)));
             sound_speak(new $c.Ptr(tmpbuf, 0));
         } else {
             await verbalize1(verbl_msg);

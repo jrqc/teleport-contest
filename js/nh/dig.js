@@ -397,7 +397,7 @@ async function dig() {   // dig.c:300
         ttmp = t_at(dpx, dpy);
         if (svc.context.digging.effort > 250 || ttmp && (ttmp.ttyp | 0) === HOLE) {
             await dighole(FALSE, FALSE, null);
-            $c.__builtin___memset_chk(svc.context.digging, 0, 32, 608);
+            $c.memset(svc.context.digging, 0, 32);
             return 0;   /* done with digging */
         }
         if (svc.context.digging.effort <= 50 || ttmp && ((ttmp.ttyp | 0) === TRAPDOOR || is_pit(ttmp.ttyp))) {
@@ -407,7 +407,7 @@ async function dig() {   // dig.c:300
                hero should have used #untrap first */
             await dotrap(ttmp, FORCETRAP);
             /* restart completely from scratch if we resume digging */
-            $c.__builtin___memset_chk(svc.context.digging, 0, 32, 608);
+            $c.memset(svc.context.digging, 0, 32);
             return 0;
         } else if (ttmp && (ttmp.ttyp | 0) === BEAR_TRAP && u.utrap) {
             if (rnl(7) > (Fumbling() ? 1 : 4)) {
@@ -418,7 +418,7 @@ async function dig() {   // dig.c:300
                     dmg = $c.div32(dmg + 1 | 0, 2);
                 }
                 await You($c.lit("hit yourself in the %s."), await body_part(FOOT));
-                $c.__builtin___sprintf_chk(new $c.Ptr(kbuf, 0), 0, 256, $c.lit("chopping off %s own %s"), genders[flags.female ? 1 : 0].his, await body_part(FOOT));
+                $c.sprintf(new $c.Ptr(kbuf, 0), $c.lit("chopping off %s own %s"), genders[flags.female ? 1 : 0].his, await body_part(FOOT));
                 await losehp(Maybe_Half_Phys(dmg), new $c.Ptr(kbuf, 0), KILLED.BY);
             } else {
                 await You($c.lit("destroy the bear trap with %s."), await yobjnam($G.uwep, null));
@@ -514,7 +514,7 @@ async function dig() {   // dig.c:300
                     lev.flags = (D.BROKEN) & 31;
                 }
             } else if (closed_door(dpx, dpy)) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(digbuf, 0), 0, 256, $c.lit("You break through the door with your %s."), await simpleonames($G.uwep));
+                $c.sprintf(new $c.Ptr(digbuf, 0), $c.lit("You break through the door with your %s."), await simpleonames($G.uwep));
                 digtxt = new $c.Ptr(digbuf, 0);
                 if (shopedge) {
                     await add_damage(dpx, dpy, SHOP.DOOR_COST);
@@ -671,10 +671,10 @@ export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
         surface_type = IS_ROOM(lev.typ) && !((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level)) ? $c.lit("floor") : $c.lit("ground");
         if (IS_ALTAR(lev.typ)) {
             old_aligntyp = $c.i8(((svl.level.locations[x][y].flags | 0) & AM.MASK & AM.MASK) === 0 ? A.NONE : ((svl.level.locations[x][y].flags | 0) & AM.MASK & AM.MASK) === AM.LAWFUL ? A.LAWFUL : ((svl.level.locations[x][y].flags | 0) & AM.MASK & AM.MASK) - 2 | 0);
-            $c.__builtin___strcpy_chk(new $c.Ptr(furniture, 0), align_str($c.i8(old_aligntyp)), 256);
-            $c.__builtin___strcat_chk(new $c.Ptr(furniture, 0), $c.lit(" "), 256);
+            $c.strcpy(new $c.Ptr(furniture, 0), align_str($c.i8(old_aligntyp)));
+            $c.strcat(new $c.Ptr(furniture, 0), $c.lit(" "));
         }
-        $c.__builtin___strcat_chk(new $c.Ptr(furniture, 0), surface(x, y), 256);
+        $c.strcat(new $c.Ptr(furniture, 0), surface(x, y));
     } else {
         surface_type = surface(x, y);
     }
@@ -1092,7 +1092,7 @@ export async function use_pick_axe(obj) {   // dig.c:1092
         ($t1 = dsp, dsp = $t1.add(1), $t1).set(0, dirch);
     }
     dsp.set(0, 0);
-    $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 256, $c.lit("In what direction do you want to %s? [%s]"), verb, new $c.Ptr(dirsyms, 0));
+    $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("In what direction do you want to %s? [%s]"), verb, new $c.Ptr(dirsyms, 0));
     if (!await getdir(new $c.Ptr(qbuf, 0))) {
         return res | ECMD.CANCEL;
     }
@@ -1121,7 +1121,7 @@ export async function use_pick_axe2(obj) {   // dig.c:1162
             dam = 1;
         }
         await You($c.lit("hit yourself with %s."), await yname($G.uwep));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s own %s"), genders[flags.female ? 1 : 0].his, obj_descr[objects[obj.otyp].oc_name_idx].oc_name);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s own %s"), genders[flags.female ? 1 : 0].his, obj_descr[objects[obj.otyp].oc_name_idx].oc_name);
         await losehp(Maybe_Half_Phys(dam), new $c.Ptr(buf, 0), KILLED.BY);
         disp.botl = TRUE;
         return ECMD.TIME;
@@ -1642,31 +1642,31 @@ function adj_pit_checks(cc, msg) {   // dig.c:1763
     } else if (closed_door(cc.x, cc.y) || room.typ === SDOOR) {
         /* We reject this here because dighole() isn't
            prepared to deal with this case */
-        $c.__builtin___strcpy_chk(msg, foundation_msg, -1);
+        $c.strcpy(msg, foundation_msg);
         return FALSE;
     } else if (IS_WALL(ltyp)) {
         /* if (room->wall_info & W_NONDIGGABLE) */
-        $c.__builtin___strcpy_chk(msg, foundation_msg, -1);
+        $c.strcpy(msg, foundation_msg);
         return FALSE;
     } else if (IS_TREE(ltyp)) {
         /* check trees before stone */
         /* if (room->wall_info & W_NONDIGGABLE) */
-        $c.__builtin___strcpy_chk(msg, $c.lit("The tree's roots glow then fade."), -1);
+        $c.strcpy(msg, $c.lit("The tree's roots glow then fade."));
         return FALSE;
     } else if (ltyp === STONE || ltyp === SCORR) {
         if ((room.flags | 0) & W.NONDIGGABLE) {
-            $c.__builtin___strcpy_chk(msg, $c.lit("The rock glows then fades."), -1);
+            $c.strcpy(msg, $c.lit("The rock glows then fades."));
             return FALSE;
         }
     } else if (ltyp === IRONBARS) {
         /* "set of iron bars" */
-        $c.__builtin___strcpy_chk(msg, $c.lit("The bars go much deeper than your pit."), -1);
+        $c.strcpy(msg, $c.lit("The bars go much deeper than your pit."));
         return FALSE;
     } else if (IS_SINK(ltyp)) {
-        $c.__builtin___strcpy_chk(msg, $c.lit("A tangled mass of plumbing remains below the sink."), -1);
+        $c.strcpy(msg, $c.lit("A tangled mass of plumbing remains below the sink."));
         return FALSE;
     } else if (On_ladder(cc.x, cc.y)) {
-        $c.__builtin___strcpy_chk(msg, $c.lit("The ladder is unaffected."), -1);
+        $c.strcpy(msg, $c.lit("The ladder is unaffected."));
         return FALSE;
     } else {
         supporting = null;
@@ -1683,7 +1683,7 @@ function adj_pit_checks(cc, msg) {   // dig.c:1763
             supporting = $c.lit("drawbridge");
         }
         if (supporting) {
-            $c.__builtin___sprintf_chk(msg, 0, -1, $c.lit("The %s supporting structures remain intact."), s_suffix(supporting));
+            $c.sprintf(msg, $c.lit("The %s supporting structures remain intact."), s_suffix(supporting));
             return FALSE;
         }
     }

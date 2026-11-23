@@ -352,7 +352,7 @@ export function tre_fill_pmatch(nmatch, pmatch, cflags, tnfa, intags, match_eo) 
             if (!t) {
                 return 12;
             }
-            $hl.__builtin___memcpy_chk(t, intags, $c.mulu64($c.u64($h.i32[(tnfa + 80) >>> 2]), 16), -1);
+            $hl.memcpy(t, intags, $c.mulu64($c.u64($h.i32[(tnfa + 80) >>> 2]), 16));
             tre_reset_last_matched_branches(t, $h.u32[($h.u32[(tnfa + 48) >>> 2] + 8) >>> 2], $h.i32[($h.u32[(tnfa + 48) >>> 2] + 16) >>> 2], 0, 0);
             tags = t;
         }

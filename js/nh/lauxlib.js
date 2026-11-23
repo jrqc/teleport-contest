@@ -518,7 +518,7 @@ async function prepbuffsize(B, sz, boxidx) {   // lauxlib.c:550
             lua_rotate(L, boxidx, 1);   /* move box to its intended position */
             await lua_toclose(L, boxidx);
             newbuff = await resizebox(L, boxidx, newsize);
-            $hl.__builtin___memcpy_chk(newbuff, $h.u32[B >>> 2], $c.mulu64($h.ldu64(B + 16), 1), -1);   /* copy original content */
+            $hl.memcpy(newbuff, $h.u32[B >>> 2], $c.mulu64($h.ldu64(B + 16), 1));   /* copy original content */
         }
         $h.stp(B, newbuff);
         $h.st64(B + 8, newsize);
@@ -536,7 +536,7 @@ export async function luaL_addlstring(B, s, l) {   // lauxlib.c:583
     if (l > 0) {
         /* avoid 'memcpy' when 's' can be NULL */
         b = await prepbuffsize(B, l, -1);
-        $hl.__builtin___memcpy_chk(b, s, $c.mulu64(l, 1), -1);
+        $hl.memcpy(b, s, $c.mulu64(l, 1));
         $h.st64(B + 16, $c.addu64($h.ldu64(B + 16), l));
     }
 }
@@ -573,7 +573,7 @@ export async function luaL_addvalue(B) {   // lauxlib.c:622
         L = $h.u32[(B + 24) >>> 2];
         s = await lua_tolstring(L, -1, $fp);
         b = await prepbuffsize(B, $h.ldu64($fp), -2);
-        $hl.__builtin___memcpy_chk(b, s, $c.mulu64($h.ldu64($fp), 1), -1);
+        $hl.memcpy(b, s, $c.mulu64($h.ldu64($fp), 1));
         $h.st64(B + 16, $c.addu64($h.ldu64(B + 16), $h.ldu64($fp)));
         await lua_settop(L, -2);   /* pop string */
     } finally { $h.st.sp = $sp0; }

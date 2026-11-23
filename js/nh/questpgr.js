@@ -56,7 +56,7 @@ export async function quest_info(typ) {   // questpgr.c:31
 export function ldrname() {   // questpgr.c:50
     let i = 0;
     i = gu.urole.ldrnum;
-    $c.__builtin___sprintf_chk(new $c.Ptr(gn.nambuf, 0), 0, 64, $c.lit("%s%s"), $c.andu64($c.relem(mons, i).mflags2, M2.PNAME) !== 0 ? $c.lit("") : $c.lit("the "), mons[i].pmnames[NEUTRAL]);
+    $c.sprintf(new $c.Ptr(gn.nambuf, 0), $c.lit("%s%s"), $c.andu64($c.relem(mons, i).mflags2, M2.PNAME) !== 0 ? $c.lit("") : $c.lit("the "), mons[i].pmnames[NEUTRAL]);
     return new $c.Ptr(gn.nambuf, 0);
 }
 /* return your intermediate target string */
@@ -122,7 +122,7 @@ export function find_quest_artifact(whichchains) {   // questpgr.c:89
 function neminame() {   // questpgr.c:124
     let i = 0;
     i = gu.urole.neminum;
-    $c.__builtin___sprintf_chk(new $c.Ptr(gn.nambuf, 0), 0, 64, $c.lit("%s%s"), $c.andu64($c.relem(mons, i).mflags2, M2.PNAME) !== 0 ? $c.lit("") : $c.lit("the "), mons[i].pmnames[NEUTRAL]);
+    $c.sprintf(new $c.Ptr(gn.nambuf, 0), $c.lit("%s%s"), $c.andu64($c.relem(mons, i).mflags2, M2.PNAME) !== 0 ? $c.lit("") : $c.lit("the "), mons[i].pmnames[NEUTRAL]);
     return new $c.Ptr(gn.nambuf, 0);
 }
 function guardname() {   // questpgr.c:134
@@ -183,7 +183,7 @@ async function qtext_pronoun(who, which) {   // questpgr.c:199
         godgend = who === 100 ? svq.quest_status.godgend | 0 : who === 108 ? svq.quest_status.ldrgend | 0 : who === 110 ? svq.quest_status.nemgend | 0 : 2;   /* default to neuter */
         pnoun = lwhich === 104 ? genders[godgend].he : lwhich === 105 ? genders[godgend].him : lwhich === 106 ? genders[godgend].his : $c.lit("?");
     }
-    $c.__builtin___strcpy_chk(new $c.Ptr(gc.cvt_buf, 0), pnoun, 64);
+    $c.strcpy(new $c.Ptr(gc.cvt_buf, 0), pnoun);
     /* capitalize for H,I,J */
     if (lwhich !== which) {
         $t1 = highc(gc.cvt_buf[0]), gc.cvt_buf[0] = $t1;
@@ -275,7 +275,7 @@ async function convert_arg(c) {   // questpgr.c:236
             str = $c.lit("");
             break;
     }
-    $c.__builtin___strcpy_chk(new $c.Ptr(gc.cvt_buf, 0), str, 64);
+    $c.strcpy(new $c.Ptr(gc.cvt_buf, 0), str);
 }
 async function convert_line(in_line, out_line) {   // questpgr.c:328
     let c = null, cc = null, $t1, $t2, $t3, $t4;
@@ -293,11 +293,11 @@ async function convert_line(in_line, out_line) {   // questpgr.c:328
                     switch ((c = c.add(1)).get(0)) {
                         case 65:
                             /* insert "a"/"an" prefix */
-                            $c.__builtin___strcat_chk(cc, await An(new $c.Ptr(gc.cvt_buf, 0)), -1);
+                            $c.strcat(cc, await An(new $c.Ptr(gc.cvt_buf, 0)));
                             cc = cc.add($c.idx($c.strlen(cc)));
                             continue L1;   /* for */
                         case 97:
-                            $c.__builtin___strcat_chk(cc, await an(new $c.Ptr(gc.cvt_buf, 0)), -1);
+                            $c.strcat(cc, await an(new $c.Ptr(gc.cvt_buf, 0)));
                             cc = cc.add($c.idx($c.strlen(cc)));
                             continue L1;   /* for */
                         case 67:
@@ -327,19 +327,19 @@ async function convert_line(in_line, out_line) {   // questpgr.c:328
                             $t2 = highc(gc.cvt_buf[0]), gc.cvt_buf[0] = $t2;
                         case 112:
                             /*FALLTHRU*/
-                            $c.__builtin___strcpy_chk(new $c.Ptr(gc.cvt_buf, 0), await makeplural(new $c.Ptr(gc.cvt_buf, 0)), 64);
+                            $c.strcpy(new $c.Ptr(gc.cvt_buf, 0), await makeplural(new $c.Ptr(gc.cvt_buf, 0)));
                             break;
                         case 83:
                             /* append possessive suffix */
                             $t3 = highc(gc.cvt_buf[0]), gc.cvt_buf[0] = $t3;
                         case 115:
                             /*FALLTHRU*/
-                            $c.__builtin___strcpy_chk(new $c.Ptr(gc.cvt_buf, 0), s_suffix(new $c.Ptr(gc.cvt_buf, 0)), 64);
+                            $c.strcpy(new $c.Ptr(gc.cvt_buf, 0), s_suffix(new $c.Ptr(gc.cvt_buf, 0)));
                             break;
                         case 116:
                             /* strip any "the" prefix */
                             if (!strncmpi(new $c.Ptr(gc.cvt_buf, 0), $c.lit("the "), 4)) {
-                                $c.__builtin___strcat_chk(cc, new $c.Ptr(gc.cvt_buf, 4), -1);
+                                $c.strcat(cc, new $c.Ptr(gc.cvt_buf, 4));
                                 cc = cc.add($c.idx($c.strlen(cc)));
                                 continue L1;   /* for */
                             }
@@ -348,7 +348,7 @@ async function convert_line(in_line, out_line) {   // questpgr.c:328
                             c = c.add(-1);   /* undo switch increment */
                             break;
                     }
-                    $c.__builtin___strcat_chk(cc, new $c.Ptr(gc.cvt_buf, 0), -1);
+                    $c.strcat(cc, new $c.Ptr(gc.cvt_buf, 0));
                     cc = cc.add($c.idx($c.strlen(new $c.Ptr(gc.cvt_buf, 0))));
                     break;
                 }
@@ -499,7 +499,7 @@ async function com_pager_core(section, msgid, showerror, rawtext) {   // questpg
              * for any item subject to having its delivery converted to by_window.
              */
             if (!synopsis) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(tmpbuf, 0), 0, 256, $c.lit("[%.*s]"), BUFSZ - 1 - 2, text);
+                $c.sprintf(new $c.Ptr(tmpbuf, 0), $c.lit("[%.*s]"), BUFSZ - 1 - 2, text);
                 /* change every newline character to a space */
                 strNsubst(new $c.Ptr(tmpbuf, 0), $c.lit("\n"), $c.lit(" "), 0);
                 synopsis = await dupstr(new $c.Ptr(tmpbuf, 0));
@@ -512,7 +512,7 @@ async function com_pager_core(section, msgid, showerror, rawtext) {   // questpg
         }
         if (synopsis) {
             /* not yet -- brackets need to be removed from quest.lua */
-            $c.__builtin___strcpy_chk(new $c.Ptr(in_line, 0), synopsis, 256);
+            $c.strcpy(new $c.Ptr(in_line, 0), synopsis);
             await convert_line(new $c.Ptr(in_line, 0), new $c.Ptr(out_line, 0));
             /* bypass message delivery but be available for ^P recall */
             await putmsghistory()(new $c.Ptr(out_line, 0), 0);

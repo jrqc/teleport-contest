@@ -90,7 +90,7 @@ export function crashreport_init(argc, argv) {   // report.c:113
         p.set(0, 0);
         return;
     }
-    $c.__builtin___strcpy_chk(new $c.Ptr(bid, 0), $c.lit("unknown"), 40);
+    $c.strcpy(new $c.Ptr(bid, 0), $c.lit("unknown"));
     nhUse(argc);
     nhUse(argv);
 }
@@ -132,10 +132,10 @@ export function swr_add_uricoded(in_, out, remaining, markp) {   // report.c:237
                 return TRUE;
             } else {
                 /* [4] should suffice */
-                $c.__builtin___sprintf_chk(new $c.Ptr(chr, 0), 0, 40, $c.lit("%%%02X"), in_.get(0));
+                $c.sprintf(new $c.Ptr(chr, 0), $c.lit("%%%02X"), in_.get(0));
                 x = $c.i32($c.strlen(new $c.Ptr(chr, 0)));
                 if (x <= remaining.get(0)) {
-                    $c.__builtin___strcpy_chk(out.get(0), new $c.Ptr(chr, 0), -1);
+                    $c.strcpy(out.get(0), new $c.Ptr(chr, 0));
                     out.set(0, out.get(0).add(x));
                     remaining.set(0, remaining.get(0) - x | 0);
                 }
@@ -168,7 +168,7 @@ export async function submit_web_report(cos, msg, why) {   // report.c:290
         if (utmp >= urem[0]) {
             break full$;
         }
-        $c.__builtin___memcpy_chk(uend[0], sysopt.crashreporturl, $c.u64(utmp), -1);
+        $c.memcpy(uend[0], sysopt.crashreporturl, $c.u64(utmp));
         uend[0] = uend[0].add(utmp);
         urem[0] = urem[0] - utmp | 0;
         uend[0].set(0, 0);
@@ -178,13 +178,13 @@ export async function submit_web_report(cos, msg, why) {   // report.c:290
          *       since they were formatting int or unsigned into a large buffer.
          */
         /* cos - operation, v - version */
-        $c.__builtin___sprintf_chk(new $c.Ptr(temp, 0), 0, 200, $c.lit("?cos=%d&v=1"), cos);
+        $c.sprintf(new $c.Ptr(temp, 0), $c.lit("?cos=%d&v=1"), cos);
         utmp = $c.i32($c.strlen(new $c.Ptr(temp, 0)));
         mark = uend[0];
         if (utmp >= urem[0]) {
             break full$;
         }
-        $c.__builtin___memcpy_chk(uend[0], new $c.Ptr(temp, 0), $c.u64(utmp), -1);
+        $c.memcpy(uend[0], new $c.Ptr(temp, 0), $c.u64(utmp));
         uend[0] = uend[0].add(utmp);
         urem[0] = urem[0] - utmp | 0;
         uend[0].set(0, 0);
@@ -195,11 +195,11 @@ export async function submit_web_report(cos, msg, why) {   // report.c:290
             if (utmp >= urem[0]) {
                 break full$;
             }
-            $c.__builtin___memcpy_chk(uend[0], $c.lit("&subject="), $c.u64(utmp), -1);
+            $c.memcpy(uend[0], $c.lit("&subject="), $c.u64(utmp));
             uend[0] = uend[0].add(utmp);
             urem[0] = urem[0] - utmp | 0;
             uend[0].set(0, 0);
-            $c.__builtin___sprintf_chk(new $c.Ptr(temp, 0), 0, 200, $c.lit("%.40s report for NetHack %.40s"), msg, version_string(new $c.Ptr(temp2, 0), 200));
+            $c.sprintf(new $c.Ptr(temp, 0), $c.lit("%.40s report for NetHack %.40s"), msg, version_string(new $c.Ptr(temp2, 0), 200));
             if (swr_add_uricoded(new $c.Ptr(temp, 0), new $c.Ptr(uend, 0), new $c.Ptr(urem, 0), mark)) {
                 break full$;
             }
@@ -209,7 +209,7 @@ export async function submit_web_report(cos, msg, why) {   // report.c:290
         if (utmp >= urem[0]) {
             break full$;
         }
-        $c.__builtin___memcpy_chk(uend[0], $c.lit("&gitver="), $c.u64(utmp), -1);
+        $c.memcpy(uend[0], $c.lit("&gitver="), $c.u64(utmp));
         uend[0] = uend[0].add(utmp);
         urem[0] = urem[0] - utmp | 0;
         uend[0].set(0, 0);
@@ -222,7 +222,7 @@ export async function submit_web_report(cos, msg, why) {   // report.c:290
             if (utmp >= urem[0]) {
                 break full$;
             }
-            $c.__builtin___memcpy_chk(uend[0], $c.lit("&name="), $c.u64(utmp), -1);
+            $c.memcpy(uend[0], $c.lit("&name="), $c.u64(utmp));
             uend[0] = uend[0].add(utmp);
             urem[0] = urem[0] - utmp | 0;
             uend[0].set(0, 0);
@@ -236,7 +236,7 @@ export async function submit_web_report(cos, msg, why) {   // report.c:290
             if (utmp >= urem[0]) {
                 break full$;
             }
-            $c.__builtin___memcpy_chk(uend[0], $c.lit("&email="), $c.u64(utmp), -1);
+            $c.memcpy(uend[0], $c.lit("&email="), $c.u64(utmp));
             uend[0] = uend[0].add(utmp);
             urem[0] = urem[0] - utmp | 0;
             uend[0].set(0, 0);
@@ -252,7 +252,7 @@ export async function submit_web_report(cos, msg, why) {   // report.c:290
         if (utmp >= urem[0]) {
             break full$;
         }
-        $c.__builtin___memcpy_chk(uend[0], $c.lit("&details="), $c.u64(utmp), -1);
+        $c.memcpy(uend[0], $c.lit("&details="), $c.u64(utmp));
         uend[0] = uend[0].add(utmp);
         urem[0] = urem[0] - utmp | 0;
         uend[0].set(0, 0);
@@ -286,7 +286,7 @@ export async function submit_web_report(cos, msg, why) {   // report.c:290
                 /* try to remove up to 16 blank spaces by removing 8 twice */
                 strsubst(new $c.Ptr(temp, 0), $c.lit("        "), $c.lit(""));
                 strsubst(new $c.Ptr(temp, 0), $c.lit("        "), $c.lit(""));
-                $c.__builtin___strncat_chk(new $c.Ptr(temp, 0), $c.lit("\n"), 199, 200);
+                $c.strncat(new $c.Ptr(temp, 0), $c.lit("\n"), 199);
                 // __linux__
                 // not needed for MacOS
                 // XXX is it actually needed for linux?  TBD
@@ -329,11 +329,11 @@ export async function submit_web_report(cos, msg, why) {   // report.c:290
         if (utmp >= urem[0]) {
             break full$;
         }
-        $c.__builtin___memcpy_chk(uend[0], $c.lit("&detailrows="), $c.u64(utmp), -1);
+        $c.memcpy(uend[0], $c.lit("&detailrows="), $c.u64(utmp));
         uend[0] = uend[0].add(utmp);
         urem[0] = urem[0] - utmp | 0;
         uend[0].set(0, 0);
-        $c.__builtin___sprintf_chk(new $c.Ptr(temp, 0), 0, 200, $c.lit("%d"), (count + countpp | 0) < 30 ? count + countpp | 0 : 30);
+        $c.sprintf(new $c.Ptr(temp, 0), $c.lit("%d"), (count + countpp | 0) < 30 ? count + countpp | 0 : 30);
         if (swr_add_uricoded(new $c.Ptr(temp, 0), new $c.Ptr(uend, 0), new $c.Ptr(urem, 0), mark)) {
             break full$;
         }
@@ -351,7 +351,7 @@ export async function submit_web_report(cos, msg, why) {   // report.c:290
         /* Keep the output clean - firefox spews useless errors on
          * my system. */
         $c.execve($c.lit("/usr/bin/open"), new $c.Ptr(xargv, 0), $c.$libc.environ);
-        $c.__builtin___sprintf_chk(new $c.Ptr(err, 0), 0, 400, $c.lit("Can't start /usr/bin/open: %.*s"), 372, $c.strerror($c.__error().get(0)));
+        $c.sprintf(new $c.Ptr(err, 0), $c.lit("Can't start /usr/bin/open: %.*s"), 372, $c.strerror($c.__error().get(0)));
         await raw_print()(new $c.Ptr(err, 0));
         $c.exit(1);
     } else {

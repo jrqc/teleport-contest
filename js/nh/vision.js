@@ -118,7 +118,7 @@ export function vision_init() {   // vision.c:121
     gv.viz_rmin = new $c.Ptr(cs_rmin0, 0);
     gv.viz_rmax = new $c.Ptr(cs_rmax0, 0);
     gv.vision_full_recalc = 0;
-    $c.__builtin___memset_chk(new $c.Ptr(could_see, 0), 0, 3360, 3360);
+    $c.memset(new $c.Ptr(could_see, 0), 0, 3360);
     /* Initialize the vision algorithm (currently C). */
     view_init();
 }
@@ -176,9 +176,9 @@ export function vision_reset() {   // vision.c:211
     gv.viz_array = new $c.Ptr(cs_rows0, 0);
     gv.viz_rmin = new $c.Ptr(cs_rmin0, 0);
     gv.viz_rmax = new $c.Ptr(cs_rmax0, 0);
-    $c.__builtin___memset_chk(new $c.Ptr(could_see, 0), 0, 3360, 3360);
+    $c.memset(new $c.Ptr(could_see, 0), 0, 3360);
     /* Reset the pointers and clear so that we have a "full" dungeon. */
-    $c.__builtin___memset_chk(new $c.Ptr(viz_clear, 0), 0, 1680, 1680);
+    $c.memset(new $c.Ptr(viz_clear, 0), 0, 1680);
     /* Dig the level */
     for (y = 0; y < ROWNO; y = y + 1 | 0) {
         dig_left = 0;
@@ -240,7 +240,7 @@ function get_unused_cs(rows, rmin, rmax) {   // vision.c:274
     /* return an initialized, unused work area */
     nrmin = rmin.get(0);
     nrmax = rmax.get(0);
-    $c.__builtin___memset_chk(rows.get(0).get(0), 0, 1680, -1);
+    $c.memset(rows.get(0).get(0), 0, 1680);
     /* see nothing */
     for (row = 0; row < ROWNO; row = row + 1 | 0) {
         /* set row min & max */

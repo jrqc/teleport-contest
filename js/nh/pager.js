@@ -132,9 +132,9 @@ async function append_str(buf, new_str) {   // pager.c:82
     }
     /* some space available, but not necessarily enough for full append */
     space_left = $c.subu64(BUFSZ - 1, oldlen);   /* space remaining in buf */
-    $c.__builtin___strncat_chk(buf, new $c.Ptr(append_str$sep, 0), space_left, -1);
+    $c.strncat(buf, new $c.Ptr(append_str$sep, 0), space_left);
     if (space_left > 4) {
-        $c.__builtin___strncat_chk(buf, new_str, $c.subu64(space_left, 4), -1);
+        $c.strncat(buf, new_str, $c.subu64(space_left, 4));
     }
     return 1;   /* something was appended, possibly just part of " or " */
 }
@@ -144,21 +144,21 @@ export async function self_lookat(outbuf) {   // pager.c:108
     /* include race with role unless polymorphed */
     race[0] = 0;
     if (!Upolyd()) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(race, 0), 0, 128, $c.lit("%s "), gu.urace.adj);
+        $c.sprintf(new $c.Ptr(race, 0), $c.lit("%s "), gu.urace.adj);
     }
-    $c.__builtin___sprintf_chk(outbuf, 0, -1, $c.lit("%s%s%s called %s"), (u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked && (u.uprops[TELEPAT].extrinsic || (u.uprops[DETECT_MONSTERS].intrinsic || u.uprops[DETECT_MONSTERS].extrinsic) || !((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) ? $c.lit("invisible ") : $c.lit(""), new $c.Ptr(race, 0), pmname($c.relem(mons, u.umonnum), (u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0), new $c.Ptr(svp.plname, 0));
+    $c.sprintf(outbuf, $c.lit("%s%s%s called %s"), (u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked && (u.uprops[TELEPAT].extrinsic || (u.uprops[DETECT_MONSTERS].intrinsic || u.uprops[DETECT_MONSTERS].extrinsic) || !((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) ? $c.lit("invisible ") : $c.lit(""), new $c.Ptr(race, 0), pmname($c.relem(mons, u.umonnum), (u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0), new $c.Ptr(svp.plname, 0));
     /* being blinded may hide invisibility from self */
     if (u.usteed) {
-        $c.__builtin___sprintf_chk(eos(outbuf), 0, -1, $c.lit(", mounted on %s"), await y_monnam(u.usteed));
+        $c.sprintf(eos(outbuf), $c.lit(", mounted on %s"), await y_monnam(u.usteed));
     }
     if (u.uundetected | 0 || Upolyd() && U_AP_TYPE() || visible_region_at(u.ux, u.uy)) {
         await mhidden_description(gy.youmonst, MHID.PREFIX | MHID.ARTICLE | MHID.REGION, eos(outbuf));
     }
     if (Punished()) {
-        $c.__builtin___sprintf_chk(eos(outbuf), 0, -1, $c.lit(", chained to %s"), $G.uball ? await ansimpleoname($G.uball) : $c.lit("nothing?"));
+        $c.sprintf(eos(outbuf), $c.lit(", chained to %s"), $G.uball ? await ansimpleoname($G.uball) : $c.lit("nothing?"));
     }
     if (u.utrap) {   /* bear trap, pit, web, in-floor, in-lava, tethered */
-        $c.__builtin___sprintf_chk(eos(outbuf), 0, -1, $c.lit(", %s"), await trap_predicament(new $c.Ptr(trapbuf, 0), 0, FALSE));
+        $c.sprintf(eos(outbuf), $c.lit(", %s"), await trap_predicament(new $c.Ptr(trapbuf, 0), 0, FALSE));
     }
     return outbuf;
 }
@@ -180,11 +180,11 @@ function trap_description(outbuf, tnum, x, y) {   // pager.c:167
      * traps now (defined trap types but not part of ftrap chain).
      */
     if (trapped_chest_at(tnum, x, y)) {
-        $c.__builtin___strcpy_chk(outbuf, $c.lit("trapped chest"), -1);   /* might actually be a large box */
+        $c.strcpy(outbuf, $c.lit("trapped chest"));   /* might actually be a large box */
     } else if (trapped_door_at(tnum, x, y)) {
-        $c.__builtin___strcpy_chk(outbuf, $c.lit("trapped door"), -1);   /* not "trap door"... */
+        $c.strcpy(outbuf, $c.lit("trapped door"));   /* not "trap door"... */
     } else {
-        $c.__builtin___strcpy_chk(outbuf, trapname(tnum, FALSE), -1);
+        $c.strcpy(outbuf, trapname(tnum, FALSE));
     }
     return;
 }
@@ -213,7 +213,7 @@ export async function mhidden_description(mon, mhid_flags, outbuf) {   // pager.
                     switch ($goto) {
                     case null:
                         if (incl_prefix) {
-                            $c.__builtin___strcpy_chk(outbuf, $c.lit(", mimicking "), -1);
+                            $c.strcpy(outbuf, $c.lit(", mimicking "));
                         }
                     case "objfrommap":
                         if ($goto !== "objfrommap" && M_AP_TYPE(mon) === M_AP.FURNITURE) {
@@ -221,7 +221,7 @@ export async function mhidden_description(mon, mhid_flags, outbuf) {   // pager.
                             if (incl_article) {
                                 what = await an(what);
                             }
-                            $c.__builtin___strcat_chk(outbuf, what, -1);
+                            $c.strcat(outbuf, what);
                         } else if ($goto === "objfrommap" || M_AP_TYPE(mon) === M_AP.OBJECT && glyph_is_object(glyph)) {
                             /* remembered glyph, not glyph_at() which is 'mon' */
                             $goto = null;   // objfrommap:
@@ -231,13 +231,13 @@ export async function mhidden_description(mon, mhid_flags, outbuf) {   // pager.
                             if (incl_article && (!otmp[0] || otmp[0].quan === 1)) {
                                 what = await an(what);
                             }
-                            $c.__builtin___strcat_chk(outbuf, what, -1);
+                            $c.strcat(outbuf, what);
                             if (fakeobj && otmp[0]) {
                                 otmp[0].where = OBJ.FREE;   /* object_from_map set to OBJ_FLOOR */
                                 await dealloc_obj(otmp[0]);   /* has no contents */
                             }
                         } else {
-                            $c.__builtin___strcat_chk(outbuf, c_common_strings.c_something, -1);
+                            $c.strcat(outbuf, c_common_strings.c_something);
                         }
                     }
                     break;
@@ -245,29 +245,29 @@ export async function mhidden_description(mon, mhid_flags, outbuf) {   // pager.
             } else if (M_AP_TYPE(mon) === M_AP.MONSTER) {
                 if (show_altmon) {
                     if (incl_prefix) {
-                        $c.__builtin___strcat_chk(outbuf, $c.lit(", masquerading as "), -1);
+                        $c.strcat(outbuf, $c.lit(", masquerading as "));
                     }
                     what = pmname($c.relem(mons, mon.mappearance), Mgender(mon));
                     if (incl_prefix) {
                         what = await an(what);
                     }
-                    $c.__builtin___strcat_chk(outbuf, what, -1);
+                    $c.strcat(outbuf, what);
                 }
             } else if (isyou ? u.uundetected | 0 : mon.mundetected | 0) {
-                $c.__builtin___strcpy_chk(outbuf, $c.lit(", hiding"), -1);
+                $c.strcpy(outbuf, $c.lit(", hiding"));
                 if (hides_under(mon.data)) {
-                    $c.__builtin___strcat_chk(outbuf, $c.lit(" under "), -1);
+                    $c.strcat(outbuf, $c.lit(" under "));
                     /* remembered glyph, not glyph_at() which is 'mon' */
                     if (glyph_is_object(glyph)) {
                         $goto = "objfrommap"; continue D1;
                     }
-                    $c.__builtin___strcat_chk(outbuf, c_common_strings.c_something, -1);
+                    $c.strcat(outbuf, c_common_strings.c_something);
                 } else if (is_hider(mon.data)) {
-                    $c.__builtin___sprintf_chk(eos(outbuf), 0, -1, $c.lit(" on the %s"), $c.andu64(mon.data.mflags1, M1.HIDE) !== 0 && ($c.andu64(mon.data.mflags1, M1.CLING) !== 0 && mon.data.mlet !== S.MIMIC || $c.andu64(mon.data.mflags1, M1.FLY) !== 0) ? $c.lit("ceiling") : surface(x, y));
+                    $c.sprintf(eos(outbuf), $c.lit(" on the %s"), $c.andu64(mon.data.mflags1, M1.HIDE) !== 0 && ($c.andu64(mon.data.mflags1, M1.CLING) !== 0 && mon.data.mlet !== S.MIMIC || $c.andu64(mon.data.mflags1, M1.FLY) !== 0) ? $c.lit("ceiling") : surface(x, y));
                     /* trapper */
                 } else {
                     if (mon.data.mlet === S.EEL && is_pool(x, y)) {
-                        $c.__builtin___strcat_chk(outbuf, $c.lit(" in murky water"), -1);
+                        $c.strcat(outbuf, $c.lit(" in murky water"));
                     }
                 }
             }
@@ -389,29 +389,29 @@ async function look_at_object(buf, x, y, glyph) {   // pager.c:380
     otmp[0] = null;
     fakeobj = await object_from_map(glyph, x, y, new $c.Ptr(otmp, 0));
     if (otmp[0]) {
-        $c.__builtin___strcpy_chk(buf, otmp[0].otyp !== STRANGE_OBJECT ? await distant_name(otmp[0], otmp[0].dknown | 0 ? doname_with_price : doname_vague_quan) : obj_descr[STRANGE_OBJECT].oc_name, -1);
+        $c.strcpy(buf, otmp[0].otyp !== STRANGE_OBJECT ? await distant_name(otmp[0], otmp[0].dknown | 0 ? doname_with_price : doname_vague_quan) : obj_descr[STRANGE_OBJECT].oc_name);
         if (fakeobj) {
             otmp[0].where = OBJ.FREE;   /* object_from_map set it to OBJ_FLOOR */
             await dealloc_obj(otmp[0]), otmp[0] = null;   /* has no contents */
         }
     } else {
-        $c.__builtin___strcpy_chk(buf, c_common_strings.c_something, -1);   /* sanity precaution */
+        $c.strcpy(buf, c_common_strings.c_something);   /* sanity precaution */
     }
     if (otmp[0] && otmp[0].where === OBJ.BURIED) {
-        $c.__builtin___strcat_chk(buf, $c.lit(" (buried)"), -1);
+        $c.strcat(buf, $c.lit(" (buried)"));
     } else if (svl.level.locations[x][y].typ === TREE || svl.level.flags.arboreal | 0 && svl.level.locations[x][y].typ === STONE) {   /* "dangling": "hanging" could imply that it's growing on this tree */
         /* check TREE before STONE due to level.flags.arboreal */
         nh_snprintf($c.lit("look_at_object"), 407, eos(buf), $c.subu64(BUFSZ, $c.strlen(buf)), $c.lit(" %s in a tree"), otmp[0] && is_treefruit(otmp[0]) ? $c.lit("dangling") : $c.lit("stuck"));
     } else if (svl.level.locations[x][y].typ === STONE || svl.level.locations[x][y].typ === SCORR) {
-        $c.__builtin___strcat_chk(buf, $c.lit(" embedded in stone"), -1);
+        $c.strcat(buf, $c.lit(" embedded in stone"));
     } else if (svl.level.locations[x][y].typ && svl.level.locations[x][y].typ <= DBWALL || svl.level.locations[x][y].typ === SDOOR) {
-        $c.__builtin___strcat_chk(buf, $c.lit(" embedded in a wall"), -1);
+        $c.strcat(buf, $c.lit(" embedded in a wall"));
     } else if (closed_door(x, y)) {
-        $c.__builtin___strcat_chk(buf, $c.lit(" embedded in a door"), -1);
+        $c.strcat(buf, $c.lit(" embedded in a door"));
     } else if (is_pool(x, y)) {
-        $c.__builtin___strcat_chk(buf, $c.lit(" in water"), -1);
+        $c.strcat(buf, $c.lit(" in water"));
     } else if (is_lava(x, y)) {
-        $c.__builtin___strcat_chk(buf, $c.lit(" in molten lava"), -1);   /* [can this ever happen?] */
+        $c.strcat(buf, $c.lit(" in molten lava"));   /* [can this ever happen?] */
     }
     return;
 }
@@ -420,12 +420,12 @@ async function look_at_monster(buf, monbuf, mtmp, x, y) {   // pager.c:422
     /* buf: output, monbuf: optional output */
     accurate = $c.i8(!Hallucination() ? 1 : 0);
     name = $c.peq(mtmp.data, $c.relem(mons, PM.COYOTE)) && accurate ? await coyotename(mtmp, new $c.Ptr(monnambuf, 0)) : await distant_monnam(mtmp, ARTICLE.NONE, new $c.Ptr(monnambuf, 0));
-    $c.__builtin___sprintf_chk(buf, 0, -1, $c.lit("%s%s%s%s"), mtmp.mx !== x || mtmp.my !== y ? mtmp.isshk | 0 && accurate ? $c.lit("tail of ") : $c.lit("tail of a ") : $c.lit(""), accurate ? monhealthdescr(mtmp, TRUE, new $c.Ptr(healthbuf, 0)) : $c.lit(""), mtmp.mtame && accurate ? $c.lit("tame ") : mtmp.mpeaceful | 0 && accurate ? $c.lit("peaceful ") : $c.lit(""), name);
+    $c.sprintf(buf, $c.lit("%s%s%s%s"), mtmp.mx !== x || mtmp.my !== y ? mtmp.isshk | 0 && accurate ? $c.lit("tail of ") : $c.lit("tail of a ") : $c.lit(""), accurate ? monhealthdescr(mtmp, TRUE, new $c.Ptr(healthbuf, 0)) : $c.lit(""), mtmp.mtame && accurate ? $c.lit("tame ") : mtmp.mpeaceful | 0 && accurate ? $c.lit("peaceful ") : $c.lit(""), name);
     if ($c.peq(u.ustuck, mtmp)) {
         if (u.uswallow | 0 || iflags.save_uswallow | 0) {   /* monster detection */
-            $c.__builtin___strcat_chk(buf, dmgtype_fromattack(mtmp.data, AD.DGST, AT.ENGL) !== null ? $c.lit(", swallowing you") : $c.lit(", engulfing you"), -1);
+            $c.strcat(buf, dmgtype_fromattack(mtmp.data, AD.DGST, AT.ENGL) !== null ? $c.lit(", swallowing you") : $c.lit(", engulfing you"));
         } else {
-            $c.__builtin___strcat_chk(buf, u.umonnum !== u.umonster && sticks(gy.youmonst.data) ? $c.lit(", being held") : $c.lit(", holding you"), -1);
+            $c.strcat(buf, u.umonnum !== u.umonster && sticks(gy.youmonst.data) ? $c.lit(", being held") : $c.lit(", holding you"));
         }
     }
     /* if mtmp isn't able to move (other than because it is a type of
@@ -434,21 +434,21 @@ async function look_at_monster(buf, monbuf, mtmp, x, y) {   // pager.c:422
     /* unfortunately mfrozen covers temporary sleep and being busy
        (donning armor, for instance) as well as paralysis */
     if (mtmp.mfrozen) {
-        $c.__builtin___strcat_chk(buf, $c.lit(", can't move (paralyzed or sleeping or busy)"), -1);
+        $c.strcat(buf, $c.lit(", can't move (paralyzed or sleeping or busy)"));
     } else if (mtmp.msleeping) {   /* sleeping for an indeterminate duration */
-        $c.__builtin___strcat_chk(buf, $c.lit(", asleep"), -1);
+        $c.strcat(buf, $c.lit(", asleep"));
     } else if ($c.andu64(mtmp.mstrategy, STRAT_WAITMASK) !== 0) {   /* arbitrary reason why it isn't moving */
-        $c.__builtin___strcat_chk(buf, $c.lit(", meditating"), -1);
+        $c.strcat(buf, $c.lit(", meditating"));
     }
     if (mtmp.mleashed) {
-        $c.__builtin___strcat_chk(buf, $c.lit(", leashed to you"), -1);
+        $c.strcat(buf, $c.lit(", leashed to you"));
     }
     if (mtmp.mtrapped | 0 && cansee(mtmp.mx, mtmp.my)) {
         t = t_at(mtmp.mx, mtmp.my);
         tt = t ? t.ttyp | 0 : NO_TRAP;
         /* newsym lets you know of the trap, so mention it here */
         if (tt === BEAR_TRAP || (tt === PIT || tt === SPIKED_PIT) || tt === WEB) {
-            $c.__builtin___sprintf_chk(eos(buf), 0, -1, $c.lit(", trapped in %s"), await an(trapname(tt, FALSE)));
+            $c.sprintf(eos(buf), $c.lit(", trapped in %s"), await an(trapname(tt, FALSE)));
             t.tseen = (1) & 1;
         }
     }
@@ -462,67 +462,67 @@ async function look_at_monster(buf, monbuf, mtmp, x, y) {   // pager.c:422
         monbuf.set(0, 0);
         if (how_seen !== 0 && how_seen !== MONSEEN.NORMAL) {
             if ((how_seen & MONSEEN.NORMAL) >>> 0) {
-                $c.__builtin___strcat_chk(monbuf, $c.lit("normal vision"), -1);
+                $c.strcat(monbuf, $c.lit("normal vision"));
                 how_seen = (how_seen & 4294967294) >>> 0;
                 /* how_seen can't be 0 yet... */
                 if (how_seen) {
-                    $c.__builtin___strcat_chk(monbuf, $c.lit(", "), -1);
+                    $c.strcat(monbuf, $c.lit(", "));
                 }
             }
             if ((how_seen & MONSEEN.SEEINVIS) >>> 0) {
-                $c.__builtin___strcat_chk(monbuf, $c.lit("see invisible"), -1);
+                $c.strcat(monbuf, $c.lit("see invisible"));
                 how_seen = (how_seen & 4294967293) >>> 0;
                 if (how_seen) {
-                    $c.__builtin___strcat_chk(monbuf, $c.lit(", "), -1);
+                    $c.strcat(monbuf, $c.lit(", "));
                 }
             }
             if ((how_seen & MONSEEN.INFRAVIS) >>> 0) {
-                $c.__builtin___strcat_chk(monbuf, $c.lit("infravision"), -1);
+                $c.strcat(monbuf, $c.lit("infravision"));
                 how_seen = (how_seen & 4294967291) >>> 0;
                 if (how_seen) {
-                    $c.__builtin___strcat_chk(monbuf, $c.lit(", "), -1);
+                    $c.strcat(monbuf, $c.lit(", "));
                 }
             }
             if ((how_seen & MONSEEN.TELEPAT) >>> 0) {
-                $c.__builtin___strcat_chk(monbuf, $c.lit("telepathy"), -1);
+                $c.strcat(monbuf, $c.lit("telepathy"));
                 how_seen = (how_seen & 4294967287) >>> 0;
                 if (how_seen) {
-                    $c.__builtin___strcat_chk(monbuf, $c.lit(", "), -1);
+                    $c.strcat(monbuf, $c.lit(", "));
                 }
             }
             if ((how_seen & MONSEEN.XRAYVIS) >>> 0) {
                 /* Eyes of the Overworld */
-                $c.__builtin___strcat_chk(monbuf, $c.lit("astral vision"), -1);
+                $c.strcat(monbuf, $c.lit("astral vision"));
                 how_seen = (how_seen & 4294967279) >>> 0;
                 if (how_seen) {
-                    $c.__builtin___strcat_chk(monbuf, $c.lit(", "), -1);
+                    $c.strcat(monbuf, $c.lit(", "));
                 }
             }
             if ((how_seen & MONSEEN.DETECT) >>> 0) {
-                $c.__builtin___strcat_chk(monbuf, $c.lit("monster detection"), -1);
+                $c.strcat(monbuf, $c.lit("monster detection"));
                 how_seen = (how_seen & 4294967263) >>> 0;
                 if (how_seen) {
-                    $c.__builtin___strcat_chk(monbuf, $c.lit(", "), -1);
+                    $c.strcat(monbuf, $c.lit(", "));
                 }
             }
             if ((how_seen & MONSEEN.WARNMON) >>> 0) {
                 if (Hallucination()) {
-                    $c.__builtin___strcat_chk(monbuf, $c.lit("paranoid delusion"), -1);
+                    $c.strcat(monbuf, $c.lit("paranoid delusion"));
                 } else {
                     mW = $c.oru64(svc.context.warntype.obj, svc.context.warntype.polyd);
                     m2 = mtmp.data.mflags2;
                     whom = $c.andu64($c.andu64(mW, M2.HUMAN), m2) ? $c.lit("human") : $c.andu64($c.andu64(mW, M2.ELF), m2) ? $c.lit("elf") : $c.andu64($c.andu64(mW, M2.ORC), m2) ? $c.lit("orc") : $c.andu64($c.andu64(mW, M2.DEMON), m2) ? $c.lit("demon") : pmname(mtmp.data, Mgender(mtmp));
-                    $c.__builtin___sprintf_chk(eos(monbuf), 0, -1, $c.lit("warned of %s"), await makeplural(whom));
+                    $c.sprintf(eos(monbuf), $c.lit("warned of %s"), await makeplural(whom));
                 }
                 how_seen = (how_seen & 4294967231) >>> 0;
                 if (how_seen) {
-                    $c.__builtin___strcat_chk(monbuf, $c.lit(", "), -1);
+                    $c.strcat(monbuf, $c.lit(", "));
                 }
             }
             /* should have used up all the how_seen bits by now */
             if (how_seen) {
                 await impossible($c.lit("lookat: unknown method of seeing monster"));
-                $c.__builtin___sprintf_chk(eos(monbuf), 0, -1, $c.lit("(%u)"), how_seen);
+                $c.sprintf(eos(monbuf), $c.lit("(%u)"), how_seen);
             }
         }   /* seen by something other than normal vision */
     }   /* monbuf is non-null */
@@ -587,10 +587,10 @@ export function ice_descr(x, y, outbuf) {   // pager.c:614
     neardist = Math.imul(Math.imul(r, r), 2) - r | 0;   /* same as r*r + r*(r-1) */
     iflags.ice_rating = -1;   /* secondary output, for 'mention_decor' */
     if (SURFACE_AT(x, y) !== ICE) {
-        $c.__builtin___sprintf_chk(outbuf, 0, -1, $c.lit("[ice:%d?]"), svl.level.locations[x][y].typ);
+        $c.sprintf(outbuf, $c.lit("[ice:%d?]"), svl.level.locations[x][y].typ);
     } else if ((distu(x, y) > neardist || !cansee(x, y) && (!u_at(x, y) || Levitation())) && !gd.decor_levitate_override) {
         /* probe_decor(pickup.c) */
-        $c.__builtin___strcpy_chk(outbuf, waterbody_name(x, y), -1);   /* "ice" or "frozen <liquid>" */
+        $c.strcpy(outbuf, waterbody_name(x, y));   /* "ice" or "frozen <liquid>" */
     } else {
         time_left = spot_time_left(x, y, MELT_ICE_AWAY);
         /* other, real ice thickness/strength terminology exists but seems
@@ -601,7 +601,7 @@ export function ice_descr(x, y, outbuf) {   // pager.c:614
         /* unsteady */
         /* thin */
         iflags.ice_rating = $c.i8(!time_left ? 0 : time_left > 1000 ? 1 : time_left > 100 ? 2 : time_left > 50 ? 3 : time_left > 14 ? 4 : 5);   /* slushy */
-        $c.__builtin___sprintf_chk(outbuf, 0, -1, $c.lit("%s %s"), ice_descr$icetyp[iflags.ice_rating], waterbody_name(x, y));
+        $c.sprintf(outbuf, $c.lit("%s %s"), ice_descr$icetyp[iflags.ice_rating], waterbody_name(x, y));
     }
     return outbuf;
 }
@@ -640,7 +640,7 @@ async function lookat(x, y, buf, monbuf) {   // pager.c:657
                 how = (how | 4) >>> 0;
             }
             if (how) {
-                $c.__builtin___sprintf_chk(eos(buf), 0, -1, $c.lit(" [seen: %s%s%s%s%s]"), (how & 1) >>> 0 ? $c.lit("infravision") : $c.lit(""), (how & 3) >>> 0 > 2 ? $c.lit(", ") : $c.lit(""), (how & 2) >>> 0 ? $c.lit("telepathy") : $c.lit(""), (how & 7) >>> 0 > 4 ? $c.lit(", ") : $c.lit(""), (how & 4) >>> 0 ? $c.lit("monster detection") : $c.lit(""));
+                $c.sprintf(eos(buf), $c.lit(" [seen: %s%s%s%s%s]"), (how & 1) >>> 0 ? $c.lit("infravision") : $c.lit(""), (how & 3) >>> 0 > 2 ? $c.lit(", ") : $c.lit(""), (how & 2) >>> 0 ? $c.lit("telepathy") : $c.lit(""), (how & 7) >>> 0 > 4 ? $c.lit(", ") : $c.lit(""), (how & 4) >>> 0 ? $c.lit("monster detection") : $c.lit(""));
             }
             /* add comma if telep and infrav */
             /* add comma if detect and (infrav or telep or both) */
@@ -648,7 +648,7 @@ async function lookat(x, y, buf, monbuf) {   // pager.c:657
     } else if (u.uswallow) {
         /* when swallowed, we're only called for spots adjacent to hero,
            and blindness doesn't prevent hero from feeling what holds him */
-        $c.__builtin___sprintf_chk(buf, 0, -1, $c.lit("interior of %s"), await mon_nam(u.ustuck));
+        $c.sprintf(buf, $c.lit("interior of %s"), await mon_nam(u.ustuck));
         pm = u.ustuck.data;
     } else if (glyph_is_monster(glyph)) {
         if ((mtmp = svl.level.monsters[x][y]) !== null) {
@@ -656,7 +656,7 @@ async function lookat(x, y, buf, monbuf) {   // pager.c:657
             pm = mtmp.data;
         } else if (Hallucination()) {
             /* 'monster' must actually be a statue */
-            $c.__builtin___strcpy_chk(buf, await rndmonnam(null), -1);
+            $c.strcpy(buf, await rndmonnam(null));
         }
     } else if (glyph_is_object(glyph)) {
         await look_at_object(buf, x, y, glyph);   /* fill in buf[] */
@@ -665,18 +665,18 @@ async function lookat(x, y, buf, monbuf) {   // pager.c:657
         trap_description(buf, tnum, x, y);
     } else if (glyph_is_warning(glyph)) {
         warnindx = glyph_to_warning(glyph);
-        $c.__builtin___strcpy_chk(buf, def_warnsyms[warnindx].explanation, -1);
+        $c.strcpy(buf, def_warnsyms[warnindx].explanation);
     } else if (glyph_is_invisible(glyph)) {
-        $c.__builtin___strcpy_chk(buf, new $c.Ptr(invisexplain, 0), -1);   /* redundant; handled by caller */
+        $c.strcpy(buf, new $c.Ptr(invisexplain, 0));   /* redundant; handled by caller */
     } else if (glyph_is_nothing(glyph)) {
-        $c.__builtin___strcpy_chk(buf, $c.lit("dark part of a room"), -1);
+        $c.strcpy(buf, $c.lit("dark part of a room"));
     } else if (glyph_is_unexplored(glyph)) {
         if ((u.uinwater | 0) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) {
             /* "unknown" == previously mapped but not visible when
                submerged; better terminology appreciated... */
-            $c.__builtin___strcpy_chk(buf, dist2(x, y, u.ux, u.uy) <= 2 ? $c.lit("land") : $c.lit("unknown"), -1);
+            $c.strcpy(buf, dist2(x, y, u.ux, u.uy) <= 2 ? $c.lit("land") : $c.lit("unknown"));
         } else {
-            $c.__builtin___strcpy_chk(buf, $c.lit("unexplored area"), -1);
+            $c.strcpy(buf, $c.lit("unexplored area"));
         }
     } else if (glyph_is_cmap(glyph)) {
         symidx = $c.i16(glyph_to_cmap(glyph));
@@ -684,21 +684,21 @@ async function lookat(x, y, buf, monbuf) {   // pager.c:657
             case S.altar:
                 amsk = altarmask_at(x, y);
                 algn = $c.i8((amsk & AM.MASK & AM.MASK) === 0 ? A.NONE : (amsk & AM.MASK & AM.MASK) === AM.LAWFUL ? A.LAWFUL : (amsk & AM.MASK & AM.MASK) - 2 | 0);
-                $c.__builtin___sprintf_chk(buf, 0, -1, $c.lit("%s %saltar"), (svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level) && !(dist2(x, y, u.ux, u.uy) <= 2) && amsk & AM.SANCTUM ? $c.lit("aligned") : align_str(algn), amsk & AM.SANCTUM ? $c.lit("high ") : $c.lit(""));
+                $c.sprintf(buf, $c.lit("%s %saltar"), (svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level) && !(dist2(x, y, u.ux, u.uy) <= 2) && amsk & AM.SANCTUM ? $c.lit("aligned") : align_str(algn), amsk & AM.SANCTUM ? $c.lit("high ") : $c.lit(""));
                 /* like endgame high priests, endgame high altars
                    are only recognizable when immediately adjacent */
                 break;
             case S.ndoor:
                 if (is_drawbridge_wall(x, y) >= 0) {
-                    $c.__builtin___strcpy_chk(buf, $c.lit("open drawbridge portcullis"), -1);
+                    $c.strcpy(buf, $c.lit("open drawbridge portcullis"));
                 } else if (((svl.level.locations[x][y].flags | 0) & ~D.TRAPPED) === D.BROKEN) {
-                    $c.__builtin___strcpy_chk(buf, $c.lit("broken door"), -1);
+                    $c.strcpy(buf, $c.lit("broken door"));
                 } else {
-                    $c.__builtin___strcpy_chk(buf, $c.lit("doorway"), -1);
+                    $c.strcpy(buf, $c.lit("doorway"));
                 }
                 break;
             case S.cloud:
-                $c.__builtin___strcpy_chk(buf, (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) ? $c.lit("cloudy area") : $c.lit("fog/vapor cloud"), -1);
+                $c.strcpy(buf, (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) ? $c.lit("cloudy area") : $c.lit("fog/vapor cloud"));
                 break;
             case S.pool:
             case S.water:
@@ -707,33 +707,33 @@ async function lookat(x, y, buf, monbuf) {   // pager.c:657
             case S.ice:
                 /* was Plane of Water, now that or "wall of water" */
                 /* for hallucination; otherwise defsyms[] would be fine */
-                $c.__builtin___strcpy_chk(buf, waterbody_name(x, y), -1);
+                $c.strcpy(buf, waterbody_name(x, y));
                 break;
             case S.engroom:
             case S.engrcorr:
-                $c.__builtin___strcpy_chk(buf, $c.lit("engraving"), -1);
+                $c.strcpy(buf, $c.lit("engraving"));
                 break;
             case S.stone:
                 if (!svl.level.locations[x][y].seenv) {
-                    $c.__builtin___strcpy_chk(buf, $c.lit("unexplored"), -1);
+                    $c.strcpy(buf, $c.lit("unexplored"));
                     break;
                 } else if ((u.uinwater | 0) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) {
                     /* "unknown" == previously mapped but not visible when
                        submerged; better terminology appreciated... */
-                    $c.__builtin___strcpy_chk(buf, dist2(x, y, u.ux, u.uy) <= 2 ? $c.lit("land") : $c.lit("unknown"), -1);
+                    $c.strcpy(buf, dist2(x, y, u.ux, u.uy) <= 2 ? $c.lit("land") : $c.lit("unknown"));
                     break;
                 } else if (svl.level.locations[x][y].typ === STONE || svl.level.locations[x][y].typ === SCORR) {
-                    $c.__builtin___strcpy_chk(buf, $c.lit("stone"), -1);
+                    $c.strcpy(buf, $c.lit("stone"));
                     break;
                 }
             default:
                 /*FALLTHRU*/
-                $c.__builtin___strcpy_chk(buf, defsyms[symidx].explanation, -1);
+                $c.strcpy(buf, defsyms[symidx].explanation);
                 break;
         }
     } else {
         /* not mon, obj, trap, or cmap */
-        $c.__builtin___strcpy_chk(buf, $c.lit("unexplored area"), -1);
+        $c.strcpy(buf, $c.lit("unexplored area"));
     }
     return pm && !Hallucination() ? pm : null;
 }
@@ -742,7 +742,7 @@ async function lookat(x, y, buf, monbuf) {   // pager.c:657
 export async function ia_checkfile(otmp) {   // pager.c:807
     let itemnam = new Int8Array(256);
     /* singular() of xname() of otmp is what "/i" looks up */
-    $c.__builtin___strcpy_chk(new $c.Ptr(itemnam, 0), await singular(otmp, xname), 256);
+    $c.strcpy(new $c.Ptr(itemnam, 0), await singular(otmp, xname));
     return await checkfile(new $c.Ptr(itemnam, 0), null, chkfilIaCheck | chkfilDontAsk, null);
 }
 /*
@@ -783,9 +783,9 @@ async function checkfile(inp, pm, chkflags, supplemental_name) {   // pager.c:83
          * user_typed_name and picked name.
          */
         if (pm !== null && !user_typed_name) {
-            dbase_str = $c.__builtin___strcpy_chk(new $c.Ptr(newstr, 0), pm.pmnames[NEUTRAL], 256);
+            dbase_str = $c.strcpy(new $c.Ptr(newstr, 0), pm.pmnames[NEUTRAL]);
         } else {
-            dbase_str = $c.__builtin___strcpy_chk(new $c.Ptr(newstr, 0), inp, 256);
+            dbase_str = $c.strcpy(new $c.Ptr(newstr, 0), inp);
         }
         lcase(dbase_str);
         /*
@@ -872,7 +872,7 @@ async function checkfile(inp, pm, chkflags, supplemental_name) {   // pager.c:83
            (note: strncpy() only terminates output string if the specified
            count is bigger than the length of the substring being copied) */
         if (!$c.strncmp(dbase_str, $c.lit("moist towel"), 11)) {
-            $c.__builtin___memcpy_chk(dbase_str = dbase_str.add(2), $c.lit("wet"), 3, -1);   /* skip "mo" replace "ist" */
+            $c.memcpy(dbase_str = dbase_str.add(2), $c.lit("wet"), 3);   /* skip "mo" replace "ist" */
         }
         bad_data_file$: {
             /* Make sure the name is non-empty. */
@@ -917,7 +917,7 @@ async function checkfile(inp, pm, chkflags, supplemental_name) {   // pager.c:83
                    if the fruit name is an extant object, looking at the fruit yields
                    that object's description. */
                 if (!alt && await fruit_from_name(dbase_str, TRUE, null)) {
-                    alt = $c.__builtin___strcpy_chk(new $c.Ptr(newstr, 0), obj_descr[SLIME_MOLD].oc_name, 256);
+                    alt = $c.strcpy(new $c.Ptr(newstr, 0), obj_descr[SLIME_MOLD].oc_name);
                 } else if (!alt) {
                     /*
                      * If the object is named, then the name is the alternate description;
@@ -992,10 +992,10 @@ async function checkfile(inp, pm, chkflags, supplemental_name) {   // pager.c:83
                         yes_to_moreinfo = FALSE;
                         if (!user_typed_name && !without_asking) {
                             entrytext = pass ? alt : dbase_str;
-                            $c.__builtin___strcpy_chk(new $c.Ptr(question, 0), $c.lit("More info about \""), 128);
+                            $c.strcpy(new $c.Ptr(question, 0), $c.lit("More info about \""));
                             /* +2 => length of "\"?" */
                             copynchars(eos(new $c.Ptr(question, 0)), entrytext, $c.i32($c.subu64(127, $c.addu64($c.strlen(new $c.Ptr(question, 0)), 2))));
-                            $c.__builtin___strcat_chk(new $c.Ptr(question, 0), $c.lit("\"?"), 128);
+                            $c.strcat(new $c.Ptr(question, 0), $c.lit("\"?"));
                             if (await y_n(new $c.Ptr(question, 0)) === 121) {
                                 yes_to_moreinfo = TRUE;
                             }
@@ -1109,14 +1109,14 @@ async function add_cmap_descr(found, idx, glyph, article, cc$in, x_str, prefix, 
             svl.level.locations[cc.x][cc.y].typ = $c.i8(idx === S.water ? WATER : idx === S.lava ? LAVAPOOL : idx === S.lavawall ? LAVAWALL : ICE);
         }
         u.uprops[HALLUC_RES].extrinsic = 1;
-        $c.__builtin___strcpy_chk(mbuf, waterbody_name(cc.x, cc.y), -1);
+        $c.strcpy(mbuf, waterbody_name(cc.x, cc.y));
         u.uprops[HALLUC_RES].extrinsic = save_prop;
         svl.level.locations[cc.x][cc.y].typ = save_ltyp;
         /* shorten the feedback for farlook/quicklook: "pool or ..." */
         if (!$c.strcmp(mbuf, $c.lit("pool of water"))) {
             mbuf.set(4, 0);
         } else if (!$c.strcmp(mbuf, $c.lit("molten lava"))) {
-            $c.__builtin___strcpy_chk(mbuf, $c.lit("lava"), -1);
+            $c.strcpy(mbuf, $c.lit("lava"));
         }
         x_str = mbuf;
         /* avoid "an ice" and so forth; "a pool", "a moat", and
@@ -1129,10 +1129,10 @@ async function add_cmap_descr(found, idx, glyph, article, cc$in, x_str, prefix, 
     if (!found) {
         /* this is the first match */
         if (is_cmap_trap(idx) && idx !== S.vibrating_square) {
-            $c.__builtin___sprintf_chk(out_str, 0, -1, $c.lit("%sa trap"), prefix);
+            $c.sprintf(out_str, $c.lit("%sa trap"), prefix);
             hit_trap.set(0, TRUE);
         } else {
-            $c.__builtin___sprintf_chk(out_str, 0, -1, $c.lit("%s%s"), prefix, article === 2 ? await the(x_str) : article === 1 ? await an(x_str) : x_str);
+            $c.sprintf(out_str, $c.lit("%s%s"), prefix, article === 2 ? await the(x_str) : article === 1 ? await an(x_str) : x_str);
         }
         firstmatch.set(0, x_str);
         found = 1;
@@ -1162,9 +1162,9 @@ export async function do_screen_description(cc$in, looked, sym, out_str, firstma
         /* Convert glyph at selected position to a symbol for use below. */
         map_glyphinfo(cc.x, cc.y, glyph, 0, glyphinfo);
         sym = glyphinfo.ttychar;
-        $c.__builtin___sprintf_chk(new $c.Ptr(prefix, 0), 0, 256, $c.lit("%s        "), encglyph(glyphinfo.glyph));
+        $c.sprintf(new $c.Ptr(prefix, 0), $c.lit("%s        "), encglyph(glyphinfo.glyph));
     } else {
-        $c.__builtin___sprintf_chk(new $c.Ptr(prefix, 0), 0, 256, $c.lit("%c        "), sym);
+        $c.sprintf(new $c.Ptr(prefix, 0), $c.lit("%c        "), sym);
     }
     /*
      * Check all the possibilities, saving all explanations in a buffer.
@@ -1202,7 +1202,7 @@ export async function do_screen_description(cc$in, looked, sym, out_str, firstma
             /* we know 'found' is zero here, but guard against some other
                special case being inserted ahead of us someday */
             if (!found) {
-                $c.__builtin___sprintf_chk(out_str, 0, -1, $c.lit("%s%s"), new $c.Ptr(prefix, 0), x_str);
+                $c.sprintf(out_str, $c.lit("%s%s"), new $c.Ptr(prefix, 0), x_str);
                 firstmatch.set(0, x_str);
                 found = found + 1 | 0;
             } else {
@@ -1225,7 +1225,7 @@ export async function do_screen_description(cc$in, looked, sym, out_str, firstma
                     if (sym === (looked ? gs.showsyms[i + SYM_OFF_M | 0] : def_monsyms[i].sym) && def_monsyms[i].explain && def_monsyms[i].explain.get(0)) {
                         need_to_look = TRUE;
                         if (!found) {
-                            $c.__builtin___sprintf_chk(out_str, 0, -1, $c.lit("%s%s"), new $c.Ptr(prefix, 0), await an(def_monsyms[i].explain));
+                            $c.sprintf(out_str, $c.lit("%s%s"), new $c.Ptr(prefix, 0), await an(def_monsyms[i].explain));
                             firstmatch.set(0, def_monsyms[i].explain);
                             found = found + 1 | 0;
                         } else {
@@ -1270,7 +1270,7 @@ export async function do_screen_description(cc$in, looked, sym, out_str, firstma
                             continue;
                         }
                         if (!found) {
-                            $c.__builtin___sprintf_chk(out_str, 0, -1, $c.lit("%s%s"), new $c.Ptr(prefix, 0), await an(oc_ptr));
+                            $c.sprintf(out_str, $c.lit("%s%s"), new $c.Ptr(prefix, 0), await an(oc_ptr));
                             /* note: if the value assigned to *firstmatch ever
                                becomes dynamically constructed, it will need to be
                                copied into a static buffer; as of now, all alternate
@@ -1288,7 +1288,7 @@ export async function do_screen_description(cc$in, looked, sym, out_str, firstma
                 usealt = $c.i8($c.and64(u.uprops[DETECT_MONSTERS].extrinsic, I_SPECIAL) !== 0 ? 1 : 0);
                 unseen_explain = usealt || Blind() ? new $c.Ptr(altinvisexplain, 0) : new $c.Ptr(invisexplain, 0);
                 if (!found) {
-                    $c.__builtin___sprintf_chk(out_str, 0, -1, $c.lit("%s%s"), new $c.Ptr(prefix, 0), await an(unseen_explain));
+                    $c.sprintf(out_str, $c.lit("%s%s"), new $c.Ptr(prefix, 0), await an(unseen_explain));
                     firstmatch.set(0, unseen_explain);
                     found = found + 1 | 0;
                 } else {
@@ -1298,7 +1298,7 @@ export async function do_screen_description(cc$in, looked, sym, out_str, firstma
             if (glyph && glyph_is_nothing(glyph) || looked && sym === gs.showsyms[SYM.NOTHING + SYM_OFF_X]) {
                 x_str = $c.lit("the dark part of a room");
                 if (!found) {
-                    $c.__builtin___sprintf_chk(out_str, 0, -1, $c.lit("%s%s"), new $c.Ptr(prefix, 0), x_str);
+                    $c.sprintf(out_str, $c.lit("%s%s"), new $c.Ptr(prefix, 0), x_str);
                     firstmatch.set(0, x_str);
                     found = found + 1 | 0;
                 } else {
@@ -1311,7 +1311,7 @@ export async function do_screen_description(cc$in, looked, sym, out_str, firstma
                     x_str = $c.lit("land");   /* replace "unexplored" */
                 }
                 if (!found) {
-                    $c.__builtin___sprintf_chk(out_str, 0, -1, $c.lit("%s%s"), new $c.Ptr(prefix, 0), x_str);
+                    $c.sprintf(out_str, $c.lit("%s%s"), new $c.Ptr(prefix, 0), x_str);
                     firstmatch.set(0, x_str);
                     found = found + 1 | 0;
                 } else {
@@ -1375,7 +1375,7 @@ export async function do_screen_description(cc$in, looked, sym, out_str, firstma
                 x_str = def_warnsyms[i].explanation;
                 if (sym === (looked ? gw.warnsyms[i] : def_warnsyms[i].sym)) {
                     if (!found) {
-                        $c.__builtin___sprintf_chk(out_str, 0, -1, $c.lit("%s%s"), new $c.Ptr(prefix, 0), x_str);
+                        $c.sprintf(out_str, $c.lit("%s%s"), new $c.Ptr(prefix, 0), x_str);
                         firstmatch.set(0, x_str);
                         found = found + 1 | 0;
                     } else {
@@ -1384,7 +1384,7 @@ export async function do_screen_description(cc$in, looked, sym, out_str, firstma
                     /* Kludge: warning trumps boulders on the display.
                        Reveal the boulder too or player can get confused */
                     if (looked && sobj_at(BOULDER, cc.x, cc.y)) {
-                        $c.__builtin___strcat_chk(out_str, $c.lit(" co-located with a boulder"), -1);
+                        $c.strcat(out_str, $c.lit(" co-located with a boulder"));
                     }
                     break;   /* out of for loop*/
                 }
@@ -1393,7 +1393,7 @@ export async function do_screen_description(cc$in, looked, sym, out_str, firstma
             if (skipped_venom && found < 2) {
                 x_str = def_oc_syms[VENOM_CLASS].explain;
                 if (!found) {
-                    $c.__builtin___sprintf_chk(out_str, 0, -1, $c.lit("%s%s"), new $c.Ptr(prefix, 0), await an(x_str));
+                    $c.sprintf(out_str, $c.lit("%s%s"), new $c.Ptr(prefix, 0), await an(x_str));
                     firstmatch.set(0, x_str);
                     found = found + 1 | 0;
                 } else {
@@ -1432,7 +1432,7 @@ export async function do_screen_description(cc$in, looked, sym, out_str, firstma
            which turned it into a sentence that lacked its terminating period;
            we could add one below but reinstating the prefix here is better */
         if (found > 4) {
-            $c.__builtin___sprintf_chk(out_str, 0, -1, $c.lit("%scan be many things"), new $c.Ptr(prefix, 0));
+            $c.sprintf(out_str, $c.lit("%scan be many things"), new $c.Ptr(prefix, 0));
         }
     }
     if (looked) {
@@ -1446,21 +1446,21 @@ export async function do_screen_description(cc$in, looked, sym, out_str, firstma
                 ice_descr(cc.x, cc.y, new $c.Ptr(do_screen_description$look_buf, 0));
             }
             if (!$c.strcmp(new $c.Ptr(do_screen_description$look_buf, 0), $c.lit("staircase down")) && on_level(u.uz, svd.dungeon_topology.d_qstart_level) && !await ok_to_quest()) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(do_screen_description$look_buf, 0), $c.lit("blocked staircase down"), 256);
+                $c.strcpy(new $c.Ptr(do_screen_description$look_buf, 0), $c.lit("blocked staircase down"));
             }
             if (do_screen_description$look_buf[0] !== 0) {
                 firstmatch.set(0, new $c.Ptr(do_screen_description$look_buf, 0));
             }
             if (firstmatch.get(0).get(0)) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(temp_buf, 0), 0, 256, $c.lit(" (%s"), firstmatch.get(0));
+                $c.sprintf(new $c.Ptr(temp_buf, 0), $c.lit(" (%s"), firstmatch.get(0));
                 add_quoted_engraving(cc.x, cc.y, new $c.Ptr(temp_buf, 0), FALSE);
-                $c.__builtin___strcat_chk(new $c.Ptr(temp_buf, 0), $c.lit(")"), 256);
-                $c.__builtin___strncat_chk(out_str, new $c.Ptr(temp_buf, 0), $c.subu64($c.subu64(BUFSZ, $c.strlen(out_str)), 1), -1);
+                $c.strcat(new $c.Ptr(temp_buf, 0), $c.lit(")"));
+                $c.strncat(out_str, new $c.Ptr(temp_buf, 0), $c.subu64($c.subu64(BUFSZ, $c.strlen(out_str)), 1));
                 found = 1;   /* we have something to look up */
             }
             if (monbuf[0]) {
                 nh_snprintf($c.lit("do_screen_description"), 1619, new $c.Ptr(temp_buf, 0), 256, $c.lit(" [seen: %s]"), new $c.Ptr(monbuf, 0));
-                $c.__builtin___strncat_chk(out_str, new $c.Ptr(temp_buf, 0), $c.subu64($c.subu64(BUFSZ, $c.strlen(out_str)), 1), -1);
+                $c.strncat(out_str, new $c.Ptr(temp_buf, 0), $c.subu64($c.subu64(BUFSZ, $c.strlen(out_str)), 1));
             }
         }
     }
@@ -1494,7 +1494,7 @@ function add_quoted_engraving(x, y, buf, force) {   // pager.c:1631
     } else {
         nh_snprintf($c.lit("add_quoted_engraving"), 1663, new $c.Ptr(temp_buf, 0), 256, $c.lit(" %s you haven't read"), headstone ? $c.lit("whose headstone") : $c.lit("that"));
     }
-    $c.__builtin___strncat_chk(buf, new $c.Ptr(temp_buf, 0), $c.subu64($c.subu64(BUFSZ, $c.strlen(buf)), 1), -1);
+    $c.strncat(buf, new $c.Ptr(temp_buf, 0), $c.subu64($c.subu64(BUFSZ, $c.strlen(buf)), 1));
     return TRUE;
 }
 export async function do_look(mode, click_cc) {   // pager.c:1673
@@ -1621,7 +1621,7 @@ export async function do_look(mode, click_cc) {   // pager.c:1673
                                     new $c.Ptr(out_str, 0).set(0, 0);
                                     for (invobj = gi.invent; invobj; invobj = invobj.nobj) {
                                         if (invobj.invlet === invlet) {
-                                            $c.__builtin___strcpy_chk(new $c.Ptr(out_str, 0), await singular(invobj, xname), 256);
+                                            $c.strcpy(new $c.Ptr(out_str, 0), await singular(invobj, xname));
                                             break;
                                         }
                                     }
@@ -1728,7 +1728,7 @@ export async function do_look(mode, click_cc) {   // pager.c:1673
                     /* check the data file for information about this thing */
                     if (found === 1 && ans !== LOOK.QUICK && ans !== LOOK.ONCE && (ans === LOOK.VERBOSE || flags.help && !quick) && !clicklook) {
                         supplemental_name[0] = 0;
-                        $c.__builtin___strcpy_chk(new $c.Ptr(temp_buf, 0), firstmatch[0], 256);
+                        $c.strcpy(new $c.Ptr(temp_buf, 0), firstmatch[0]);
                         await checkfile(new $c.Ptr(temp_buf, 0), pm, (ans === LOOK.VERBOSE ? chkfilDontAsk : chkfilNone) >>> 0, new $c.Ptr(supplemental_name, 0));
                         if (supplemental_pm[0]) {
                             await do_supplemental_info(new $c.Ptr(supplemental_name, 0), supplemental_pm[0], $c.i8(ans === LOOK.VERBOSE ? 1 : 0));
@@ -1773,11 +1773,11 @@ async function look_all(nearby, do_mons) {   // pager.c:1979
                     }
                 } else if (glyph_is_invisible(glyph)) {
                     /* remembered, unseen, creature */
-                    $c.__builtin___strcpy_chk(new $c.Ptr(lookbuf, 0), new $c.Ptr(invisexplain, 0), 256);
+                    $c.strcpy(new $c.Ptr(lookbuf, 0), new $c.Ptr(invisexplain, 0));
                     count = count + 1 | 0;
                 } else if (glyph_is_warning(glyph)) {
                     warnindx = glyph_to_warning(glyph);
-                    $c.__builtin___strcpy_chk(new $c.Ptr(lookbuf, 0), def_warnsyms[warnindx].explanation, 256);
+                    $c.strcpy(new $c.Ptr(lookbuf, 0), def_warnsyms[warnindx].explanation);
                     count = count + 1 | 0;
                 }
             } else {
@@ -1790,11 +1790,11 @@ async function look_all(nearby, do_mons) {   // pager.c:1979
             if (new $c.Ptr(lookbuf, 0).get(0)) {
                 cmode = $c.i8(iflags.getpos_coords !== 110 ? iflags.getpos_coords : 109);
                 if (count === 1) {
-                    $c.__builtin___strcpy_chk(new $c.Ptr(which, 0), do_mons ? $c.lit("monsters") : $c.lit("objects"), 12);
+                    $c.strcpy(new $c.Ptr(which, 0), do_mons ? $c.lit("monsters") : $c.lit("objects"));
                     if (nearby) {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(outbuf, 0), 0, 256, $c.lit("%s currently shown near %s:"), upstart(new $c.Ptr(which, 0)), cmode !== 99 ? coord_desc(u.ux, u.uy, new $c.Ptr(coordbuf, 0), cmode) : !((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked || u.uswallow | 0 || !((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked && !(u.uprops[SEE_INVIS].intrinsic || u.uprops[SEE_INVIS].extrinsic)) && !u.uundetected || (u.uprops[TELEPAT].extrinsic || (u.uprops[DETECT_MONSTERS].intrinsic || u.uprops[DETECT_MONSTERS].extrinsic))) ? $c.lit("your position") : $c.lit("you"));
+                        $c.sprintf(new $c.Ptr(outbuf, 0), $c.lit("%s currently shown near %s:"), upstart(new $c.Ptr(which, 0)), cmode !== 99 ? coord_desc(u.ux, u.uy, new $c.Ptr(coordbuf, 0), cmode) : !((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked || u.uswallow | 0 || !((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked && !(u.uprops[SEE_INVIS].intrinsic || u.uprops[SEE_INVIS].extrinsic)) && !u.uundetected || (u.uprops[TELEPAT].extrinsic || (u.uprops[DETECT_MONSTERS].intrinsic || u.uprops[DETECT_MONSTERS].extrinsic))) ? $c.lit("your position") : $c.lit("you"));
                     } else {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(outbuf, 0), 0, 256, $c.lit("All %s currently shown on the map:"), new $c.Ptr(which, 0));
+                        $c.sprintf(new $c.Ptr(outbuf, 0), $c.lit("All %s currently shown on the map:"), new $c.Ptr(which, 0));
                     }
                     await putstr()(win, 0, new $c.Ptr(outbuf, 0));
                     /* hack alert! Qt watches a text window for any line
@@ -1815,11 +1815,11 @@ async function look_all(nearby, do_mons) {   // pager.c:1979
                     strkitten(new $c.Ptr(coordbuf, 0), 32);
                 }
                 /* prefix: "coords  C  " where 'C' is mon or obj symbol */
-                $c.__builtin___sprintf_chk(new $c.Ptr(outbuf, 0), 0, 256, cmode === 115 ? $c.lit("%s  ") : cmode === 109 ? $c.lit("%8s  ") : $c.lit("%12s  "), new $c.Ptr(coordbuf, 0));
-                $c.__builtin___sprintf_chk(eos(new $c.Ptr(outbuf, 0)), 0, -1, $c.lit("%s  "), encglyph(glyph));
+                $c.sprintf(new $c.Ptr(outbuf, 0), cmode === 115 ? $c.lit("%s  ") : cmode === 109 ? $c.lit("%8s  ") : $c.lit("%12s  "), new $c.Ptr(coordbuf, 0));
+                $c.sprintf(eos(new $c.Ptr(outbuf, 0)), $c.lit("%s  "), encglyph(glyph));
                 /* guard against potential overflow */
                 lookbuf[$c.idx($c.subu64(255, $c.strlen(new $c.Ptr(outbuf, 0))))] = 0;
-                $c.__builtin___strcat_chk(new $c.Ptr(outbuf, 0), new $c.Ptr(lookbuf, 0), 256);
+                $c.strcat(new $c.Ptr(outbuf, 0), new $c.Ptr(lookbuf, 0));
                 await putmixed()(win, 0, new $c.Ptr(outbuf, 0));
             }
         }
@@ -1848,15 +1848,15 @@ async function look_traps(nearby) {   // pager.c:2078
             } else if ((t = t_at(x, y)) !== null && t.tseen | 0 && (!((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && !((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) || couldsee(x, y))) {
                 /* can't use /" to track traps moved by bubbles or
                    clouds except when hero has direct line of sight */
-                $c.__builtin___strcpy_chk(new $c.Ptr(lookbuf, 0), trapname(t.ttyp | 0, FALSE), 256);
-                $c.__builtin___sprintf_chk(eos(new $c.Ptr(lookbuf, 0)), 0, -1, $c.lit(", obscured by %s"), encglyph(glyph));
+                $c.strcpy(new $c.Ptr(lookbuf, 0), trapname(t.ttyp | 0, FALSE));
+                $c.sprintf(eos(new $c.Ptr(lookbuf, 0)), $c.lit(", obscured by %s"), encglyph(glyph));
                 glyph = ((S.arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) === S.stone ? GLYPH.CMAP_STONE_OFF : ((S.arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) <= S.trwall ? (((S.arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : ((S.arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) < S.altar ? (((S.arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : ((S.arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) === S.altar ? 4008 : ((S.arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) < S.arrow_trap + MAXTCHARS ? (((S.arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : ((S.arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) <= S.goodpos ? (((S.arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH;
                 count = count + 1 | 0;
             }
             if (new $c.Ptr(lookbuf, 0).get(0)) {
                 cmode = $c.i8(iflags.getpos_coords !== 110 ? iflags.getpos_coords : 109);
                 if (count === 1) {
-                    $c.__builtin___sprintf_chk(new $c.Ptr(outbuf, 0), 0, 256, $c.lit("%sseen or remembered traps%s:"), nearby ? $c.lit("nearby ") : $c.lit(""), nearby ? $c.lit("") : $c.lit(" on this level"));
+                    $c.sprintf(new $c.Ptr(outbuf, 0), $c.lit("%sseen or remembered traps%s:"), nearby ? $c.lit("nearby ") : $c.lit(""), nearby ? $c.lit("") : $c.lit(" on this level"));
                     await putstr()(win, 0, upstart(new $c.Ptr(outbuf, 0)));
                     /* hack alert! Qt watches a text window for any line
                        with 4 consecutive spaces and renders the window
@@ -1864,11 +1864,11 @@ async function look_traps(nearby) {   // pager.c:2078
                     await putstr()(win, 0, $c.lit("    "));   /* separator */
                 }
                 /* prefix: "coords  C  " where 'C' is trap symbol */
-                $c.__builtin___sprintf_chk(new $c.Ptr(outbuf, 0), 0, 256, cmode === 115 ? $c.lit("%s  ") : cmode === 109 ? $c.lit("%8s  ") : $c.lit("%12s  "), coord_desc(x, y, new $c.Ptr(coordbuf, 0), cmode));
-                $c.__builtin___sprintf_chk(eos(new $c.Ptr(outbuf, 0)), 0, -1, $c.lit("%s  "), encglyph(glyph));
+                $c.sprintf(new $c.Ptr(outbuf, 0), cmode === 115 ? $c.lit("%s  ") : cmode === 109 ? $c.lit("%8s  ") : $c.lit("%12s  "), coord_desc(x, y, new $c.Ptr(coordbuf, 0), cmode));
+                $c.sprintf(eos(new $c.Ptr(outbuf, 0)), $c.lit("%s  "), encglyph(glyph));
                 /* guard against potential overflow */
                 lookbuf[$c.idx($c.subu64(255, $c.strlen(new $c.Ptr(outbuf, 0))))] = 0;
-                $c.__builtin___strcat_chk(new $c.Ptr(outbuf, 0), new $c.Ptr(lookbuf, 0), 256);
+                $c.strcat(new $c.Ptr(outbuf, 0), new $c.Ptr(lookbuf, 0));
                 await putmixed()(win, 0, new $c.Ptr(outbuf, 0));
             }
         }
@@ -1903,7 +1903,7 @@ async function look_engrs(nearby) {   // pager.c:2144
                 continue;
             }
             is_headstone = $c.i8(IS_GRAVE(svl.lastseentyp[x][y]));
-            $c.__builtin___sprintf_chk(new $c.Ptr(lookbuf, 0), 0, 256, $c.lit(" (%s"), is_headstone ? $c.lit("grave") : $c.lit("engraving"));
+            $c.sprintf(new $c.Ptr(lookbuf, 0), $c.lit(" (%s"), is_headstone ? $c.lit("grave") : $c.lit("engraving"));
             add_quoted_engraving(x, y, new $c.Ptr(lookbuf, 0), TRUE);
             /* the paren is used by farlook and add_quoted_engraving()
                expected to see it; we don't want it here */
@@ -1929,7 +1929,7 @@ async function look_engrs(nearby) {   // pager.c:2144
                 /* (redundant) */
                 cmode = $c.i8(iflags.getpos_coords !== 110 ? iflags.getpos_coords : 109);
                 if (count === 1) {
-                    $c.__builtin___sprintf_chk(new $c.Ptr(outbuf, 0), 0, 256, $c.lit("%sseen or remembered engravings%s:"), nearby ? $c.lit("nearby ") : $c.lit(""), nearby ? $c.lit("") : $c.lit(" on this level"));
+                    $c.sprintf(new $c.Ptr(outbuf, 0), $c.lit("%sseen or remembered engravings%s:"), nearby ? $c.lit("nearby ") : $c.lit(""), nearby ? $c.lit("") : $c.lit(" on this level"));
                     await putstr()(win, 0, upstart(new $c.Ptr(outbuf, 0)));
                     /* hack alert! Qt watches a text window for any line
                        with 4 consecutive spaces and renders the window
@@ -1937,11 +1937,11 @@ async function look_engrs(nearby) {   // pager.c:2144
                     await putstr()(win, 0, $c.lit("    "));   /* separator */
                 }
                 /* prefix: "coords  C  " where 'C' is engrvng|grave symbol */
-                $c.__builtin___sprintf_chk(new $c.Ptr(outbuf, 0), 0, 256, cmode === 115 ? $c.lit("%s  ") : cmode === 109 ? $c.lit("%8s  ") : $c.lit("%12s  "), coord_desc(x, y, new $c.Ptr(coordbuf, 0), cmode));
-                $c.__builtin___sprintf_chk(eos(new $c.Ptr(outbuf, 0)), 0, -1, $c.lit("%s "), encglyph(glyph));
+                $c.sprintf(new $c.Ptr(outbuf, 0), cmode === 115 ? $c.lit("%s  ") : cmode === 109 ? $c.lit("%8s  ") : $c.lit("%12s  "), coord_desc(x, y, new $c.Ptr(coordbuf, 0), cmode));
+                $c.sprintf(eos(new $c.Ptr(outbuf, 0)), $c.lit("%s "), encglyph(glyph));
                 /* guard against potential overflow */
                 lookbuf[$c.idx($c.subu64(255, $c.strlen(new $c.Ptr(outbuf, 0))))] = 0;
-                $c.__builtin___strcat_chk(new $c.Ptr(outbuf, 0), new $c.Ptr(lookbuf, 0), 256);
+                $c.strcat(new $c.Ptr(outbuf, 0), new $c.Ptr(lookbuf, 0));
                 await putmixed()(win, 0, new $c.Ptr(outbuf, 0));
             }
         }
@@ -1970,12 +1970,12 @@ async function do_supplemental_info(name, pm, without_asking) {   // pager.c:225
         bp = strstri(name, $c.lit(" of "));
         bp2 = strstri(name, $c.lit(" the Fence"));
         if (bp || bp2) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(fullname, 0), name, 256);
+            $c.strcpy(new $c.Ptr(fullname, 0), name);
             if (!without_asking) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(question, 0), $c.lit("More info about \""), 128);
+                $c.strcpy(new $c.Ptr(question, 0), $c.lit("More info about \""));
                 /* +2 => length of "\"?" */
                 copynchars(eos(new $c.Ptr(question, 0)), entrytext, $c.i32($c.subu64(127, $c.addu64($c.strlen(new $c.Ptr(question, 0)), 2))));
-                $c.__builtin___strcat_chk(new $c.Ptr(question, 0), $c.lit("\"?"), 128);
+                $c.strcat(new $c.Ptr(question, 0), $c.lit("\"?"));
                 if (await y_n(new $c.Ptr(question, 0)) === 121) {
                     yes_to_moreinfo = TRUE;
                 }
@@ -1994,7 +1994,7 @@ async function do_supplemental_info(name, pm, without_asking) {   // pager.c:225
                 datawin = await create_nhwindow()(NHW.MENU);
                 for (i = 0; textp.get(i); i = i + 1 | 0) {
                     if (strstri(textp.get(i), $c.lit("%s")) !== null) {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, textp.get(i), ($t1 = subs, subs = $t1 + 1 | 0, $t1) ? gang : new $c.Ptr(fullname, 0));
+                        $c.sprintf(new $c.Ptr(buf, 0), textp.get(i), ($t1 = subs, subs = $t1 + 1 | 0, $t1) ? gang : new $c.Ptr(fullname, 0));
                         txt = new $c.Ptr(buf, 0);
                     } else {
                         txt = textp.get(i);
@@ -2134,8 +2134,8 @@ export function dowhatdoes_core(q, cbuf) {   // pager.c:2577
     if (!$c.peq(ec_desc = key2extcmddesc($c.u8(q)), $c.asArr(null, Int8Array))) {
         /* note: if "%-8s" gets changed, the "%8.8s" in dowhatdoes() will
            need a comparable change */
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%-8s%s."), key2txt($c.u8(q), new $c.Ptr(keybuf, 0)), ec_desc);
-        $c.__builtin___strcpy_chk(cbuf, new $c.Ptr(buf, 0), -1);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%-8s%s."), key2txt($c.u8(q), new $c.Ptr(keybuf, 0)), ec_desc);
+        $c.strcpy(cbuf, new $c.Ptr(buf, 0));
         return cbuf;
     }
     return null;
@@ -2192,22 +2192,22 @@ async function docontact() {   // pager.c:2718
     cwin = await create_nhwindow()(NHW.TEXT);
     if (sysopt.support) {
         /*XXX overflow possibilities*/
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("To contact local support, %s"), sysopt.support);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("To contact local support, %s"), sysopt.support);
         await putstr()(cwin, 0, new $c.Ptr(buf, 0));
         await putstr()(cwin, 0, $c.lit(""));
     } else if (sysopt.fmtd_wizard_list) {
         /* formatted SYSCF WIZARDS */
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("To contact local support, contact %s."), sysopt.fmtd_wizard_list);
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("To contact local support, contact %s."), sysopt.fmtd_wizard_list);
         await putstr()(cwin, 0, new $c.Ptr(buf, 0));
         await putstr()(cwin, 0, $c.lit(""));
     }
     await putstr()(cwin, 0, $c.lit("To contact the NetHack development team directly,"));
     /*XXX overflow possibilities*/
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("see the 'Contact' form on our website or email <%s>."), $c.lit("devteam@nethack.org"));
+    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("see the 'Contact' form on our website or email <%s>."), $c.lit("devteam@nethack.org"));
     await putstr()(cwin, 0, new $c.Ptr(buf, 0));
     await putstr()(cwin, 0, $c.lit(""));
     await putstr()(cwin, 0, $c.lit("For more information on NetHack, or to report a bug,"));
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("visit our website \"%s\"."), $c.lit("https://www.nethack.org/"));
+    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("visit our website \"%s\"."), $c.lit("https://www.nethack.org/"));
     await putstr()(cwin, 0, new $c.Ptr(buf, 0));
     await display_nhwindow()(cwin, FALSE);
     await destroy_nhwindow()(cwin);
@@ -2270,11 +2270,11 @@ export async function dohelp() {   // pager.c:2860
             continue;
         }
         if (help_menu_items[i].text.get(0) === 37) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(helpbuf, 0), 0, 128, help_menu_items[i].text, $c.lit("MacOS"));
+            $c.sprintf(new $c.Ptr(helpbuf, 0), help_menu_items[i].text, $c.lit("MacOS"));
         } else if (help_menu_items[i].f === dispfile_optmenu) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(helpbuf, 0), 0, 128, help_menu_items[i].text, await setopt_cmd(new $c.Ptr(tmpbuf, 0)));
+            $c.sprintf(new $c.Ptr(helpbuf, 0), help_menu_items[i].text, await setopt_cmd(new $c.Ptr(tmpbuf, 0)));
         } else {
-            $c.__builtin___strcpy_chk(new $c.Ptr(helpbuf, 0), help_menu_items[i].text, 128);
+            $c.strcpy(new $c.Ptr(helpbuf, 0), help_menu_items[i].text);
         }
         any.a_int = i + 1 | 0;
         await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(helpbuf, 0), MENU.ITEMFLAGS_NONE);
@@ -2295,50 +2295,50 @@ export async function dohelp() {   // pager.c:2860
    the full options command; format it as 'm O' */
 async function setopt_cmd(outbuf) {   // pager.c:2908
     let cmdbuf = new Int8Array(128), cmdnm = null, key = 0;
-    $c.__builtin___strcpy_chk(outbuf, $c.lit("'"), -1);
+    $c.strcpy(outbuf, $c.lit("'"));
     /* #optionsfull */
     key = cmd_from_func(doset);
     if (key) {
-        $c.__builtin___strcat_chk(outbuf, visctrl(key), -1);
+        $c.strcat(outbuf, visctrl(key));
     } else {
         /* extended command name, with leading "#" */
         cmdnm = await cmdname_from_func(doset, new $c.Ptr(cmdbuf, 0), TRUE);
         if (!cmdnm) {   /* paranoia */
             cmdnm = $c.lit("optionsfull");
         }
-        $c.__builtin___sprintf_chk(eos(outbuf), 0, -1, $c.lit("%s%.31s"), cmdnm.get(0) !== 35 ? $c.lit("#") : $c.lit(""), cmdnm);
+        $c.sprintf(eos(outbuf), $c.lit("%s%.31s"), cmdnm.get(0) !== 35 ? $c.lit("#") : $c.lit(""), cmdnm);
         /* since there's no key bound to #optionsfull, include 'm O' */
-        $c.__builtin___strcat_chk(outbuf, $c.lit("' or '"), -1);
+        $c.strcat(outbuf, $c.lit("' or '"));
         /* m prefix plus #options */
         key = cmd_from_func(do_reqmenu);
         if (key) {
             /* key for 'm' prefix */
-            $c.__builtin___strcat_chk(outbuf, visctrl(key), -1);
+            $c.strcat(outbuf, visctrl(key));
         } else {
             /* extended command name for 'm' prefix */
             cmdnm = await cmdname_from_func(do_reqmenu, new $c.Ptr(cmdbuf, 0), TRUE);
             if (!cmdnm) {
                 cmdnm = $c.lit("reqmenu");
             }
-            $c.__builtin___sprintf_chk(eos(outbuf), 0, -1, $c.lit("%s%.31s"), cmdnm.get(0) !== 35 ? $c.lit("#") : $c.lit(""), cmdnm);
+            $c.sprintf(eos(outbuf), $c.lit("%s%.31s"), cmdnm.get(0) !== 35 ? $c.lit("#") : $c.lit(""), cmdnm);
         }
         /* this is slightly iffy because the user shouldn't type <space> to
            get the command we're describing, but it improves readability */
-        $c.__builtin___strcat_chk(outbuf, $c.lit(" "), -1);
+        $c.strcat(outbuf, $c.lit(" "));
         /* now #options, normally 'O' */
         key = cmd_from_func(doset_simple);
         if (key) {
-            $c.__builtin___strcat_chk(outbuf, visctrl(key), -1);
+            $c.strcat(outbuf, visctrl(key));
         } else {
             /* extended command name */
             cmdnm = await cmdname_from_func(doset_simple, new $c.Ptr(cmdbuf, 0), TRUE);
             if (!cmdnm) {   /* paranoia */
                 cmdnm = $c.lit("options");
             }
-            $c.__builtin___sprintf_chk(eos(outbuf), 0, -1, $c.lit("%s%.31s"), cmdnm.get(0) !== 35 ? $c.lit("#") : $c.lit(""), cmdnm);
+            $c.sprintf(eos(outbuf), $c.lit("%s%.31s"), cmdnm.get(0) !== 35 ? $c.lit("#") : $c.lit(""), cmdnm);
         }
     }
-    $c.__builtin___strcat_chk(outbuf, $c.lit("'"), -1);
+    $c.strcat(outbuf, $c.lit("'"));
     return outbuf;
 }
 /* the 'V' command; also a choice for '?' */

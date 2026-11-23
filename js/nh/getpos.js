@@ -127,10 +127,10 @@ async function getpos_help_keyxhelp(tmpwin, k1, k2, gloc) {   // getpos.c:137
         /* default is too wide for basic 80-column tty so shorten it
            to avoid wrapping */
         if (iflags.getloc_usemenu) {
-            filtertxt = strsubst($c.__builtin___strcpy_chk(new $c.Ptr(fbuf, 0), filtertxt, 128), $c.lit("this area"), $c.lit("area"));
+            filtertxt = strsubst($c.strcpy(new $c.Ptr(fbuf, 0), filtertxt), $c.lit("this area"), $c.lit("area"));
         }
     }
-    $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s'/'%s' to %s%s%s."), k1, k2, iflags.getloc_usemenu ? $c.lit("get a menu of ") : move_cursor_to, gloc_descr[gloc][2 + iflags.getloc_usemenu | 0], filtertxt);
+    $c.sprintf(new $c.Ptr(sbuf, 0), $c.lit("Use '%s'/'%s' to %s%s%s."), k1, k2, iflags.getloc_usemenu ? $c.lit("get a menu of ") : move_cursor_to, gloc_descr[gloc][2 + iflags.getloc_usemenu | 0], filtertxt);
     await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
 }
 /* the response for '?' help request in getpos() */
@@ -140,15 +140,15 @@ async function getpos_help(force, goal) {   // getpos.c:167
         switch ($goto) {
         case null:
             tmpwin = await create_nhwindow()(NHW.MENU);
-            $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s', '%s', '%s', '%s' to move the cursor to %s."), visctrl(cmd_from_func(do_move_west)), visctrl(cmd_from_func(do_move_south)), visctrl(cmd_from_func(do_move_north)), visctrl(cmd_from_func(do_move_east)), goal);
+            $c.sprintf(new $c.Ptr(sbuf, 0), $c.lit("Use '%s', '%s', '%s', '%s' to move the cursor to %s."), visctrl(cmd_from_func(do_move_west)), visctrl(cmd_from_func(do_move_south)), visctrl(cmd_from_func(do_move_north)), visctrl(cmd_from_func(do_move_east)), goal);
             /* hjkl */
             await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
-            $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s', '%s', '%s', '%s' to fast-move the cursor, %s."), visctrl(cmd_from_func(do_run_west)), visctrl(cmd_from_func(do_run_south)), visctrl(cmd_from_func(do_run_north)), visctrl(cmd_from_func(do_run_east)), getpos_help$fastmovemode[iflags.getloc_moveskip]);
+            $c.sprintf(new $c.Ptr(sbuf, 0), $c.lit("Use '%s', '%s', '%s', '%s' to fast-move the cursor, %s."), visctrl(cmd_from_func(do_run_west)), visctrl(cmd_from_func(do_run_south)), visctrl(cmd_from_func(do_run_north)), visctrl(cmd_from_func(do_run_east)), getpos_help$fastmovemode[iflags.getloc_moveskip]);
             await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
-            $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("(or prefix normal move with '%s' or '%s' to fast-move)"), visctrl(cmd_from_func(do_run)), visctrl(cmd_from_func(do_rush)));
+            $c.sprintf(new $c.Ptr(sbuf, 0), $c.lit("(or prefix normal move with '%s' or '%s' to fast-move)"), visctrl(cmd_from_func(do_run)), visctrl(cmd_from_func(do_rush)));
             await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
             await putstr()(tmpwin, 0, $c.lit("Or enter a background symbol (ex. '<')."));
-            $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s' to move the cursor on yourself."), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_SELF]));
+            $c.sprintf(new $c.Ptr(sbuf, 0), $c.lit("Use '%s' to move the cursor on yourself."), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_SELF]));
             await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
             if (!iflags.terrainmode || (iflags.terrainmode & TER.MON) >>> 0 !== 0) {
                 await getpos_help_keyxhelp(tmpwin, visctrl(gc.Cmd.spkeys[NHKF.GETPOS_MON_NEXT]), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_MON_PREV]), GLOC.MONS);
@@ -166,12 +166,12 @@ async function getpos_help(force, goal) {   // getpos.c:167
                 await getpos_help_keyxhelp(tmpwin, visctrl(gc.Cmd.spkeys[NHKF.GETPOS_UNEX_NEXT]), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_UNEX_PREV]), GLOC.EXPLORE);
                 await getpos_help_keyxhelp(tmpwin, visctrl(gc.Cmd.spkeys[NHKF.GETPOS_INTERESTING_NEXT]), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_INTERESTING_PREV]), GLOC.INTERESTING);
             }
-            $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s' to change fast-move mode to %s."), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_MOVESKIP]), getpos_help$fastmovemode[!iflags.getloc_moveskip ? 1 : 0]);
+            $c.sprintf(new $c.Ptr(sbuf, 0), $c.lit("Use '%s' to change fast-move mode to %s."), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_MOVESKIP]), getpos_help$fastmovemode[!iflags.getloc_moveskip ? 1 : 0]);
             await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
             if (!iflags.terrainmode || (iflags.terrainmode & TER.DETECT) >>> 0 === 0) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s' to toggle menu listing for possible targets."), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_MENU]));
+                $c.sprintf(new $c.Ptr(sbuf, 0), $c.lit("Use '%s' to toggle menu listing for possible targets."), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_MENU]));
                 await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
-                $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s' to change the mode of limiting possible targets."), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_LIMITVIEW]));
+                $c.sprintf(new $c.Ptr(sbuf, 0), $c.lit("Use '%s' to change the mode of limiting possible targets."), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_LIMITVIEW]));
                 await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
             }
         case "skip_non_mons":
@@ -180,18 +180,18 @@ async function getpos_help(force, goal) {   // getpos.c:167
                     switch ($goto) {
                     case null:
                         if (getpos_getvalid) {
-                            $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s' or '%s' to move to valid locations."), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_VALID_NEXT]), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_VALID_PREV]));
+                            $c.sprintf(new $c.Ptr(sbuf, 0), $c.lit("Use '%s' or '%s' to move to valid locations."), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_VALID_NEXT]), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_VALID_PREV]));
                             await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
                         }
                         if (getpos_hilitefunc) {
-                            $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s' to toggle marking of valid locations."), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_SHOWVALID]));
+                            $c.sprintf(new $c.Ptr(sbuf, 0), $c.lit("Use '%s' to toggle marking of valid locations."), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_SHOWVALID]));
                             await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
                         }
-                        $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s' to toggle automatic description."), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_AUTODESC]));
+                        $c.sprintf(new $c.Ptr(sbuf, 0), $c.lit("Use '%s' to toggle automatic description."), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_AUTODESC]));
                         await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
                         if (iflags.cmdassist) {
                             /* assisting the '/' command, I suppose... */
-                            $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, iflags.getpos_coords === 110 ? $c.lit("(Set 'whatis_coord' option to include coordinates with '%s' text.)") : $c.lit("(Reset 'whatis_coord' option to omit coordinates from '%s' text.)"), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_AUTODESC]));
+                            $c.sprintf(new $c.Ptr(sbuf, 0), iflags.getpos_coords === 110 ? $c.lit("(Set 'whatis_coord' option to include coordinates with '%s' text.)") : $c.lit("(Reset 'whatis_coord' option to omit coordinates from '%s' text.)"), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_AUTODESC]));
                         }
                     case "skip_non_mons":
                         $goto = null;   // skip_non_mons:
@@ -200,20 +200,20 @@ async function getpos_help(force, goal) {   // getpos.c:167
                            also for dotherecmdmenu's simulated mouse) */
                         doing_what_is = $c.i8($c.peq(goal, new $c.Ptr(what_is_a_location, 0)) ? 1 : 0);
                         if (doing_what_is) {
-                            $c.__builtin___sprintf_chk(new $c.Ptr(kbuf, 0), 0, 256, $c.lit("'%s' or '%s' or '%s' or '%s'"), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_PICK]), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_PICK_Q]), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_PICK_O]), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_PICK_V]));
+                            $c.sprintf(new $c.Ptr(kbuf, 0), $c.lit("'%s' or '%s' or '%s' or '%s'"), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_PICK]), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_PICK_Q]), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_PICK_O]), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_PICK_V]));
                         } else {
-                            $c.__builtin___sprintf_chk(new $c.Ptr(kbuf, 0), 0, 256, $c.lit("'%s'"), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_PICK]));
+                            $c.sprintf(new $c.Ptr(kbuf, 0), $c.lit("'%s'"), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_PICK]));
                         }
                         nh_snprintf($c.lit("getpos_help"), 280, new $c.Ptr(sbuf, 0), 256, $c.lit("Type a %s when you are at the right place."), new $c.Ptr(kbuf, 0));
                         await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
                         if (doing_what_is) {
-                            $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("  '%s' describe current spot, show 'more info', move to another spot."), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_PICK_V]));
+                            $c.sprintf(new $c.Ptr(sbuf, 0), $c.lit("  '%s' describe current spot, show 'more info', move to another spot."), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_PICK_V]));
                             await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
-                            $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("  '%s' describe current spot,%s move to another spot;"), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_PICK]), flags.help && !force ? $c.lit(" prompt if 'more info',") : $c.lit(""));
+                            $c.sprintf(new $c.Ptr(sbuf, 0), $c.lit("  '%s' describe current spot,%s move to another spot;"), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_PICK]), flags.help && !force ? $c.lit(" prompt if 'more info',") : $c.lit(""));
                             await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
-                            $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("  '%s' describe current spot, move to another spot;"), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_PICK_Q]));
+                            $c.sprintf(new $c.Ptr(sbuf, 0), $c.lit("  '%s' describe current spot, move to another spot;"), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_PICK_Q]));
                             await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
-                            $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("  '%s' describe current spot, stop looking at things;"), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_PICK_O]));
+                            $c.sprintf(new $c.Ptr(sbuf, 0), $c.lit("  '%s' describe current spot, stop looking at things;"), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_PICK_O]));
                             await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
                         }
                     }
@@ -395,10 +395,10 @@ async function gather_locs(arr_p, cnt_p, gloc) {   // getpos.c:513
 export function dxdy_to_dist_descr(dx, dy, fulldir) {   // getpos.c:557
     let dst = 0;
     if (!dx && !dy) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(dxdy_to_dist_descr$buf, 0), 0, 30, $c.lit("here"));
+        $c.sprintf(new $c.Ptr(dxdy_to_dist_descr$buf, 0), $c.lit("here"));
     } else if ((dst = xytodir(dx, dy)) !== -1) {
         /* explicit direction; 'one step' is implicit */
-        $c.__builtin___sprintf_chk(new $c.Ptr(dxdy_to_dist_descr$buf, 0), 0, 30, $c.lit("%s"), directionname(dst));
+        $c.sprintf(new $c.Ptr(dxdy_to_dist_descr$buf, 0), $c.lit("%s"), directionname(dst));
     } else {
         dxdy_to_dist_descr$buf[0] = 0;
         /* 9999: protect buf[] against overflow caused by invalid values */
@@ -406,13 +406,13 @@ export function dxdy_to_dist_descr(dx, dy, fulldir) {   // getpos.c:557
             if ($c.abs(dy) > 9999) {
                 dy = $c.i16(Math.imul(sgn(dy), 9999));
             }
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(dxdy_to_dist_descr$buf, 0)), 0, -1, $c.lit("%d%s%s"), $c.abs(dy), dxdy_to_dist_descr$dirnames[dy > 0 ? 1 : 0][fulldir], dx ? $c.lit(",") : $c.lit(""));
+            $c.sprintf(eos(new $c.Ptr(dxdy_to_dist_descr$buf, 0)), $c.lit("%d%s%s"), $c.abs(dy), dxdy_to_dist_descr$dirnames[dy > 0 ? 1 : 0][fulldir], dx ? $c.lit(",") : $c.lit(""));
         }
         if (dx) {
             if ($c.abs(dx) > 9999) {
                 dx = $c.i16(Math.imul(sgn(dx), 9999));
             }
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(dxdy_to_dist_descr$buf, 0)), 0, -1, $c.lit("%d%s"), $c.abs(dx), dxdy_to_dist_descr$dirnames[2 + (dx > 0 ? 1 : 0) | 0][fulldir]);
+            $c.sprintf(eos(new $c.Ptr(dxdy_to_dist_descr$buf, 0)), $c.lit("%d%s"), $c.abs(dx), dxdy_to_dist_descr$dirnames[2 + (dx > 0 ? 1 : 0) | 0][fulldir]);
         }
     }
     return new $c.Ptr(dxdy_to_dist_descr$buf, 0);
@@ -430,13 +430,13 @@ export function coord_desc(x, y, outbuf, cmode) {   // getpos.c:595
             /* "east", "3s", "2n,4w" */
             dx = x - u.ux | 0;
             dy = y - u.uy | 0;
-            $c.__builtin___sprintf_chk(outbuf, 0, -1, $c.lit("(%s)"), dxdy_to_dist_descr($c.i16(dx), $c.i16(dy), $c.i8(cmode === 102 ? 1 : 0)));
+            $c.sprintf(outbuf, $c.lit("(%s)"), dxdy_to_dist_descr($c.i16(dx), $c.i16(dy), $c.i8(cmode === 102 ? 1 : 0)));
             break;
         case 109:
             /* x,y */
             /* upper left corner of map is <1,0>;
                with default COLNO,ROWNO lower right corner is <79,20> */
-            $c.__builtin___sprintf_chk(outbuf, 0, -1, $c.lit("<%d,%d>"), x, y);
+            $c.sprintf(outbuf, $c.lit("<%d,%d>"), x, y);
             break;
         case 115:
             /* y+2,x */
@@ -448,11 +448,11 @@ export function coord_desc(x, y, outbuf, cmode) {   // getpos.c:595
                The (100) is placed in brackets below to mark the [: "03"] as
                explicit compile-time dead code for clang */
             if (!new $c.Ptr(coord_desc$screen_fmt, 0).get(0)) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(coord_desc$screen_fmt, 0), 0, 16, $c.lit("[%%%sd,%%%sd]"), 1 ? $c.lit("02") : $c.lit("03"), 1 ? $c.lit("02") : $c.lit("03"));
+                $c.sprintf(new $c.Ptr(coord_desc$screen_fmt, 0), $c.lit("[%%%sd,%%%sd]"), 1 ? $c.lit("02") : $c.lit("03"), 1 ? $c.lit("02") : $c.lit("03"));
             }
             /* map line 0 is screen row 2;
                map column 0 isn't used, map column 1 is screen column 1 */
-            $c.__builtin___sprintf_chk(outbuf, 0, -1, new $c.Ptr(coord_desc$screen_fmt, 0), y + 2 | 0, x);
+            $c.sprintf(outbuf, new $c.Ptr(coord_desc$screen_fmt, 0), y + 2 | 0, x);
             break;
     }
     return outbuf;
@@ -499,7 +499,7 @@ export async function getpos_menu(ccp, gloc) {   // getpos.c:665
             await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(fullbuf, 0), MENU.ITEMFLAGS_NONE);
         }
     }
-    $c.__builtin___sprintf_chk(new $c.Ptr(tmpbuf, 0), 0, 256, $c.lit("Pick %s%s%s"), await an(gloc_descr[gloc][1]), gloc_filtertxt[iflags.getloc_filter], iflags.getloc_travelmode ? $c.lit(" for travel destination") : $c.lit(""));
+    $c.sprintf(new $c.Ptr(tmpbuf, 0), $c.lit("Pick %s%s%s"), await an(gloc_descr[gloc][1]), gloc_filtertxt[iflags.getloc_filter], iflags.getloc_travelmode ? $c.lit(" for travel destination") : $c.lit(""));
     await end_menu()(tmpwin, new $c.Ptr(tmpbuf, 0));
     pick_cnt = await select_menu(tmpwin, PICK.ONE, new $c.Ptr(picks, 0));
     await destroy_nhwindow()(tmpwin);
@@ -777,7 +777,7 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
                     } else {
                         if (!$c.strchr(new $c.Ptr(quitchars, 0), c)) {
                             k = 0;
-                            $c.__builtin___memset_chk(new $c.Ptr(matching, 0), 0, 105, 105);
+                            $c.memset(new $c.Ptr(matching, 0), 0, 105);
                             for (sidx[0] = 0; sidx[0] < MAXPCHARS; sidx[0] = sidx[0] + 1 | 0) {
                                 /* don't even try to match some terrain: walls, room... */
                                 if (is_cmap_wall(sidx[0]) || is_cmap_room(sidx[0]) || is_cmap_corr(sidx[0]) || is_cmap_door(sidx[0]) || sidx[0] === S.ndoor) {
@@ -847,10 +847,10 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
                                 $goto = "nxtc"; continue D1;
                             } else {
                                 if (!force) {
-                                    $c.__builtin___strcpy_chk(new $c.Ptr(note, 0), $c.lit("aborted"), 128);
+                                    $c.strcpy(new $c.Ptr(note, 0), $c.lit("aborted"));
                                 } else {
                                     /* hjkl */
-                                    $c.__builtin___sprintf_chk(new $c.Ptr(note, 0), 0, 128, $c.lit("use '%s', '%s', '%s', '%s' or '%s'"), visctrl(cmd_from_func(do_move_west)), visctrl(cmd_from_func(do_move_south)), visctrl(cmd_from_func(do_move_north)), visctrl(cmd_from_func(do_move_east)), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_PICK]));
+                                    $c.sprintf(new $c.Ptr(note, 0), $c.lit("use '%s', '%s', '%s', '%s' or '%s'"), visctrl(cmd_from_func(do_move_west)), visctrl(cmd_from_func(do_move_south)), visctrl(cmd_from_func(do_move_north)), visctrl(cmd_from_func(do_move_east)), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_PICK]));
                                 }
                                 await pline($c.lit("Unknown direction: '%s' (%s)."), visctrl($c.i8(c)), new $c.Ptr(note, 0));
                                 msg_given = TRUE;

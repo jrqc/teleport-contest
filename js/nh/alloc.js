@@ -58,7 +58,7 @@ export function fmt_ptr(ptr) {   // alloc.c:125
     if ((ptrbufidx = ptrbufidx + 1 | 0) >= PTRBUFCNT) {
         ptrbufidx = 0;
     }
-    $c.__builtin___sprintf_chk(buf, 0, -1, $c.lit("%p"), ptr);
+    $c.sprintf(buf, $c.lit("%p"), ptr);
     return buf;
 }
 /* If ${NH_HEAPLOG} is defined and we can create a file by that name,
@@ -87,7 +87,7 @@ export async function dupstr(string) {   // alloc.c:238
     if (len > 4294967294) {
         await panic($c.lit("dupstr: string length overflow"));
     }
-    return $c.__builtin___strcpy_chk($c.asArr(await alloc($c.u32($c.addu64(len, 1))), Int8Array), string, -1);
+    return $c.strcpy($c.asArr(await alloc($c.u32($c.addu64(len, 1))), Int8Array), string);
 }
 /* suppress this; if included, it will need a MONITOR_HEAP edition */
 /* similar for reasonable size strings, but return length of input as well */

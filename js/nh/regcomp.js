@@ -113,7 +113,7 @@ export function regncomp_l(preg, regex, n, cflags, loc) {   // regcomp.c:23
             wlen = n;
         } else {
             wcptr = wregex;
-            $h.A($c.__builtin___memset_chk($h.P($fp), 0, 128, -1));
+            $hl.memset($fp, 0, 128);
             /* HAVE_MBSTATE_T */
             while (n > 0) {
                 consumed = mbrtowc_l(wcptr, regex, n, $fp, loc);

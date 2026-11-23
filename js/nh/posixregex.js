@@ -67,14 +67,14 @@ export function regex_compile(s, re) {   // posixregex.c:66
 }
 export function regex_error_desc(re, errbuf) {   // posixregex.c:76
     if (!re) {
-        $c.__builtin___strcpy_chk(errbuf, $c.lit("no regexp"), -1);
+        $c.strcpy(errbuf, $c.lit("no regexp"));
     } else if (!re.err) {
-        $c.__builtin___strcpy_chk(errbuf, $c.lit("no explanation"), -1);
+        $c.strcpy(errbuf, $c.lit("no explanation"));
     } else {
         errbuf.set(0, 0);
         regerror(re.err, re.re, errbuf, BUFSZ);
         if (!errbuf.get(0)) {
-            $c.__builtin___strcpy_chk(errbuf, $c.lit("unspecified regexp error"), -1);
+            $c.strcpy(errbuf, $c.lit("unspecified regexp error"));
         }
     }
     return errbuf;

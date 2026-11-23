@@ -195,7 +195,7 @@ export async function remember_topl() {   // topl.c:170
         $t1 = $c.asArr(await alloc(len), Int8Array), cw.data.set(idx, $t1);
         cw.datlen.set(idx, $c.i16(len));
     }
-    $c.__builtin___strcpy_chk(cw.data.get(idx), new $c.Ptr(gt.toplines, 0), -1);
+    $c.strcpy(cw.data.get(idx), new $c.Ptr(gt.toplines, 0));
     if (!program_state.in_checkpoint) {
         new $c.Ptr(gt.toplines, 0).set(0, 0);
         $t2 = cw.maxrow = $c.rem64(idx + 1 | 0, cw.rows), cw.maxcol = $t2;
@@ -261,8 +261,8 @@ export async function update_topl(bp) {   // topl.c:251
     n0 = $c.i32($c.strlen(bp));
     /* room for --More-- */
     if (($G.ttyDisplay.toplin === TOPLINE.NEED_MORE || skip) && cw.cury === 0 && ((n0 + $c.i32($c.strlen(new $c.Ptr(gt.toplines, 0))) | 0) + 3 | 0) < (gt.tc_gbl_data.tc_CO - 8 | 0) && (notdied = $c.strncmp(bp, $c.lit("You die"), 7)) !== 0) {
-        $c.__builtin___strcat_chk(new $c.Ptr(gt.toplines, 0), $c.lit("  "), 300);
-        $c.__builtin___strcat_chk(new $c.Ptr(gt.toplines, 0), bp, 300);
+        $c.strcat(new $c.Ptr(gt.toplines, 0), $c.lit("  "));
+        $c.strcat(new $c.Ptr(gt.toplines, 0), bp);
         cw.curx = $c.add64(cw.curx, 2);
         if (!skip) {
             await addtopl(bp);
@@ -278,7 +278,7 @@ export async function update_topl(bp) {   // topl.c:251
         }
     }
     await remember_topl();
-    $c.__builtin___strncpy_chk(new $c.Ptr(gt.toplines, 0), bp, TBUFSZ, 300);
+    $c.strncpy(new $c.Ptr(gt.toplines, 0), bp, TBUFSZ);
     gt.toplines[TBUFSZ - 1] = 0;
     for (tl = new $c.Ptr(gt.toplines, 0); n0 >= gt.tc_gbl_data.tc_CO; ) {
         otl = tl;
@@ -391,7 +391,7 @@ export async function tty_yn_function(query, resp, def) {   // topl.c:373
     clean_up$: {
         if (resp) {
             allow_num = $c.i8($c.strchr(resp, 35) !== null ? 1 : 0);
-            $c.__builtin___strcpy_chk(new $c.Ptr(respbuf, 0), resp, 128);
+            $c.strcpy(new $c.Ptr(respbuf, 0), resp);
             /* normally we force lowercase, but if any uppercase letters
                are present in the allowed response, preserve case;
                check this before stripping the hidden choices */
@@ -405,20 +405,20 @@ export async function tty_yn_function(query, resp, def) {   // topl.c:373
             if ((rb = $c.strchr(new $c.Ptr(respbuf, 0), 27)) !== null) {
                 rb.set(0, 0);
             }
-            $c.__builtin___strncpy_chk(new $c.Ptr(prompt, 0), query, QBUFSZ - 1, 256);
+            $c.strncpy(new $c.Ptr(prompt, 0), query, QBUFSZ - 1);
             prompt[QBUFSZ - 1] = 0;
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(prompt, 0)), 0, -1, $c.lit(" [%s]"), new $c.Ptr(respbuf, 0));
+            $c.sprintf(eos(new $c.Ptr(prompt, 0)), $c.lit(" [%s]"), new $c.Ptr(respbuf, 0));
             if (def) {
-                $c.__builtin___sprintf_chk(eos(new $c.Ptr(prompt, 0)), 0, -1, $c.lit(" (%c)"), def);
+                $c.sprintf(eos(new $c.Ptr(prompt, 0)), $c.lit(" (%c)"), def);
             }
             /* not pline("%s ", prompt);
                trailing space is wanted here in case of reprompt */
-            $c.__builtin___strcat_chk(new $c.Ptr(prompt, 0), $c.lit(" "), 256);
+            $c.strcat(new $c.Ptr(prompt, 0), $c.lit(" "));
             await custompline(OVERRIDE_MSGTYPE | SUPPRESS_HISTORY, $c.lit("%s"), new $c.Ptr(prompt, 0));
         } else {
             /* no restriction on allowed response, so always preserve case */
             /* preserve_case = TRUE; -- moot since we're jumping to the end */
-            $c.__builtin___sprintf_chk(new $c.Ptr(prompt, 0), 0, 256, $c.lit("%s "), query);
+            $c.sprintf(new $c.Ptr(prompt, 0), $c.lit("%s "), query);
             await custompline(OVERRIDE_MSGTYPE | SUPPRESS_HISTORY, $c.lit("%s"), new $c.Ptr(prompt, 0));
             q = await readchar();
             break clean_up$;
@@ -534,12 +534,12 @@ export async function tty_yn_function(query, resp, def) {   // topl.c:373
         } while (!q);
     }
     if ($G.yn_number) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(rtmp, 0), 0, 40, $c.lit("#%ld"), $G.yn_number);
+        $c.sprintf(new $c.Ptr(rtmp, 0), $c.lit("#%ld"), $G.yn_number);
     } else {
         key2txt($c.u8(q), new $c.Ptr(rtmp, 0));
     }
     /* addtopl(rtmp); -- rewrite gt.toplines instead */
-    $c.__builtin___sprintf_chk(new $c.Ptr(gt.toplines, 0), 0, 300, $c.lit("%s%s"), new $c.Ptr(prompt, 0), new $c.Ptr(rtmp, 0));
+    $c.sprintf(new $c.Ptr(gt.toplines, 0), $c.lit("%s%s"), new $c.Ptr(prompt, 0), new $c.Ptr(rtmp, 0));
     await dumplogmsg(new $c.Ptr(gt.toplines, 0));
     $G.ttyDisplay.inread = $G.ttyDisplay.inread - 1 | 0;
     $G.ttyDisplay.toplin = TOPLINE.NON_EMPTY;
@@ -677,14 +677,14 @@ export async function tty_putmsghistory(msg, restoring_msghist) {   // topl.c:68
         }
         /* move most recent message to history, make this become most recent */
         await remember_topl();
-        $c.__builtin___strcpy_chk(new $c.Ptr(gt.toplines, 0), msg, 300);
+        $c.strcpy(new $c.Ptr(gt.toplines, 0), msg);
         await dumplogmsg(new $c.Ptr(gt.toplines, 0));
     } else if (snapshot_mesgs) {
         !!($c.peq($G.ttyDisplay, $c.asRec(null, $T.DisplayDesc, 60)) || $G.ttyDisplay.toplin !== TOPLINE.NEED_MORE) || (await nhassert_failed($c.lit("ttyDisplay == NULL || ttyDisplay->toplin != TOPLINE_NEED_MORE"), $c.lit("../win/tty/topl.c"), 720), 0);
         /* done putting arbitrary messages in; put the snapshot ones back */
         for (idx = 0; snapshot_mesgs.get(idx); idx = idx + 1 | 0) {
             await remember_topl();
-            $c.__builtin___strcpy_chk(new $c.Ptr(gt.toplines, 0), snapshot_mesgs.get(idx), 300);
+            $c.strcpy(new $c.Ptr(gt.toplines, 0), snapshot_mesgs.get(idx));
             await dumplogmsg(new $c.Ptr(gt.toplines, 0));
         }
         /* now release the snapshot */

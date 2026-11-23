@@ -160,8 +160,8 @@ export async function nhl_error(L, msg) {   // nhlua.c:201
     let ar = new $T.lua_Debug(), buf = new Int8Array(512);
     lua_getstack(L, 1, ar);
     await lua_getinfo(L, $c.lit("lS"), ar);
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 512, $c.lit("%s (line %d "), msg, ar.currentline);
-    $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%.*s)"), $c.i32($c.subu64(512, $c.addu64($c.strlen(new $c.Ptr(buf, 0)), 2))), new $c.Ptr(ar.short_src, 0));
+    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s (line %d "), msg, ar.currentline);
+    $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("%.*s)"), $c.i32($c.subu64(512, $c.addu64($c.strlen(new $c.Ptr(buf, 0)), 2))), new $c.Ptr(ar.short_src, 0));
     /* (max length of ar.short_src is actually LUA_IDSIZE
        so this is overkill for it, but crucial for ar.source) */
     /* (used to be 'ar.source' here) */
@@ -227,7 +227,7 @@ export async function nhl_add_table_entry_int(L, name, value) {   // nhlua.c:295
 }
 export async function nhl_add_table_entry_char(L, name, value) {   // nhlua.c:303
     let buf = new Int8Array(2);
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 2, $c.lit("%c"), value);
+    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%c"), value);
     await lua_pushstring(L, name);
     await lua_pushstring(L, new $c.Ptr(buf, 0));
     await lua_rawset(L, -3);
@@ -382,7 +382,7 @@ async function nhl_getmap(L) {   // nhlua.c:532
         await nhl_add_table_entry_int(L, $c.lit("glyph"), svl.level.locations[x[0]][y[0]].glyph);
         await nhl_add_table_entry_int(L, $c.lit("typ"), svl.level.locations[x[0]][y[0]].typ);
         await nhl_add_table_entry_str(L, $c.lit("typ_name"), levltyp_to_name(svl.level.locations[x[0]][y[0]].typ));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%c"), splev_typ2chr(svl.level.locations[x[0]][y[0]].typ));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%c"), splev_typ2chr(svl.level.locations[x[0]][y[0]].typ));
         await nhl_add_table_entry_str(L, $c.lit("mapchr"), new $c.Ptr(buf, 0));
         await nhl_add_table_entry_int(L, $c.lit("seenv"), svl.level.locations[x[0]][y[0]].seenv);
         await nhl_add_table_entry_bool(L, $c.lit("horizontal"), $c.i8(svl.level.locations[x[0]][y[0]].horizontal));
@@ -1428,11 +1428,11 @@ async function nhl_gamestate(L) {   // nhlua.c:1876
             }
         }
         (!!$c.peq(gg.gmst_ubak, $c.asArr(null, 'ptr')) ? 1 : 0) ? $c.__assert_rtn($c.lit("nhl_gamestate"), $c.lit("nhlua.c"), 1906, $c.lit("gg.gmst_ubak != NULL")) : 0;
-        $c.__builtin___memcpy_chk(u, gg.gmst_ubak, 2760, 2760);
+        $c.memcpy(u, gg.gmst_ubak, 2760);
         (!!$c.peq(gg.gmst_disco, $c.asArr(null, 'ptr')) ? 1 : 0) ? $c.__assert_rtn($c.lit("nhl_gamestate"), $c.lit("nhlua.c"), 1908, $c.lit("gg.gmst_disco != NULL")) : 0;
-        $c.__builtin___memcpy_chk(new $c.Ptr([svd.disco], 0), gg.gmst_disco, 962, 964);
+        $c.memcpy(new $c.Ptr([svd.disco], 0), gg.gmst_disco, 962);
         (!!$c.peq(gg.gmst_mvitals, $c.asArr(null, 'ptr')) ? 1 : 0) ? $c.__assert_rtn($c.lit("nhl_gamestate"), $c.lit("nhlua.c"), 1911, $c.lit("gg.gmst_mvitals != NULL")) : 0;
-        $c.__builtin___memcpy_chk(new $c.Ptr([svm.mvitals], 0), gg.gmst_mvitals, 1532, 1536);
+        $c.memcpy(new $c.Ptr([svm.mvitals], 0), gg.gmst_mvitals, 1532);
         /* clear user-given object type names */
         for (otyp = 0; otyp < NUM_OBJECTS; otyp = otyp + 1 | 0) {
             if (objects[otyp].oc_uname) {
@@ -1445,7 +1445,7 @@ async function nhl_gamestate(L) {   // nhlua.c:1876
         await init_uhunger();
         await free_tutorial();   /* release gg.gmst_XYZ */
         gg.gmst_stored = FALSE;
-        $c.__builtin___memcpy_chk($c.relem(svs.spl_book, 0), $c.relem(gg.gmst_spl_book, 0), 344, 352);
+        $c.memcpy($c.relem(svs.spl_book, 0), $c.relem(gg.gmst_spl_book, 0), 344);
     } else if (!reststate && !gg.gmst_stored) {
         /* store game state */
         gg.gmst_moves = svm.moves;
@@ -1459,13 +1459,13 @@ async function nhl_gamestate(L) {   // nhlua.c:1876
         }
         gl.lastinvnr = 51;   /* next inv letter to try to use will be 'a' */
         $t1 = $c.asArr(await alloc(2760), 'ptr'), gg.gmst_ubak = $t1;
-        $c.__builtin___memcpy_chk(gg.gmst_ubak, u, 2760, -1);
+        $c.memcpy(gg.gmst_ubak, u, 2760);
         $t2 = $c.asArr(await alloc(962), 'ptr'), gg.gmst_disco = $t2;
-        $c.__builtin___memcpy_chk(gg.gmst_disco, new $c.Ptr([svd.disco], 0), 962, -1);
+        $c.memcpy(gg.gmst_disco, new $c.Ptr([svd.disco], 0), 962);
         $t3 = $c.asArr(await alloc(1532), 'ptr'), gg.gmst_mvitals = $t3;
-        $c.__builtin___memcpy_chk(gg.gmst_mvitals, new $c.Ptr([svm.mvitals], 0), 1532, -1);
-        $c.__builtin___memcpy_chk($c.relem(gg.gmst_spl_book, 0), $c.relem(svs.spl_book, 0), 344, 376);
-        $c.__builtin___memset_chk($c.relem(svs.spl_book, 0), 0, 344, 352);
+        $c.memcpy(gg.gmst_mvitals, new $c.Ptr([svm.mvitals], 0), 1532);
+        $c.memcpy($c.relem(gg.gmst_spl_book, 0), $c.relem(svs.spl_book, 0), 344);
+        $c.memset($c.relem(svs.spl_book, 0), 0, 344);
         gg.gmst_stored = TRUE;
     } else {
         await impossible($c.lit("nhl_gamestate: inconsistent state (%s vs %s)"), reststate ? $c.lit("restore") : $c.lit("save"), gg.gmst_stored ? $c.lit("already stored") : $c.lit("not stored"));
@@ -1674,7 +1674,7 @@ export async function nhl_loadlua(L, fname) {   // nhlua.c:2338
     /* don't know whether 'fname' is inside a dlb container;
        if we did, we could choose between "nhdat(<fname>)" and "<fname>"
        but since we don't, compromise */
-    $c.__builtin___sprintf_chk(altfname, 0, -1, $c.lit("(%s)"), fname);
+    $c.sprintf(altfname, $c.lit("(%s)"), fname);
     fh = $c.fopen(fname, $c.lit("r"));
     give_up$: {
         if (!fh) {
@@ -1878,12 +1878,12 @@ export async function get_lua_version() {   // nhlua.c:2570
                         vs = vs.add(1);
                     }
                 }
-                $c.__builtin___strcpy_chk(new $c.Ptr(gl.lua_ver, 0), vs, 20);
+                $c.strcpy(new $c.Ptr(gl.lua_ver, 0), vs);
             }
         }
         await nhl_done(L);
         if (1) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(gl.lua_copyright, 0), $c.lit("Lua 5.4.8  Copyright (C) 1994-2025 Lua.org, PUC-Rio"), 120);
+            $c.strcpy(new $c.Ptr(gl.lua_copyright, 0), $c.lit("Lua 5.4.8  Copyright (C) 1994-2025 Lua.org, PUC-Rio"));
         }
     }
     return new $c.Ptr(gl.lua_ver, 0);
@@ -2111,7 +2111,7 @@ function nhl_warn(userdata, msg_fragment, to_be_continued) {   // nhlua.c:3171
         if ($c.addu64(buflen, fraglen) > 255) {
             fraglen = $c.subu64(255, buflen);
         }
-        $c.__builtin___strncat_chk(new $c.Ptr(gl.lua_warnbuf, 0), msg_fragment, fraglen, 256);
+        $c.strncat(new $c.Ptr(gl.lua_warnbuf, 0), msg_fragment, fraglen);
     }
     if (!to_be_continued) {
         paniclog($c.lit("[lua]"), new $c.Ptr(gl.lua_warnbuf, 0));

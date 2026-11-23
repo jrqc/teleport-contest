@@ -48,7 +48,7 @@ export async function dumplogmsg(line) {   // pline.c:22
     if (oldest && $c.strlen(oldest) >= $c.strlen(line)) {
         /* this buffer will gradually shrink until the 'else' is needed;
            there's no pressing need to track allocation size instead */
-        $c.__builtin___strcpy_chk(oldest, line, -1);
+        $c.strcpy(oldest, line);
     } else {
         if (oldest) {
             $c.free(oldest);
@@ -146,9 +146,9 @@ async function vpline(line, the_args) {   // pline.c:153
     if (a11y.accessiblemsg && isok(a11y_mesgxy.x, a11y_mesgxy.y)) {
         dirstr = coord_desc(a11y_mesgxy.x, a11y_mesgxy.y, new $c.Ptr(dirstrbuf, 0), $c.i8(iflags.getpos_coords === 110 ? 102 : iflags.getpos_coords));
         tmp = $c.asArr(await alloc($c.u32($c.addu64($c.addu64($c.strlen(line), 3), $c.strlen(dirstr)))), Int8Array);
-        $c.__builtin___strcpy_chk(tmp, dirstr, -1);
-        $c.__builtin___strcat_chk(tmp, $c.lit(": "), -1);
-        $c.__builtin___strcat_chk(tmp, line, -1);
+        $c.strcpy(tmp, dirstr);
+        $c.strcat(tmp, $c.lit(": "));
+        $c.strcat(tmp, line);
         await vpline(tmp, the_args);
         $c.free(tmp);
         return;
@@ -164,7 +164,7 @@ async function vpline(line, the_args) {   // pline.c:153
         ln = $c.i32($c.strlen(line));
     } else {
         /* perform printf() formatting */
-        ln = $c.__builtin___vsnprintf_chk(new $c.Ptr(pbuf, 0), 1280, 0, 1280, line, the_args);
+        ln = $c.vsnprintf(new $c.Ptr(pbuf, 0), 1280, line, the_args);
         line = new $c.Ptr(pbuf, 0);
         /* note: 'ln' is number of characters attempted, not necessarily
            strlen(line); that matters for the overflow check; if we avoid
@@ -178,7 +178,7 @@ async function vpline(line, the_args) {   // pline.c:153
            3 chars: "___ extremely long text" -> "___ extremely l...ext"
            (this may be suboptimal if overflow is less than 3) */
         if (!$c.peq(line, new $c.Ptr(pbuf, 0))) {   /* no '%' was present or format was just "%s" */
-            $c.__builtin___strncpy_chk(new $c.Ptr(pbuf, 0), line, BUFSZ - 1, 1280);   /* caveat: unterminated */
+            $c.strncpy(new $c.Ptr(pbuf, 0), line, BUFSZ - 1);   /* caveat: unterminated */
         }
         $t3 = ($t2 = pbuf[BUFSZ - 1 - 4] = 46, pbuf[BUFSZ - 1 - 5] = $t2), pbuf[BUFSZ - 1 - 6] = $t3;
         /* avoid strncpy; buffers could overlap if excess is small */
@@ -233,7 +233,7 @@ async function vpline(line, the_args) {   // pline.c:153
         await execplinehandler(line);
         /* this gets cleared after every pline message */
         iflags.last_msg = PLNMSG.UNKNOWN;
-        $c.__builtin___strncpy_chk(new $c.Ptr(gp.prevmsg, 0), line, BUFSZ, 256), gp.prevmsg[BUFSZ - 1] = 0;
+        $c.strncpy(new $c.Ptr(gp.prevmsg, 0), line, BUFSZ), gp.prevmsg[BUFSZ - 1] = 0;
         if (msgtyp === MSGTYP.STOP) {
             await display_nhwindow()($G.WIN_MESSAGE, TRUE);   /* --more-- */
         }
@@ -293,42 +293,42 @@ export function free_youbuf() {   // pline.c:351
 export async function You(line, ...$va) {   // pline.c:366
     let the_args = null, tmp = null;
     the_args = new $c.VaList($va);
-    await vpline($c.__builtin___strcat_chk(($c.__builtin___strcpy_chk(tmp = await You_buf($c.i32($c.addu64($c.strlen(line), 5))), $c.lit("You "), -1), tmp), line, -1), the_args);
+    await vpline($c.strcat(($c.strcpy(tmp = await You_buf($c.i32($c.addu64($c.strlen(line), 5))), $c.lit("You ")), tmp), line), the_args);
     void 0;
 }
 export async function Your(line, ...$va) {   // pline.c:377
     let the_args = null, tmp = null;
     the_args = new $c.VaList($va);
-    await vpline($c.__builtin___strcat_chk(($c.__builtin___strcpy_chk(tmp = await You_buf($c.i32($c.addu64($c.strlen(line), 6))), $c.lit("Your "), -1), tmp), line, -1), the_args);
+    await vpline($c.strcat(($c.strcpy(tmp = await You_buf($c.i32($c.addu64($c.strlen(line), 6))), $c.lit("Your ")), tmp), line), the_args);
     void 0;
 }
 export async function You_feel(line, ...$va) {   // pline.c:388
     let the_args = null, tmp = null;
     the_args = new $c.VaList($va);
     if (Unaware()) {
-        $c.__builtin___strcpy_chk(tmp = await You_buf($c.i32($c.addu64($c.strlen(line), 25))), $c.lit("You dream that you feel "), -1);
+        $c.strcpy(tmp = await You_buf($c.i32($c.addu64($c.strlen(line), 25))), $c.lit("You dream that you feel "));
     } else {
-        $c.__builtin___strcpy_chk(tmp = await You_buf($c.i32($c.addu64($c.strlen(line), 10))), $c.lit("You feel "), -1);
+        $c.strcpy(tmp = await You_buf($c.i32($c.addu64($c.strlen(line), 10))), $c.lit("You feel "));
     }
-    await vpline($c.__builtin___strcat_chk(tmp, line, -1), the_args);
+    await vpline($c.strcat(tmp, line), the_args);
     void 0;
 }
 export async function You_cant(line, ...$va) {   // pline.c:403
     let the_args = null, tmp = null;
     the_args = new $c.VaList($va);
-    await vpline($c.__builtin___strcat_chk(($c.__builtin___strcpy_chk(tmp = await You_buf($c.i32($c.addu64($c.strlen(line), 11))), $c.lit("You can't "), -1), tmp), line, -1), the_args);
+    await vpline($c.strcat(($c.strcpy(tmp = await You_buf($c.i32($c.addu64($c.strlen(line), 11))), $c.lit("You can't ")), tmp), line), the_args);
     void 0;
 }
 export async function pline_The(line, ...$va) {   // pline.c:414
     let the_args = null, tmp = null;
     the_args = new $c.VaList($va);
-    await vpline($c.__builtin___strcat_chk(($c.__builtin___strcpy_chk(tmp = await You_buf($c.i32($c.addu64($c.strlen(line), 5))), $c.lit("The "), -1), tmp), line, -1), the_args);
+    await vpline($c.strcat(($c.strcpy(tmp = await You_buf($c.i32($c.addu64($c.strlen(line), 5))), $c.lit("The ")), tmp), line), the_args);
     void 0;
 }
 export async function There(line, ...$va) {   // pline.c:425
     let the_args = null, tmp = null;
     the_args = new $c.VaList($va);
-    await vpline($c.__builtin___strcat_chk(($c.__builtin___strcpy_chk(tmp = await You_buf($c.i32($c.addu64($c.strlen(line), 7))), $c.lit("There "), -1), tmp), line, -1), the_args);
+    await vpline($c.strcat(($c.strcpy(tmp = await You_buf($c.i32($c.addu64($c.strlen(line), 7))), $c.lit("There ")), tmp), line), the_args);
     void 0;
 }
 export async function You_hear(line, ...$va) {   // pline.c:436
@@ -338,26 +338,26 @@ export async function You_hear(line, ...$va) {   // pline.c:436
     }
     the_args = new $c.VaList($va);
     if (Underwater()) {
-        $c.__builtin___strcpy_chk(tmp = await You_buf($c.i32($c.addu64($c.strlen(line), 17))), $c.lit("You barely hear "), -1);
+        $c.strcpy(tmp = await You_buf($c.i32($c.addu64($c.strlen(line), 17))), $c.lit("You barely hear "));
     } else if (Unaware()) {
-        $c.__builtin___strcpy_chk(tmp = await You_buf($c.i32($c.addu64($c.strlen(line), 25))), $c.lit("You dream that you hear "), -1);
+        $c.strcpy(tmp = await You_buf($c.i32($c.addu64($c.strlen(line), 25))), $c.lit("You dream that you hear "));
     } else {
-        $c.__builtin___strcpy_chk(tmp = await You_buf($c.i32($c.addu64($c.strlen(line), 10))), $c.lit("You hear "), -1);   /* Deaf-aware */
+        $c.strcpy(tmp = await You_buf($c.i32($c.addu64($c.strlen(line), 10))), $c.lit("You hear "));   /* Deaf-aware */
     }
-    await vpline($c.__builtin___strcat_chk(tmp, line, -1), the_args);
+    await vpline($c.strcat(tmp, line), the_args);
     void 0;
 }
 export async function You_see(line, ...$va) {   // pline.c:455
     let the_args = null, tmp = null;
     the_args = new $c.VaList($va);
     if (Unaware()) {
-        $c.__builtin___strcpy_chk(tmp = await You_buf($c.i32($c.addu64($c.strlen(line), 24))), $c.lit("You dream that you see "), -1);
+        $c.strcpy(tmp = await You_buf($c.i32($c.addu64($c.strlen(line), 24))), $c.lit("You dream that you see "));
     } else if (Blind()) {   /* caller should have caught this... */
-        $c.__builtin___strcpy_chk(tmp = await You_buf($c.i32($c.addu64($c.strlen(line), 11))), $c.lit("You sense "), -1);
+        $c.strcpy(tmp = await You_buf($c.i32($c.addu64($c.strlen(line), 11))), $c.lit("You sense "));
     } else {
-        $c.__builtin___strcpy_chk(tmp = await You_buf($c.i32($c.addu64($c.strlen(line), 9))), $c.lit("You see "), -1);
+        $c.strcpy(tmp = await You_buf($c.i32($c.addu64($c.strlen(line), 9))), $c.lit("You see "));
     }
-    await vpline($c.__builtin___strcat_chk(tmp, line, -1), the_args);
+    await vpline($c.strcat(tmp, line), the_args);
     void 0;
 }
 /* Print a message inside double-quotes.
@@ -369,9 +369,9 @@ export async function verbalize(line, ...$va) {   // pline.c:476
     the_args = new $c.VaList($va);
     gp.pline_flags = (gp.pline_flags | PLINE_VERBALIZE) >>> 0;
     tmp = await You_buf($c.i32($c.addu64($c.u64($c.i32($c.strlen(line))), 3)));
-    $c.__builtin___strcpy_chk(tmp, $c.lit("\""), -1);
-    $c.__builtin___strcat_chk(tmp, line, -1);
-    $c.__builtin___strcat_chk(tmp, $c.lit("\""), -1);
+    $c.strcpy(tmp, $c.lit("\""));
+    $c.strcat(tmp, line);
+    $c.strcat(tmp, $c.lit("\""));
     await vpline(tmp, the_args);
     gp.pline_flags = (gp.pline_flags & 4294967279) >>> 0;
     void 0;
@@ -396,7 +396,7 @@ export async function gamelog_add(glflags, gltime, str) {   // pline.c:495
 export async function livelog_printf(ll_type, line, ...$va) {   // pline.c:514
     let gamelogbuf = new Int8Array(512), the_args = null;
     the_args = new $c.VaList($va);
-    $c.__builtin___vsnprintf_chk(new $c.Ptr(gamelogbuf, 0), 512, 0, 512, line, the_args);
+    $c.vsnprintf(new $c.Ptr(gamelogbuf, 0), 512, line, the_args);
     void 0;
     await gamelog_add(ll_type, svm.moves, new $c.Ptr(gamelogbuf, 0));
     strNsubst(new $c.Ptr(gamelogbuf, 0), $c.lit("\t"), $c.lit("_"), 0);
@@ -415,12 +415,12 @@ async function vraw_printf(line, the_args) {   // pline.c:563
     let pbuf = new Int8Array(1280);
     /* will be chopped down to BUFSZ-1 if longer */
     if ($c.strchr(line, 37)) {
-        $c.__builtin___vsnprintf_chk(new $c.Ptr(pbuf, 0), 1280, 0, 1280, line, the_args);
+        $c.vsnprintf(new $c.Ptr(pbuf, 0), 1280, line, the_args);
         line = new $c.Ptr(pbuf, 0);
     }
     if ($c.i32($c.strlen(line)) > BUFSZ - 1) {
         if (!$c.peq(line, new $c.Ptr(pbuf, 0))) {
-            line = $c.__builtin___strncpy_chk(new $c.Ptr(pbuf, 0), line, BUFSZ - 1, 1280);
+            line = $c.strncpy(new $c.Ptr(pbuf, 0), line, BUFSZ - 1);
         }
         /* unlike pline, we don't futz around to keep last few chars */
         pbuf[BUFSZ - 1] = 0;   /* terminate strncpy or truncate vsprintf */
@@ -439,7 +439,7 @@ export async function impossible(s, ...$va) {   // pline.c:584
         await panic($c.lit("impossible called impossible"));
     }
     program_state.in_impossible = 1;
-    $c.__builtin___vsnprintf_chk(new $c.Ptr(pbuf, 0), 1280, 0, 1280, s, the_args);
+    $c.vsnprintf(new $c.Ptr(pbuf, 0), 1280, s, the_args);
     void 0;
     pbuf[BUFSZ - 1] = 0;   /* sanity */
     paniclog($c.lit("impossible"), new $c.Ptr(pbuf, 0));
@@ -454,9 +454,9 @@ export async function impossible(s, ...$va) {   // pline.c:584
         program_state.in_impossible = 0;
         return;
     }
-    $c.__builtin___strcpy_chk(new $c.Ptr(pbuf2, 0), $c.lit("Program in disorder!"), 256);
+    $c.strcpy(new $c.Ptr(pbuf2, 0), $c.lit("Program in disorder!"));
     if (program_state.something_worth_saving) {
-        $c.__builtin___strcat_chk(new $c.Ptr(pbuf2, 0), $c.lit("  (Saving and reloading may fix this problem.)"), 256);
+        $c.strcat(new $c.Ptr(pbuf2, 0), $c.lit("  (Saving and reloading may fix this problem.)"));
     }
     await pline($c.lit("%s"), new $c.Ptr(pbuf2, 0));
     await pline($c.lit("Please report these messages to %s."), $c.lit("devteam@nethack.org"));

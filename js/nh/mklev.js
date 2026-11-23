@@ -539,9 +539,9 @@ async function alloc_doors() {   // mklev.c:556
     if (!svd.doors || gd.doorindex >= svd.doors_alloc) {
         c = svd.doors_alloc + DOORINC | 0;
         doortmp = $c.asRec(await alloc($c.u32($c.mulu64($c.u64(c), 4))), $T.nhcoord, 4);
-        $c.__builtin___memset_chk(doortmp, 0, $c.mulu64($c.u64(c), 4), -1);
+        $c.memset(doortmp, 0, $c.mulu64($c.u64(c), 4));
         if (svd.doors) {
-            $c.__builtin___memcpy_chk(doortmp, svd.doors, $c.mulu64($c.u64(svd.doors_alloc), 4), -1);
+            $c.memcpy(doortmp, svd.doors, $c.mulu64($c.u64(svd.doors_alloc), 4));
             $c.free(svd.doors);
         }
         svd.doors = doortmp;
@@ -1111,10 +1111,10 @@ async function makelevel() {   // mklev.c:1251
     } else if (svd.dungeons[u.uz.dnum].fill_lvl[0]) {
         await makemaz(new $c.Ptr(svd.dungeons[u.uz.dnum].fill_lvl, 0));
     } else if (In_quest(u.uz)) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(fillname, 0), 0, 9, $c.lit("%s-loca"), gu.urole.filecode);
+        $c.sprintf(new $c.Ptr(fillname, 0), $c.lit("%s-loca"), gu.urole.filecode);
         loc_lev = find_level(new $c.Ptr(fillname, 0));
-        $c.__builtin___sprintf_chk(new $c.Ptr(fillname, 0), 0, 9, $c.lit("%s-fil"), gu.urole.filecode);
-        $c.__builtin___strcat_chk(new $c.Ptr(fillname, 0), u.uz.dlevel < loc_lev.dlevel.dlevel ? $c.lit("a") : $c.lit("b"), 9);
+        $c.sprintf(new $c.Ptr(fillname, 0), $c.lit("%s-fil"), gu.urole.filecode);
+        $c.strcat(new $c.Ptr(fillname, 0), u.uz.dlevel < loc_lev.dlevel.dlevel ? $c.lit("a") : $c.lit("b"));
         await makemaz(new $c.Ptr(fillname, 0));
     } else if (In_hell(u.uz) || rn2(5) && u.uz.dnum === svd.dungeon_topology.d_medusa_level.dnum && depth(u.uz) > depth(svd.dungeon_topology.d_medusa_level)) {
         await makemaz($c.lit(""));

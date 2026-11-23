@@ -148,7 +148,7 @@ export function mon_track_add(mtmp, x, y) {   // monmove.c:78
     mtmp.mtrack[0].y = y;
 }
 export function mon_track_clear(mtmp) {   // monmove.c:89
-    $c.__builtin___memset_chk($c.relem(mtmp.mtrack, 0), 0, 16, -1);
+    $c.memset($c.relem(mtmp.mtrack, 0), 0, 16);
 }
 /* check whether a monster is carrying a locking/unlocking tool */
 export function monhaskey(mon, for_unlocking) {   // monmove.c:96
@@ -1117,7 +1117,7 @@ async function maybe_spin_web(mtmp) {   // monmove.c:1269
         if (rn2(1000) < prob && (trap = await maketrap(mtmp.mx, mtmp.my, WEB)) !== null) {
             $t1 = d(4, 4), mtmp.mspec_used = $t1;   /* 4..16 */
             if (cansee(mtmp.mx, mtmp.my)) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(mbuf, 0), canseemon(mtmp) || sensemon(mtmp) ? await y_monnam(mtmp) : c_common_strings.c_something, 256);
+                $c.strcpy(new $c.Ptr(mbuf, 0), canseemon(mtmp) || sensemon(mtmp) ? await y_monnam(mtmp) : c_common_strings.c_something);
                 await pline_mon(mtmp, $c.lit("%s spins a web."), upstart(new $c.Ptr(mbuf, 0)));
                 trap.tseen = (1) & 1;
             }

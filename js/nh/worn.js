@@ -369,11 +369,11 @@ export async function check_wornmask_slots() {   // worn.c:355
                 }
             }
             if (!otmp) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(whybuf, 0), 0, 256, $c.lit("%s (%s) not found in invent"), wp.w_what, fmt_ptr(o));
+                $c.sprintf(new $c.Ptr(whybuf, 0), $c.lit("%s (%s) not found in invent"), wp.w_what, fmt_ptr(o));
             } else if ($c.and64(o.owornmask, m) === 0) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(whybuf, 0), 0, 256, $c.lit("%s bit not set in owornmask [0x%08lx]"), wp.w_what, o.owornmask);
+                $c.sprintf(new $c.Ptr(whybuf, 0), $c.lit("%s bit not set in owornmask [0x%08lx]"), wp.w_what, o.owornmask);
             } else if ($c.and64(o.owornmask, $c.not64($c.or64(m, IGNORE_SLOTS))) !== 0) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(whybuf, 0), 0, 256, $c.lit("%s wrong bit set in owornmask [0x%08lx]"), wp.w_what, o.owornmask);
+                $c.sprintf(new $c.Ptr(whybuf, 0), $c.lit("%s wrong bit set in owornmask [0x%08lx]"), wp.w_what, o.owornmask);
             }
             if (whybuf[0]) {
                 await impossible($c.lit("Worn-slot insanity: %s."), new $c.Ptr(whybuf, 0));
@@ -388,7 +388,7 @@ export async function check_wornmask_slots() {   // worn.c:355
                give a false complaint about item other than uarm having
                W_ARM bit set if we didn't screen it out here */
             if (!$c.peq(otmp, o) && $c.and64(otmp.owornmask, m) !== 0 && (m !== W.ARM || !$c.peq(otmp, $G.uskin) || $c.and64(otmp.owornmask, I_SPECIAL) === 0)) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(whybuf, 0), 0, 256, $c.lit("%s [0x%08lx] has %s mask 0x%08lx bit set"), await simpleonames(otmp), otmp.owornmask, wp.w_what, m);
+                $c.sprintf(new $c.Ptr(whybuf, 0), $c.lit("%s [0x%08lx] has %s mask 0x%08lx bit set"), await simpleonames(otmp), otmp.owornmask, wp.w_what, m);
                 await impossible($c.lit("Worn-slot insanity: %s."), new $c.Ptr(whybuf, 0));
             }
         }
@@ -725,7 +725,7 @@ async function m_dowear_type(mon, flag, creation, racialexception) {   // worn.c
         return;   /* probably putting previous item on */
     }
     /* Get a copy of monster's name before altering its visibility */
-    $c.__builtin___strcpy_chk(new $c.Ptr(nambuf, 0), u.uprops[SEE_INVIS].intrinsic || u.uprops[SEE_INVIS].extrinsic ? await Monnam(mon) : await mon_nam(mon), 256);
+    $c.strcpy(new $c.Ptr(nambuf, 0), u.uprops[SEE_INVIS].intrinsic || u.uprops[SEE_INVIS].extrinsic ? await Monnam(mon) : await mon_nam(mon));
     old = await which_armor(mon, flag);
     if (old && old.cursed | 0) {
         return;
@@ -846,12 +846,12 @@ async function m_dowear_type(mon, flag, creation, racialexception) {   // worn.c
             /* "<Mon> [removes <oldarm> and ]puts on <newarm>."
                uses accessory verbs for armor but we can live with that */
             if (old) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(oldarm, 0), await distant_name(old, doname), 256);
+                $c.strcpy(new $c.Ptr(oldarm, 0), await distant_name(old, doname));
                 nh_snprintf($c.lit("m_dowear_type"), 932, new $c.Ptr(buf, 0), 256, $c.lit(" removes %s and"), new $c.Ptr(oldarm, 0));
             } else {
                 $t1 = oldarm[0] = 0, buf[0] = $t1;
             }
-            $c.__builtin___strcpy_chk(new $c.Ptr(newarm, 0), await distant_name(best, doname), 265);
+            $c.strcpy(new $c.Ptr(newarm, 0), await distant_name(best, doname));
             /* a monster will swap an item of the same type as the one it
                is replacing when the enchantment is better;
                if newarm and oldarm have identical descriptions, substitute
@@ -1203,7 +1203,7 @@ export async function mon_break_armor(mon, polyspot) {   // worn.c:1177
         await You($c.lit("can no longer ride %s."), await mon_nam(mon));
         if (touch_petrifies(u.usteed.data) && !Stone_resistance() && rnl(3)) {
             await You($c.lit("touch %s."), await mon_nam(u.usteed));
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("falling off %s"), await an(pmname(u.usteed.data, Mgender(u.usteed))));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("falling off %s"), await an(pmname(u.usteed.data, Mgender(u.usteed))));
             await instapetrify(new $c.Ptr(buf, 0));
         }
         await dismount_steed(DISMOUNT.FELL);

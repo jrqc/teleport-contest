@@ -241,7 +241,7 @@ export async function losexp(drainer) {   // exper.c:207
         if (drainer) {
             svk.killer.format = KILLED.BY;
             if (!$c.peq(new $c.Ptr(svk.killer.name, 0), drainer)) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), drainer, 256);
+                $c.strcpy(new $c.Ptr(svk.killer.name, 0), drainer);
             }
             await done(DIED);
         }

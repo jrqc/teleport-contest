@@ -481,7 +481,7 @@ export async function pick_lock(pick, rx, ry, container) {   // lock.c:358
                 } else if (autounlock && (flags.autounlock & AUTOUNLOCK.APPLY_KEY) >>> 0 !== 0) {
                     c = 113;
                     if (!$c.peq(pick, dummypick)) {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Unlock it with %s?"), await yname(pick));
+                        $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("Unlock it with %s?"), await yname(pick));
                         c = await ynq(new $c.Ptr(qbuf, 0));
                     }
                     if (c !== 121) {
@@ -489,7 +489,7 @@ export async function pick_lock(pick, rx, ry, container) {   // lock.c:358
                     }
                 } else {
                     /* "There is <a box> here; <verb> <it|its lock>?" */
-                    $c.__builtin___sprintf_chk(new $c.Ptr(qsfx, 0), 0, 128, $c.lit(" here; %s %s?"), verb, it ? $c.lit("it") : $c.lit("its lock"));
+                    $c.sprintf(new $c.Ptr(qsfx, 0), $c.lit(" here; %s %s?"), verb, it ? $c.lit("it") : $c.lit("its lock"));
                     await safe_qbuf(new $c.Ptr(qbuf, 0), $c.lit("There is "), new $c.Ptr(qsfx, 0), otmp, doname, ansimpleoname, $c.lit("a box"));
                     otmp.lknown = (1) & 1;
                     c = await ynq(new $c.Ptr(qbuf, 0));
@@ -602,7 +602,7 @@ export async function pick_lock(pick, rx, ry, container) {   // lock.c:358
                     await You_cant($c.lit("lock a door with a credit card."));
                     return PICKLOCK_LEARNED_SOMETHING;
                 }
-                $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("%s it%s%s?"), (door.flags | 0) & D.LOCKED ? $c.lit("Unlock") : $c.lit("Lock"), autounlock ? $c.lit(" with ") : $c.lit(""), autounlock ? await yname(pick) : $c.lit(""));
+                $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("%s it%s%s?"), (door.flags | 0) & D.LOCKED ? $c.lit("Unlock") : $c.lit("Lock"), autounlock ? $c.lit(" with ") : $c.lit(""), autounlock ? await yname(pick) : $c.lit(""));
                 c = await ynq(new $c.Ptr(qbuf, 0));
                 if (c !== 121) {
                     return PICKLOCK_DID_NOTHING;
@@ -863,7 +863,7 @@ async function obstructed(x, y, quietly) {   // lock.c:926
                 if (!quietly) {
                     Mn = await Some_Monnam(mtmp);   /* Monnam, Someone or Something */
                     if ((mtmp.mx !== x || mtmp.my !== y) && canspotmon(mtmp)) {   /* s_suffix() returns a modifiable buffer */
-                        Mn = $c.__builtin___strcat_chk(s_suffix(Mn), $c.lit(" tail"), -1);
+                        Mn = $c.strcat(s_suffix(Mn), $c.lit(" tail"));
                     }
                     await pline($c.lit("%s blocks the way!"), Mn);
                 }

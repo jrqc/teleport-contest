@@ -334,15 +334,15 @@ async function e_nam(etmp) {   // dbridge.c:351
  * verb, where necessary.
  */
 async function E_phrase(etmp, verb) {   // dbridge.c:361
-    $c.__builtin___strcpy_chk(new $c.Ptr(E_phrase$wholebuf, 0), $c.peq(etmp.emon, gy.youmonst) ? $c.lit("You") : await Monnam(etmp.emon), 80);
+    $c.strcpy(new $c.Ptr(E_phrase$wholebuf, 0), $c.peq(etmp.emon, gy.youmonst) ? $c.lit("You") : await Monnam(etmp.emon));
     if (!verb || !verb.get(0)) {
         return new $c.Ptr(E_phrase$wholebuf, 0);
     }
-    $c.__builtin___strcat_chk(new $c.Ptr(E_phrase$wholebuf, 0), $c.lit(" "), 80);
+    $c.strcat(new $c.Ptr(E_phrase$wholebuf, 0), $c.lit(" "));
     if (is_u(etmp)) {
-        $c.__builtin___strcat_chk(new $c.Ptr(E_phrase$wholebuf, 0), verb, 80);
+        $c.strcat(new $c.Ptr(E_phrase$wholebuf, 0), verb);
     } else {
-        $c.__builtin___strcat_chk(new $c.Ptr(E_phrase$wholebuf, 0), await vtense(null, verb), 80);
+        $c.strcat(new $c.Ptr(E_phrase$wholebuf, 0), await vtense(null, verb));
     }
     return new $c.Ptr(E_phrase$wholebuf, 0);
 }
@@ -378,7 +378,7 @@ async function e_died(etmp, xkill_flags, how) {   // dbridge.c:402
             /* use more specific killer if specified */
             if (!svk.killer.name[0]) {
                 svk.killer.format = KILLED.BY_AN;
-                $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), $c.lit("falling drawbridge"), 256);
+                $c.strcpy(new $c.Ptr(svk.killer.name, 0), $c.lit("falling drawbridge"));
             }
             await done(how);
             /* So, you didn't die */
@@ -556,7 +556,7 @@ async function do_entity(etmp) {   // dbridge.c:554
         if (crm.typ === DRAWBRIDGE_DOWN) {
             if (is_u(etmp)) {
                 svk.killer.format = NO_KILLER_PREFIX;
-                $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), $c.lit("crushed to death underneath a drawbridge"), 256);
+                $c.strcpy(new $c.Ptr(svk.killer.name, 0), $c.lit("crushed to death underneath a drawbridge"));
             }
             await pline($c.lit("%s crushed underneath the drawbridge."), await E_phrase(etmp, $c.lit("are")));   /* no jump */
             await e_died(etmp, XKILL.NOCORPSE | (e_inview ? XKILL.GIVEMSG : XKILL.NOMSG), CRUSHING);   /* no corpse */
@@ -728,7 +728,7 @@ async function do_entity(etmp) {   // dbridge.c:554
         }
         if (!e_survives_at(etmp, $c.i16(etmp.ex), $c.i16(etmp.ey))) {
             svk.killer.format = KILLED.BY_AN;
-            $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), $c.lit("closing drawbridge"), 256);
+            $c.strcpy(new $c.Ptr(svk.killer.name, 0), $c.lit("closing drawbridge"));
             await e_died(etmp, XKILL.NOMSG, CRUSHING);
             return;
         }
@@ -777,7 +777,7 @@ async function do_entity(etmp) {   // dbridge.c:554
             }
         }
         svk.killer.format = NO_KILLER_PREFIX;
-        $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), $c.lit("fell from a drawbridge"), 256);
+        $c.strcpy(new $c.Ptr(svk.killer.name, 0), $c.lit("fell from a drawbridge"));
         /* CRUSHING is arbitrary */
         await e_died(etmp, XKILL.NOCORPSE | (e_inview ? XKILL.GIVEMSG : XKILL.NOMSG), is_pool($c.i16(etmp.ex), $c.i16(etmp.ey)) ? DROWNING : is_lava($c.i16(etmp.ex), $c.i16(etmp.ey)) ? BURNING : CRUSHING);   /*no corpse*/
         return;
@@ -978,7 +978,7 @@ export async function destroy_drawbridge(x, y) {   // dbridge.c:888
                 await pline($c.lit("%s blown apart by flying debris."), await E_phrase(etmp2, $c.lit("are")));
             }
             svk.killer.format = KILLED.BY_AN;
-            $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), $c.lit("exploding drawbridge"), 256);
+            $c.strcpy(new $c.Ptr(svk.killer.name, 0), $c.lit("exploding drawbridge"));
             await e_died(etmp2, XKILL.NOCORPSE | (e_inview ? XKILL.GIVEMSG : XKILL.NOMSG), CRUSHING);   /*no corpse*/
         }   /* nothing which is vulnerable can survive this */
     }
@@ -1020,7 +1020,7 @@ export async function destroy_drawbridge(x, y) {   // dbridge.c:888
                 }
             }
             svk.killer.format = KILLED.BY_AN;
-            $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), $c.lit("collapsing drawbridge"), 256);
+            $c.strcpy(new $c.Ptr(svk.killer.name, 0), $c.lit("collapsing drawbridge"));
             await e_died(etmp1, XKILL.NOCORPSE | (e_inview ? XKILL.GIVEMSG : XKILL.NOMSG), CRUSHING);   /*no corpse*/
             if (svl.level.locations[etmp1.ex][etmp1.ey].typ === MOAT) {
                 await do_entity(etmp1);

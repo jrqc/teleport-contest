@@ -83,9 +83,9 @@ export function regerror(errcode, preg, errbuf, errbuf_size) {   // regerror.c:1
             }
             if (errcode & 256) {
                 if ($h.i32[r >>> 2] !== 0) {
-                    $hl.__builtin___strcpy_chk($fp, $h.u32[(r + 8) >>> 2], -1);
+                    $hl.strcpy($fp, $h.u32[(r + 8) >>> 2]);
                 } else {
-                    $c.__builtin___sprintf_chk($h.P($fp), 0, -1, $h.P($h.lit("REG_0x%x")), target);
+                    $c.sprintf($h.P($fp), $h.P($h.lit("REG_0x%x")), target);
                 }
                 0;
                 s = $fp;
@@ -96,9 +96,9 @@ export function regerror(errcode, preg, errbuf, errbuf_size) {   // regerror.c:1
         len = $c.addu64($hl.strlen(s), 1);
         if (errbuf_size > 0) {
             if (errbuf_size > len) {
-                $hl.__builtin___strcpy_chk(errbuf, s, -1);
+                $hl.strcpy(errbuf, s);
             } else {
-                $h.A($c.__builtin___strncpy_chk($h.P(errbuf), $h.P(s), $c.subu64(errbuf_size, 1), -1));
+                $h.A($c.strncpy($h.P(errbuf), $h.P(s), $c.subu64(errbuf_size, 1)));
                 $h.i8[errbuf + $c.idx($c.subu64(errbuf_size, 1))] = 0;
             }
         }
@@ -119,7 +119,7 @@ function regatoi(preg, localbuf) {   // regerror.c:167
     if ($h.i32[r >>> 2] === 0) {
         return $h.lit("0");
     }
-    $c.__builtin___sprintf_chk($h.P(localbuf), 0, -1, $h.P($h.lit("%d")), $h.i32[r >>> 2]);
+    $c.sprintf($h.P(localbuf), $h.P($h.lit("%d")), $h.i32[r >>> 2]);
     return localbuf;
 }
 

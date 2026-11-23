@@ -496,7 +496,7 @@ async function loot_xname(obj) {   // invent.c:309
         /* give "towel" a suffix that will force wet ones to come first,
            moist ones next, and dry ones last regardless of whether
            they've been flagged as having spe known */
-        $c.__builtin___strcat_chk(res, obj.otyp === TOWEL && obj.spe > 0 ? obj.spe >= 3 ? $c.lit("x") : $c.lit("y") : $c.lit("z"), -1);
+        $c.strcat(res, obj.otyp === TOWEL && obj.spe > 0 ? obj.spe >= 3 ? $c.lit("x") : $c.lit("y") : $c.lit("z"));
     }
     if (obj.globby) {
         obj.owt = saveo.owt;
@@ -505,7 +505,7 @@ async function loot_xname(obj) {   // invent.c:309
            but globs with different bless/curse state won't merge so it is
            feasible to have multiple at the same location; add a suffix to
            get such sorted by size (small first) */
-        $c.__builtin___strcat_chk(res, obj.owt <= 100 ? $c.lit("a") : obj.owt <= 300 ? $c.lit("b") : obj.owt <= 500 ? $c.lit("c") : $c.lit("d"), -1);
+        $c.strcat(res, obj.owt <= 100 ? $c.lit("a") : obj.owt <= 300 ? $c.lit("b") : obj.owt <= 500 ? $c.lit("c") : $c.lit("d"));
     }
     if (save_oname && !obj.oartifact) {
         obj.oextra.oname = save_oname;
@@ -1286,7 +1286,7 @@ export async function hold_another_object(obj, drop_fmt, drop_arg, hold_msg) {  
                [should no longer be necessary now that perm_invent update is
                suppressed, but it's cheap to keep as a paranoid precaution] */
             if (drop_arg) {
-                drop_arg = $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), drop_arg, 256);
+                drop_arg = $c.strcpy(new $c.Ptr(buf, 0), drop_arg);
             }
             obj = await addinv_core0(obj, null, FALSE);
             if (inv_cnt(FALSE) > invlet_basic || (obj.otyp !== LOADSTONE || !obj.cursed) && near_capacity() > prev_encumbr) {
@@ -1609,7 +1609,7 @@ function taking_off(action) {   // invent.c:1672
 }
 async function mime_action(word) {   // invent.c:1678
     let buf = new Int8Array(256), bp = null, pfx = null, sfx = null;
-    $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), word, 256);
+    $c.strcpy(new $c.Ptr(buf, 0), word);
     bp = pfx = sfx = null;
     if ((bp = $c.strstr(new $c.Ptr(buf, 0), $c.lit(" on the "))) !== null) {
         /* rub on the stone[s] */
@@ -1640,15 +1640,15 @@ export function any_obj_ok(obj) {   // invent.c:1710
 /* return string describing your hands based on action. */
 async function getobj_hands_txt(action, qbuf) {   // invent.c:1719
     if (!$c.strcmp(action, $c.lit("grease"))) {
-        $c.__builtin___sprintf_chk(qbuf, 0, -1, $c.lit("your %s"), await fingers_or_gloves(FALSE));
+        $c.sprintf(qbuf, $c.lit("your %s"), await fingers_or_gloves(FALSE));
     } else if (!$c.strcmp(action, $c.lit("write with"))) {
-        $c.__builtin___sprintf_chk(qbuf, 0, -1, $c.lit("your %s"), await body_part(FINGERTIP));
+        $c.sprintf(qbuf, $c.lit("your %s"), await body_part(FINGERTIP));
     } else if (!$c.strcmp(action, $c.lit("wield"))) {
-        $c.__builtin___sprintf_chk(qbuf, 0, -1, $c.lit("your %s %s%s"), $G.uarmg ? $c.lit("gloved") : $c.lit("bare"), await makeplural(await body_part(HAND)), !$G.uwep ? $c.lit(" (wielded)") : $c.lit(""));
+        $c.sprintf(qbuf, $c.lit("your %s %s%s"), $G.uarmg ? $c.lit("gloved") : $c.lit("bare"), await makeplural(await body_part(HAND)), !$G.uwep ? $c.lit(" (wielded)") : $c.lit(""));
     } else if (!$c.strcmp(action, $c.lit("ready"))) {
-        $c.__builtin___sprintf_chk(qbuf, 0, -1, $c.lit("empty quiver%s"), !$G.uquiver ? $c.lit(" (nothing readied)") : $c.lit(""));
+        $c.sprintf(qbuf, $c.lit("empty quiver%s"), !$G.uquiver ? $c.lit(" (nothing readied)") : $c.lit(""));
     } else {
-        $c.__builtin___sprintf_chk(qbuf, 0, -1, $c.lit("your %s"), await makeplural(await body_part(HAND)));
+        $c.sprintf(qbuf, $c.lit("your %s"), await makeplural(await body_part(HAND)));
     }
     return qbuf;
 }
@@ -1822,7 +1822,7 @@ export async function getobj(word, obj_ok, ctrlflags) {   // invent.c:1752
         if (suggested === 0 && $c.pcmp(bp, new $c.Ptr(buf, 0)) > 0 && bp.get(-1) === 32) {
             (bp = bp.add(-1)).set(0, 0);
         }
-        $c.__builtin___strcpy_chk(new $c.Ptr(lets, 0), bp, 256);   /* necessary since we destroy buf */
+        $c.strcpy(new $c.Ptr(lets, 0), bp);   /* necessary since we destroy buf */
         if (suggested > 5) {   /* compactify string */
             compactify(bp);
         }
@@ -1834,7 +1834,7 @@ export async function getobj(word, obj_ok, ctrlflags) {   // invent.c:1752
         L1: for (; ; ) {
             cnt = 0;
             cntgiven = FALSE;
-            $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("What do you want to %s?"), word);
+            $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("What do you want to %s?"), word);
             if (gi.in_doagain) {
                 ilet = await readchar();
             } else if (iflags.force_invmenu) {
@@ -1849,9 +1849,9 @@ export async function getobj(word, obj_ok, ctrlflags) {   // invent.c:1752
                 oneloop = TRUE;
             } else {
                 if (!buf[0]) {
-                    $c.__builtin___strcat_chk(new $c.Ptr(qbuf, 0), $c.lit(" [*]"), 128);
+                    $c.strcat(new $c.Ptr(qbuf, 0), $c.lit(" [*]"));
                 } else {
-                    $c.__builtin___sprintf_chk(eos(new $c.Ptr(qbuf, 0)), 0, -1, $c.lit(" [%s or ?*]"), new $c.Ptr(buf, 0));
+                    $c.sprintf(eos(new $c.Ptr(qbuf, 0)), $c.lit(" [%s or ?*]"), new $c.Ptr(buf, 0));
                 }
                 ilet = await yn_function(new $c.Ptr(qbuf, 0), null, 0, FALSE);
             }
@@ -2115,7 +2115,7 @@ export async function ggetobj(word, fn, mx, combo, resultflags) {   // invent.c:
     }
     ilets[iletct] = 0;
     for (; ; ) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("What kinds of thing do you want to %s? [%s]"), word, new $c.Ptr(ilets, 0));
+        $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("What kinds of thing do you want to %s? [%s]"), word, new $c.Ptr(ilets, 0));
         await getlin(new $c.Ptr(qbuf, 0), new $c.Ptr(buf, 0));
         if (buf[0] === 27) {
             return 0;
@@ -2311,7 +2311,7 @@ export async function askchain(objchn, olets, allflag, fn, ckfn, mx, word) {   /
                            class of objects is involved, so prefix the first
                            object being queried here with an explanation why */
                         if (take_out || put_in) {
-                            $c.__builtin___sprintf_chk(new $c.Ptr(qpfx, 0), 0, 128, $c.lit("%s: "), word), ($t1 = highc(new $c.Ptr(qpfx, 0).get(0)), new $c.Ptr(qpfx, 0).set(0, $t1));
+                            $c.sprintf(new $c.Ptr(qpfx, 0), $c.lit("%s: "), word), ($t1 = highc(new $c.Ptr(qpfx, 0).get(0)), new $c.Ptr(qpfx, 0).set(0, $t1));
                         }
                         first = FALSE;
                     }
@@ -2425,7 +2425,7 @@ export async function reroll_menu() {   // invent.c:2552
     iflags.override_ID = iflags.override_ID - 1 | 0;
     gd.distantname = gd.distantname - 1 | 0;
     await add_menu(win, nul_glyphinfo, any, 0, 0, ATR.NONE, NO_COLOR, $c.lit(""), MENU.ITEMFLAGS_NONE);
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("St:%s Dx:%-1d Co:%-1d In:%-1d Wi:%-1d Ch:%-1d"), get_strength_str(), acurr(A.DEX), acurr(A.CON), acurr(A.INT), acurr(A.WIS), acurr(A.CHA));
+    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("St:%s Dx:%-1d Co:%-1d In:%-1d Wi:%-1d Ch:%-1d"), get_strength_str(), acurr(A.DEX), acurr(A.CON), acurr(A.INT), acurr(A.WIS), acurr(A.CHA));
     await add_menu(win, nul_glyphinfo, any, 0, 0, ATR.NONE, NO_COLOR, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
     await end_menu()(win, $c.lit("Reroll this character?"));
     if (await select_menu(win, PICK.ONE, new $c.Ptr(pick_list, 0)) > 0) {
@@ -2486,7 +2486,7 @@ async function menu_identify(id_limit) {   // invent.c:2660
     tryct = 5;
     /* assumptions:  id_limit > 0 and at least one unID'd item is present */
     while (id_limit) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("What would you like to identify %s?"), first ? $c.lit("first") : $c.lit("next"));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("What would you like to identify %s?"), first ? $c.lit("first") : $c.lit("next"));
         n = await query_objlist(new $c.Ptr(buf, 0), new $c.FieldRef(gi, "invent", "ptr"), SIGNAL.NOMENU | SIGNAL.ESCAPE | USE_INVLET | INVORDER_SORT, new $c.Ptr(pick_list, 0), PICK.ANY, not_fully_identified);
         if (n > 0) {
             if (n > id_limit) {
@@ -2710,7 +2710,7 @@ export async function xprname(obj, txt, let_, dot, cost, quan) {   // invent.c:2
         if (dot && use_invlet) {
             let_ = obj.invlet;
         }
-        $c.__builtin___sprintf_chk(new $c.Ptr(suffix, 0), 0, 80, $c.lit("%c%6ld %.50s"), iflags.menu_tab_sep ? 9 : 32, cost, await currency(cost));
+        $c.sprintf(new $c.Ptr(suffix, 0), $c.lit("%c%6ld %.50s"), iflags.menu_tab_sep ? 9 : 32, cost, await currency(cost));
         if (!iflags.menu_tab_sep) {
             fmt = $c.lit("%c - %-45.*s%s");
             if (txtlen < 45) {
@@ -2722,13 +2722,13 @@ export async function xprname(obj, txt, let_, dot, cost, quan) {   // invent.c:2
         if (use_invlet) {
             let_ = obj.invlet;
         }
-        $c.__builtin___strcpy_chk(new $c.Ptr(suffix, 0), dot ? $c.lit(".") : $c.lit(""), 80);
+        $c.strcpy(new $c.Ptr(suffix, 0), dot ? $c.lit(".") : $c.lit(""));
     }
     sfxlen = $c.i32($c.strlen(new $c.Ptr(suffix, 0)));
     if (txtlen > (BUFSZ - 1 - (4 + sfxlen | 0) | 0)) {   /* 4: "c - " prefix */
         txtlen = BUFSZ - 1 - (4 + sfxlen | 0) | 0;
     }
-    $c.__builtin___sprintf_chk(new $c.Ptr(xprname$li, 0), 0, 256, fmt, let_, txtlen, txt, new $c.Ptr(suffix, 0));
+    $c.sprintf(new $c.Ptr(xprname$li, 0), fmt, let_, txtlen, txt, new $c.Ptr(suffix, 0));
     if (savequan) {
         obj.quan = savequan;
     }
@@ -2962,9 +2962,9 @@ async function display_pickinv(lets, xtra_choice, query, allowxtra, want_reply, 
     any.$copyFrom(cg.zeroany);
     if (wizid) {
         unid_cnt = count_unidentified(gi.invent);
-        $c.__builtin___sprintf_chk(new $c.Ptr(prompt, 0), 0, 128, $c.lit("Debug Identify"));   /* 'title' rather than 'prompt' */
+        $c.sprintf(new $c.Ptr(prompt, 0), $c.lit("Debug Identify"));   /* 'title' rather than 'prompt' */
         if (unid_cnt) {
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(prompt, 0)), 0, -1, $c.lit(" -- unidentified or partially identified item%s"), unid_cnt === 1 ? $c.lit("") : $c.lit("s"));
+            $c.sprintf(eos(new $c.Ptr(prompt, 0)), $c.lit(" -- unidentified or partially identified item%s"), unid_cnt === 1 ? $c.lit("") : $c.lit("s"));
         }
         await add_menu_str(win, new $c.Ptr(prompt, 0));
         if (!unid_cnt) {
@@ -2972,14 +2972,14 @@ async function display_pickinv(lets, xtra_choice, query, allowxtra, want_reply, 
             gotsomething = TRUE;
         } else {
             any.a_obj = wizid_fakeobj;
-            $c.__builtin___sprintf_chk(new $c.Ptr(prompt, 0), 0, 128, $c.lit("select %s to permanently identify"), unid_cnt === 1 ? $c.lit("it") : $c.lit("any or all of them"));
+            $c.sprintf(new $c.Ptr(prompt, 0), $c.lit("select %s to permanently identify"), unid_cnt === 1 ? $c.lit("it") : $c.lit("any or all of them"));
             /* wiz_identify stuffed the wiz_identify command character (^I)
                into iflags.override_ID for our use as an accelerator;
                it could be ambiguous if player has assigned a letter to
                the #wizidentify command, so include it as a group accelerator
                but use '_' as the primary selector */
             if (unid_cnt > 1) {
-                $c.__builtin___sprintf_chk(eos(new $c.Ptr(prompt, 0)), 0, -1, $c.lit(" (%s for all)"), visctrl($c.i8(iflags.override_ID)));
+                $c.sprintf(eos(new $c.Ptr(prompt, 0)), $c.lit(" (%s for all)"), visctrl($c.i8(iflags.override_ID)));
             }
             await add_menu(win, nul_glyphinfo, any, 95, $c.i8(iflags.override_ID), ATR.NONE, clr, new $c.Ptr(prompt, 0), MENU.ITEMFLAGS_SKIPINVERT);
             gotsomething = TRUE;
@@ -3037,7 +3037,7 @@ async function display_pickinv(lets, xtra_choice, query, allowxtra, want_reply, 
                     /* fake item to format as "bare|gloved hands" */
                     /* like doname() below, makeplural() returns an obuf[] */
                     formattedobj = await makeplural(await body_part(HAND));
-                    $c.__builtin___sprintf_chk(new $c.Ptr(barehands, 0), 0, 128, $c.lit("%s %s (no weapon)"), $G.uarmg ? $c.lit("gloved") : $c.lit("bare"), formattedobj);
+                    $c.sprintf(new $c.Ptr(barehands, 0), $c.lit("%s %s (no weapon)"), $G.uarmg ? $c.lit("gloved") : $c.lit("bare"), formattedobj);
                     await add_menu(win, nul_glyphinfo, any, ilet, 0, ATR.NONE, clr, new $c.Ptr(barehands, 0), MENU.ITEMFLAGS_NONE);
                 } else {
                     /* normal inventory item */
@@ -3406,7 +3406,7 @@ async function dounpaid(count, floorcount, buriedcount) {   // invent.c:3654
                 }
                 if (!otmp.cknown) {
                     /* Shopkeeper knows what to charge for contents */
-                    $c.__builtin___sprintf_chk(new $c.Ptr(contbuf, 0), 0, 256, $c.lit("%s contents"), s_suffix(await xname(otmp)));
+                    $c.sprintf(new $c.Ptr(contbuf, 0), $c.lit("%s contents"), s_suffix(await xname(otmp)));
                     await putstr()(win, 0, await xprname(null, new $c.Ptr(contbuf, 0), CONTAINED_SYM, TRUE, contcost, 0));
                 }
             }
@@ -3434,7 +3434,7 @@ async function dounpaid(count, floorcount, buriedcount) {   // invent.c:3654
             await You($c.lit("aren't carrying any unpaid items but there %s %d %s."), floorverb, xtracount, where);
         } else {
             await putstr()(win, 0, $c.lit(""));
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("(There %s %d more unpaid object%s %s.)"), floorverb, xtracount, xtracount === 1 ? $c.lit("") : $c.lit("s"), where);
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("(There %s %d more unpaid object%s %s.)"), floorverb, xtracount, xtracount === 1 ? $c.lit("") : $c.lit("s"), where);
             await putstr()(win, 0, new $c.Ptr(buf, 0));
         }
     }
@@ -3667,11 +3667,11 @@ export async function dotypeinv() {   // invent.c:3827
         if ($c.strchr($c.lit("BUCXP"), c)) {
             /* the before and after phrases for "you have no..." can both be
                treated as mutually-exclusive suffices when creating a title */
-            $c.__builtin___sprintf_chk(new $c.Ptr(title, 0), 0, 128, $c.lit("Items %s"), before && before.get(0) ? before : after);
+            $c.sprintf(new $c.Ptr(title, 0), $c.lit("Items %s"), before && before.get(0) ? before : after);
             /* get rid of trailing space from 'before' and double-space from
                'after's leading space */
             mungspaces(new $c.Ptr(title, 0));
-            $c.__builtin___strcat_chk(new $c.Ptr(title, 0), $c.lit(":"), 128);   /* after removing unwanted trailing space */
+            $c.strcat(new $c.Ptr(title, 0), $c.lit(":"));   /* after removing unwanted trailing space */
             gt.this_title = new $c.Ptr(title, 0);
         }
         if (await query_objlist(null, new $c.FieldRef(gi, "invent", "ptr"), (flags.invlet_constant ? USE_INVLET : 0) | INVORDER_SORT | INCLUDE_VENOM, new $c.Ptr(pick_list, 0), PICK.ONE, this_type_only) > 0) {
@@ -3725,7 +3725,7 @@ export async function dfeature_at(x, y, buf) {   // invent.c:4037
     } else if (IS_SINK(ltyp)) {
         cmap = S.sink;   /* "sink" */
     } else if (IS_ALTAR(ltyp)) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(dfeature_at$altbuf, 0), 0, 256, $c.lit("%saltar to %s (%s)"), (lev.flags | 0) & AM.SANCTUM ? $c.lit("high ") : $c.lit(""), await a_gname(), align_str($c.i8(((lev.flags | 0) & ~AM.SHRINE & AM.MASK) === 0 ? A.NONE : ((lev.flags | 0) & ~AM.SHRINE & AM.MASK) === AM.LAWFUL ? A.LAWFUL : ((lev.flags | 0) & ~AM.SHRINE & AM.MASK) - 2 | 0)));
+        $c.sprintf(new $c.Ptr(dfeature_at$altbuf, 0), $c.lit("%saltar to %s (%s)"), (lev.flags | 0) & AM.SANCTUM ? $c.lit("high ") : $c.lit(""), await a_gname(), align_str($c.i8(((lev.flags | 0) & ~AM.SHRINE & AM.MASK) === 0 ? A.NONE : ((lev.flags | 0) & ~AM.SHRINE & AM.MASK) === AM.LAWFUL ? A.LAWFUL : ((lev.flags | 0) & ~AM.SHRINE & AM.MASK) - 2 | 0)));
         dfeature = new $c.Ptr(dfeature_at$altbuf, 0);
     } else if (stway) {
         dfeature = stairs_description(stway, new $c.Ptr(dfeature_at$altbuf, 0), TRUE);
@@ -3744,7 +3744,7 @@ export async function dfeature_at(x, y, buf) {   // invent.c:4037
         dfeature = defsyms[cmap].explanation;
     }
     if (dfeature) {
-        $c.__builtin___strcpy_chk(buf, dfeature, -1);
+        $c.strcpy(buf, dfeature);
     }
     return dfeature;
 }
@@ -3779,7 +3779,7 @@ export async function look_here(obj_cnt, lookhere_flags) {   // invent.c:4104
          *  something along the lines of "because it's worn on the outside
          *  so is unreachable from in here...").
          */
-        $c.__builtin___sprintf_chk(new $c.Ptr(fbuf, 0), 0, 256, $c.lit("Contents of %s %s"), s_suffix(await mon_nam(mtmp)), await mbodypart(mtmp, STOMACH));
+        $c.sprintf(new $c.Ptr(fbuf, 0), $c.lit("Contents of %s %s"), s_suffix(await mon_nam(mtmp)), await mbodypart(mtmp, STOMACH));
         /* Skip "Contents of " by using fbuf index 12 */
         await You($c.lit("%s to %s what is lying in %s."), Blind() ? $c.lit("try") : $c.lit("look around"), verb, new $c.Ptr(fbuf, 12));
         otmp = mtmp.minvent;
@@ -3792,9 +3792,9 @@ export async function look_here(obj_cnt, lookhere_flags) {   // invent.c:4104
                 }
             }
             if (Blind()) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(fbuf, 0), $c.lit("You feel"), 256);
+                $c.strcpy(new $c.Ptr(fbuf, 0), $c.lit("You feel"));
             }
-            $c.__builtin___strcat_chk(new $c.Ptr(fbuf, 0), $c.lit(":"), 256);
+            $c.strcat(new $c.Ptr(fbuf, 0), $c.lit(":"));
             await display_minventory(mtmp, MINV.ALL | PICK.NONE, new $c.Ptr(fbuf, 0));
         } else {
             await You($c.lit("%s no objects here."), verb);
@@ -3804,7 +3804,7 @@ export async function look_here(obj_cnt, lookhere_flags) {   // invent.c:4104
     if (!skip_objects) {
         regbuf[0] = 0;
         if ((reg = visible_region_at(u.ux, u.uy)) !== null) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(regbuf, 0), 0, 128, $c.lit("a %s cloud"), reg_damg(reg) ? $c.lit("poison gas") : $c.lit("vapor"));
+            $c.sprintf(new $c.Ptr(regbuf, 0), $c.lit("a %s cloud"), reg_damg(reg) ? $c.lit("poison gas") : $c.lit("vapor"));
         }
         if ((trap = t_at(u.ux, u.uy)) !== null && !trap.tseen) {
             trap = $c.asRec(null, $T.trap, 32);
@@ -3863,7 +3863,7 @@ export async function look_here(obj_cnt, lookhere_flags) {   // invent.c:4104
         }
         /* hardcoded "is" worked here because "iron bars" is actually
            "set of iron bars"; use vtense() instead of relying on that */
-        $c.__builtin___sprintf_chk(new $c.Ptr(fbuf, 0), 0, 256, $c.lit("There %s %s here."), await vtense(dfeature, $c.lit("are")), dfeature);
+        $c.sprintf(new $c.Ptr(fbuf, 0), $c.lit("There %s %s here."), await vtense(dfeature, $c.lit("are")), dfeature);
     }
     if (!otmp || is_lava(u.ux, u.uy) || is_pool(u.ux, u.uy) && !Underwater()) {
         if (dfeature && !skip_dfeature) {
@@ -3911,12 +3911,12 @@ export async function look_here(obj_cnt, lookhere_flags) {   // invent.c:4104
             await putstr()(tmpwin, 0, new $c.Ptr(fbuf, 0));
             await putstr()(tmpwin, 0, $c.lit(""));
         }
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s that %s here:"), picked_some ? $c.lit("Other things") : $c.lit("Things"), (u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked ? $c.lit("you feel") : $c.lit("are"));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s that %s here:"), picked_some ? $c.lit("Other things") : $c.lit("Things"), (u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked ? $c.lit("you feel") : $c.lit("are"));
         await putstr()(tmpwin, 0, new $c.Ptr(buf, 0));
         for (; otmp; otmp = otmp.v.v_nexthere) {
             if (otmp.otyp === CORPSE && will_feel_cockatrice(otmp, FALSE)) {
                 felt_cockatrice = TRUE;
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s..."), await doname(otmp));
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s..."), await doname(otmp));
                 await putstr()(tmpwin, 0, new $c.Ptr(buf, 0));
                 break;
             }
@@ -3953,14 +3953,14 @@ export async function feel_cockatrice(otmp, force_touch) {   // invent.c:4343
     let kbuf = new Int8Array(256);
     if (will_feel_cockatrice(otmp, force_touch)) {
         /* "the <cockatrice> corpse" */
-        $c.__builtin___strcpy_chk(new $c.Ptr(kbuf, 0), await corpse_xname(otmp, null, CXN.PFX_THE), 256);
+        $c.strcpy(new $c.Ptr(kbuf, 0), await corpse_xname(otmp, null, CXN.PFX_THE));
         if (poly_when_stoned(gy.youmonst.data)) {
             await You($c.lit("touched %s with your bare %s."), new $c.Ptr(kbuf, 0), await makeplural(await body_part(HAND)));
         } else {
             await pline($c.lit("Touching %s is a fatal mistake..."), new $c.Ptr(kbuf, 0));
         }
         /* normalize body shape here; hand, not body_part(HAND) */
-        $c.__builtin___sprintf_chk(new $c.Ptr(kbuf, 0), 0, 256, $c.lit("touching %s bare-handed"), await killer_xname(otmp));
+        $c.sprintf(new $c.Ptr(kbuf, 0), $c.lit("touching %s bare-handed"), await killer_xname(otmp));
         /* will call polymon() for the poly_when_stoned() case */
         await instapetrify(new $c.Ptr(kbuf, 0));
     }
@@ -4086,12 +4086,12 @@ export async function doprgold() {   // invent.c:4503
     hmoney = hidden_gold(FALSE);
     if (flags.verbose) {
         if (!umoney) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("Your wallet is empty"), 256);
+            $c.strcpy(new $c.Ptr(buf, 0), $c.lit("Your wallet is empty"));
         } else {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Your wallet contains %ld %s"), umoney, await currency(umoney));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Your wallet contains %ld %s"), umoney, await currency(umoney));
         }
         if (hmoney) {
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(", %s you have %ld %s stashed away in your pack"), umoney ? $c.lit("and") : $c.lit("but"), hmoney, umoney ? $c.lit("more") : await currency(hmoney));
+            $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit(", %s you have %ld %s stashed away in your pack"), umoney ? $c.lit("and") : $c.lit("but"), hmoney, umoney ? $c.lit("more") : await currency(hmoney));
         }
         await pline($c.lit("%s."), new $c.Ptr(buf, 0));
     } else {
@@ -4144,7 +4144,7 @@ async function noarmor(report_uskin) {   // invent.c:4578
     if (!$G.uskin || !report_uskin) {
         await You($c.lit("are not wearing any armor."));
     } else {
-        uskinname = $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await simpleonames($G.uskin), 256);
+        uskinname = $c.strcpy(new $c.Ptr(buf, 0), await simpleonames($G.uskin));
         /* shorten "set of <color> dragon scales" to "<color> scales"
            and "<color> dragon scale mail" to "<color> scale mail" */
         if (!strncmpi(uskinname, $c.lit("set of "), 7)) {
@@ -4353,9 +4353,9 @@ export async function let_to_name(let_, unpaid, showsym) {   // invent.c:4800
         $t1 = $c.asArr(await alloc(gi.invbufsiz), Int8Array), gi.invbuf = $t1;
     }
     if (unpaid) {
-        $c.__builtin___strcat_chk($c.__builtin___strcpy_chk(gi.invbuf, $c.lit("Unpaid "), -1), class_name, -1);
+        $c.strcat($c.strcpy(gi.invbuf, $c.lit("Unpaid ")), class_name);
     } else {
-        $c.__builtin___strcpy_chk(gi.invbuf, class_name, -1);
+        $c.strcpy(gi.invbuf, class_name);
     }
     if (oclass !== 0 && showsym) {
         bp = eos(gi.invbuf);
@@ -4365,7 +4365,7 @@ export async function let_to_name(let_, unpaid, showsym) {   // invent.c:4800
             bp = bp.add(1);
         }
         bp.set(0, 0);
-        $c.__builtin___sprintf_chk(eos(gi.invbuf), 0, -1, ocsymfmt, def_oc_syms[oclass].sym);
+        $c.sprintf(eos(gi.invbuf), ocsymfmt, def_oc_syms[oclass].sym);
     }
     return gi.invbuf;
 }
@@ -4627,12 +4627,12 @@ async function doorganize_core(obj$in) {   // invent.c:5068
     }
     /* get 'to' slot to use as destination */
     if (!splitting[0]) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(qbuf, 0), $c.lit("Adjust letter"), 128);
+        $c.strcpy(new $c.Ptr(qbuf, 0), $c.lit("Adjust letter"));
     } else {
         /* note: splitting->quan is the amount being left in original slot */
-        $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Split %ld"), obj[0].quan);
+        $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("Split %ld"), obj[0].quan);
     }
-    $c.__builtin___sprintf_chk(eos(new $c.Ptr(qbuf, 0)), 0, -1, $c.lit(" to what [%s]%s?"), new $c.Ptr(lets, 0), gi.invent ? $c.lit(" (? see used letters)") : $c.lit(""));
+    $c.sprintf(eos(new $c.Ptr(qbuf, 0)), $c.lit(" to what [%s]%s?"), new $c.Ptr(lets, 0), gi.invent ? $c.lit(" (? see used letters)") : $c.lit(""));
     L2: for (trycnt = 1; ; trycnt = trycnt + 1 | 0) {
         D1: for (;;) {
             switch ($goto) {
@@ -4829,7 +4829,7 @@ export async function display_minventory(mon, dflags, title) {   // invent.c:534
     have_inv = mon.minvent !== null ? 1 : 0;
     have_any = have_inv || incl_hero ? 1 : 0;
     pickings = dflags & MINV.PICKMASK;
-    $c.__builtin___sprintf_chk(new $c.Ptr(tmp, 0), 0, 128, $c.lit("%s %s:"), s_suffix(await noit_Monnam(mon)), do_all ? $c.lit("possessions") : $c.lit("armament"));
+    $c.sprintf(new $c.Ptr(tmp, 0), $c.lit("%s %s:"), s_suffix(await noit_Monnam(mon)), do_all ? $c.lit("possessions") : $c.lit("armament"));
     if (do_all ? have_any : mon.misc_worn_check || MON_WEP(mon)) {
         /* Fool the 'weapon in hand' routine into
          * displaying 'weapon in claw', etc. properly.
@@ -4957,7 +4957,7 @@ export async function display_binventory(x, y, as_if_seen) {   // invent.c:5489
             }
             underwhat = more_than_1 ? $c.lit("under them") : $c.lit("beneath it");
         } else {
-            $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Things that are under the %s here:"), seen_liquid);
+            $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("Things that are under the %s here:"), seen_liquid);
             if (await query_objlist(new $c.Ptr(qbuf, 0), new $c.Ptr(svl.level.objects[x], y), BY_NEXTHERE, new $c.Ptr(selected, 0), PICK.NONE, allow_all) > 0) {
                 $c.free(selected[0]), selected[0] = null;
             }
@@ -4980,7 +4980,7 @@ export async function display_binventory(x, y, as_if_seen) {   // invent.c:5489
         go.only.x = x;
         go.only.y = y;
         /* "buried here", but vary if we've already shown underwater items */
-        $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Things that are buried %s:"), underwhat);
+        $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("Things that are buried %s:"), underwhat);
         if (await query_objlist(new $c.Ptr(qbuf, 0), new $c.FieldRef(svl.level, "buriedobjlist", "ptr"), INVORDER_SORT, new $c.Ptr(selected, 0), PICK.NONE, only_here) > 0) {
             $c.free(selected[0]);
         }
