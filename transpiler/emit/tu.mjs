@@ -1886,7 +1886,8 @@ export class TUEmitter {
                     t, simple: this.isSimple(a0) && this.isSimple(i),
                     get: () => E(acc, PREC.call),
                     set: (x) => E(`${acc} = ${x}`, PREC.assign),
-                    addr: () => (t.k === 'rec' ? E(`$c.relem(${arr.c}, ${idxC})`, PREC.call) : E(`new $c.Ptr(${arr.c}, ${idxC})`, PREC.call)),
+                    // &T[K] with K a constant inside T: the element object itself (relem returns it)
+                    addr: () => (t.k === 'rec' ? (this.inBounds(kids(a0)[0], i) ? E(acc, PREC.call) : E(`$c.relem(${arr.c}, ${idxC})`, PREC.call)) : E(`new $c.Ptr(${arr.c}, ${idxC})`, PREC.call)),
                 };
             }
             const pt = this.T(a);
@@ -2009,7 +2010,7 @@ export class TUEmitter {
             if (s0.kind === 'StringLiteral' || s0.kind === 'PredefinedExpr') return this.ex(s0, 'v');
             const at = this.T(sub);
             const arr = this.lvalue(sub).get();
-            if (at.of.k === 'rec') return E(`$c.relem(${arr.c}, 0)`, PREC.call);
+            if (at.of.k === 'rec') return at.n > 0 ? E(`${par(arr, PREC.call)}[0]`, PREC.call) : E(`$c.relem(${arr.c}, 0)`, PREC.call);
             return E(`new $c.Ptr(${arr.c}, 0)`, PREC.call);
         }
         case 'NullToPointer': return E('null');
@@ -2152,6 +2153,32 @@ export class TUEmitter {
     }
     shiftCount(B) { return /^\d+n$/.test(B.c) ? E(B.c.slice(0, -1)) : (/n$/.test(B.c) ? E(`Number(${B.c})`, PREC.call) : B); }
 
+    /** Whether index expression i of array expression arrN folds to a constant inside the array's length. */
+    inBounds(arrN, i) {
+        const at = this.S.resolve(this.T(arrN));
+        const k = this.fold(i);
+        return at.k === 'arr' && at.n > 0 && k !== null && Number(k) >= 0 && Number(k) < at.n;
+    }
+    /** Whether pointer expression n is a record array's own element: &T[K] (K inside T), or T decayed (T has elements). */
+    canonElem(n) {
+        let x = n;
+        while (x && (x.kind === 'ParenExpr' || (x.kind === 'ImplicitCastExpr' && x.castKind === 'NoOp'))) x = kids(x)[0];
+        if (!x) return false;
+        if (x.kind === 'UnaryOperator' && x.opcode === '&') {
+            const s = this.skipParens(kids(x)[0]);
+            if (s.kind !== 'ArraySubscriptExpr') return false;
+            const [a, i] = kids(s);
+            const a0 = this.skipParens(a);
+            if (!(a0.kind === 'ImplicitCastExpr' && a0.castKind === 'ArrayToPointerDecay')) return false;
+            const at = this.S.resolve(this.T(kids(a0)[0]));
+            return at.k === 'arr' && this.S.resolve(at.of).k === 'rec' && this.inBounds(kids(a0)[0], i);
+        }
+        if (x.kind === 'ImplicitCastExpr' && x.castKind === 'ArrayToPointerDecay') {
+            const at = this.S.resolve(this.T(kids(x)[0]));
+            return at.k === 'arr' && this.S.resolve(at.of).k === 'rec' && at.n > 0;
+        }
+        return false;
+    }
     ptrBinary(n, op, a, b, ta, tb, ctx) {
         if (['==', '!='].includes(op)) {
             const A = this.rv(a), B = this.rv(b);
@@ -2159,6 +2186,10 @@ export class TUEmitter {
             if (fnp || B.c === 'null' || A.c === 'null') {
                 return this.boolVal(E(`${par(A, PREC.eq)} ${op === '==' ? '===' : '!=='} ${par(B, PREC.eq + 1)}`, PREC.eq), ctx);
             }
+            // an element of a record array at a constant index inside it is the array's own
+            // object; peq(x, it) is true exactly when x is that object (peq's other cases,
+            // pointers into byte buffers, fields or outside an array, never equal it)
+            if (this.canonElem(a) || this.canonElem(b)) return this.boolVal(E(`${par(A, PREC.eq)} ${op === '==' ? '===' : '!=='} ${par(B, PREC.eq + 1)}`, PREC.eq), ctx);
             const e = E(`$c.peq(${A.c}, ${B.c})`, PREC.call);
             return this.boolVal(op === '==' ? e : E(`!${par(e, PREC.unary)}`, PREC.unary), ctx);
         }
