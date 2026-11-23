@@ -172,6 +172,9 @@ const FORTIFY_DROP = {
 // the sub-statement that ends a statement's head (an index into its children; -1: the last)
 const HEADED = { IfStmt: 1, WhileStmt: -1, ForStmt: -1, SwitchStmt: -1 };
 
+/** The values of a C integer type of at most 32 bits: [lo, hi]. */
+const typeRange = (t) => (t.size === 1 && t.bool ? [0, 1] : t.signed ? [-(2 ** (t.size * 8 - 1)), 2 ** (t.size * 8 - 1) - 1] : [0, 2 ** (t.size * 8) - 1]);
+
 /** A C type as a JSDoc description: one line, no comment terminator. */
 const cTypeText = (s) => String(s || '').replace(/\s+/g, ' ').replace(/\*\//g, '* /').trim();
 
@@ -1948,8 +1951,81 @@ export class TUEmitter {
         if (!f) this.err(n, `no field ${n.name} in ${bt.key}`);
         return f;
     }
+    // ---------- readability plan P5: value ranges ----------
+    /**
+     * The range [lo, hi] of integer expression n's value, or null (unknown, 64-bit, not an
+     * integer). Sound because the port keeps every value inside its C type's range (stores
+     * convert; bit-field stores mask): a value read from a `signed char` is in [-128, 127].
+     * Only the object world is analysed.
+     */
+    range(n) {
+        if (this.heap || !n) return null;
+        const t = this.S.resolve(this.T(n));
+        if (t.k !== 'int' || t.size > 4) return null;
+        const own = typeRange(t);
+        const k = this.fold(n);
+        if (k !== null) { const v = Number(k); return Number.isSafeInteger(v) && v >= own[0] && v <= own[1] ? [v, v] : null; }
+        const meet = (r) => (r && r[0] >= own[0] && r[1] <= own[1] ? r : own);
+        const ks = kids(n);
+        switch (n.kind) {
+        case 'ParenExpr': return meet(this.range(ks[0]));
+        case 'ImplicitCastExpr': case 'CStyleCastExpr': {
+            const ck = n.castKind;
+            if (ck === 'LValueToRValue') {
+                const x = this.skipParens(ks[0]);
+                if (x.kind === 'MemberExpr') {
+                    let f = null;
+                    try { f = this.fieldByName(kids(x)[0], x); } catch { f = null; }
+                    if (f && f.bits !== null) { const w = f.bits; return meet(t.signed || f.type.signed ? [-(2 ** (w - 1)), 2 ** (w - 1) - 1] : [0, 2 ** w - 1]); }
+                }
+                return own;
+            }
+            if (ck === 'IntegralCast' || ck === 'NoOp') { const r = this.range(ks[0]); return r && r[0] >= own[0] && r[1] <= own[1] ? r : own; }
+            if (ck === 'IntegralToBoolean' || ck === 'PointerToBoolean' || ck === 'FloatingToBoolean') return [0, 1];
+            return own;
+        }
+        case 'BinaryOperator': {
+            const op = n.opcode;
+            if (['<', '>', '<=', '>=', '==', '!=', '&&', '||'].includes(op)) return [0, 1];
+            if (op === ',') return meet(this.range(ks[1]));
+            if (op.endsWith('=') ) return own;   // assignments
+            const a = this.range(ks[0]), b = this.range(ks[1]);
+            if (!a || !b) return own;
+            let r = null;
+            if (op === '+') r = [a[0] + b[0], a[1] + b[1]];
+            else if (op === '-') r = [a[0] - b[1], a[1] - b[0]];
+            else if (op === '*') { const ps = [a[0] * b[0], a[0] * b[1], a[1] * b[0], a[1] * b[1]]; r = [Math.min(...ps), Math.max(...ps)]; }
+            else if (op === '&' && (a[0] >= 0 || b[0] >= 0)) r = [0, Math.min(a[0] >= 0 ? a[1] : Infinity, b[0] >= 0 ? b[1] : Infinity)];
+            else if ((op === '|' || op === '^') && a[0] >= 0 && b[0] >= 0) r = [0, 2 ** Math.ceil(Math.log2(Math.max(a[1], b[1]) + 1)) - 1];
+            return r ? meet(r) : own;
+        }
+        case 'UnaryOperator': {
+            const op = n.opcode;
+            if (op === '!') return [0, 1];
+            const a = this.range(ks[0]);
+            if (!a) return own;
+            if (op === '-') return meet([-a[1], -a[0]]);
+            if (op === '~') return meet([-a[1] - 1, -a[0] - 1]);
+            if (op === '+') return meet(a);
+            return own;
+        }
+        case 'ConditionalOperator': {
+            const a = this.range(ks[1]), b = this.range(ks[2]);
+            return a && b ? meet([Math.min(a[0], b[0]), Math.max(a[1], b[1])]) : own;
+        }
+        default: return own;
+        }
+    }
     bitStore(x, f) {
         const w = f.bits;
+        // a constant: its stored value (P5)
+        if (!this.heap && /^-?\d+$/.test(String(x).trim())) {
+            const v = Number(x);
+            if (Number.isSafeInteger(v) && w < 32) {
+                const m = v & (2 ** w - 1);
+                return String(f.type.signed && m >= 2 ** (w - 1) ? m - 2 ** w : m);
+            }
+        }
         if (f.type.signed) return w >= 32 ? `(${x}) | 0` : `((${x}) << ${32 - w}) >> ${32 - w}`;
         return w >= 32 ? `(${x}) >>> 0` : `(${x}) & ${(2 ** w - 1)}`;
     }
@@ -2041,7 +2117,12 @@ export class TUEmitter {
             }
             return e;
         }
-        case 'IntegralCast': return this.convInt(this.rv(sub), this.T(sub), to);
+        case 'IntegralCast': {
+            // P5: no conversion when the value's range already fits the target type
+            const r = this.range(sub), tr = to.k === 'int' && to.size <= 4 ? typeRange(to) : null;
+            if (r && tr && r[0] >= tr[0] && r[1] <= tr[1]) return this.rv(sub);
+            return this.convInt(this.rv(sub), this.T(sub), to);
+        }
         case 'IntegralToBoolean': return this.boolVal(E(`${par(this.rv(sub), PREC.eq)} != 0`, PREC.eq), ctx);
         case 'PointerToBoolean': return this.boolVal(E(`${par(this.rv(sub), PREC.eq)} !== null`, PREC.eq), ctx);
         case 'FloatingToBoolean': return this.boolVal(E(`${par(this.rv(sub), PREC.eq)} !== 0`, PREC.eq), ctx);
@@ -2111,6 +2192,20 @@ export class TUEmitter {
             const p = op === '+' || op === '-' ? PREC.add : PREC.mul;
             const e = E(`${par(A, p)} ${op} ${par(B, p + 1)}`, p);
             return t.size === 4 ? E(`Math.fround(${e.c})`, PREC.call) : e;
+        }
+        // P5: + - * on 32-bit values whose result range fits the type need no wrap-around.
+        // A product only of factors that cannot be negative: JS gives -1 * 0 = -0, which C's
+        // int has not (it would print as -0.000000 once converted to double); a sum or
+        // difference is -0 only when an operand already is, and no generated int is.
+        if (['+', '-', '*'].includes(op) && t.k === 'int' && t.size === 4) {
+            const ra = this.range(a), rb = this.range(b), tr = typeRange(t);
+            if (ra && rb && (op !== '*' || (ra[0] >= 0 && rb[0] >= 0))) {
+                const sum = op === '+' ? [ra[0] + rb[0], ra[1] + rb[1]] : op === '-' ? [ra[0] - rb[1], ra[1] - rb[0]] : (() => { const ps = [ra[0] * rb[0], ra[0] * rb[1], ra[1] * rb[0], ra[1] * rb[1]]; return [Math.min(...ps), Math.max(...ps)]; })();
+                if (sum[0] >= tr[0] && sum[1] <= tr[1] && Number.isSafeInteger(sum[0]) && Number.isSafeInteger(sum[1])) {
+                    const p = op === '*' ? PREC.mul : PREC.add;
+                    return E(`${par(A, p)} ${op} ${par(B, p + 1)}`, p);
+                }
+            }
         }
         return this.intOp(op, A, B, t, this.T(a), this.T(b));
     }
