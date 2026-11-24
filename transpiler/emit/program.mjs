@@ -7,11 +7,21 @@
 // scalars and pointers, with their zero values) and index.js (the $init
 // order: TU link order, like C's static initialization, which has no order).
 import path from 'node:path';
-import { TUEmitter, EmitError, IMPORTS_MARK, LOCAL_MACROS_MARK, SITE_RE, STR_TAG } from './tu.mjs';
+import { TUEmitter, EmitError, IMPORTS_MARK, LOCAL_MACROS_MARK, SITE_RE, STR_TAG, BRK } from './tu.mjs';
 
 const CRT_IMPORT = "import * as $c from '../crt/index.js';\n";
 /** Module text with the string-literal tag imported, when the module uses it (tu.mjs STR_TAG). */
+/** Expand the C line-break markers (tu.mjs BRK): a newline, one level deeper than its line. */
+export function withBreaks(code) {
+    if (!code.includes(BRK)) return code;
+    return code.split('\n').map((l) => {
+        if (!l.includes(BRK)) return l;
+        const cont = '\n' + /^ */.exec(l)[0] + '    ';
+        return l.split(/ *\u0004 */).join(cont);
+    }).join('\n');
+}
 function withStrTag(code) {
+    code = withBreaks(code);
     if (!code.includes(`${STR_TAG}\``) || !code.includes(CRT_IMPORT)) return code;
     return code.replace(CRT_IMPORT, `${CRT_IMPORT}import { ${STR_TAG} } from '../crt/index.js';\n`);
 }

@@ -92,6 +92,8 @@ function decodeEscapes(lit, s, wide) {
  * shared NUL-terminated byte array (js/crt/mem.js). `$` keeps it apart from every C name.
  */
 export const STR_TAG = '$C';
+/** A C line break inside an expression (TU.brk); program.mjs withBreaks expands it. */
+export const BRK = '\u0004';
 /**
  * A JS template literal for byte text (one char per byte) whose cooked value is that text:
  * printable ASCII as is, except ` \ and ${ (escaped); \n and \t; every other byte as \xNN
@@ -1025,6 +1027,32 @@ export class TUEmitter {
         return { pre, out };
     }
     /** The source range of node n in this TU's .c file: { begin, end (offset of the last token), endLine }, or null. */
+    /**
+     * Readability (c): the C's line breaks inside long statements. brk(prev, n) is the break
+     * marker BRK when n starts on a later C line than prev ends, both written in this file
+     * (a macro's text counts at its invocation); '' otherwise. program.mjs withBreaks turns each marker into a
+     * newline indented one level past its line.
+     */
+    srcOff(n, end) {
+        const r = n && n.range && (end ? n.range.end : n.range.begin);
+        // a macro invocation counts where it is written in this file
+        const l = r && (r.expansionLoc || r);
+        if (!l || l._f !== this.tu.file || typeof l.offset !== 'number') return null;
+        return l.offset;
+    }
+    brk(prev, n) {
+        if (!this.cm || !prev || !n) return '';
+        const a = this.srcOff(prev, true), b = this.srcOff(n, false);
+        if (a === null || b === null || b <= a) return '';
+        return this.cm.lineOf(b) > this.cm.lineOf(a) ? BRK : '';
+    }
+    /** For binary operator op between a and b: [before, after] the operator, one of them BRK when the C breaks there. */
+    brkOp(a, b, op) {
+        if (!this.brk(a, b)) return ['', ''];
+        const t = this.cm.text.slice(this.srcOff(a, true), this.srcOff(b, false));
+        const i = t.lastIndexOf(op);
+        return i >= 0 && t.slice(0, i).includes('\n') ? [BRK, ''] : ['', BRK];
+    }
     cRange(n) {
         const r = n.range;
         const b = r && r.begin && (r.begin.expansionLoc || r.begin), e = r && r.end && (r.end.expansionLoc || r.end);
@@ -1675,7 +1703,8 @@ export class TUEmitter {
             const [c, a, b] = kids(n);
             const t = this.T(n);
             const sub = (x) => (t.k === 'void' ? this.ex(x, 'd') : this.ex(x, ctx === 'c' && isInt(t) ? 'c' : 'v'));
-            return E(`${par(this.cond(c), PREC.or)} ? ${par(sub(a), PREC.assign)} : ${par(sub(b), PREC.assign)}`, PREC.cond);
+            const [q1, q2] = this.brkOp(c, a, '?'), [c1, c2] = this.brkOp(a, b, ':');
+            return E(`${par(this.cond(c), PREC.or)} ${q1}? ${q2}${par(sub(a), PREC.assign)} ${c1}: ${c2}${par(sub(b), PREC.assign)}`, PREC.cond);
         }
         case 'CallExpr': return this.call(n, ctx);
         case 'MemberExpr': case 'ArraySubscriptExpr': return this.lvalue(n).get();
@@ -2384,7 +2413,8 @@ export class TUEmitter {
         if (op === '=') return this.assign(n, a, b, ctx);
         if (op === ',') return E(`${par(this.ex(a, 'd'), PREC.comma)}, ${par(this.ex(b, ctx === 'd' ? 'd' : 'v'), PREC.assign)}`, PREC.comma);
         if (op === '&&' || op === '||') {
-            const e = E(`${par(this.cond(a), op === '&&' ? PREC.and : PREC.or)} ${op} ${par(this.cond(b), (op === '&&' ? PREC.and : PREC.or) + 1)}`, op === '&&' ? PREC.and : PREC.or);
+            const [k1, k2] = this.brkOp(a, b, op);
+            const e = E(`${par(this.cond(a), op === '&&' ? PREC.and : PREC.or)} ${k1}${op} ${k2}${par(this.cond(b), (op === '&&' ? PREC.and : PREC.or) + 1)}`, op === '&&' ? PREC.and : PREC.or);
             return ctx === 'd' ? e : this.boolVal(e, ctx);
         }
         const t = this.T(n);
@@ -2396,7 +2426,8 @@ export class TUEmitter {
             const jop = op === '==' ? '===' : op === '!=' ? '!==' : op;
             if (isFloat(ta) && (op === '==' || op === '!=')) return this.boolVal(E(`${par(A, PREC.eq)} ${op === '==' ? '===' : '!=='} ${par(B, PREC.eq + 1)}`, PREC.eq), ctx);
             const p = op === '==' || op === '!=' ? PREC.eq : PREC.rel;
-            return this.boolVal(E(`${par(A, p)} ${jop} ${par(B, p + 1)}`, p), ctx);
+            const [k1, k2] = this.brkOp(a, b, op);
+            return this.boolVal(E(`${par(A, p)} ${k1}${jop} ${k2}${par(B, p + 1)}`, p), ctx);
         }
         if (isFloat(t)) {
             const p = op === '+' || op === '-' ? PREC.add : PREC.mul;
@@ -2786,7 +2817,7 @@ export class TUEmitter {
                 f = `$c.${fnName}$async`;
             }
         } else asyncCall = fnName ? this.prog.isAsync(this, fnName) : this.prog.isAsyncIndirect(this, this.T(callee));
-        let e = E(`${f}(${argc.join(', ')})`, PREC.call);
+        let e = E(`${f}(${argc.map((x, i) => this.brk(i ? args[i - 1] : callee, args[i]) + x).join(', ')})`, PREC.call);
         if (asyncCall) {
             if (!this.fn || !this.fn.isAsync) this.err(n, `await of ${fnName || 'an indirect call'} in a function outside the async set`);
             e = E(`await ${par(e, PREC.unary)}`, PREC.unary);
