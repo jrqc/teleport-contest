@@ -666,7 +666,7 @@ export async function doextlist() {   // cmd.c:562
         await add_menu_str(menuwin, $C``);
         $t1 = menushown[1] = 0, menushown[0] = $t1;
         let n = 0;
-        for (pass = 0; pass <= 1; pass = pass + 1 | 0) {
+        for (pass = 0; pass <= 1; pass = pass + 1) {
             /* skip second pass if not in wizard mode or wizard mode
                commands are being integrated into a single list */
             if (pass === 1 && (onelist || !wizard())) {
@@ -1791,7 +1791,7 @@ export function count_bind_keys() {   // cmd.c:2208
         bind = bind.next;
     }
     /* commands which should be bound to a key, but aren't */
-    for (i = 0; i < extcmdlist_length; i = i + 1 | 0) {
+    for (i = 0; i < extcmdlist_length; i = i + 1) {
         if (extcmdlist[i].key && !keys[extcmdlist[i].key]) {
             nbinds = nbinds + 1 | 0;
         }
@@ -1829,7 +1829,7 @@ export async function get_changed_key_binds(sbuf) {   // cmd.c:2235
         bind = bind.next;
     }
     /* commands which should be bound to a key, but aren't */
-    for (i = 0; i < extcmdlist_length; i = i + 1 | 0) {
+    for (i = 0; i < extcmdlist_length; i = i + 1) {
         const ec = $c.relem(extcmdlist, i);
         if (ec.key && !keys[ec.key]) {
             $c.sprintf(new $c.Ptr(buf, 0), $C`BIND=%s:nothing%s`, key2txt(ec.key, new $c.Ptr(buf2, 0)), sbuf ? $C`\n` : $C``);
@@ -1880,7 +1880,7 @@ async function handler_rebind_keys_add(keyfirst) {   // cmd.c:2291
         $C`nothing: unbind the key`,
         MENU.ITEMFLAGS_NONE);
     await add_menu_str(win, $C``);
-    for (i = 0; i < extcmdlist_length; i = i + 1 | 0) {
+    for (i = 0; i < extcmdlist_length; i = i + 1) {
         ec = $c.relem(extcmdlist, i);
         if ((ec.flags & (MOVEMENTCMD | INTERNALCMD | CMD_NOT_AVAILABLE)) >>> 0 !== 0) {
             continue;
@@ -1989,7 +1989,7 @@ export async function handler_change_autocompletions() {   // cmd.c:2449
     const win = await create_nhwindow()(NHW.MENU);
     await start_menu()(win, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
-    for (i = 0; i < extcmdlist_length; i = i + 1 | 0) {
+    for (i = 0; i < extcmdlist_length; i = i + 1) {
         ec = $c.relem(extcmdlist, i);
         if ((ec.flags & (INTERNALCMD | CMD_NOT_AVAILABLE)) >>> 0 !== 0) {
             continue;
@@ -2007,7 +2007,7 @@ export async function handler_change_autocompletions() {   // cmd.c:2449
     await end_menu()(win, $C`Which commands autocomplete?`);
     const n = await select_menu(win, PICK.ANY, new $c.Ptr(picks, 0));
     if (n >= 0) {
-        for (i = 0; i < extcmdlist_length; i = i + 1 | 0) {
+        for (i = 0; i < extcmdlist_length; i = i + 1) {
             let setit = FALSE;
             ec = $c.relem(extcmdlist, i);
             if ((ec.flags & (INTERNALCMD | CMD_NOT_AVAILABLE)) >>> 0 !== 0) {
@@ -2017,7 +2017,7 @@ export async function handler_change_autocompletions() {   // cmd.c:2449
                 continue;
             }
             $c.sprintf(new $c.Ptr(buf, 0), $C`%s`, ec.ef_txt);
-            for (j = 0; j < n; j = j + 1 | 0) {
+            for (j = 0; j < n; j = j + 1) {
                 if (ec === $c.relem(extcmdlist, $c.radd(picks[0], j).item.a_int - 1 | 0)) {
                     await parseautocomplete(new $c.Ptr(buf, 0), TRUE);
                     setit = TRUE;
@@ -2293,7 +2293,7 @@ async function commands_init() {   // cmd.c:2750
 function keylist_func_has_key(extcmd, skip_keys_used) {   // cmd.c:2785
     let i = 0, bind = null;
     /* boolean keys_used[256] */
-    for (i = 0; i < 256; i = i + 1 | 0) {
+    for (i = 0; i < 256; i = i + 1) {
         if (skip_keys_used.get(i)) {
             continue;
         }
@@ -2316,7 +2316,7 @@ async function keylist_putcmds(datawin, docount, incl_flags, excl_flags, keys_us
     /* boolean keys_used[256] */
     /* copy of keys_used[] before updates */
     let count = 0;
-    for (i = 0; i < 256; i = i + 1 | 0) {
+    for (i = 0; i < 256; i = i + 1) {
         const key = $c.u8(i);
         keys_already_used[i] = keys_used.get(i);
         if (keys_used.get(i)) {
@@ -2658,7 +2658,7 @@ export async function cmdname_from_func(fn, outbuf, fullname) {   // cmd.c:3106
  */
 export function bind_specialkey(key, command) {   // cmd.c:3194
     let i = 0;
-    for (i = 0; i < 29; i = i + 1 | 0) {
+    for (i = 0; i < 29; i = i + 1) {
         if (!spkeys_binds[i].name || $c.strcmp(command, spkeys_binds[i].name)) {
             continue;
         }
@@ -2674,7 +2674,7 @@ export function bind_specialkey(key, command) {   // cmd.c:3194
 function spkey_name(nhkf) {   // cmd.c:3208
     let i = 0;
     let name = null;
-    for (i = 0; i < 29; i = i + 1 | 0) {
+    for (i = 0; i < 29; i = i + 1) {
         if (spkeys_binds[i].nhkf === nhkf) {
             name = nhkf === NHKF.ESC ? $C`escape` : spkeys_binds[i].name;
             break;
@@ -2790,12 +2790,12 @@ export function count_autocompletions() {   // cmd.c:3312
 export function lock_mouse_buttons(savebtns) {   // cmd.c:3326
     let i = 0;
     if (savebtns) {
-        for (i = 0; i < NUM_MOUSE_BUTTONS; i = i + 1 | 0) {
+        for (i = 0; i < NUM_MOUSE_BUTTONS; i = i + 1) {
             lock_mouse_buttons$mousebtn[i] = gc.Cmd.mousebtn[i];
             gc.Cmd.mousebtn[i] = null;
         }
     } else {
-        for (i = 0; i < NUM_MOUSE_BUTTONS; i = i + 1 | 0) {
+        for (i = 0; i < NUM_MOUSE_BUTTONS; i = i + 1) {
             gc.Cmd.mousebtn[i] = lock_mouse_buttons$mousebtn[i];
         }
     }
@@ -2812,14 +2812,14 @@ export async function reset_commands(initial) {   // cmd.c:3344
         updated = 1;
         gc.Cmd.num_pad = FALSE;
         $t2 = ($t1 = gc.Cmd.swap_yz = FALSE, gc.Cmd.phone_layout = $t1), gc.Cmd.pcHack_compat = $t2;
-        for (i = 0; i < 29; i = i + 1 | 0) {
+        for (i = 0; i < 29; i = i + 1) {
             gc.Cmd.spkeys[spkeys_binds[i].nhkf] = $c.i8(spkeys_binds[i].key);
         }
         await commands_init();
     } else {
         if (reset_commands$backed_dir_cmd) {
-            for (dir = 0; dir < N_DIRS; dir = dir + 1 | 0) {
-                for (mode = 0; mode < N_MOVEMODES; mode = mode + 1 | 0) {
+            for (dir = 0; dir < N_DIRS; dir = dir + 1) {
+                for (mode = 0; mode < N_MOVEMODES; mode = mode + 1) {
                     await cmdbind_add(reset_commands$back_dir_key[dir][mode], reset_commands$back_dir_cmd[dir][mode], FALSE);
                 }
             }
@@ -2839,7 +2839,7 @@ export async function reset_commands(initial) {   // cmd.c:3344
             /* FIXME? should Cmd.spkeys[] be scanned for y and/or z to swap?
                Cmd.swap_yz has been toggled;
                perform the swap (or reverse previous one) */
-            for (i = 0; i < 6; i = i + 1 | 0) {
+            for (i = 0; i < 6; i = i + 1) {
                 c = reset_commands$ylist[i] & 255;
                 cmdbind_swapkeys($c.u8(c), $c.u8(c + 1 | 0));
             }
@@ -2864,7 +2864,7 @@ export async function reset_commands(initial) {   // cmd.c:3344
             gc.Cmd.phone_layout = flagtemp;
             updated = updated + 1 | 0;
             /* phone_layout has been toggled */
-            for (i = 0; i < 3; i = i + 1 | 0) {
+            for (i = 0; i < 3; i = i + 1) {
                 c = 49 + i | 0;   /* 1,2,3 <-> 7,8,9 */
                 cmdbind_swapkeys($c.u8(c), $c.u8(c + 6 | 0));
                 c = 177 + i | 0;   /* M-1,M-2,M-3 <-> M-7,M-8,M-9 */
@@ -2881,8 +2881,8 @@ export async function reset_commands(initial) {   // cmd.c:3344
         : !gc.Cmd.phone_layout ? new $c.Ptr(reset_commands$ndir, 0) : new $c.Ptr(reset_commands$ndir_phone_layout, 0);
     gc.Cmd.alphadirchars = !gc.Cmd.num_pad ? gc.Cmd.dirchars : new $c.Ptr(reset_commands$sdir, 0);
     /* back up the commands & keys overwritten by new movement keys */
-    for (dir = 0; dir < N_DIRS; dir = dir + 1 | 0) {
-        for (mode = MV.WALK; mode < N_MOVEMODES; mode = mode + 1 | 0) {
+    for (dir = 0; dir < N_DIRS; dir = dir + 1) {
+        for (mode = MV.WALK; mode < N_MOVEMODES; mode = mode + 1) {
             let di = $c.u8(gc.Cmd.dirchars.get(dir));
             if (!gc.Cmd.num_pad) {
                 if (mode === MV.RUN) {
@@ -2908,7 +2908,7 @@ export async function reset_commands(initial) {   // cmd.c:3344
     }
     reset_commands$backed_dir_cmd = TRUE;
     /* bind the new keys to movement commands */
-    for (i = 0; i < N_DIRS; i = i + 1 | 0) {
+    for (i = 0; i < N_DIRS; i = i + 1) {
         await bind_key_fn($c.u8(gc.Cmd.dirchars.get(i)), move_funcs[i][MV.WALK]);
         if (!gc.Cmd.num_pad) {
             await bind_key_fn($c.u8(highc(gc.Cmd.dirchars.get(i))),
@@ -3306,7 +3306,7 @@ export async function rhack(key) {   // cmd.c:3627
  */
 export function xytodir(x, y) {   // cmd.c:3847
     let dd = 0;
-    for (dd = 0; dd < N_DIRS; dd = dd + 1 | 0) {
+    for (dd = 0; dd < N_DIRS; dd = dd + 1) {
         if (x === xdir[dd] && y === ydir[dd]) {
             return dd;
         }
@@ -3336,7 +3336,7 @@ export function movecmd(sym, mode) {   // cmd.c:3869
     if (bind && bind.cmd) {
         const fnc = bind.cmd.ef_funct;
         if (mode === MV.ANY) {
-            for (d = N_DIRS_Z - 1; d > DIR.ERR; d = d - 1 | 0) {
+            for (d = N_DIRS_Z - 1; d > DIR.ERR; d = d - 1) {
                 if (fnc === move_funcs[d][MV.WALK]
                     || fnc === move_funcs[d][MV.RUN]
                     || fnc === move_funcs[d][MV.RUSH]) {
@@ -3344,7 +3344,7 @@ export function movecmd(sym, mode) {   // cmd.c:3869
                 }
             }
         } else {
-            for (d = N_DIRS_Z - 1; d > DIR.ERR; d = d - 1 | 0) {
+            for (d = N_DIRS_Z - 1; d > DIR.ERR; d = d - 1) {
                 if (fnc === move_funcs[d][mode]) {
                     break;
                 }

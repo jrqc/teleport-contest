@@ -145,7 +145,7 @@ function count_and_validate_winopts() {   // mdlib.c:602
     let i = 0;
     let cnt = 0;
     /* window_opts has a fencepost entry at the end */
-    for (i = 0; i < 1; i = i + 1 | 0) {
+    for (i = 0; i < 1; i = i + 1) {
         /* !MAKEDEFS_C && FOR_RUNTIME */
         cnt = cnt + 1 | 0;
         window_opts[i].valid = TRUE;
@@ -159,7 +159,7 @@ function count_and_validate_soundlibopts() {   // mdlib.c:627
     let i = 0;
     let cnt = 0;
     /* soundlib_opts has a fencepost entry at the end */
-    for (i = 0; i < 1; i = i + 1 | 0) {
+    for (i = 0; i < 1; i = i + 1) {
         cnt = cnt + 1 | 0;
         soundlib_opts[i].valid = TRUE;
     }
@@ -208,7 +208,7 @@ async function build_options() {   // mdlib.c:669
     length[0] = COLNO + 1;   /* force 1st item onto new line */
     $c.strcat($c.strcpy(new $c.Ptr(buf, 0), datamodel(0)), $C` data model,`);
     await opt_out_words(new $c.Ptr(buf, 0), new $c.Ptr(length, 0));
-    for (i = 0; i < 26; i = i + 1 | 0) {
+    for (i = 0; i < 26; i = i + 1) {
         /* ignore the console entry if GUI version */
         /* !MAKEDEFS_C && FOR_RUNTIME */
         $c.strcat($c.strcpy(new $c.Ptr(buf, 0), build_opts[i]), i < 25 ? $C`,` : $C`.`);
@@ -222,7 +222,7 @@ async function build_options() {   // mdlib.c:669
     idxopttext < MAXOPT ? ($t17 = await dupstr(new $c.Ptr(optbuf, 0)), $t18 = new $c.Ptr(opttext, ($t16 = idxopttext, idxopttext = $t16 + 1 | 0, $t16)), $t18.set(0, $t17)) : null;
     optbuf[0] = 0;
     length[0] = COLNO + 1;   /* force 1st item onto new line */
-    for (i = 0; i < 1; i = i + 1 | 0) {
+    for (i = 0; i < 1; i = i + 1) {
         if (!window_opts[i].valid) {
             continue;
         }
@@ -256,7 +256,7 @@ async function build_options() {   // mdlib.c:669
     idxopttext < MAXOPT ? ($t26 = await dupstr(new $c.Ptr(optbuf, 0)), $t27 = new $c.Ptr(opttext, ($t25 = idxopttext, idxopttext = $t25 + 1 | 0, $t25)), $t27.set(0, $t26)) : null;
     optbuf[0] = 0;
     length[0] = COLNO + 1;   /* force 1st item onto new line */
-    for (i = 0; i < 1; i = i + 1 | 0) {
+    for (i = 0; i < 1; i = i + 1) {
         if (!soundlib_opts[i].valid) {
             continue;
         }

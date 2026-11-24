@@ -187,8 +187,8 @@ async function clear_fcorr(grd, forceshow) {   // vault.c:48
  */
 function blackout(x, y) {   // vault.c:123
     let i = 0, j = 0, $t1;
-    for (i = x - 1; i <= x + 1; i = i + 1 | 0) {
-        for (j = y - 1; j <= y + 1; j = j + 1 | 0) {
+    for (i = x - 1; i <= x + 1; i = i + 1) {
+        for (j = y - 1; j <= y + 1; j = j + 1) {
             if (!isok($c.i16(i), $c.i16(j))) {
                 continue;
             }
@@ -266,7 +266,7 @@ export async function grddead(grd) {   // vault.c:175
 function in_fcorridor(grd, x, y) {   // vault.c:192
     let fci = 0;
     const egrd = grd.mextra.egd;
-    for (fci = egrd.fcbeg; fci < egrd.fcend; fci = fci + 1 | 0) {
+    for (fci = egrd.fcbeg; fci < egrd.fcend; fci = fci + 1) {
         if (x === egrd.fakecorr[fci].fx && y === egrd.fakecorr[fci].fy) {
             return TRUE;
         }

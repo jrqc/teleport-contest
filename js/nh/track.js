@@ -74,7 +74,7 @@ export function gettrack(x, y) {   // track.c:42
  */
 export function hastrack(x, y) {   // track.c:63
     let i = 0;
-    for (i = 0; i < utcnt[0]; i = i + 1 | 0) {
+    for (i = 0; i < utcnt[0]; i = i + 1) {
         if (utrack[i].x === x && utrack[i].y === y) {
             return TRUE;
         }
@@ -91,7 +91,7 @@ export async function save_track(nhfp) {   // track.c:76
     if (update_file(nhfp)) {
         await Sfo_int(nhfp, new $c.Ptr(utcnt, 0), $C`track-utcnt`);
         await Sfo_int(nhfp, new $c.Ptr(utpnt, 0), $C`track-utpnt`);
-        for (i = 0; i < utcnt[0]; i = i + 1 | 0) {
+        for (i = 0; i < utcnt[0]; i = i + 1) {
             await Sfo_nhcoord(nhfp, $c.relem(utrack, i), $C`utrack`);
         }
     }
@@ -111,7 +111,7 @@ export async function rest_track(nhfp) {   // track.c:93
     if (utcnt[0] > UTSZ || utpnt[0] > UTSZ) {
         await panic($C`rest_track: impossible pt counts`);
     }
-    for (i = 0; i < utcnt[0]; i = i + 1 | 0) {
+    for (i = 0; i < utcnt[0]; i = i + 1) {
         await Sfi_nhcoord(nhfp, $c.relem(utrack, i), $C`utrack`);
     }
 }

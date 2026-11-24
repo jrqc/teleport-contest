@@ -1726,7 +1726,7 @@ async function seffect_light(sobjp) {   // read.c:1741
             /* surround with cancelled tame lights which won't explode */
             let sawlights = FALSE;
             const numlights = rn1(2, 3) + Math.imul(sblessed, 2) | 0;
-            for (i = 0; i < numlights; i = i + 1 | 0) {
+            for (i = 0; i < numlights; i = i + 1) {
                 const mon = await makemon($c.relem(mons, pm), u.ux, u.uy,
                     MM.EDOG | NO.MINVENT | MM.NOMSG);
                 if (mon) {
@@ -2568,8 +2568,8 @@ export async function litroom(on, obj) {   // read.c:2491
         /* rogue lighting must light the entire room */
         const rnum = svl.level.locations[u.ux][u.uy].roomno - ROOMOFFSET;
         if (rnum >= 0) {
-            for (rx = svr.rooms[rnum].lx - 1; rx <= svr.rooms[rnum].hx + 1; rx = rx + 1 | 0) {
-                for (ry = svr.rooms[rnum].ly - 1; ry <= svr.rooms[rnum].hy + 1; ry = ry + 1 | 0) {
+            for (rx = svr.rooms[rnum].lx - 1; rx <= svr.rooms[rnum].hx + 1; rx = rx + 1) {
+                for (ry = svr.rooms[rnum].ly - 1; ry <= svr.rooms[rnum].hy + 1; ry = ry + 1) {
                     await set_lit($c.i16(rx), $c.i16(ry),
                         on ? new $c.Ptr(is_lit, 0) : null);
                 }
@@ -2661,7 +2661,7 @@ async function do_class_genocide() {   // read.c:2638
             class_ = mons[i].mlet;
         }
         let immunecnt = gonecnt = goodcnt = 0;
-        for (i = LOW_PM; i < NUMMONS; i = i + 1 | 0) {
+        for (i = LOW_PM; i < NUMMONS; i = i + 1) {
             if (mons[i].mlet === class_) {
                 if (!(mons[i].geno & G_GENO)) {
                     immunecnt = immunecnt + 1 | 0;
@@ -2696,7 +2696,7 @@ async function do_class_genocide() {   // read.c:2638
             }
             continue;
         }
-        for (i = LOW_PM; i < NUMMONS; i = i + 1 | 0) {
+        for (i = LOW_PM; i < NUMMONS; i = i + 1) {
             if (mons[i].mlet === class_) {
                 $c.strcpy(new $c.Ptr(nam, 0), await makeplural(mons[i].pmnames[NEUTRAL]));
                 /* Although "genus" is Latin for race, the hero benefits
@@ -2963,7 +2963,7 @@ export async function do_genocide(how) {   // read.c:2826
         const census = monster_census(FALSE);
         if (!(mons[mndx].geno & G_UNIQ)
             && !(svm.mvitals[mndx].mvflags & (G_GENOD | G_EXTINCT))) {
-            for (i = rn1(3, 4); i > 0; i = i - 1 | 0) {
+            for (i = rn1(3, 4); i > 0; i = i - 1) {
                 if (!await makemon(ptr, u.ux, u.uy, NO.MINVENT | MM.NOMSG)) {
                     break;   /* couldn't make one */
                 }
@@ -3244,7 +3244,7 @@ async function create_particular_creation(d) {   // read.c:3252
         }
         whichpm = $c.relem(mons, d.which);
     }
-    for (i = 0; i < d.quan; i = i + 1 | 0) {
+    for (i = 0; i < d.quan; i = i + 1) {
         let mmflags = NO.MM_FLAGS;
         if (d.monclass !== MAXMCLASSES) {
             whichpm = await mkclass(d.monclass, 0);

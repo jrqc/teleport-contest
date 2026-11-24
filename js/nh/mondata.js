@@ -125,7 +125,7 @@ export function attacktype(ptr, atyp) {   // mondata.c:54
 export function noattacks(ptr) {   // mondata.c:61
     let i = 0;
     const mattk = ptr.mattk[0];
-    for (i = 0; i < NATTK; i = i + 1 | 0) {
+    for (i = 0; i < NATTK; i = i + 1) {
         /* AT_BOOM "passive attack" (gas spore's explosion upon death)
            isn't an attack as far as our callers are concerned */
         if ($c.radd(mattk, i).aatyp === AT.BOOM) {
@@ -494,7 +494,7 @@ export async function can_blnd(magr, mdef, aatyp, obj) {   // mondata.c:305
  */
 export function ranged_attk(ptr) {   // mondata.c:402
     let i = 0;
-    for (i = 0; i < NATTK; i = i + 1 | 0) {
+    for (i = 0; i < NATTK; i = i + 1) {
         if (DISTANCE_ATTK_TYPE(ptr.mattk[i].aatyp)) {
             return TRUE;
         }
@@ -527,7 +527,7 @@ export function mstrength(ptr) {   // mondata.c:428
     /* for very fast monsters */
     n = n + (ptr.mmove >= 18 ? 1 : 0) | 0;
     /* for each attack and "special" attack */
-    for (i = 0; i < NATTK; i = i + 1 | 0) {
+    for (i = 0; i < NATTK; i = i + 1) {
         tmp2 = ptr.mattk[i].aatyp;
         n = n + (tmp2 > 0 ? 1 : 0) | 0;
         n = n + (tmp2 === AT.MAGC ? 1 : 0) | 0;
@@ -542,7 +542,7 @@ export function mstrength(ptr) {   // mondata.c:428
         }
     }
     /* for each "special" damage type */
-    for (i = 0; i < NATTK; i = i + 1 | 0) {
+    for (i = 0; i < NATTK; i = i + 1) {
         tmp2 = ptr.mattk[i].adtyp;
         if (tmp2 === AD.DRLI || tmp2 === AD.STON || tmp2 === AD.DRST
             || tmp2 === AD.DRDX || tmp2 === AD.DRCO || tmp2 === AD.WERE) {
@@ -581,7 +581,7 @@ export function mstrength(ptr) {   // mondata.c:428
 function mstrength_ranged_attk(ptr) {   // mondata.c:501
     let i = 0, j = 0;
     const atk_mask = 1 << AT.BREA | 1 << AT.SPIT | 1 << AT.GAZE;
-    for (i = 0; i < NATTK; i = i + 1 | 0) {
+    for (i = 0; i < NATTK; i = i + 1) {
         if ((j = ptr.mattk[i].aatyp) >= AT.WEAP
             || j < 32 && (atk_mask & 1 << j) !== 0) {
             return TRUE;
@@ -830,7 +830,7 @@ export async function max_passive_dmg(mdef, magr) {   // mondata.c:720
     let i = 0;
     let multi2 = 0;
     /* each attack by magr can result in passive damage */
-    for (i = 0; i < NATTK; i = i + 1 | 0) {
+    for (i = 0; i < NATTK; i = i + 1) {
         switch (magr.data.mattk[i].aatyp) {
             case AT.CLAW:
             case AT.BITE:
@@ -849,7 +849,7 @@ export async function max_passive_dmg(mdef, magr) {   // mondata.c:720
         }
     }
     let dmg = 0;
-    for (i = 0; i < NATTK; i = i + 1 | 0) {
+    for (i = 0; i < NATTK; i = i + 1) {
         if (mdef.data.mattk[i].aatyp === AT.NONE
             || mdef.data.mattk[i].aatyp === AT.BOOM) {
             const adtyp = mdef.data.mattk[i].adtyp;
@@ -1090,8 +1090,8 @@ export async function name_to_monplus(in_str, remainder_p, gender_name_var) {   
             }
         }
     }
-    for (len[0] = 0, i = LOW_PM; i < NUMMONS; i = i + 1 | 0) {
-        for (mgend = MALE; mgend < NUM_MGENDERS; mgend = mgend + 1 | 0) {
+    for (len[0] = 0, i = LOW_PM; i < NUMMONS; i = i + 1) {
+        for (mgend = MALE; mgend < NUM_MGENDERS; mgend = mgend + 1) {
             if (!mons[i].pmnames[mgend]) {
                 continue;
             }
@@ -1209,7 +1209,7 @@ export async function name_to_monclass(in_str, mndx_p) {   // mondata.c:1090
         }
         /* check monster class descriptions */
         const len = $c.i32($c.strlen(in_str));
-        for (i = 1; i < MAXMCLASSES; i = i + 1 | 0) {
+        for (i = 1; i < MAXMCLASSES; i = i + 1) {
             const x = def_monsyms[i].explain;
             if ((p = strstri(x, in_str)) !== null && ($c.peq(p, x) || p.add(-1).get(0) === 32)
                 && ($c.i32($c.strlen(p)) >= len
@@ -1608,7 +1608,7 @@ export function give_u_to_m_resistances(mtmp) {   // mondata.c:1586
     /* convert the hero's current set of intrinsics to their monster
        equivalents -- FIRE_RES to MR_FIRE, COLD_RES to MR_COLD, etc -- and
        add each to the mintrinsics field for the given monster */
-    for (intr = FIRE_RES; intr <= STONE_RES; intr = intr + 1 | 0) {
+    for (intr = FIRE_RES; intr <= STONE_RES; intr = intr + 1) {
         if ($c.and64(u.uprops[intr].intrinsic, INTRINSIC) !== 0) {
             mtmp.mintrinsics = $c.u16(mtmp.mintrinsics | res_to_mr(intr));
         }

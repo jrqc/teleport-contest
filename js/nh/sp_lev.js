@@ -755,7 +755,7 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
         }
     }
     /* level (teleport) regions */
-    for (i = 0; i < gn.num_lregions; i = i + 1 | 0) {
+    for (i = 0; i < gn.num_lregions; i = i + 1) {
         if (flp & 1) {
             $c.radd(gl.lregions, i).inarea.y1 = $c.i16(maxy[0] - $c.radd(gl.lregions, i).inarea.y1 + miny[0]);
             $c.radd(gl.lregions, i).inarea.y2 = $c.i16(maxy[0] - $c.radd(gl.lregions, i).inarea.y2 + miny[0]);
@@ -790,13 +790,13 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
         }
     }
     /* regions (poison clouds, etc) */
-    for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
+    for (i = 0; i < svn.n_regions; i = i + 1) {
         if (flp & 1) {
             tmp1 = maxy[0] - gr.regions.get(i).bounding_box.ly + miny[0];
             tmp2 = maxy[0] - gr.regions.get(i).bounding_box.hy + miny[0];
             gr.regions.get(i).bounding_box.ly = $c.i16(min(tmp1, tmp2));
             gr.regions.get(i).bounding_box.hy = $c.i16(max(tmp1, tmp2));
-            for (j = 0; j < gr.regions.get(i).nrects; j = j + 1 | 0) {
+            for (j = 0; j < gr.regions.get(i).nrects; j = j + 1) {
                 tmp1 = maxy[0] - $c.radd(gr.regions.get(i).rects, j).ly + miny[0];
                 tmp2 = maxy[0] - $c.radd(gr.regions.get(i).rects, j).hy + miny[0];
                 $c.radd(gr.regions.get(i).rects, j).ly = $c.i16(min(tmp1, tmp2));
@@ -808,7 +808,7 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
             tmp2 = maxx[0] - gr.regions.get(i).bounding_box.hx + minx[0];
             gr.regions.get(i).bounding_box.lx = $c.i16(min(tmp1, tmp2));
             gr.regions.get(i).bounding_box.hx = $c.i16(max(tmp1, tmp2));
-            for (j = 0; j < gr.regions.get(i).nrects; j = j + 1 | 0) {
+            for (j = 0; j < gr.regions.get(i).nrects; j = j + 1) {
                 tmp1 = maxx[0] - $c.radd(gr.regions.get(i).rects, j).lx + minx[0];
                 tmp2 = maxx[0] - $c.radd(gr.regions.get(i).rects, j).hx + minx[0];
                 $c.radd(gr.regions.get(i).rects, j).lx = $c.i16(min(tmp1, tmp2));
@@ -840,7 +840,7 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
             }
         }
         if (sroom.nsubrooms) {
-            for (i = 0; i < sroom.nsubrooms; i = i + 1 | 0) {
+            for (i = 0; i < sroom.nsubrooms; i = i + 1) {
                 const rroom = sroom.sbrooms[i];
                 if (flp & 1) {
                     rroom.ly = $c.i16(maxy[0] - rroom.ly + miny[0]);
@@ -864,7 +864,7 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
         }
     }
     /* doors */
-    for (i = 0; i < gd.doorindex; i = i + 1 | 0) {
+    for (i = 0; i < gd.doorindex; i = i + 1) {
         do {
             if ($c.radd(svd.doors, i).x && ($c.radd(svd.doors, i).x >= minx[0] && $c.radd(svd.doors, i).x <= maxx[0] && $c.radd(svd.doors, i).y >= miny[0] && $c.radd(svd.doors, i).y <= maxy[0])) {
                 if (flp & 1) {
@@ -878,8 +878,8 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
     }
     /* the map */
     if (flp & 1) {
-        for (x = minx[0]; x <= maxx[0]; x = x + 1 | 0) {
-            for (y = miny[0]; y < (miny[0] + $c.div32(maxy[0] - miny[0] + 1, 2) | 0); y = y + 1 | 0) {
+        for (x = minx[0]; x <= maxx[0]; x = x + 1) {
+            for (y = miny[0]; y < (miny[0] + $c.div32(maxy[0] - miny[0] + 1, 2) | 0); y = y + 1) {
                 const ny = (maxy[0] - y | 0) + miny[0] | 0;
                 flip_dbridge_vertical($c.relem(svl.level.locations[x], y));
                 flip_dbridge_vertical($c.relem(svl.level.locations[x], ny));
@@ -896,8 +896,8 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
         }
     }
     if (flp & 2) {
-        for (x = minx[0]; x < (minx[0] + $c.div32(maxx[0] - minx[0] + 1, 2) | 0); x = x + 1 | 0) {
-            for (y = miny[0]; y <= maxy[0]; y = y + 1 | 0) {
+        for (x = minx[0]; x < (minx[0] + $c.div32(maxx[0] - minx[0] + 1, 2) | 0); x = x + 1) {
+            for (y = miny[0]; y <= maxy[0]; y = y + 1) {
                 const nx = (maxx[0] - x | 0) + minx[0] | 0;
                 flip_dbridge_horizontal($c.relem(svl.level.locations[x], y));
                 flip_dbridge_horizontal($c.relem(svl.level.locations[nx], y));
@@ -1026,7 +1026,7 @@ function flip_vault_guard(flp, grd, minx, miny, maxx, maxy) {   // sp_lev.c:926
             egd.ogx = $c.i16(maxx - egd.ogx + minx);
         }
     }
-    for (i = egd.fcbeg; i < egd.fcend; i = i + 1 | 0) {
+    for (i = egd.fcbeg; i < egd.fcend; i = i + 1) {
         const fx = egd.fakecorr[i].fx;
         const fy = egd.fakecorr[i].fy;
         if (fx >= minx && fx <= maxx && fy >= miny && fy <= maxy) {
@@ -1222,16 +1222,16 @@ async function maybe_add_door(x, y, droom) {   // sp_lev.c:1110
  */
 async function link_doors_rooms() {   // sp_lev.c:1122
     let x = 0, y = 0, tmpi = 0, m = 0;
-    for (y = 0; y < ROWNO; y = y + 1 | 0) {
-        for (x = 0; x < COLNO; x = x + 1 | 0) {
+    for (y = 0; y < ROWNO; y = y + 1) {
+        for (x = 0; x < COLNO; x = x + 1) {
             if (svl.level.locations[x][y].typ === DOOR || svl.level.locations[x][y].typ === SDOOR) {
                 /* in case this door was a '+' or 'S' from the
                    MAP...ENDMAP section without an explicit DOOR
                    directive, set/clear levl[][].horizontal for it */
                 set_door_orientation(x, y);
-                for (tmpi = 0; tmpi < svn.nroom; tmpi = tmpi + 1 | 0) {
+                for (tmpi = 0; tmpi < svn.nroom; tmpi = tmpi + 1) {
                     await maybe_add_door(x, y, $c.relem(svr.rooms, tmpi));
-                    for (m = 0; m < svr.rooms[tmpi].nsubrooms; m = m + 1 | 0) {
+                    for (m = 0; m < svr.rooms[tmpi].nsubrooms; m = m + 1) {
                         await maybe_add_door(x, y, svr.rooms[tmpi].sbrooms[m]);
                     }
                 }
@@ -1894,7 +1894,7 @@ async function create_door(dd, broom) {   // sp_lev.c:1714
             }
         }
     }
-    L1: for (trycnt = 0; trycnt < 100; trycnt = trycnt + 1 | 0) {
+    L1: for (trycnt = 0; trycnt < 100; trycnt = trycnt + 1) {
         const dwall = dd.wall;
         const dpos = dd.pos;
         /* Convert wall and pos into an absolute coordinate! */
@@ -2171,7 +2171,7 @@ async function create_monster(m, croom) {   // sp_lev.c:1925
                         m.appear_as.str);
                     break;
                 case M_AP.FURNITURE:
-                    for (i = 0; i < MAXPCHARS; i = i + 1 | 0) {
+                    for (i = 0; i < MAXPCHARS; i = i + 1) {
                         if (!$c.strcmp(defsyms[i].explanation, m.appear_as.str)) {
                             break;
                         }
@@ -2185,7 +2185,7 @@ async function create_monster(m, croom) {   // sp_lev.c:1925
                     }
                     break;
                 case M_AP.OBJECT:
-                    for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
+                    for (i = 0; i < NUM_OBJECTS; i = i + 1) {
                         if (obj_descr[objects[i].oc_name_idx].oc_name
                             && !$c.strcmp(obj_descr[objects[i].oc_name_idx].oc_name, m.appear_as.str)) {
                             break;
@@ -2913,7 +2913,7 @@ export async function fill_special_room(croom) {   // sp_lev.c:2731
     /* First recurse into subrooms. We don't want to block an ordinary room
      * with a special subroom from having the subroom filled, or an unfilled
      * outer room preventing a special subroom from being filled. */
-    for (i = 0; i < croom.nsubrooms; i = i + 1 | 0) {
+    for (i = 0; i < croom.nsubrooms; i = i + 1) {
         await fill_special_room(croom.sbrooms[i]);
     }
     if (croom.rtype === OROOM || croom.rtype === THEMEROOM
@@ -2929,8 +2929,8 @@ export async function fill_special_room(croom) {   // sp_lev.c:2731
         }
         switch (croom.rtype) {
             case VAULT:
-                for (x = croom.lx; x <= croom.hx; x = x + 1 | 0) {
-                    for (y = croom.ly; y <= croom.hy; y = y + 1 | 0) {
+                for (x = croom.lx; x <= croom.hx; x = x + 1) {
+                    for (y = croom.ly; y <= croom.hy; y = y + 1) {
                         await mkgold(rn2(Math.imul($c.abs(depth(u.uz)), 100)) + 51 | 0,
                             $c.i16(x), $c.i16(y));
                     }
@@ -3658,7 +3658,7 @@ async function find_objtype(L, s, oclass) {   // sp_lev.c:3468
             }
         }
         /* find by object name */
-        for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
+        for (i = 0; i < NUM_OBJECTS; i = i + 1) {
             objname = obj_descr[objects[i].oc_name_idx].oc_name;
             if ((!class_ || class_ === objects[i].oc_class)
                 && objname && !strcmpi(s, objname)) {
@@ -3677,7 +3677,7 @@ async function find_objtype(L, s, oclass) {   // sp_lev.c:3468
          *  level description but "gray stone" is not....
          */
         /* find by object description */
-        for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
+        for (i = 0; i < NUM_OBJECTS; i = i + 1) {
             objname = obj_descr[objects[i].oc_descr_idx].oc_descr;
             if (objname && !strcmpi(s, objname)) {
                 return i;
@@ -3814,7 +3814,7 @@ export async function lspo_object(L) {   // sp_lev.c:3557
                 pm = await mkclass($c.i8(def_char_to_monclass(montype.get(0))),
                     G_NOGEN | G_IGNORE);
             } else {
-                for (i = LOW_PM; i < NUMMONS; i = i + 1 | 0) {
+                for (i = LOW_PM; i < NUMMONS; i = i + 1) {
                     if (!strcmpi(mons[i].pmnames[NEUTRAL], montype)
                         || mons[i].pmnames[MALE] !== null
                         && !strcmpi(mons[i].pmnames[MALE], montype)
@@ -5457,7 +5457,7 @@ async function add_doors_to_room(croom) {   // sp_lev.c:5544
             }
         }
     }
-    for (i = 0; i < croom.nsubrooms; i = i + 1 | 0) {
+    for (i = 0; i < croom.nsubrooms; i = i + 1) {
         await add_doors_to_room(croom.sbrooms[i]);
     }
 }
@@ -5896,7 +5896,7 @@ export async function lspo_finalize_level(L) {   // sp_lev.c:6014
         await premap_detect();
     }
     await level_finalize_topology();
-    for (i = 0; i < svn.nroom; i = i + 1 | 0) {
+    for (i = 0; i < svn.nroom; i = i + 1) {
         await fill_special_room($c.relem(svr.rooms, i));
     }
     await makemap_prepost(FALSE, wtower);
@@ -6163,12 +6163,12 @@ async function sp_level_coder_init() {   // sp_lev.c:6336
     coder.room_stack = 0;
     splev_init_present = FALSE;
     icedpools = FALSE;
-    for (tmpi = 0; tmpi <= MAX_NESTED_ROOMS; tmpi = tmpi + 1 | 0) {
+    for (tmpi = 0; tmpi <= MAX_NESTED_ROOMS; tmpi = tmpi + 1) {
         coder.tmproomlist[tmpi] = null;
         coder.failed_room[tmpi] = FALSE;
     }
     update_croom();
-    for (tmpi = 0; tmpi < MAX_CONTAINMENT; tmpi = tmpi + 1 | 0) {
+    for (tmpi = 0; tmpi < MAX_CONTAINMENT; tmpi = tmpi + 1) {
         container_obj[tmpi] = null;
     }
     container_idx = 0;

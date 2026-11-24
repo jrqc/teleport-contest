@@ -806,7 +806,7 @@ function improvised_notes(same_as_last_time) {   // music.c:733
     /* You can change your tune, usually */
     if (!(Unchanging() && svc.context.jingle[0] !== 0)) {
         const notecount = rnd(5);   /* 1 - 5 */
-        for (i = 0; i < notecount; i = i + 1 | 0) {
+        for (i = 0; i < notecount; i = i + 1) {
             $t1 = improvised_notes$notes[rn2(7)], svc.context.jingle[i] = $t1;
         }
         svc.context.jingle[notecount] = 0;

@@ -730,7 +730,7 @@ function find_targ(mtmp, dx, dy, maxdist) {   // dogmove.c:650
     let cury = mtmp.my;
     let dist = 0;
     /* Walk outwards */
-    for (; dist < maxdist; dist = dist + 1 | 0) {
+    for (; dist < maxdist; dist = dist + 1) {
         curx = curx + dx | 0;
         cury = cury + dy | 0;
         if (!isok($c.i16(curx), $c.i16(cury))) {
@@ -940,8 +940,8 @@ function best_target(mtmp, forced) {   // dogmove.c:838
      * distance from the pet (7 squares, even along diagonals). Monsters
      * are assigned scores and the best score is chosen.
      */
-    for (dy = -1; dy < 2; dy = dy + 1 | 0) {
-        for (dx = -1; dx < 2; dx = dx + 1 | 0) {
+    for (dy = -1; dy < 2; dy = dy + 1) {
+        for (dx = -1; dx < 2; dx = dx + 1) {
             if (!dx && !dy) {
                 continue;
             }
@@ -1135,7 +1135,7 @@ export async function dog_move(mtmp, after) {   // dogmove.c:977
          * to see how many uncursed item squares are around.
          */
         uncursedcnt = 0;
-        for (i = 0; i < cnt; i = i + 1 | 0) {
+        for (i = 0; i < cnt; i = i + 1) {
             nx = mfp.poss[i].x;
             ny = mfp.poss[i].y;
             if (MON_AT(nx, ny) && !($c.and64(mfp.info[i], ALLOW.M) || $c.and64(mfp.info[i], ALLOW.MDISP))) {
@@ -1459,8 +1459,8 @@ function can_reach_location(mon, mx, my, fx, fy) {   // dogmove.c:1379
         return FALSE;   /* should not happen */
     }
     const dist = dist2(mx, my, fx, fy);
-    for (i = mx - 1; i <= mx + 1; i = i + 1 | 0) {
-        for (j = my - 1; j <= my + 1; j = j + 1 | 0) {
+    for (i = mx - 1; i <= mx + 1; i = i + 1) {
+        for (j = my - 1; j <= my + 1; j = j + 1) {
             if (!isok($c.i16(i), $c.i16(j))) {
                 continue;
             }

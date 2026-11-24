@@ -455,7 +455,7 @@ async function learn() {   // spell.c:356
         return 0;
     }
     $c.sprintf(new $c.Ptr(splname, 0), objects[booktype].oc_name_known ? $C`"%s"` : $C`the "%s" spell`, obj_descr[objects[booktype].oc_name_idx].oc_name);
-    for (i = 0; i < MAXSPELL; i = i + 1 | 0) {
+    for (i = 0; i < MAXSPELL; i = i + 1) {
         if (svs.spl_book[i].sp_id === booktype || svs.spl_book[i].sp_id === NO_SPELL) {
             break;
         }
@@ -619,7 +619,7 @@ export async function study_book(spellbook) {   // spell.c:468
                 return 0;
         }
         /* check to see if we already know it and want to refresh our memory */
-        for (i = 0; i < MAXSPELL; i = i + 1 | 0) {
+        for (i = 0; i < MAXSPELL; i = i + 1) {
             if (svs.spl_book[i].sp_id === booktype || svs.spl_book[i].sp_id === NO_SPELL) {
                 break;
             }
@@ -728,7 +728,7 @@ export function age_spells() {   // spell.c:669
      * The hero's speed, rest status, conscious status etc.
      * does not alter the loss of memory.
      */
-    for (i = 0; i < MAXSPELL && svs.spl_book[i].sp_id !== NO_SPELL; i = i + 1 | 0) {
+    for (i = 0; i < MAXSPELL && svs.spl_book[i].sp_id !== NO_SPELL; i = i + 1) {
         if (spellknow(i)) {
             svs.spl_book[i].sp_know = svs.spl_book[i].sp_know - 1 | 0;
         }
@@ -843,7 +843,7 @@ export async function dowizcast() {   // spell.c:787
     const win = await create_nhwindow()(NHW.MENU);
     await start_menu()(win, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
-    for (i = 0; i < MAXSPELL; i = i + 1 | 0) {
+    for (i = 0; i < MAXSPELL; i = i + 1) {
         n = SPE_DIG + i | 0;
         if (n >= SPE_BLANK_PAPER) {
             break;
@@ -917,7 +917,7 @@ export async function skill_based_spellbook_id() {   // spell.c:864
         return;
     }
     const spbook_class = SPBOOK_CLASS;
-    for (booktype = svb.bases[spbook_class]; booktype < svb.bases[spbook_class + 1]; booktype = booktype + 1 | 0) {
+    for (booktype = svb.bases[spbook_class]; booktype < svb.bases[spbook_class + 1]; booktype = booktype + 1) {
         const skill = spell_skilltype(booktype);
         if (skill === P.NONE) {
             continue;
@@ -991,7 +991,7 @@ async function propagate_chain_lightning(clq, zap$in) {   // spell.c:952
         return;
     }
     /* The same square can't be chained to twice. */
-    for (i = 0; i < clq.tail; i = i + 1 | 0) {
+    for (i = 0; i < clq.tail; i = i + 1) {
         if (clq.q[i].x === zap.x && clq.q[i].y === zap.y) {
             return;
         }
@@ -1023,7 +1023,7 @@ async function cast_chain_lightning() {   // spell.c:1003
        anyway */
     await tmp_at(DISP_BEAM, $c.i16(await zapdir_to_glyph(0, 1, clq.displayed_beam)));
     /* start by propagating in all directions from the caster */
-    for (dir = 0; dir < N_DIRS; dir = dir + 1 | 0) {
+    for (dir = 0; dir < N_DIRS; dir = dir + 1) {
         zap.$copyFrom(new $T.chain_lightning_zap());
         zap.dir = $c.u8(dir);
         zap.x = u.ux;
@@ -1716,7 +1716,7 @@ async function throwspell() {   // spell.c:1655
 export async function tport_spell(what) {   // spell.c:1707
     let i = 0;
     /* also defined in teleport.c */
-    for (i = 0; i < MAXSPELL; i = i + 1 | 0) {
+    for (i = 0; i < MAXSPELL; i = i + 1) {
         if (svs.spl_book[i].sp_id === SPE_TELEPORT_AWAY || svs.spl_book[i].sp_id === NO_SPELL) {
             break;
         }
@@ -1768,7 +1768,7 @@ export async function losespells() {   // spell.c:1763
     svc.context.spbook.book = null;
     svc.context.spbook.o_id = 0;
     /* count the number of known spells */
-    for (n = 0; n < MAXSPELL; n = n + 1 | 0) {
+    for (n = 0; n < MAXSPELL; n = n + 1) {
         if (svs.spl_book[n].sp_id === NO_SPELL) {
             break;
         }
@@ -1917,7 +1917,7 @@ async function sortspells() {   // spell.c:1927
         }
         /* allocate enough for full spellbook rather than just N spells */
         $t1 = $c.asArr(await alloc(168), Int32Array), gs.spl_orderindx = $t1;
-        for (i = 0; i < MAXSPELL; i = i + 1 | 0) {
+        for (i = 0; i < MAXSPELL; i = i + 1) {
             gs.spl_orderindx.set(i, i);
         }
     }
@@ -1925,10 +1925,10 @@ async function sortspells() {   // spell.c:1927
         /* sort svs.spl_book[] rather than spl_orderindx[];
            this also updates the index to reflect the new ordering (we
            could just free it since that ordering becomes the default) */
-        for (i = 0; i < MAXSPELL; i = i + 1 | 0) {
+        for (i = 0; i < MAXSPELL; i = i + 1) {
             tmp_book[i].$copyFrom(svs.spl_book[gs.spl_orderindx.get(i)]);
         }
-        for (i = 0; i < MAXSPELL; i = i + 1 | 0) {
+        for (i = 0; i < MAXSPELL; i = i + 1) {
             svs.spl_book[i].$copyFrom(tmp_book[i]), gs.spl_orderindx.set(i, i);
         }
         gs.spl_sortmode = SORTBY.LETTER;   /* reset */
@@ -1948,7 +1948,7 @@ async function spellsortmenu() {   // spell.c:1976
     const tmpwin = await create_nhwindow()(NHW.MENU);
     await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);   /* zero out all bits */
-    for (i = 0; i < 9; i = i + 1 | 0) {
+    for (i = 0; i < 9; i = i + 1) {
         if (i === SORTRETAINORDER) {
             let_ = 122;   /* assumes fewer than 26 sort choices... */
             /* separate final choice from others with a blank line */
@@ -2064,7 +2064,7 @@ async function dospellmenu(prompt, splaction, spell_no) {   // spell.c:2075
         $c.sprintf(eos(new $c.Ptr(buf, 0)), $C`%c%6s`, sep, $C`turns`);
     }
     await add_menu_heading(tmpwin, new $c.Ptr(buf, 0));
-    for (i = 0; i < MAXSPELL && svs.spl_book[i].sp_id !== NO_SPELL; i = i + 1 | 0) {
+    for (i = 0; i < MAXSPELL && svs.spl_book[i].sp_id !== NO_SPELL; i = i + 1) {
         const splnum = !gs.spl_orderindx ? i : gs.spl_orderindx.get(i);
         $c.sprintf(new $c.Ptr(buf, 0), fmt, obj_descr[objects[svs.spl_book[splnum].sp_id].oc_name_idx].oc_name, svs.spl_book[splnum].sp_lev, await spelltypemnemonic(spell_skilltype(svs.spl_book[splnum].sp_id)), 100 - await percent_success(splnum) | 0, spellretention(splnum, new $c.Ptr(retentionbuf, 0)));
         if (wizard()) {
@@ -2279,7 +2279,7 @@ function spellretention(idx, outbuf) {   // spell.c:2295
 export async function initialspell(obj) {   // spell.c:2340
     let i = 0;
     const otyp = obj.otyp;
-    for (i = 0; i < MAXSPELL; i = i + 1 | 0) {
+    for (i = 0; i < MAXSPELL; i = i + 1) {
         if (svs.spl_book[i].sp_id === NO_SPELL || svs.spl_book[i].sp_id === otyp) {
             break;
         }
@@ -2303,7 +2303,7 @@ export async function initialspell(obj) {   // spell.c:2340
  */
 export function known_spell(otyp) {   // spell.c:2363
     let i = 0;
-    for (i = 0; i < MAXSPELL && svs.spl_book[i].sp_id !== NO_SPELL; i = i + 1 | 0) {
+    for (i = 0; i < MAXSPELL && svs.spl_book[i].sp_id !== NO_SPELL; i = i + 1) {
         if (svs.spl_book[i].sp_id === otyp) {
             const k = svs.spl_book[i].sp_know;
             return k > 2000 ? spe_Fresh
@@ -2320,7 +2320,7 @@ export function known_spell(otyp) {   // spell.c:2363
  */
 export function spell_idx(otyp) {   // spell.c:2379
     let i = 0;
-    for (i = 0; i < MAXSPELL && svs.spl_book[i].sp_id !== NO_SPELL; i = i + 1 | 0) {
+    for (i = 0; i < MAXSPELL && svs.spl_book[i].sp_id !== NO_SPELL; i = i + 1) {
         if (svs.spl_book[i].sp_id === otyp) {
             return i;
         }
@@ -2338,7 +2338,7 @@ export async function force_learn_spell(otyp) {   // spell.c:2391
         || known_spell(otyp) === spe_Fresh) {
         return 0;
     }
-    for (i = 0; i < MAXSPELL; i = i + 1 | 0) {
+    for (i = 0; i < MAXSPELL; i = i + 1) {
         if (svs.spl_book[i].sp_id === NO_SPELL || svs.spl_book[i].sp_id === otyp) {
             break;
         }
@@ -2362,7 +2362,7 @@ export async function force_learn_spell(otyp) {   // spell.c:2391
  */
 export function num_spells() {   // spell.c:2417
     let i = 0;
-    for (i = 0; i < MAXSPELL; i = i + 1 | 0) {
+    for (i = 0; i < MAXSPELL; i = i + 1) {
         if (svs.spl_book[i].sp_id === NO_SPELL) {
             break;
         }

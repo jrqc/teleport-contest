@@ -119,7 +119,7 @@ async function choose_monster_spell(mtmp, adtyp) {   // mcastu.c:89
         spellval = rn2(maxlev);
     }
     /* find the highest spell in the list we could cast */
-    for (i = len - 1 | 0; i >= 0; i = i - 1 | 0) {
+    for (i = len - 1 | 0; i >= 0; i = i - 1) {
         if (mcast_data[list.get(i)].level <= spellval
             && !await spell_would_be_useless(mtmp, list.get(i))) {
             return list.get(i);

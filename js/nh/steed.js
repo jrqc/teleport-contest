@@ -536,7 +536,7 @@ async function landing_spot(spot, reason, forceit) {   // steed.c:460
     } else {
         best_j = clockwise_j = counterclk_j = -1;
     }
-    for (j = 0; j < N_DIRS; j = j + 1 | 0) {
+    for (j = 0; j < N_DIRS; j = j + 1) {
         /* fortunately NODIAG() handling isn't needed for DISMOUNT_KNOCKED
            because hero can only ride when humanoid */
         if (j === best_j || j === clockwise_j || j === counterclk_j) {
@@ -567,8 +567,8 @@ async function landing_spot(spot, reason, forceit) {   // steed.c:460
     for (i = reason === DISMOUNT.BYCHOICE && !impaird ? 0
         : reason === DISMOUNT.BYCHOICE && impaird
         || reason === DISMOUNT.KNOCKED ? 1
-        : 2; i <= 2 && !found; i = i + 1 | 0) {
-        for (j = 0; j < n; j = j + 1 | 0) {
+        : 2; i <= 2 && !found; i = i + 1) {
+        for (j = 0; j < n; j = j + 1) {
             const x = $c.i16(u.ux + try_[j].x);
             const y = $c.i16(u.uy + try_[j].y);
             if (!isok(x, y) || u_at(x, y)) {   /* [note: u_at() can't happen] */

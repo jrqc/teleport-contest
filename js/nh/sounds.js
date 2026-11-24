@@ -301,8 +301,8 @@ export async function dosounds() {   // sounds.c:202
                 case 1:
                     {
                         let gold_in_vault = FALSE;
-                        for (vx = sroom.lx; vx <= sroom.hx; vx = vx + 1 | 0) {
-                            for (vy = sroom.ly; vy <= sroom.hy; vy = vy + 1 | 0) {
+                        for (vx = sroom.lx; vx <= sroom.hx; vx = vx + 1) {
+                            for (vy = sroom.ly; vy <= sroom.hy; vy = vy + 1) {
                                 if (g_at($c.i16(vx), $c.i16(vy))) {
                                     gold_in_vault = TRUE;
                                 }
@@ -1454,7 +1454,7 @@ export async function tiphat() {   // sounds.c:1427
             mtmp = null;
             vismon = unseen = statue = 0, glyph = GLYPH.MON_OFF;
             x = u.ux, y = u.uy;
-            for (range = 1; range <= BOLT_LIM + 1; range = range + 1 | 0) {
+            for (range = 1; range <= BOLT_LIM + 1; range = range + 1) {
                 x = x + u.dx | 0, y = y + u.dy | 0;
                 if (!isok($c.i16(x), $c.i16(y)) || range > 1 && !couldsee(x, y)) {
                     /* switch back to coordinates for previous iteration's 'mtmp' */
@@ -1586,7 +1586,7 @@ export async function get_soundlib_name(dest, maxlen) {   // sounds.c:1864
         await panic($C`get_soundlib_name: invalid active_soundlib (%d)`, idx);
     }
     let src = soundlib_choices[idx].sndprocs.soundname;
-    for (count = 1; count < maxlen; count = count + 1 | 0) {
+    for (count = 1; count < maxlen; count = count + 1) {
         if (src.get(0) === 44 || src.get(0) === 0) {
             break;   /*exit on \0 terminator*/
         }
@@ -1602,7 +1602,7 @@ export function soundlib_id_from_opt(op) {   // sounds.c:1883
     let idx = 0;
     const defproc = nosound_procs;
     let sp = null;
-    for (idx = 0; idx < 1; idx = idx + 1 | 0) {
+    for (idx = 0; idx < 1; idx = idx + 1) {
         sp = soundlib_choices[idx].sndprocs;
         if (!$c.strcmp(sp.soundname, op)) {
             return sp.soundlib_id;

@@ -193,7 +193,7 @@ function consume_arg(ndx, ac_p, av_p) {   // earlyarg.c:149
     /* "-one -two -three -four" -> "-two -three -four -one" */
     if (ac > 2) {
         const gone = av.get(ndx);
-        for (i = ndx + 1 | 0; i < ac; i = i + 1 | 0) {
+        for (i = ndx + 1 | 0; i < ac; i = i + 1) {
             av.set(i - 1 | 0, av.get(i));
         }
         av.set(ac - 1 | 0, gone);
@@ -456,7 +456,7 @@ export async function argcheck(argc, argv, e_arg) {   // earlyarg.c:450
     let match = FALSE;
     let userea = null;
     let dashdash = $C``;
-    for (idx = 0; idx < 8; idx = idx + 1 | 0) {
+    for (idx = 0; idx < 8; idx = idx + 1) {
         if (earlyopts[idx].e === e_arg) {
             break;
         }
@@ -464,7 +464,7 @@ export async function argcheck(argc, argv, e_arg) {   // earlyarg.c:450
     if (idx >= 8 || argc < 1) {
         return 0;
     }
-    for (i = 0; i < argc; i = i + 1 | 0) {
+    for (i = 0; i < argc; i = i + 1) {
         if (argv.get(i).get(0) !== 45) {
             continue;
         }
@@ -610,9 +610,9 @@ function debug_fields(opts) {   // earlyarg.c:576
 async function dump_enums() {   // earlyarg.c:706
     let i = 0, j = 0, comment = new Int8Array(256);
     /* 0 = dump numerically only, 1 = add 'char' comment */
-    for (i = 0; i < 11 /* NUM_ENUM_DUMPS */; i = i + 1 | 0) {
+    for (i = 0; i < 11 /* NUM_ENUM_DUMPS */; i = i + 1) {
         await raw_printf($C`enum %s = {`, dump_enums$edmp[i].title);
-        for (j = 0; j < dump_enums$edmp[i].szd; j = j + 1 | 0) {
+        for (j = 0; j < dump_enums$edmp[i].szd; j = j + 1) {
             const nmprefix = j >= (dump_enums$edmp[i].szd - dump_enums$edmp[i].unprefixed_count | 0)
                 ? $C`` : dump_enums$edmp[i].pfx;   /* "" or "PM_" */
             const nmwidth = 27 - $c.i32($c.strlen(nmprefix)) | 0;   /* 27 or 24 */

@@ -406,7 +406,7 @@ function finish_map(fg_typ, bg_typ, lit, walled, icedpools) {   // mkmap.c:331
  */
 export async function remove_rooms(lx, ly, hx, hy) {   // mkmap.c:379
     let i = 0;
-    for (i = svn.nroom - 1 | 0; i >= 0; i = i - 1 | 0) {
+    for (i = svn.nroom - 1 | 0; i >= 0; i = i - 1) {
         const croom = $c.relem(svr.rooms, i);
         if (croom.hx < lx || croom.lx >= hx || croom.hy < ly
             || croom.ly >= hy) {
@@ -487,14 +487,14 @@ export async function mkmap(init_lev) {   // mkmap.c:451
     $t1 = $c.asArr(await alloc((WIDTH + 1) * HEIGHT), Int8Array), gn.new_locations = $t1;
     init_map(bg_typ);
     init_fill(bg_typ, fg_typ);
-    for (i = 0; i < N_P1_ITER; i = i + 1 | 0) {
+    for (i = 0; i < N_P1_ITER; i = i + 1) {
         pass_one(bg_typ, fg_typ);
     }
-    for (i = 0; i < N_P2_ITER; i = i + 1 | 0) {
+    for (i = 0; i < N_P2_ITER; i = i + 1) {
         pass_two(bg_typ, fg_typ);
     }
     if (smooth) {
-        for (i = 0; i < N_P3_ITER; i = i + 1 | 0) {
+        for (i = 0; i < N_P3_ITER; i = i + 1) {
             pass_three(bg_typ, fg_typ);
         }
     }

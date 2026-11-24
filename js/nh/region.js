@@ -80,7 +80,7 @@ export function inside_region(reg, x, y) {   // region.c:63
     if (reg === null || !inside_rect(reg.bounding_box, x, y)) {
         return FALSE;
     }
-    for (i = 0; i < reg.nrects; i = i + 1 | 0) {
+    for (i = 0; i < reg.nrects; i = i + 1) {
         if (inside_rect($c.radd(reg.rects, i), x, y)) {
             return TRUE;
         }
@@ -110,7 +110,7 @@ export async function create_region(rects, nrect) {   // region.c:79
     }
     reg.nrects = $c.i16(nrect);
     $t1 = nrect > 0 ? $c.asRec(await alloc($c.u32($c.mulu64($c.u64(nrect), 8))), $T.nhrect, 8) : null, reg.rects = $t1;
-    for (i = 0; i < nrect; i = i + 1 | 0) {
+    for (i = 0; i < nrect; i = i + 1) {
         if ($c.radd(rects, i).lx < reg.bounding_box.lx) {
             reg.bounding_box.lx = $c.radd(rects, i).lx;
         }
@@ -198,7 +198,7 @@ export async function add_mon_to_reg(reg, mon) {   // region.c:161
     if (reg.max_monst <= reg.n_monst) {
         const tmp_m = $c.asArr(await alloc($c.u32($c.mulu64(4, $c.u64(reg.max_monst + MONST_INC)))), Uint32Array);
         if (reg.max_monst > 0) {
-            for (i = 0; i < reg.max_monst; i = i + 1 | 0) {
+            for (i = 0; i < reg.max_monst; i = i + 1) {
                 tmp_m.set(i, reg.monsters.get(i));
             }
             $c.free(reg.monsters);
@@ -217,7 +217,7 @@ export async function add_mon_to_reg(reg, mon) {   // region.c:161
  */
 export function remove_mon_from_reg(reg, mon) {   // region.c:192
     let i = 0;
-    for (i = 0; i < reg.n_monst; i = i + 1 | 0) {
+    for (i = 0; i < reg.n_monst; i = i + 1) {
         if (reg.monsters.get(i) === mon.m_id) {
             reg.n_monst = $c.i16(reg.n_monst - 1);
             reg.monsters.set(i, reg.monsters.get(reg.n_monst));
@@ -237,7 +237,7 @@ export function remove_mon_from_reg(reg, mon) {   // region.c:192
  */
 export function mon_in_region(reg, mon) {   // region.c:210
     let i = 0;
-    for (i = 0; i < reg.n_monst; i = i + 1 | 0) {
+    for (i = 0; i < reg.n_monst; i = i + 1) {
         if (reg.monsters.get(i) === mon.m_id) {
             return TRUE;
         }
@@ -297,8 +297,8 @@ export async function add_region(reg) {   // region.c:284
     gr.regions.set(svn.n_regions, reg);
     svn.n_regions = svn.n_regions + 1 | 0;
     /* Check for monsters inside the region */
-    for (i = reg.bounding_box.lx; i <= reg.bounding_box.hx; i = i + 1 | 0) {
-        for (j = reg.bounding_box.ly; j <= reg.bounding_box.hy; j = j + 1 | 0) {
+    for (i = reg.bounding_box.lx; i <= reg.bounding_box.hx; i = i + 1) {
+        for (j = reg.bounding_box.ly; j <= reg.bounding_box.hy; j = j + 1) {
             let is_inside = FALSE;
             /* Some regions can cross the level boundaries */
             if (!isok($c.i16(i), $c.i16(j))) {
@@ -341,7 +341,7 @@ export async function add_region(reg) {   // region.c:284
  */
 export async function remove_region(reg) {   // region.c:344
     let i = 0, x = 0, y = 0, pass = 0;
-    for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
+    for (i = 0; i < svn.n_regions; i = i + 1) {
         if (gr.regions.get(i) === reg) {
             break;
         }
@@ -361,10 +361,10 @@ export async function remove_region(reg) {   // region.c:344
         /* need to process the region's spots twice, first unblocking all
            locations which no longer block line-of-sight, then redrawing
            spots within revised line-of-sight; skip second pass if blind */
-        for (pass = 1; pass <= (Blind() ? 1 : 2); pass = pass + 1 | 0) {
+        for (pass = 1; pass <= (Blind() ? 1 : 2); pass = pass + 1) {
             u.uinwater = ((pass === 1 ? 0 : tmp_uinwater) >>> 0) & 1;
-            for (x = reg.bounding_box.lx; x <= reg.bounding_box.hx; x = x + 1 | 0) {
-                for (y = reg.bounding_box.ly; y <= reg.bounding_box.hy; y = y + 1 | 0) {
+            for (x = reg.bounding_box.lx; x <= reg.bounding_box.hx; x = x + 1) {
+                for (y = reg.bounding_box.ly; y <= reg.bounding_box.hy; y = y + 1) {
                     if (isok($c.i16(x), $c.i16(y)) && inside_region(reg, x, y)) {
                         if (pass === 1) {
                             if (!does_block(x, y, $c.relem(svl.level.locations[x], y))) {
@@ -391,7 +391,7 @@ export async function remove_region(reg) {   // region.c:344
  */
 export function clear_regions() {   // region.c:394
     let i = 0;
-    for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
+    for (i = 0; i < svn.n_regions; i = i + 1) {
         free_region(gr.regions.get(i));
     }
     svn.n_regions = 0;
@@ -416,7 +416,7 @@ export async function run_regions() {   // region.c:414
     gg.gas_cloud_diss_seen = 0;
     /* End of life ? */
     /* Do it backward because the array will be modified */
-    for (i = svn.n_regions - 1 | 0; i >= 0; i = i - 1 | 0) {
+    for (i = svn.n_regions - 1 | 0; i >= 0; i = i - 1) {
         if (gr.regions.get(i).ttl === 0) {
             if ((f_indx = gr.regions.get(i).expire_f) === NO_CALLBACK
                 || await callbacks[f_indx](gr.regions.get(i), null)) {
@@ -425,7 +425,7 @@ export async function run_regions() {   // region.c:414
         }
     }
     /* Process remaining regions */
-    for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
+    for (i = 0; i < svn.n_regions; i = i + 1) {
         /* Make the region age */
         if (gr.regions.get(i).ttl > 0) {
             gr.regions.get(i).ttl = $c.sub64(gr.regions.get(i).ttl, 1);
@@ -478,7 +478,7 @@ export async function in_out_region(x, y) {   // region.c:480
     let i = 0;
     let f_indx = 0;
     /* First check if hero can do the move */
-    for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
+    for (i = 0; i < svn.n_regions; i = i + 1) {
         if (gr.regions.get(i).attach_2_u) {
             continue;
         }
@@ -493,7 +493,7 @@ export async function in_out_region(x, y) {   // region.c:480
         }
     }
     /* Callbacks for the regions hero does leave */
-    for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
+    for (i = 0; i < svn.n_regions; i = i + 1) {
         if (gr.regions.get(i).attach_2_u) {
             continue;
         }
@@ -509,7 +509,7 @@ export async function in_out_region(x, y) {   // region.c:480
         }
     }
     /* Callbacks for the regions hero does enter */
-    for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
+    for (i = 0; i < svn.n_regions; i = i + 1) {
         if (gr.regions.get(i).attach_2_u) {
             continue;
         }
@@ -539,7 +539,7 @@ export async function m_in_out_region(mon, x, y) {   // region.c:533
     let i = 0;
     let f_indx = 0;
     /* First check if mon can do the move */
-    for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
+    for (i = 0; i < svn.n_regions; i = i + 1) {
         if (gr.regions.get(i).attach_2_m === mon.m_id) {
             continue;
         }
@@ -554,7 +554,7 @@ export async function m_in_out_region(mon, x, y) {   // region.c:533
         }
     }
     /* Callbacks for the regions mon does leave */
-    for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
+    for (i = 0; i < svn.n_regions; i = i + 1) {
         if (gr.regions.get(i).attach_2_m === mon.m_id) {
             continue;
         }
@@ -567,7 +567,7 @@ export async function m_in_out_region(mon, x, y) {   // region.c:533
         }
     }
     /* Callbacks for the regions mon does enter */
-    for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
+    for (i = 0; i < svn.n_regions; i = i + 1) {
         if (gr.regions.get(i).attach_2_m === mon.m_id) {
             continue;
         }
@@ -586,7 +586,7 @@ export async function m_in_out_region(mon, x, y) {   // region.c:533
  */
 export function update_player_regions() {   // region.c:582
     let i = 0;
-    for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
+    for (i = 0; i < svn.n_regions; i = i + 1) {
         if (!gr.regions.get(i).attach_2_u
             && inside_region(gr.regions.get(i), u.ux, u.uy)) {
             gr.regions.get(i).player_flags = (gr.regions.get(i).player_flags | REG.HERO_INSIDE) >>> 0;
@@ -604,7 +604,7 @@ export function update_player_regions() {   // region.c:582
  */
 export async function update_monster_region(mon) {   // region.c:598
     let i = 0;
-    for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
+    for (i = 0; i < svn.n_regions; i = i + 1) {
         if (inside_region(gr.regions.get(i), mon.mx, mon.my)) {
             if (!mon_in_region(gr.regions.get(i), mon)) {
                 await add_mon_to_reg(gr.regions.get(i), mon);
@@ -641,7 +641,7 @@ export function reg_damg(reg) {   // region.c:651
  */
 export function any_visible_region() {   // region.c:660
     let i = 0;
-    for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
+    for (i = 0; i < svn.n_regions; i = i + 1) {
         if (!gr.regions.get(i).visible || gr.regions.get(i).ttl === -2) {
             continue;
         }
@@ -658,7 +658,7 @@ export async function visible_region_summary(win) {   // region.c:674
     let buf = new Int8Array(256), typbuf = new Int8Array(128), i = 0, $t1;
     let hdr_done = 0;
     const fldsep = iflags.menu_tab_sep ? $C`\t` : $C`  `;
-    for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
+    for (i = 0; i < svn.n_regions; i = i + 1) {
         const reg = gr.regions.get(i);
         if (!reg.visible || reg.ttl === -2) {
             continue;
@@ -698,7 +698,7 @@ export async function visible_region_summary(win) {   // region.c:674
  */
 export function visible_region_at(x, y) {   // region.c:718
     let i = 0;
-    for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
+    for (i = 0; i < svn.n_regions; i = i + 1) {
         if (!gr.regions.get(i).visible || gr.regions.get(i).ttl === -2) {
             continue;
         }
@@ -733,11 +733,11 @@ export async function save_regions(nhfp) {   // region.c:741
         /* timestamp */
         await sfo_long(nhfp, new $c.FieldRef(svm, "moves", "i64"), $C`region-tmstamp`);
         await Sfo_int(nhfp, new $c.FieldRef(svn, "n_regions", "i32"), $C`region-region_count`);
-        for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
+        for (i = 0; i < svn.n_regions; i = i + 1) {
             r = gr.regions.get(i);
             await Sfo_nhrect(nhfp, r.bounding_box, $C`region-bounding_box`);
             await Sfo_short(nhfp, new $c.FieldRef(r, "nrects", "i16"), $C`region-nrects`);
-            for (j = 0; j < r.nrects; j = j + 1 | 0) {
+            for (j = 0; j < r.nrects; j = j + 1) {
                 await Sfo_nhrect(nhfp, $c.radd(r.rects, j), $C`region-rect`);
             }
             await Sfo_boolean(nhfp, new $c.FieldRef(r, "attach_2_u", "i8"), $C`region-attach_2_u`);
@@ -762,7 +762,7 @@ export async function save_regions(nhfp) {   // region.c:741
             await Sfo_short(nhfp, new $c.FieldRef(r, "inside_f", "i16"), $C`region-inside_f`);
             await Sfo_unsigned(nhfp, new $c.FieldRef(r, "player_flags", "u32"), $C`region-player_flags`);
             await Sfo_short(nhfp, new $c.FieldRef(r, "n_monst", "i16"), $C`region-monster_count`);
-            for (j = 0; j < r.n_monst; j = j + 1 | 0) {
+            for (j = 0; j < r.n_monst; j = j + 1) {
                 await Sfo_unsigned(nhfp, r.monsters.add(j), $C`region-monster`);
             }
             await Sfo_boolean(nhfp, new $c.FieldRef(r, "visible", "i8"), $C`region-visible`);
@@ -796,7 +796,7 @@ export async function rest_regions(nhfp) {   // region.c:799
     if (svn.n_regions > 0) {
         $t1 = $c.asArr(await alloc($c.u32($c.mulu64($c.u64(svn.n_regions), 8))), 'ptr'), gr.regions = $t1;
     }
-    for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
+    for (i = 0; i < svn.n_regions; i = i + 1) {
         r = ($t2 = $c.asRec(await alloc(96), $T.NhRegion, 96), gr.regions.set(i, $t2));
         await Sfi_nhrect(nhfp, r.bounding_box, $C`region-bounding box`);
         await Sfi_short(nhfp, new $c.FieldRef(r, "nrects", "i16"), $C`region-nrects`);
@@ -805,7 +805,7 @@ export async function rest_regions(nhfp) {   // region.c:799
         } else {
             r.rects = null;
         }
-        for (j = 0; j < r.nrects; j = j + 1 | 0) {
+        for (j = 0; j < r.nrects; j = j + 1) {
             await Sfi_nhrect(nhfp, $c.radd(r.rects, j), $C`region-rect`);
         }
         await Sfi_boolean(nhfp, new $c.FieldRef(r, "attach_2_u", "i8"), $C`region-attach_2_u`);
@@ -853,7 +853,7 @@ export async function rest_regions(nhfp) {   // region.c:799
             r.monsters = null;
         }
         r.max_monst = r.n_monst;
-        for (j = 0; j < r.n_monst; j = j + 1 | 0) {
+        for (j = 0; j < r.n_monst; j = j + 1) {
             await sfi_unsigned(nhfp, r.monsters.add(j), $C`region-monster`);
         }
         await Sfi_boolean(nhfp, new $c.FieldRef(r, "visible", "i8"), $C`region-visible`);
@@ -862,7 +862,7 @@ export async function rest_regions(nhfp) {   // region.c:799
     }
     /* remove expired regions, do not trigger the expire_f callback (yet!);
        also update monster lists if this data is coming from a bones file */
-    for (i = svn.n_regions - 1 | 0; i >= 0; i = i - 1 | 0) {
+    for (i = svn.n_regions - 1 | 0; i >= 0; i = i - 1) {
         r = gr.regions.get(i);
         if (r.ttl === 0) {
             await remove_region(r);
@@ -885,7 +885,7 @@ export function region_stats(hdrfmt, hdrbuf, count, size) {   // region.c:899
     $c.sprintf(hdrbuf, hdrfmt, 96, 8);
     count.set(0, svn.n_regions);   /* might be 0 even tho max_regions isn't */
     size.set(0, $c.mul64(gm.max_regions, 96));
-    for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
+    for (i = 0; i < svn.n_regions; i = i + 1) {
         const rg = gr.regions.get(i);
         size.set(0, $c.add64(size.get(0), $c.mul64(rg.nrects, 8)));
         if (rg.enter_msg) {
@@ -964,7 +964,7 @@ export function expire_gas_cloud(p1, p2) {   // region.c:1046
     }
     /* The cloud no longer blocks vision.  cansee() checks shouldn't be made
        until all blocked spots have been unblocked, so we need two passes */
-    for (pass = 1; pass <= (Blind() ? 1 : 2); pass = pass + 1 | 0) {
+    for (pass = 1; pass <= (Blind() ? 1 : 2); pass = pass + 1) {
         for (x = reg.bounding_box.lx; x <= reg.bounding_box.hx; x = $c.i16(x + 1)) {
             for (y = reg.bounding_box.ly; y <= reg.bounding_box.hy; y = $c.i16(y + 1)) {
                 if (inside_region(reg, x, y)) {
@@ -1080,7 +1080,7 @@ export async function inside_gas_cloud(p1, p2) {   // region.c:1091
  */
 function is_hero_inside_gas_cloud() {   // region.c:1168
     let i = 0;
-    for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
+    for (i = 0; i < svn.n_regions; i = i + 1) {
         if (hero_inside(gr.regions.get(i))
             && gr.regions.get(i).inside_f === INSIDE_GAS_CLOUD) {
             return TRUE;
@@ -1146,7 +1146,7 @@ export async function create_gas_cloud(x, y, cloudsize, damage) {   // region.c:
         await impossible($C`create_gas_cloud: cloud too large (%d)!`, cloudsize);
         cloudsize = MAX_CLOUD_SIZE;
     }
-    for (curridx = 0; curridx < newidx; curridx = curridx + 1 | 0) {
+    for (curridx = 0; curridx < newidx; curridx = curridx + 1) {
         if (newidx >= cloudsize) {
             break;
         }
@@ -1167,14 +1167,14 @@ export async function create_gas_cloud(x, y, cloudsize, damage) {   // region.c:
         dirs[2].y = 0;
         dirs[3].x = 1;
         dirs[3].y = 0;
-        for (i = 4; i > 0; i = i - 1 | 0) {
+        for (i = 4; i > 0; i = i - 1) {
             const swapidx = $c.i16(rn2(i));
             tmp.$copyFrom(dirs[swapidx]);
             dirs[swapidx].$copyFrom(dirs[i - 1 | 0]);
             dirs[i - 1 | 0].$copyFrom(tmp);
         }
         let nvalid = 0;   /* # of valid adjacent spots */
-        for (i = 0; i < 4; i = i + 1 | 0) {
+        for (i = 0; i < 4; i = i + 1) {
             /* try all 4 cardinal directions */
             const dx = dirs[i].x;
             const dy = dirs[i].y;
@@ -1182,7 +1182,7 @@ export async function create_gas_cloud(x, y, cloudsize, damage) {   // region.c:
             if (valid_cloud_pos($c.i16(xx + dx | 0), $c.i16(yy + dy | 0))) {
                 nvalid = nvalid + 1 | 0;
                 /* don't pick a location we've already picked */
-                for (j = 0; j < newidx; j = j + 1 | 0) {
+                for (j = 0; j < newidx; j = j + 1) {
                     if (xcoords[j] === (xx + dx | 0) && ycoords[j] === (yy + dy | 0)) {
                         isunpicked = FALSE;
                         break;
@@ -1210,7 +1210,7 @@ export async function create_gas_cloud(x, y, cloudsize, damage) {   // region.c:
        of space.  In either case, newidx is the correct total number of
        coordinates inserted. */
     const cloud = await create_region(null, 0);
-    for (i = 0; i < newidx; i = i + 1 | 0) {
+    for (i = 0; i < newidx; i = i + 1) {
         $t1 = tmprect.hx = xcoords[i], tmprect.lx = $t1;
         $t2 = tmprect.hy = ycoords[i], tmprect.ly = $t2;
         await add_rect_to_reg(cloud, tmprect);
@@ -1252,7 +1252,7 @@ export async function create_gas_cloud_selection(sel, damage) {   // region.c:13
 export function region_danger() {   // region.c:1341
     let i = 0;
     let n = 0;
-    for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
+    for (i = 0; i < svn.n_regions; i = i + 1) {
         /* only care about regions that hero is in */
         if (!hero_inside(gr.regions.get(i))) {
             continue;
@@ -1283,7 +1283,7 @@ export async function region_safety() {   // region.c:1368
     let i = 0, $t1;
     let r = null;
     let n = 0;
-    for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
+    for (i = 0; i < svn.n_regions; i = i + 1) {
         /* only care about regions that hero is in */
         if (!hero_inside(gr.regions.get(i))) {
             continue;

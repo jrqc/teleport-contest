@@ -314,7 +314,7 @@ async function insert_rtoption(buf) {   // version.c:339
     if (!gl.lua_ver[0]) {
         await get_lua_version();
     }
-    for (i = 0; i < 3; i = i + 1 | 0) {
+    for (i = 0; i < 3; i = i + 1) {
         if (strstri(buf, rt_opts[i].token) && rt_opts[i].value.get(0)) {
             strsubst(buf, rt_opts[i].token, rt_opts[i].value);
         }
@@ -489,7 +489,7 @@ export async function store_critical_bytes(nhfp) {   // version.c:676
         await Sfo_char(nhfp, new $c.Ptr(indicate, 0), $C`indicate-format`, 1);
         await Sfo_char(nhfp, new $c.Ptr(csc_count, 0), $C`count-critical_sizes`, 1);
         const cnt = csc_count[0];
-        for (i = 0; i < cnt; i = i + 1 | 0) {
+        for (i = 0; i < cnt; i = i + 1) {
             await Sfo_uchar(nhfp, new $c.FieldRef(critical_sizes[i], "ucsize", "u8"), $C`critical_sizes`);
         }
     }
@@ -578,10 +578,10 @@ export async function compare_critical_bytes(nhfp, idx_1st_mismatch, utdflags) {
         }
         return SF.CRITICAL_BYTE_COUNT_MISMATCH;
     }
-    for (i = 0; i < file_csc_count[0]; i = i + 1 | 0) {
+    for (i = 0; i < file_csc_count[0]; i = i + 1) {
         await Sfi_uchar(nhfp, new $c.Ptr(cscbuf, i), $C`critical_sizes`);
     }
-    for (i = 1; i < cnt; i = i + 1 | 0) {
+    for (i = 1; i < cnt; i = i + 1) {
         if (cscbuf[i] !== critical_sizes[i].ucsize) {
             const dm = datamodel(0);
             /* short */

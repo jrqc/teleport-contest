@@ -412,7 +412,7 @@ export async function NH_panictrace_libc() {   // report.c:485
     await raw_print()($C`  Generating more information you may report:\n`);
     const count = $c.backtrace(new $c.Ptr(bt, 0), 20);
     const info = $c.backtrace_symbols(new $c.Ptr(bt, 0), count);
-    for (x = 0; x < count; x = x + 1 | 0) {
+    for (x = 0; x < count; x = x + 1) {
         copynchars(new $c.Ptr(buf, 0), info.get(x), 255);
         /* try to remove up to 16 blank spaces by removing 8 twice */
         strsubst(new $c.Ptr(buf, 0), $C`        `, $C``);

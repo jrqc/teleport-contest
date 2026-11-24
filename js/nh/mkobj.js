@@ -377,7 +377,7 @@ async function mkbox_cnts(box) {   // mkobj.c:304
             n = 0;
             break;
     }
-    for (n = rn2(n + 1 | 0); n > 0; n = n - 1 | 0) {
+    for (n = rn2(n + 1 | 0); n > 0; n = n - 1) {
         if (box.otyp === ICE_BOX) {
             otmp = await mksobj(CORPSE, TRUE, FALSE);
             /* Note: setting age to 0 is correct.  Age has a different
@@ -971,7 +971,7 @@ async function mksobj_init(obj, artif) {   // mkobj.c:869
                 case EGG:
                     otmp.corpsenm = NON_PM;   /* generic egg */
                     if (!rn2(3)) {
-                        for (tryct = 200; tryct > 0; tryct = tryct - 1 | 0) {
+                        for (tryct = 200; tryct > 0; tryct = tryct - 1) {
                             mndx = can_be_hatched(await rndmonnum());
                             if (mndx !== NON_PM && !dead_species(mndx, TRUE)) {
                                 otmp.corpsenm = mndx;   /* typed egg */
@@ -986,7 +986,7 @@ async function mksobj_init(obj, artif) {   // mkobj.c:869
                     if (!rn2(6)) {
                         set_tin_variety(otmp, SPINACH_TIN);
                     } else {
-                        for (tryct = 200; tryct > 0; tryct = tryct - 1 | 0) {
+                        for (tryct = 200; tryct > 0; tryct = tryct - 1) {
                             mndx = undead_to_corpse(await rndmonnum());
                             if (mons[mndx].cnutrit
                                 && !(svm.mvitals[mndx].mvflags & G_NOCORPSE)) {
@@ -2081,7 +2081,7 @@ export async function rnd_treefruit_at(x, y) {   // mkobj.c:1984
  */
 export function is_treefruit(otmp) {   // mkobj.c:1991
     let fruitidx = 0;
-    for (fruitidx = 0; fruitidx < 5; fruitidx = fruitidx + 1 | 0) {
+    for (fruitidx = 0; fruitidx < 5; fruitidx = fruitidx + 1) {
         if (treefruits[fruitidx] === otmp.otyp) {
             return TRUE;
         }

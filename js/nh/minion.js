@@ -438,7 +438,7 @@ export async function bribe(mtmp, prompt) {   // minion.c:361
  */
 export async function dprince(atyp) {   // minion.c:391
     let tryct = 0;
-    for (tryct = !In_endgame(u.uz) ? 20 : 0; tryct > 0; tryct = tryct - 1 | 0) {
+    for (tryct = !In_endgame(u.uz) ? 20 : 0; tryct > 0; tryct = tryct - 1) {
         const pm = rn1(PM.DEMOGORGON + 1 - PM.ORCUS, PM.ORCUS);
         if (!(svm.mvitals[pm].mvflags & G_GONE)
             && (atyp === A.NONE || sgn(mons[pm].maligntyp) === sgn(atyp))) {
@@ -453,7 +453,7 @@ export async function dprince(atyp) {   // minion.c:391
  */
 export async function dlord(atyp) {   // minion.c:405
     let tryct = 0;
-    for (tryct = !In_endgame(u.uz) ? 20 : 0; tryct > 0; tryct = tryct - 1 | 0) {
+    for (tryct = !In_endgame(u.uz) ? 20 : 0; tryct > 0; tryct = tryct - 1) {
         const pm = rn1(PM.YEENOGHU + 1 - PM.JUIBLEX, PM.JUIBLEX);
         if (!(svm.mvitals[pm].mvflags & G_GONE)
             && (atyp === A.NONE || sgn(mons[pm].maligntyp) === sgn(atyp))) {
@@ -477,7 +477,7 @@ export async function llord() {   // minion.c:420
  */
 export async function lminion() {   // minion.c:429
     let tryct = 0;
-    for (tryct = 0; tryct < 20; tryct = tryct + 1 | 0) {
+    for (tryct = 0; tryct < 20; tryct = tryct + 1) {
         const ptr = await mkclass(S.ANGEL, 0);
         if (ptr && !is_lord(ptr)) {
             return ptr.pmidx;
@@ -524,7 +524,7 @@ export async function lose_guardian_angel(mon) {   // minion.c:468
         await mongone(mon);
     }
     /* create 2 to 4 hostile angels to replace the lost guardian */
-    for (i = rn1(3, 2); i > 0; i = i - 1 | 0) {
+    for (i = rn1(3, 2); i > 0; i = i - 1) {
         mm.x = u.ux;
         mm.y = u.uy;
         if (await enexto(mm, mm.x, mm.y, mons[PM.ANGEL])) {

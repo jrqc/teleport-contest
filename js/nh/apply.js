@@ -2420,7 +2420,7 @@ export async function use_unicorn_horn(optr) {   // apply.c:2259
         val_limit = trouble_count;
     }
     /* fix [some of] the troubles */
-    for (val = 0; val < val_limit; val = val + 1 | 0) {
+    for (val = 0; val < val_limit; val = val + 1) {
         const idx = trouble_list[val];
         switch (idx) {
             case SICK:
@@ -4049,7 +4049,7 @@ async function do_break_wand(obj) {   // apply.c:3909
     /* prepare for potential feedback from polymorph... */
     zapsetup();
     /* this makes it hit us last, so that we can see the action first */
-    for (i = 0; i <= N_DIRS; i = i + 1 | 0) {
+    for (i = 0; i <= N_DIRS; i = i + 1) {
         $t2 = x = $c.i16(obj.ox + xdir[i]), gb.bhitpos.x = $t2;
         $t3 = y = $c.i16(obj.oy + ydir[i]), gb.bhitpos.y = $t3;
         if (!isok(x, y)) {

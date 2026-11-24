@@ -123,7 +123,7 @@ export async function query_color_attr(ca, prompt) {   // coloratt.c:304
  */
 export function attr2attrname(attr) {   // coloratt.c:320
     let i = 0;
-    for (i = 0; i < 11; i = i + 1 | 0) {
+    for (i = 0; i < 11; i = i + 1) {
         if (attrnames[i].attr === attr) {
             return attrnames[i].name;
         }
@@ -142,7 +142,7 @@ export function attr2attrname(attr) {   // coloratt.c:320
  */
 export function clr2colorname(clr) {   // coloratt.c:338
     let i = 0;
-    for (i = 0; i < 27; i = i + 1 | 0) {
+    for (i = 0; i < 27; i = i + 1) {
         if (colornames[i].name && colornames[i].color === clr) {
             return colornames[i].name;
         }
@@ -160,7 +160,7 @@ export async function match_str2clr(str, suppress_msg) {   // coloratt.c:349
     /* allow "lightblue", "light blue", and "light-blue" to match "light blue"
        (also junk like "_l i-gh_t---b l u e" but we won't worry about that);
        also copes with trailing space; caller has removed any leading space */
-    for (i = 0; i < 27; i = i + 1 | 0) {
+    for (i = 0; i < 27; i = i + 1) {
         if (colornames[i].name
             && fuzzymatch(str, colornames[i].name, $C` -_`, TRUE)) {
             c = colornames[i].color;
@@ -186,7 +186,7 @@ export async function match_str2clr(str, suppress_msg) {   // coloratt.c:349
 export async function match_str2attr(str, complain) {   // coloratt.c:374
     let i = 0;
     let a = -1;
-    for (i = 0; i < 11; i = i + 1 | 0) {
+    for (i = 0; i < 11; i = i + 1) {
         if (attrnames[i].name
             && fuzzymatch(str, attrnames[i].name, $C` -_`, TRUE)) {
             a = attrnames[i].attr;
@@ -215,7 +215,7 @@ export async function query_attr(prompt, dflt_attr) {   // coloratt.c:396
     const tmpwin = await create_nhwindow()(NHW.MENU);
     await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
-    for (i = 0; i < 11; i = i + 1 | 0) {
+    for (i = 0; i < 11; i = i + 1) {
         if (!attrnames[i].name) {
             break;
         }
@@ -233,7 +233,7 @@ export async function query_attr(prompt, dflt_attr) {   // coloratt.c:396
         if (allow_many) {
             /* PICK_ANY, with one preselected entry (ATR_NONE) which
                should be excluded if any other choices were picked */
-            for (i = 0; i < pick_cnt; i = i + 1 | 0) {
+            for (i = 0; i < pick_cnt; i = i + 1) {
                 j = $c.radd(picks[0], i).item.a_int - 1 | 0;
                 if (attrnames[j].attr !== ATR.NONE || pick_cnt === 1) {
                     switch (attrnames[j].attr) {
@@ -294,7 +294,7 @@ export async function query_color(prompt, dflt_color) {   // coloratt.c:475
     const tmpwin = await create_nhwindow()(NHW.MENU);
     await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
-    for (i = 0; i < 27; i = i + 1 | 0) {
+    for (i = 0; i < 27; i = i + 1) {
         if (!colornames[i].name) {
             break;
         }
@@ -360,7 +360,7 @@ export async function basic_menu_colors(load_colors) {   // coloratt.c:530
                "<foo>" ones, which is exactly what we want (so that the
                shorter basic names won't get false matches as substrings
                of the longer ones) */
-            for (i = 0; i < 27; i = i + 1 | 0) {
+            for (i = 0; i < 27; i = i + 1) {
                 if (!colornames[i].name) {   /* first alias entry has no name */
                     break;
                 }
@@ -543,7 +543,7 @@ export async function check_enhanced_colors(buf) {   // coloratt.c:723
             /*(void) strncpy(&altbuf[greyoffset], "gray", 4);*/
             $c.memcpy(altbuf.add($c.idx(greyoffset)), $C`gray`, 4);
         }
-        for (color = 0; color < 155; color = color + 1 | 0) {
+        for (color = 0; color < 155; color = color + 1) {
             if (fuzzymatch(buf, colortable[color].name, $C` -_`, TRUE)
                 || altbuf && fuzzymatch(altbuf, colortable[color].name,
                 $C` -_`, TRUE)) {
@@ -582,7 +582,7 @@ export function wc_color_name(colorindx) {   // coloratt.c:764
             nh_snprintf($C`wc_color_name`, 784, new $c.Ptr(wc_color_name$hexcolor, 0), 8, $C`#%02x%02x%02x`, $c.u8(r), $c.u8(g), $c.u8(b));
             result = new $c.Ptr(wc_color_name$hexcolor, 0);
             /* override hex value if this is a named color */
-            for (indx = 16; indx < 155; indx = indx + 1 | 0) {
+            for (indx = 16; indx < 155; indx = indx + 1) {
                 if (colortable[indx].r === r
                     && colortable[indx].g === g
                     && colortable[indx].b === b) {
@@ -715,7 +715,7 @@ export function closest_color(lcolor, closecolor, clridx) {   // coloratt.c:997
     let color_index = -1;
     let similar = 2147483647;
     let retbool = FALSE;
-    for (i = 0; i < 240; i = i + 1 | 0) {
+    for (i = 0; i < 240; i = i + 1) {
         /* look for an exact match */
         if (lcolor === color_256_definitions[i].value) {
             color_index = i;

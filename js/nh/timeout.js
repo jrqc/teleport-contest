@@ -949,7 +949,7 @@ export async function attach_egg_hatch_timeout(egg, when) {   // timeout.c:981
      * hatching > 99.9993%.  Mimic that here.
      */
     if (!when) {
-        for (i = MAX.EGG_HATCH_TIME - 50 + 1; i <= MAX.EGG_HATCH_TIME; i = i + 1 | 0) {
+        for (i = MAX.EGG_HATCH_TIME - 50 + 1; i <= MAX.EGG_HATCH_TIME; i = i + 1) {
             if (rnd(i) > 150) {
                 /* egg will hatch */
                 when = i;
@@ -999,7 +999,7 @@ export async function hatch_egg(arg, timeout) {   // timeout.c:1017
         cansee_hatchspot = cansee(x[0], y[0]) && !silent ? 1 : 0;
         if (!(mons[mnum].geno & G_UNIQ)
             && !(svm.mvitals[mnum].mvflags & (G_GENOD | G_EXTINCT))) {
-            for (i = hatchcount; i > 0; i = i - 1 | 0) {
+            for (i = hatchcount; i > 0; i = i - 1) {
                 if (!await enexto(cc, x[0], y[0], $c.relem(mons, mnum))
                     || !(mon = await makemon($c.relem(mons, mnum), cc.x, cc.y,
                     NO.MINVENT | MM.NOMSG))) {

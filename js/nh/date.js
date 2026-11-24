@@ -65,26 +65,26 @@ export async function populate_nomakedefs(version) {   // date.c:52
         01234567890123456789  */
     if ($c.i32($c.strlen(new $c.Ptr(tmpbuf1, 0))) === 20) {
         do {
-            for (i = 0; i < 4; i = i + 1 | 0) {
+            for (i = 0; i < 4; i = i + 1) {
                 tmpbuf2[i] = tmpbuf1[i + 7 | 0];   /* year */
             }
             tmpbuf2[i] = 0;
         } while (0);
         $t1 = $c.atoi(new $c.Ptr(tmpbuf2, 0)) - 1900 | 0, t.tm_year = $t1;
         do {
-            for (i = 0; i < 3; i = i + 1 | 0) {
+            for (i = 0; i < 3; i = i + 1) {
                 tmpbuf2[i] = tmpbuf1[i + 0];   /* mon */
             }
             tmpbuf2[i] = 0;
         } while (0);
-        for (i = 0; i < 12; i = i + 1 | 0) {
+        for (i = 0; i < 12; i = i + 1) {
             if (!case_insensitive_comp(new $c.Ptr(tmpbuf2, 0), mth[i])) {
                 t.tm_mon = i;
                 break;
             }
         }
         do {
-            for (i = 0; i < 2; i = i + 1 | 0) {
+            for (i = 0; i < 2; i = i + 1) {
                 tmpbuf2[i] = tmpbuf1[i + 4 | 0];   /* mday */
             }
             tmpbuf2[i] = 0;
@@ -95,21 +95,21 @@ export async function populate_nomakedefs(version) {   // date.c:52
         }
         $t2 = $c.atoi(strp), t.tm_mday = $t2;
         do {
-            for (i = 0; i < 2; i = i + 1 | 0) {
+            for (i = 0; i < 2; i = i + 1) {
                 tmpbuf2[i] = tmpbuf1[i + 12 | 0];   /* hour */
             }
             tmpbuf2[i] = 0;
         } while (0);
         $t3 = $c.atoi(new $c.Ptr(tmpbuf2, 0)), t.tm_hour = $t3;
         do {
-            for (i = 0; i < 2; i = i + 1 | 0) {
+            for (i = 0; i < 2; i = i + 1) {
                 tmpbuf2[i] = tmpbuf1[i + 15 | 0];   /* min  */
             }
             tmpbuf2[i] = 0;
         } while (0);
         $t4 = $c.atoi(new $c.Ptr(tmpbuf2, 0)), t.tm_min = $t4;
         do {
-            for (i = 0; i < 2; i = i + 1 | 0) {
+            for (i = 0; i < 2; i = i + 1) {
                 tmpbuf2[i] = tmpbuf1[i + 18 | 0];   /* sec  */
             }
             tmpbuf2[i] = 0;

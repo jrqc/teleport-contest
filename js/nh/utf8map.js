@@ -62,7 +62,7 @@ export async function set_map_u(gmap, utf32ch, utf8str) {   // utf8map.c:37
 }
 export function free_all_glyphmap_u() {   // utf8map.c:59
     let glyph = 0, x = 0, y = 0;
-    for (glyph = 0; glyph < MAX_GLYPH; glyph = glyph + 1 | 0) {
+    for (glyph = 0; glyph < MAX_GLYPH; glyph = glyph + 1) {
         if (glyphmap[glyph].u) {
             if (glyphmap[glyph].u.utf8str) {
                 $c.free(glyphmap[glyph].u.utf8str);
@@ -73,8 +73,8 @@ export function free_all_glyphmap_u() {   // utf8map.c:59
         }
     }
     /* Prevent use after free from gg.gbuf */
-    for (y = 0; y < ROWNO; y = y + 1 | 0) {
-        for (x = 0; x < COLNO; x = x + 1 | 0) {
+    for (y = 0; y < ROWNO; y = y + 1) {
+        for (x = 0; x < COLNO; x = x + 1) {
             gg.gbuf[y][x].glyphinfo.gm.u = null;
         }
     }

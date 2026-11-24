@@ -1326,7 +1326,7 @@ export async function shieldeff(x, y) {   // display.c:1110
     }
     if (cansee(x, y)) {
         /* Don't see anything if can't see the location */
-        for (i = 0; i < SHIELD_COUNT; i = i + 1 | 0) {
+        for (i = 0; i < SHIELD_COUNT; i = i + 1) {
             await show_glyph(x, y, shield_static[i] === S.stone ? GLYPH.CMAP_STONE_OFF : shield_static[i] <= S.trwall ? (shield_static[i] - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : shield_static[i] < S.altar ? (shield_static[i] - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : shield_static[i] === S.altar ? 4008 : shield_static[i] < S.arrow_trap + MAXTCHARS ? (shield_static[i] - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : shield_static[i] <= S.goodpos ? (shield_static[i] - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH);
             await flush_screen(1);   /* make sure the glyph shows up */
             await nh_delay_output()();
@@ -1393,13 +1393,13 @@ export async function tmp_at(x, y) {   // display.c:1174
             case DISP_END:
                 if (tmp_at$tglyph.style === DISP_BEAM || tmp_at$tglyph.style === DISP_ALL) {
                     /* Erase (reset) from source to end */
-                    for (i = 0; i < tmp_at$tglyph.sidx; i = i + 1 | 0) {
+                    for (i = 0; i < tmp_at$tglyph.sidx; i = i + 1) {
                         await newsym(tmp_at$tglyph.saved[i].x, tmp_at$tglyph.saved[i].y);
                     }
                 } else if (tmp_at$tglyph.style === DISP_TETHER) {
                     if (y === BACKTRACK && tmp_at$tglyph.sidx > 1) {
                         /* backtrack */
-                        for (i$2 = tmp_at$tglyph.sidx - 1 | 0; i$2 > 0; i$2 = i$2 - 1 | 0) {
+                        for (i$2 = tmp_at$tglyph.sidx - 1 | 0; i$2 > 0; i$2 = i$2 - 1) {
                             await newsym(tmp_at$tglyph.saved[i$2].x, tmp_at$tglyph.saved[i$2].y);
                             await show_glyph(tmp_at$tglyph.saved[i$2 - 1 | 0].x,
                                 tmp_at$tglyph.saved[i$2 - 1 | 0].y, tmp_at$tglyph.glyph);
@@ -1408,7 +1408,7 @@ export async function tmp_at(x, y) {   // display.c:1174
                         }
                         tmp_at$tglyph.sidx = 1;
                     }
-                    for (i$2 = 0; i$2 < tmp_at$tglyph.sidx; i$2 = i$2 + 1 | 0) {
+                    for (i$2 = 0; i$2 < tmp_at$tglyph.sidx; i$2 = i$2 + 1) {
                         await newsym(tmp_at$tglyph.saved[i$2].x, tmp_at$tglyph.saved[i$2].y);
                     }
                 } else {
@@ -1495,7 +1495,7 @@ export async function flash_glyph_at(x, y, tg, rpt) {   // display.c:1305
     /* even iteration count (guaranteed) ends with glyph[1] showing;
        caller might want to override that, but no newsym() calls here
        in case caller has tinkered with location visibility */
-    for (i = 0; i < rpt; i = i + 1 | 0) {
+    for (i = 0; i < rpt; i = i + 1) {
         await show_glyph(x, y, glyph[$c.rem32(i, 2)]);
         await flush_screen(1);
         await nh_delay_output()();
@@ -2302,7 +2302,7 @@ export async function flush_screen(cursor_on_u) {   // display.c:2208
         }
     }
     {
-        for (i = 0; i < ROWNO; i = i + 1 | 0) {
+        for (i = 0; i < ROWNO; i = i + 1) {
             gg.gbuf_start[i] = COLNO - 1;
             gg.gbuf_stop[i] = 0;
         }
@@ -2749,7 +2749,7 @@ export function reset_glyphmap(trigger) {   // display.c:2739
             gg.glyphmap_perlevel_flags = $c.or64(gg.glyphmap_perlevel_flags, GMAP_ROGUELEVEL);
         }
     }
-    for (glyph = 0; glyph < MAX_GLYPH; glyph = glyph + 1 | 0) {
+    for (glyph = 0; glyph < MAX_GLYPH; glyph = glyph + 1) {
         const gmap = $c.relem(glyphmap, glyph);
         gmap.glyphflags = 0;
         /*

@@ -1828,7 +1828,7 @@ export async function rndmonst_adj(minadj, maxadj) {   // makemon.c:1659
     /* amount processed so far */
     let totalweight = 0;
     let selected_mndx = NON_PM;
-    for (mndx = LOW_PM; mndx < SPECIAL_PM; mndx = mndx + 1 | 0) {
+    for (mndx = LOW_PM; mndx < SPECIAL_PM; mndx = mndx + 1) {
         ptr = $c.relem(mons, mndx);
         if (montooweak(mndx, minmlev) || montoostrong(mndx, maxmlev)) {
             continue;
@@ -1943,7 +1943,7 @@ async function init_mongen_order() {   // makemon.c:1807
         return;
     }
     mongen_order_init = TRUE;
-    for (i = LOW_PM; i < NUMMONS; i = i + 1 | 0) {
+    for (i = LOW_PM; i < NUMMONS; i = i + 1) {
         mongen_order[i] = i;
         const mlet = mons[i].mlet;
         if ((mons[i].geno & G_FREQ) > mclass_maxf[mlet]) {
@@ -1963,7 +1963,7 @@ export async function dump_mongen() {   // makemon.c:1835
     monst_globals_init();
     await init_mongen_order();
     await raw_printf($C`int mongen_order[] = {`);
-    for (i = LOW_PM; i < SPECIAL_PM; i = i + 1 | 0) {
+    for (i = LOW_PM; i < SPECIAL_PM; i = i + 1) {
         const special = mons[mongen_order[i]].geno & (G_NOGEN | G_UNIQ);
         const mlet = def_monsyms[mons[mongen_order[i]].mlet].sym;
         if (prev_mlet && prev_mlet !== mlet) {
@@ -2025,7 +2025,7 @@ export async function mkclass_aligned(class_, spc, atyp) {   // makemon.c:1880
      *                  SPECIAL_PM is long worm tail and separates the
      *                  regular monsters from the exceptions.
      */
-    for (first = LOW_PM; first < SPECIAL_PM; first = first + 1 | 0) {
+    for (first = LOW_PM; first < SPECIAL_PM; first = first + 1) {
         if (mons[mongen_order[first]].mlet === class_) {
             break;
         }
@@ -2043,7 +2043,7 @@ export async function mkclass_aligned(class_, spc, atyp) {   // makemon.c:1880
     /*  Assumption #2:  monsters of a given class are presented in ascending
      *                  order of strength.
      */
-    for (last = first; last < SPECIAL_PM && mons[mongen_order[last]].mlet === class_; last = last + 1 | 0) {
+    for (last = first; last < SPECIAL_PM && mons[mongen_order[last]].mlet === class_; last = last + 1) {
         if (atyp !== A.NONE && sgn(mons[mongen_order[last]].maligntyp) !== sgn(atyp)) {
             continue;
         }
@@ -2089,7 +2089,7 @@ export async function mkclass_aligned(class_, spc, atyp) {   // makemon.c:1880
     }
     /* the hard work has already been done; 'num' should hit 0 before
        first reaches last (which is actually one past our last candidate) */
-    for (num = rnd(num); first < last; first = first + 1 | 0) {
+    for (num = rnd(num); first < last; first = first + 1) {
         if ((num = num - nums[mongen_order[first]] | 0) <= 0) {
             break;
         }
@@ -2107,7 +2107,7 @@ export async function mkclass_aligned(class_, spc, atyp) {   // makemon.c:1880
 export function mkclass_poly(class_) {   // makemon.c:1983
     let first = 0, last = 0;
     let num = 0;
-    for (first = LOW_PM; first < SPECIAL_PM; first = first + 1 | 0) {
+    for (first = LOW_PM; first < SPECIAL_PM; first = first + 1) {
         if (mons[first].mlet === class_) {
             break;
         }
@@ -2121,7 +2121,7 @@ export function mkclass_poly(class_) {   // makemon.c:1983
     if (rn2(9) || class_ === S.LICH) {
         gmask = (gmask | (Inhell() ? G_NOHELL : G_HELL)) >>> 0;
     }
-    for (last = first; last < SPECIAL_PM && mons[last].mlet === class_; last = last + 1 | 0) {
+    for (last = first; last < SPECIAL_PM && mons[last].mlet === class_; last = last + 1) {
         if (mk_gen_ok(last, G_GENOD, gmask)) {
             num = num + (mons[last].geno & G_FREQ) | 0;
         }

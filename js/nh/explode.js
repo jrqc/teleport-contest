@@ -425,8 +425,8 @@ export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:
         }
     }
     let any_shield = visible = FALSE;
-    for (i = 0; i < 3; i = i + 1 | 0) {
-        for (j = 0; j < 3; j = j + 1 | 0) {
+    for (i = 0; i < 3; i = i + 1) {
+        for (j = 0; j < 3; j = j + 1) {
             xx = $c.i16((x + i | 0) - 1 | 0);
             yy = $c.i16((y + j | 0) - 1 | 0);
             if (!isok(xx, yy)) {
@@ -463,8 +463,8 @@ export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:
     }
     if (visible) {
         /* Start the explosion */
-        for (i = 0; i < 3; i = i + 1 | 0) {
-            for (j = 0; j < 3; j = j + 1 | 0) {
+        for (i = 0; i < 3; i = i + 1) {
+            for (j = 0; j < 3; j = j + 1) {
                 if (explmask[i][j] === EXPL_SKIP) {
                     continue;
                 }
@@ -479,9 +479,9 @@ export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:
         await curs_on_u();   /* will flush screen and output */
         if (any_shield && flags.sparkle) {
             /* simulate shield effect */
-            for (k = 0; k < SHIELD_COUNT; k = k + 1 | 0) {
-                for (i = 0; i < 3; i = i + 1 | 0) {
-                    for (j = 0; j < 3; j = j + 1 | 0) {
+            for (k = 0; k < SHIELD_COUNT; k = k + 1) {
+                for (i = 0; i < 3; i = i + 1) {
+                    for (j = 0; j < 3; j = j + 1) {
                         xx = $c.i16((x + i | 0) - 1 | 0);
                         yy = $c.i16((y + j | 0) - 1 | 0);
                         /*
@@ -499,8 +499,8 @@ export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:
                 await nh_delay_output()();
             }
             /* Cover last shield glyph with blast symbol. */
-            for (i = 0; i < 3; i = i + 1 | 0) {
-                for (j = 0; j < 3; j = j + 1 | 0) {
+            for (i = 0; i < 3; i = i + 1) {
+                for (j = 0; j < 3; j = j + 1) {
                     xx = $c.i16((x + i | 0) - 1 | 0);
                     yy = $c.i16((y + j | 0) - 1 | 0);
                     if ((explmask[i][j] & (EXPL_MON | EXPL_HERO)) !== 0) {
@@ -531,8 +531,8 @@ export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:
     /* apply effects to monsters and floor objects first, in case the
        damage to the hero is fatal and leaves bones */
     if (dam) {
-        for (i = 0; i < 3; i = i + 1 | 0) {
-            for (j = 0; j < 3; j = j + 1 | 0) {
+        for (i = 0; i < 3; i = i + 1) {
+            for (j = 0; j < 3; j = j + 1) {
                 let itemdmg = 0;
                 if (explmask[i][j] === EXPL_SKIP) {
                     continue;

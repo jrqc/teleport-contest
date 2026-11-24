@@ -642,8 +642,8 @@ export function nomux_capture_write_input_boundary() {   // termcap.c:713
 }
 export function nomux_clear_screen() {   // termcap.c:725
     let r = 0, c = 0;
-    for (r = 0; r < 24; r = r + 1 | 0) {
-        for (c = 0; c < 80; c = c + 1 | 0) {
+    for (r = 0; r < 24; r = r + 1) {
+        for (c = 0; c < 80; c = c + 1) {
             nomux_buf[r][c].ch = 32;
             nomux_buf[r][c].fg = 7;
             nomux_buf[r][c].attr = 0;
@@ -660,7 +660,7 @@ export function nomux_clear_to_eol(row, col) {   // termcap.c:735
     if (row < 0 || row >= 24) {
         return;
     }
-    for (c = col < 0 ? 0 : col; c < 80; c = c + 1 | 0) {
+    for (c = col < 0 ? 0 : col; c < 80; c = c + 1) {
         nomux_buf[row][c].ch = 32;
         nomux_buf[row][c].fg = 7;
         nomux_buf[row][c].attr = 0;
@@ -755,7 +755,7 @@ export function nomux_capture_screen() {   // termcap.c:796
      * - Attr end: \033[27m (end inverse), \033[22m (end bold)
      * - Full reset: \033[0m only at end-of-line or when both attr+color reset
      * Incremental: only emit what changes between cells. */
-    for (row = 0; row < 24; row = row + 1 | 0) {
+    for (row = 0; row < 24; row = row + 1) {
         let cur_fg = 7;
         let cur_attr = 0;
         let end = 79;
@@ -1082,7 +1082,7 @@ export async function cl_eos() {   // termcap.c:1198
         xputs(tc_lcl_data.tc_CD);
         {
             nomux_clear_to_eol($G.ttyDisplay.cury, $G.ttyDisplay.curx);
-            for (r = $G.ttyDisplay.cury + 1; r < 24; r = r + 1 | 0) {
+            for (r = $G.ttyDisplay.cury + 1; r < 24; r = r + 1) {
                 nomux_clear_to_eol(r, 0);
             }
         }
@@ -1132,7 +1132,7 @@ async function init_hilite() {   // termcap.c:1300
         return;
     }
     if (colors >= 16) {
-        for (c = 0; c < 6; c = c + 1 | 0) {
+        for (c = 0; c < 6; c = c + 1) {
             /* system colors */
             scratch = $c.tparm(setf, ti_map[c].nh_color);
             $t1 = await dupstr(scratch), hilites[ti_map[c].nh_color] = $t1;
@@ -1250,7 +1250,7 @@ function kill_hilite() {   // termcap.c:1400
     if (hilites[CLR.WHITE]) {
         $c.free(hilites[CLR.WHITE]);
     }
-    for (c = 0; c < CLR.MAX; c = c + 1 | 0) {
+    for (c = 0; c < CLR.MAX; c = c + 1) {
         hilites[c] = null;
     }
 }

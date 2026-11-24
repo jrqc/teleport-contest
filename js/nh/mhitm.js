@@ -418,7 +418,7 @@ export async function mattackm(magr, mdef) {   // mhitm.c:293
        tentacle miss) is very verbose and makes the flayer look stupid */
     gs.skipdrin = FALSE;
     /* Now perform all attacks for the monster. */
-    L1: for (i = 0; i < NATTK; i = i + 1 | 0) {
+    L1: for (i = 0; i < NATTK; i = i + 1) {
         res[i] = M_ATTK.MISS;
         /* target might no longer be there */
         if (i > 0 && (svl.level.monsters[gb.bhitpos.x][gb.bhitpos.y] !== mdef

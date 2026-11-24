@@ -100,8 +100,8 @@ const N_PER_BUCKET = 64;
 async function find_lev_obj() {   // restore.c:71
     let otmp = null, x = 0, y = 0;
     let fobjtmp = null;
-    for (x = 0; x < COLNO; x = x + 1 | 0) {
-        for (y = 0; y < ROWNO; y = y + 1 | 0) {
+    for (x = 0; x < COLNO; x = x + 1) {
+        for (y = 0; y < ROWNO; y = y + 1) {
             svl.level.objects[x][y] = null;
         }
     }
@@ -642,7 +642,7 @@ async function restgamestate(nhfp) {   // restore.c:525
     }
     $t6 = await restobjchn(nhfp, FALSE), gm.migrating_objs = $t6;
     $t7 = await restmonchn(nhfp), gm.migrating_mons = $t7;
-    for (i = 0; i < NUMMONS; i = i + 1 | 0) {
+    for (i = 0; i < NUMMONS; i = i + 1) {
         await Sfi_mvitals(nhfp, $c.relem(svm.mvitals, i), $C`gamestate-mvitals`);
     }
     /*
@@ -673,7 +673,7 @@ async function restgamestate(nhfp) {   // restore.c:525
     /* hero_seq isn't saved and restored because it can be recalculated */
     gh.hero_seq = $c.shl64(svm.moves, 3);   /* normally handled in moveloop() */
     await Sfi_q_score(nhfp, svq.quest_status, $C`gamestate-quest_status`);
-    for (i = 0; i < MAXSPELL + 1; i = i + 1 | 0) {
+    for (i = 0; i < MAXSPELL + 1; i = i + 1) {
         await Sfi_spell(nhfp, $c.relem(svs.spl_book, i), $C`gamestate-spl_book`);
     }
     await restore_artifacts(nhfp);
@@ -926,8 +926,8 @@ export async function restcemetery(nhfp, cemeteryaddr) {   // restore.c:988
  */
 async function rest_levl(nhfp) {   // restore.c:1021
     let c = 0, r = 0;
-    for (c = 0; c < COLNO; c = c + 1 | 0) {
-        for (r = 0; r < ROWNO; r = r + 1 | 0) {
+    for (c = 0; c < COLNO; c = c + 1) {
+        for (r = 0; r < ROWNO; r = r + 1) {
             await Sfi_rm(nhfp, $c.relem(svl.level.locations[c], r), $C`location-rm`);
         }
     }
@@ -985,8 +985,8 @@ export async function getlev(nhfp, pid, lev) {   // restore.c:1046
     }
     await restcemetery(nhfp, new $c.FieldRef(svl.level, "bonesinfo", "ptr"));
     await rest_levl(nhfp);
-    for (c = 0; c < COLNO; c = c + 1 | 0) {
-        for (r = 0; r < ROWNO; r = r + 1 | 0) {
+    for (c = 0; c < COLNO; c = c + 1) {
+        for (r = 0; r < ROWNO; r = r + 1) {
             await Sfi_schar(nhfp, new $c.Ptr(svl.lastseentyp[c], r), $C`lastseentyp`);
         }
     }
@@ -1006,7 +1006,7 @@ export async function getlev(nhfp, pid, lev) {   // restore.c:1046
         /* avoid pointless alloc(0) */
         $t2 = $c.asRec(await alloc($c.u32($c.mulu64($c.u64(svd.doors_alloc), 4))), $T.nhcoord, 4), svd.doors = $t2;
         tmpc = svd.doors;
-        for (i = 0; i < svd.doors_alloc; i = i + 1 | 0) {
+        for (i = 0; i < svd.doors_alloc; i = i + 1) {
             await Sfi_nhcoord(nhfp, tmpc, $C`lev-doors`);
             tmpc = $c.radd(tmpc, 1);
         }
@@ -1048,8 +1048,8 @@ export async function getlev(nhfp, pid, lev) {   // restore.c:1046
     $t6 = await restobjchn(nhfp, FALSE), gb.billobjs = $t6;
     await rest_engravings(nhfp);
     /* reset level.monsters for new level */
-    for (x = 0; x < COLNO; x = x + 1 | 0) {
-        for (y = 0; y < ROWNO; y = y + 1 | 0) {
+    for (x = 0; x < COLNO; x = x + 1) {
+        for (y = 0; y < ROWNO; y = y + 1) {
             svl.level.monsters[x][y] = null;
         }
     }
@@ -1408,7 +1408,7 @@ export async function restore_menu(bannerwin) {   // restore.c:1536
             /* for tty; erase copyright notice and redo it in the menu */
             await clear_nhwindow()(bannerwin);
             /* COPYRIGHT_BANNER_[ABCD] */
-            for (k = 1; k <= 4; k = k + 1 | 0) {
+            for (k = 1; k <= 4; k = k + 1) {
                 await add_menu_str(tmpwin, copyright_banner_line(k));
             }
             await add_menu_str(tmpwin, $C``);

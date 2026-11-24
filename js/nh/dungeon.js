@@ -85,7 +85,7 @@ async function dumpit() {   // dungeon.c:91
     if (!debugcore($C`dungeon.c`, FALSE)) {
         return;
     }
-    for (i = 0; i < svn.n_dgns; i = i + 1 | 0) {
+    for (i = 0; i < svn.n_dgns; i = i + 1) {
         $c.fprintf($c.__stderrp, $C`\n#%d "%s" (%s):\n`, i, new $c.Ptr(svd.dungeons[i].dname, 0), new $c.Ptr(svd.dungeons[i].proto, 0));
         $c.fprintf($c.__stderrp, $C`    num_dunlevs %d, dunlev_ureached %d\n`,
             svd.dungeons[i].num_dunlevs, svd.dungeons[i].dunlev_ureached);
@@ -139,7 +139,7 @@ export async function save_dungeon(nhfp, perform_write, free_data) {   // dungeo
     let i = 0, count = Int32Array.of(0), curr = null, next = null, curr_ms = null, next_ms = null;
     if (perform_write) {
         await Sfo_int(nhfp, new $c.FieldRef(svn, "n_dgns", "i32"), $C`dungeon_count`);
-        for (i = 0; i < svn.n_dgns; i = i + 1 | 0) {
+        for (i = 0; i < svn.n_dgns; i = i + 1) {
             await Sfo_dungeon(nhfp, $c.relem(svd.dungeons, i), $C`dungeon`);
         }
         await Sfo_dgn_topology(nhfp, svd.dungeon_topology, $C`svd.dungeon_topology`);
@@ -153,7 +153,7 @@ export async function save_dungeon(nhfp, perform_write, free_data) {   // dungeo
         }
         count[0] = maxledgerno();
         await Sfo_int(nhfp, new $c.Ptr(count, 0), $C`level_info_count`);
-        for (i = 0; i < count[0]; i = i + 1 | 0) {
+        for (i = 0; i < count[0]; i = i + 1) {
             await Sfo_linfo(nhfp, $c.relem(svl.level_info, i), $C`svl.level_info`);
         }
         await Sfo_nhcoord(nhfp, svi.inv_pos, $C`svi.inv_pos`);
@@ -194,14 +194,14 @@ export async function restore_dungeon(nhfp) {   // dungeon.c:211
     let curr = null, count = Int32Array.of(0), i = 0;
     count[0] = 0;
     await sfi_int(nhfp, new $c.FieldRef(svn, "n_dgns", "i32"), $C`dungeon_count`);
-    for (i = 0; i < svn.n_dgns; i = i + 1 | 0) {
+    for (i = 0; i < svn.n_dgns; i = i + 1) {
         await Sfi_dungeon(nhfp, $c.relem(svd.dungeons, i), $C`dungeon`);
     }
     await Sfi_dgn_topology(nhfp, svd.dungeon_topology, $C`svd.dungeon_topology`);
     await Sfi_char(nhfp, new $c.Ptr(svt.tune, 0), $C`tune`, 6);
     let last = svb.branches = null;
     await sfi_int(nhfp, new $c.Ptr(count, 0), $C`branch_count`);
-    for (i = 0; i < count[0]; i = i + 1 | 0) {
+    for (i = 0; i < count[0]; i = i + 1) {
         curr = $c.asRec(await alloc(32), $T.branch, 32);
         await Sfi_branch(nhfp, curr, $C`branch`);
         curr.next = null;
@@ -217,13 +217,13 @@ export async function restore_dungeon(nhfp) {   // dungeon.c:211
         await panic($C`level information count larger (%d) than allocated size`,
             count[0]);
     }
-    for (i = 0; i < count[0]; i = i + 1 | 0) {
+    for (i = 0; i < count[0]; i = i + 1) {
         await Sfi_linfo(nhfp, $c.relem(svl.level_info, i), $C`svl.level_info`);
     }
     await Sfi_nhcoord(nhfp, svi.inv_pos, $C`svi.inv_pos`);
     await sfi_int(nhfp, new $c.Ptr(count, 0), $C`mapseen_count`);
     let last_ms = null;
-    for (i = 0; i < count[0]; i = i + 1 | 0) {
+    for (i = 0; i < count[0]; i = i + 1) {
         const curr_ms = await load_mapseen(nhfp);
         curr_ms.next = null;
         if (last_ms) {
@@ -272,7 +272,7 @@ async function find_branch(s, pd) {   // dungeon.c:311
     let i = 0, br = null;
     /* dungeon name */
     if (pd) {
-        for (i = 0; i < pd.n_brs; i = i + 1 | 0) {
+        for (i = 0; i < pd.n_brs; i = i + 1) {
             if (!$c.strcmp(pd.tmpbranch[i].name, s)) {
                 break;
             }
@@ -556,18 +556,18 @@ async function possible_places(idx, map, pd) {   // dungeon.c:598
     /* array MAXLEVEL+1 in length */
     const lev = pd.final_lev[idx];
     /* init level possibilities */
-    for (i = 0; i <= MAXLEVEL; i = i + 1 | 0) {
+    for (i = 0; i <= MAXLEVEL; i = i + 1) {
         map.set(i, FALSE);
     }
     /* get base and range and set those entries to true */
     let count = await level_range(lev.dlevel.dnum, pd.tmplevel[idx].lev.base,
         pd.tmplevel[idx].lev.rand, pd.tmplevel[idx].chain,
         pd, new $c.Ptr(start, 0));
-    for (i = start[0]; i < (start[0] + count | 0); i = i + 1 | 0) {
+    for (i = start[0]; i < (start[0] + count | 0); i = i + 1) {
         map.set(i, TRUE);
     }
     /* mark off already placed levels */
-    for (i = pd.start; i < idx; i = i + 1 | 0) {
+    for (i = pd.start; i < idx; i = i + 1) {
         if (pd.final_lev[i] && map.get(pd.final_lev[i].dlevel.dlevel)) {
             map.set(pd.final_lev[i].dlevel.dlevel, FALSE);
             count = count - 1 | 0;
@@ -638,7 +638,7 @@ async function get_dgn_flags(L) {   // dungeon.c:744
         await lua_len(L, -1);
         const nflags = $c.i32(lua_tointeger(L, -1));
         await lua_pop(L, 1);
-        for (f = 0; f < nflags; f = f + 1 | 0) {
+        for (f = 0; f < nflags; f = f + 1) {
             lua_pushinteger(L, f + 1 | 0);
             await lua_gettable(L, -2);
             if (lua_type(L, -1) === LUA.TSTRING) {
@@ -678,7 +678,7 @@ async function init_dungeon_levels(L, pd, dngidx) {   // dungeon.c:797
     const nlevels = $c.i32(lua_tointeger(L, -1));
     pd.tmpdungeon[dngidx].levels = nlevels;
     await lua_pop(L, 1);
-    for (f = 0; f < nlevels; f = f + 1 | 0) {
+    for (f = 0; f < nlevels; f = f + 1) {
         lua_pushinteger(L, f + 1 | 0);
         await lua_gettable(L, -2);
         if (lua_type(L, -1) === LUA.TTABLE) {
@@ -720,7 +720,7 @@ async function init_dungeon_levels(L, pd, dngidx) {   // dungeon.c:797
                         iflags.last_msg = save_plnmsg$2;
                     }
                 } while (0);
-                for (bi = 0; bi < (pd.n_levs + f | 0); bi = bi + 1 | 0) {
+                for (bi = 0; bi < (pd.n_levs + f | 0); bi = bi + 1) {
                     do {
                         if (debugcore($C`dungeon.c`, TRUE)) {
                             const save_plnmsg$3 = iflags.last_msg;
@@ -761,7 +761,7 @@ async function init_dungeon_branches(L, pd, dngidx) {   // dungeon.c:867
     const nbranches = $c.i32(lua_tointeger(L, -1));
     pd.tmpdungeon[dngidx].branches = nbranches;
     await lua_pop(L, 1);
-    for (f = 0; f < nbranches; f = f + 1 | 0) {
+    for (f = 0; f < nbranches; f = f + 1) {
         lua_pushinteger(L, f + 1 | 0);
         await lua_gettable(L, -2);
         if (lua_type(L, -1) === LUA.TTABLE) {
@@ -795,7 +795,7 @@ async function init_dungeon_branches(L, pd, dngidx) {   // dungeon.c:867
                         iflags.last_msg = save_plnmsg$2;
                     }
                 } while (0);
-                for (bi = 0; bi < ((pd.n_levs + f | 0) - 1 | 0); bi = bi + 1 | 0) {
+                for (bi = 0; bi < ((pd.n_levs + f | 0) - 1 | 0); bi = bi + 1) {
                     if (!$c.strcmp(pd.tmplevel[bi].name, br_chain)) {
                         tmpb.chain = bi;
                         break;
@@ -993,7 +993,7 @@ async function init_dungeon_dungeons(L, pd, dngidx) {   // dungeon.c:997
 /* initialize the Castle drawbridge tune */
 function init_castle_tune() {   // dungeon.c:1111
     let i = 0, $t1;
-    for (i = 0; i < 5; i = i + 1 | 0) {
+    for (i = 0; i < 5; i = i + 1) {
         $t1 = $c.i8(65 + rn2(7) | 0), svt.tune[i] = $t1;
     }
     svt.tune[5] = 0;
@@ -1063,16 +1063,16 @@ async function fixup_level_locations() {   // dungeon.c:1122
  */
 function free_proto_dungeon(pd) {   // dungeon.c:1185
     let i = 0;
-    for (i = 0; i < pd.n_brs; i = i + 1 | 0) {
+    for (i = 0; i < pd.n_brs; i = i + 1) {
         $c.free(pd.tmpbranch[i].name);
     }
-    for (i = 0; i < pd.n_levs; i = i + 1 | 0) {
+    for (i = 0; i < pd.n_levs; i = i + 1) {
         $c.free(pd.tmplevel[i].name);
         if (pd.tmplevel[i].chainlvl) {
             $c.free(pd.tmplevel[i].chainlvl);
         }
     }
-    for (i = 0; i < svn.n_dgns; i = i + 1 | 0) {
+    for (i = 0; i < svn.n_dgns; i = i + 1) {
         $c.free(pd.tmpdungeon[i].name);
         $c.free(pd.tmpdungeon[i].protoname);
     }
@@ -1133,7 +1133,7 @@ export async function init_dungeons() {   // dungeon.c:1205
             await panic($C`dungeon[%i] is not a lua table`, i);
         }
         if (await init_dungeon_dungeons(L, pd, i)) {
-            for (; cl < pd.n_levs; cl = cl + 1 | 0) {
+            for (; cl < pd.n_levs; cl = cl + 1) {
                 await init_level(i, cl, pd);
             }
             /*
@@ -1207,7 +1207,7 @@ export function deepest_lev_reached(noquest) {   // dungeon.c:1339
      * include it in the factor of difficulty calculations.
      */
     let ret = 0;
-    for (i = 0; i < svn.n_dgns; i = i + 1 | 0) {
+    for (i = 0; i < svn.n_dgns; i = i + 1) {
         if (noquest && i === svd.dungeon_topology.d_quest_dnum) {
             continue;
         }
@@ -2543,7 +2543,7 @@ async function save_mapseen(nhfp, mptr) {   // dungeon.c:2695
     if (mptr.custom_lth) {
         await Sfo_char(nhfp, mptr.custom, $C`mapseen-custom`, mptr.custom_lth | 0);
     }
-    for (i = 0; i < (MAXNROFROOMS + 1) * 2; i = i + 1 | 0) {
+    for (i = 0; i < (MAXNROFROOMS + 1) * 2; i = i + 1) {
         await Sfo_mapseen_rooms(nhfp, $c.relem(mptr.msrooms, i), $C`mapseen-msrooms`);
     }
     await savecemetery(nhfp, new $c.FieldRef(mptr, "final_resting_place", "ptr"));
@@ -2576,7 +2576,7 @@ async function load_mapseen(nhfp) {   // dungeon.c:2721
     } else {
         load.custom = null;
     }
-    for (i = 0; i < (MAXNROFROOMS + 1) * 2; i = i + 1 | 0) {
+    for (i = 0; i < (MAXNROFROOMS + 1) * 2; i = i + 1) {
         await Sfi_mapseen_rooms(nhfp, $c.relem(load.msrooms, i), $C`mapseen-msrooms`);
     }
     await restcemetery(nhfp, new $c.FieldRef(load, "final_resting_place", "ptr"));
@@ -2854,7 +2854,7 @@ function count_feat_lastseentyp(mptr, x, y) {   // dungeon.c:2951
                  * For 3.6.0 and earlier, it was always in direct line:
                  * both throne and door on the lower of the two rows.
                  */
-                for (ty = y - 1; ty <= y + 1; ty = ty + 1 | 0) {
+                for (ty = y - 1; ty <= y + 1; ty = ty + 1) {
                     if (isok($c.i16(tx), $c.i16(ty)) && svl.level.locations[tx][ty].typ === THRONE) {
                         mptr.flags.ludios = 1;
                         break;

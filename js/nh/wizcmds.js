@@ -936,7 +936,7 @@ export async function wiz_levltyp_legend() {   // wizcmds.c:841
        the empty string entry to pad out the final pair, depending
        upon how many other entries are present in levltyp[] */
     const last = 38;
-    for (i = 0; i < $c.div32(last, 2); i = i + 1 | 0) {
+    for (i = 0; i < $c.div32(last, 2); i = i + 1) {
         for (j = i; j < last; j = j + $c.div32(last, 2) | 0) {
             const dsc = levltyp[j];
             /* same int-to-char conversion as wiz_map_levltyp() */
@@ -1435,7 +1435,7 @@ async function misc_stats(win, total_count, total_size) {   // wizcmds.c:1284
         await putstr()(win, 0, new $c.Ptr(buf, 0));
     }
     count[0] = size[0] = 0;
-    for (idx = 0; idx < NUM_OBJECTS; idx = idx + 1 | 0) {
+    for (idx = 0; idx < NUM_OBJECTS; idx = idx + 1) {
         if (objects[idx].oc_uname) {
             count[0] = $c.add64(count[0], 1);
             size[0] = $c.add64(size[0], $c.i64($c.addu64($c.strlen(objects[idx].oc_uname), 1)));
@@ -1743,7 +1743,7 @@ export async function wiz_display_macros() {   // wizcmds.c:1705
     const no_glyph = NO_GLYPH;
     const max_glyph = MAX_GLYPH;
     const win = await create_nhwindow()(NHW.TEXT);
-    for (glyph = 0; glyph < MAX_GLYPH; glyph = glyph + 1 | 0) {
+    for (glyph = 0; glyph < MAX_GLYPH; glyph = glyph + 1) {
         /* glyph_is_cmap / glyph_to_cmap() */
         if (glyph_is_cmap(glyph)) {
             test = glyph_to_cmap(glyph);
@@ -1859,11 +1859,11 @@ export async function wiz_objprobs() {   // wizcmds.c:1832
     let buf = new Int8Array(256), probsum = new Int32Array(18), otyp = 0;
     let oclass = objects[FIRST_OBJECT].oc_class;
     $c.memset(new $c.Ptr(probsum, 0), 0, 72);
-    for (otyp = FIRST_OBJECT; otyp < NUM_OBJECTS; otyp = otyp + 1 | 0) {
+    for (otyp = FIRST_OBJECT; otyp < NUM_OBJECTS; otyp = otyp + 1) {
         probsum[objects[otyp].oc_class] = probsum[objects[otyp].oc_class] + objects[otyp].oc_prob | 0;
     }
     const win = await create_nhwindow()(NHW.TEXT);
-    for (otyp = FIRST_OBJECT; otyp < NUM_OBJECTS; otyp = otyp + 1 | 0) {
+    for (otyp = FIRST_OBJECT; otyp < NUM_OBJECTS; otyp = otyp + 1) {
         /* placeholders for extra descriptions aren't generatable objects */
         if (!obj_descr[objects[otyp].oc_name_idx].oc_name) {
             continue;

@@ -128,7 +128,7 @@ export function wipeout_text(engr, cnt, seed) {   // engrave.c:120
             if (!use_rubout) {
                 i = 48;
             } else {
-                for (i = 0; i < 48; i = i + 1 | 0) {
+                for (i = 0; i < 48; i = i + 1) {
                     if (s.get(0) === rubouts[i].wipefrom) {
                         const ln = $c.u32($c.strlen(rubouts[i].wipeto));
                         /*
@@ -439,7 +439,7 @@ export async function make_engr_at(x, y, s, pristine_s, e_time, e_type) {   // e
     ep.engr_txt[actual_text] = $c.recTail(ep);
     ep.engr_txt[remembered_text] = ep.engr_txt[actual_text].add(smem);
     ep.engr_txt[pristine_text] = ep.engr_txt[remembered_text].add(smem);
-    for (i = 0; i < text_states; i = i + 1 | 0) {
+    for (i = 0; i < text_states; i = i + 1) {
         $c.strcpy(ep.engr_txt[i], s);
     }
     if (havepristine) {

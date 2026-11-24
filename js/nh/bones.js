@@ -288,8 +288,8 @@ async function give_to_nearby_mon(otmp, x, y) {   // bones.c:226
     let mtmp = null, xx = 0, yy = 0;
     let selected = null;
     let nmon = 0;
-    for (xx = x - 1; xx <= x + 1; xx = xx + 1 | 0) {
-        for (yy = y - 1; yy <= y + 1; yy = yy + 1 | 0) {
+    for (xx = x - 1; xx <= x + 1; xx = xx + 1) {
+        for (yy = y - 1; yy <= y + 1; yy = yy + 1) {
             if (!isok($c.i16(xx), $c.i16(yy))) {
                 continue;
             }
@@ -397,7 +397,7 @@ async function fixuporacle(oracle) {   // bones.c:308
      * her back inside her room, if necessary, and restore its type.
      */
     /* find original delphi chamber; should always succeed */
-    for (ridx = 0; ridx < 82; ridx = ridx + 1 | 0) {
+    for (ridx = 0; ridx < 82; ridx = ridx + 1) {
         if (svr.rooms[ridx].orig_rtype === DELPHI) {
             break;
         }
@@ -587,7 +587,7 @@ export async function savebones(how, when, corpse) {   // bones.c:403
             await newebones(mtmp);
         }
         if (has_ebones(mtmp)) {
-            for (i = 0; i <= NUM.ROLES; i = i + 1 | 0) {
+            for (i = 0; i <= NUM.ROLES; i = i + 1) {
                 if (!$c.strcmp(gu.urole.name.m, roles[i].name.m)) {
                     mtmp.mextra.ebones.role = $c.u8(i);
                     break;
@@ -595,7 +595,7 @@ export async function savebones(how, when, corpse) {   // bones.c:403
                 /* impossible("savebones: bad gu.urole.name.m \"%s\"",
                               gu.urole.name.m); */
             }
-            for (i = 0; i <= NUM.RACES; i = i + 1 | 0) {
+            for (i = 0; i <= NUM.RACES; i = i + 1) {
                 if (!$c.strcmp(gu.urace.noun, races[i].noun)) {
                     mtmp.mextra.ebones.race = $c.u8(i);
                     break;

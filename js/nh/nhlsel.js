@@ -252,8 +252,8 @@ async function l_selection_and(L) {   // nhlsel.c:281
     const selr = await l_selection_push_new(L);
     rect.$copyFrom(cg.zeroNhRect);
     rect_bounds(sela.bounds.$clone(), selb.bounds.$clone(), rect);
-    for (x = rect.lx; x <= rect.hx; x = x + 1 | 0) {
-        for (y = rect.ly; y <= rect.hy; y = y + 1 | 0) {
+    for (x = rect.lx; x <= rect.hx; x = x + 1) {
+        for (y = rect.ly; y <= rect.hy; y = y + 1) {
             const val = selection_getpoint($c.i16(x), $c.i16(y), sela) & selection_getpoint($c.i16(x), $c.i16(y), selb);
             selection_setpoint($c.i16(x), $c.i16(y), selr, val);
         }
@@ -274,8 +274,8 @@ async function l_selection_or(L) {   // nhlsel.c:306
     const selr = await l_selection_push_new(L);
     rect.$copyFrom(cg.zeroNhRect);
     rect_bounds(sela.bounds.$clone(), selb.bounds.$clone(), rect);
-    for (x = rect.lx; x <= rect.hx; x = x + 1 | 0) {
-        for (y = rect.ly; y <= rect.hy; y = y + 1 | 0) {
+    for (x = rect.lx; x <= rect.hx; x = x + 1) {
+        for (y = rect.ly; y <= rect.hy; y = y + 1) {
             const val = selection_getpoint($c.i16(x), $c.i16(y), sela) | selection_getpoint($c.i16(x), $c.i16(y), selb);
             selection_setpoint($c.i16(x), $c.i16(y), selr, val);
         }
@@ -297,8 +297,8 @@ async function l_selection_xor(L) {   // nhlsel.c:332
     const selr = await l_selection_push_new(L);
     rect.$copyFrom(cg.zeroNhRect);
     rect_bounds(sela.bounds.$clone(), selb.bounds.$clone(), rect);
-    for (x = rect.lx; x <= rect.hx; x = x + 1 | 0) {
-        for (y = rect.ly; y <= rect.hy; y = y + 1 | 0) {
+    for (x = rect.lx; x <= rect.hx; x = x + 1) {
+        for (y = rect.ly; y <= rect.hy; y = y + 1) {
             const val = selection_getpoint($c.i16(x), $c.i16(y), sela) ^ selection_getpoint($c.i16(x), $c.i16(y), selb);
             selection_setpoint($c.i16(x), $c.i16(y), selr, val);
         }
@@ -323,8 +323,8 @@ async function l_selection_sub(L) {   // nhlsel.c:361
     const selr = await l_selection_push_new(L);
     rect.$copyFrom(cg.zeroNhRect);
     rect_bounds(sela.bounds.$clone(), selb.bounds.$clone(), rect);
-    for (x = rect.lx; x <= rect.hx; x = x + 1 | 0) {
-        for (y = rect.ly; y <= rect.hy; y = y + 1 | 0) {
+    for (x = rect.lx; x <= rect.hx; x = x + 1) {
+        for (y = rect.ly; y <= rect.hy; y = y + 1) {
             const a_pt = selection_getpoint($c.i16(x), $c.i16(y), sela);
             const b_pt = selection_getpoint($c.i16(x), $c.i16(y), selb);
             const val = (a_pt ^ b_pt) & a_pt;
@@ -524,11 +524,11 @@ async function l_selection_fillrect(L) {   // nhlsel.c:559
     await l_selection_clone(L);
     sel[0] = await l_selection_check(L, 2);
     if (x1[0] === x2[0]) {
-        for (y = y1[0]; y <= y2[0]; y = y + 1 | 0) {
+        for (y = y1[0]; y <= y2[0]; y = y + 1) {
             selection_setpoint(x1[0], $c.i16(y), sel[0], 1);
         }
     } else {
-        for (y = y1[0]; y <= y2[0]; y = y + 1 | 0) {
+        for (y = y1[0]; y <= y2[0]; y = y + 1) {
             selection_do_line(x1[0], $c.i16(y), x2[0], $c.i16(y), sel[0]);
         }
     }
@@ -644,7 +644,7 @@ async function l_selection_match(L) {   // nhlsel.c:682
         /*NOTREACHED*/
     }
     for (y = 0; y <= sel.hei; y = y + 1 | 0) {
-        for (x = 1; x < sel.wid; x = x + 1 | 0) {
+        for (x = 1; x < sel.wid; x = x + 1) {
             selection_setpoint($c.i16(x), $c.i16(y), sel, await mapfrag_match(mf[0], x, y) ? 1 : 0);
         }
     }

@@ -85,7 +85,7 @@ async function setgemprobs(dlev) {   // o_init.c:54
         lev = 0;
     }
     let first = svb.bases[GEM_CLASS];
-    for (j = 0; j < (9 - $c.div32(lev, 3) | 0); j = j + 1 | 0) {
+    for (j = 0; j < (9 - $c.div32(lev, 3) | 0); j = j + 1) {
         objects[first + j | 0].oc_prob = 0;
     }
     first = first + j | 0;
@@ -95,11 +95,11 @@ async function setgemprobs(dlev) {   // o_init.c:54
             LAST_REAL_GEM);
         await wait_synch()();
     }
-    for (j = first; j <= LAST_REAL_GEM; j = j + 1 | 0) {
+    for (j = first; j <= LAST_REAL_GEM; j = j + 1) {
         objects[j].oc_prob = $c.i16($c.div32((171 + j | 0) - first | 0, LAST_REAL_GEM + 1 - first | 0));
     }
     /* recompute GEM_CLASS total oc_prob - including rocks/stones */
-    for (j = svb.bases[GEM_CLASS]; j < svb.bases[GEM_CLASS + 1]; j = j + 1 | 0) {
+    for (j = svb.bases[GEM_CLASS]; j < svb.bases[GEM_CLASS + 1]; j = j + 1) {
         sum = sum + objects[j].oc_prob | 0;
     }
     go.oclass_prob_totals[GEM_CLASS] = $c.i16(sum);
@@ -177,7 +177,7 @@ function shuffle(o_low, o_high, domaterial) {   // o_init.c:113
  */
 export async function init_objects() {   // o_init.c:151
     let i = 0, last = 0, $t1, $t2, $t3;
-    for (i = 0; i <= MAXOCLASSES; i = i + 1 | 0) {
+    for (i = 0; i <= MAXOCLASSES; i = i + 1) {
         svb.bases[i] = 0;
         if (i > 0 && i < MAXOCLASSES && objects[i].oc_class !== i) {
             await panic(
@@ -186,7 +186,7 @@ export async function init_objects() {   // o_init.c:151
         }
     }
     /* initialize object descriptions */
-    for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
+    for (i = 0; i < NUM_OBJECTS; i = i + 1) {
         $t1 = objects[i].oc_descr_idx = $c.i16(i), objects[i].oc_name_idx = $t1;
     }
     /* init base; if probs given check that they add up to 1000,
@@ -229,13 +229,13 @@ export async function init_objects() {   // o_init.c:151
     /* hypothetically someone might remove all objects of some class,
        or be adding a new class and not populated it yet, leaving gaps
        in bases[]; guarantee that there are no such gaps */
-    for (last = MAXOCLASSES - 1; last >= 0; last = last - 1 | 0) {
+    for (last = MAXOCLASSES - 1; last >= 0; last = last - 1) {
         if (!svb.bases[last]) {
             svb.bases[last] = svb.bases[last + 1 | 0];
         }
     }
     /* check objects[].oc_name_known */
-    for (i = MAXOCLASSES; i < NUM_OBJECTS; i = i + 1 | 0) {
+    for (i = MAXOCLASSES; i < NUM_OBJECTS; i = i + 1) {
         const nmkn = objects[i].oc_name_known !== 0 ? 1 : 0;
         if ((!obj_descr[objects[i].oc_descr_idx].oc_descr ? 1 : 0) ^ nmkn) {
             if (iflags.sanity_check) {
@@ -262,12 +262,12 @@ export async function init_objects() {   // o_init.c:151
  */
 export async function init_oclass_probs() {   // o_init.c:240
     let i = 0, oclass = 0;
-    for (oclass = 0; oclass < MAXOCLASSES; oclass = oclass + 1 | 0) {
+    for (oclass = 0; oclass < MAXOCLASSES; oclass = oclass + 1) {
         let sum = 0;
         /* note: for ILLOBJ_CLASS, bases[oclass+1]-1 isn't the last item
            in the class; but all the generic items have probability 0 so
            adding them to 'sum' has no impact */
-        for (i = svb.bases[oclass]; i < svb.bases[oclass + 1 | 0]; i = i + 1 | 0) {
+        for (i = svb.bases[oclass]; i < svb.bases[oclass + 1 | 0]; i = i + 1) {
             sum = $c.i16(sum + objects[i].oc_prob | 0);
         }
         if (sum <= 0 && oclass !== ILLOBJ_CLASS
@@ -275,7 +275,7 @@ export async function init_oclass_probs() {   // o_init.c:240
             await impossible($C`%s (%d) probability total for oclass %d`,
                 !sum ? $C`zero` : $C`negative`, sum, oclass);
             /* gracefully fail by setting all members of this class to 1 */
-            for (i = svb.bases[oclass]; i < svb.bases[oclass + 1 | 0]; i = i + 1 | 0) {
+            for (i = svb.bases[oclass]; i < svb.bases[oclass + 1 | 0]; i = i + 1) {
                 objects[i].oc_prob = 1;
                 sum = $c.i16(sum + 1);
             }
@@ -346,13 +346,13 @@ function shuffle_all() {   // o_init.c:322
     /* entire classes; obj_shuffle_range() handles their exceptions */
     /* sub-class type ranges (one item from each group) */
     /* do whole classes (amulets, &c) */
-    for (idx = 0; idx < 7; idx = idx + 1 | 0) {
+    for (idx = 0; idx < 7; idx = idx + 1) {
         obj_shuffle_range(svb.bases[shuffle_all$shuffle_classes[idx]],
             new $c.Ptr(first, 0), new $c.Ptr(last, 0));
         shuffle(first[0], last[0], TRUE);
     }
     /* do type ranges (helms, &c) */
-    for (idx = 0; idx < 4; idx = idx + 1 | 0) {
+    for (idx = 0; idx < 4; idx = idx + 1) {
         obj_shuffle_range(shuffle_all$shuffle_types[idx], new $c.Ptr(first, 0), new $c.Ptr(last, 0));
         shuffle(first[0], last[0], FALSE);
     }
@@ -390,20 +390,20 @@ export async function oinit() {   // o_init.c:369
 export async function savenames(nhfp) {   // o_init.c:375
     let i = 0, len = Uint32Array.of(0);
     if (update_file(nhfp)) {
-        for (i = 0; i < MAXOCLASSES + 2; i = i + 1 | 0) {
+        for (i = 0; i < MAXOCLASSES + 2; i = i + 1) {
             await Sfo_int(nhfp, new $c.Ptr(svb.bases, i), $C`names-bases`);
         }
-        for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
+        for (i = 0; i < NUM_OBJECTS; i = i + 1) {
             await Sfo_short(nhfp, new $c.Ptr(svd.disco, i), $C`names-disco`);
         }
-        for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
+        for (i = 0; i < NUM_OBJECTS; i = i + 1) {
             await Sfo_objclass(nhfp, $c.relem(objects, i), $C`names-objclass`);
         }
     }
     /* as long as we use only one version of Hack we
        need not save oc_name and oc_descr, but we must save
        oc_uname for all objects */
-    for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
+    for (i = 0; i < NUM_OBJECTS; i = i + 1) {
         if (objects[i].oc_uname) {
             if (update_file(nhfp)) {
                 len[0] = await Strlen_(objects[i].oc_uname, $C`savenames`, 397) + 1 >>> 0;
@@ -425,16 +425,16 @@ export async function savenames(nhfp) {   // o_init.c:375
 export async function restnames(nhfp) {   // o_init.c:411
     let i = 0, len = Uint32Array.of(0), $t1;
     len[0] = 0;
-    for (i = 0; i < MAXOCLASSES + 2; i = i + 1 | 0) {
+    for (i = 0; i < MAXOCLASSES + 2; i = i + 1) {
         await sfi_int(nhfp, new $c.Ptr(svb.bases, i), $C`names-bases`);
     }
-    for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
+    for (i = 0; i < NUM_OBJECTS; i = i + 1) {
         await Sfi_short(nhfp, new $c.Ptr(svd.disco, i), $C`names-disco`);
     }
-    for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
+    for (i = 0; i < NUM_OBJECTS; i = i + 1) {
         await Sfi_objclass(nhfp, $c.relem(objects, i), $C`names-objclass`);
     }
-    for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
+    for (i = 0; i < NUM_OBJECTS; i = i + 1) {
         if (objects[i].oc_uname) {
             await sfi_unsigned(nhfp, new $c.Ptr(len, 0), $C`names-len`);
             $t1 = $c.asArr(await alloc(len[0]), Int8Array), objects[i].oc_uname = $t1;
@@ -516,7 +516,7 @@ export async function undiscover_object(oindx) {   // o_init.c:498
         let found = FALSE;
         /* find the object; shift those behind it forward one slot */
         for (dindx = svb.bases[acls]; dindx < NUM_OBJECTS && svd.disco[dindx] !== 0
-            && objects[dindx].oc_class === acls; dindx = dindx + 1 | 0) {
+            && objects[dindx].oc_class === acls; dindx = dindx + 1) {
             if (found) {
                 svd.disco[dindx - 1 | 0] = svd.disco[dindx];
             } else if (svd.disco[dindx] === oindx) {
@@ -729,7 +729,7 @@ function disco_fmt_uniq(uidx, outbuf) {   // o_init.c:725
 async function disco_output_sorted(tmpwin, sorted_lines, sorted_ct, lootsort) {   // o_init.c:741
     let j = 0;
     $c.nh_deterministic_qsort(sorted_lines, $c.u64(sorted_ct), 8, discovered_cmp);
-    for (j = 0; j < sorted_ct; j = j + 1 | 0) {
+    for (j = 0; j < sorted_ct; j = j + 1) {
         let p = sorted_lines.get(j);
         (!!$c.peq(p, $c.asArr(null, Int8Array)) ? 1 : 0) ? $c.__assert_rtn($C`disco_output_sorted`, $C`o_init.c`, 752, $C`p != NULL`) : 0;   /* pacify static analyzer */
         if (lootsort) {
@@ -773,7 +773,7 @@ export async function dodiscovered() {   // o_init.c:764
     /* gather "unique objects", also called "relics", into a pseudo-class;
        they'll also be displayed individually within their regular class */
     let uniq_ct = 0;
-    for (i = dis = 0; i < 4; i = i + 1 | 0) {
+    for (i = dis = 0; i < 4; i = i + 1) {
         const uidx = uniq_objs[i];
         if (objects[uidx].oc_name_known
             || objects[uidx].oc_encountered && uidx !== AMULET_OF_YENDOR) {
@@ -798,7 +798,7 @@ export async function dodiscovered() {   // o_init.c:764
     for (s = new $c.Ptr(classes, 0); s.get(0); s = s.add(1)) {
         const oclass = s.get(0);
         let prev_class = $c.i8(oclass + 1);   /* forced different from oclass */
-        for (i = svb.bases[oclass]; i < NUM_OBJECTS && objects[i].oc_class === oclass; i = i + 1 | 0) {
+        for (i = svb.bases[oclass]; i < NUM_OBJECTS && objects[i].oc_class === oclass; i = i + 1) {
             if ((dis = svd.disco[i]) !== 0 && interesting_to_discover(dis)) {
                 ct = ct + 1 | 0;
                 if (oclass !== prev_class) {
@@ -900,7 +900,7 @@ export async function doclassdisco() {   // o_init.c:891
        invocation items; the Guidebook calls unique items "relics" but the
        Amulet of Yendor is unique too so we haven't made a blanket change
        from 'u' to 'r') */
-    for (i = 0; i < 4; i = i + 1 | 0) {
+    for (i = 0; i < 4; i = i + 1) {
         uidx = uniq_objs[i];
         if (objects[uidx].oc_name_known
             || objects[uidx].oc_encountered && uidx !== AMULET_OF_YENDOR) {
@@ -935,7 +935,7 @@ export async function doclassdisco() {   // o_init.c:891
     for (s = new $c.Ptr(allclasses, 0); s.get(0); s = s.add(1)) {
         oclass = s.get(0);
         c = def_oc_syms[oclass].sym;
-        for (i = svb.bases[oclass]; i < NUM_OBJECTS && objects[i].oc_class === oclass; i = i + 1 | 0) {
+        for (i = svb.bases[oclass]; i < NUM_OBJECTS && objects[i].oc_class === oclass; i = i + 1) {
             if ((dis = svd.disco[i]) !== 0 && interesting_to_discover(dis)) {
                 if (!$c.strchr(new $c.Ptr(discosyms, 0), c)) {
                     strkitten(new $c.Ptr(discosyms, 0), c);
@@ -1010,7 +1010,7 @@ export async function doclassdisco() {   // o_init.c:891
         case 114:
             await putstr()(tmpwin, iflags.menu_headings.attr,
                 upstart($c.strcpy(new $c.Ptr(buf, 0), new $c.Ptr(doclassdisco$unique_items, 0))));
-            for (i = 0; i < 4; i = i + 1 | 0) {
+            for (i = 0; i < 4; i = i + 1) {
                 uidx = uniq_objs[i];
                 if (objects[uidx].oc_name_known
                     || objects[uidx].oc_encountered
@@ -1068,7 +1068,7 @@ export async function doclassdisco() {   // o_init.c:891
                 await You(new $c.Ptr(doclassdisco$havent_discovered_any, 0), await oclass_to_name(oclass, new $c.Ptr(buf, 0)));
             } else if (sorted_ct) {
                 $c.nh_deterministic_qsort(new $c.Ptr(sorted_lines, 0), $c.u64(sorted_ct), 8, discovered_cmp);
-                for (i = 0; i < sorted_ct; i = i + 1 | 0) {
+                for (i = 0; i < sorted_ct; i = i + 1) {
                     let sl = sorted_lines[i];
                     if (lootsort) {
                         sl.set(6, sl.get(0));   /* '*' or ' ' */
@@ -1109,7 +1109,7 @@ export async function rename_disco() {   // o_init.c:1131
     for (s = new $c.Ptr(flags.inv_order, 0); s.get(0); s = s.add(1)) {
         const oclass = s.get(0);
         let prev_class = $c.i8(oclass + 1);   /* forced different from oclass */
-        for (i = svb.bases[oclass]; i < NUM_OBJECTS && objects[i].oc_class === oclass; i = i + 1 | 0) {
+        for (i = svb.bases[oclass]; i < NUM_OBJECTS && objects[i].oc_class === oclass; i = i + 1) {
             dis = svd.disco[i];
             if (!dis || !interesting_to_discover(dis)) {
                 continue;

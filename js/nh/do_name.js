@@ -1550,7 +1550,7 @@ export function rndorcname(s) {   // do_name.c:1538
     let vstart = rn2(2);
     if (s) {
         s.set(0, 0);
-        for (i = 0; i < iend; i = i + 1 | 0) {
+        for (i = 0; i < iend; i = i + 1) {
             vstart = 1 - vstart | 0;   /* 0 -> 1, 1 -> 0 */
             $c.sprintf(eos(s), $C`%s%s`, i > 0 && !rn2(30) ? $C`-` : $C``, vstart ? rndorcname$v[rn2(4)] : rndorcname$snd[rn2(11)]);
         }
@@ -1630,7 +1630,7 @@ export async function lookup_novel(lookname, idx) {   // do_name.c:1627
     } else if (!strcmpi(lookname, $C`Thud`)) {
         lookname = sir_Terry_novels[NVL_THUD];
     }
-    for (k = 0; k < 41; k = k + 1 | 0) {
+    for (k = 0; k < 41; k = k + 1) {
         if (!strcmpi(lookname, sir_Terry_novels[k])
             || !strncmpi(await The(lookname), sir_Terry_novels[k], -1)) {
             if (idx) {

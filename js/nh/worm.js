@@ -541,7 +541,7 @@ export async function detect_wsegs(worm, use_detection_glyph) {   // worm.c:503
 export async function save_worm(nhfp) {   // worm.c:528
     let i = 0, count = Int32Array.of(0), curr = null, $t1;
     if (update_file(nhfp)) {
-        for (i = 1; i < MAX_NUM_WORMS; i = i + 1 | 0) {
+        for (i = 1; i < MAX_NUM_WORMS; i = i + 1) {
             for (count[0] = 0, curr = wtails[i]; curr; curr = curr.nseg) {
                 count[0] = count[0] + 1 | 0;
             }
@@ -555,14 +555,14 @@ export async function save_worm(nhfp) {   // worm.c:528
                 }
             }
         }
-        for (i = 0; i < MAX_NUM_WORMS; i = i + 1 | 0) {
+        for (i = 0; i < MAX_NUM_WORMS; i = i + 1) {
             await sfo_long(nhfp, new $c.Ptr(wgrowtime, i), $C`worm-wgrowtime`);
         }
     }
     if (release_data(nhfp)) {
         /* Free the segments only.  savemonchn() will take care of the
          * monsters. */
-        for (i = 1; i < MAX_NUM_WORMS; i = i + 1 | 0) {
+        for (i = 1; i < MAX_NUM_WORMS; i = i + 1) {
             if (!(curr = wtails[i])) {
                 continue;
             }
@@ -589,10 +589,10 @@ export async function save_worm(nhfp) {   // worm.c:528
 export async function rest_worm(nhfp) {   // worm.c:577
     let i = 0, j = 0, count = Int32Array.of(0), curr = null;
     count[0] = 0;
-    for (i = 1; i < MAX_NUM_WORMS; i = i + 1 | 0) {
+    for (i = 1; i < MAX_NUM_WORMS; i = i + 1) {
         await sfi_int(nhfp, new $c.Ptr(count, 0), $C`worm-segment_count`);
         /* Get the segments. */
-        for (curr = null, j = 0; j < count[0]; j = j + 1 | 0) {
+        for (curr = null, j = 0; j < count[0]; j = j + 1) {
             const temp = await newseg();
             temp.nseg = null;
             await Sfi_coordxy(nhfp, new $c.FieldRef(temp, "wx", "i16"), $C`worm-wx`);
@@ -606,7 +606,7 @@ export async function rest_worm(nhfp) {   // worm.c:577
         }
         wheads[i] = curr;
     }
-    for (i = 0; i < MAX_NUM_WORMS; i = i + 1 | 0) {
+    for (i = 0; i < MAX_NUM_WORMS; i = i + 1) {
         await sfi_long(nhfp, new $c.Ptr(wgrowtime, i), $C`worm-wgrowtime`);
     }
 }

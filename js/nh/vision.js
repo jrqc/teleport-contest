@@ -113,7 +113,7 @@ export function get_viz_clear(x, y) {   // vision.c:105
 export function vision_init() {   // vision.c:121
     let i = 0;
     /* Set up the pointers. */
-    for (i = 0; i < ROWNO; i = i + 1 | 0) {
+    for (i = 0; i < ROWNO; i = i + 1) {
         cs_rows0[i] = new $c.Ptr(could_see[0][i], 0);
         cs_rows1[i] = new $c.Ptr(could_see[1][i], 0);
         viz_clear_rows[i] = new $c.Ptr(viz_clear[i], 0);
@@ -195,14 +195,14 @@ export function vision_reset() {   // vision.c:211
     /* Reset the pointers and clear so that we have a "full" dungeon. */
     $c.memset(new $c.Ptr(viz_clear, 0), 0, 1680);
     /* Dig the level */
-    for (y = 0; y < ROWNO; y = y + 1 | 0) {
+    for (y = 0; y < ROWNO; y = y + 1) {
         let dig_left = 0;
         let block = TRUE;   /* location (0,y) is always stone; it's !isok() */
         let lev = $c.relem(svl.level.locations[1], y);
         for (x = 1; x < COLNO; x = x + 1 | 0, lev = $c.radd(lev, ROWNO)) {
             if (block !== (IS_OBSTRUCTED(lev.typ) || does_block(x, y, lev) ? 1 : 0)) {
                 if (block) {
-                    for (i = dig_left; i < x; i = i + 1 | 0) {
+                    for (i = dig_left; i < x; i = i + 1) {
                         left_ptrs[y][i] = $c.i16(dig_left);
                         right_ptrs[y][i] = $c.i16(x - 1 | 0);
                     }
@@ -211,7 +211,7 @@ export function vision_reset() {   // vision.c:211
                     if (dig_left) {
                         dig_left = dig_left - 1 | 0;   /* point at first blocked point */
                     }
-                    for (; i < x; i = i + 1 | 0) {
+                    for (; i < x; i = i + 1) {
                         left_ptrs[y][i] = $c.i16(dig_left);
                         right_ptrs[y][i] = $c.i16(x);
                         viz_clear[y][i] = 1;
@@ -226,7 +226,7 @@ export function vision_reset() {   // vision.c:211
         if (!block && dig_left) {
             dig_left = dig_left - 1 | 0;   /* point at first blocked point */
         }
-        for (; i < COLNO; i = i + 1 | 0) {
+        for (; i < COLNO; i = i + 1) {
             left_ptrs[y][i] = $c.i16(dig_left);
             right_ptrs[y][i] = COLNO - 1;
             viz_clear[y][i] = !block ? 1 : 0;
@@ -262,7 +262,7 @@ function get_unused_cs(rows, rmin, rmax) {   // vision.c:274
     let nrmax = rmax.get(0);
     $c.memset(rows.get(0).get(0), 0, 1680);
     /* see nothing */
-    for (row = 0; row < ROWNO; row = row + 1 | 0) {
+    for (row = 0; row < ROWNO; row = row + 1) {
         /* set row min & max */
         ($t1 = nrmin, nrmin = $t1.add(1), $t1).set(0, COLNO - 1);
         ($t2 = nrmax, nrmax = $t2.add(1), $t2).set(0, 1);
@@ -292,7 +292,7 @@ async function rogue_vision(next, rmin, rmax) {   // vision.c:314
     /* If in a lit room, we are able to see to its boundaries. */
     /* If dark, set COULD_SEE so various spells work -dlc */
     if (rnum >= 0) {
-        for (zy = svr.rooms[rnum].ly - 1; zy <= svr.rooms[rnum].hy + 1; zy = zy + 1 | 0) {
+        for (zy = svr.rooms[rnum].ly - 1; zy <= svr.rooms[rnum].hy + 1; zy = zy + 1) {
             $t1 = $c.i16(start = svr.rooms[rnum].lx - 1), rmin.set(zy, $t1);
             $t2 = $c.i16(stop = svr.rooms[rnum].hx + 1), rmax.set(zy, $t2);
             for (zx = start; zx <= stop; zx = zx + 1 | 0) {
@@ -493,7 +493,7 @@ export async function vision_recalc(control) {   // vision.c:512
              */
             temp_array = gv.viz_array;   /* set gv.viz_array so newsym() will work */
             gv.viz_array = next_array[0];
-            for (row = 0; row < ROWNO; row = row + 1 | 0) {
+            for (row = 0; row < ROWNO; row = row + 1) {
                 old_row = temp_array.get(row);
                 /* Find the min and max positions on the row. */
                 start = min(gv.viz_rmin.get(row), next_rmin[0].get(row));
@@ -518,8 +518,8 @@ export async function vision_recalc(control) {   // vision.c:512
                  */
                 has_night_vision = 0;
                 lo_col = max(u.ux - 1, 1);
-                for (row = u.uy - 1; row <= u.uy + 1; row = row + 1 | 0) {
-                    for (col = lo_col; col <= u.ux + 1; col = col + 1 | 0) {
+                for (row = u.uy - 1; row <= u.uy + 1; row = row + 1) {
+                    for (col = lo_col; col <= u.ux + 1; col = col + 1) {
                         if (!isok($c.i16(col), $c.i16(row)) || !is_pool($c.i16(col), $c.i16(row))) {
                             continue;
                         }
@@ -530,7 +530,7 @@ export async function vision_recalc(control) {   // vision.c:512
                 }
                 /* if in a pit, just update for immediate locations */
             } else if (u.utrap && u.utraptype === TT.PIT) {
-                for (row = u.uy - 1; row <= u.uy + 1; row = row + 1 | 0) {
+                for (row = u.uy - 1; row <= u.uy + 1; row = row + 1) {
                     if (row < 0) {
                         continue;
                     }
@@ -540,7 +540,7 @@ export async function vision_recalc(control) {   // vision.c:512
                     next_rmin[0].set(row, $c.i16(max(1, u.ux - 1)));
                     next_rmax[0].set(row, $c.i16(COLNO - 1 < u.ux + 1 ? COLNO - 1 : u.ux + 1));
                     next_row = next_array[0].get(row);
-                    for (col = next_rmin[0].get(row); col <= next_rmax[0].get(row); col = col + 1 | 0) {
+                    for (col = next_rmin[0].get(row); col <= next_rmax[0].get(row); col = col + 1) {
                         next_row.set(col, IN_SIGHT | COULD_SEE);
                     }
                 }
@@ -891,7 +891,7 @@ function dig_point(row, col) {   // vision.c:967
             right_ptrs[row][0] = right_ptrs[row][1];
         } else {
             right_ptrs[row][0] = 1;
-            for (i = 1; i <= right_ptrs[row][1]; i = i + 1 | 0) {
+            for (i = 1; i <= right_ptrs[row][1]; i = i + 1) {
                 left_ptrs[row][i] = 1;
             }
         }
@@ -901,7 +901,7 @@ function dig_point(row, col) {   // vision.c:967
             left_ptrs[row][COLNO - 1] = left_ptrs[row][COLNO - 2];
         } else {
             left_ptrs[row][COLNO - 1] = COLNO - 2;
-            for (i = left_ptrs[row][COLNO - 2]; i < COLNO - 1; i = i + 1 | 0) {
+            for (i = left_ptrs[row][COLNO - 2]; i < COLNO - 1; i = i + 1) {
                 right_ptrs[row][i] = COLNO - 2;
             }
         }
@@ -916,7 +916,7 @@ function dig_point(row, col) {   // vision.c:967
             }
             right_ptrs[row][i] = right_ptrs[row][col + 1 | 0];
         }
-        for (i = col; i <= right_ptrs[row][col + 1 | 0]; i = i + 1 | 0) {
+        for (i = col; i <= right_ptrs[row][col + 1 | 0]; i = i + 1) {
             if (!viz_clear[row][i]) {
                 continue;   /* catch non-end case */
             }
@@ -924,7 +924,7 @@ function dig_point(row, col) {   // vision.c:967
         }
     } else if (viz_clear[row][col - 1 | 0]) {
         /* Left side clear, right side blocked. */
-        for (i = col + 1 | 0; i <= right_ptrs[row][col + 1 | 0]; i = i + 1 | 0) {
+        for (i = col + 1 | 0; i <= right_ptrs[row][col + 1 | 0]; i = i + 1) {
             left_ptrs[row][i] = $c.i16(col + 1 | 0);
         }
         for (i = left_ptrs[row][col - 1 | 0]; i <= col; i = i + 1 | 0) {
@@ -936,10 +936,10 @@ function dig_point(row, col) {   // vision.c:967
         left_ptrs[row][col] = left_ptrs[row][col - 1 | 0];
     } else if (viz_clear[row][col + 1 | 0]) {
         /* Right side clear, left side blocked. */
-        for (i = left_ptrs[row][col - 1 | 0]; i < col; i = i + 1 | 0) {
+        for (i = left_ptrs[row][col - 1 | 0]; i < col; i = i + 1) {
             right_ptrs[row][i] = $c.i16(col - 1 | 0);
         }
-        for (i = col; i <= right_ptrs[row][col + 1 | 0]; i = i + 1 | 0) {
+        for (i = col; i <= right_ptrs[row][col + 1 | 0]; i = i + 1) {
             if (!viz_clear[row][i]) {
                 continue;   /* catch non-end case */
             }
@@ -948,10 +948,10 @@ function dig_point(row, col) {   // vision.c:967
         right_ptrs[row][col] = right_ptrs[row][col + 1 | 0];
     } else {
         /* Both sides blocked */
-        for (i = left_ptrs[row][col - 1 | 0]; i < col; i = i + 1 | 0) {
+        for (i = left_ptrs[row][col - 1 | 0]; i < col; i = i + 1) {
             right_ptrs[row][i] = $c.i16(col - 1 | 0);
         }
-        for (i = col + 1 | 0; i <= right_ptrs[row][col + 1 | 0]; i = i + 1 | 0) {
+        for (i = col + 1 | 0; i <= right_ptrs[row][col + 1 | 0]; i = i + 1) {
             left_ptrs[row][i] = $c.i16(col + 1 | 0);
         }
         left_ptrs[row][col] = $c.i16(col - 1 | 0);
@@ -974,7 +974,7 @@ function fill_point(row, col) {   // vision.c:1051
             right_ptrs[row][0] = 0;
         } else {
             right_ptrs[row][0] = right_ptrs[row][1];
-            for (i = 1; i <= right_ptrs[row][1]; i = i + 1 | 0) {
+            for (i = 1; i <= right_ptrs[row][1]; i = i + 1) {
                 left_ptrs[row][i] = 0;
             }
         }
@@ -984,7 +984,7 @@ function fill_point(row, col) {   // vision.c:1051
             left_ptrs[row][COLNO - 1] = COLNO - 1;
         } else {
             left_ptrs[row][COLNO - 1] = left_ptrs[row][COLNO - 2];
-            for (i = left_ptrs[row][COLNO - 2]; i < COLNO - 1; i = i + 1 | 0) {
+            for (i = left_ptrs[row][COLNO - 2]; i < COLNO - 1; i = i + 1) {
                 right_ptrs[row][i] = COLNO - 1;
             }
         }
@@ -999,7 +999,7 @@ function fill_point(row, col) {   // vision.c:1051
         if (!left_ptrs[row][col - 1 | 0]) {   /* catch the end case */
             right_ptrs[row][0] = $c.i16(col);
         }
-        for (i = col; i < right_ptrs[row][col + 1 | 0]; i = i + 1 | 0) {
+        for (i = col; i < right_ptrs[row][col + 1 | 0]; i = i + 1) {
             left_ptrs[row][i] = $c.i16(col);
         }
         if (right_ptrs[row][col + 1 | 0] === COLNO - 1) {   /* catch the end case */
@@ -1007,10 +1007,10 @@ function fill_point(row, col) {   // vision.c:1051
         }
     } else if (viz_clear[row][col - 1 | 0]) {
         /* Left side clear, right side blocked. */
-        for (i = col; i <= right_ptrs[row][col + 1 | 0]; i = i + 1 | 0) {
+        for (i = col; i <= right_ptrs[row][col + 1 | 0]; i = i + 1) {
             left_ptrs[row][i] = $c.i16(col);
         }
-        for (i = left_ptrs[row][col - 1 | 0] + 1; i < col; i = i + 1 | 0) {
+        for (i = left_ptrs[row][col - 1 | 0] + 1; i < col; i = i + 1) {
             right_ptrs[row][i] = $c.i16(col);
         }
         if (!left_ptrs[row][col - 1 | 0]) {   /* catch the end case */
@@ -1022,7 +1022,7 @@ function fill_point(row, col) {   // vision.c:1051
         for (i = left_ptrs[row][col - 1 | 0]; i <= col; i = i + 1 | 0) {
             right_ptrs[row][i] = $c.i16(col);
         }
-        for (i = col + 1 | 0; i < right_ptrs[row][col + 1 | 0]; i = i + 1 | 0) {
+        for (i = col + 1 | 0; i < right_ptrs[row][col + 1 | 0]; i = i + 1) {
             left_ptrs[row][i] = $c.i16(col);
         }
         if (right_ptrs[row][col + 1 | 0] === COLNO - 1) {   /* catch the end case */
@@ -1034,7 +1034,7 @@ function fill_point(row, col) {   // vision.c:1051
         for (i = left_ptrs[row][col - 1 | 0]; i <= col; i = i + 1 | 0) {
             right_ptrs[row][i] = right_ptrs[row][col + 1 | 0];
         }
-        for (i = col; i <= right_ptrs[row][col + 1 | 0]; i = i + 1 | 0) {
+        for (i = col; i <= right_ptrs[row][col + 1 | 0]; i = i + 1) {
             left_ptrs[row][i] = left_ptrs[row][col - 1 | 0];
         }
     }

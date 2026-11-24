@@ -115,7 +115,7 @@ const help_menu_items = $c.recArray($T.anon_pager_2830, 17);
  */
 function is_swallow_sym(c) {   // pager.c:68
     let i = 0;
-    for (i = S.sw_tl; i <= S.sw_br; i = i + 1 | 0) {
+    for (i = S.sw_tl; i <= S.sw_br; i = i + 1) {
         if (gs.showsyms[i] === c) {
             return TRUE;
         }
@@ -1390,7 +1390,7 @@ export async function do_screen_description(cc$in, looked, sym, out_str, firstma
         check_monsters$: for (;;) {
             /* Check for monsters */
             if (!iflags.terrainmode || (iflags.terrainmode & TER.MON) >>> 0 !== 0) {
-                for (i = 1; i < MAXMCLASSES; i = i + 1 | 0) {
+                for (i = 1; i < MAXMCLASSES; i = i + 1) {
                     if (i === S.invisible) {   /* avoid matching on this */
                         continue;
                     }
@@ -1425,7 +1425,7 @@ export async function do_screen_description(cc$in, looked, sym, out_str, firstma
                 if (!bouldersym) {
                     bouldersym = $c.u8(def_oc_syms[ROCK_CLASS].sym);
                 }
-                for (i = 1; i < MAXOCLASSES; i = i + 1 | 0) {
+                for (i = 1; i < MAXOCLASSES; i = i + 1) {
                     /* ROCK_CLASS is complicated; statues are displayed as the
                        monster they depict rather than as S_rock; boulders might
                        be displayed as a custom symbol rather than as S_rock */
@@ -1503,7 +1503,7 @@ export async function do_screen_description(cc$in, looked, sym, out_str, firstma
                 }
             }
             /* Now check for graphics symbols */
-            for (hit_trap[0] = FALSE, i = 0; i < MAXPCHARS; i = i + 1 | 0) {
+            for (hit_trap[0] = FALSE, i = 0; i < MAXPCHARS; i = i + 1) {
                 /*
                  * Index hackery:  we want
                  *   "pool or moat or wall of water or lava or wall of lava"
@@ -1571,7 +1571,7 @@ export async function do_screen_description(cc$in, looked, sym, out_str, firstma
                 }
             }
             /* Now check for warning symbols */
-            for (i = 1; i < WARNCOUNT; i = i + 1 | 0) {
+            for (i = 1; i < WARNCOUNT; i = i + 1) {
                 x_str = def_warnsyms[i].explanation;
                 if (sym === (looked ? gw.warnsyms[i] : def_warnsyms[i].sym)) {
                     if (!found) {

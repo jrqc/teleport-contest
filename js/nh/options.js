@@ -329,7 +329,7 @@ export async function parseoptions(opts, tinitial, tfrom_file) {   // options.c:
     if (optlen_wo_val < optlen) {
         optlen = optlen_wo_val;
     }
-    for (i = 0; i < OPTCOUNT; i = i + 1 | 0) {
+    for (i = 0; i < OPTCOUNT; i = i + 1) {
         got_match = FALSE;
         if (allopt[i].pfx) {
             if (str_start_is(opts, allopt[i].name, TRUE)) {
@@ -367,7 +367,7 @@ export async function parseoptions(opts, tinitial, tfrom_file) {   // options.c:
            becomes desirable in the future, this is where you'll need
            to split a delimited allopt[i].alias field into each
            individual alias */
-        for (i = 0; i < OPTCOUNT; i = i + 1 | 0) {
+        for (i = 0; i < OPTCOUNT; i = i + 1) {
             if (!allopt[i].alias) {
                 continue;
             }
@@ -494,7 +494,7 @@ async function getoptstr(optidx, ophase) {   // options.c:734
         /* any source */
         /* find non-Null, in order optvals[][play_opt], [cmdline_opt],
            [environ_opt], [rc_file_opt], [syscf_opt], [builtin_opt] */
-        for (phase = num_opt_phases - 1; phase >= 0; phase = phase - 1 | 0) {
+        for (phase = num_opt_phases - 1; phase >= 0; phase = phase - 1) {
             if (roleoptvals[roleoptindx][phase]) {
                 ophase = phase;
                 break;
@@ -546,8 +546,8 @@ function unsaveoptstr(optidx, ophase) {   // options.c:776
 /* discard all saved option strings */
 export function freeroleoptvals() {   // options.c:787
     let i = 0, j = 0;
-    for (i = 0; i < 4; i = i + 1 | 0) {
-        for (j = 0; j < num_opt_phases; j = j + 1 | 0) {
+    for (i = 0; i < 4; i = i + 1) {
+        for (j = 0; j < num_opt_phases; j = j + 1) {
             unsaveoptstr(roleopt2opt[i], j);
         }
     }
@@ -787,7 +787,7 @@ async function optfn_autounlock(optidx, req, negated, opts, op) {   // options.c
             if (str_start_is($C`none`, op, TRUE)) {
                 negated = TRUE, matched = TRUE;
             }
-            for (i = 0; i < 4 && !matched; i = i + 1 | 0) {
+            for (i = 0; i < 4 && !matched; i = i + 1) {
                 /* fuzzymatch() doesn't match leading substrings but
                    this allows "apply_key" and "applykey" to match
                    "apply-key"; "apply key" too if part of foo+bar */
@@ -1183,7 +1183,7 @@ async function optfn_disclose(optidx, req, negated, opts, op) {   // options.c:1
     }
     if (req === get_val || req === get_cnf_val) {
         opts.set(0, 0);
-        for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i = i + 1 | 0) {
+        for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i = i + 1) {
             if (i) {
                 strkitten(opts, 32);
             }
@@ -1600,7 +1600,7 @@ async function optfn_IBMgraphics(optidx, req, negated, opts, op) {   // options.
     if (req === do_set) {
         /* "IBMgraphics" */
         if (!negated) {
-            for (i = 0; i < NUM_GRAPHICS; i = i + 1 | 0) {
+            for (i = 0; i < NUM_GRAPHICS; i = i + 1) {
                 if (gs.symset[i].name) {
                     badflag = TRUE;
                 } else {
@@ -1966,7 +1966,7 @@ async function optfn_menu_objsyms(optidx, req, negated, opts, op) {   // options
             const l5 = 16;
             osyms = 0;
             const k = $c.u32($c.strlen(op));
-            for (i = 0; i < 6; i = i + 1 | 0) {
+            for (i = 0; i < 6; i = i + 1) {
                 let l = $c.u32($c.strlen(objsymvals[i].nam));
                 if (k >= 4) {
                     l = k;
@@ -2574,7 +2574,7 @@ async function optfn_paranoid_confirmation(optidx, req, opt_negated, opts, op) {
             /* we aren't matching option names but match_optname()
                does what we want once we've broken the space
                delimited aggregate into separate tokens */
-            for (i = 0; i < 15; i = i + 1 | 0) {
+            for (i = 0; i < 15; i = i + 1) {
                 if (match_optname(op, paranoia[i].argname,
                     paranoia[i].argMinLen, FALSE)
                     || paranoia[i].synonym
@@ -3594,7 +3594,7 @@ async function optfn_sortloot(optidx, req, negated, opts, op) {   // options.c:3
         return optn_ok;
     }
     if (req === get_val || req === get_cnf_val) {
-        for (i = 0; i < 3; i = i + 1 | 0) {
+        for (i = 0; i < 3; i = i + 1) {
             if (flags.sortloot === sortltype[i].get(0)) {
                 $c.strcpy(opts, sortltype[i]);
                 break;
@@ -4356,7 +4356,7 @@ async function optfn_windowborders(optidx, req, negated, opts, op) {   // option
 async function optfn_windowcolors(optidx, req, negated, opts, op) {   // options.c:4894
     let wccount = 0;
     if (req === do_init) {
-        for (wccount = 0; wccount < WC_COUNT; wccount = wccount + 1 | 0) {
+        for (wccount = 0; wccount < WC_COUNT; wccount = wccount + 1) {
             wcolors_opt[wccount] = 0;
         }
         return optn_ok;
@@ -4378,7 +4378,7 @@ async function optfn_windowcolors(optidx, req, negated, opts, op) {   // options
     if (req === get_val || req === get_cnf_val) {
         /* TODO: wide 'get_val' may need to be wrapped in the menu display */
         opts.set(0, 0);
-        for (wccount = 0; wccount < WC_COUNT; wccount = wccount + 1 | 0) {
+        for (wccount = 0; wccount < WC_COUNT; wccount = wccount + 1) {
             let fg = iflags.wcolors[wccount].fg;
             let bg = iflags.wcolors[wccount].bg;
             if (fg && (!fg.get(0) || !$c.strcmp(fg, new $c.Ptr(defbrief, 0)))) {
@@ -4945,7 +4945,7 @@ async function handler_menustyle() {   // options.c:5544
     const tmpwin = await create_nhwindow()(NHW.MENU);
     await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
-    for (i = 0; i < 4; i = i + 1 | 0) {
+    for (i = 0; i < 4; i = i + 1) {
         $c.sprintf(new $c.Ptr(buf, 0), $C`%-12.12s%c%.60s`, menutype[i][0], sep, menutype[i][1]);
         any.a_int = i + 1 | 0;
         await add_menu(tmpwin, nul_glyphinfo, any, new $c.Ptr(buf, 0).get(0), 0, ATR.NONE, clr, new $c.Ptr(buf, 0),
@@ -5025,7 +5025,7 @@ async function handler_autounlock(optidx) {   // options.c:5624
     const tmpwin = await create_nhwindow()(NHW.MENU);
     await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
-    for (i = 0; i < 4; i = i + 1 | 0) {
+    for (i = 0; i < 4; i = i + 1) {
         $c.sprintf(new $c.Ptr(buf, 0), $C`%-10.10s%c%.40s`, unlocktypes[i][0], sep, unlocktypes[i][1]);
         const presel = (flags.autounlock & 1 << i >>> 0) >>> 0 | 0;
         any.a_int = i + 1 | 0;
@@ -5038,7 +5038,7 @@ async function handler_autounlock(optidx) {   // options.c:5624
     const n = await select_menu(tmpwin, PICK.ANY, new $c.Ptr(window_pick, 0));
     if (n > 0) {
         let newflags = 0;
-        for (i = 0; i < n; i = i + 1 | 0) {
+        for (i = 0; i < n; i = i + 1) {
             newflags = (newflags | 1 << ($c.radd(window_pick[0], i).item.a_int - 1 | 0) >>> 0) >>> 0;
         }
         flags.autounlock = newflags;
@@ -5071,7 +5071,7 @@ async function handler_disclose() {   // options.c:5675
     let tmpwin = await create_nhwindow()(NHW.MENU);
     await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
-    for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i = i + 1 | 0) {
+    for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i = i + 1) {
         $c.sprintf(new $c.Ptr(buf, 0), $C`%-12s[%c%c]`, handler_disclose$disclosure_names[i], flags.end_disclose[i], disclosure_options[i]);
         any.a_int = i + 1 | 0;
         await add_menu(tmpwin, nul_glyphinfo, any, disclosure_options[i],
@@ -5081,7 +5081,7 @@ async function handler_disclose() {   // options.c:5675
     await end_menu()(tmpwin, $C`Change which disclosure options categories:`);
     const pick_cnt = await select_menu(tmpwin, PICK.ANY, new $c.Ptr(disclosure_pick, 0));
     if (pick_cnt > 0) {
-        for (pick_idx = 0; pick_idx < pick_cnt; pick_idx = pick_idx + 1 | 0) {
+        for (pick_idx = 0; pick_idx < pick_cnt; pick_idx = pick_idx + 1) {
             const opt_idx = $c.radd(disclosure_pick[0], pick_idx).item.a_int - 1 | 0;
             disc_cat[opt_idx] = 1;
         }
@@ -5089,7 +5089,7 @@ async function handler_disclose() {   // options.c:5675
         disclosure_pick[0] = null;
     }
     await destroy_nhwindow()(tmpwin);
-    for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i = i + 1 | 0) {
+    for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i = i + 1) {
         if (disc_cat[i]) {
             const c = flags.end_disclose[i];
             $c.sprintf(new $c.Ptr(buf, 0), $C`Disclosure options for %s:`, handler_disclose$disclosure_names[i]);
@@ -5177,7 +5177,7 @@ async function handler_menu_objsyms() {   // options.c:5795
     const tmpwin = await create_nhwindow()(NHW.MENU);
     await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
-    for (i = 0; i < 6; i = i + 1 | 0) {
+    for (i = 0; i < 6; i = i + 1) {
         nh_snprintf($C`handler_menu_objsyms`, 5809, new $c.Ptr(buf, 0), 256, $C`%-12.12s%c%.60s`, objsymvals[i].nam, sep, objsymvals[i].descr);
         any.a_int = i + 1 | 0;
         const j = objsymvals[i].num;
@@ -5217,7 +5217,7 @@ async function handler_msg_window() {   // options.c:5832
         const tmpwin = await create_nhwindow()(NHW.MENU);
         await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
         any.$copyFrom(cg.zeroany);
-        for (i = 0; i < 4; i = i + 1 | 0) {
+        for (i = 0; i < 4; i = i + 1) {
             if (i < 2 && is_curses) {
                 continue;
             }
@@ -5267,7 +5267,7 @@ async function handler_number_pad() {   // options.c:5893
     const tmpwin = await create_nhwindow()(NHW.MENU);
     await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
-    for (i = 0; i < 6; i = i + 1 | 0) {
+    for (i = 0; i < 6; i = i + 1) {
         any.a_int = i + 1 | 0;
         await add_menu(tmpwin, nul_glyphinfo, any, $c.i8(97 + i | 0), $c.i8(48 + i | 0),
             ATR.NONE, clr, handler_number_pad$npchoices[i], MENU.ITEMFLAGS_NONE);
@@ -5379,7 +5379,7 @@ async function handler_perminv_mode() {   // options.c:6011
     const tmpwin = await create_nhwindow()(NHW.MENU);
     await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
-    for (i = 0; i < 9; i = i + 1 | 0) {
+    for (i = 0; i < 9; i = i + 1) {
         if (!(pi0 = perminv_modes[i][0])) {
             continue;
         }
@@ -5443,7 +5443,7 @@ async function handler_pickup_burden() {   // options.c:6086
     const tmpwin = await create_nhwindow()(NHW.MENU);
     await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
-    for (i = 0; i < 6; i = i + 1 | 0) {
+    for (i = 0; i < 6; i = i + 1) {
         const burden_name = burdentype[i];
         any.a_int = i + 1 | 0;
         await add_menu(tmpwin, nul_glyphinfo, any, burden_letters.get(i),
@@ -5476,7 +5476,7 @@ async function handler_runmode() {   // options.c:6124
     const tmpwin = await create_nhwindow()(NHW.MENU);
     await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
-    for (i = 0; i < 4; i = i + 1 | 0) {
+    for (i = 0; i < 4; i = i + 1) {
         const mode_name = runmodes[i];
         any.a_int = i + 1 | 0;
         await add_menu(tmpwin, nul_glyphinfo, any, mode_name.get(0),
@@ -5514,7 +5514,7 @@ async function handler_sortloot() {   // options.c:6167
     const tmpwin = await create_nhwindow()(NHW.MENU);
     await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
-    for (i = 0; i < 3; i = i + 1 | 0) {
+    for (i = 0; i < 3; i = i + 1) {
         const sortl_name = sortltype[i];
         any.a_char = sortl_name.get(0);
         await add_menu(tmpwin, nul_glyphinfo, any, sortl_name.get(0),
@@ -5695,7 +5695,7 @@ async function handler_autopickup_exception() {   // options.c:6331
                 any.$copyFrom(cg.zeroany);
                 await add_menu_heading(tmpwin,
                     $C`Always pickup '<'; never pickup '>'`);
-                for (i = 0; i < numapes && ape; i = i + 1 | 0) {
+                for (i = 0; i < numapes && ape; i = i + 1) {
                     any.a_void = opt_idx === 1 ? null : ape;
                     /* length of pattern plus quotes (plus '<'/'>') is
                        less than BUFSZ */
@@ -5711,7 +5711,7 @@ async function handler_autopickup_exception() {   // options.c:6331
                 opt_idx === 1 ? PICK.NONE : PICK.ANY,
                 new $c.Ptr(pick_list, 0));
             if (pick_cnt > 0) {
-                for (pick_idx = 0; pick_idx < pick_cnt; pick_idx = pick_idx + 1 | 0) {
+                for (pick_idx = 0; pick_idx < pick_cnt; pick_idx = pick_idx + 1) {
                     remove_autopickup_exception(
                         $c.asRec($c.radd(pick_list[0], pick_idx).item.a_void, $T.autopickup_exception, 32));
                 }
@@ -5804,7 +5804,7 @@ async function handler_menu_colors() {   // options.c:6407
                     opt_idx === 1 ? PICK.NONE : PICK.ANY,
                     new $c.Ptr(pick_list, 0));
                 if (pick_cnt > 0) {
-                    for (pick_idx = 0; pick_idx < pick_cnt; pick_idx = pick_idx + 1 | 0) {
+                    for (pick_idx = 0; pick_idx < pick_cnt; pick_idx = pick_idx + 1) {
                         free_one_menu_coloring(($c.radd(pick_list[0], pick_idx).item.a_int - 1 | 0) - pick_idx | 0);
                     }
                     $c.free(pick_list[0]), pick_list[0] = null;
@@ -5874,7 +5874,7 @@ async function handler_msgtype() {   // options.c:6502
                 opt_idx === 1 ? PICK.NONE : PICK.ANY,
                 new $c.Ptr(pick_list, 0));
             if (pick_cnt > 0) {
-                for (pick_idx = 0; pick_idx < pick_cnt; pick_idx = pick_idx + 1 | 0) {
+                for (pick_idx = 0; pick_idx < pick_cnt; pick_idx = pick_idx + 1) {
                     free_one_msgtype(($c.radd(pick_list[0], pick_idx).item.a_int - 1 | 0) - pick_idx | 0);
                 }
                 $c.free(pick_list[0]), pick_list[0] = null;
@@ -5915,7 +5915,7 @@ async function handler_versinfo() {   // options.c:6573
     n = await select_menu(tmpwin, PICK.ANY, new $c.Ptr(vi_pick, 0));
     if (n > 0) {
         let newval = 0;
-        for (i = 0; i < n; i = i + 1 | 0) {
+        for (i = 0; i < n; i = i + 1) {
             newval = newval | $c.radd(vi_pick[0], i).item.a_int;
         }
         newval = newval & 7;
@@ -5937,7 +5937,7 @@ async function handler_windowborders() {   // options.c:6620
     const tmpwin = await create_nhwindow()(NHW.MENU);
     await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
-    for (i = 0; i < 5; i = i + 1 | 0) {
+    for (i = 0; i < 5; i = i + 1) {
         const mode_name = handler_windowborders$windowborders_text[i];
         any.a_int = i + 1 | 0;
         /* index 'i' matches the numeric setting for windowborders,
@@ -6009,11 +6009,11 @@ async function bad_negation(optname, with_parameter) {   // options.c:6693
  */
 async function determine_ambiguities() {   // options.c:6703
     let i = 0, j = 0, needed = new Int32Array(218);
-    for (i = 0; i < 217; i = i + 1 | 0) {
+    for (i = 0; i < 217; i = i + 1) {
         needed[i] = 0;
     }
-    for (i = 0; i < 217; i = i + 1 | 0) {
-        for (j = 0; j < 217; j = j + 1 | 0) {
+    for (i = 0; i < 217; i = i + 1) {
+        for (j = 0; j < 217; j = j + 1) {
             if (j === i) {
                 continue;
             }
@@ -6033,7 +6033,7 @@ async function determine_ambiguities() {   // options.c:6703
             }
         }
     }
-    for (i = 0; i < 217; i = i + 1 | 0) {
+    for (i = 0; i < 217; i = i + 1) {
         const len = await Strlen_(allopt[i].name, $C`determine_ambiguities`, 6732) | 0;
         allopt[i].minmatch = needed[i] < 3 ? 3
             : needed[i] <= len ? needed[i] : len;
@@ -6080,7 +6080,7 @@ export function match_optname(user_string, optn_name, min_length, val_allowed) {
 }
 export function reset_duplicate_opt_detection() {   // options.c:6773
     let k = 0;
-    for (k = 0; k < OPTCOUNT; k = k + 1 | 0) {
+    for (k = 0; k < OPTCOUNT; k = k + 1) {
         allopt[k].dupdetected = 0;
     }
 }
@@ -6171,7 +6171,7 @@ export function nh_getenv(ev) {   // options.c:6848
  */
 function nmcpy(dest, src, maxlen) {   // options.c:6861
     let count = 0, $t1, $t2, $t3, $t4;
-    for (count = 1; count < maxlen; count = count + 1 | 0) {
+    for (count = 1; count < maxlen; count = count + 1) {
         if (src.get(0) === 44 || src.get(0) === 0) {
             break;   /*exit on \0 terminator*/
         }
@@ -6367,7 +6367,7 @@ export function txt2key(txt) {   // options.c:6971
     /* ascii codes: must be three-digit decimal */
     if (txt.get(0) >= 48 && txt.get(0) <= 57) {
         let key = 0;
-        for (i = 0; i < 3; i = i + 1 | 0) {
+        for (i = 0; i < 3; i = i + 1) {
             if (txt.get(i) < 48 || txt.get(i) > 57) {
                 return 0;
             }
@@ -6486,7 +6486,7 @@ export async function initoptions_init() {   // options.c:7119
     init_ov_rogue_symbols();
     /* Set the default monster and object class symbols. */
     init_symbols();
-    for (i = 0; i < WARNCOUNT; i = i + 1 | 0) {
+    for (i = 0; i < WARNCOUNT; i = i + 1) {
         gw.warnsyms[i] = def_warnsyms[i].sym;
     }
     /* assert( sizeof flags.inv_order == sizeof def_inv_order ); */
@@ -6494,7 +6494,7 @@ export async function initoptions_init() {   // options.c:7119
     flags.pickup_types[0] = 0;
     flags.pickup_burden = MOD_ENCUMBER;
     flags.sortloot = 108;   /* sort only loot by default */
-    for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i = i + 1 | 0) {
+    for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i = i + 1) {
         flags.end_disclose[i] = DISCLOSE_PROMPT_DEFAULT_NO;
     }
     await switch_symbols(FALSE);   /* set default characters */
@@ -6676,7 +6676,7 @@ export async function allopt_array_init() {   // options.c:7405
          * option settings to remain adjacent to, and in the same function as,
          * the code that processes those options.
          */
-        for (i = 0; i < OPTCOUNT; i = i + 1 | 0) {
+        for (i = 0; i < OPTCOUNT; i = i + 1) {
             if (allopt[i].optfn) {
                 await allopt[i].optfn(i, do_init, FALSE, new $c.Ptr(empty_optstr, 0),
                     new $c.Ptr(empty_optstr, 0));
@@ -6781,7 +6781,7 @@ async function warning_opts(opts, optype) {   // options.c:7521
     escapes(opts, opts);
     const length = $c.i32($c.strlen(opts));
     /* match the form obtained from PC configuration files */
-    for (i = 0; i < WARNCOUNT; i = i + 1 | 0) {
+    for (i = 0; i < WARNCOUNT; i = i + 1) {
         translate[i] = i >= length ? 0
             : opts.get(i) ? $c.u8(opts.get(i))
             : def_warnsyms[i].sym;
@@ -6794,7 +6794,7 @@ async function warning_opts(opts, optype) {   // options.c:7521
  */
 export function assign_warnings(graph_chars) {   // options.c:7541
     let i = 0;
-    for (i = 0; i < WARNCOUNT; i = i + 1 | 0) {
+    for (i = 0; i < WARNCOUNT; i = i + 1) {
         if (graph_chars.get(i)) {
             gw.warnsyms[i] = graph_chars.get(i);
         }
@@ -6878,7 +6878,7 @@ export async function parsebindings(bindings) {   // options.c:7596
     }
     ($t2 = bind, bind = $t2.add(1), $t2).set(0, 0);
     bind = trimspaces(bind);
-    for (i = 0; i < 2; i = i + 1 | 0) {
+    for (i = 0; i < 2; i = i + 1) {
         if (!$c.strcmp(bindings, parsebindings$mousebtn_names[i])) {
             if (!await bind_mousebtn(i + 1 | 0, bind)) {
                 await config_error_add($C`Error binding mouse button %i`, i + 1 | 0);
@@ -6922,7 +6922,7 @@ export async function parsebindings(bindings) {   // options.c:7596
  */
 function msgtype2name(typ) {   // options.c:7690
     let i = 0;
-    for (i = 0; i < 6; i = i + 1 | 0) {
+    for (i = 0; i < 6; i = i + 1) {
         if (msgtype_names[i].descr && msgtype_names[i].msgtyp === typ) {
             return msgtype_names[i].name;
         }
@@ -6939,7 +6939,7 @@ async function query_msgtype() {   // options.c:7701
     const tmpwin = await create_nhwindow()(NHW.MENU);
     await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
-    for (i = 0; i < 6; i = i + 1 | 0) {
+    for (i = 0; i < 6; i = i + 1) {
         if (msgtype_names[i].descr) {
             any.a_int = msgtype_names[i].msgtyp + 1;
             await add_menu(tmpwin, nul_glyphinfo, any, 0, 0,
@@ -7076,7 +7076,7 @@ export async function msgtype_parse_add(str) {   // options.c:7844
     let pattern = new Int8Array(256), msgtype = new Int8Array(11), i = 0;
     if ($c.sscanf(str, $C`%10s "%255[^"]"`, new $c.Ptr(msgtype, 0), new $c.Ptr(pattern, 0)) === 2) {
         let typ = -1;
-        for (i = 0; i < 6; i = i + 1 | 0) {
+        for (i = 0; i < 6; i = i + 1) {
             if (str_start_is(msgtype_names[i].name, new $c.Ptr(msgtype, 0), TRUE)) {
                 typ = msgtype_names[i].msgtyp;
                 break;
@@ -7245,7 +7245,7 @@ async function parse_role_opt(optidx, negated, fullname, opts, opp) {   // optio
 async function get_cnf_role_opt(optidx) {   // options.c:8021
     let phase = 0;
     let op = null;
-    for (phase = num_opt_phases - 1; phase >= 0 && !op; phase = phase - 1 | 0) {
+    for (phase = num_opt_phases - 1; phase >= 0 && !op; phase = phase - 1) {
         if (phase === cmdline_opt || phase === environ_opt
             || phase === builtin_opt) {
             continue;
@@ -7267,7 +7267,7 @@ async function illegal_menu_cmd_key(c) {   // options.c:8037
         return TRUE;
     } else {
         /* reject default object class symbols */
-        for (j = 1; j < MAXOCLASSES; j = j + 1 | 0) {
+        for (j = 1; j < MAXOCLASSES; j = j + 1) {
             if (c === $c.u8(def_oc_syms[j].sym)) {
                 await config_error_add($C`Menu command key '%s' is an object class`,
                     visctrl($c.i8(c)));
@@ -7363,7 +7363,7 @@ export function collect_menu_keys(outbuf, scrollmask, printable) {   // options.
      * matters iff user has mapped any menu scrolling
      * commands to control or meta characters */
     outbuf.set(0, 0);
-    for (i = 0; i < 6; i = i + 1 | 0) {
+    for (i = 0; i < 6; i = i + 1) {
         if ((scrollmask & collect_menu_keys$scroll_keys[i].maskindx) >>> 0) {
             const c = get_menu_cmd_key(collect_menu_keys$scroll_keys[i].cmdkey);
             if (printable) {
@@ -7746,7 +7746,7 @@ async function longest_option_name(startpass, endpass) {   // options.c:8508
     let i = 0, pass = 0, name = null;
     /* spin through the options to find the longest name */
     let longest_name_len = 0;
-    for (pass = 0; pass < 2; pass = pass + 1 | 0) {
+    for (pass = 0; pass < 2; pass = pass + 1) {
         for (i = 0; (name = allopt[i].name) !== null; i = i + 1 | 0) {
             if (pass === 0
                 && (allopt[i].opttyp !== BoolOpt || !allopt[i].addr)) {
@@ -7997,7 +7997,7 @@ export async function doset() {   // options.c:8758
         if (!skiphelp) {
             /* help text surrounding '?' choice should have exactly one NULL */
             any.$copyFrom(cg.zeroany);
-            for (i = 0; i < 5; i = i + 1 | 0) {
+            for (i = 0; i < 5; i = i + 1) {
                 if (doset$helptext[i]) {
                     $c.sprintf(new $c.Ptr(buf, 0), $C`%4s%.75s`, $C``, doset$helptext[i]);
                     await add_menu_str(tmpwin, new $c.Ptr(buf, 0));
@@ -8024,7 +8024,7 @@ export async function doset() {   // options.c:8758
         await add_menu_heading(tmpwin, $C`Booleans (selecting will toggle value):`);
         any.a_int = 0;
         /* first list any other non-modifiable booleans, then modifiable ones */
-        for (pass = 0; pass <= 1; pass = pass + 1 | 0) {
+        for (pass = 0; pass <= 1; pass = pass + 1) {
             for (i = 0; (name = allopt[i].name) !== null; i = i + 1 | 0) {
                 if (allopt[i].opttyp === BoolOpt
                     && (bool_p = allopt[i].addr) !== null
@@ -8101,7 +8101,7 @@ export async function doset() {   // options.c:8758
              * to take care of options that require special attention, like
              * redraws.
              */
-            for (pick_idx = 0; pick_idx < pick_cnt; pick_idx = pick_idx + 1 | 0) {
+            for (pick_idx = 0; pick_idx < pick_cnt; pick_idx = pick_idx + 1) {
                 opt_indx = $c.radd(pick_list[0], pick_idx).item.a_int - 1 | 0;
                 if (opt_indx === HELP_IDX) {
                     await display_file()($C`optmenu`, FALSE);
@@ -8322,7 +8322,7 @@ export async function show_menu_controls(win, dolist) {   // options.c:9070
 function count_cond() {   // options.c:9179
     let i = 0;
     let cnt = 0;
-    for (i = 0; i < CONDITION_COUNT; i = i + 1 | 0) {
+    for (i = 0; i < CONDITION_COUNT; i = i + 1) {
         if (condtests[i].enabled) {
             cnt = cnt + 1 | 0;
         }
@@ -8354,7 +8354,7 @@ async function handle_add_list_remove(optname, numtotal) {   // options.c:9208
     const tmpwin = await create_nhwindow()(NHW.MENU);
     await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
-    for (i = 0; i < 4; i = i + 1 | 0) {
+    for (i = 0; i < 4; i = i + 1) {
         any.a_int = any.a_int + 1 | 0;
         /* omit list and remove if there aren't any yet */
         if (!numtotal && (i === 1 || i === 2)) {
@@ -8401,7 +8401,7 @@ export async function dotogglepickup() {   // options.c:9256
 export async function toggle_bool_option(p) {   // options.c:9278
     let i = 0, buf = new Int8Array(256);
     let ret = ECMD.FAIL;
-    for (i = 0; i < OPTCOUNT; i = i + 1 | 0) {
+    for (i = 0; i < OPTCOUNT; i = i + 1) {
         if (!strncmpi(allopt[i].name, p, $c.i32($c.strlen(p)))
             && allopt[i].opttyp === BoolOpt
             && allopt[i].setwhere === set_in_game
@@ -8681,7 +8681,7 @@ async function all_options_menucolors(sbuf) {   // options.c:9595
         arr.set(($t1 = i, i = $t1 + 1 | 0, $t1), tmp);
         tmp = tmp.next;
     }
-    for (i = ncolors; i > 0; i = i - 1 | 0) {
+    for (i = ncolors; i > 0; i = i - 1) {
         tmp = arr.get(i - 1 | 0);
         const sattr = attr2attrname(tmp.attr);
         const sclr = clr2colorname(tmp.color);
@@ -9057,7 +9057,7 @@ async function wc_set_window_colors(op) {   // options.c:10023
         if (newop.get(0)) {
             ($t3 = newop, newop = $t3.add(1), $t3).set(0, 0);
         }
-        for (j = 0; j < WC_COUNT; j = j + 1 | 0) {
+        for (j = 0; j < WC_COUNT; j = j + 1) {
             if (!strcmpi(wn, wcnames[j]) || !strcmpi(wn, wcshortnames[j])) {
                 if (!strstri(tfg, $C` `)) {
                     if (fgp[j].get(0)) {
@@ -9092,7 +9092,7 @@ async function wc_set_window_colors(op) {   // options.c:10023
 }
 export function options_free_window_colors() {   // options.c:10116
     let j = 0;
-    for (j = 0; j < WC_COUNT; j = j + 1 | 0) {
+    for (j = 0; j < WC_COUNT; j = j + 1) {
         if (fgp[j].get(0)) {
             $c.free(fgp[j].get(0)), fgp[j].set(0, null);
         }
@@ -9147,13 +9147,13 @@ function enhance_menu_text(buf, sz, whichpass, bool_p, thisopt) {   // options.c
 }
 export function heed_all_options() {   // options.c:10183
     let i = 0;
-    for (i = 0; i < OPTCOUNT; i = i + 1 | 0) {
+    for (i = 0; i < OPTCOUNT; i = i + 1) {
         allopt[i].disregarded = FALSE;
     }
 }
 export function disregard_all_options() {   // options.c:10192
     let i = 0;
-    for (i = 0; i < OPTCOUNT; i = i + 1 | 0) {
+    for (i = 0; i < OPTCOUNT; i = i + 1) {
         allopt[i].disregarded = TRUE;
     }
 }

@@ -120,33 +120,33 @@ export function init_symbols() {   // symbols.c:85
 }
 export function init_showsyms() {   // symbols.c:95
     let i = 0, $t1;
-    for (i = 0; i < MAXPCHARS; i = i + 1 | 0) {
+    for (i = 0; i < MAXPCHARS; i = i + 1) {
         gs.showsyms[i + SYM_OFF_P] = defsyms[i].sym;
     }
-    for (i = 0; i < MAXOCLASSES; i = i + 1 | 0) {
+    for (i = 0; i < MAXOCLASSES; i = i + 1) {
         gs.showsyms[i + SYM_OFF_O | 0] = $c.u8(def_oc_syms[i].sym);
     }
-    for (i = 0; i < MAXMCLASSES; i = i + 1 | 0) {
+    for (i = 0; i < MAXMCLASSES; i = i + 1) {
         gs.showsyms[i + SYM_OFF_M | 0] = $c.u8(def_monsyms[i].sym);
     }
-    for (i = 0; i < WARNCOUNT; i = i + 1 | 0) {
+    for (i = 0; i < WARNCOUNT; i = i + 1) {
         gs.showsyms[i + SYM_OFF_W | 0] = def_warnsyms[i].sym;
     }
-    for (i = 0; i < MAXOTHER; i = i + 1 | 0) {
+    for (i = 0; i < MAXOTHER; i = i + 1) {
         $t1 = get_othersym(i, PRIMARYSET), gs.showsyms[i + SYM_OFF_X | 0] = $t1;
     }
 }
 /* initialize defaults for the overrides to the rogue symset */
 export function init_ov_rogue_symbols() {   // symbols.c:113
     let i = 0;
-    for (i = 0; i < SYM_MAX; i = i + 1 | 0) {
+    for (i = 0; i < SYM_MAX; i = i + 1) {
         go.ov_rogue_syms[i] = 0;
     }
 }
 /* initialize defaults for the overrides to the primary symset */
 export function init_ov_primary_symbols() {   // symbols.c:122
     let i = 0;
-    for (i = 0; i < SYM_MAX; i = i + 1 | 0) {
+    for (i = 0; i < SYM_MAX; i = i + 1) {
         go.ov_primary_syms[i] = 0;
     }
 }
@@ -185,19 +185,19 @@ export function get_othersym(idx, which_set) {   // symbols.c:131
 /* initialize defaults for the primary symset */
 export function init_primary_symbols() {   // symbols.c:167
     let i = 0, $t1;
-    for (i = 0; i < MAXPCHARS; i = i + 1 | 0) {
+    for (i = 0; i < MAXPCHARS; i = i + 1) {
         gp.primary_syms[i + SYM_OFF_P] = defsyms[i].sym;
     }
-    for (i = 0; i < MAXOCLASSES; i = i + 1 | 0) {
+    for (i = 0; i < MAXOCLASSES; i = i + 1) {
         gp.primary_syms[i + SYM_OFF_O | 0] = $c.u8(def_oc_syms[i].sym);
     }
-    for (i = 0; i < MAXMCLASSES; i = i + 1 | 0) {
+    for (i = 0; i < MAXMCLASSES; i = i + 1) {
         gp.primary_syms[i + SYM_OFF_M | 0] = $c.u8(def_monsyms[i].sym);
     }
-    for (i = 0; i < WARNCOUNT; i = i + 1 | 0) {
+    for (i = 0; i < WARNCOUNT; i = i + 1) {
         gp.primary_syms[i + SYM_OFF_W | 0] = def_warnsyms[i].sym;
     }
-    for (i = 0; i < MAXOTHER; i = i + 1 | 0) {
+    for (i = 0; i < MAXOTHER; i = i + 1) {
         $t1 = get_othersym(i, PRIMARYSET), gp.primary_syms[i + SYM_OFF_X | 0] = $t1;
     }
     clear_symsetentry(PRIMARYSET, FALSE);
@@ -207,21 +207,21 @@ export function init_rogue_symbols() {   // symbols.c:187
     let i = 0, $t1, $t2, $t3, $t4;
     /* These are defaults that can get overwritten
        later by the roguesymbols option */
-    for (i = 0; i < MAXPCHARS; i = i + 1 | 0) {
+    for (i = 0; i < MAXPCHARS; i = i + 1) {
         gr.rogue_syms[i + SYM_OFF_P] = defsyms[i].sym;
     }
     $t2 = ($t1 = gr.rogue_syms[S.ndoor] = 43, gr.rogue_syms[S.hodoor] = $t1), gr.rogue_syms[S.vodoor] = $t2;
     $t3 = gr.rogue_syms[S.dnstair] = 37, gr.rogue_syms[S.upstair] = $t3;
-    for (i = 0; i < MAXOCLASSES; i = i + 1 | 0) {
+    for (i = 0; i < MAXOCLASSES; i = i + 1) {
         gr.rogue_syms[i + SYM_OFF_O | 0] = def_r_oc_syms[i];
     }
-    for (i = 0; i < MAXMCLASSES; i = i + 1 | 0) {
+    for (i = 0; i < MAXMCLASSES; i = i + 1) {
         gr.rogue_syms[i + SYM_OFF_M | 0] = $c.u8(def_monsyms[i].sym);
     }
-    for (i = 0; i < WARNCOUNT; i = i + 1 | 0) {
+    for (i = 0; i < WARNCOUNT; i = i + 1) {
         gr.rogue_syms[i + SYM_OFF_W | 0] = def_warnsyms[i].sym;
     }
-    for (i = 0; i < MAXOTHER; i = i + 1 | 0) {
+    for (i = 0; i < MAXOTHER; i = i + 1) {
         $t4 = get_othersym(i, ROGUESET), gr.rogue_syms[i + SYM_OFF_X | 0] = $t4;
     }
     clear_symsetentry(ROGUESET, FALSE);
@@ -238,7 +238,7 @@ export function assign_graphics(whichset) {   // symbols.c:217
     switch (whichset) {
         case ROGUESET:
             /* Adjust graphics display characters on Rogue levels */
-            for (i = 0; i < SYM_MAX; i = i + 1 | 0) {
+            for (i = 0; i < SYM_MAX; i = i + 1) {
                 gs.showsyms[i] = go.ov_rogue_syms[i] ? go.ov_rogue_syms[i]
                     : gr.rogue_syms[i];
             }
@@ -246,7 +246,7 @@ export function assign_graphics(whichset) {   // symbols.c:217
             break;
         case PRIMARYSET:
         default:
-            for (i = 0; i < SYM_MAX; i = i + 1 | 0) {
+            for (i = 0; i < SYM_MAX; i = i + 1) {
                 gs.showsyms[i] = go.ov_primary_syms[i] ? go.ov_primary_syms[i]
                     : gp.primary_syms[i];
             }
@@ -262,7 +262,7 @@ export function assign_graphics(whichset) {   // symbols.c:217
 export async function switch_symbols(nondefault) {   // symbols.c:253
     let i = 0;
     if (nondefault) {
-        for (i = 0; i < SYM_MAX; i = i + 1 | 0) {
+        for (i = 0; i < SYM_MAX; i = i + 1) {
             gs.showsyms[i] = go.ov_primary_syms[i] ? go.ov_primary_syms[i]
                 : gp.primary_syms[i];
         }
@@ -798,7 +798,7 @@ export function match_sym(buf) {   // symbols.c:852
         }
         sp = $c.radd(sp, 1);
     }
-    for (i = 0; i < 10; i = i + 1 | 0) {
+    for (i = 0; i < 10; i = i + 1) {
         if (len >= $c.strlen(match_sym$alternates[i].altnm)
             && !strncmpi(buf, match_sym$alternates[i].altnm, $c.i32(len))) {
             sp = loadsyms[0];

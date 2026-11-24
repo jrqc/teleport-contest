@@ -348,7 +348,7 @@ export async function enexto_core(cc, xx, yy, mdat, entflags) {   // teleport.c:
        this will usually find a good spot without scanning the whole map */
     const nearcandyct = await collect_coords(candy[0], xx, yy, 3, CC_NO_FLAGS,
         null);
-    for (i = 0; i < nearcandyct; i = i + 1 | 0) {
+    for (i = 0; i < nearcandyct; i = i + 1) {
         cc.$copyFrom(candy[i]);
         if (goodpos(cc.x, cc.y, fakemon, entflags)) {
             return TRUE;
@@ -361,7 +361,7 @@ export async function enexto_core(cc, xx, yy, mdat, entflags) {   // teleport.c:
         null);
     /* skip first 'nearcandyct' spots, they have already been rejected;
        they will occur in different random order but same overall total */
-    for (i = nearcandyct; i < allcandyct; i = i + 1 | 0) {
+    for (i = nearcandyct; i < allcandyct; i = i + 1) {
         cc.$copyFrom(candy[i]);
         if (goodpos(cc.x, cc.y, fakemon, entflags)) {
             return TRUE;
@@ -792,7 +792,7 @@ export async function safe_teleds(teleds_flags) {   // teleport.c:717
      * first then expanding out from there.  If no non-trap spot is found,
      * first trap spot is used.
      */
-    for (tcnt = 0; tcnt < 40; tcnt = tcnt + 1 | 0) {
+    for (tcnt = 0; tcnt < 40; tcnt = tcnt + 1) {
         nux = $c.i16(rnd(COLNO - 1));
         nuy = $c.i16(rn2(ROWNO));
         if (await teleok(nux, nuy, FALSE)) {
@@ -811,7 +811,7 @@ export async function safe_teleds(teleds_flags) {   // teleport.c:717
     $t1 = backupspot.y = 0, backupspot.x = $t1;
     /* skip trap locations via teleok(,,FALSE) but remember first
        encountered trap spot that is acceptable to teleok(,,TRUE) */
-    for (tcnt = 0; tcnt < candycount; tcnt = tcnt + 1 | 0) {
+    for (tcnt = 0; tcnt < candycount; tcnt = tcnt + 1) {
         nux = candy[tcnt].x, nuy = candy[tcnt].y;
         if (await teleok(nux, nuy, FALSE)) {
             await teleds(nux, nuy, teleds_flags);
@@ -1027,7 +1027,7 @@ export async function dotelecmd() {   // teleport.c:919
         const win = await create_nhwindow()(NHW.MENU);
         await start_menu()(win, MENU.BEHAVE_STANDARD);
         any.$copyFrom(cg.zeroany);
-        for (i = 0; i < 4; i = i + 1 | 0) {
+        for (i = 0; i < 4; i = i + 1) {
             any.a_int = dotelecmd$tports[i].menulet;
             await add_menu(win, nul_glyphinfo, any, $c.i8(any.a_int), 0,
                 ATR.NONE, clr, dotelecmd$tports[i].menudesc,

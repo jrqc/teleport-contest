@@ -213,9 +213,9 @@ export function stuck_in_wall() {   // pray.c:161
     if (Passes_walls()) {
         return FALSE;
     }
-    for (i = -1; i <= 1; i = i + 1 | 0) {
+    for (i = -1; i <= 1; i = i + 1) {
         const x = u.ux + i | 0;
-        for (j = -1; j <= 1; j = j + 1 | 0) {
+        for (j = -1; j <= 1; j = j + 1) {
             if (!i && !j) {
                 continue;
             }
@@ -335,7 +335,7 @@ async function in_trouble() {   // pray.c:198
     if ($c.and64(u.uprops[DEAF].intrinsic, TIMEOUT) > 1) {
         return TROUBLE_BLIND;
     }
-    for (i = 0; i < A.MAX; i = i + 1 | 0) {
+    for (i = 0; i < A.MAX; i = i + 1) {
         if (u.acurr.a[i] < u.amax.a[i]) {
             return TROUBLE_POISONED;
         }
@@ -647,7 +647,7 @@ async function fix_worst_trouble(trouble) {   // pray.c:373
             } else {
                 await You_feel($C`in good health again.`);
             }
-            for (i = 0; i < A.MAX; i = i + 1 | 0) {
+            for (i = 0; i < A.MAX; i = i + 1) {
                 if (u.acurr.a[i] < u.amax.a[i]) {
                     u.acurr.a[i] = u.amax.a[i];
                     disp.botl = TRUE;

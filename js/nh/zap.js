@@ -4356,7 +4356,7 @@ export async function boomhit(obj$in, dx, dy) {   // zap.c:4148
     let boom = counterclockwise ? S.boomleft : S.boomright;
     let i = xytodir(dx, dy);
     await tmp_at(DISP_FLASH, $c.i16((boom === S.stone ? GLYPH.CMAP_STONE_OFF : boom <= S.trwall ? (boom - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : boom < S.altar ? (boom - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : boom === S.altar ? 4008 : boom < S.arrow_trap + MAXTCHARS ? (boom - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : boom <= S.goodpos ? (boom - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH)));
-    for (ct = 0; ct < 10; ct = ct + 1 | 0) {
+    for (ct = 0; ct < 10; ct = ct + 1) {
         i = DIR_CLAMP(i);
         boom = S.boomleft + S.boomright - boom | 0;   /* toggle */
         await tmp_at(DISP_CHANGE, $c.i16((boom === S.stone ? GLYPH.CMAP_STONE_OFF : boom <= S.trwall ? (boom - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : boom < S.altar ? (boom - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : boom === S.altar ? 4008 : boom < S.arrow_trap + MAXTCHARS ? (boom - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : boom <= S.goodpos ? (boom - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH)));   /* change glyph */
@@ -6268,7 +6268,7 @@ export async function destroy_items(mon, dmgtyp, dmg_in) {   // zap.c:5965
     let dmg_out = 0;   /* damage caused by items getting destroyed */
     let where = NOBJ_STATES;
     /* initialize items_to_destroy */
-    for (i = 0; i < MAX_ITEMS_DESTROYED; i = i + 1 | 0) {
+    for (i = 0; i < MAX_ITEMS_DESTROYED; i = i + 1) {
         /* 0 should not be a valid o_id for anything */
         items_to_destroy[i].oid = 0;
         items_to_destroy[i].otmp = null;
@@ -6357,11 +6357,11 @@ export async function destroy_items(mon, dmgtyp, dmg_in) {   // zap.c:5965
     if (elig_stacks > limit) {
         elig_stacks = limit;   /* so we can loop up to elig_stacks */
     }
-    for (defer = 0; defer <= 1; defer = defer + 1 | 0) {
+    for (defer = 0; defer <= 1; defer = defer + 1) {
         /* if we saved some items for later (most likely just a worn ring
            of levitation) and they're still in inventory, handle them on the
            second iteration of the loop */
-        for (i = 0; i < elig_stacks; i = i + 1 | 0) {
+        for (i = 0; i < elig_stacks; i = i + 1) {
             obj = items_to_destroy[i].otmp;
             if (obj && obj.o_id === items_to_destroy[i].oid
                 && obj.where === where
@@ -6450,7 +6450,7 @@ async function wishcmdassist(triesleft) {   // zap.c:6165
     if (!win) {
         return;
     }
-    for (i = 0; i < 15; i = i + 1 | 0) {
+    for (i = 0; i < 15; i = i + 1) {
         await putstr()(win, 0, wishcmdassist$wishinfo[i]);
     }
     if (!u.uconduct.wishes) {
@@ -6477,7 +6477,7 @@ export async function wish_history_add(buf) {   // zap.c:6227
     if (!wizard()) {
         return;
     }
-    for (i = 0; i < MAX_WISH_HISTORY; i = i + 1 | 0) {
+    for (i = 0; i < MAX_WISH_HISTORY; i = i + 1) {
         const idx = $c.rem32(wish_history_idx + i | 0, MAX_WISH_HISTORY);
         if (!wish_history[idx]) {
             continue;
@@ -6500,7 +6500,7 @@ export async function wish_history_add(buf) {   // zap.c:6227
 /* release any old wish text; called from freedynamicdata(save.c) */
 export function wish_history_flush() {   // zap.c:6259
     let idx = 0;
-    for (idx = 0; idx < MAX_WISH_HISTORY; idx = idx + 1 | 0) {
+    for (idx = 0; idx < MAX_WISH_HISTORY; idx = idx + 1) {
         if (wish_history[idx]) {
             $c.free(wish_history[idx]), wish_history[idx] = null;
         }
@@ -6520,7 +6520,7 @@ async function wish_history_menu(buf) {   // zap.c:6275
     const win = await create_nhwindow()(NHW.MENU);
     await start_menu()(win, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
-    for (i = MAX_WISH_HISTORY - 1; i >= 0; i = i - 1 | 0) {
+    for (i = MAX_WISH_HISTORY - 1; i >= 0; i = i - 1) {
         idx = $c.rem32(wish_history_idx + i | 0, MAX_WISH_HISTORY);
         if (wish_history[idx]) {
             any.a_int = i + 1 | 0;

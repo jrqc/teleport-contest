@@ -727,7 +727,7 @@ export function get_nhuuid() {   // unixmain.c:860
 }
 export function free_nhuuid() {   // unixmain.c:885
     let i = 0;
-    for (i = 0; i < 37; i = i + 1 | 0) {
+    for (i = 0; i < 37; i = i + 1) {
         svn.nhuuid[i] = 0;
     }
 }

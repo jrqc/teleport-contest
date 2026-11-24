@@ -256,7 +256,7 @@ async function kick_monster(mon, x, y) {   // dokick.c:146
         tmp = await find_roll_to_hit(mon, AT.KICK, null, new $c.Ptr(attknum, 0),
             new $c.Ptr(armorpenalty, 0));
         mon_maybe_unparalyze(mon);
-        for (i = 0; i < NATTK; i = i + 1 | 0) {
+        for (i = 0; i < NATTK; i = i + 1) {
             /* first of two kicks might have provoked counterattack
                that has incapacitated the hero (ie, floating eye) */
             if (gm.multi < 0) {

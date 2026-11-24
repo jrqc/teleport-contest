@@ -72,7 +72,7 @@ function eraseoldlocks() {   // unixunix.c:80
      * before starting everything (including the dungeon initialization
      * that sets astral_level, needed for maxledgerno()) up
      */
-    for (i = 1; i <= MAXDUNGEON * MAXLEVEL + 1; i = i + 1 | 0) {
+    for (i = 1; i <= MAXDUNGEON * MAXLEVEL + 1; i = i + 1) {
         /* try to remove all */
         set_levelfile_name(new $c.Ptr(gl.lock, 0), i);
         $c.unlink(fqname(new $c.Ptr(gl.lock, 0), LEVELPREFIX, 0));

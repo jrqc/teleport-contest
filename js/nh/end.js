@@ -353,7 +353,7 @@ export async function done_in_by(mtmp, how) {   // end.c:186
 function fixup_death(how) {   // end.c:367
     let i = 0;
     if (gm.multi_reason) {
-        for (i = 0; i < 2; i = i + 1 | 0) {
+        for (i = 0; i < 2; i = i + 1) {
             if (death_fixups[i].why === how
                 && !$c.strcmp(death_fixups[i].exclude, gm.multi_reason)) {
                 if (death_fixups[i].include) {   /* substitute alternate reason */
@@ -698,12 +698,12 @@ function sort_valuables(list, size) {   // end.c:799
     let i = 0, j = 0, ltmp = new $T.valuable_data();
     /* max value is less than 20 */
     /* move greater quantities to the front of the list */
-    for (i = 1; i < size; i = i + 1 | 0) {
+    for (i = 1; i < size; i = i + 1) {
         if ($c.radd(list, i).count === 0) {
             continue;   /* empty slot */
         }
         ltmp.$copyFrom($c.radd(list, i));   /* structure copy */
-        for (j = i; j > 0; j = j - 1 | 0) {
+        for (j = i; j > 0; j = j - 1) {
             if ($c.radd(list, j - 1 | 0).count >= ltmp.count) {
                 break;
             }
@@ -846,7 +846,7 @@ async function fuzzer_savelife(how) {   // end.c:946
             if (!rn2(3 + Math.imul(3, remedies) | 0)) {
                 /* confer temporary resistances for first 8 properties:
                    fire, cold, sleep, disint, shock, poison, acid, stone */
-                for (propidx = 1; propidx <= 8; propidx = propidx + 1 | 0) {
+                for (propidx = 1; propidx <= 8; propidx = propidx + 1) {
                     if (!u.uprops[propidx].intrinsic
                         && !u.uprops[propidx].extrinsic
                         && (proptim = rn2(3)) > 0) {   /* 0..2 */
@@ -1259,14 +1259,14 @@ async function really_done(how) {   // end.c:1132
     await dump_forward_putstr(endwin, 0, $C``, program_state.stopprint);
     if (how === ESCAPED || how === ASCENDED) {
         for (val = gv.valuables[0]; val.list; val = $c.radd(val, 1)) {
-            for (i = 0; i < val.size; i = i + 1 | 0) {
+            for (i = 0; i < val.size; i = i + 1) {
                 $c.radd(val.list, i).count = 0;
             }
         }
         get_valuables(gi.invent);
         /* add points for collected valuables */
         for (val = gv.valuables[0]; val.list; val = $c.radd(val, 1)) {
-            for (i = 0; i < val.size; i = i + 1 | 0) {
+            for (i = 0; i < val.size; i = i + 1) {
                 if ($c.radd(val.list, i).count !== 0) {
                     tmp = $c.mul64($c.radd(val.list, i).count, objects[$c.radd(val.list, i).typ].oc_cost);
                     u.urexp = nowrap_add(u.urexp, tmp);
@@ -1307,7 +1307,7 @@ async function really_done(how) {   // end.c:1132
         /* list valuables here */
         for (val = gv.valuables[0]; val.list; val = $c.radd(val, 1)) {
             sort_valuables(val.list, val.size);
-            for (i = 0; i < val.size && !program_state.stopprint; i = i + 1 | 0) {
+            for (i = 0; i < val.size && !program_state.stopprint; i = i + 1) {
                 const typ = $c.radd(val.list, i).typ;
                 const count = $c.radd(val.list, i).count;
                 if (count === 0) {

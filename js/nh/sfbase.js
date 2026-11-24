@@ -3310,7 +3310,7 @@ export function bitfield_dump(a) {   // sfbase.c:617
 export function complex_dump(a) {   // sfbase.c:625
     let i = 0, x = new Uint32Array(10), $t1, $t2;
     let uc = a;
-    for (i = 0; i < 10; i = i + 1 | 0) {
+    for (i = 0; i < 10; i = i + 1) {
         $t2 = ($t1 = uc, uc = $t1.add(1), $t1).get(0), x[i] = $t2;
     }
     nh_snprintf($C`complex_dump`, 636, new $c.Ptr(complex_dump$buf, 0), 50, $C`%03x %03x %03x %03x %03x %03x %03x %03x %03x %03x`, x[0], x[1], x[2], x[3], x[4], x[5], x[6], x[7], x[8], x[9]);

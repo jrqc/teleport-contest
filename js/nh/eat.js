@@ -1593,7 +1593,7 @@ export async function corpse_intrinsic(ptr) {   // eat.c:1339
             }
         } while (0);
     }
-    for (i = 1; i <= LAST_PROP; i = i + 1 | 0) {
+    for (i = 1; i <= LAST_PROP; i = i + 1) {
         if (!await intrinsic_possible(i, ptr)) {
             continue;
         }
@@ -1659,7 +1659,7 @@ export function tin_variety_txt(s, tinvariety) {   // eat.c:1405
     let k = 0;
     if (s && tinvariety) {
         tinvariety.set(0, -1);
-        for (k = 0; k < 15; k = k + 1 | 0) {
+        for (k = 0; k < 15; k = k + 1) {
             const l = $c.i32($c.strlen(tintxts[k].txt));
             if (!strncmpi(s, tintxts[k].txt, l) && $c.i32($c.strlen(s)) > l
                 && s.get(l) === 32) {

@@ -503,7 +503,7 @@ export async function place_lregion(lx, ly, hx, hy, nlx, nly, nhx, nhy, rtype, l
     }
     /* first a probabilistic approach */
     const oneshot = lx === hx && ly === hy ? 1 : 0;
-    for (trycnt = 0; trycnt < 200; trycnt = trycnt + 1 | 0) {
+    for (trycnt = 0; trycnt < 200; trycnt = trycnt + 1) {
         x = $c.i16(rn2(hx - lx + 1) + lx | 0);
         y = $c.i16(rn2(hy - ly + 1) + ly | 0);
         if (await put_lregion_here(x, y, nlx, nly, nhx, nhy, rtype, oneshot, lev)) {
@@ -605,7 +605,7 @@ async function baalz_fixup() {   // mkmaze.c:475
      */
     /* find low and high x for to-be-wallified portion of level */
     let y = 10;
-    for (lastx = x = 0; x < COLNO; x = x + 1 | 0) {
+    for (lastx = x = 0; x < COLNO; x = x + 1) {
         if ((svl.level.locations[x][y].flags & W.NONDIGGABLE) !== 0) {
             if (!lastx) {
                 gb.bughack.inarea.x1 = $c.i16(x + 1 | 0);
@@ -616,7 +616,7 @@ async function baalz_fixup() {   // mkmaze.c:475
     gb.bughack.inarea.x2 = $c.i16((lastx > gb.bughack.inarea.x1 ? lastx : x) - 1 | 0);
     /* find low and high y for to-be-wallified portion of level */
     x = gb.bughack.inarea.x1;
-    for (lasty = y = 0; y < ROWNO; y = y + 1 | 0) {
+    for (lasty = y = 0; y < ROWNO; y = y + 1) {
         if ((svl.level.locations[x][y].flags & W.NONDIGGABLE) !== 0) {
             if (!lasty) {
                 gb.bughack.inarea.y1 = $c.i16(y + 1 | 0);
@@ -626,8 +626,8 @@ async function baalz_fixup() {   // mkmaze.c:475
     }
     gb.bughack.inarea.y2 = $c.i16((lasty > gb.bughack.inarea.y1 ? lasty : y) - 1 | 0);
     /* two pools mark where special post-wallify fix-ups are needed */
-    for (x = gb.bughack.inarea.x1; x <= gb.bughack.inarea.x2; x = x + 1 | 0) {
-        for (y = gb.bughack.inarea.y1; y <= gb.bughack.inarea.y2; y = y + 1 | 0) {
+    for (x = gb.bughack.inarea.x1; x <= gb.bughack.inarea.x2; x = x + 1) {
+        for (y = gb.bughack.inarea.y1; y <= gb.bughack.inarea.y2; y = y + 1) {
             if (svl.level.locations[x][y].typ === POOL) {
                 svl.level.locations[x][y].typ = HWALL;
                 if (gb.bughack.delarea.x1 === COLNO) {
@@ -928,17 +928,17 @@ async function stolen_booty() {   // mkmaze.c:799
     const gang = rndorcname(new $c.Ptr(gang_name, 0));
     /* create the stuff that the gang took */
     let cnt = rnd(4);
-    for (i = 0; i < cnt; i = i + 1 | 0) {
+    for (i = 0; i < cnt; i = i + 1) {
         await migr_booty_item(rn2(4) ? TALLOW_CANDLE : WAX_CANDLE, gang);
     }
     cnt = rnd(3);
-    for (i = 0; i < cnt; i = i + 1 | 0) {
+    for (i = 0; i < cnt; i = i + 1) {
         await migr_booty_item(SKELETON_KEY, gang);
     }
     let otyp = rn1(GAUNTLETS_OF_DEXTERITY - LEATHER_GLOVES + 1, LEATHER_GLOVES);
     await migr_booty_item(otyp, gang);
     cnt = rnd(10);
-    for (i = 0; i < cnt; i = i + 1 | 0) {
+    for (i = 0; i < cnt; i = i + 1) {
         /* Food items - but no lembas! (or some other weird things) */
         otyp = rn1(TIN - TRIPE_RATION + 1, TRIPE_RATION);
         /* exclude meat <anything>, globs of <anything>, kelp
@@ -989,7 +989,7 @@ async function stolen_booty() {   // mkmaze.c:799
      * to the inventory; handled during that assignment.
      */
     cnt = rn2(10) + 5 | 0;
-    for (i = 0; i < cnt; i = i + 1 | 0) {
+    for (i = 0; i < cnt; i = i + 1) {
         const mtyp = rn2(PM.ORC_SHAMAN - PM.ORC + 1) + PM.ORC | 0;
         mtmp = await makemon($c.relem(mons, mtyp), 0, 0, MM.NONAME);
         if (mtmp) {
@@ -1201,8 +1201,8 @@ export async function create_maze(corrwid, wallthick, rmdeadends) {   // mkmaze.
                 const my = $c.rem32(y, 2) ? corrwid
                     : y === 2 || y === Math.imul(rdy, 2) ? 1
                     : wallthick;
-                for (dx = 0; dx < mx; dx = dx + 1 | 0) {
-                    for (dy = 0; dy < my; dy = dy + 1 | 0) {
+                for (dx = 0; dx < mx; dx = dx + 1) {
+                    for (dy = 0; dy < my; dy = dy + 1) {
                         if ((rx + dx | 0) >= gx.x_maze_max
                             || (ry + dy | 0) >= gy.y_maze_max) {
                             break;
@@ -1414,7 +1414,7 @@ export async function walkfrom(x, y, typ) {   // mkmaze.c:1279
     }
     while (1) {
         let q = 0;
-        for (a = 0; a < 4; a = a + 1 | 0) {
+        for (a = 0; a < 4; a = a + 1) {
             if (await okay(x, y, $c.i16(a))) {
                 dirs[($t1 = q, q = $t1 + 1 | 0, $t1)] = a;
             }
@@ -1883,7 +1883,7 @@ export async function restore_waterlevel(nhfp) {   // mkmaze.c:1750
     await sfi_int(nhfp, new $c.FieldRef(svy, "ymin", "i32"), $C`waterlevel-ymin`);
     await sfi_int(nhfp, new $c.FieldRef(svx, "xmax", "i32"), $C`waterlevel-xmax`);
     await sfi_int(nhfp, new $c.FieldRef(svy, "ymax", "i32"), $C`waterlevel-ymax`);
-    for (i = 0; i < n[0]; i = i + 1 | 0) {
+    for (i = 0; i < n[0]; i = i + 1) {
         const btmp = b;
         b = $c.asRec(await alloc(40), $T.bubble, 40);
         await Sfi_bubble(nhfp, b, $C`waterlevel-bubble`);

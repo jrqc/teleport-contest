@@ -1563,7 +1563,7 @@ async function mon_likes_objpile_at(mtmp, x, y) {   // muse.c:1395
         return FALSE;
     }
     /* monster likes any of the top 3 items in the pile? */
-    for (i = 0, otmp = svl.level.objects[x][y]; otmp && i < 3; i = i + 1 | 0) {
+    for (i = 0, otmp = svl.level.objects[x][y]; otmp && i < 3; i = i + 1) {
         if (await mon_would_take_item(mtmp, otmp)) {
             return TRUE;
         }
@@ -2469,7 +2469,7 @@ async function mloot_container(mon, container, vismon) {   // muse.c:2264
            from one item to the next */
         $c.strcpy(new $c.Ptr(mpronounbuf, 0), genders[pronoun_gender(mon, PRONOUN.HALLU)].he);
     }
-    for (takeout_indx = 0; takeout_indx < takeout_count; takeout_indx = takeout_indx + 1 | 0) {
+    for (takeout_indx = 0; takeout_indx < takeout_count; takeout_indx = takeout_indx + 1) {
         if (!Has_contents(container)) {   /* might have removed all items */
             break;
         }

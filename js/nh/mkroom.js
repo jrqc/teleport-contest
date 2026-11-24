@@ -357,8 +357,8 @@ export async function fill_zoo(sroom) {   // mkroom.c:276
         }
         break;
     }
-    for (sx = sroom.lx; sx <= sroom.hx; sx = sx + 1 | 0) {
-        for (sy = sroom.ly; sy <= sroom.hy; sy = sy + 1 | 0) {
+    for (sx = sroom.lx; sx <= sroom.hx; sx = sx + 1) {
+        for (sy = sroom.ly; sy <= sroom.hy; sy = sy + 1) {
             if (sroom.irregular) {
                 if (svl.level.locations[sx][sy].roomno !== rmno || svl.level.locations[sx][sy].edge
                     || sroom.doorct
@@ -578,7 +578,7 @@ async function mkswamp() {   // mkroom.c:530
     let i = 0, sx = 0, sy = 0;
     /* Michiel Huisjes & Fred de Wilde */
     let eelct = 0;
-    for (i = 0; i < 5; i = i + 1 | 0) {
+    for (i = 0; i < 5; i = i + 1) {
         /* turn up to 5 rooms swampy */
         const sroom = $c.relem(svr.rooms, rn2(svn.nroom));
         if (sroom.hx < 0 || sroom.rtype !== OROOM || has_upstairs(sroom)
@@ -669,8 +669,8 @@ async function mktemple() {   // mkroom.c:598
  */
 export function nexttodoor(sx, sy) {   // mkroom.c:623
     let dx = 0, dy = 0;
-    for (dx = -1; dx <= 1; dx = dx + 1 | 0) {
-        for (dy = -1; dy <= 1; dy = dy + 1 | 0) {
+    for (dx = -1; dx <= 1; dx = dx + 1) {
+        for (dy = -1; dy <= 1; dy = dy + 1) {
             if (!isok($c.i16(sx + dx | 0), $c.i16(sy + dy | 0))) {
                 continue;
             }

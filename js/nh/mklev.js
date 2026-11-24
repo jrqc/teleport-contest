@@ -408,7 +408,7 @@ export async function free_luathemes(theme_group) {   // mklev.c:345
      *  most_themes => entering endgame, free non-endgame themes;
      *  all_themes  => end of game, free all themes.
      */
-    for (i = 0; i < svn.n_dgns; i = i + 1 | 0) {
+    for (i = 0; i < svn.n_dgns; i = i + 1) {
         if (theme_group === tut_themes && i !== svd.dungeon_topology.d_tutorial_dnum
             || theme_group === most_themes && i === svd.dungeon_topology.d_astral_level.dnum) {
             continue;
@@ -587,20 +587,20 @@ async function join(a, b, nxcor) {   // mklev.c:439
 export async function makecorridors() {   // mklev.c:522
     let a = 0, b = 0, i = 0;
     let any = TRUE;
-    for (a = 0; a < (svn.nroom - 1 | 0); a = a + 1 | 0) {
+    for (a = 0; a < (svn.nroom - 1 | 0); a = a + 1) {
         await join(a, a + 1 | 0, FALSE);
         if (!rn2(50)) {
             break;   /* allow some randomness */
         }
     }
-    for (a = 0; a < (svn.nroom - 2 | 0); a = a + 1 | 0) {
+    for (a = 0; a < (svn.nroom - 2 | 0); a = a + 1) {
         if (gs.smeq[a] !== gs.smeq[a + 2 | 0]) {
             await join(a, a + 2 | 0, FALSE);
         }
     }
-    for (a = 0; any && a < svn.nroom; a = a + 1 | 0) {
+    for (a = 0; any && a < svn.nroom; a = a + 1) {
         any = FALSE;
-        for (b = 0; b < svn.nroom; b = b + 1 | 0) {
+        for (b = 0; b < svn.nroom; b = b + 1) {
             if (gs.smeq[a] !== gs.smeq[b]) {
                 await join(a, b, FALSE);
                 any = TRUE;
@@ -646,7 +646,7 @@ export async function add_door(x, y, aroom) {   // mklev.c:574
     let broom = null, tmp = 0, i = 0;
     await alloc_doors();
     if (aroom.doorct) {
-        for (i = 0; i < aroom.doorct; i = i + 1 | 0) {
+        for (i = 0; i < aroom.doorct; i = i + 1) {
             tmp = aroom.fdoor + i | 0;
             if ($c.radd(svd.doors, tmp).x === x && $c.radd(svd.doors, tmp).y === y) {
                 return;
@@ -657,16 +657,16 @@ export async function add_door(x, y, aroom) {   // mklev.c:574
         aroom.fdoor = gd.doorindex;
     }
     aroom.doorct = $c.i8(aroom.doorct + 1);
-    for (tmp = gd.doorindex; tmp > aroom.fdoor; tmp = tmp - 1 | 0) {
+    for (tmp = gd.doorindex; tmp > aroom.fdoor; tmp = tmp - 1) {
         $c.radd(svd.doors, tmp).$copyFrom($c.radd(svd.doors, tmp - 1 | 0));
     }
-    for (i = 0; i < svn.nroom; i = i + 1 | 0) {
+    for (i = 0; i < svn.nroom; i = i + 1) {
         broom = $c.relem(svr.rooms, i);
         if (broom !== aroom && broom.doorct && broom.fdoor >= aroom.fdoor) {
             broom.fdoor = broom.fdoor + 1 | 0;
         }
     }
-    for (i = 0; i < gn.nsubroom; i = i + 1 | 0) {
+    for (i = 0; i < gn.nsubroom; i = i + 1) {
         broom = $c.radd(gs.subrooms, i);
         if (broom !== aroom && broom.doorct && broom.fdoor >= aroom.fdoor) {
             broom.fdoor = broom.fdoor + 1 | 0;
@@ -1258,7 +1258,7 @@ async function mklev_sanity_check() {   // mklev.c:1223
             }
         }
     }
-    for (i = 0; i < svn.nroom; i = i + 1 | 0) {
+    for (i = 0; i < svn.nroom; i = i + 1) {
         if (!svr.rooms[i].needjoining) {
             continue;
         }
@@ -1434,7 +1434,7 @@ async function makelevel() {   // mklev.c:1251
     }
     /* Fill all special rooms now, regardless of whether this is a special
      * level, proto level, or ordinary level. */
-    for (i = 0; i < svn.nroom; i = i + 1 | 0) {
+    for (i = 0; i < svn.nroom; i = i + 1) {
         await fill_special_room($c.relem(svr.rooms, i));
     }
     await themerooms_post_level_generate();
@@ -1555,7 +1555,7 @@ export async function mineralize(kelp_pool, kelp_moat, goldprob, gemprob, skip_l
                     }
                 }
                 if (rn2(1000) < gemprob) {
-                    for (cnt = rnd(2 + $c.div32(dunlev(u.uz), 3) | 0); cnt > 0; cnt = cnt - 1 | 0) {
+                    for (cnt = rnd(2 + $c.div32(dunlev(u.uz), 3) | 0); cnt > 0; cnt = cnt - 1) {
                         if ((otmp = await mkobj(GEM_CLASS, FALSE)) !== null) {
                             if (otmp.otyp === ROCK) {
                                 await dealloc_obj(otmp);   /* discard it */
@@ -1600,7 +1600,7 @@ export async function level_finalize_topology() {   // mklev.c:1544
     set_wall_state();
     /* for many room types, svr.rooms[].rtype is zeroed once the room has been
        entered; svr.rooms[].orig_rtype always retains original rtype value */
-    for (ridx = 0; ridx < 82; ridx = ridx + 1 | 0) {
+    for (ridx = 0; ridx < 82; ridx = ridx + 1) {
         svr.rooms[ridx].orig_rtype = svr.rooms[ridx].rtype;
     }
 }
@@ -1668,7 +1668,7 @@ export function topologize(croom) {   // mklev.c:1599
         }
     }
     /* gs.subrooms */
-    for (subindex = 0; subindex < nsubrooms; subindex = subindex + 1 | 0) {
+    for (subindex = 0; subindex < nsubrooms; subindex = subindex + 1) {
         topologize(croom.sbrooms[subindex]);
     }
 }
@@ -2264,9 +2264,9 @@ async function generate_stairs_find_room() {   // mklev.c:2219
         return null;
     }
     const rmarr = $c.asArr(await alloc($c.u32($c.mulu64(4, $c.u64(svn.nroom)))), Int32Array);
-    for (phase = 2; phase > -1; phase = phase - 1 | 0) {
+    for (phase = 2; phase > -1; phase = phase - 1) {
         let ai = 0;
-        for (i = 0; i < svn.nroom; i = i + 1 | 0) {
+        for (i = 0; i < svn.nroom; i = i + 1) {
             if (generate_stairs_room_good($c.relem(svr.rooms, i), phase)) {
                 rmarr.set(($t1 = ai, ai = $t1 + 1 | 0, $t1), i);
             }
@@ -2454,7 +2454,7 @@ export async function mkinvokearea() {   // mklev.c:2410
         /* this replicates the somewhat convoluted loop below, working
            out from the stair position, except for stopping early when
            walls are found */
-        for (dist = 1; !wallct && dist < 7; dist = dist + 1 | 0) {
+        for (dist = 1; !wallct && dist < 7; dist = dist + 1) {
             xmin = $c.i16(xmin - 1), xmax = $c.i16(xmax + 1);
             /* top and bottom */
             if (dist !== 3) {
@@ -2503,7 +2503,7 @@ export async function mkinvokearea() {   // mklev.c:2410
     xmin = xmax = svi.inv_pos.x;   /* reset after the check for walls */
     ymin = ymax = svi.inv_pos.y;
     await mkinvpos(xmin, ymin, 0);   /* middle, before placing stairs */
-    for (dist = 1; dist < 7; dist = dist + 1 | 0) {
+    for (dist = 1; dist < 7; dist = dist + 1) {
         xmin = $c.i16(xmin - 1);
         xmax = $c.i16(xmax + 1);
         /* top and bottom */

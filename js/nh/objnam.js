@@ -553,7 +553,7 @@ export async function fruit_from_name(fname, exact, highest_fid) {   // objnam.c
 export async function reorder_fruit(forward) {   // objnam.c:523
     let f = null, allfr = $c.nulls(128), i = 0, j = 0;
     const k = 128;
-    for (i = 0; i < k; i = i + 1 | 0) {
+    for (i = 0; i < k; i = i + 1) {
         allfr[i] = null;
     }
     for (f = gf.ffruit; f; f = f.nextf) {
@@ -571,7 +571,7 @@ export async function reorder_fruit(forward) {   // objnam.c:523
     gf.ffruit = null;   /* reset linked list; we're rebuilding it from scratch */
     /* slot [0] will always be empty; must start 'i' at 1 to avoid
        [k - i] being out of bounds during first iteration */
-    for (i = 1; i < k; i = i + 1 | 0) {
+    for (i = 1; i < k; i = i + 1) {
         /* for forward ordering, go through indices from high to low;
            for backward ordering, go from low to high */
         j = forward ? k - i | 0 : i;
@@ -2903,7 +2903,7 @@ export async function makeplural(oldstr) {   // objnam.c:2836
        and "it" (which matches genders[2].he and [2].him) are ambiguous;
        we'll live with that; caller can fix things up if necessary */
     str.set(0, 0);
-    for (i = 0; i <= 2; i = i + 1 | 0) {
+    for (i = 0; i <= 2; i = i + 1) {
         if (!strcmpi(genders[i].he, oldstr)) {
             $c.strcpy(str, genders[3].he);   /* "they" */
         } else if (!strcmpi(genders[i].him, oldstr)) {
@@ -3227,7 +3227,7 @@ function ch_ksound(basestr) {   // objnam.c:3168
         return FALSE;
     }
     const endstr = eos(basestr);
-    for (i = 0; i < 19; i = i + 1 | 0) {
+    for (i = 0; i < 19; i = i + 1) {
         const al = $c.i32($c.strlen(ch_ksound$ch_k[i]));
         if (!($c.pcmp(endstr.add(-al), basestr) < 0 || strncmpi(endstr.add(-al), ch_ksound$ch_k[i], -1))) {
             return TRUE;
@@ -3250,7 +3250,7 @@ function badman(basestr, to_plural) {   // objnam.c:3194
     }
     const endstr = eos(basestr);
     if (to_plural) {
-        for (i = 0; i < 36; i = i + 1 | 0) {
+        for (i = 0; i < 36; i = i + 1) {
             al = $c.i32($c.strlen(badman$no_men[i]));
             spot = endstr.add(-(al + 3 | 0));
             if (!($c.pcmp(spot, basestr) < 0 || strncmpi(spot, badman$no_men[i], al))
@@ -3259,7 +3259,7 @@ function badman(basestr, to_plural) {   // objnam.c:3194
             }
         }
     } else {
-        for (i = 0; i < 31; i = i + 1 | 0) {
+        for (i = 0; i < 31; i = i + 1) {
             al = $c.i32($c.strlen(badman$no_man[i]));
             spot = endstr.add(-(al + 3 | 0));
             if (!($c.pcmp(spot, basestr) < 0 || strncmpi(spot, badman$no_man[i], al))
@@ -3379,7 +3379,7 @@ function rnd_otyp_by_wpnskill(skill) {   // objnam.c:3432
     let i = 0;
     let n = 0;
     let otyp = STRANGE_OBJECT;
-    for (i = svb.bases[WEAPON_CLASS]; i < NUM_OBJECTS && objects[i].oc_class === WEAPON_CLASS; i = i + 1 | 0) {
+    for (i = svb.bases[WEAPON_CLASS]; i < NUM_OBJECTS && objects[i].oc_class === WEAPON_CLASS; i = i + 1) {
         if (objects[i].oc_subtyp === skill) {
             n = n + 1 | 0;
             otyp = $c.i16(i);
@@ -3387,7 +3387,7 @@ function rnd_otyp_by_wpnskill(skill) {   // objnam.c:3432
     }
     if (n > 0) {
         n = rn2(n);
-        for (i = svb.bases[WEAPON_CLASS]; i < NUM_OBJECTS && objects[i].oc_class === WEAPON_CLASS; i = i + 1 | 0) {
+        for (i = svb.bases[WEAPON_CLASS]; i < NUM_OBJECTS && objects[i].oc_class === WEAPON_CLASS; i = i + 1) {
             if (objects[i].oc_subtyp === skill) {
                 if ((n = n - 1 | 0) < 0) {
                     return $c.i16(i);
@@ -3468,7 +3468,7 @@ async function rnd_otyp_by_namedesc(name, oclass, xtra_prob) {   // objnam.c:345
     }
     if (n > 0 && maxprob) {
         let prob = rn2(maxprob);
-        for (i = 0; i < (n - 1 | 0); i = i + 1 | 0) {
+        for (i = 0; i < (n - 1 | 0); i = i + 1) {
             if ((prob = prob - (objects[validobjs[i]].oc_prob + xtra_prob | 0) | 0) < 0) {
                 break;
             }
@@ -4217,7 +4217,7 @@ async function readobjnam_postparse1(d) {   // objnam.c:4240
         /* "helmet called telepathy" is not "helmet" (a specific type)
          * "shield called reflection" is not "shield" (a general type)
          */
-        for (i = 0; i < 19; i = i + 1 | 0) {
+        for (i = 0; i < 19; i = i + 1) {
             if (!strcmpi(d.bp, o_ranges[i].name)) {
                 d.oclass = o_ranges[i].oclass;
                 return 1;   /*goto srch;*/
@@ -4521,7 +4521,7 @@ async function readobjnam_postparse1(d) {   // objnam.c:4240
         && strncmpi(d.bp, $C`tooled horn`, 11)
         && strncmpi(d.bp, $C`food ration`, 11)
         && strncmpi(d.bp, $C`meat ring`, 9)) {
-        for (i = 0; i < 13; i = i + 1 | 0) {
+        for (i = 0; i < 13; i = i + 1) {
             const j = await Strlen_(wrp[i], $C`readobjnam_postparse1`, 4568) | 0;
             /* check for "<class> [ of ] something" */
             if (!strncmpi(d.bp, wrp[i], j)) {
@@ -4624,7 +4624,7 @@ async function readobjnam_postparse1(d) {   // objnam.c:4240
 function readobjnam_postparse2(d) {   // objnam.c:4666
     let i = 0, tbuf = new Int8Array(256), $t1, $t2, $t3;
     /* "grey stone" check must be before general "stone" */
-    for (i = 0; i < 19; i = i + 1 | 0) {
+    for (i = 0; i < 19; i = i + 1) {
         if (!strcmpi(d.bp, o_ranges[i].name)) {
             $t1 = rnd_class(o_ranges[i].f_o_range, o_ranges[i].l_o_range), d.typ = $t1;
             return 2;   /*goto typfnd;*/
@@ -4688,7 +4688,7 @@ async function readobjnam_postparse3(d) {   // objnam.c:4727
     let i = 0, zn = null, l = 0, iscursedf = 0, uncursedf = 0, halfeatenf = 0, f = null, objtyp = Int16Array.of(0), $t1, $t2, $t3, $t4, $t5;
     /* check real names of gems first */
     if (!d.oclass && d.actualn) {
-        for (i = svb.bases[GEM_CLASS]; i <= LAST_REAL_GEM; i = i + 1 | 0) {
+        for (i = svb.bases[GEM_CLASS]; i <= LAST_REAL_GEM; i = i + 1) {
             if ((zn = obj_descr[objects[i].oc_name_idx].oc_name) !== null && !strcmpi(d.actualn, zn)) {
                 d.typ = i;
                 return 2;   /*goto typfnd;*/

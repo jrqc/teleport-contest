@@ -3263,7 +3263,7 @@ async function menu_remarm(retry) {   // do_wear.c:3090
         if (!n) {
             return 0;
         }
-        for (i = 0; i < n; i = i + 1 | 0) {
+        for (i = 0; i < n; i = i + 1) {
             if ($c.radd(pick_list[0], i).item.a_int === ALL_TYPES_SELECTED) {
                 all_worn_categories = TRUE;
             } else {
@@ -3289,7 +3289,7 @@ async function menu_remarm(retry) {   // do_wear.c:3090
         new $c.Ptr(pick_list, 0), PICK.ANY,
         all_worn_categories ? is_worn : is_worn_by_type);
     if (n > 0) {
-        for (i = 0; i < n; i = i + 1 | 0) {
+        for (i = 0; i < n; i = i + 1) {
             await select_off($c.radd(pick_list[0], i).item.a_obj);
         }
         $c.free(pick_list[0]);
@@ -3478,7 +3478,7 @@ export async function destroy_arm() {   // do_wear.c:3278
     if (!idx) {
         return 0;
     }
-    for (i = 0; i < hits; i = i + 1 | 0) {
+    for (i = 0; i < hits; i = i + 1) {
         const otmp = armors[rn2(idx)];
         if (erosion_matters(otmp) && is_damageable(otmp) && !otmp.oerodeproof) {
             const erosion = obj_erode_type(otmp);

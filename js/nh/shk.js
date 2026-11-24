@@ -242,8 +242,8 @@ export async function shkgone(mtmp) {   // shk.c:235
             svl.level.flags.has_shop = 0;
         }
         /* items on shop floor revert to ordinary objects */
-        for (sx = sroom.lx; sx <= sroom.hx; sx = sx + 1 | 0) {
-            for (sy = sroom.ly; sy <= sroom.hy; sy = sy + 1 | 0) {
+        for (sx = sroom.lx; sx <= sroom.hx; sx = sx + 1) {
+            for (sy = sroom.ly; sy <= sroom.hy; sy = sy + 1) {
                 for (otmp = svl.level.objects[sx][sy]; otmp; otmp = otmp.v.v_nexthere) {
                     otmp.no_charge = 0;
                 }
@@ -733,8 +733,8 @@ async function deserted_shop(enterstring) {   // shk.c:723
     const r = $c.relem(svr.rooms, enterstring.get(0) - ROOMOFFSET);
     let m = 0;
     let n = 0;
-    for (x = r.lx; x <= r.hx; x = x + 1 | 0) {
-        for (y = r.ly; y <= r.hy; y = y + 1 | 0) {
+    for (x = r.lx; x <= r.hx; x = x + 1) {
+        for (y = r.ly; y <= r.hy; y = y + 1) {
             if (u_at(x, y)) {
                 continue;
             }
@@ -1010,7 +1010,7 @@ export async function shopper_financial_report() {   // shk.c:1003
     }
     /* pass 0: report for the shop we're currently in, if any;
        pass 1: report for all other shops on this level. */
-    for (pass = this_shkp ? 0 : 1; pass <= 1; pass = pass + 1 | 0) {
+    for (pass = this_shkp ? 0 : 1; pass <= 1; pass = pass + 1) {
         for (shkp = next_shkp(svl.level.monlist, FALSE); shkp; shkp = next_shkp(shkp.nmon, FALSE)) {
             if ((shkp !== this_shkp ? 1 : 0) ^ pass) {
                 continue;
@@ -1562,7 +1562,7 @@ function cheapest_item(ibillct, ibill) {   // shk.c:1522
      * obtain quanities for every entry on eshkp->bill_p[], switch to
      * ibill[] which has already split such items into separate entries.
      */
-    for (i = 1; i < ibillct; i = i + 1 | 0) {
+    for (i = 1; i < ibillct; i = i + 1) {
         if ($c.radd(ibill, i).cost < gmin) {
             gmin = $c.radd(ibill, i).cost;
         }
@@ -1589,11 +1589,11 @@ async function make_itemized_bill(shkp, ibill_p) {   // shk.c:1545
        time; (the +1 for a terminator isn't actually needed) */
     let n = Math.imul(2, ebillct) + 1 | 0;
     ibill = ($t1 = $c.asRec(await alloc($c.u32($c.mulu64($c.u64(n), 32))), $T.sortbill_item, 32), ibill_p.set(0, $t1));
-    for (i = 0; i < n; i = i + 1 | 0) {
+    for (i = 0; i < n; i = i + 1) {
         $c.radd(ibill, i).$copyFrom(make_itemized_bill$zerosbi);
     }
     n = 0;   /* number of entries in ibill[]; won't necessary match ebillct */
-    for (i = 0; i < ebillct; i = i + 1 | 0) {
+    for (i = 0; i < ebillct; i = i + 1) {
         const bp = $c.radd(eshkp.bill_p, i);
         /* find the object on the bill */
         let otmp = bp_to_obj(bp);
@@ -1640,7 +1640,7 @@ async function make_itemized_bill(shkp, ibill_p) {   // shk.c:1545
                itself or if it holds more than one unpaid item and another
                besides this one has already been processed; only include
                first instance */
-            for (j = 0; j < n; j = j + 1 | 0) {
+            for (j = 0; j < n; j = j + 1) {
                 if (otmp === $c.radd(ibill, j).obj) {
                     break;
                 }
@@ -1707,7 +1707,7 @@ async function menu_pick_pay_items(ibillct, ibill) {   // shk.c:1668
     /* we go through ibill[] twice, first time to control price formatting
        during the second */
     let largest_amt = 0;
-    for (i = 0; i < ibillct; i = i + 1 | 0) {
+    for (i = 0; i < ibillct; i = i + 1) {
         if ($c.radd(ibill, i).cost > largest_amt) {
             largest_amt = $c.radd(ibill, i).cost;
         }
@@ -1721,7 +1721,7 @@ async function menu_pick_pay_items(ibillct, ibill) {   // shk.c:1668
         $c.sprintf(new $c.Ptr(buf, 0), $C`Used up item%s:`, ibillct > 1 && $c.radd(ibill, 1).usedup <= PartlyUsedUp ? $C`s` : $C``);
         await add_menu_heading(win, new $c.Ptr(buf, 0));
     }
-    for (i = 0; i < ibillct; i = i + 1 | 0) {
+    for (i = 0; i < ibillct; i = i + 1) {
         /* the "unpaid items" header is only shown if the "used up items"
            one was shown before the first menu entry */
         if (i > 0 && $c.radd(ibill, i - 1 | 0).usedup <= PartlyUsedUp
@@ -1745,7 +1745,7 @@ async function menu_pick_pay_items(ibillct, ibill) {   // shk.c:1668
     await end_menu()(win, $C`Pay for which items?`);
     const n = await select_menu(win, PICK.ANY, new $c.Ptr(pick_list, 0));
     await destroy_nhwindow()(win);
-    for (j = 0; j < n; j = j + 1 | 0) {
+    for (j = 0; j < n; j = j + 1) {
         /*
          * FIXME:
          *  The menu will accept a subset count for each entry but buying
@@ -2133,7 +2133,7 @@ async function pay_billed_items(shkp, ibillct, ibill, stashed_gold, paid_p) {   
      * Partly used items have two entries for same base item, one in
      * each section.
      */
-    L1: for (indx = 0; indx < ibillct; indx = indx + 1 | 0) {
+    L1: for (indx = 0; indx < ibillct; indx = indx + 1) {
         if (queuedpay && !$c.radd(ibill, indx).queuedpay) {
             continue;
         }
@@ -2201,7 +2201,7 @@ async function update_bill(indx, ibillct, ibill, eshkp, bp, paiditem) {   // shk
         /* 'paiditem' points to the partly intact portion still in invent or
            inside a container (ibill[indx].obj points to the container) */
         bp.bquan = paiditem.quan;
-        for (j = 0; j < ibillct; j = j + 1 | 0) {
+        for (j = 0; j < ibillct; j = j + 1) {
             if ($c.radd(ibill, j).obj === paiditem && $c.radd(ibill, j).usedup === PartlyIntact) {
                 $c.radd(ibill, j).usedup = FullyIntact;
                 break;
@@ -2219,7 +2219,7 @@ async function update_bill(indx, ibillct, ibill, eshkp, bp, paiditem) {   // shk
         }
         const newebillct = eshkp.billct - 1 | 0;
         bp.$copyFrom($c.radd(eshkp.bill_p, newebillct));
-        for (j = 0; j < ibillct; j = j + 1 | 0) {
+        for (j = 0; j < ibillct; j = j + 1) {
             if ($c.radd(ibill, j).bidx === newebillct) {
                 $c.radd(ibill, j).bidx = $c.i32($c.rdiff(bp, eshkp.bill_p));
             }
@@ -2344,7 +2344,7 @@ async function buy_container(shkp, indx, ibillct, ibill) {   // shk.c:2309
         return 1;   /* message given by insufficent_funds() */
     }
     /* check for partly intact portion of a not-yet-paid partly used item */
-    for (i = 0; i < ebillct; i = i + 1 | 0) {
+    for (i = 0; i < ebillct; i = i + 1) {
         bp = $c.radd(eshkp.bill_p, i);
         otmp = bp_to_obj(bp);   /* ibill[bidx].obj is the container */
         if (!otmp) {
@@ -2379,7 +2379,7 @@ async function buy_container(shkp, indx, ibillct, ibill) {   // shk.c:2309
     /* now make the actual purchasing pass; we've collected a set of
        o_id values in order to avoid traversing the shk's bill while it
        undergoes updates */
-    for (j = 0; j < boidsct; j = j + 1 | 0) {
+    for (j = 0; j < boidsct; j = j + 1) {
         const boid = boids[j];
         for (i = 0, bp = eshkp.bill_p; i < ebillct; i = i + 1 | 0, bp = $c.radd(bp, 1)) {
             if (bp.bo_id === boid) {
@@ -2824,7 +2824,7 @@ export function find_oid(id) {   // shk.c:2777
     mmtmp[0] = svl.level.monlist;
     mmtmp[1] = gm.migrating_mons;
     mmtmp[2] = gm.mydogs;   /* for use during level changes */
-    for (i = 0; i < 3; i = i + 1 | 0) {
+    for (i = 0; i < 3; i = i + 1) {
         for (mon = mmtmp[i]; mon; mon = mon.nmon) {
             if ((obj = o_on(id, mon.minvent)) !== null) {
                 return obj;
@@ -4291,7 +4291,7 @@ async function corpsenm_price_adj(obj) {   // shk.c:4275
         icost[9].cost = 3;
         icost[10].trinsic = TELEPAT;
         icost[10].cost = 5;
-        for (i = 0; i < 11; i = i + 1 | 0) {
+        for (i = 0; i < 11; i = i + 1) {
             if (await intrinsic_possible(icost[i].trinsic, ptr)) {
                 tmp = $c.add64(tmp, icost[i].cost);
             }
@@ -4595,7 +4595,7 @@ function litter_getpos(litter, x, y, shkp) {   // shk.c:4591
     let k = 0;   /* number of adjacent shop spots */
     $c.memset(litter, 0, 9);
     if (svl.level.objects[x][y] && !(svl.level.locations[x][y].typ >= ROOM)) {
-        for (i = 0; i < 9; i = i + 1 | 0) {
+        for (i = 0; i < 9; i = i + 1) {
             const ix = x + horiz(i) | 0;
             const iy = y + vert(i) | 0;
             if (i === 4 || !isok($c.i16(ix), $c.i16(iy)) || !(svl.level.locations[ix][iy].typ >= POOL)) {
@@ -4710,7 +4710,7 @@ async function litter_scatter(litter, x, y, shkp) {   // shk.c:4622
  */
 async function litter_newsyms(litter, x, y) {   // shk.c:4712
     let i = 0;
-    for (i = 0; i < 9; i = i + 1 | 0) {
+    for (i = 0; i < 9; i = i + 1) {
         if ((litter.get(i) & LITTER_UPDATE) >>> 0) {
             await newsym($c.i16(x + horiz(i) | 0), $c.i16(y + vert(i) | 0));
         }
@@ -5103,7 +5103,7 @@ async function makekops(mm) {   // shk.c:5113
     k_cnt[1] = $c.div32(cnt, 3) + 1 | 0;   /* at least one sarge */
     k_cnt[2] = $c.div32(cnt, 6);   /* maybe a lieutenant */
     k_cnt[3] = $c.div32(cnt, 9);   /* and maybe a kaptain */
-    for (k = 0; k < 4; k = k + 1 | 0) {
+    for (k = 0; k < 4; k = k + 1) {
         if ((cnt = k_cnt[k]) === 0) {
             break;
         }

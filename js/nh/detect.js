@@ -1061,7 +1061,7 @@ async function display_trap_map(cursed_src) {   // detect.c:956
         await sense_trap(ttmp, 0, 0, cursed_src);
     }
     dummytrap.ttyp = (TRAPPED_DOOR) & 31;
-    for (door = 0; door < gd.doorindex; door = door + 1 | 0) {
+    for (door = 0; door < gd.doorindex; door = door + 1) {
         cc.$copyFrom($c.radd(svd.doors, door));
         if (svl.level.locations[cc.x][cc.y].typ === SDOOR) {   /* can't be trapped; see above */
             continue;
@@ -1139,7 +1139,7 @@ export async function trap_detect(sobj) {   // detect.c:1011
         found = TRUE;
     }
     /* door traps */
-    for (door = 0; door < gd.doorindex; door = door + 1 | 0) {
+    for (door = 0; door < gd.doorindex; door = door + 1) {
         cc.$copyFrom($c.radd(svd.doors, door));
         /* levl[][].doormask and .wall_info both overlay levl[][].flags;
            the bit in doormask for D_TRAPPED is also a bit in wall_info;
@@ -1502,8 +1502,8 @@ export async function show_map_spot(x, y, cnf) {   // detect.c:1372
 export async function do_mapping() {   // detect.c:1422
     let zx = 0, zy = 0;
     const unconstrained = unconstrain_map();
-    for (zx = 1; zx < COLNO; zx = zx + 1 | 0) {
-        for (zy = 0; zy < ROWNO; zy = zy + 1 | 0) {
+    for (zx = 1; zx < COLNO; zx = zx + 1) {
+        for (zy = 0; zy < ROWNO; zy = zy + 1) {
             await show_map_spot($c.i16(zx), $c.i16(zy), $c.i8(u.uprops[CONFUSION].intrinsic));
         }
     }

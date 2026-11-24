@@ -731,7 +731,7 @@ async function peffect_restore_ability(otmp) {   // potion.c:646
             : unfixable_trouble_count(FALSE) ? $C`better`
             : $C`great`);
         let i = rn2(A.MAX);   /* start at a random point */
-        for (ii = 0; ii < A.MAX; ii = ii + 1 | 0) {
+        for (ii = 0; ii < A.MAX; ii = ii + 1) {
             const lim = u.amax.a[i];
             /* this used to adjust 'lim' for A_STR when u.uhs was
                WEAK or worse, but that's handled via ATEMP(A_STR) now */
@@ -1020,8 +1020,8 @@ async function peffect_monster_detection(otmp) {   // potion.c:914
             i = rn2(100) + 100 | 0;
         }
         incr_itimeout(new $c.FieldRef(u.uprops[DETECT_MONSTERS], "intrinsic", "i64"), i);
-        for (x = 1; x < COLNO; x = x + 1 | 0) {
-            for (y = 0; y < ROWNO; y = y + 1 | 0) {
+        for (x = 1; x < COLNO; x = x + 1) {
+            for (y = 0; y < ROWNO; y = y + 1) {
                 if (svl.level.locations[x][y].glyph === GLYPH_INVISIBLE) {
                     await unmap_object($c.i16(x), $c.i16(y));
                     await newsym($c.i16(x), $c.i16(y));
@@ -1140,7 +1140,7 @@ async function peffect_gain_ability(otmp) {   // potion.c:1030
         /* If blessed, increase all; if not, try up to */
         /* 6 times to find one which can be increased. */
         let i = -1;   /* increment to 0 */
-        for (ii = A.MAX; ii > 0; ii = ii - 1 | 0) {
+        for (ii = A.MAX; ii > 0; ii = ii - 1) {
             i = otmp.blessed ? i + 1 | 0 : rn2(A.MAX);
             /* only give "your X is already as high as it can get"
                message on last attempt (except blessed potions) */
@@ -2104,7 +2104,7 @@ export async function potionbreathe(obj) {   // potion.c:1932
                 break;
             } else {
                 let i = rn2(A.MAX);   /* start at a random point */
-                for (isdone = ii = 0; !isdone && ii < A.MAX; ii = ii + 1 | 0) {
+                for (isdone = ii = 0; !isdone && ii < A.MAX; ii = ii + 1) {
                     if (u.acurr.a[i] < u.amax.a[i]) {
                         u.acurr.a[i] = $c.i8(u.acurr.a[i] + 1);
                         /* only first found if not blessed */

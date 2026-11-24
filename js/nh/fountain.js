@@ -313,7 +313,7 @@ export async function drinkfountain() {   // fountain.c:243
         const littleluck = u.uluck < 4 ? 1 : 0;
         await pline($C`Wow!  This makes you feel great!`);
         /* blessed restore ability */
-        for (ii = 0; ii < A.MAX; ii = ii + 1 | 0) {
+        for (ii = 0; ii < A.MAX; ii = ii + 1) {
             if (u.acurr.a[ii] < u.amax.a[ii]) {
                 u.acurr.a[ii] = u.amax.a[ii];
                 disp.botl = TRUE;
@@ -321,7 +321,7 @@ export async function drinkfountain() {   // fountain.c:243
         }
         /* gain ability, blessed if "natural" luck is high */
         let i = rn2(A.MAX);   /* start at a random attribute */
-        for (ii = 0; ii < A.MAX; ii = ii + 1 | 0) {
+        for (ii = 0; ii < A.MAX; ii = ii + 1) {
             if (await adjattrib(i, 1, littleluck ? -1 : 0) && littleluck) {
                 break;
             }

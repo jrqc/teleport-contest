@@ -1177,7 +1177,7 @@ export async function prscore(argc, argv) {   // topten.c:1194
             if (playerct > 1) {
                 $c.strcat(new $c.Ptr(pbuf, 0), $C`any of `);
             }
-            for (i = 0; i < playerct; i = i + 1 | 0) {
+            for (i = 0; i < playerct; i = i + 1) {
                 /* accept '-u name' and '-uname' as well as just 'name'
                    so skip '-u' for the none-found feedback */
                 if (!$c.strncmp(players.get(i), $C`-u`, 2)) {

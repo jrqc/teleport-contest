@@ -535,7 +535,7 @@ async function oselect(mtmp, type) {   // weapon.c:476
  */
 export function autoreturn_weapon(otmp) {   // weapon.c:520
     let i = 0;
-    for (i = 0; i < 1; i = i + 1 | 0) {
+    for (i = 0; i < 1; i = i + 1) {
         if (otmp.otyp === arwep[i].otyp) {
             return $c.relem(arwep, i);
         }
@@ -587,7 +587,7 @@ export async function select_rwep(mtmp) {   // weapon.c:533
             gp.propellor = mwep;
             return mwep;
         }
-        for (i = 0; i < 13; i = i + 1 | 0) {
+        for (i = 0; i < 13; i = i + 1) {
             /* Only strong monsters can wield big (esp. long) weapons.
              * Big weapon is basically the same as bimanual.
              * All monsters can wield the remaining weapons.
@@ -609,7 +609,7 @@ export async function select_rwep(mtmp) {   // weapon.c:533
      * also not as expendable. Again, don't pick one if monster's
      * weapon is welded.
      */
-    for (i = 0; i < 1; i = i + 1 | 0) {
+    for (i = 0; i < 1; i = i + 1) {
         const arw = $c.relem(arwep, i);
         if (!mindless(mtmp.data) && !is_animal(mtmp.data) && !mweponly
             && dist2(mtmp.mx, mtmp.my, mtmp.mux, mtmp.muy) <= arw.range
@@ -630,7 +630,7 @@ export async function select_rwep(mtmp) {   // weapon.c:533
      * other than the specific cases above, always select the
      * most potent ranged weapon to hand.
      */
-    for (i = 0; i < 24; i = i + 1 | 0) {
+    for (i = 0; i < 24; i = i + 1) {
         /* shooting gems from slings; this goes just before the darts */
         /* (shooting rocks is already handled via the rwep[] ordering) */
         if (rwep[i] === DART && !likes_gems(mtmp.data)
@@ -747,7 +747,7 @@ export async function select_hwep(mtmp) {   // weapon.c:705
     /* only strong monsters can wield big (esp. long) weapons */
     /* big weapon is basically the same as bimanual */
     /* all monsters can wield the remaining weapons */
-    for (i = 0; i < 45; i = i + 1 | 0) {
+    for (i = 0; i < 45; i = i + 1) {
         if (hwep[i] === CORPSE && !$c.and64(mtmp.misc_worn_check, W.ARMG)
             && !await resists_ston(mtmp)) {
             continue;
@@ -1268,7 +1268,7 @@ export async function add_skills_to_menu(win, selectable, speedy) {   // weapon.
     let pass = 0, i = 0, len = 0, longest = 0, any = new $T.any(), buf = new Int8Array(256), sklnambuf = new Int8Array(256), prefix = null, $t1;
     const clr = NO_COLOR;
     /* Find the longest skill name. */
-    for (longest = 0, i = 0; i < P.NUM_SKILLS; i = i + 1 | 0) {
+    for (longest = 0, i = 0; i < P.NUM_SKILLS; i = i + 1) {
         if (P_RESTRICTED(i)) {
             continue;
         }
@@ -1280,8 +1280,8 @@ export async function add_skills_to_menu(win, selectable, speedy) {   // weapon.
        selectable is set.  List the miscellaneous skills first.  Possible
        future enhancement: list spell skills before weapon skills for
        spellcaster roles. */
-    for (pass = 0; pass < 3; pass = pass + 1 | 0) {
-        for (i = skill_ranges[pass].first; i <= skill_ranges[pass].last; i = i + 1 | 0) {
+    for (pass = 0; pass < 3; pass = pass + 1) {
+        for (i = skill_ranges[pass].first; i <= skill_ranges[pass].last; i = i + 1) {
             /* Print headings for skill types */
             any.$copyFrom(cg.zeroany);
             if (i === skill_ranges[pass].first) {
@@ -1364,7 +1364,7 @@ export async function enhance_weapon_skill() {   // weapon.c:1329
     do {
         /* count advanceable skills */
         let to_advance = eventually_advance = maxxed_cnt = 0;
-        for (i = 0; i < P.NUM_SKILLS; i = i + 1 | 0) {
+        for (i = 0; i < P.NUM_SKILLS; i = i + 1) {
             if (P_RESTRICTED(i)) {
                 continue;
             }
@@ -1405,7 +1405,7 @@ export async function enhance_weapon_skill() {   // weapon.c:1329
             $c.free(selected[0]);
             await skill_advance(n);
             /* check for more skills able to advance; if so, then... */
-            for (n = i = 0; i < P.NUM_SKILLS; i = i + 1 | 0) {
+            for (n = i = 0; i < P.NUM_SKILLS; i = i + 1) {
                 if (can_advance(i, speedy)) {
                     if (!speedy) {
                         await You_feel($C`you could be more dangerous!`);
@@ -1453,13 +1453,13 @@ export async function use_skill(skill, degree) {   // weapon.c:1424
 export async function add_weapon_skill(n) {   // weapon.c:1437
     let i = 0, before = 0, after = 0;
     /* number of slots to gain; normally one */
-    for (i = 0, before = 0; i < P.NUM_SKILLS; i = i + 1 | 0) {
+    for (i = 0, before = 0; i < P.NUM_SKILLS; i = i + 1) {
         if (can_advance(i, FALSE)) {
             before = before + 1 | 0;
         }
     }
     u.weapon_slots = u.weapon_slots + n | 0;
-    for (i = 0, after = 0; i < P.NUM_SKILLS; i = i + 1 | 0) {
+    for (i = 0, after = 0; i < P.NUM_SKILLS; i = i + 1) {
         if (can_advance(i, FALSE)) {
             after = after + 1 | 0;
         }
@@ -1507,7 +1507,7 @@ export async function drain_weapon_skill(n) {   // weapon.c:1476
             let i = rn2(u.skills_advanced);
             skill = u.skill_record[i];
             tmpskills[skill] = 1;
-            for (; i < (u.skills_advanced - 1 | 0); i = i + 1 | 0) {
+            for (; i < (u.skills_advanced - 1 | 0); i = i + 1) {
                 u.skill_record[i] = u.skill_record[i + 1 | 0];
             }
             u.skills_advanced = u.skills_advanced - 1 | 0;
@@ -1525,7 +1525,7 @@ export async function drain_weapon_skill(n) {   // weapon.c:1476
             }
         }
     }
-    for (skill = 0; skill < P.NUM_SKILLS; skill = skill + 1 | 0) {
+    for (skill = 0; skill < P.NUM_SKILLS; skill = skill + 1) {
         if (tmpskills[skill]) {
             await You($C`forget %syour training in %s.`,
                 u.weapon_skills[skill].skill >= P.BASIC ? $C`some of ` : $C``, P_NAME(skill));
@@ -1757,7 +1757,7 @@ export async function weapon_dam_bonus(weapon) {   // weapon.c:1644
 export async function skill_init(class_skill) {   // weapon.c:1738
     let obj = null, skill = 0;
     /* initialize skill array; by default, everything is restricted */
-    for (skill = 0; skill < P.NUM_SKILLS; skill = skill + 1 | 0) {
+    for (skill = 0; skill < P.NUM_SKILLS; skill = skill + 1) {
         u.weapon_skills[skill].skill = P.ISRESTRICTED;
         u.weapon_skills[skill].max_skill = P.ISRESTRICTED;
         u.weapon_skills[skill].advance = 0;
@@ -1805,7 +1805,7 @@ export async function skill_init(class_skill) {   // weapon.c:1738
      * Make sure we haven't missed setting the max on a skill
      * & set advance
      */
-    for (skill = 0; skill < P.NUM_SKILLS; skill = skill + 1 | 0) {
+    for (skill = 0; skill < P.NUM_SKILLS; skill = skill + 1) {
         if (!P_RESTRICTED(skill)) {
             if (u.weapon_skills[skill].max_skill < u.weapon_skills[skill].skill) {
                 await impossible($C`skill_init: curr > max: %s`, P_NAME(skill));

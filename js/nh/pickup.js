@@ -843,7 +843,7 @@ export async function pickup(what) {   // pickup.c:672
                             n = await query_objlist(new $c.Ptr(qbuf, 0), objchain_p, traverse_how,
                                 new $c.Ptr(pick_list, 0), PICK.ONE, n_or_more);
                             /* correct counts, if any given */
-                            for (i = 0; i < n; i = i + 1 | 0) {
+                            for (i = 0; i < n; i = i + 1) {
                                 $c.radd(pick_list[0], i).count = count;
                             }
                         } else {
@@ -857,7 +857,7 @@ export async function pickup(what) {   // pickup.c:672
                             reset_justpicked(gi.invent);
                         }
                         n_tried = n;
-                        for (n_picked = i = 0; i < n; i = i + 1 | 0) {
+                        for (n_picked = i = 0; i < n; i = i + 1) {
                             res = await pickup_object($c.radd(pick_list[0], i).item.a_obj, $c.radd(pick_list[0], i).count,
                                 FALSE);
                             if (res < 0) {
@@ -1527,7 +1527,7 @@ export async function query_category(qstr, olist, qflags, pick_list, how) {   //
         }
         /* handle ParanoidAutoAll by confirming 'A' choice if present */
         if (n > 0 && verify_All) {
-            for (i = 0; i < n; i = i + 1 | 0) {
+            for (i = 0; i < n; i = i + 1) {
                 if ($c.radd(pick_list.get(0), i).item.a_int === 65) {
                     /* ParanoidAutoAll is set (otherwise verify_All is false);
                        if ParanoidConfirm is also set, require "yes" rather than
@@ -1542,7 +1542,7 @@ export async function query_category(qstr, olist, qflags, pick_list, how) {   //
                             /* no => remove 'A' from the list; if that would make
                                it empty then replace with 'a' */
                             if (n > 1) {
-                                for (j = i + 1 | 0; j < n; j = j + 1 | 0) {
+                                for (j = i + 1 | 0; j < n; j = j + 1) {
                                     $c.radd(pick_list.get(0), j - 1 | 0).$copyFrom($c.radd(pick_list.get(0), j));
                                 }
                                 n = n - 1 | 0;
@@ -2147,8 +2147,8 @@ async function able_to_loot(x, y, looting) {   // pickup.c:2041
  */
 function mon_beside(x, y) {   // pickup.c:2072
     let i = 0, j = 0;
-    for (i = -1; i <= 1; i = i + 1 | 0) {
-        for (j = -1; j <= 1; j = j + 1 | 0) {
+    for (i = -1; i <= 1; i = i + 1) {
+        for (j = -1; j <= 1; j = j + 1) {
             const nx = $c.i16(x + i | 0);
             const ny = $c.i16(y + j | 0);
             if (isok(nx, ny) && MON_AT(nx, ny)) {
@@ -3358,7 +3358,7 @@ async function menu_loot(retry, put_in) {   // pickup.c:3265
         if (!n) {
             return ECMD.OK;   /* no non-autopick category filters specified */
         }
-        for (i = 0; i < n; i = i + 1 | 0) {
+        for (i = 0; i < n; i = i + 1) {
             if ($c.radd(pick_list[0], i).item.a_int === 65) {
                 loot_everything = autopick = TRUE;
             } else if (put_in && $c.radd(pick_list[0], i).item.a_int === 80) {
@@ -3431,7 +3431,7 @@ async function menu_loot(retry, put_in) {   // pickup.c:3265
             all_categories ? allow_all : allow_category);
         if (n) {
             n_looted = n;
-            for (i = 0; i < n; i = i + 1 | 0) {
+            for (i = 0; i < n; i = i + 1) {
                 otmp = $c.radd(pick_list[0], i).item.a_obj;
                 (!(otmp !== null) ? 1 : 0) ? $c.__assert_rtn($C`menu_loot`, $C`pickup.c`, 3370, $C`otmp != 0`) : 0;
                 count = $c.radd(pick_list[0], i).count;

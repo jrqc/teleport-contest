@@ -234,8 +234,8 @@ export function selection_setpoint(x, y, sel, c) {   // selvar.c:181
 export function selection_not(s) {   // selvar.c:211
     let x = 0, y = 0, tmprect = new $T.nhrect();
     tmprect.$copyFrom(cg.zeroNhRect);
-    for (x = 0; x < s.wid; x = x + 1 | 0) {
-        for (y = 0; y < s.hei; y = y + 1 | 0) {
+    for (x = 0; x < s.wid; x = x + 1) {
+        for (y = 0; y < s.hei; y = y + 1) {
             selection_setpoint($c.i16(x), $c.i16(y), s, selection_getpoint($c.i16(x), $c.i16(y), s) ? 0 : 1);
         }
     }
@@ -255,8 +255,8 @@ export async function selection_filter_percent(ov, percent) {   // selvar.c:224
     }
     const ret = await selection_new();
     selection_getbounds(ov, rect);
-    for (x = rect.lx; x <= rect.hx; x = x + 1 | 0) {
-        for (y = rect.ly; y <= rect.hy; y = y + 1 | 0) {
+    for (x = rect.lx; x <= rect.hx; x = x + 1) {
+        for (y = rect.ly; y <= rect.hy; y = y + 1) {
             if (selection_getpoint($c.i16(x), $c.i16(y), ov) && rn2(100) < percent) {
                 selection_setpoint($c.i16(x), $c.i16(y), ret, 1);
             }
@@ -278,8 +278,8 @@ export async function selection_filter_mapchar(ov, typ, lit) {   // selvar.c:248
     }
     const ret = await selection_new();
     selection_getbounds(ov, rect);
-    for (x = rect.lx; x <= rect.hx; x = x + 1 | 0) {
-        for (y = rect.ly; y <= rect.hy; y = y + 1 | 0) {
+    for (x = rect.lx; x <= rect.hx; x = x + 1) {
+        for (y = rect.ly; y <= rect.hy; y = y + 1) {
             if (selection_getpoint($c.i16(x), $c.i16(y), ov)
                 && match_maptyps(typ, svl.level.locations[x][y].typ)) {
                 switch (lit) {
@@ -314,8 +314,8 @@ export function selection_rndcoord(ov, x, y, removeit) {   // selvar.c:284
     let idx = 0;
     rect.$copyFrom(cg.zeroNhRect);
     selection_getbounds(ov, rect);
-    for (dx = rect.lx; dx <= rect.hx; dx = dx + 1 | 0) {
-        for (dy = rect.ly; dy <= rect.hy; dy = dy + 1 | 0) {
+    for (dx = rect.lx; dx <= rect.hx; dx = dx + 1) {
+        for (dy = rect.ly; dy <= rect.hy; dy = dy + 1) {
             if (selection_getpoint($c.i16(dx), $c.i16(dy), ov)) {
                 idx = idx + 1 | 0;
             }
@@ -323,8 +323,8 @@ export function selection_rndcoord(ov, x, y, removeit) {   // selvar.c:284
     }
     if (idx) {
         let c = rn2(idx);
-        for (dx = rect.lx; dx <= rect.hx; dx = dx + 1 | 0) {
-            for (dy = rect.ly; dy <= rect.hy; dy = dy + 1 | 0) {
+        for (dx = rect.lx; dx <= rect.hx; dx = dx + 1) {
+            for (dy = rect.ly; dy <= rect.hy; dy = dy + 1) {
                 if (selection_getpoint($c.i16(dx), $c.i16(dy), ov)) {
                     if (!c) {
                         x.set(0, $c.i16(dx));

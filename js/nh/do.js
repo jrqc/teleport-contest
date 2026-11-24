@@ -1138,7 +1138,7 @@ async function menu_drop(retry) {   // do.c:981
             if (!n) {
                 break drop_done$;   /* no non-autopick category filters specified */
             }
-            for (i = 0; i < n; i = i + 1 | 0) {
+            for (i = 0; i < n; i = i + 1) {
                 if ($c.radd(pick_list[0], i).item.a_int === ALL_TYPES_SELECTED) {
                     all_categories = TRUE;
                 } else if ($c.radd(pick_list[0], i).item.a_int === 65) {
@@ -1221,7 +1221,7 @@ async function menu_drop(retry) {   // do.c:981
                  * to verify that it is in gi.invent and has that bit set.
                  */
                 bypass_objlist(gi.invent, TRUE);
-                for (i = 0; i < n; i = i + 1 | 0) {
+                for (i = 0; i < n; i = i + 1) {
                     otmp = $c.radd(pick_list[0], i).item.a_obj;
                     for (otmp2 = gi.invent; otmp2; otmp2 = otmp2.nobj) {
                         if (otmp2 === otmp) {
@@ -1757,13 +1757,13 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
     await close_nhfile(nhfp);
     if (cant_go_back) {
         /* discard unreachable levels; keep #0 */
-        for (l_idx = maxledgerno(); l_idx > 0; l_idx = l_idx - 1 | 0) {
+        for (l_idx = maxledgerno(); l_idx > 0; l_idx = l_idx - 1) {
             if (!leaving_tutorial || await ledger_to_dnum($c.i16(l_idx)) === svd.dungeon_topology.d_tutorial_dnum) {
                 delete_levelfile(l_idx);
             }
         }
         /* mark #overview data for all dungeon branches as uninteresting */
-        for (l_idx = 0; l_idx < svn.n_dgns; l_idx = l_idx + 1 | 0) {
+        for (l_idx = 0; l_idx < svn.n_dgns; l_idx = l_idx + 1) {
             if (!leaving_tutorial || l_idx === svd.dungeon_topology.d_tutorial_dnum) {
                 remdun_mapseen(l_idx);
             }

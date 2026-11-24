@@ -185,7 +185,7 @@ export async function were_summon(ptr, yours, visible, genbuf) {   // were.c:142
     if (Protection_from_shape_changers() && !yours) {
         return 0;
     }
-    L1: for (i = rnd(5); i > 0; i = i - 1 | 0) {
+    L1: for (i = rnd(5); i > 0; i = i - 1) {
         switch (pm) {
             case PM.WERERAT:
             case PM.HUMAN_WERERAT:

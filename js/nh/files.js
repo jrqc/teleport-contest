@@ -216,7 +216,7 @@ export function fname_decode(quotechar, s, callerbuf, bufsz) {   // files.c:305
         }
         if (sp.get(0) === quotechar) {
             sp = sp.add(1);
-            for (k = 0; k < 16; k = k + 1 | 0) {
+            for (k = 0; k < 16; k = k + 1) {
                 if (sp.get(0) === fname_decode$hexdigits[k]) {
                     break;
                 }
@@ -226,7 +226,7 @@ export function fname_decode(quotechar, s, callerbuf, bufsz) {   // files.c:305
             }
             let calc = k << 4;
             sp = sp.add(1);
-            for (k = 0; k < 16; k = k + 1 | 0) {
+            for (k = 0; k < 16; k = k + 1) {
                 if (sp.get(0) === fname_decode$hexdigits[k]) {
                     break;
                 }
@@ -542,7 +542,7 @@ export async function clearlocks() {   // files.c:733
     sethanguphandler($c.ptrConst(1));
     /* NO_SIGNAL */
     /* can't access maxledgerno() before dungeons are created -dlc */
-    for (x = svn.n_dgns ? maxledgerno() : 0; x >= 0; x = x - 1 | 0) {
+    for (x = svn.n_dgns ? maxledgerno() : 0; x >= 0; x = x - 1) {
         delete_levelfile(x);   /* not all levels need be present */
     }
 }
@@ -1024,7 +1024,7 @@ export async function get_saved_games() {   // files.c:1399
             }
             result = $c.asArr(await alloc($c.u32($c.mulu64($c.u64(n + 1 | 0), 8))), 'ptr');   /* at most */
             $c.memset(result, 0, $c.mulu64($c.u64(n + 1 | 0), 8));
-            for (i = 0, j = 0; i < n; i = i + 1 | 0) {
+            for (i = 0, j = 0; i < n; i = i + 1) {
                 /* more than PL_NSIZ+1 */
                 const entry = $c.readdir(dir);
                 if (!entry) {
@@ -1134,7 +1134,7 @@ async function problematic_savefile(sfstatus, savefilenm) {   // files.c:2015
         case SF.CRITICAL_BYTE_COUNT_MISMATCH:
         default:
             /*FALLTHRU*/
-            for (i = 0; i < 10; i = i + 1 | 0) {
+            for (i = 0; i < 10; i = i + 1) {
                 if (sf2msg[i].sfstatus === sfstatus) {
                     await raw_printf($C`\n%s is %s %s\n`,
                         savefilenm,
@@ -1258,7 +1258,7 @@ export function contains_directory(s) {   // files.c:2179
     let i = 0;
     const slen = $c.i32($c.strlen(s));
     let cp = s;
-    for (i = 0; i < slen; i = i + 1 | 0) {
+    for (i = 0; i < slen; i = i + 1) {
         if (cp.get(0) === 92 || cp.get(0) === 47 || cp.get(0) === 58) {
             return 1;
         }
@@ -1847,7 +1847,7 @@ function choose_passage(passagecnt, oid) {   // files.c:3431
         if (range <= limit) {
             /* collect all of the N indices */
             svc.context.novel.count = passagecnt;
-            for (idx = 0; idx < 30; idx = idx + 1 | 0) {
+            for (idx = 0; idx < 30; idx = idx + 1) {
                 svc.context.novel.pasg[idx] = $c.i8($c.i16(idx < passagecnt
                     ? idx + 1 | 0 : 0));
             }

@@ -217,7 +217,7 @@ async function resize_tty() {   // wintty.c:392
     if (map_active) {
         await docrt_flags(docrtRefresh);
         await bot();   /* context.botlx=1 gets set by docrt() */
-        for (i = 0; i < MAXWIN; i = i + 1 | 0) {
+        for (i = 0; i < MAXWIN; i = i + 1) {
             /* docrt() updates it */
             /* docrt()+bot() updates it */
             /* docrt() again */
@@ -336,7 +336,7 @@ export async function tty_init_nhwindows(argcp, argv) {   // wintty.c:511
      * Move the copyright information a little further down to
      * row 3, out of the way. */
     await tty_curs($G.BASE_WINDOW, 1, 4);
-    for (i = 1; i <= 4; i = i + 1 | 0) {
+    for (i = 1; i <= 4; i = i + 1) {
         await tty_putstr($G.BASE_WINDOW, 0, copyright_banner_line(i));
     }
     await tty_putstr($G.BASE_WINDOW, 0, $C``);
@@ -552,7 +552,7 @@ export async function tty_exit_nhwindows(str) {   // wintty.c:834
      * Disable windows to avoid calls to window routines.
      */
     await free_pickinv_cache();   /* reset its state as well as tear down window */
-    for (i = 0; i < MAXWIN; i = i + 1 | 0) {
+    for (i = 0; i < MAXWIN; i = i + 1) {
         if (i === $G.BASE_WINDOW) {
             continue;   /* handle wins[BASE_WINDOW] last */
         }
@@ -581,7 +581,7 @@ export async function tty_exit_nhwindows(str) {   // wintty.c:834
  */
 export async function tty_create_nhwindow(type) {   // wintty.c:874
     let i = 0, rowoffset = 0, newid = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13, $t14, $t15, $t16;
-    for (newid = 0; newid < MAXWIN; newid = newid + 1 | 0) {
+    for (newid = 0; newid < MAXWIN; newid = newid + 1) {
         if (wins[newid] === null) {
             break;
         }
@@ -786,12 +786,12 @@ export async function tty_clear_nhwindow(window) {   // wintty.c:1058
         case NHW.STATUS:
             m = $c.i32(cw.maxrow);
             n = $c.i32(cw.cols);
-            for (i = 0; i < m; i = i + 1 | 0) {
+            for (i = 0; i < m; i = i + 1) {
                 if (!erasing_tty_screen) {
                     await tty_curs(window, 1, i);
                     await cl_end();
                 }
-                for (j = 0; j < (n - 1 | 0); j = j + 1 | 0) {
+                for (j = 0; j < (n - 1 | 0); j = j + 1) {
                     cw.data.get(i).set(j, 32);
                 }
                 cw.data.get(i).set(n - 1 | 0, 0);
@@ -1105,7 +1105,7 @@ async function process_menu_window(window, cw) {   // wintty.c:1359
     gacc[0] = 0;
     if (cw.how !== PICK.NONE) {
         /* guard against `signed char' */
-        for (i = 0; i < 128; i = i + 1 | 0) {
+        for (i = 0; i < 128; i = i + 1) {
             gcnt[i] = 0;
         }
         for (n = 0, curr = cw.mlist; curr; curr = curr.next) {
@@ -1829,7 +1829,7 @@ export async function erase_tty_screen() {   // wintty.c:2084
     /* originally we called term_clear_screen() but now it calls us */
     /* erase the screen */
     /* update window data to reflect that each active window is all blanks */
-    for (i = 0; i < MAXWIN; i = i + 1 | 0) {
+    for (i = 0; i < MAXWIN; i = i + 1) {
         const cw = wins[i];
         if (cw && cw.active) {
             await tty_clear_nhwindow(i);
@@ -2784,7 +2784,7 @@ export async function docorner(xmin, ymax, ystart_between_menu_pages) {   // win
     if (ystart_between_menu_pages) {
         ystart = ystart_between_menu_pages;
     }
-    for (y = ystart; y < ymax; y = y + 1 | 0) {
+    for (y = ystart; y < ymax; y = y + 1) {
         await tty_curs($G.BASE_WINDOW, xmin, y);   /* move cursor */
         if (!ystart_between_menu_pages) {
             await cl_end();   /* clear to end of line */
@@ -3235,7 +3235,7 @@ export async function tty_status_init() {   // wintty.c:4409
     let i = 0, $t1;
     const num_rows = StatusRows();   /* 2 or 3 */
     fieldorder = num_rows !== 3 ? new $c.Ptr(twolineorder, 0) : new $c.Ptr(threelineorder, 0);
-    for (i = 0; i < MAXBLSTATS; i = i + 1 | 0) {
+    for (i = 0; i < MAXBLSTATS; i = i + 1) {
         tty_status[NOW][i].idx = BL.FLUSH;
         tty_status[NOW][i].color = NO_COLOR;   /* no color */
         tty_status[NOW][i].attr = ATR.NONE;
@@ -3475,7 +3475,7 @@ async function make_things_fit(force_update) {   // wintty.c:4657
         shrink_dlvl(0);
     }
     set_condition_length();
-    for (trycnt = 0; trycnt < 6 && !fitting; trycnt = trycnt + 1 | 0) {
+    for (trycnt = 0; trycnt < 6 && !fitting; trycnt = trycnt + 1) {
         /* FIXME: this remeasures each line every time even though it
            is only attempting to shrink one of them and the other one
            (or two) remains the same */
@@ -3535,7 +3535,7 @@ async function check_fields(forcefields, sz) {   // wintty.c:4720
         return 0;
     }
     const num_rows = StatusRows();   /* 2 or 3 */
-    for (row = 0; row < num_rows; row = row + 1 | 0) {
+    for (row = 0; row < num_rows; row = row + 1) {
         sz.set(row, 0);
         let col = 1;
         let update_right = 0;
@@ -3669,7 +3669,7 @@ async function tty_putstatusfield(text, x, y) {   // wintty.c:4876
         if (x !== cw.curx || y !== cw.cury) {
             await tty_curs(NHW.STATUS, x, y);
         }
-        for (i = 0; i < lth; i = i + 1 | 0) {
+        for (i = 0; i < lth; i = i + 1) {
             const n = i + x | 0;
             if (n < ncols && text.get(0)) {
                 $c.putchar(text.get(0));
@@ -3689,7 +3689,7 @@ function set_condition_length() {   // wintty.c:4920
     let c = 0;
     let lth = 0;
     if (tty_condition_bits) {
-        for (c = 0; c < 30; c = c + 1 | 0) {
+        for (c = 0; c < 30; c = c + 1) {
             const mask = conditions[c].mask;
             if ($c.and64(tty_condition_bits, mask) === mask) {
                 lth = lth + (1 + $c.i32($c.strlen(conditions[c].text[cond_shrinklvl])) | 0) | 0;
@@ -3754,7 +3754,7 @@ async function check_windowdata() {   // wintty.c:4967
 function condcolor(bm, bmarray) {   // wintty.c:4984
     let i = 0;
     if (bm && bmarray) {
-        for (i = 0; i < CLR.MAX; i = i + 1 | 0) {
+        for (i = 0; i < CLR.MAX; i = i + 1) {
             if ($c.andu64($c.u64(bm), bmarray.get(i)) !== 0) {
                 return i;
             }
@@ -3771,7 +3771,7 @@ function condattr(bm, bmarray) {   // wintty.c:4997
     let i = 0;
     let attr = 0;
     if (bm && bmarray) {
-        for (i = CLR.MAX + 2; i < CLR.MAX + 8; i = i + 1 | 0) {
+        for (i = CLR.MAX + 2; i < CLR.MAX + 8; i = i + 1) {
             if ($c.andu64($c.u64(bm), bmarray.get(i)) !== 0) {
                 switch (i) {
                     case CLR.MAX + 2:
@@ -3812,7 +3812,7 @@ async function render_status() {   // wintty.c:5068
         return;
     }
     const num_rows = StatusRows();   /* 2 or 3 */
-    for (row = 0; row < num_rows; row = row + 1 | 0) {
+    for (row = 0; row < num_rows; row = row + 1) {
         do {
             if (program_state.done_hup) {
                 $G.morc = 27;
@@ -3884,7 +3884,7 @@ async function render_status() {   // wintty.c:5068
                         }
                     }
                     /* actually draw condition words */
-                    for (c = 0; c < 30 && bits !== 0; c = c + 1 | 0) {
+                    for (c = 0; c < 30 && bits !== 0; c = c + 1) {
                         const ci = cond_idx[c];
                         const mask = conditions[ci].mask;
                         if ($c.and64(bits, mask)) {

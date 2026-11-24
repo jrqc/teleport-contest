@@ -130,7 +130,7 @@ export function experience(mtmp, nk) {   // exper.c:85
         tmp = tmp + (ptr.mmove > 18 ? 5 : 3) | 0;
     }
     /*  For each "special" attack type give extra experience */
-    for (i = 0; i < NATTK; i = i + 1 | 0) {
+    for (i = 0; i < NATTK; i = i + 1) {
         tmp2 = ptr.mattk[i].aatyp;
         if (tmp2 > AT.BUTT) {
             if (tmp2 === AT.WEAP) {
@@ -143,7 +143,7 @@ export function experience(mtmp, nk) {   // exper.c:85
         }
     }
     /*  For each "special" damage type give extra experience */
-    for (i = 0; i < NATTK; i = i + 1 | 0) {
+    for (i = 0; i < NATTK; i = i + 1) {
         tmp2 = ptr.mattk[i].adtyp;
         if (tmp2 > AD.PHYS && tmp2 < AD.BLND) {
             tmp = tmp + 2 * mtmp.m_lev | 0;

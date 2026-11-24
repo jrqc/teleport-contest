@@ -820,7 +820,7 @@ export function assigninvlet(otmp) {   // invent.c:694
         otmp.invlet = GOLD_SYM;
         return;
     }
-    for (i = 0; i < invlet_basic; i = i + 1 | 0) {
+    for (i = 0; i < invlet_basic; i = i + 1) {
         inuse[i] = FALSE;
     }
     for (obj = gi.invent; obj; obj = obj.nobj) {
@@ -3531,7 +3531,7 @@ async function display_pickinv(lets, xtra_choice, query, allowxtra, want_reply, 
                to filter on unID'd items */
             iflags.override_ID = 0;
             ret = 0;
-            for (i = 0; i < n; i = i + 1 | 0) {
+            for (i = 0; i < n; i = i + 1) {
                 otmp = $c.radd(selected[0], i).item.a_obj;
                 if (otmp === wizid_fakeobj) {
                     await identify_pack(0, FALSE);
@@ -4083,7 +4083,7 @@ export async function dotypeinv() {   // invent.c:3827
                 ($t17 = extra_types, extra_types = $t17.add(1), $t17).set(0, 80);
             }
             extra_types.set(0, 0);   /* for strchr() */
-            for (i = 0; i < MAXOCLASSES; i = i + 1 | 0) {
+            for (i = 0; i < MAXOCLASSES; i = i + 1) {
                 if (!$c.strchr(new $c.Ptr(types, 0), def_oc_syms[i].sym)) {
                     ($t18 = extra_types, extra_types = $t18.add(1), $t18).set(0, def_oc_syms[i].sym);
                     extra_types.set(0, 0);

@@ -137,7 +137,7 @@ async function md_start(startp) {   // mail.c:149
     lax = 0;   /* be picky */
     max_distance = -1;
     retry$: for (;;) {
-        for (row = 0; row < ROWNO; row = row + 1 | 0) {
+        for (row = 0; row < ROWNO; row = row + 1) {
             if (gv.viz_rmin.get(row) < gv.viz_rmax.get(row)) {
                 /* There are valid positions on this row. */
                 dd = dist2(gv.viz_rmin.get(row), $c.i16(row), u.ux, u.uy);
@@ -256,8 +256,8 @@ async function md_rush(md, tx, ty) {   // mail.c:288
     while (1) {
         /* Find a good location next to (fx,fy) closest to (tx,ty). */
         let d1 = dist2($c.i16(fx), $c.i16(fy), $c.i16(tx), $c.i16(ty));
-        for (dx = -1; dx <= 1; dx = dx + 1 | 0) {
-            for (dy = -1; dy <= 1; dy = dy + 1 | 0) {
+        for (dx = -1; dx <= 1; dx = dx + 1) {
+            for (dy = -1; dy <= 1; dy = dy + 1) {
                 if ((dx || dy) && isok($c.i16(fx + dx | 0), $c.i16(fy + dy | 0))
                     && !(svl.level.locations[fx + dx | 0][fy + dy | 0].typ <= DBWALL)) {
                     const d2 = dist2($c.i16(fx + dx | 0), $c.i16(fy + dy | 0), $c.i16(tx), $c.i16(ty));

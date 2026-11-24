@@ -486,7 +486,7 @@ async function gather_locs(arr_p, cnt_p, gloc) {   // getpos.c:513
      */
     await gloc_filter_init();
     $t1 = idx = 0, cnt_p.set(0, $t1);
-    for (pass = 0; pass < 2; pass = pass + 1 | 0) {
+    for (pass = 0; pass < 2; pass = pass + 1) {
         for (x = 1; x < COLNO; x = $c.i16(x + 1)) {
             for (y = 0; y < ROWNO; y = $c.i16(y + 1)) {
                 if (u_at(x, y) || await gather_locs_interesting(x, y, gloc)) {
@@ -636,7 +636,7 @@ export async function getpos_menu(ccp, gloc) {   // getpos.c:665
     await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     /* gather_locs returns array[0] == you. skip it. */
-    for (i = 1; i < gcount[0]; i = i + 1 | 0) {
+    for (i = 1; i < gcount[0]; i = i + 1) {
         firstmatch[0] = $C`unknown`;
         const sym = 0;
         any.a_int = i + 1 | 0;
@@ -746,11 +746,11 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
             return result;
         }
     }
-    for (i = 0; i < 4; i = i + 1 | 0) {
+    for (i = 0; i < 4; i = i + 1) {
         pick_chars[i] = gc.Cmd.spkeys[getpos$pick_chars_def[i].nhkf];
     }
     pick_chars[4] = 0;
-    for (i = 0; i < 12; i = i + 1 | 0) {
+    for (i = 0; i < 12; i = i + 1) {
         mMoOdDxX[i] = gc.Cmd.spkeys[getpos$mMoOdDxX_def[i]];
     }
     mMoOdDxX[12] = 0;
@@ -889,7 +889,7 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
                         $goto = "nxtc"; continue D1;
                     } else if (c === gc.Cmd.spkeys[NHKF.GETPOS_LIMITVIEW]) {
                         iflags.getloc_filter = $c.rem32(iflags.getloc_filter + 1 | 0, NUM_GFILTER);
-                        for (i = 0; i < NUM_GLOCS; i = i + 1 | 0) {
+                        for (i = 0; i < NUM_GLOCS; i = i + 1) {
                             if (garr[i]) {
                                 $c.free(garr[i]);
                                 garr[i] = null;
@@ -910,7 +910,7 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
                     } else if (c === gc.Cmd.spkeys[NHKF.GETPOS_SELF]) {
                         /* reset 'm&M', 'o&O', &c; otherwise, there's no way for player
                            to achieve that except by manually cycling through all spots */
-                        for (i = 0; i < NUM_GLOCS; i = i + 1 | 0) {
+                        for (i = 0; i < NUM_GLOCS; i = i + 1) {
                             gidx[i] = 0;
                         }
                         cx[0] = u.ux;
@@ -1073,7 +1073,7 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
     ccp.x = cx[0];
     ccp.y = cy[0];
     $t3 = gg.getposy = 0, gg.getposx = $t3;
-    for (i = 0; i < NUM_GLOCS; i = i + 1 | 0) {
+    for (i = 0; i < NUM_GLOCS; i = i + 1) {
         if (garr[i]) {
             $c.free(garr[i]);
         }

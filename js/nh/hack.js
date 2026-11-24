@@ -1408,13 +1408,13 @@ async function findtravelpath(mode) {   // hack.c:1266
                 travelstepy[0][0] = ty;
                 while (n !== 0) {
                     nn = 0;
-                    for (i = 0; i < n; i = i + 1 | 0) {
+                    for (i = 0; i < n; i = i + 1) {
                         x = travelstepx[set][i];
                         y = travelstepy[set][i];
                         /* no diagonal movement for grid bugs */
                         dirmax = NODIAG(u.umonnum) ? 4 : N_DIRS;
                         alreadyrepeated = FALSE;
-                        for (dir = 0; dir < dirmax; dir = dir + 1 | 0) {
+                        for (dir = 0; dir < dirmax; dir = dir + 1) {
                             nx = $c.i16(x + xdir[dirs_ord[dir]]);
                             ny = $c.i16(y + ydir[dirs_ord[dir]]);
                             /*
@@ -1514,7 +1514,7 @@ async function findtravelpath(mode) {   // hack.c:1266
                     if (iflags.trav_debug) {
                         /* Use of warning glyph is arbitrary. It stands out. */
                         await tmp_at(DISP_ALL, 1 + GLYPH.WARNING_OFF);
-                        for (i = 0; i < nn; i = i + 1 | 0) {
+                        for (i = 0; i < nn; i = i + 1) {
                             await tmp_at(travelstepx[1 - set | 0][i], travelstepy[1 - set | 0][i]);
                         }
                         await nh_delay_output()();
@@ -1875,7 +1875,7 @@ export async function notice_all_mons(reset) {   // hack.c:1744
         }
         if (i) {
             $c.nh_deterministic_qsort(arr, $c.u64(i), 8, notice_mons_cmp);
-            for (j = 0; j < i; j = j + 1 | 0) {
+            for (j = 0; j < i; j = j + 1) {
                 await notice_mon(arr.get(j));
             }
         }
@@ -4359,7 +4359,7 @@ async function maybe_wail() {   // hack.c:4211
         if (u.uhp === 1) {
             await pline($C`%s is about to die.`, who);
         } else {
-            for (i = 0, powercnt = 0; i < 12; i = i + 1 | 0) {
+            for (i = 0, powercnt = 0; i < 12; i = i + 1) {
                 if ($c.and64(u.uprops[maybe_wail$powers[i]].intrinsic, INTRINSIC)) {
                     powercnt = powercnt + 1 | 0;
                 }
@@ -4558,7 +4558,7 @@ export async function dump_weights() {   // hack.c:4421
     weightlist = $c.asRec(await alloc($c.u32($c.mulu64(32, num_entries))), $T.weight_table_entry, 32);
     await decl_globals_init();
     await init_objects();
-    for (i = 0; i < mcount; i = i + 1 | 0) {
+    for (i = 0; i < mcount; i = i + 1) {
         if (i !== PM.LONG_WORM_TAIL) {
             $c.radd(weightlist, cnt).wt = mons[i].cwt | 0;
             $c.radd(weightlist, cnt).idx = i;
@@ -4571,7 +4571,7 @@ export async function dump_weights() {   // hack.c:4421
             cnt = cnt + 1 | 0;
         }
     }
-    for (i = 0; i < ocount; i = i + 1 | 0) {
+    for (i = 0; i < ocount; i = i + 1) {
         const oc_name = i === SLIME_MOLD ? $C`slime mold`
             : obj_descr[i].oc_name;
         const wt = objects[i].oc_weight | 0;
@@ -4589,7 +4589,7 @@ export async function dump_weights() {   // hack.c:4421
     }
     $c.nh_deterministic_qsort(weightlist, $c.u64(cnt), 32, cmp_weights);
     await raw_printf($C`int all_weights[] = {`);
-    for (i = 0; i < cnt; i = i + 1 | 0) {
+    for (i = 0; i < cnt; i = i + 1) {
         if ($c.radd(weightlist, i).nm) {
             await raw_printf($C`    %7u%s /* %*s */`, $c.radd(weightlist, i).wt,
                 i === (cnt - 1 | 0) ? $C` ` : $C`,`, -nmwidth | 0,

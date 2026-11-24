@@ -125,7 +125,7 @@ export async function l_nhcore_init() {   // nhlua.c:142
         if (!await nhl_loadlua(gl.luacore, $C`nhcore.lua`)) {
             gl.luacore = null;
         } else {
-            for (i = 0; i < NUM_NHCORE_CALLS; i = i + 1 | 0) {
+            for (i = 0; i < NUM_NHCORE_CALLS; i = i + 1) {
                 nhcore_call_available[i] = TRUE;
             }
         }
@@ -1664,7 +1664,7 @@ async function nhl_callback(L) {   // nhlua.c:1818
             fn = await luaL_checkstring(L, -2);
             cb = await luaL_checkstring(L, -3);
         }
-        for (i = 0; i < NUM_NHCB; i = i + 1 | 0) {
+        for (i = 0; i < NUM_NHCB; i = i + 1) {
             if (!$c.strcmp(cb, nhcb_name[i])) {
                 break;
             }
@@ -1742,7 +1742,7 @@ async function nhl_gamestate(L) {   // nhlua.c:1876
         (!!$c.peq(gg.gmst_mvitals, $c.asArr(null, 'ptr')) ? 1 : 0) ? $c.__assert_rtn($C`nhl_gamestate`, $C`nhlua.c`, 1911, $C`gg.gmst_mvitals != NULL`) : 0;
         $c.memcpy(new $c.Ptr([svm.mvitals], 0), gg.gmst_mvitals, 1532);
         /* clear user-given object type names */
-        for (otyp = 0; otyp < NUM_OBJECTS; otyp = otyp + 1 | 0) {
+        for (otyp = 0; otyp < NUM_OBJECTS; otyp = otyp + 1) {
             if (objects[otyp].oc_uname) {
                 $c.free(objects[otyp].oc_uname);
                 objects[otyp].oc_uname = null;
@@ -1874,7 +1874,7 @@ async function nhl_meta_u_index(L) {   // nhlua.c:2118
     let i = 0;
     const tkey = await luaL_checkstring(L, 2);
     /* FIXME: doesn't really work, eg. negative values for u.dx */
-    for (i = 0; i < 24; i = i + 1 | 0) {
+    for (i = 0; i < 24; i = i + 1) {
         if (!$c.strcmp(tkey, nhl_meta_u_index$ustruct[i].name)) {
             return nhl_push_anything(L, nhl_meta_u_index$ustruct[i].type, nhl_meta_u_index$ustruct[i].ptr);
         }

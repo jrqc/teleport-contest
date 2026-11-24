@@ -73,10 +73,10 @@ export async function genl_outrip(tmpwin, how, when) {   // rip.c:86
     /* Put together death description */
     await formatkiller(new $c.Ptr(buf, 0), 256, how, FALSE);
     /* Put death type on stone */
-    for (line = DEATH_LINE, dpx = new $c.Ptr(buf, 0); line < YEAR_LINE; line = line + 1 | 0) {
+    for (line = DEATH_LINE, dpx = new $c.Ptr(buf, 0); line < YEAR_LINE; line = line + 1) {
         let i0 = $c.i32($c.strlen(dpx));
         if (i0 > STONE_LINE_LEN) {
-            for (i = STONE_LINE_LEN; i > 0 && i0 > STONE_LINE_LEN; i = i - 1 | 0) {
+            for (i = STONE_LINE_LEN; i > 0 && i0 > STONE_LINE_LEN; i = i - 1) {
                 if (dpx.get(i) === 32) {
                     i0 = i;
                 }

@@ -293,7 +293,7 @@ export async function priestini(lvl, sroom, sx, sy, sanctum) {   // priest.c:220
     const si = rn2(N_DIRS);
     const prim = $c.relem(mons, sanctum ? PM.HIGH_CLERIC
         : PM.ALIGNED_CLERIC);
-    for (i = 0; i < N_DIRS; i = i + 1 | 0) {
+    for (i = 0; i < N_DIRS; i = i + 1) {
         px = sx + xdir[DIR_CLAMP(i + si | 0)] | 0;
         py = sy + ydir[DIR_CLAMP(i + si | 0)] | 0;
         if (await pm_good_location($c.i16(px), $c.i16(py), prim)) {
@@ -325,7 +325,7 @@ export async function priestini(lvl, sroom, sx, sy, sanctum) {   // priest.c:220
             await mongets(priest, AMULET_OF_YENDOR);
         }
         /* 2 to 4 spellbooks */
-        for (cnt = rn1(3, 2); cnt > 0; cnt = cnt - 1 | 0) {
+        for (cnt = rn1(3, 2); cnt > 0; cnt = cnt - 1) {
             await mpickobj(priest, await mkobj(SPBOOK_no_NOVEL, FALSE));
         }
         /* robe [via makemon()] */

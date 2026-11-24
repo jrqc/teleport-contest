@@ -434,7 +434,7 @@ async function get_rnd_line(fh, buf, bufsiz, rng, startpos, endpos, padlength) {
      * which hasn't been stripped away yet), effectively shortening
      * them to normal length.  That yields even selection distribution.
      */
-    for (trylimit = 10; trylimit > 0; trylimit = trylimit - 1 | 0) {
+    for (trylimit = 10; trylimit > 0; trylimit = trylimit - 1) {
         const chunkoffset = await rng($c.i32(filechunksize));
         $c.fseek(fh, $c.add64(startpos, chunkoffset), 0);
         $c.fgets(buf, bufsiz | 0, fh);
@@ -554,7 +554,7 @@ async function init_oracles(fp) {   // rumors.c:577
     if ($c.sscanf(new $c.Ptr(line, 0), $C`%5d\n`, new $c.Ptr(cnt, 0)) === 1 && cnt[0] > 0) {
         svo.oracle_cnt = cnt[0] >>> 0;
         $t1 = await alloc($c.u32($c.mulu64(cnt[0] >>> 0, 8))), svo.oracle_loc = $t1;
-        for (i = 0; i < cnt[0]; i = i + 1 | 0) {
+        for (i = 0; i < cnt[0]; i = i + 1) {
             $c.fgets(new $c.Ptr(line, 0), 256, fp);
             $c.sscanf(new $c.Ptr(line, 0), $C`%5lx\n`, svo.oracle_loc.add(i));
         }

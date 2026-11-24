@@ -723,7 +723,7 @@ async function hitum_cleave(target, uattk) {   // uhitm.c:651
      * occupying both spots) so we don't assume that it's still present
      * on the second attack.
      */
-    for (count = 3; count > 0; count = count - 1 | 0) {
+    for (count = 3; count > 0; count = count - 1) {
         attknum[0] = 0;
         /* ++i, wrap 8 to i=0 /or/ --i, wrap -1 to i=7 */
         i = hitum_cleave$clockwise ? DIR_RIGHT(i) : DIR_LEFT(i);
@@ -5858,7 +5858,7 @@ async function hmonas(mon) {   // uhitm.c:5424
     /* with just one touch/claw/weapon attack, both rings matter;
        with more than one, alternate right and left when checking
        whether silver ring causes successful hit */
-    for (i = 0; i < NATTK; i = i + 1 | 0) {
+    for (i = 0; i < NATTK; i = i + 1) {
         sum[i] = M_ATTK.MISS;
         mattk = await getmattk(gy.youmonst, mon, i, new $c.Ptr(sum, 0), alt_attk);
         if (mattk.aatyp === AT.WEAP) {

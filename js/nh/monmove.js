@@ -162,7 +162,7 @@ export async function mb_trapped(mtmp, canseeit) {   // monmove.c:54
  */
 export function mon_track_add(mtmp, x, y) {   // monmove.c:78
     let j = 0;
-    for (j = MTSZ - 1; j > 0; j = j - 1 | 0) {
+    for (j = MTSZ - 1; j > 0; j = j - 1) {
         mtmp.mtrack[j].$copyFrom(mtmp.mtrack[j - 1 | 0]);
     }
     mtmp.mtrack[0].x = x;
@@ -1188,7 +1188,7 @@ export function should_displace(mtmp, data, ggx, ggy) {   // monmove.c:1070
     let shortest_with_displacing = -1;
     let shortest_without_displacing = -1;
     let count_without_displacing = 0;
-    for (i = 0; i < data.cnt; i = i + 1 | 0) {
+    for (i = 0; i < data.cnt; i = i + 1) {
         const nx = data.poss[i].x;
         const ny = data.poss[i].y;
         const ndist = dist2($c.i16(nx), $c.i16(ny), ggx, ggy);
@@ -2059,7 +2059,7 @@ export async function m_move(mtmp, after) {   // monmove.c:1715
         }
         if (is_unicorn(ptr) && await noteleport_level(mtmp)) {
             /* on noteleport levels, perhaps we cannot avoid hero */
-            for (i$2 = 0; i$2 < cnt; i$2 = i$2 + 1 | 0) {
+            for (i$2 = 0; i$2 < cnt; i$2 = i$2 + 1) {
                 if (!$c.and64(mfp.info[i$2], NOTONL)) {
                     avoid = TRUE;
                 }

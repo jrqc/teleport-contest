@@ -407,7 +407,7 @@ async function special_throne_effect(effect) {   // sit.c:238
             {
                 /* ability shuffle */
                 await pline($C`As you sit on the throne, your body and mind start to warp.`);
-                for (ability = 0; ability < A.MAX; ability = ability + 1 | 0) {
+                for (ability = 0; ability < A.MAX; ability = ability + 1) {
                     await adjattrib(ability, rn2(5) - 2 | 0, -1);
                 }
                 break;
@@ -663,7 +663,7 @@ export async function rndcurse() {   // sit.c:569
     }
     let cnt = rnd($c.div32(6, (!!(u.uprops[ANTIMAGIC].intrinsic || u.uprops[ANTIMAGIC].extrinsic) ? 1 : 0) + (!!(u.uprops[HALF_SPDAM].intrinsic || u.uprops[HALF_SPDAM].extrinsic) ? 1 : 0) + 1));
     if (nobj) {
-        for (; cnt > 0; cnt = cnt - 1 | 0) {
+        for (; cnt > 0; cnt = cnt - 1) {
             let onum = rnd(nobj);
             for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
                 /* as above */

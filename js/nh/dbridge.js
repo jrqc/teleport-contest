@@ -343,7 +343,7 @@ export async function create_drawbridge(x, y, dir, flag) {   // dbridge.c:235
  */
 async function e_at(x, y) {   // dbridge.c:286
     let entitycnt = 0;
-    for (entitycnt = 0; entitycnt < ENTITIES; entitycnt = entitycnt + 1 | 0) {
+    for (entitycnt = 0; entitycnt < ENTITIES; entitycnt = entitycnt + 1) {
         if (go.occupants[entitycnt].edata
             && go.occupants[entitycnt].ex === x
             && go.occupants[entitycnt].ey === y) {
@@ -541,7 +541,7 @@ async function e_died(etmp, xkill_flags, how) {   // dbridge.c:402
         }
         etmp.edata = null;
         /* dead long worm handling */
-        for (entitycnt = 0; entitycnt < ENTITIES; entitycnt = entitycnt + 1 | 0) {
+        for (entitycnt = 0; entitycnt < ENTITIES; entitycnt = entitycnt + 1) {
             if (etmp !== $c.relem(go.occupants, entitycnt)
                 && etmp.emon === go.occupants[entitycnt].emon) {
                 go.occupants[entitycnt].edata = null;
@@ -1130,7 +1130,7 @@ export async function destroy_drawbridge(x, y) {   // dbridge.c:888
     }
     await del_engr_at(x, y);
     await del_engr_at(x2[0], y2[0]);
-    for (i = rn2(6); i > 0; i = i - 1 | 0) {
+    for (i = rn2(6); i > 0; i = i - 1) {
         /* scatter some debris */
         /* doesn't matter if we happen to pick <x,y2> or <x2,y>;
            since drawbridges are never placed diagonally, those

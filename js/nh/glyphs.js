@@ -253,7 +253,7 @@ async function glyph_find_core(id, findwhat) {   // glyphs.c:234
         if (findwhat.findtype === find_glyph) {
             await findwhat.callback(findwhat.val, findwhat);
         } else {
-            for (glyph = 0; glyph < MAX_GLYPH; glyph = glyph + 1 | 0) {
+            for (glyph = 0; glyph < MAX_GLYPH; glyph = glyph + 1) {
                 let do_callback = FALSE;
                 switch (findwhat.findtype) {
                     case find_cmap:
@@ -543,7 +543,7 @@ export async function apply_customizations(which_set, docustomize) {   // glyphs
     let at_least_one = FALSE;
     const do_colors = (docustomize & do_custom_colors) >>> 0 !== 0 ? 1 : 0;
     const do_symbols = (docustomize & do_custom_symbols) >>> 0 !== 0 ? 1 : 0;
-    for (custs = 0; custs < custom_count; custs = custs + 1 | 0) {
+    for (custs = 0; custs < custom_count; custs = custs + 1) {
         const sc = $c.relem(gs.sym_customizations[which_set], custs);
         if (sc.count && sc.details) {
             at_least_one = TRUE;
@@ -598,15 +598,15 @@ export async function maybe_shuffle_customizations() {   // glyphs.c:581
  */
 async function shuffle_customizations() {   // glyphs.c:646
     let j = 0, i = 0, tmp_u = $c.nulls(481), tmp_customcolor = new Uint32Array(481), tmp_color256idx = new Uint16Array(481), duplicate = new Int32Array(481), $t1, $t2;
-    for (j = 0; j < 2; j = j + 1 | 0) {
+    for (j = 0; j < 2; j = j + 1) {
         const obj_glyphs = $c.radd(glyphmap[0], shuffle_customizations$offsets[j]);
-        for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
+        for (i = 0; i < NUM_OBJECTS; i = i + 1) {
             duplicate[i] = -1;
             tmp_u[i] = null;
             tmp_customcolor[i] = 0;
             tmp_color256idx[i] = 0;
         }
-        for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
+        for (i = 0; i < NUM_OBJECTS; i = i + 1) {
             const idx = objects[i].oc_descr_idx;
             /*
              * Shuffling gem appearances can cause the same oc_descr_idx to
@@ -641,7 +641,7 @@ async function shuffle_customizations() {   // glyphs.c:646
                 }
             }
         }
-        for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
+        for (i = 0; i < NUM_OBJECTS; i = i + 1) {
             /* Some glyphmaps may not have been transferred */
             if ($c.radd(obj_glyphs, i).u !== $c.asRec(null, $T.unicode_representation, 16)) {
                 $c.free($c.radd(obj_glyphs, i).u.utf8str);
@@ -669,7 +669,7 @@ export function find_matching_customization(customization_name, custtype, which_
 }
 export function purge_all_custom_entries() {   // glyphs.c:751
     let i = 0;
-    for (i = 0; i < NUM_GRAPHICS + 1; i = i + 1 | 0) {
+    for (i = 0; i < NUM_GRAPHICS + 1; i = i + 1) {
         purge_custom_entries(i >>> 0);
     }
 }
@@ -728,7 +728,7 @@ export async function wizcustom_glyphids(win) {   // glyphs.c:808
     if (!glyphid_cache) {
         return;
     }
-    for (glyphnum = 0; glyphnum < MAX_GLYPH; glyphnum = glyphnum + 1 | 0) {
+    for (glyphnum = 0; glyphnum < MAX_GLYPH; glyphnum = glyphnum + 1) {
         const id = find_glyphid_in_cache_by_glyphnum(glyphnum);
         if (id) {
             await wizcustom_callback(win, glyphnum, id);
@@ -812,7 +812,7 @@ async function parse_id(id, findwhat) {   // glyphs.c:824
             }
         } else {
             /* individual matching glyph entries */
-            for (glyph = 0; glyph < MAX_GLYPH; glyph = glyph + 1 | 0) {
+            for (glyph = 0; glyph < MAX_GLYPH; glyph = glyph + 1) {
                 skip_base = FALSE;
                 skip_this_one = FALSE;
                 $t3 = ($t2 = ($t1 = buf[3][0] = 0, buf[2][0] = $t1), buf[1][0] = $t2), buf[0][0] = $t3;
@@ -1022,7 +1022,7 @@ async function parse_id(id, findwhat) {   // glyphs.c:824
         }   /* not glyphid_cache */
     } else if (is_S) {
         /* cmap entries */
-        for (i = 0; i < cmap_count; i = i + 1 | 0) {
+        for (i = 0; i < cmap_count; i = i + 1) {
             if (!strcmpi(loadsyms[i + cmap_offset | 0].name.add(2), id.add(2))) {
                 findwhat.findtype = find_cmap;
                 findwhat.val = i;
@@ -1031,7 +1031,7 @@ async function parse_id(id, findwhat) {   // glyphs.c:824
             }
         }
         /* objclass entries */
-        for (i = 0; i < oc_count; i = i + 1 | 0) {
+        for (i = 0; i < oc_count; i = i + 1) {
             if (!strcmpi(loadsyms[i + oc_offset | 0].name.add(2), id.add(2))) {
                 findwhat.findtype = find_oc;
                 findwhat.val = i;
@@ -1060,7 +1060,7 @@ async function parse_id(id, findwhat) {   // glyphs.c:824
 /* extern glyph_map glyphmap[MAX_GLYPH]; */
 export function clear_all_glyphmap_colors() {   // glyphs.c:1167
     let glyph = 0;
-    for (glyph = 0; glyph < MAX_GLYPH; glyph = glyph + 1 | 0) {
+    for (glyph = 0; glyph < MAX_GLYPH; glyph = glyph + 1) {
         if (glyphmap[glyph].customcolor) {
             glyphmap[glyph].customcolor = 0;
         }

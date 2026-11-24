@@ -3202,7 +3202,7 @@ export async function corpse_chance(mon, magr, was_swallowed) {   // mon.c:3181
         return FALSE;
     }
     /* Gas spores always explode upon death */
-    for (i = 0; i < NATTK; i = i + 1 | 0) {
+    for (i = 0; i < NATTK; i = i + 1) {
         if (mdat.mattk[i].aatyp === AT.BOOM) {
             if (mdat.mattk[i].damn) {
                 tmp = d(mdat.mattk[i].damn, mdat.mattk[i].damd);
@@ -4127,7 +4127,7 @@ async function m_respond_shrieker(mtmp) {   // mon.c:4089
  */
 async function m_respond_medusa(mtmp) {   // mon.c:4109
     let i = 0;
-    for (i = 0; i < NATTK; i = i + 1 | 0) {
+    for (i = 0; i < NATTK; i = i + 1) {
         if (mtmp.data.mattk[i].aatyp === AT.GAZE) {
             await gazemu(mtmp, $c.relem(mtmp.data.mattk, i));
             break;
@@ -4895,7 +4895,7 @@ export async function mon_animal_list(construct) {   // mon.c:4829
     let animal_temp = new Int16Array(330), i = 0, n = 0, $t1, $t2;
     if (construct) {
         /* if (animal_list) impossible("animal_list already exists"); */
-        for (n = 0, i = LOW_PM; i < SPECIAL_PM; i = i + 1 | 0) {
+        for (n = 0, i = LOW_PM; i < SPECIAL_PM; i = i + 1) {
             if (is_animal($c.relem(mons, i))) {
                 animal_temp[($t1 = n, n = $t1 + 1 | 0, $t1)] = $c.i16(i);
             }

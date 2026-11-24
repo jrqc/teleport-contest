@@ -3181,7 +3181,7 @@ function trapnote(trap, noprefix) {   // trap.c:3063
 function choose_trapnote(ttmp) {   // trap.c:3083
     let tavail = new Int32Array(12), tpick = new Int32Array(12), k = 0, t = null, $t1, $t2;
     let tcnt = 0;
-    for (k = 0; k < 12; k = k + 1 | 0) {
+    for (k = 0; k < 12; k = k + 1) {
         $t1 = tpick[k] = 0, tavail[k] = $t1;
     }
     for (t = gf.ftrap; t; t = t.ntrap) {
@@ -3190,7 +3190,7 @@ function choose_trapnote(ttmp) {   // trap.c:3083
         }
     }
     /* now populate tpick[] with the available indices */
-    for (k = 0; k < 12; k = k + 1 | 0) {
+    for (k = 0; k < 12; k = k + 1) {
         if (tavail[k] === 0) {
             tpick[($t2 = tcnt, tcnt = $t2 + 1 | 0, $t2)] = k;
         }
@@ -4545,8 +4545,8 @@ async function domagictrap() {   // trap.c:4317
                 {
                     /* tame nearby monsters */
                     await adjattrib(A.CHA, 1, FALSE);
-                    for (i = -1; i <= 1; i = i + 1 | 0) {
-                        for (j = -1; j <= 1; j = j + 1 | 0) {
+                    for (i = -1; i <= 1; i = i + 1) {
+                        for (j = -1; j <= 1; j = j + 1) {
                             if (!isok($c.i16(u.ux + i | 0), $c.i16(u.uy + j | 0))) {
                                 continue;
                             }
@@ -5098,16 +5098,16 @@ async function emergency_disrobe(lostsome) {   // trap.c:4897
 export async function rnd_nextto_goodpos(x, y, mtmp) {   // trap.c:4947
     let i = 0, dirs = new Int16Array(8);
     const is_u = mtmp === gy.youmonst ? 1 : 0;
-    for (i = 0; i < N_DIRS; i = i + 1 | 0) {
+    for (i = 0; i < N_DIRS; i = i + 1) {
         dirs[i] = $c.i16(i);
     }
-    for (i = N_DIRS; i > 0; i = i - 1 | 0) {
+    for (i = N_DIRS; i > 0; i = i - 1) {
         const j = rn2(i);
         const k = dirs[j];
         dirs[j] = dirs[i - 1 | 0];
         dirs[i - 1 | 0] = k;
     }
-    for (i = 0; i < N_DIRS; i = i + 1 | 0) {
+    for (i = 0; i < N_DIRS; i = i + 1) {
         const nx = $c.i16(x.get(0) + xdir[dirs[i]]);
         const ny = $c.i16(y.get(0) + ydir[dirs[i]]);
         /* crawl_destination and goodpos both include an isok() check */
@@ -5325,7 +5325,7 @@ export async function drown() {   // trap.c:5059
     /* first pass is survivable by using up an amulet of life-saving or by
        answering no to "Die?" in explore|wizard mode; second pass can only
        be survivable via the latter */
-    for (i = 0; i < 2; i = i + 1 | 0) {
+    for (i = 0; i < 2; i = i + 1) {
         /* killer format and name are reconstructed every iteration
            because lifesaving resets them */
         let pool_of_water = waterbody_name(u.ux, u.uy);
@@ -6788,7 +6788,7 @@ export function conjoined_pits(trap2, trap1, u_entering_trap2) {   // trap.c:655
 function clear_conjoined_pits(trap) {   // trap.c:6580
     let diridx = 0, t = null;
     if (trap && is_pit(trap.ttyp)) {
-        for (diridx = 0; diridx < N_DIRS; diridx = diridx + 1 | 0) {
+        for (diridx = 0; diridx < N_DIRS; diridx = diridx + 1) {
             if (trap.vl.v_conjoined & 1 << diridx) {
                 const x = $c.i16(trap.tx + xdir[diridx]);
                 const y = $c.i16(trap.ty + ydir[diridx]);
@@ -7121,7 +7121,7 @@ export async function lava_effects() {   // trap.c:6794
                 || u.umonnum === PM.FOG_CLOUD ? 1 : 0;
             /* burn to death; if hero is life-saved on the first pass, try
                to teleport to safety; if that fails, burn all over again */
-            for (burncount = 0; burncount < 2; burncount = burncount + 1 | 0) {
+            for (burncount = 0; burncount < 2; burncount = burncount + 1) {
                 u.uhp = -1;
                 /* killer format and name are reconstructed every iteration
                    because lifesaving resets them */

@@ -443,7 +443,7 @@ export async function restore_attrib() {   // attrib.c:455
      * time out, and for dexterity loss from wounded legs, which has
      * its own timeout routine.
      */
-    for (i = 0; i < A.MAX; i = i + 1 | 0) {
+    for (i = 0; i < A.MAX; i = i + 1) {
         /* all temporary losses/gains */
         const equilibrium = i === A.STR && u.uhs >= WEAK
             || i === A.DEX && Wounded_legs() ? -1 : 0;
@@ -714,7 +714,7 @@ function rnd_attr() {   // attrib.c:682
     let x = rn2(100);
     /* 5.0: the x -= ... calculation used to have an off by 1 error that
        resulted in the values being biased toward Str and away from Cha */
-    for (i = 0; i < A.MAX; i = i + 1 | 0) {
+    for (i = 0; i < A.MAX; i = i + 1) {
         if ((x = x - gu.urole.attrdist[i] | 0) < 0) {
             break;
         }
@@ -754,7 +754,7 @@ function init_attr_role_redist(np, addition) {   // attrib.c:699
  */
 export function init_attr(np) {   // attrib.c:723
     let i = 0, $t1, $t2;
-    for (i = 0; i < A.MAX; i = i + 1 | 0) {
+    for (i = 0; i < A.MAX; i = i + 1) {
         $t1 = u.amax.a[i] = $c.i8(gu.urole.attrbase[i]), u.acurr.a[i] = $t1;
         $t2 = u.atime.a[i] = 0, u.atemp.a[i] = $t2;
         np = np - gu.urole.attrbase[i] | 0;
@@ -766,7 +766,7 @@ export function init_attr(np) {   // attrib.c:723
 }
 export function redist_attr() {   // attrib.c:740
     let i = 0, $t1, $t2;
-    for (i = 0; i < A.MAX; i = i + 1 | 0) {
+    for (i = 0; i < A.MAX; i = i + 1) {
         if (i === A.INT || i === A.WIS) {
             continue;
         }
@@ -793,7 +793,7 @@ export function redist_attr() {   // attrib.c:740
  */
 export async function vary_init_attr() {   // attrib.c:764
     let i = 0;
-    for (i = 0; i < A.MAX; i = i + 1 | 0) {
+    for (i = 0; i < A.MAX; i = i + 1) {
         if (!rn2(20)) {
             const xd = rn2(7) - 2 | 0;   /* biased variation */
             await adjattrib(i, xd, TRUE);

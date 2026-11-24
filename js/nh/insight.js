@@ -147,7 +147,7 @@ async function enlght_line(start, middle, end, ps) {   // insight.c:127
     $c.sprintf(new $c.Ptr(buf, 0), $C` %s%s%s%s.`, start, middle, end, ps);
     if (strstri(new $c.Ptr(buf, 0), $C` not `)) {
         /* TODO: switch to libc strstr() */
-        for (i = 0; i < 6; i = i + 1 | 0) {
+        for (i = 0; i < 6; i = i + 1) {
             strsubst(new $c.Ptr(buf, 0), enlght_line$contra[i].twowords, enlght_line$contra[i].contrctn);
         }
     }
@@ -2170,7 +2170,7 @@ async function show_achievements(final) {   // insight.c:2243
         }
         await record_achievement(ACH.UWIN);
     }
-    for (i = 0; i < acnt; i = i + 1 | 0) {
+    for (i = 0; i < acnt; i = i + 1) {
         const achidx = u.uachieved[i];
         const absidx = $c.abs(achidx);
         switch (absidx) {
@@ -2559,7 +2559,7 @@ export async function set_vanq_order(for_vanq) {   // insight.c:2718
     const tmpwin = await create_nhwindow()(NHW.MENU);
     await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);   /* zero out all bits */
-    for (i = 0; i < 8; i = i + 1 | 0) {
+    for (i = 0; i < 8; i = i + 1) {
         if (i === VANQ.ALPHA_MIX || i === VANQ.MCLS_HTOL) {   /* skip these */
             continue;
         }
@@ -2636,7 +2636,7 @@ export async function list_vanquished(defquery, ask) {   // insight.c:2784
     }
     /* get totals first */
     let ntypes = 0;
-    for (i = LOW_PM; i < NUMMONS; i = i + 1 | 0) {
+    for (i = LOW_PM; i < NUMMONS; i = i + 1) {
         if ((nkilled = svm.mvitals[i].died) === 0) {
             continue;
         }
@@ -2772,7 +2772,7 @@ export async function list_vanquished(defquery, ask) {   // insight.c:2784
 export async function num_genocides() {   // insight.c:2953
     let i = 0;
     let n = 0;
-    for (i = LOW_PM; i < NUMMONS; i = i + 1 | 0) {
+    for (i = LOW_PM; i < NUMMONS; i = i + 1) {
         if (svm.mvitals[i].mvflags & G_GENOD) {
             n = n + 1 | 0;
             if (UniqCritterIndx(i)) {
@@ -2790,7 +2790,7 @@ export async function num_genocides() {   // insight.c:2953
 function num_extinct() {   // insight.c:2970
     let i = 0;
     let n = 0;
-    for (i = LOW_PM; i < NUMMONS; i = i + 1 | 0) {
+    for (i = LOW_PM; i < NUMMONS; i = i + 1) {
         if (UniqCritterIndx(i)) {
             continue;
         }
@@ -2811,7 +2811,7 @@ function num_gone(mvflags, mindx) {   // insight.c:2985
     const mflg = $c.u8(mvflags);
     let n = 0;
     $c.memset(mindx, 0, 1532);
-    for (i = LOW_PM; i < NUMMONS; i = i + 1 | 0) {
+    for (i = LOW_PM; i < NUMMONS; i = i + 1) {
         /* uniques can't be genocided but can become extinct;
            however, they're never reported as extinct, so skip them */
         if (UniqCritterIndx(i)) {
@@ -2892,7 +2892,7 @@ export async function list_genocided(defquery, ask) {   // insight.c:3007
             if (!dumping) {
                 await putstr()(klwin, 0, $C``);
             }
-            for (i = 0; i < ngone; i = i + 1 | 0) {
+            for (i = 0; i < ngone; i = i + 1) {
                 const mndx = mindx[i];
                 const mlet = mons[mndx].mlet;
                 if (class_header && mlet !== prev_mlet) {
@@ -2959,7 +2959,7 @@ export async function doborn() {   // insight.c:3145
     let nborn = 0;
     let ndied = 0;
     await putstr()(datawin, 0, $C`died born`);
-    for (i = LOW_PM; i < NUMMONS; i = i + 1 | 0) {
+    for (i = LOW_PM; i < NUMMONS; i = i + 1) {
         if (svm.mvitals[i].born || svm.mvitals[i].died
             || (svm.mvitals[i].mvflags & G_GONE) !== 0) {
             $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(doborn$fmt, 0), svm.mvitals[i].died, svm.mvitals[i].born, (svm.mvitals[i].mvflags & G_GONE) === G_EXTINCT ? 69 : (svm.mvitals[i].mvflags & G_GONE) === G_GENOD ? 71 : (svm.mvitals[i].mvflags & G_GONE) !== 0 ? 88 : 32, mons[i].pmnames[NEUTRAL]);

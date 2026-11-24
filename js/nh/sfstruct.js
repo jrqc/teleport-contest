@@ -1793,7 +1793,7 @@ export async function historical_sfi_bitfield(nhfp, d_bitfield, myname, bflen) {
 function getidx(fd, flg) {   // sfstruct.c:384
     let i = 0;
     let retval = -1;
-    for (i = 0; i < MAXFD; i = i + 1 | 0) {
+    for (i = 0; i < MAXFD; i = i + 1) {
         if (bw_sticky[i] === fd) {
             return i;
         }
@@ -1801,7 +1801,7 @@ function getidx(fd, flg) {   // sfstruct.c:384
     if (flg === NOSLOT) {
         return retval;
     }
-    for (i = 0; i < MAXFD; i = i + 1 | 0) {
+    for (i = 0; i < MAXFD; i = i + 1) {
         if (bw_sticky[i] < 0) {
             bw_sticky[i] = fd;
             retval = i;

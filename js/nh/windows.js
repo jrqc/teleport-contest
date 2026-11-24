@@ -537,7 +537,7 @@ export function hup_ctrl_nhwindow(window, request, wri) {   // windows.c:872
  */
 export async function genl_status_init() {   // windows.c:893
     let i = 0, $t1;
-    for (i = 0; i < MAXBLSTATS; i = i + 1 | 0) {
+    for (i = 0; i < MAXBLSTATS; i = i + 1) {
         $t1 = $c.asArr(await alloc(200), Int8Array), status_vals[i] = $t1;
         status_vals[i].set(0, 0);
         status_activefields[i] = 0;
@@ -551,7 +551,7 @@ export function genl_status_finish() {   // windows.c:909
     let i = 0;
     /* tear down routine */
     /* free alloc'd memory here */
-    for (i = 0; i < MAXBLSTATS; i = i + 1 | 0) {
+    for (i = 0; i < MAXBLSTATS; i = i + 1) {
         if (status_vals[i]) {
             $c.free(status_vals[i]), status_vals[i] = null;
         }
@@ -1260,14 +1260,14 @@ export async function choose_classes_menu(prompt, category, way, class_list, cla
         if (category === 1) {
             /* for object classes, first check for 'all'; it means 'use
                a blank list' rather than 'collect every possible choice' */
-            for (i = 0; i < n; i = i + 1 | 0) {
+            for (i = 0; i < n; i = i + 1) {
                 if ($c.radd(pick_list[0], i).item.a_int === 32) {
                     $c.radd(pick_list[0], 0).item.a_int = 32;
                     n = 1;   /* return 1; also an implicit 'break;' */
                 }
             }
         }
-        for (i = 0; i < n; i = i + 1 | 0) {
+        for (i = 0; i < n; i = i + 1) {
             ($t1 = class_select, class_select = $t1.add(1), $t1).set(0, $c.i8($c.radd(pick_list[0], i).item.a_int));
         }
         $c.free(pick_list[0]);

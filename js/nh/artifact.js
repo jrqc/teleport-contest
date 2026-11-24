@@ -168,10 +168,10 @@ export function init_artifacts() {   // artifact.c:111
  */
 export async function save_artifacts(nhfp) {   // artifact.c:119
     let i = 0;
-    for (i = 0; i < NROFARTIFACTS + 1; i = i + 1 | 0) {
+    for (i = 0; i < NROFARTIFACTS + 1; i = i + 1) {
         await Sfo_arti_info(nhfp, $c.relem(artiexist, i), $C`artiexist`);
     }
-    for (i = 0; i < NROFARTIFACTS; i = i + 1 | 0) {
+    for (i = 0; i < NROFARTIFACTS; i = i + 1) {
         await Sfo_xint16(nhfp, new $c.Ptr(artidisco, i), $C`artidisco`);
     }
 }
@@ -182,10 +182,10 @@ export async function save_artifacts(nhfp) {   // artifact.c:119
  */
 export async function restore_artifacts(nhfp) {   // artifact.c:133
     let i = 0;
-    for (i = 0; i < NROFARTIFACTS + 1; i = i + 1 | 0) {
+    for (i = 0; i < NROFARTIFACTS + 1; i = i + 1) {
         await Sfi_arti_info(nhfp, $c.relem(artiexist, i), $C`artiexist`);
     }
-    for (i = 0; i < NROFARTIFACTS; i = i + 1 | 0) {
+    for (i = 0; i < NROFARTIFACTS; i = i + 1) {
         await Sfi_short(nhfp, new $c.Ptr(artidisco, i), $C`artidisco`);
     }
     hack_artifacts();   /* redo non-saved special cases */
@@ -519,7 +519,7 @@ export async function find_artifact(otmp) {   // artifact.c:422
 export function nartifact_exist() {   // artifact.c:462
     let i = 0;
     let a = 0;
-    for (i = 1; i <= NROFARTIFACTS; i = i + 1 | 0) {
+    for (i = 1; i <= NROFARTIFACTS; i = i + 1) {
         if (artiexist[i].exists) {
             a = a + 1 | 0;
         }
@@ -667,7 +667,7 @@ export function restrict_name(otmp, name) {   // artifact.c:575
     if (!objects[otyp].oc_name_known
         && (odesc = obj_descr[objects[otyp].oc_descr_idx].oc_descr) !== null) {
         obj_shuffle_range(otyp, new $c.Ptr(lo, 0), new $c.Ptr(hi, 0));
-        for (i = svb.bases[ocls]; i < NUM_OBJECTS; i = i + 1 | 0) {
+        for (i = svb.bases[ocls]; i < NUM_OBJECTS; i = i + 1) {
             if (objects[i].oc_class !== ocls) {
                 break;
             }
@@ -1225,7 +1225,7 @@ export async function discover_artifact(m) {   // artifact.c:1113
     let i = 0;
     /* look for this artifact in the discoveries list;
        if we hit an empty slot then it's not present, so add it */
-    for (i = 0; i < NROFARTIFACTS; i = i + 1 | 0) {
+    for (i = 0; i < NROFARTIFACTS; i = i + 1) {
         if (artidisco[i] === 0 || artidisco[i] === m) {
             artidisco[i] = m;
             return;
@@ -1244,7 +1244,7 @@ export function undiscovered_artifact(m) {   // artifact.c:1131
     let i = 0;
     /* look for this artifact in the discoveries list;
        if we hit an empty slot then it's undiscovered */
-    for (i = 0; i < NROFARTIFACTS; i = i + 1 | 0) {
+    for (i = 0; i < NROFARTIFACTS; i = i + 1) {
         if (artidisco[i] === m) {
             return FALSE;
         } else if (artidisco[i] === 0) {
@@ -1261,7 +1261,7 @@ export function undiscovered_artifact(m) {   // artifact.c:1131
 export async function disp_artifact_discoveries(tmpwin) {   // artifact.c:1147
     let i = 0, buf = new Int8Array(256);
     /* supplied by dodiscover(); type is NHW_TEXT */
-    for (i = 0; i < NROFARTIFACTS; i = i + 1 | 0) {
+    for (i = 0; i < NROFARTIFACTS; i = i + 1) {
         if (artidisco[i] === 0) {
             break;   /* empty slot implies end of list */
         }
@@ -1291,7 +1291,7 @@ export async function dump_artifact_info(tmpwin) {   // artifact.c:1177
     let m = 0, buf = new Int8Array(256), buf2 = new Int8Array(256);
     /* not a menu, but header uses same bold or whatever attribute as such */
     await putstr()(tmpwin, iflags.menu_headings.attr, $C`Artifacts`);
-    for (m = 1; m <= NROFARTIFACTS; m = m + 1 | 0) {
+    for (m = 1; m <= NROFARTIFACTS; m = m + 1) {
         nh_snprintf($C`dump_artifact_info`, 1197, new $c.Ptr(buf2, 0), 256, $C`[%s%s%s%s%s%s%s%s%s]`, artiexist[m].exists ? $C`exists;` : $C``, artiexist[m].found ? $C` hero knows;` : $C``, artiexist[m].gift ? $C` gift` : $C``, artiexist[m].wish ? $C` wish` : $C``, artiexist[m].named ? $C` named` : $C``, artiexist[m].viadip ? $C` viadip` : $C``, artiexist[m].lvldef ? $C` lvldef` : $C``, artiexist[m].bones ? $C` bones` : $C``, artiexist[m].rndm ? $C` random` : $C``);
         /* 9 bits overall */
         /* .exists and .found have different punctuation because
@@ -1953,7 +1953,7 @@ async function invoke_create_portal(obj) {   // artifact.c:1867
     any.$copyFrom(cg.zeroany);   /* set all bits to zero */
     await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     /* use index+1 (can't use 0) as identifier */
-    for (i = num_ok_dungeons = 0; i < svn.n_dgns; i = i + 1 | 0) {
+    for (i = num_ok_dungeons = 0; i < svn.n_dgns; i = i + 1) {
         if (!svd.dungeons[i].dunlev_ureached) {
             continue;
         }
@@ -2452,7 +2452,7 @@ function abil_to_adtyp(abil) {   // artifact.c:2320
     abil2adtyp[5].adtyp = AD.DRST;
     abil2adtyp[6].abil = new $c.FieldRef(u.uprops[DRAIN_RES], "extrinsic", "i64");
     abil2adtyp[6].adtyp = AD.DRLI;
-    for (k = 0; k < 7; k = k + 1 | 0) {
+    for (k = 0; k < 7; k = k + 1) {
         if ($c.peq(abil2adtyp[k].abil, abil)) {
             return abil2adtyp[k].adtyp;
         }
@@ -2465,7 +2465,7 @@ function abil_to_adtyp(abil) {   // artifact.c:2320
  */
 function abil_to_spfx(abil) {   // artifact.c:2344
     let k = 0;
-    for (k = 0; k < 12; k = k + 1 | 0) {
+    for (k = 0; k < 12; k = k + 1) {
         if ($c.peq(abil_to_spfx$abil2spfx[k].abil, abil)) {
             return abil_to_spfx$abil2spfx[k].spfx;
         }

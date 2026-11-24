@@ -1099,7 +1099,7 @@ export async function parse_config_line(origbuf) {   // cfgfiles.c:1389
     if (bufp.get(0) === 32) {
         bufp = bufp.add(1);
     }
-    for (i = 0; i < 59; i = i + 1 | 0) {
+    for (i = 0; i < 59; i = i + 1) {
         if (config_line_stmt[i].syscnf_only && !in_sysconf) {
             continue;
         }
@@ -1600,13 +1600,13 @@ export async function rcfile_interface_options() {   // cfgfiles.c:1960
 }
 export function heed_all_config_statements() {   // cfgfiles.c:1979
     let i = 0;
-    for (i = 0; i < 59; i = i + 1 | 0) {
+    for (i = 0; i < 59; i = i + 1) {
         disregarded_config_lines[i] = FALSE;
     }
 }
 export function disregard_all_config_statements() {   // cfgfiles.c:1988
     let i = 0;
-    for (i = 0; i < 59; i = i + 1 | 0) {
+    for (i = 0; i < 59; i = i + 1) {
         disregarded_config_lines[i] = TRUE;
     }
 }

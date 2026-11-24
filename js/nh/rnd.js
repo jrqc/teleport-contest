@@ -111,7 +111,7 @@ function rng_log_write(func, args, result) {   // rnd.c:72
  */
 function whichrng(fn) {   // rnd.c:120
     let i = 0;
-    for (i = 0; i < 2; i = i + 1 | 0) {
+    for (i = 0; i < 2; i = i + 1) {
         if (rnglist[i].fn === fn) {
             return i;
         }
@@ -362,7 +362,7 @@ export async function reseed_random(fn) {   // rnd.c:430
  */
 export function shuffle_int_array(indices, count) {   // rnd.c:440
     let i = 0, iswap = 0;
-    for (i = count - 1 | 0; i > 0; i = i - 1 | 0) {
+    for (i = count - 1 | 0; i > 0; i = i - 1) {
         if ((iswap = rn2(i + 1 | 0)) === i) {
             continue;
         }

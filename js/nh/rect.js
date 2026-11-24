@@ -189,7 +189,7 @@ export async function split_rects(r1, r2) {   // rect.c:182
     old_r.$copyFrom(r1);
     remove_rect(r1);
     /* Walk down since rect_cnt & rect[] will change... */
-    for (i = rect_cnt - 1 | 0; i >= 0; i = i - 1 | 0) {
+    for (i = rect_cnt - 1 | 0; i >= 0; i = i - 1) {
         if (intersect($c.radd(rect, i), r2, r)) {
             await split_rects($c.radd(rect, i), r);
         }

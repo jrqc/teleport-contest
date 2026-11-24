@@ -135,7 +135,7 @@ async function knows_class(sym) {   // u_init.c:586
      *        for example, knows all elven weapons despite the bow,
      *        arrow, and spear limitation below.
      */
-    for (ct = svb.bases[$c.u8(sym)]; ct < svb.bases[$c.u8(sym) + 1]; ct = ct + 1 | 0) {
+    for (ct = svb.bases[$c.u8(sym)]; ct < svb.bases[$c.u8(sym) + 1]; ct = ct + 1) {
         /* not flagged as magic but shouldn't be pre-discovered
            (small shields look the same as two types of magical shield;
            cornuthaum / dunce cap look the same as each other) */
@@ -286,7 +286,7 @@ async function u_init_role() {   // u_init.c:637
             await knows_class(ARMOR_CLASS);
             /* in order to assist non-Japanese speakers, pre-discover items
                that switch to Japanese names when playing as a Samurai */
-            for (i = MAXOCLASSES; i < NUM_OBJECTS; i = i + 1 | 0) {
+            for (i = MAXOCLASSES; i < NUM_OBJECTS; i = i + 1) {
                 if (objects[i].oc_magic) {   /* skip "magic koto" */
                     continue;
                 }
@@ -427,7 +427,7 @@ async function pauper_reinit() {   // u_init.c:870
     if (!u.uroleplay.pauper) {
         return;
     }
-    for (skill = 0; skill < P.NUM_SKILLS; skill = skill + 1 | 0) {
+    for (skill = 0; skill < P.NUM_SKILLS; skill = skill + 1) {
         if (u.weapon_skills[skill].skill > P.UNSKILLED) {
             u.weapon_skills[skill].skill = P.UNSKILLED;
             u.weapon_skills[skill].advance = 0;
@@ -533,7 +533,7 @@ export async function u_init_misc() {   // u_init.c:944
     await adjabil(0, 1);
     $t8 = u.ulevelmax = 1, u.ulevel = $t8;
     await init_uhunger();
-    for (i = 0; i <= MAXSPELL; i = i + 1 | 0) {
+    for (i = 0; i <= MAXSPELL; i = i + 1) {
         svs.spl_book[i].sp_id = NO_SPELL;
     }
     u.ublesscnt = 300;   /* no prayers just yet */

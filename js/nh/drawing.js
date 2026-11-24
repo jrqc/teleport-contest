@@ -49,7 +49,7 @@ export const def_r_oc_syms = new Uint8Array(18);
  */
 export function def_char_to_objclass(ch) {   // drawing.c:91
     let i = 0;
-    for (i = 1; i < MAXOCLASSES; i = i + 1 | 0) {
+    for (i = 1; i < MAXOCLASSES; i = i + 1) {
         if (ch === def_oc_syms[i].sym) {
             break;
         }
@@ -68,7 +68,7 @@ export function def_char_to_objclass(ch) {   // drawing.c:91
  */
 export function def_char_to_monclass(ch) {   // drawing.c:108
     let i = 0;
-    for (i = 1; i < MAXMCLASSES; i = i + 1 | 0) {
+    for (i = 1; i < MAXMCLASSES; i = i + 1) {
         if (ch === def_monsyms[i].sym) {
             break;
         }
@@ -86,7 +86,7 @@ export function def_char_is_furniture(ch) {   // drawing.c:120
        levl[][].typ order but both keep furniture in a contiguous block */
     /* "staircase up" */
     let furniture = FALSE;
-    for (i = 0; i < MAXPCHARS; i = i + 1 | 0) {
+    for (i = 0; i < MAXPCHARS; i = i + 1) {
         if (!furniture) {
             if (!$c.strncmp(defsyms[i].explanation, new $c.Ptr(def_char_is_furniture$first_furniture, 0), 5)) {
                 furniture = TRUE;

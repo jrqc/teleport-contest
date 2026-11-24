@@ -193,7 +193,7 @@ async function mkcavearea(rockit) {   // dig.c:88
             svl.level.locations[u.ux][u.uy].typ === CORR ? $C`creates a` : $C`extends the`);
     }
     await display_nhwindow()($G.WIN_MESSAGE, TRUE);
-    for (dist = 1; dist <= 2; dist = dist + 1 | 0) {
+    for (dist = 1; dist <= 2; dist = dist + 1) {
         xmin = $c.i16(xmin - 1);
         xmax = $c.i16(xmax + 1);
         /* top and bottom */
@@ -1218,7 +1218,7 @@ export async function use_pick_axe(obj) {   // dig.c:1092
     /* construct list of directions to show player for likely choices */
     const downok = !!can_reach_floor(FALSE) ? 1 : 0;
     let dsp = new $c.Ptr(dirsyms, 0);
-    for (dir = 0; dir < N_DIRS_Z; dir = dir + 1 | 0) {
+    for (dir = 0; dir < N_DIRS_Z; dir = dir + 1) {
         const dirch = await cmd_from_dir(dir, MV.WALK);
         /* filter out useless directions */
         if (u.uswallow) {
@@ -1939,7 +1939,7 @@ async function pit_flow(trap, filltyp) {   // dig.c:1844
             t.tx === u.ux && t.ty === u.uy
             ? $C`Suddenly %s flows in from the adjacent pit!`
             : null);
-        for (idx = 0; idx < N_DIRS; idx = idx + 1 | 0) {
+        for (idx = 0; idx < N_DIRS; idx = idx + 1) {
             if (t.vl.v_conjoined & 1 << idx) {
                 const x = $c.i16(t.tx + xdir[idx]);
                 const y = $c.i16(t.ty + ydir[idx]);
@@ -2276,8 +2276,8 @@ export async function wiz_debug_cmd_bury() {   // dig.c:2288
     let otmp = null, x = 0, y = 0;
     let before = 0;
     let after = 0;
-    for (x = u.ux - 1; x <= u.ux + 1; x = x + 1 | 0) {
-        for (y = u.uy - 1; y <= u.uy + 1; y = y + 1 | 0) {
+    for (x = u.ux - 1; x <= u.ux + 1; x = x + 1) {
+        for (y = u.uy - 1; y <= u.uy + 1; y = y + 1) {
             if (!isok($c.i16(x), $c.i16(y))) {
                 continue;
             }

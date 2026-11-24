@@ -136,7 +136,7 @@ async function shkveg() {   // shknam.c:408
     const oclass = FOOD_CLASS;
     $c.memset(new $c.Ptr(ok, 0), 0, 1924);   /* lint suppression */
     let j = maxprob = 0;
-    for (i = svb.bases[oclass]; i < NUM_OBJECTS; i = i + 1 | 0) {
+    for (i = svb.bases[oclass]; i < NUM_OBJECTS; i = i + 1) {
         if (objects[i].oc_class !== oclass) {
             break;
         }
@@ -237,7 +237,7 @@ function nameshk(shk, nlp) {   // shknam.c:487
         }
         (!(names_avail > 0) ? 1 : 0) ? $c.__assert_rtn($C`nameshk`, $C`shknam.c`, 514, $C`names_avail > 0`) : 0;
         name_wanted = $c.rem32(name_wanted, names_avail);
-        for (trycnt = 0; trycnt < 50; trycnt = trycnt + 1 | 0) {
+        for (trycnt = 0; trycnt < 50; trycnt = trycnt + 1) {
             if ($c.peq(nlp, new $c.Ptr(shktools, 0))) {
                 shname = shktools[rn2(names_avail)];
                 shk.female = 0;   /* reversed below for '_' prefix */
@@ -316,7 +316,7 @@ export function free_eshk(mtmp) {   // shknam.c:569
  */
 function good_shopdoor(sroom, sx, sy) {   // shknam.c:582
     let i = 0;
-    for (i = 0; i < sroom.doorct; i = i + 1 | 0) {
+    for (i = 0; i < sroom.doorct; i = i + 1) {
         const di = sroom.fdoor + i | 0;
         sx.set(0, $c.radd(svd.doors, di).x);
         sy.set(0, $c.radd(svd.doors, di).y);
@@ -505,8 +505,8 @@ export async function stock_room(shp_indx, sroom) {   // shknam.c:718
          * Out of the number of spots where we're actually
          * going to put stuff, randomly single out one in particular.
          */
-        for (sx = sroom.lx; sx <= sroom.hx; sx = sx + 1 | 0) {
-            for (sy = sroom.ly; sy <= sroom.hy; sy = sy + 1 | 0) {
+        for (sx = sroom.lx; sx <= sroom.hx; sx = sx + 1) {
+            for (sy = sroom.ly; sy <= sroom.hy; sy = sy + 1) {
                 if (stock_room_goodpos(sroom, rmno, sh, sx, sy)) {
                     stockcount = stockcount + 1 | 0;
                 }
@@ -515,8 +515,8 @@ export async function stock_room(shp_indx, sroom) {   // shknam.c:718
         specialspot = rnd(stockcount);
         stockcount = 0;
     }
-    for (sx = sroom.lx; sx <= sroom.hx; sx = sx + 1 | 0) {
-        for (sy = sroom.ly; sy <= sroom.hy; sy = sy + 1 | 0) {
+    for (sx = sroom.lx; sx <= sroom.hx; sx = sx + 1) {
+        for (sy = sroom.ly; sy <= sroom.hy; sy = sy + 1) {
             if (stock_room_goodpos(sroom, rmno, sh, sx, sy)) {
                 stockcount = stockcount + 1 | 0;
                 await mkshobj_at(shp, sx, sy,
@@ -548,7 +548,7 @@ export function saleable(shkp, obj) {   // shknam.c:805
     if (shp.symb === RANDOM_CLASS) {
         return TRUE;
     }
-    for (i = 0; i < 9 && shp.iprobs[i].iprob; i = i + 1 | 0) {
+    for (i = 0; i < 9 && shp.iprobs[i].iprob; i = i + 1) {
         /* pseudo-class needs special handling */
         if (shp.iprobs[i].itype === VEGETARIAN_CLASS) {
             if (veggy_item(obj, 0)) {
@@ -614,7 +614,7 @@ export async function shkname(mtmp) {   // shknam.c:856
             /* count the number of non-unique shop types;
                pick one randomly, ignoring shop generation probabilities;
                pick a name at random from that shop type's list */
-            for (num = 0; num < 13; num = num + 1 | 0) {
+            for (num = 0; num < 13; num = num + 1) {
                 if (shtypes[num].prob === 0) {
                     break;
                 }

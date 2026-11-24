@@ -778,7 +778,7 @@ export async function newgame() {   // allmain.c:766
     svc.context.tribute.enabled = TRUE;   /* turn on 3.6 tributes    */
     svc.context.tribute.tributesz = 16;
     get_nhuuid();
-    for (i = LOW_PM; i < NUMMONS; i = i + 1 | 0) {
+    for (i = LOW_PM; i < NUMMONS; i = i + 1) {
         svm.mvitals[i].mvflags = mons[i].geno & G_NOCORPSE;
     }
     await init_objects();   /* must be before u_init() */

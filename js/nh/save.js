@@ -337,14 +337,14 @@ async function savegamestate(nhfp) {   // save.c:265
     if (release_data(nhfp)) {
         gm.migrating_mons = null;
     }
-    for (i = 0; i < NUMMONS; i = i + 1 | 0) {
+    for (i = 0; i < NUMMONS; i = i + 1) {
         await Sfo_mvitals(nhfp, $c.relem(svm.mvitals, i), $C`gamestate-mvitals`);
     }
     await save_dungeon(nhfp, !!update_file(nhfp) ? 1 : 0,
         !!release_data(nhfp) ? 1 : 0);
     await savelevchn(nhfp);
     await Sfo_q_score(nhfp, svq.quest_status, $C`gamestate-quest_status`);
-    for (i = 0; i < MAXSPELL + 1; i = i + 1 | 0) {
+    for (i = 0; i < MAXSPELL + 1; i = i + 1) {
         await Sfo_spell(nhfp, $c.relem(svs.spl_book, i), $C`gamestate-spl_book`);
     }
     await save_artifacts(nhfp);
@@ -545,8 +545,8 @@ async function savelev_core(nhfp, lev$in) {   // save.c:452
             break skip_lots$;
         }
         await savelevl(nhfp);
-        for (c = 0; c < COLNO; c = c + 1 | 0) {
-            for (r = 0; r < ROWNO; r = r + 1 | 0) {
+        for (c = 0; c < COLNO; c = c + 1) {
+            for (r = 0; r < ROWNO; r = r + 1) {
                 await Sfo_schar(nhfp, new $c.Ptr(svl.lastseentyp[c], r), $C`lastseentyp`);
             }
         }
@@ -563,7 +563,7 @@ async function savelev_core(nhfp, lev$in) {   // save.c:452
          *  nothing if count arg is 0, just skip it */
         if (svd.doors_alloc) {
             tmpc = svd.doors;
-            for (i = 0; i < svd.doors_alloc; i = i + 1 | 0) {
+            for (i = 0; i < svd.doors_alloc; i = i + 1) {
                 await Sfo_nhcoord(nhfp, tmpc, $C`lev-doors`);
                 tmpc = $c.radd(tmpc, 1);
             }
@@ -610,8 +610,8 @@ export function save_adjust_levelflags() {   // save.c:570
  */
 async function savelevl(nhfp) {   // save.c:577
     let x = 0, y = 0;
-    for (x = 0; x < COLNO; x = x + 1 | 0) {
-        for (y = 0; y < ROWNO; y = y + 1 | 0) {
+    for (x = 0; x < COLNO; x = x + 1) {
+        for (y = 0; y < ROWNO; y = y + 1) {
             await Sfo_rm(nhfp, $c.relem(svl.level.locations[x], y), $C`location-rm`);
         }
     }

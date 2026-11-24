@@ -115,32 +115,32 @@ export function time_from_yyyymmddhhmmss(buf) {   // calendar.c:126
     if (buf && $c.strlen(buf) === 14) {
         let d = buf;
         let p = new $c.Ptr(y, 0);   /* year */
-        for (k = 0; k < 4; k = k + 1 | 0) {
+        for (k = 0; k < 4; k = k + 1) {
             $t3 = ($t2 = d, d = $t2.add(1), $t2).get(0), $t4 = ($t1 = p, p = $t1.add(1), $t1), $t4.set(0, $t3);
         }
         p.set(0, 0);
         p = new $c.Ptr(mo, 0);   /* month */
-        for (k = 0; k < 2; k = k + 1 | 0) {
+        for (k = 0; k < 2; k = k + 1) {
             $t7 = ($t6 = d, d = $t6.add(1), $t6).get(0), $t8 = ($t5 = p, p = $t5.add(1), $t5), $t8.set(0, $t7);
         }
         p.set(0, 0);
         p = new $c.Ptr(md, 0);   /* day */
-        for (k = 0; k < 2; k = k + 1 | 0) {
+        for (k = 0; k < 2; k = k + 1) {
             $t11 = ($t10 = d, d = $t10.add(1), $t10).get(0), $t12 = ($t9 = p, p = $t9.add(1), $t9), $t12.set(0, $t11);
         }
         p.set(0, 0);
         p = new $c.Ptr(h, 0);   /* hour */
-        for (k = 0; k < 2; k = k + 1 | 0) {
+        for (k = 0; k < 2; k = k + 1) {
             $t15 = ($t14 = d, d = $t14.add(1), $t14).get(0), $t16 = ($t13 = p, p = $t13.add(1), $t13), $t16.set(0, $t15);
         }
         p.set(0, 0);
         p = new $c.Ptr(mi, 0);   /* minutes */
-        for (k = 0; k < 2; k = k + 1 | 0) {
+        for (k = 0; k < 2; k = k + 1) {
             $t19 = ($t18 = d, d = $t18.add(1), $t18).get(0), $t20 = ($t17 = p, p = $t17.add(1), $t17), $t20.set(0, $t19);
         }
         p.set(0, 0);
         p = new $c.Ptr(s, 0);   /* seconds */
-        for (k = 0; k < 2; k = k + 1 | 0) {
+        for (k = 0; k < 2; k = k + 1) {
             $t23 = ($t22 = d, d = $t22.add(1), $t22).get(0), $t24 = ($t21 = p, p = $t21.add(1), $t21), $t24.set(0, $t23);
         }
         p.set(0, 0);

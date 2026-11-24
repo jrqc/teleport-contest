@@ -594,7 +594,7 @@ async function newman() {   // polyself.c:336
              * drain and polyself steps until out of lifesaving capability.)
              */
             hpmax = u.uhpmax;
-            for (i = 0; i < oldlvl; i = i + 1 | 0) {
+            for (i = 0; i < oldlvl; i = i + 1) {
                 hpmax = hpmax - u.uhpinc[i] | 0;
             }
             /* hpmax * rn1(4,8) / 10; 0.95*hpmax on average */
@@ -612,7 +612,7 @@ async function newman() {   // polyself.c:336
              * Do the same for spell power.
              */
             enmax = u.uenmax;
-            for (i = 0; i < oldlvl; i = i + 1 | 0) {
+            for (i = 0; i < oldlvl; i = i + 1) {
                 enmax = enmax - u.ueninc[i] | 0;
             }
             enmax = await rounddiv($c.mul64(enmax, rn1(4, 8)), 10);
@@ -1749,7 +1749,7 @@ export async function dospinweb() {   // polyself.c:1497
             return ECMD.OK;
         }
         if (is_whirly(u.ustuck.data)) {
-            for (i = 0; i < NATTK; i = i + 1 | 0) {
+            for (i = 0; i < NATTK; i = i + 1) {
                 if (u.ustuck.data.mattk[i].aatyp === AT.ENGL) {
                     break;
                 }
@@ -1876,7 +1876,7 @@ export async function dogaze() {   // polyself.c:1642
     let mtmp = null, qbuf = new Int8Array(128), i = 0;
     let looked = 0;
     let adtyp = 0;
-    for (i = 0; i < NATTK; i = i + 1 | 0) {
+    for (i = 0; i < NATTK; i = i + 1) {
         if (gy.youmonst.data.mattk[i].aatyp === AT.GAZE) {
             adtyp = gy.youmonst.data.mattk[i].adtyp;
             break;

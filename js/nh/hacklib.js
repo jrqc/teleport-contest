@@ -847,7 +847,7 @@ export function strstri(str, sub) {   // hacklib.c:804
         return str;
     }
     /* do some useful work while determining relative lengths */
-    for (i = 0; i < TABSIZ; i = i + 1 | 0) {
+    for (i = 0; i < TABSIZ; i = i + 1) {
         $t1 = tsub[i] = 0, tstr[i] = $t1;   /* init */
     }
     for (k = 0, s1 = str; s1.get(0); k = k + 1 | 0) {
@@ -860,7 +860,7 @@ export function strstri(str, sub) {   // hacklib.c:804
     if (k < 0) {
         return null;   /* sub longer than str, so can't match */
     }
-    for (i = 0; i < TABSIZ; i = i + 1 | 0) {   /* does sub have more 'x's than str? */
+    for (i = 0; i < TABSIZ; i = i + 1) {   /* does sub have more 'x's than str? */
         if (tsub[i] > tstr[i]) {
             return null;   /* match not possible */
         }
@@ -1053,9 +1053,9 @@ export function copy_bytes(ifd, ofd) {   // hacklib.c:1010
  */
 export function datamodel(retidx) {   // hacklib.c:1046
     let i = 0, j = 0;
-    for (i = 1; i < 5; i = i + 1 | 0) {
+    for (i = 1; i < 5; i = i + 1) {
         let matchcount = 0;
-        for (j = 0; j < MAX_D; j = j + 1 | 0) {
+        for (j = 0; j < MAX_D; j = j + 1) {
             if (dm[0].sz[j] === dm[i].sz[j]) {
                 matchcount = matchcount + 1 | 0;
             }
@@ -1077,7 +1077,7 @@ export function datamodel(retidx) {   // hacklib.c:1046
  */
 export function what_datamodel_is_this(retidx, szshort, szint, szlong, szll, szptr) {   // hacklib.c:1064
     let i = 0;
-    for (i = 1; i < 5; i = i + 1 | 0) {
+    for (i = 1; i < 5; i = i + 1) {
         if (szshort === dm[i].sz[0] && szint === dm[i].sz[1]
             && szlong === dm[i].sz[2] && szll === dm[i].sz[3]
             && szptr === dm[i].sz[4]) {

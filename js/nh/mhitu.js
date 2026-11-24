@@ -849,7 +849,7 @@ export async function mattacku(mtmp) {   // mhitu.c:491
     }
     gs.skipdrin = FALSE;   /* [see mattackm(mhitm.c)] */
     const firstfoundyou = foundyou[0];
-    L1: for (i = 0; i < NATTK; i = i + 1 | 0) {
+    L1: for (i = 0; i < NATTK; i = i + 1) {
         sum[i] = M_ATTK.MISS;
         /* counterattack against attack [i-1] might have been fatal */
         if (DEADMONSTER(mtmp)) {
@@ -2504,7 +2504,7 @@ export function ranged_attk_available(mtmp) {   // mhitu.c:2413
     let i = 0;
     let typ = -1;
     const ptr = mtmp.data;
-    for (i = 0; i < NATTK; i = i + 1 | 0) {
+    for (i = 0; i < NATTK; i = i + 1) {
         if (DISTANCE_ATTK_TYPE(ptr.mattk[i].aatyp)
             && (typ = get_atkdam_type(ptr.mattk[i].adtyp)) >= 0
             && $c.andu64(mtmp.seen_resistance, cvt_adtyp_to_mseenres($c.u8(typ))) === 0) {
