@@ -618,7 +618,8 @@ function nomux_emit_marker(kind) {   // termcap.c:681
         const scr = nomux_capture_screen();
         const scr_len = scr ? $c.strlen(scr) : 0;
         nomux_get_cursor(new $c.Ptr(cx, 0), new $c.Ptr(cy, 0));
-        $c.fprintf($c.__stdoutp, $C`\x1b]7777;KIND=%s;SEQ=%d;ANIM=%d;CX=%d;CY=%d;LEN=%zu\x07`, kind, nomux_seq, $G.nomux_anim_id, cx[0], cy[0], scr_len);
+        $c.fprintf($c.__stdoutp, $C`\x1b]7777;KIND=%s;SEQ=%d;ANIM=%d;CX=%d;CY=%d;LEN=%zu\x07`,
+            kind, nomux_seq, $G.nomux_anim_id, cx[0], cy[0], scr_len);
         if (scr_len > 0) {
             $c.fwrite(scr, 1, scr_len, $c.__stdoutp);
         }
@@ -758,7 +759,10 @@ export function nomux_capture_screen() {   // termcap.c:796
         let cur_fg = 7;
         let cur_attr = 0;
         let end = 79;
-        while (end >= 0 && (nomux_buf[row][end].ch === 32 || nomux_buf[row][end].ch === 0) && nomux_buf[row][end].attr === 0 && (nomux_buf[row][end].fg === 7 || nomux_buf[row][end].fg === 0)) {
+        while (end >= 0
+            && (nomux_buf[row][end].ch === 32 || nomux_buf[row][end].ch === 0)
+            && nomux_buf[row][end].attr === 0
+            && (nomux_buf[row][end].fg === 7 || nomux_buf[row][end].fg === 0)) {
             end = end - 1 | 0;
         }
         let in_dec = 0;
@@ -849,7 +853,8 @@ function nomux_raw_putch(ch) {   // termcap.c:885
     if (ch < 32) {
         return;
     }
-    if (nomux_raw_row >= 0 && nomux_raw_row < 24 && nomux_raw_col >= 0 && nomux_raw_col < 80) {
+    if (nomux_raw_row >= 0 && nomux_raw_row < 24
+        && nomux_raw_col >= 0 && nomux_raw_col < 80) {
         nomux_buf[nomux_raw_row][nomux_raw_col].ch = $c.i8(ch);
         nomux_buf[nomux_raw_row][nomux_raw_col].fg = nomux_fg_cur;
         nomux_buf[nomux_raw_row][nomux_raw_col].attr = nomux_attr_cur;
@@ -954,7 +959,8 @@ export async function cl_end() {   // termcap.c:974
             xputc(32);
             cx = cx + 1 | 0;
         }
-        await tty_curs($G.BASE_WINDOW, $G.ttyDisplay.curx + 1, $G.ttyDisplay.cury);
+        await tty_curs($G.BASE_WINDOW, $G.ttyDisplay.curx + 1,
+            $G.ttyDisplay.cury);
     }
 }
 /**
@@ -1051,7 +1057,9 @@ export async function tty_delay_output() {   // termcap.c:1129
     /* BUG: if the padding character is visible, as it is on the 5620
        then this looks terrible. */
     if (flags.null) {
-        $c.tputs($C`$<50>`, 1, xputc);
+        $c.tputs(
+            $C`$<50>`,
+            1, xputc);
     } else if ($c.$libc.ospeed > 0 && $c.$libc.ospeed < 15 && nh_CM()) {
         /* delay by sending cm(here) an appropriate number of times */
         const cmlen = $c.i32($c.strlen($c.tgoto(tc_lcl_data.tc_CM, $G.ttyDisplay.curx, $G.ttyDisplay.cury)));
@@ -1086,7 +1094,8 @@ export async function cl_eos() {   // termcap.c:1198
             cy = cy + 1 | 0;
         }
         await cl_end();
-        await tty_curs($G.BASE_WINDOW, $G.ttyDisplay.curx + 1, $G.ttyDisplay.cury);
+        await tty_curs($G.BASE_WINDOW, $G.ttyDisplay.curx + 1,
+            $G.ttyDisplay.cury);
     }
 }
 /**
@@ -1097,7 +1106,9 @@ async function init_hilite() {   // termcap.c:1300
     const colors = $c.tgetnum(nhStr($C`Co`));
     iflags.colorcount = colors >>> 0;
     let md_len = 0;
-    if (colors < 8 || !MD || !MD.get(0) || (setf = $c.tgetstr(nhStr($C`AF`), null)) === null && (setf = $c.tgetstr(nhStr($C`Sf`), null)) === null) {
+    if (colors < 8 || !MD || !MD.get(0)
+        || (setf = $c.tgetstr(nhStr($C`AF`), null)) === null
+        && (setf = $c.tgetstr(nhStr($C`Sf`), null)) === null) {
         /* Fallback when colors not available
          * It's arbitrary to collapse all colors except gray
          * together, but that's what the previous code did.

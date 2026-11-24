@@ -351,7 +351,8 @@ export async function set_uasmon() {   // polyself.c:38
 export function float_vs_flight() {   // polyself.c:131
     const stuck_in_floor = u.utrap && u.utraptype !== TT.PIT ? 1 : 0;
     /* floating overrides flight; so does being trapped in the floor */
-    if (HLevitation() || ELevitation() || (HFlying() || EFlying()) && stuck_in_floor) {
+    if (HLevitation() || ELevitation()
+        || (HFlying() || EFlying()) && stuck_in_floor) {
         u.uprops[FLYING].blocked = $c.or64(u.uprops[FLYING].blocked, I_SPECIAL);
     } else {
         u.uprops[FLYING].blocked = $c.and64(u.uprops[FLYING].blocked, ~I_SPECIAL);
@@ -388,10 +389,13 @@ async function check_strangling(on) {   // polyself.c:168
         const was_strangled = u.uprops[STRANGLED].intrinsic !== 0 ? 1 : 0;
         /* when Strangled is already set, polymorphing from one
            vulnerable form into another causes the counter to be reset */
-        if ($G.uamul && $G.uamul.otyp === AMULET_OF_STRANGULATION && await can_be_strangled(gy.youmonst)) {
+        if ($G.uamul && $G.uamul.otyp === AMULET_OF_STRANGULATION
+            && await can_be_strangled(gy.youmonst)) {
             u.uprops[STRANGLED].intrinsic = 6;
             disp.botl = TRUE;
-            await Your($C`%s %s your %s!`, await simpleonames($G.uamul), was_strangled ? $C`still constricts` : $C`begins constricting`, await body_part(NECK));   /* "throat" */
+            await Your($C`%s %s your %s!`, await simpleonames($G.uamul),
+                was_strangled ? $C`still constricts` : $C`begins constricting`,
+                await body_part(NECK));   /* "throat" */
             await makeknown(AMULET_OF_STRANGULATION);
         }
         /* off -- maybe block strangling */
@@ -483,7 +487,9 @@ export async function change_sex() {   // polyself.c:273
      * !Upolyd check necessary because is_male() and is_female()
      * may be true for certain roles
      */
-    if (!Upolyd() || !is_male(gy.youmonst.data) && !is_female(gy.youmonst.data) && !is_neuter(gy.youmonst.data)) {
+    if (!Upolyd()
+        || !is_male(gy.youmonst.data) && !is_female(gy.youmonst.data)
+        && !is_neuter(gy.youmonst.data)) {
         flags.female = !flags.female ? 1 : 0;
     }
     if (Upolyd()) {   /* poly'd: also change saved sex */
@@ -519,12 +525,18 @@ export async function livelog_newform(viapoly, oldgend, newgend) {   // polyself
      */
     if (!Upolyd()) {
         if (newgend !== oldgend) {
-            const oldrole = oldgend && gu.urole.name.f ? gu.urole.name.f : gu.urole.name.m;
-            const newrole = newgend && gu.urole.name.f ? gu.urole.name.f : gu.urole.name.m;
+            const oldrole = oldgend && gu.urole.name.f ? gu.urole.name.f
+                : gu.urole.name.m;
+            const newrole = newgend && gu.urole.name.f ? gu.urole.name.f
+                : gu.urole.name.m;
             const oldrank = rank_of(u.ulevel, gu.urole.mnum, $c.i8(oldgend));
             const newrank = rank_of(u.ulevel, gu.urole.mnum, $c.i8(newgend));
             $c.sprintf(new $c.Ptr(buf, 0), $C`%.10s %.30s`, genders[flags.female].adj, newrank);
-            await livelog_printf(LL.MINORAC, $C`%s into %s`, viapoly ? $C`polymorphed` : $C`transformed`, await an($c.strcmp(newrole, oldrole) ? newrole : $c.strcmp(newrank, oldrank) ? newrank : new $c.Ptr(buf, 0)));
+            await livelog_printf(LL.MINORAC, $C`%s into %s`,
+                viapoly ? $C`polymorphed` : $C`transformed`,
+                await an($c.strcmp(newrole, oldrole) ? newrole
+                : $c.strcmp(newrank, oldrank) ? newrank
+                : new $c.Ptr(buf, 0)));
         }
     }
 }
@@ -610,7 +622,8 @@ async function newman() {   // polyself.c:336
             if (enmax < u.ulevel) {
                 enmax = u.ulevel;
             }
-            $t3 = await rounddiv($c.mul64(u.uen, enmax), u.uenmax < 1 ? 1 : u.uenmax), u.uen = $t3;
+            $t3 = await rounddiv($c.mul64(u.uen, enmax),
+                u.uenmax < 1 ? 1 : u.uenmax), u.uen = $t3;
             u.uenmax = enmax;
             /* [should alignment record be tweaked too?] */
             $t4 = rn1(500, 500), u.uhunger = $t4;
@@ -630,7 +643,8 @@ async function newman() {   // polyself.c:336
                 } else {
                     $goto = null;   // dead:
                     /* we come directly here if experience level went to 0 or less */
-                    await urgent_pline($C`Your new form doesn't seem healthy enough to survive.`);
+                    await urgent_pline(
+                        $C`Your new form doesn't seem healthy enough to survive.`);
                     svk.killer.format = KILLED.BY_AN;
                     $c.strcpy(new $c.Ptr(svk.killer.name, 0), $C`unsuccessful polymorph`);
                     await done(DIED);
@@ -642,13 +656,18 @@ async function newman() {   // polyself.c:336
             }
             await newuhs(FALSE);
             /* use saved gender we're about to revert to, not current */
-            newform = (Upolyd() ? u.mfemale : flags.female) && gu.urace.individual.f ? gu.urace.individual.f : gu.urace.individual.m ? gu.urace.individual.m : gu.urace.noun;
+            newform = (Upolyd() ? u.mfemale : flags.female) && gu.urace.individual.f
+                ? gu.urace.individual.f
+                : gu.urace.individual.m
+                ? gu.urace.individual.m
+                : gu.urace.noun;
             await polyman($C`You feel like a new %s!`, newform);
             newgend = poly_gender();
             /* note: newman() bypasses achievements for new ranks attained and
                doesn't log "new <form>" when that isn't accompanied by level change */
             if (newlvl !== oldlvl) {
-                await livelog_printf(LL.MINORAC, $C`became experience level %d as a new %s`, newlvl, newform);
+                await livelog_printf(LL.MINORAC, $C`became experience level %d as a new %s`,
+                    newlvl, newform);
             } else {
                 await livelog_newform(TRUE, oldgend, newgend);
             }
@@ -683,14 +702,16 @@ export async function polyself(psflags) {   // polyself.c:469
             formrevert = (psflags & POLY.REVERT) !== 0 ? 1 : 0;
             draconian = $G.uarm && Is_dragon_armor($G.uarm) ? 1 : 0;
             iswere = ismnum(u.ulycn);
-            isvamp = is_vampire(gy.youmonst.data) || is_vampshifter(gy.youmonst) ? 1 : 0;
+            isvamp = is_vampire(gy.youmonst.data)
+                || is_vampshifter(gy.youmonst) ? 1 : 0;
             controllable_poly = Polymorph_control() && !(u.uprops[STUNNED].intrinsic || Unaware()) ? 1 : 0;
             if (Unchanging()) {
                 await You($C`fail to transform!`);
                 return;
             }
             /* being Stunned|Unaware doesn't negate this aspect of Poly_control */
-            if (!Polymorph_control() && !forcecontrol && !draconian && !iswere && !isvamp) {
+            if (!Polymorph_control() && !forcecontrol && !draconian && !iswere
+                && !isvamp) {
                 if (rn2(20) > ACURR(A.CON)) {
                     await You($C`%s`, c_common_strings.c_shudder_for_moment);
                     await losehp(rnd(30), $C`system shock`, KILLED.BY_AN);
@@ -705,7 +726,8 @@ export async function polyself(psflags) {   // polyself.c:469
                 monsterpoly = TRUE;
                 controllable_poly = FALSE;
             }
-            if (forcecontrol && low_control && (draconian || monsterpoly || isvamp || iswere)) {
+            if (forcecontrol && low_control
+                && (draconian || monsterpoly || isvamp || iswere)) {
                 forcecontrol = FALSE;
             }
             if (monsterpoly && isvamp) {
@@ -743,12 +765,16 @@ export async function polyself(psflags) {   // polyself.c:469
                                 $goto = null;   // by_class:
                                 class_ = await name_to_monclass(new $c.Ptr(buf, 0), new $c.Ptr(mntmp, 0));
                                 if (class_ && mntmp[0] === NON_PM) {
-                                    mntmp[0] = draconian && class_ === S.DRAGON ? armor_to_dragon($G.uarm.otyp) : mkclass_poly(class_);
+                                    mntmp[0] = draconian && class_ === S.DRAGON
+                                        ? armor_to_dragon($G.uarm.otyp)
+                                        : mkclass_poly(class_);
                                 }
                                 /* placeholder monsters are for corpses and all flagged
                                    M2_NOPOLY but they are reasonable polymorph targets;
                                    pick a suitable substitute (which might be geno'd) */
-                            } else if (is_placeholder($c.relem(mons, mntmp[0])) && !your_race($c.relem(mons, mntmp[0])) && mntmp[0] !== PM.HUMAN) {
+                            } else if (is_placeholder($c.relem(mons, mntmp[0]))
+                                && !your_race($c.relem(mons, mntmp[0]))
+                                && mntmp[0] !== PM.HUMAN) {
                                 /* when your own race, fall to !polyok() case */
                                 /* same for generic human, even if hero isn't human */
                                 /* far less general than mkclass() */
@@ -770,7 +796,11 @@ export async function polyself(psflags) {   // polyself.c:469
                                 } else {
                                     await You_cant($C`polymorph into any of those.`);
                                 }
-                            } else if (wizard() && Upolyd() && (mntmp[0] === u.umonster || u.umonster === PM.CLERIC && mntmp[0] === PM.ALIGNED_CLERIC && !strstri(new $c.Ptr(buf, 0), $C`aligned`))) {
+                            } else if (wizard() && Upolyd()
+                                && (mntmp[0] === u.umonster
+                                || u.umonster === PM.CLERIC
+                                && mntmp[0] === PM.ALIGNED_CLERIC
+                                && !strstri(new $c.Ptr(buf, 0), $C`aligned`))) {
                                 /* "priest" and "priestess" match the monster
                                    rather than the role; override that unless
                                    the text explicitly contains "aligned" */
@@ -779,9 +809,15 @@ export async function polyself(psflags) {   // polyself.c:469
                                 await rehumanize();
                                 old_light = 0;   /* rehumanize() extinguishes u-as-mon light */
                                 $goto = "made_change"; continue D1;
-                            } else if (iswere && (were_beastie(mntmp[0]) === u.ulycn || mntmp[0] === counter_were(u.ulycn) || Upolyd() && mntmp[0] === PM.HUMAN)) {
+                            } else if (iswere && (were_beastie(mntmp[0]) === u.ulycn
+                                || mntmp[0] === counter_were(u.ulycn)
+                                || Upolyd() && mntmp[0] === PM.HUMAN)) {
                                 $goto = "do_shift"; continue D1;
-                            } else if (!polyok($c.relem(mons, mntmp[0])) && !(mntmp[0] === PM.HUMAN || your_race($c.relem(mons, mntmp[0])) && (mons[mntmp[0]].geno & G_UNIQ) === 0 || mntmp[0] === gu.urole.mnum)) {
+                            } else if (!polyok($c.relem(mons, mntmp[0]))
+                                && !(mntmp[0] === PM.HUMAN
+                                || your_race($c.relem(mons, mntmp[0]))
+                                && (mons[mntmp[0]].geno & G_UNIQ) === 0
+                                || mntmp[0] === gu.urole.mnum)) {
                                 /* Note:  humans are illegal as monsters, but an
                                    illegal monster forces newman(), which is what
                                    we want if they specified a human.... (unless
@@ -818,7 +854,8 @@ export async function polyself(psflags) {   // polyself.c:469
                 if (draconian && (tryct <= 0 || mntmp[0] === armor_to_dragon($G.uarm.otyp))) {
                     $goto = "do_merge"; continue D1;
                 }
-                if (isvamp && (tryct <= 0 || mntmp[0] === PM.WOLF || mntmp[0] === PM.FOG_CLOUD || is_bat($c.relem(mons, mntmp[0])))) {
+                if (isvamp && (tryct <= 0 || mntmp[0] === PM.WOLF || mntmp[0] === PM.FOG_CLOUD
+                    || is_bat($c.relem(mons, mntmp[0])))) {
                     $goto = "do_vampyr"; continue D1;
                 }
             } else if ($goto === "do_vampyr" || $goto === "do_shift" || $goto === "do_merge" || (draconian || iswere || isvamp)) {
@@ -828,7 +865,8 @@ export async function polyself(psflags) {   // polyself.c:469
                     mntmp[0] = armor_to_dragon($G.uarm.otyp);
                     if (!(svm.mvitals[mntmp[0]].mvflags & G_GENOD)) {
                         was_lit = $G.uarm.lamplit;
-                        arm_light = artifact_light($G.uarm) ? arti_light_radius($G.uarm) : 0;
+                        arm_light = artifact_light($G.uarm) ? arti_light_radius($G.uarm)
+                            : 0;
                         /* allow G_EXTINCT */
                         if (Is_dragon_scales($G.uarm)) {
                             /* dragon scales remain intact as uskin */
@@ -869,8 +907,12 @@ export async function polyself(psflags) {   // polyself.c:469
                 } else if ($goto === "do_vampyr" || isvamp) {
                     $goto = null;   // do_vampyr:
                     if (mntmp[0] < LOW_PM || mons[mntmp[0]].geno & G_UNIQ) {
-                        mntmp[0] = gy.youmonst.data === mons[PM.VAMPIRE_LEADER] && !rn2(10) ? PM.WOLF : !rn2(4) ? PM.FOG_CLOUD : PM.VAMPIRE_BAT;
-                        if (ismnum(gy.youmonst.cham) && !is_vampire(gy.youmonst.data) && !rn2(2)) {
+                        mntmp[0] = gy.youmonst.data === mons[PM.VAMPIRE_LEADER]
+                            && !rn2(10) ? PM.WOLF
+                            : !rn2(4) ? PM.FOG_CLOUD
+                            : PM.VAMPIRE_BAT;
+                        if (ismnum(gy.youmonst.cham)
+                            && !is_vampire(gy.youmonst.data) && !rn2(2)) {
                             mntmp[0] = gy.youmonst.cham;
                         }
                     }
@@ -905,7 +947,8 @@ export async function polyself(psflags) {   // polyself.c:469
              * we deliberately chose something illegal to force newman().
              */
             gs.sex_change_ok = gs.sex_change_ok + 1 | 0;
-            if (!polyok($c.relem(mons, mntmp[0])) || !forcecontrol && !rn2(5) || your_race($c.relem(mons, mntmp[0]))) {
+            if (!polyok($c.relem(mons, mntmp[0])) || !forcecontrol && !rn2(5)
+                || your_race($c.relem(mons, mntmp[0]))) {
                 await newman();
             } else {
                 await polymon(mntmp[0]);
@@ -922,7 +965,8 @@ export async function polyself(psflags) {   // polyself.c:469
                     new_light = new_light + 1 | 0;   /* otherwise it's undetectable */
                 }
                 if (new_light) {
-                    await new_light_source(u.ux, u.uy, new_light, LS_MONSTER, monst_to_any(gy.youmonst));
+                    await new_light_source(u.ux, u.uy, new_light, LS_MONSTER,
+                        monst_to_any(gy.youmonst));
                 }
             }
         }
@@ -943,13 +987,16 @@ export async function polymon(mntmp) {   // polyself.c:735
     const was_hiding_under = u.uundetected && hides_under(gy.youmonst.data) ? 1 : 0;
     if (svm.mvitals[mntmp].mvflags & G_GENOD) {
         /* allow G_EXTINCT */
-        await You_feel($C`rather %s-ish.`, pmname($c.relem(mons, mntmp), flags.female ? FEMALE : MALE));
+        await You_feel($C`rather %s-ish.`,
+            pmname($c.relem(mons, mntmp), flags.female ? FEMALE : MALE));
         await exercise(A.WIS, TRUE);
         return 0;
     }
     /* KMH, conduct */
     if (!($t1 = u.uconduct.polyselfs, u.uconduct.polyselfs = $c.add64($t1, 1), $t1)) {
-        await livelog_printf(LL.CONDUCT, $C`changed form for the first time, becoming %s`, await an(pmname($c.relem(mons, mntmp), flags.female ? FEMALE : MALE)));
+        await livelog_printf(LL.CONDUCT,
+            $C`changed form for the first time, becoming %s`,
+            await an(pmname($c.relem(mons, mntmp), flags.female ? FEMALE : MALE)));
     }
     /* exercise used to be at the very end but only Wis was affected
        there since the polymorph was always in effect by then */
@@ -969,7 +1016,8 @@ export async function polymon(mntmp) {   // polyself.c:735
         flags.female = u.mfemale;
     }
     /* if stuck mimicking gold, stop immediately */
-    if (gm.multi < 0 && U_AP_TYPE() === M_AP.OBJECT && gy.youmonst.data.mlet !== S.MIMIC) {
+    if (gm.multi < 0 && U_AP_TYPE() === M_AP.OBJECT
+        && gy.youmonst.data.mlet !== S.MIMIC) {
         await unmul($C``);
     }
     /* if becoming a non-mimic, stop mimicking anything */
@@ -1026,7 +1074,8 @@ export async function polymon(mntmp) {   // polyself.c:735
     }
     if (Stone_resistance() && Stoned()) {
         /* parnes@eniac.seas.upenn.edu */
-        await make_stoned(0, $C`You no longer seem to be petrifying.`, 0, null);
+        await make_stoned(0, $C`You no longer seem to be petrifying.`, 0,
+            null);
     }
     if (await Sick_resistance() && Sick()) {
         await make_sick(0, null, FALSE, SICK_ALL);
@@ -1100,7 +1149,9 @@ export async function polymon(mntmp) {   // polyself.c:735
     if (u.uswallow) {
         /* if new form can't be swallowed, make engulfer expel hero */
         /* subset of engulf_target() */
-        if (unsolid(gy.youmonst.data) || (usiz = gy.youmonst.data.msize) >= MZ.HUGE || u.ustuck.data.msize < usiz && !is_whirly(u.ustuck.data)) {
+        if (unsolid(gy.youmonst.data)
+            || (usiz = gy.youmonst.data.msize) >= MZ.HUGE
+            || u.ustuck.data.msize < usiz && !is_whirly(u.ustuck.data)) {
             let expels_mesg = TRUE;
             if (unsolid(gy.youmonst.data)) {
                 if (canseemon(u.ustuck) || sensemon(u.ustuck)) {   /* [see below for explanation] */
@@ -1117,7 +1168,8 @@ export async function polymon(mntmp) {   // polyself.c:735
         /* [note:  this 'sticking' handling is only sufficient for changing from
            grabber to engulfer or vice versa because engulfing by poly'd hero
            always ends immediately so won't be in effect during a polymorph] */
-    } else if (u.ustuck && !sticking && (sticks(gy.youmonst.data) || unsolid(gy.youmonst.data))) {
+    } else if (u.ustuck && !sticking
+        && (sticks(gy.youmonst.data) || unsolid(gy.youmonst.data))) {
         /* && !u.uswallow */
         /* being held; if now capable of holding, make holder
            release so that hero doesn't automagically start holding
@@ -1136,7 +1188,8 @@ export async function polymon(mntmp) {   // polyself.c:735
     }
     if (u.usteed) {
         if (touch_petrifies(u.usteed.data) && !Stone_resistance() && rnl(3)) {
-            await pline($C`%s touch %s.`, new $c.Ptr(no_longer_petrify_resistant, 0), await mon_nam(u.usteed));
+            await pline($C`%s touch %s.`, new $c.Ptr(no_longer_petrify_resistant, 0),
+                await mon_nam(u.usteed));
             $c.sprintf(new $c.Ptr(buf, 0), $C`riding %s`, await an(pmname(u.usteed.data, Mgender(u.usteed))));
             await instapetrify(new $c.Ptr(buf, 0));
         }
@@ -1146,12 +1199,15 @@ export async function polymon(mntmp) {   // polyself.c:735
     }
     find_ac();
     /* if expelled above, expels() already called spoteffects() */
-    if ((!Levitation() && !u.ustuck && !Flying() && is_pool_or_lava(u.ux, u.uy) || Underwater() && !Swimming()) && !was_expelled) {
+    if ((!Levitation() && !u.ustuck && !Flying() && is_pool_or_lava(u.ux, u.uy)
+        || Underwater() && !Swimming())
+        && !was_expelled) {
         await spoteffects(TRUE);
         /* FIXME? if spoteffects() triggered rehumanize then we should
            return early */
     }
-    if (Passes_walls() && u.utrap && (u.utraptype === TT.INFLOOR || u.utraptype === TT.BURIEDBALL)) {
+    if (Passes_walls() && u.utrap
+        && (u.utraptype === TT.INFLOOR || u.utraptype === TT.BURIEDBALL)) {
         if (u.utraptype === TT.INFLOOR) {
             await pline_The($C`rock seems to no longer trap you.`);
         } else {
@@ -1159,11 +1215,13 @@ export async function polymon(mntmp) {   // polyself.c:735
             await buried_ball_to_freedom();
         }
         await reset_utrap(TRUE);
-    } else if (likes_lava(gy.youmonst.data) && u.utrap && u.utraptype === TT.LAVA) {
+    } else if (likes_lava(gy.youmonst.data) && u.utrap
+        && u.utraptype === TT.LAVA) {
         await pline_The($C`%s now feels soothing.`, hliquid($C`lava`));
         await reset_utrap(TRUE);
     }
-    if (amorphous(gy.youmonst.data) || is_whirly(gy.youmonst.data) || unsolid(gy.youmonst.data)) {
+    if (amorphous(gy.youmonst.data) || is_whirly(gy.youmonst.data)
+        || unsolid(gy.youmonst.data)) {
         if (Punished()) {
             await You($C`slip out of the iron chain.`);
             await unpunish();
@@ -1172,8 +1230,13 @@ export async function polymon(mntmp) {   // polyself.c:735
             await buried_ball_to_freedom();
         }
     }
-    if (u.utrap && (u.utraptype === TT.WEB || u.utraptype === TT.BEARTRAP) && (amorphous(gy.youmonst.data) || is_whirly(gy.youmonst.data) || unsolid(gy.youmonst.data) || gy.youmonst.data.msize <= MZ.SMALL && u.utraptype === TT.BEARTRAP)) {
-        await You($C`are no longer stuck in the %s.`, u.utraptype === TT.WEB ? $C`web` : $C`bear trap`);
+    if (u.utrap && (u.utraptype === TT.WEB || u.utraptype === TT.BEARTRAP)
+        && (amorphous(gy.youmonst.data) || is_whirly(gy.youmonst.data)
+        || unsolid(gy.youmonst.data)
+        || gy.youmonst.data.msize <= MZ.SMALL
+        && u.utraptype === TT.BEARTRAP)) {
+        await You($C`are no longer stuck in the %s.`,
+            u.utraptype === TT.WEB ? $C`web` : $C`bear trap`);
         /* probably should burn webs too if PM_FIRE_ELEMENTAL */
         await reset_utrap(TRUE);
     }
@@ -1236,8 +1299,11 @@ export async function polymon(mntmp) {   // polyself.c:735
         if (is_vampire(uptr) || is_vampshifter(gy.youmonst)) {
             await pline(new $c.Ptr(polymon$use_thec, 0), new $c.Ptr(polymon$monsterc, 0), $C`change shape`);
         }
-        if (lays_eggs(uptr) && flags.female && !(uptr === mons[PM.GIANT_EEL] || uptr === mons[PM.ELECTRIC_EEL])) {
-            await pline(new $c.Ptr(polymon$use_thec, 0), $C`sit`, eggs_in_water(uptr) ? $C`spawn in the water` : $C`lay an egg`);
+        if (lays_eggs(uptr) && flags.female
+            && !(uptr === mons[PM.GIANT_EEL]
+            || uptr === mons[PM.ELECTRIC_EEL])) {
+            await pline(new $c.Ptr(polymon$use_thec, 0), $C`sit`,
+                eggs_in_water(uptr) ? $C`spawn in the water` : $C`lay an egg`);
         }
     }
     return 1;
@@ -1341,7 +1407,8 @@ async function break_armor() {   // polyself.c:1157
             await useup(otmp);
         }
         /* mummy wrapping adapts to small and very big sizes */
-        if ((otmp = $G.uarmc) !== null && (otmp.otyp !== MUMMY_WRAPPING || !WrappingAllowed(uptr))) {
+        if ((otmp = $G.uarmc) !== null
+            && (otmp.otyp !== MUMMY_WRAPPING || !WrappingAllowed(uptr))) {
             if (otmp.otyp === MUMMY_WRAPPING) {
                 /* doesn't have a clasp to break open */
                 await Your($C`%s tears apart!`, cloak_simple_name(otmp));
@@ -1375,7 +1442,8 @@ async function break_armor() {   // polyself.c:1157
             await dropp(otmp);
         }
         /* mummy wrapping adapts to small and very big sizes */
-        if ((otmp = $G.uarmc) !== null && (otmp.otyp !== MUMMY_WRAPPING || !WrappingAllowed(uptr))) {
+        if ((otmp = $G.uarmc) !== null
+            && (otmp.otyp !== MUMMY_WRAPPING || !WrappingAllowed(uptr))) {
             if (is_whirly(uptr)) {
                 await Your($C`%s falls, unsupported!`, cloak_simple_name(otmp));
             } else {
@@ -1399,12 +1467,14 @@ async function break_armor() {   // polyself.c:1157
             if (is_flimsy(otmp) && !donning(otmp)) {
                 /* Future possibilities: This could damage/destroy helmet */
                 $c.sprintf(new $c.Ptr(hornbuf, 0), $C`horn%s`, num_horns(uptr) === 1 ? $C`` : $C`s`);
-                await Your($C`%s %s through %s.`, new $c.Ptr(hornbuf, 0), await vtense(new $c.Ptr(hornbuf, 0), $C`pierce`), await yname(otmp));
+                await Your($C`%s %s through %s.`, new $c.Ptr(hornbuf, 0), await vtense(new $c.Ptr(hornbuf, 0), $C`pierce`),
+                    await yname(otmp));
             } else {
                 if (donning(otmp)) {
                     cancel_don();
                 }
-                await Your($C`%s falls to the %s!`, helm_simple_name(otmp), surface(u.ux, u.uy));
+                await Your($C`%s falls to the %s!`, helm_simple_name(otmp),
+                    surface(u.ux, u.uy));
                 await Helmet_off();
                 await dropp(otmp);
             }
@@ -1431,12 +1501,14 @@ async function break_armor() {   // polyself.c:1157
             if (donning(otmp)) {
                 cancel_don();
             }
-            await Your($C`%s falls to the %s!`, helm_simple_name(otmp), surface(u.ux, u.uy));
+            await Your($C`%s falls to the %s!`, helm_simple_name(otmp),
+                surface(u.ux, u.uy));
             await Helmet_off();
             await dropp(otmp);
         }
     }
-    if (nohands(uptr) || verysmall(uptr) || slithy(uptr) || uptr.mlet === S.CENTAUR) {
+    if (nohands(uptr) || verysmall(uptr)
+        || slithy(uptr) || uptr.mlet === S.CENTAUR) {
         if ((otmp = $G.uarmf) !== null) {
             if (donning(otmp)) {
                 cancel_don();
@@ -1444,7 +1516,8 @@ async function break_armor() {   // polyself.c:1157
             if (is_whirly(uptr)) {
                 await Your($C`boots fall away!`);
             } else {
-                await Your($C`boots %s off your feet!`, verysmall(uptr) ? $C`slide` : $C`are pushed`);
+                await Your($C`boots %s off your feet!`,
+                    verysmall(uptr) ? $C`slide` : $C`are pushed`);
             }
             await Boots_off();
             await dropp(otmp);
@@ -1492,7 +1565,8 @@ async function drop_weapon(alone) {   // polyself.c:1305
                 if ($G.uwep.quan !== 1 || u.twoweap) {
                     which = await makeplural(which);
                 }
-                await You($C`find you must %s %s %s!`, what, c_common_strings.c_the_your[!!$c.strncmp(which, $C`corpse`, 6) ? 1 : 0], which);
+                await You($C`find you must %s %s %s!`, what,
+                    c_common_strings.c_the_your[!!$c.strncmp(which, $C`corpse`, 6) ? 1 : 0], which);
             }
             /* if either uwep or wielded uswapwep is flagged as 'in_use'
                then don't drop it or explicitly update inventory; leave
@@ -1570,7 +1644,8 @@ export async function rehumanize() {   // polyself.c:1367
     await encumber_msg();
     await update_inventory();
     if (was_flying && !Flying() && u.usteed) {
-        await You($C`and %s return gently to the %s.`, await mon_nam(u.usteed), surface(u.ux, u.uy));
+        await You($C`and %s return gently to the %s.`,
+            await mon_nam(u.usteed), surface(u.ux, u.uy));
     }
     await retouch_equipment(2);
     if (!$G.uarmg) {
@@ -1639,7 +1714,8 @@ export async function dospit() {   // polyself.c:1450
 export async function doremove() {   // polyself.c:1481
     if (!Punished()) {
         if (u.utrap && u.utraptype === TT.BURIEDBALL) {
-            await pline_The($C`ball and chain are buried firmly in the %s.`, surface(u.ux, u.uy));
+            await pline_The($C`ball and chain are buried firmly in the %s.`,
+                surface(u.ux, u.uy));
             return ECMD.OK;
         }
         await You($C`are not chained to anything!`);
@@ -1662,7 +1738,8 @@ export async function dospinweb() {   // polyself.c:1497
        webmaker and a flyer, but with the advent of amulet of flying that
        became a possibility; at present hero can spin a web while flying] */
     if (Levitation() || reject_terrain) {
-        await You($C`must be on %s ground to spin a web.`, reject_terrain ? $C`solid` : $C`the`);
+        await You($C`must be on %s ground to spin a web.`,
+            reject_terrain ? $C`solid` : $C`the`);
         return ECMD.OK;
     }
     if (u.uswallow) {
@@ -1729,7 +1806,8 @@ export async function dospinweb() {   // polyself.c:1497
                 return ECMD.TIME;
             case HOLE:
             case TRAPDOOR:
-                await You($C`web over the %s.`, ttmp.ttyp === TRAPDOOR ? $C`trap door` : $C`hole`);
+                await You($C`web over the %s.`,
+                    ttmp.ttyp === TRAPDOOR ? $C`trap door` : $C`hole`);
                 await deltrap(ttmp);
                 await newsym(x, y);
                 return ECMD.TIME;
@@ -1758,7 +1836,8 @@ export async function dospinweb() {   // polyself.c:1497
         }
     } else if (On_stairs(x, y)) {
         /* cop out: don't let them hide the stairs */
-        await Your($C`web fails to impede access to the %s.`, svl.level.locations[x][y].typ === STAIRS ? $C`stairs` : $C`ladder`);
+        await Your($C`web fails to impede access to the %s.`,
+            svl.level.locations[x][y].typ === STAIRS ? $C`stairs` : $C`ladder`);
         return ECMD.TIME;
     }
     ttmp = await maketrap(x, y, WEB);
@@ -1830,7 +1909,8 @@ export async function dogaze() {   // polyself.c:1642
                 await pline($C`%s seems not to notice your gaze.`, await Monnam(mtmp));
             } else if (mtmp.minvis && !See_invisible()) {
                 await You_cant($C`see where to gaze at %s.`, await Monnam(mtmp));
-            } else if (M_AP_TYPE(mtmp) === M_AP.FURNITURE || M_AP_TYPE(mtmp) === M_AP.OBJECT) {
+            } else if (M_AP_TYPE(mtmp) === M_AP.FURNITURE
+                || M_AP_TYPE(mtmp) === M_AP.OBJECT) {
                 looked = looked - 1 | 0;
                 continue;
             } else if (flags.safe_dog && mtmp.mtame && !u.uprops[CONFUSION].intrinsic) {
@@ -1843,7 +1923,8 @@ export async function dogaze() {   // polyself.c:1642
                     }
                 }
                 await setmangry(mtmp, TRUE);
-                if (helpless(mtmp) || mtmp.mstun || !mtmp.mcansee || !haseyes(mtmp.data)) {
+                if (helpless(mtmp) || mtmp.mstun
+                    || !mtmp.mcansee || !haseyes(mtmp.data)) {
                     looked = looked - 1 | 0;
                     continue;
                 }
@@ -1854,7 +1935,8 @@ export async function dogaze() {   // polyself.c:1642
                     if (!mtmp.mconf) {
                         await Your($C`gaze confuses %s!`, await mon_nam(mtmp));
                     } else {
-                        await pline($C`%s is getting more and more confused.`, await Monnam(mtmp));
+                        await pline($C`%s is getting more and more confused.`,
+                            await Monnam(mtmp));
                     }
                     mtmp.mconf = 1;
                 } else if (adtyp === AD.FIRE) {
@@ -1885,13 +1967,17 @@ export async function dogaze() {   // polyself.c:1642
                 }
                 if (mtmp.data === mons[PM.FLOATING_EYE] && !mtmp.mcan) {
                     if (!Free_action()) {
-                        await You($C`are frozen by %s gaze!`, s_suffix(await mon_nam(mtmp)));
-                        nomul(u.ulevel > 6 || rn2(4) ? -d(mtmp.m_lev + 1, mtmp.data.mattk[0].damd) | 0 : -200);
+                        await You($C`are frozen by %s gaze!`,
+                            s_suffix(await mon_nam(mtmp)));
+                        nomul(u.ulevel > 6 || rn2(4)
+                            ? -d(mtmp.m_lev + 1, mtmp.data.mattk[0].damd) | 0
+                            : -200);
                         gm.multi_reason = $C`frozen by a monster's gaze`;
                         gn.nomovemsg = null;
                         return ECMD.TIME;
                     } else {
-                        await You($C`stiffen momentarily under %s gaze.`, s_suffix(await mon_nam(mtmp)));
+                        await You($C`stiffen momentarily under %s gaze.`,
+                            s_suffix(await mon_nam(mtmp)));
                     }
                 }
                 /* Technically this one shouldn't affect you at all because
@@ -1900,7 +1986,8 @@ export async function dogaze() {   // polyself.c:1642
                  * effect would be too weird.
                  */
                 if (mtmp.data === mons[PM.MEDUSA] && !mtmp.mcan) {
-                    await pline($C`Gazing at the awake %s is not a very good idea.`, await l_monnam(mtmp));
+                    await pline($C`Gazing at the awake %s is not a very good idea.`,
+                        await l_monnam(mtmp));
                     /* as if gazing at a sleeping anything is fruitful... */
                     await urgent_pline($C`You turn to stone...`);
                     svk.killer.format = KILLED.BY;
@@ -1926,7 +2013,13 @@ export async function dohide() {   // polyself.c:1777
     /* can't hide while being held (or holding) or while trapped
        (except for floor hiders [trapper or mimic] in pits) */
     if (u.ustuck || u.utrap && (u.utraptype !== TT.PIT || on_ceiling)) {
-        await You_cant($C`hide while you're %s.`, !u.ustuck ? $C`trapped` : u.uswallow ? dmgtype_fromattack(u.ustuck.data, AD.DGST, AT.ENGL) !== null ? $C`swallowed` : $C`engulfed` : !sticks(gy.youmonst.data) ? $C`being held` : humanoid(u.ustuck.data) ? $C`holding someone` : $C`holding that creature`);
+        await You_cant($C`hide while you're %s.`,
+            !u.ustuck ? $C`trapped`
+            : u.uswallow ? dmgtype_fromattack(u.ustuck.data, AD.DGST, AT.ENGL) !== null ? $C`swallowed`
+            : $C`engulfed`
+            : !sticks(gy.youmonst.data) ? $C`being held`
+            : humanoid(u.ustuck.data) ? $C`holding someone`
+            : $C`holding that creature`);
         if (u.uundetected || ismimic && U_AP_TYPE() !== M_AP.NOTHING) {
             u.uundetected = 0;
             gy.youmonst.m_ap_type = M_AP.NOTHING;
@@ -1953,7 +2046,8 @@ export async function dohide() {   // polyself.c:1777
             u.uundetected = 0;
             return ECMD.OK;
         }
-        for (otmp = otop; otmp && otmp.otyp === CORPSE && touch_petrifies($c.relem(mons, otmp.corpsenm)); otmp = otmp.v.v_nexthere) {
+        for (otmp = otop; otmp && otmp.otyp === CORPSE
+            && touch_petrifies($c.relem(mons, otmp.corpsenm)); otmp = otmp.v.v_nexthere) {
             ct = $c.add64(ct, otmp.quan);
         }
         /* otmp will be Null iff the entire pile consists of 'trice corpses */
@@ -1967,7 +2061,8 @@ export async function dohide() {   // polyself.c:1777
             }
             /* no need to check poly_when_stoned(); no hide-underers can
                turn into stone golems instead of becoming petrified */
-            await pline($C`Hiding under %s%s is a fatal mistake...`, corpse_name, plur(ct));
+            await pline($C`Hiding under %s%s is a fatal mistake...`,
+                corpse_name, plur(ct));
             $c.sprintf(new $c.Ptr(kbuf, 0), $C`hiding under %s%s`, corpse_name, ct === 1 ? $C`` : $C`s`);
             await instapetrify(new $c.Ptr(kbuf, 0));
             /* only reach here if life-saved */
@@ -1982,7 +2077,8 @@ export async function dohide() {   // polyself.c:1777
         return ECMD.OK;
     }
     /* floor hider */
-    if (is_hider(gy.youmonst.data) && !Flying() && (Is_airlevel(u.uz) || Is_waterlevel(u.uz))) {
+    if (is_hider(gy.youmonst.data) && !Flying()
+        && (Is_airlevel(u.uz) || Is_waterlevel(u.uz))) {
         await There($C`is nowhere to hide beneath you.`);
         u.uundetected = 0;
         return ECMD.OK;
@@ -2013,7 +2109,8 @@ export async function dopoly() {   // polyself.c:1877
     if (is_vampire(gy.youmonst.data) || is_vampshifter(gy.youmonst)) {
         await polyself(POLY.MONSTER);
         if (savedat !== gy.youmonst.data) {
-            await You($C`transform into %s.`, await an(pmname(gy.youmonst.data, Ugender())));
+            await You($C`transform into %s.`,
+                await an(pmname(gy.youmonst.data, Ugender())));
             await newsym(u.ux, u.uy);
         }
     }
@@ -2055,7 +2152,10 @@ export async function domindblast() {   // polyself.c:1894
                unless it will survive the psychic blast, otherwise hero
                would avoid the penalty for killing it while peaceful */
             await wakeup(mtmp, dmg > mtmp.mhp ? TRUE : FALSE);
-            await You($C`lock in on %s %s.`, s_suffix(await mon_nam(mtmp)), u_sen ? $C`telepathy` : telepathic(mtmp.data) ? $C`latent telepathy` : $C`mind`);
+            await You($C`lock in on %s %s.`, s_suffix(await mon_nam(mtmp)),
+                u_sen ? $C`telepathy`
+                : telepathic(mtmp.data) ? $C`latent telepathy`
+                : $C`mind`);
             mtmp.mhp = mtmp.mhp - dmg | 0;
             if (DEADMONSTER(mtmp)) {
                 await killed(mtmp);
@@ -2109,7 +2209,8 @@ export async function mbodypart(mon, part) {   // polyself.c:1972
         return $C`mystery part`;
     }
     /* some special cases */
-    if (mptr.mlet === S.DOG || mptr.mlet === S.FELINE || mptr.mlet === S.RODENT || mptr === mons[PM.OWLBEAR]) {
+    if (mptr.mlet === S.DOG || mptr.mlet === S.FELINE
+        || mptr.mlet === S.RODENT || mptr === mons[PM.OWLBEAR]) {
         switch (part) {
             case HAND:
                 return $C`paw`;
@@ -2128,22 +2229,29 @@ export async function mbodypart(mon, part) {   // polyself.c:1972
         /* opposable thumbs, hence "hands", "arms", "legs", &c */
         return mbodypart$humanoid_parts[part];   /* yeti/sasquatch, monkey/ape */
     }
-    if ((part === HAND || part === HANDED) && (humanoid(mptr) && attacktype(mptr, AT.CLAW) && !$c.strchr(new $c.Ptr(mbodypart$not_claws, 0), mptr.mlet) && mptr !== mons[PM.STONE_GOLEM] && mptr !== mons[PM.AMOROUS_DEMON])) {
+    if ((part === HAND || part === HANDED)
+        && (humanoid(mptr) && attacktype(mptr, AT.CLAW)
+        && !$c.strchr(new $c.Ptr(mbodypart$not_claws, 0), mptr.mlet) && mptr !== mons[PM.STONE_GOLEM]
+        && mptr !== mons[PM.AMOROUS_DEMON])) {
         return part === HAND ? $C`claw` : $C`clawed`;
     }
-    if ((mptr === mons[PM.MUMAK] || mptr === mons[PM.MASTODON]) && part === NOSE) {
+    if ((mptr === mons[PM.MUMAK] || mptr === mons[PM.MASTODON])
+        && part === NOSE) {
         return $C`trunk`;
     }
     if (mptr === mons[PM.SHARK] && part === HAIR) {
         return $C`skin`;   /* sharks don't have scales */
     }
-    if ((mptr === mons[PM.JELLYFISH] || mptr === mons[PM.KRAKEN]) && (part === ARM || part === FINGER || part === HAND || part === FOOT || part === TOE)) {
+    if ((mptr === mons[PM.JELLYFISH] || mptr === mons[PM.KRAKEN])
+        && (part === ARM || part === FINGER || part === HAND || part === FOOT
+        || part === TOE)) {
         return $C`tentacle`;
     }
     if (mptr === mons[PM.FLOATING_EYE] && part === EYE) {
         return $C`cornea`;
     }
-    if (humanoid(mptr) && (part === ARM || part === FINGER || part === FINGERTIP || part === HAND || part === HANDED)) {
+    if (humanoid(mptr) && (part === ARM || part === FINGER || part === FINGERTIP
+        || part === HAND || part === HANDED)) {
         return mbodypart$humanoid_parts[part];
     }
     if (mptr.mlet === S.COCKATRICE) {
@@ -2152,13 +2260,16 @@ export async function mbodypart(mon, part) {   // polyself.c:1972
     if (mptr === mons[PM.RAVEN]) {
         return mbodypart$bird_parts[part];
     }
-    if (mptr.mlet === S.CENTAUR || mptr.mlet === S.UNICORN || mptr === mons[PM.KI_RIN] || mptr === mons[PM.ROTHE] && part !== HAIR) {
+    if (mptr.mlet === S.CENTAUR || mptr.mlet === S.UNICORN
+        || mptr === mons[PM.KI_RIN]
+        || mptr === mons[PM.ROTHE] && part !== HAIR) {
         return mbodypart$horse_parts[part];
     }
     if (mptr.mlet === S.LIGHT) {
         if (part === HANDED) {
             return $C`rayed`;
-        } else if (part === ARM || part === FINGER || part === FINGERTIP || part === HAND) {
+        } else if (part === ARM || part === FINGER || part === FINGERTIP
+            || part === HAND) {
             return $C`ray`;
         } else {
             return $C`beam`;
@@ -2182,7 +2293,8 @@ export async function mbodypart(mon, part) {   // polyself.c:1972
     if (mptr.mlet === S.EYE) {
         return mbodypart$sphere_parts[part];
     }
-    if (mptr.mlet === S.JELLY || mptr.mlet === S.PUDDING || mptr.mlet === S.BLOB || mptr === mons[PM.JELLYFISH]) {
+    if (mptr.mlet === S.JELLY || mptr.mlet === S.PUDDING
+        || mptr.mlet === S.BLOB || mptr === mons[PM.JELLYFISH]) {
         return mbodypart$jelly_parts[part];
     }
     if (mptr.mlet === S.VORTEX || mptr.mlet === S.ELEMENTAL) {
@@ -2321,7 +2433,8 @@ function polysense() {   // polyself.c:2236
  * @returns {number} boolean
  */
 export function ugenocided() {   // polyself.c:2265
-    return svm.mvitals[gu.urole.mnum].mvflags & G_GENOD || svm.mvitals[gu.urace.mnum].mvflags & G_GENOD ? 1 : 0;
+    return svm.mvitals[gu.urole.mnum].mvflags & G_GENOD
+        || svm.mvitals[gu.urace.mnum].mvflags & G_GENOD ? 1 : 0;
 }
 /* how hero feels "inside" after self-genocide of role or race */
 /**
@@ -2334,7 +2447,11 @@ export function udeadinside() {   // polyself.c:2273
        for monster death message; we refine the nonliving aspect a bit */
     /* living, including demons */
     /* undead plus manes */
-    return !nonliving(gy.youmonst.data) ? $C`dead` : !weirdnonliving(gy.youmonst.data) ? $C`condemned` : $C`empty`;   /* golems plus vortices */
+    return !nonliving(gy.youmonst.data)
+        ? $C`dead`
+        : !weirdnonliving(gy.youmonst.data)
+        ? $C`condemned`
+        : $C`empty`;   /* golems plus vortices */
 }
 
 export function $init() {

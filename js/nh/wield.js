@@ -85,7 +85,9 @@ export async function setuwep(obj) {   // wield.c:100
     await setworn(obj, W.WEP);
     /* handle Ogresmasher before Sunsword; even though they can't be happening
        at the same time, botl flag update should come before pline message */
-    if ($G.uwep === obj && ($G.uwep && $G.uwep.oartifact === ART.OGRESMASHER || olduwep && olduwep.oartifact === ART.OGRESMASHER)) {
+    if ($G.uwep === obj
+        && ($G.uwep && $G.uwep.oartifact === ART.OGRESMASHER
+        || olduwep && olduwep.oartifact === ART.OGRESMASHER)) {
         disp.botl = TRUE;   /* gaining or losing Con bonus */
     }
     /* This message isn't printed in the caller because it happens
@@ -96,7 +98,9 @@ export async function setuwep(obj) {   // wield.c:100
             await pline($C`%s shining.`, await Tobjnam(olduwep, $C`stop`));
         }
     }
-    if ($G.uwep === obj && (u_wield_art(ART.OGRESMASHER) || is_art(olduwep, ART.OGRESMASHER))) {
+    if ($G.uwep === obj
+        && (u_wield_art(ART.OGRESMASHER)
+        || is_art(olduwep, ART.OGRESMASHER))) {
         disp.botl = TRUE;
     }
     /* Note: Explicitly wielding a pick-axe will not give a "bashing"
@@ -104,7 +108,10 @@ export async function setuwep(obj) {   // wield.c:100
      * 3.2.2:  Wielding arbitrary objects will give bashing message too.
      */
     if (obj) {
-        $t1 = obj.oclass === WEAPON_CLASS ? is_launcher(obj) || is_ammo(obj) || is_missile(obj) || is_pole(obj) && !u.usteed && !is_art(obj, ART.SNICKERSNEE) ? 1 : 0 : !is_weptool(obj) && !is_wet_towel(obj) ? 1 : 0, gu.unweapon = $t1;
+        $t1 = obj.oclass === WEAPON_CLASS
+            ? is_launcher(obj) || is_ammo(obj) || is_missile(obj)
+            || is_pole(obj) && !u.usteed && !is_art(obj, ART.SNICKERSNEE) ? 1 : 0
+            : !is_weptool(obj) && !is_wet_towel(obj) ? 1 : 0, gu.unweapon = $t1;
     } else {
         gu.unweapon = TRUE;   /* for "bare hands" message */
     }
@@ -115,11 +122,14 @@ export async function setuwep(obj) {   // wield.c:100
  */
 async function cant_wield_corpse(obj) {   // wield.c:138
     let kbuf = new Int8Array(256);
-    if ($G.uarmg || obj.otyp !== CORPSE || !touch_petrifies($c.relem(mons, obj.corpsenm)) || Stone_resistance()) {
+    if ($G.uarmg || obj.otyp !== CORPSE || !touch_petrifies($c.relem(mons, obj.corpsenm))
+        || Stone_resistance()) {
         return FALSE;
     }
     /* Prevent wielding cockatrice when not wearing gloves --KAA */
-    await You($C`wield %s in your bare %s.`, await corpse_xname(obj, null, CXN.PFX_THE), await makeplural(await body_part(HAND)));
+    await You($C`wield %s in your bare %s.`,
+        await corpse_xname(obj, null, CXN.PFX_THE),
+        await makeplural(await body_part(HAND)));
     $c.sprintf(new $c.Ptr(kbuf, 0), $C`wielding %s bare-handed`, await killer_xname(obj));
     await instapetrify(new $c.Ptr(kbuf, 0));
     return TRUE;
@@ -133,7 +143,10 @@ export function empty_handed() {   // wield.c:158
     /* gloves imply hands */
     /* hands but no weapon and no gloves */
     /* alternate phrasing for paws or lack of hands */
-    return $G.uarmg ? $C`empty handed` : humanoid(gy.youmonst.data) ? $C`bare handed` : $C`not wielding anything`;
+    return $G.uarmg ? $C`empty handed`
+        : humanoid(gy.youmonst.data)
+        ? $C`bare handed`
+        : $C`not wielding anything`;
 }
 /**
  * @param {$T.obj | null} wep$in struct obj *
@@ -159,7 +172,9 @@ async function ready_weapon(wep$in) {   // wield.c:169
         /* hero must have been life-saved to get here; use a turn */
         res = ECMD.TIME;   /* corpse won't be wielded */
     } else if ($G.uarms && bimanual(wep[0])) {
-        await You($C`cannot wield a two-handed %s while wearing a shield.`, is_sword(wep[0]) ? $C`sword` : wep[0].otyp === BATTLE_AXE ? $C`axe` : $C`weapon`);
+        await You($C`cannot wield a two-handed %s while wearing a shield.`,
+            is_sword(wep[0]) ? $C`sword` : wep[0].otyp === BATTLE_AXE ? $C`axe`
+            : $C`weapon`);
         res = ECMD.FAIL;
     } else if (!await retouch_object(new $c.Ptr(wep, 0), FALSE)) {
         res = ECMD.TIME;   /* takes a turn even though it doesn't get wielded */
@@ -175,7 +190,12 @@ async function ready_weapon(wep$in) {   // wield.c:169
                 tmp = $C``;
             }
             /* a3 */
-            await pline($C`%s%s %s to your %s%s!`, tmp, await aobjnam(wep[0], $C`weld`), wep[0].quan === 1 ? $C`itself` : $C`themselves`, bimanual(wep[0]) ? $C`` : URIGHTY() ? $C`dominant right ` : $C`dominant left `, bimanual(wep[0]) ? await makeplural(await body_part(HAND)) : await body_part(HAND));
+            await pline($C`%s%s %s to your %s%s!`, tmp, await aobjnam(wep[0], $C`weld`),
+                wep[0].quan === 1 ? $C`itself` : $C`themselves`,
+                bimanual(wep[0]) ? $C`` :
+                URIGHTY() ? $C`dominant right ` : $C`dominant left `,
+                bimanual(wep[0]) ? await makeplural(await body_part(HAND))
+                : await body_part(HAND));
             await set_bknown(wep[0], 1);
         } else {
             /* The message must be printed before setuwep (since
@@ -201,7 +221,9 @@ async function ready_weapon(wep$in) {   // wield.c:169
             /* skip this message if we already got "empty handed" one above;
                also, Null is not safe for neither TWOWEAPOK() or bimanual() */
             if ($G.uwep) {
-                await You($C`%s.`, TWOWEAPOK($G.uwep) && !bimanual($G.uwep) ? new $c.Ptr(are_no_longer_twoweap, 0) : new $c.Ptr(can_no_longer_twoweap, 0));
+                await You($C`%s.`, TWOWEAPOK($G.uwep) && !bimanual($G.uwep)
+                    ? new $c.Ptr(are_no_longer_twoweap, 0)
+                    : new $c.Ptr(can_no_longer_twoweap, 0));
             }
         }
         /* KMH -- Talking artifacts are finally implemented */
@@ -211,14 +233,16 @@ async function ready_weapon(wep$in) {   // wield.c:169
         if (artifact_light(wep[0]) && !wep[0].lamplit) {
             await begin_burn(wep[0], FALSE);
             if (!Blind()) {
-                await pline($C`%s to shine %s!`, await Tobjnam(wep[0], $C`begin`), arti_light_description(wep[0]));
+                await pline($C`%s to shine %s!`, await Tobjnam(wep[0], $C`begin`),
+                    arti_light_description(wep[0]));
             }
         }
         /* we'll get back to this someday, but it's not balanced yet */
         /* Elves are averse to wielding cold iron */
         if (wep[0].unpaid) {
             if ((this_shkp = await shop_keeper(inside_shop(u.ux, u.uy))) !== null) {
-                await pline($C`%s says "You be careful with my %s!"`, await shkname(this_shkp), await xname(wep[0]));
+                await pline($C`%s says "You be careful with my %s!"`,
+                    await shkname(this_shkp), await xname(wep[0]));
             }
         }
     }
@@ -260,7 +284,10 @@ function ready_ok(obj) {   // wield.c:294
         return obj.quan === 1 ? GETOBJ.DOWNPLAY : GETOBJ.SUGGEST;
     }
     if (is_ammo(obj)) {
-        return $G.uwep && ammo_and_launcher(obj, $G.uwep) || $G.uswapwep && ammo_and_launcher(obj, $G.uswapwep) ? GETOBJ.SUGGEST : GETOBJ.DOWNPLAY;
+        return $G.uwep && ammo_and_launcher(obj, $G.uwep)
+            || $G.uswapwep && ammo_and_launcher(obj, $G.uswapwep)
+            ? GETOBJ.SUGGEST
+            : GETOBJ.DOWNPLAY;
     } else if (is_launcher(obj)) {
         /* part of 'possible extension' below */
         return GETOBJ.DOWNPLAY;
@@ -362,7 +389,8 @@ export async function dowield() {   // wield.c:355
                 return await doswapweapon();
             } else if (wep === $G.uquiver) {
                 /* offer to split stack if multiple are quivered */
-                if ($G.uquiver.quan > 1 && inv_cnt(FALSE) < invlet_basic && await splittable($G.uquiver)) {
+                if ($G.uquiver.quan > 1 && inv_cnt(FALSE) < invlet_basic
+                    && await splittable($G.uquiver)) {
                     $c.sprintf(new $c.Ptr(qbuf, 0), $C`You have %ld %s readied.  Wield one?`, $G.uquiver.quan, await simpleonames($G.uquiver));
                     switch (await ynq(new $c.Ptr(qbuf, 0))) {
                         case 113:
@@ -383,7 +411,8 @@ export async function dowield() {   // wield.c:355
                 /* require confirmation to wield the quivered weapon */
                 if (await ynq(new $c.Ptr(qbuf, 0)) !== 121) {
                     await Shk_Your(new $c.Ptr(qbuf, 0), $G.uquiver);   /* replace qbuf[] contents */
-                    await pline($C`%s%s %s readied.`, new $c.Ptr(qbuf, 0), await simpleonames($G.uquiver), await otense($G.uquiver, $C`remain`));
+                    await pline($C`%s%s %s readied.`, new $c.Ptr(qbuf, 0),
+                        await simpleonames($G.uquiver), await otense($G.uquiver, $C`remain`));
                     return ECMD.OK;
                 }
                 /* wielding whole readied stack, so no longer quivered */
@@ -522,7 +551,8 @@ export async function doquiver_core(verb) {   // wield.c:512
                     return weld_res ? ECMD.TIME : ECMD.OK;
                 }
                 /* offer to split stack if wielding more than 1 */
-                if ($G.uwep.quan > 1 && inv_cnt(FALSE) < invlet_basic && await splittable($G.uwep)) {
+                if ($G.uwep.quan > 1 && inv_cnt(FALSE) < invlet_basic
+                    && await splittable($G.uwep)) {
                     $c.sprintf(new $c.Ptr(qbuf, 0), $C`You are wielding %ld %s.  Ready %ld of them?`, $G.uwep.quan, await simpleonames($G.uwep), $c.sub64($G.uwep.quan, 1));
                     switch (await ynq(new $c.Ptr(qbuf, 0))) {
                         case 113:
@@ -543,7 +573,8 @@ export async function doquiver_core(verb) {   // wield.c:512
                 /* require confirmation to ready the main weapon */
                 if (await ynq(new $c.Ptr(qbuf, 0)) !== 121) {
                     await Shk_Your(new $c.Ptr(qbuf, 0), $G.uwep);   /* replace qbuf[] contents */
-                    await pline($C`%s%s %s wielded.`, new $c.Ptr(qbuf, 0), await simpleonames($G.uwep), await otense($G.uwep, $C`remain`));
+                    await pline($C`%s%s %s wielded.`, new $c.Ptr(qbuf, 0),
+                        await simpleonames($G.uwep), await otense($G.uwep, $C`remain`));
                     return ECMD.OK;
                 }
                 /* quivering main weapon, so no longer wielding it */
@@ -551,7 +582,8 @@ export async function doquiver_core(verb) {   // wield.c:512
                 await untwoweapon();
                 was_uwep = TRUE;
             } else if (newquiver === $G.uswapwep) {
-                if ($G.uswapwep.quan > 1 && inv_cnt(FALSE) < invlet_basic && await splittable($G.uswapwep)) {
+                if ($G.uswapwep.quan > 1 && inv_cnt(FALSE) < invlet_basic
+                    && await splittable($G.uswapwep)) {
                     $c.sprintf(new $c.Ptr(qbuf, 0), $C`%s %ld %s.  Ready %ld of them?`, u.twoweap ? $C`You are dual wielding` : $C`Your alternate weapon is`, $G.uswapwep.quan, await simpleonames($G.uswapwep), $c.sub64($G.uswapwep.quan, 1));
                     switch (await ynq(new $c.Ptr(qbuf, 0))) {
                         case 113:
@@ -572,7 +604,9 @@ export async function doquiver_core(verb) {   // wield.c:512
                 /* require confirmation to ready the alternate weapon */
                 if (await ynq(new $c.Ptr(qbuf, 0)) !== 121) {
                     await Shk_Your(new $c.Ptr(qbuf, 0), $G.uswapwep);   /* replace qbuf[] contents */
-                    await pline($C`%s%s %s %s.`, new $c.Ptr(qbuf, 0), await simpleonames($G.uswapwep), await otense($G.uswapwep, $C`remain`), u.twoweap ? $C`wielded` : $C`as secondary weapon`);
+                    await pline($C`%s%s %s %s.`, new $c.Ptr(qbuf, 0),
+                        await simpleonames($G.uswapwep), await otense($G.uswapwep, $C`remain`),
+                        u.twoweap ? $C`wielded` : $C`as secondary weapon`);
                     return ECMD.OK;
                 }
                 /* quivering alternate weapon, so no more uswapwep */
@@ -626,9 +660,11 @@ export async function wield_tool(obj, verb) {   // wield.c:683
         verb = $C`wield`;
     }
     const what = await xname(obj);
-    let more_than_1 = obj.quan > 1 || strstri(what, $C`pair of `) !== null || strstri(what, $C`s of `) !== null ? 1 : 0;
+    let more_than_1 = obj.quan > 1 || strstri(what, $C`pair of `) !== null
+        || strstri(what, $C`s of `) !== null ? 1 : 0;
     if ($c.and64(obj.owornmask, W_ARMOR | W_ACCESSORY)) {
-        await You_cant($C`%s %s while wearing %s.`, verb, await yname(obj), more_than_1 ? $C`them` : $C`it`);
+        await You_cant($C`%s %s while wearing %s.`, verb, await yname(obj),
+            more_than_1 ? $C`them` : $C`it`);
         return FALSE;
     }
     if ($G.uwep && await welded($G.uwep)) {
@@ -640,7 +676,9 @@ export async function wield_tool(obj, verb) {   // wield.c:683
             if (strstri(what, $C`pair of `) !== null) {
                 more_than_1 = FALSE;
             }
-            await pline($C`Since your weapon is welded to your %s, you cannot %s %s %s.`, hand, verb, more_than_1 ? $C`those` : $C`that`, await xname(obj));
+            await pline(
+                $C`Since your weapon is welded to your %s, you cannot %s %s %s.`,
+                hand, verb, more_than_1 ? $C`those` : $C`that`, await xname(obj));
         } else {
             await You_cant($C`do that.`);
         }
@@ -652,7 +690,8 @@ export async function wield_tool(obj, verb) {   // wield.c:683
     }
     /* check shield */
     if ($G.uarms && bimanual(obj)) {
-        await You($C`cannot %s a two-handed %s while wearing a shield.`, verb, obj.oclass === WEAPON_CLASS ? $C`weapon` : $C`tool`);
+        await You($C`cannot %s a two-handed %s while wearing a shield.`, verb,
+            obj.oclass === WEAPON_CLASS ? $C`weapon` : $C`tool`);
         return FALSE;
     }
     if ($G.uquiver === obj) {
@@ -698,7 +737,9 @@ export async function can_twoweapon() {   // wield.c:761
         if (Upolyd()) {
             await You_cant($C`use two weapons in your current form.`);
         } else {
-            await pline($C`%s aren't able to use two weapons at once.`, await makeplural(flags.female && gu.urole.name.f ? gu.urole.name.f : gu.urole.name.m));
+            await pline($C`%s aren't able to use two weapons at once.`,
+                await makeplural(flags.female && gu.urole.name.f
+                ? gu.urole.name.f : gu.urole.name.m));
         }
     } else if (!$G.uwep || !$G.uswapwep) {
         let hand_s = await body_part(HAND);
@@ -706,17 +747,22 @@ export async function can_twoweapon() {   // wield.c:761
             hand_s = await makeplural(hand_s);
         }
         /* "your hands are empty" or "your {left|right} hand is empty" */
-        await Your($C`%s%s %s empty.`, $G.uwep ? $C`left ` : $G.uswapwep ? $C`right ` : $C``, hand_s, await vtense(hand_s, $C`are`));
+        await Your($C`%s%s %s empty.`, $G.uwep ? $C`left ` : $G.uswapwep ? $C`right ` : $C``,
+            hand_s, await vtense(hand_s, $C`are`));
     } else if (!TWOWEAPOK($G.uwep) || !TWOWEAPOK($G.uswapwep)) {
         otmp = !TWOWEAPOK($G.uwep) ? $G.uwep : $G.uswapwep;
-        await pline($C`%s %s suitable %s weapon%s.`, await Yname2(otmp), is_plural(otmp) ? $C`aren't` : $C`isn't a`, otmp === $G.uwep ? $C`primary` : $C`secondary`, plur(otmp.quan));
+        await pline($C`%s %s suitable %s weapon%s.`, await Yname2(otmp),
+            is_plural(otmp) ? $C`aren't` : $C`isn't a`,
+            otmp === $G.uwep ? $C`primary` : $C`secondary`,
+            plur(otmp.quan));
     } else if (bimanual($G.uwep) || bimanual($G.uswapwep)) {
         otmp = bimanual($G.uwep) ? $G.uwep : $G.uswapwep;
         await pline($C`%s isn't one-handed.`, await Yname2(otmp));
     } else if ($G.uarms) {
         await You_cant($C`use two weapons while wearing a shield.`);
     } else if ($G.uswapwep.oartifact) {
-        await pline($C`%s being held second to another weapon!`, await Yobjnam2($G.uswapwep, $C`resist`));
+        await pline($C`%s being held second to another weapon!`,
+            await Yobjnam2($G.uswapwep, $C`resist`));
     } else if ($G.uswapwep.otyp === CORPSE && await cant_wield_corpse($G.uswapwep)) {
         /* [Note: !TWOWEAPOK() check prevents ever getting here...] */
         /* must be life-saved to reach here; return FALSE */
@@ -746,7 +792,8 @@ export async function drop_uswapwep() {   // wield.c:809
     if (!obj.cursed) {   /* attempting to two-weapon while Glib */
         await pline($C`%s from your %s!`, await Yobjnam2(obj, $C`slip`), new $c.Ptr(left_hand, 0));
     } else if (!u.twoweap) {   /* attempting to two-weapon when uswapwep is cursed */
-        await pline($C`%s your grasp and %s from your %s!`, await Yobjnam2(obj, $C`evade`), await otense(obj, $C`drop`), new $c.Ptr(left_hand, 0));
+        await pline($C`%s your grasp and %s from your %s!`,
+            await Yobjnam2(obj, $C`evade`), await otense(obj, $C`drop`), new $c.Ptr(left_hand, 0));
     } else {
         /* already two-weaponing but can't anymore because uswapwep has
            become cursed */
@@ -874,7 +921,8 @@ export async function chwepon(otmp, amount) {   // wield.c:918
     if ($G.uwep.otyp === WORM_TOOTH && amount >= 0) {
         multiple = $G.uwep.quan > 1 ? 1 : 0;
         /* order: message, transformation, shop handling */
-        await Your($C`%s %s much sharper now.`, await simpleonames($G.uwep), multiple ? $C`fuse, and become` : $C`is`);
+        await Your($C`%s %s much sharper now.`, await simpleonames($G.uwep),
+            multiple ? $C`fuse, and become` : $C`is`);
         $G.uwep.otyp = CRYSKNIFE;
         $G.uwep.oerodeproof = 0;
         if (multiple) {
@@ -898,7 +946,8 @@ export async function chwepon(otmp, amount) {   // wield.c:918
     } else if ($G.uwep.otyp === CRYSKNIFE && amount < 0) {
         multiple = $G.uwep.quan > 1 ? 1 : 0;
         /* order matters: message, shop handling, transformation */
-        await Your($C`%s %s much duller now.`, await simpleonames($G.uwep), multiple ? $C`fuse, and become` : $C`is`);
+        await Your($C`%s %s much duller now.`, await simpleonames($G.uwep),
+            multiple ? $C`fuse, and become` : $C`is`);
         await costly_alteration($G.uwep, COST.DEGRD);   /* DECHNT? other? */
         $G.uwep.otyp = WORM_TOOTH;
         $G.uwep.oerodeproof = 0;
@@ -924,9 +973,12 @@ export async function chwepon(otmp, amount) {   // wield.c:918
         return 1;
     }
     /* there is a (soft) upper and lower limit to uwep->spe */
-    if (($G.uwep.spe > 5 && amount >= 0 || $G.uwep.spe < -5 && amount < 0) && rn2(3)) {
+    if (($G.uwep.spe > 5 && amount >= 0 || $G.uwep.spe < -5 && amount < 0)
+        && rn2(3)) {
         if (!Blind()) {
-            await pline($C`%s %s for a while and then %s.`, await Yobjnam2($G.uwep, $C`violently glow`), color, await otense($G.uwep, $C`evaporate`));
+            await pline($C`%s %s for a while and then %s.`,
+                await Yobjnam2($G.uwep, $C`violently glow`), color,
+                await otense($G.uwep, $C`evaporate`));
         } else {
             await pline($C`%s.`, await Yobjnam2($G.uwep, $C`evaporate`));
         }
@@ -935,8 +987,11 @@ export async function chwepon(otmp, amount) {   // wield.c:918
     }
     if (!Blind()) {
         const xtime = Math.imul(amount, amount) === 1 ? $C`moment` : $C`while`;
-        await pline($C`%s %s for a %s.`, await Yobjnam2($G.uwep, amount === 0 ? $C`violently glow` : $C`glow`), color, xtime);
-        if (otyp !== STRANGE_OBJECT && $G.uwep.known && (amount > 0 || amount < 0 && otmp.bknown)) {
+        await pline($C`%s %s for a %s.`,
+            await Yobjnam2($G.uwep, amount === 0 ? $C`violently glow` : $C`glow`), color,
+            xtime);
+        if (otyp !== STRANGE_OBJECT && $G.uwep.known
+            && (amount > 0 || amount < 0 && otmp.bknown)) {
             await makeknown(otyp);
         }
     }
@@ -959,11 +1014,13 @@ export async function chwepon(otmp, amount) {   // wield.c:918
      * spe dependent.  Give an obscure clue here.
      */
     if (u_wield_art(ART.MAGICBANE) && $G.uwep.spe >= 0) {
-        await Your($C`right %s %sches!`, await body_part(HAND), amount > 1 && $G.uwep.spe > 1 ? $C`flin` : $C`it`);
+        await Your($C`right %s %sches!`, await body_part(HAND),
+            amount > 1 && $G.uwep.spe > 1 ? $C`flin` : $C`it`);
     }
     /* an elven magic clue, cookie@keebler */
     /* elven weapons vibrate warningly when enchanted beyond a limit */
-    if ($G.uwep.spe > 5 && (is_elven_weapon($G.uwep) || $G.uwep.oartifact || !rn2(7))) {
+    if ($G.uwep.spe > 5
+        && (is_elven_weapon($G.uwep) || $G.uwep.oartifact || !rn2(7))) {
         await pline($C`%s unexpectedly.`, await Yobjnam2($G.uwep, $C`suddenly vibrate`));
     }
     return 1;

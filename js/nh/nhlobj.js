@@ -64,7 +64,8 @@ async function l_obj_gc(L) {   // nhlobj.c:47
             obj.lua_ref_cnt = obj.lua_ref_cnt - 1 >>> 0;
         }
         /* free-floating objects with no other refs are deallocated. */
-        if (!obj.lua_ref_cnt && (obj.where === OBJ.FREE || obj.where === OBJ.LUAFREE)) {
+        if (!obj.lua_ref_cnt
+            && (obj.where === OBJ.FREE || obj.where === OBJ.LUAFREE)) {
             if (Has_contents(obj)) {
                 while ((otmp = obj.cobj) !== null) {
                     await obj_extract_self(otmp);
@@ -199,7 +200,8 @@ async function l_obj_objects_to_table(L) {   // nhlobj.c:171
         await nhl_add_table_entry_str(L, $C`name`, obj_descr[objects[otyp].oc_name_idx].oc_name);
     }
     if (obj_descr[objects[otyp].oc_descr_idx].oc_descr) {
-        await nhl_add_table_entry_str(L, $C`descr`, obj_descr[objects[otyp].oc_descr_idx].oc_descr);
+        await nhl_add_table_entry_str(L, $C`descr`,
+            obj_descr[objects[otyp].oc_descr_idx].oc_descr);
     }
     if (o.oc_uname) {
         await nhl_add_table_entry_str(L, $C`uname`, o.oc_uname);
@@ -219,7 +221,8 @@ async function l_obj_objects_to_table(L) {   // nhlobj.c:171
     await nhl_add_table_entry_str(L, $C`material`, materialnm[o.oc_material]);
     /* TODO: oc_subtyp, oc_skill, oc_armcat */
     await nhl_add_table_entry_int(L, $C`oprop`, o.oc_oprop);
-    await nhl_add_table_entry_char(L, $C`class`, def_oc_syms[$c.u8(o.oc_class)].sym);
+    await nhl_add_table_entry_char(L, $C`class`,
+        def_oc_syms[$c.u8(o.oc_class)].sym);
     await nhl_add_table_entry_int(L, $C`delay`, o.oc_delay);
     await nhl_add_table_entry_int(L, $C`color`, o.oc_color);   /* TODO: text? */
     await nhl_add_table_entry_int(L, $C`prob`, o.oc_prob);
@@ -257,19 +260,24 @@ async function l_obj_to_table(L) {   // nhlobj.c:247
         await nhl_add_table_entry_str(L, $C`otyp_name`, obj_descr[objects[obj.otyp].oc_name_idx].oc_name);
     }
     if (obj_descr[objects[obj.otyp].oc_descr_idx].oc_descr) {
-        await nhl_add_table_entry_str(L, $C`otyp_descr`, obj_descr[objects[obj.otyp].oc_descr_idx].oc_descr);
+        await nhl_add_table_entry_str(L, $C`otyp_descr`,
+            obj_descr[objects[obj.otyp].oc_descr_idx].oc_descr);
     }
     await nhl_add_table_entry_int(L, $C`owt`, obj.owt);
     await nhl_add_table_entry_int(L, $C`quan`, obj.quan);
     await nhl_add_table_entry_int(L, $C`spe`, obj.spe);
     if (obj.otyp === STATUE) {
-        await nhl_add_table_entry_int(L, $C`historic`, (obj.spe & CORPSTAT.HISTORIC) !== 0 ? 1 : 0);
+        await nhl_add_table_entry_int(L, $C`historic`,
+            (obj.spe & CORPSTAT.HISTORIC) !== 0 ? 1 : 0);
     }
     if (obj.otyp === CORPSE || obj.otyp === STATUE) {
-        await nhl_add_table_entry_int(L, $C`male`, (obj.spe & CORPSTAT.MALE) !== 0 ? 1 : 0);
-        await nhl_add_table_entry_int(L, $C`female`, (obj.spe & CORPSTAT.FEMALE) !== 0 ? 1 : 0);
+        await nhl_add_table_entry_int(L, $C`male`,
+            (obj.spe & CORPSTAT.MALE) !== 0 ? 1 : 0);
+        await nhl_add_table_entry_int(L, $C`female`,
+            (obj.spe & CORPSTAT.FEMALE) !== 0 ? 1 : 0);
     }
-    await nhl_add_table_entry_char(L, $C`oclass`, def_oc_syms[$c.u8(obj.oclass)].sym);
+    await nhl_add_table_entry_char(L, $C`oclass`,
+        def_oc_syms[$c.u8(obj.oclass)].sym);
     await nhl_add_table_entry_char(L, $C`invlet`, obj.invlet);
     /* TODO: nhl_add_table_entry_char(L, "oartifact", obj->oartifact);*/
     await nhl_add_table_entry_int(L, $C`where`, obj.where);
@@ -311,8 +319,11 @@ async function l_obj_to_table(L) {   // nhlobj.c:247
     await nhl_add_table_entry_int(L, $C`cknown`, obj.cknown);
     await nhl_add_table_entry_int(L, $C`lknown`, obj.lknown);
     await nhl_add_table_entry_int(L, $C`corpsenm`, obj.corpsenm);
-    if (obj.corpsenm !== NON_PM && (obj.otyp === TIN || obj.otyp === CORPSE || obj.otyp === EGG || obj.otyp === FIGURINE || obj.otyp === STATUE)) {
-        await nhl_add_table_entry_str(L, $C`corpsenm_name`, mons[obj.corpsenm].pmnames[NEUTRAL]);
+    if (obj.corpsenm !== NON_PM
+        && (obj.otyp === TIN || obj.otyp === CORPSE || obj.otyp === EGG
+        || obj.otyp === FIGURINE || obj.otyp === STATUE)) {
+        await nhl_add_table_entry_str(L, $C`corpsenm_name`,
+            mons[obj.corpsenm].pmnames[NEUTRAL]);
     }
     /* TODO: leashmon, fromsink, novelidx, record_achieve_special */
     await nhl_add_table_entry_int(L, $C`usecount`, obj.usecount);
@@ -433,7 +444,9 @@ async function l_obj_nextobj(L) {   // nhlobj.c:445
             use_nexthere = $c.i8(lua_toboolean(L, 2));
         }
         if (lo && lo.obj) {
-            await l_obj_push(L, use_nexthere && lo.obj.where === OBJ.FLOOR ? lo.obj.v.v_nexthere : lo.obj.nobj);
+            await l_obj_push(L, use_nexthere && lo.obj.where === OBJ.FLOOR
+                ? lo.obj.v.v_nexthere
+                : lo.obj.nobj);
         }
     }
     return 1;

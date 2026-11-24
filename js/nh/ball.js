@@ -86,7 +86,8 @@ export async function ballfall() {   // ball.c:43
     if (!$G.uball || $G.uball && carried($G.uball) && await welded($G.uball)) {
         return;
     }
-    const gets_hit = ($G.uball.ox !== u.ux || $G.uball.oy !== u.uy) && ($G.uwep === $G.uball ? FALSE : $c.i8(rn2(5))) ? 1 : 0;
+    const gets_hit = ($G.uball.ox !== u.ux || $G.uball.oy !== u.uy)
+        && ($G.uwep === $G.uball ? FALSE : $c.i8(rn2(5))) ? 1 : 0;
     await ballrelease(TRUE);
     if (gets_hit) {
         let dmg = rn1(7, 25);
@@ -99,7 +100,8 @@ export async function ballfall() {   // ball.c:43
                 await pline($C`%s does not protect you.`, await Yname2($G.uarmh));
             }
         }
-        await losehp(Maybe_Half_Phys(dmg), $C`crunched in the head by an iron ball`, NO_KILLER_PREFIX);
+        await losehp(Maybe_Half_Phys(dmg), $C`crunched in the head by an iron ball`,
+            NO_KILLER_PREFIX);
     }
 }
 /*
@@ -281,7 +283,8 @@ export async function lift_covet_and_placebc(pin) {   // ball.c:236
  */
 async function bc_order() {   // ball.c:354
     let obj = null;
-    if ($G.uchain.ox !== $G.uball.ox || $G.uchain.oy !== $G.uball.oy || carried($G.uball) || u.uswallow) {
+    if ($G.uchain.ox !== $G.uball.ox || $G.uchain.oy !== $G.uball.oy || carried($G.uball)
+        || u.uswallow) {
         return BCPOS_DIFFER;
     }
     for (obj = svl.level.objects[$G.uball.ox][$G.uball.oy]; obj; obj = obj.v.v_nexthere) {
@@ -412,7 +415,9 @@ export async function move_bc(before, control, ballx, bally, chainx, chainy) {  
                     u.bc_felt = u.bc_felt & ~BC.BALL;   /* no longer feel the ball */
                 }
                 /* Pick up glyph at new position. */
-                u.bglyph = ballx !== chainx || bally !== chainy ? svl.level.locations[ballx][bally].glyph : u.cglyph;
+                u.bglyph = ballx !== chainx || bally !== chainy
+                    ? svl.level.locations[ballx][bally].glyph
+                    : u.cglyph;
                 await movobj($G.uball, ballx, bally);
             } else if (control & BC.CHAIN) {
                 if (u.bc_felt & BC.CHAIN) {
@@ -428,7 +433,9 @@ export async function move_bc(before, control, ballx, bally, chainx, chainy) {  
                     u.bc_felt = u.bc_felt & ~BC.CHAIN;
                 }
                 /* Pick up glyph at new position. */
-                u.cglyph = ballx !== chainx || bally !== chainy ? svl.level.locations[chainx][chainy].glyph : u.bglyph;
+                u.cglyph = ballx !== chainx || bally !== chainy
+                    ? svl.level.locations[chainx][chainy].glyph
+                    : u.bglyph;
                 await movobj($G.uchain, chainx, chainy);
             }
             $t1 = await bc_order(), u.bc_order = $t1;   /* reset the order */
@@ -458,7 +465,8 @@ export async function move_bc(before, control, ballx, bally, chainx, chainy) {  
             }
         } else {
             const on_floor = !carried($G.uball) ? 1 : 0;
-            if (control & BC.CHAIN || !control && u.bc_order === BCPOS_CHAIN) {
+            if (control & BC.CHAIN
+                || !control && u.bc_order === BCPOS_CHAIN) {
                 /* If the chain moved or nothing moved & chain on top. */
                 if (on_floor) {
                     await place_object($G.uball, ballx, bally);
@@ -540,7 +548,8 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
              * appear, since unless we moved at least two squares there is no
              * possibility of the chain position being in solid rock.
              */
-            if (IS_CHAIN_ROCK(u.ux, u.uy) || IS_CHAIN_ROCK(chainx.get(0), chainy.get(0)) || IS_CHAIN_ROCK($G.uball.ox, $G.uball.oy)) {
+            if (IS_CHAIN_ROCK(u.ux, u.uy) || IS_CHAIN_ROCK(chainx.get(0), chainy.get(0))
+                || IS_CHAIN_ROCK($G.uball.ox, $G.uball.oy)) {
                 already_in_rock = TRUE;
             } else {
                 already_in_rock = FALSE;
@@ -578,14 +587,16 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
                             tempy = y;
                             tempy2 = $G.uball.oy;
                         }
-                        if (IS_CHAIN_ROCK(tempx, tempy) && !IS_CHAIN_ROCK(tempx2, tempy2) && !already_in_rock) {
+                        if (IS_CHAIN_ROCK(tempx, tempy) && !IS_CHAIN_ROCK(tempx2, tempy2)
+                            && !already_in_rock) {
                             if (allow_drag) {
                                 /* Avoid pathological case *if* not teleporting:
                                  *   0                          0_
                                  *   _X  move northeast  ----->  X@
                                  *    @
                                  */
-                                if (dist2(u.ux, u.uy, $G.uball.ox, $G.uball.oy) === 5 && dist2(x, y, tempx, tempy) === 1) {
+                                if (dist2(u.ux, u.uy, $G.uball.ox, $G.uball.oy) === 5
+                                    && dist2(x, y, tempx, tempy) === 1) {
                                     do {
                                         chainx.set(0, oldchainx);
                                         chainy.set(0, oldchainy);
@@ -598,7 +609,8 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
                                  *   _X  move east       ----->  X_
                                  *    @                           @
                                  */
-                                if (dist2(u.ux, u.uy, $G.uball.ox, $G.uball.oy) === 4 && dist2(x, y, tempx, tempy) === 2) {
+                                if (dist2(u.ux, u.uy, $G.uball.ox, $G.uball.oy) === 4
+                                    && dist2(x, y, tempx, tempy) === 2) {
                                     do {
                                         chainx.set(0, oldchainx);
                                         chainy.set(0, oldchainy);
@@ -609,9 +621,11 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
                             }
                             chainx.set(0, tempx2);
                             chainy.set(0, tempy2);
-                        } else if (!IS_CHAIN_ROCK(tempx, tempy) && IS_CHAIN_ROCK(tempx2, tempy2) && !already_in_rock) {
+                        } else if (!IS_CHAIN_ROCK(tempx, tempy)
+                            && IS_CHAIN_ROCK(tempx2, tempy2) && !already_in_rock) {
                             if (allow_drag) {
-                                if (dist2(u.ux, u.uy, $G.uball.ox, $G.uball.oy) === 5 && dist2(x, y, tempx2, tempy2) === 1) {
+                                if (dist2(u.ux, u.uy, $G.uball.ox, $G.uball.oy) === 5
+                                    && dist2(x, y, tempx2, tempy2) === 1) {
                                     do {
                                         chainx.set(0, oldchainx);
                                         chainy.set(0, oldchainy);
@@ -619,7 +633,8 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
                                         break drag$;
                                     } while (0);
                                 }
-                                if (dist2(u.ux, u.uy, $G.uball.ox, $G.uball.oy) === 4 && dist2(x, y, tempx2, tempy2) === 2) {
+                                if (dist2(u.ux, u.uy, $G.uball.ox, $G.uball.oy) === 4
+                                    && dist2(x, y, tempx2, tempy2) === 2) {
                                     do {
                                         chainx.set(0, oldchainx);
                                         chainy.set(0, oldchainy);
@@ -630,14 +645,19 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
                             }
                             chainx.set(0, tempx);
                             chainy.set(0, tempy);
-                        } else if (IS_CHAIN_ROCK(tempx, tempy) && IS_CHAIN_ROCK(tempx2, tempy2) && !already_in_rock) {
+                        } else if (IS_CHAIN_ROCK(tempx, tempy)
+                            && IS_CHAIN_ROCK(tempx2, tempy2) && !already_in_rock) {
                             do {
                                 chainx.set(0, oldchainx);
                                 chainy.set(0, oldchainy);
                                 await move_bc(0, bc_control.get(0), ballx.get(0), bally.get(0), chainx.get(0), chainy.get(0));
                                 break drag$;
                             } while (0);
-                        } else if (dist2(tempx, tempy, $G.uchain.ox, $G.uchain.oy) < dist2(tempx2, tempy2, $G.uchain.ox, $G.uchain.oy) || dist2(tempx, tempy, $G.uchain.ox, $G.uchain.oy) === dist2(tempx2, tempy2, $G.uchain.ox, $G.uchain.oy) && rn2(2)) {
+                        } else if (dist2(tempx, tempy, $G.uchain.ox, $G.uchain.oy)
+                            < dist2(tempx2, tempy2, $G.uchain.ox, $G.uchain.oy)
+                            || dist2(tempx, tempy, $G.uchain.ox, $G.uchain.oy)
+                            === dist2(tempx2, tempy2, $G.uchain.ox, $G.uchain.oy)
+                            && rn2(2)) {
                             chainx.set(0, tempx);
                             chainy.set(0, tempy);
                         } else {
@@ -672,7 +692,8 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
                      * (This will also catch teleporting that happens to resemble
                      * this case, but oh well.)  Otherwise fall through.
                      */
-                    if (dist2(x, y, $G.uball.ox, $G.uball.oy) === 2 && dist2(x, y, $G.uchain.ox, $G.uchain.oy) === 4) {
+                    if (dist2(x, y, $G.uball.ox, $G.uball.oy) === 2
+                        && dist2(x, y, $G.uchain.ox, $G.uchain.oy) === 4) {
                         if ($G.uchain.oy === y) {
                             chainx.set(0, $G.uball.ox);
                         } else {
@@ -714,12 +735,18 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
         }
     }
     if (near_capacity() > SLT_ENCUMBER && dist2(x, y, u.ux, u.uy) <= 2) {
-        await You($C`cannot %sdrag the heavy iron ball.`, gi.invent ? $C`carry all that and also ` : $C``);
+        await You($C`cannot %sdrag the heavy iron ball.`,
+            gi.invent ? $C`carry all that and also ` : $C``);
         nomul(0);
         return FALSE;
     }
     /* water not mere continuation of previous water */
-    if (is_pool($G.uchain.ox, $G.uchain.oy) && (svl.level.locations[$G.uchain.ox][$G.uchain.oy].typ === POOL || !is_pool($G.uball.ox, $G.uball.oy) || svl.level.locations[$G.uball.ox][$G.uball.oy].typ === POOL) || (t = t_at($G.uchain.ox, $G.uchain.oy)) && (is_pit(t.ttyp) || is_hole(t.ttyp))) {
+    if (is_pool($G.uchain.ox, $G.uchain.oy)
+        && (svl.level.locations[$G.uchain.ox][$G.uchain.oy].typ === POOL
+        || !is_pool($G.uball.ox, $G.uball.oy)
+        || svl.level.locations[$G.uball.ox][$G.uball.oy].typ === POOL)
+        || (t = t_at($G.uchain.ox, $G.uchain.oy))
+        && (is_pit(t.ttyp) || is_hole(t.ttyp))) {
         if (Levitation()) {
             await You_feel($C`a tug from the iron ball.`);
             if (t) {
@@ -774,7 +801,8 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
          * take the simple approach if the hero's previous location or
          * the potential between location is inaccessible.
          */
-        if (dist2(x, y, $G.uchain.ox, $G.uchain.oy) === 4 && !IS_CHAIN_ROCK(newchainx, newchainy)) {
+        if (dist2(x, y, $G.uchain.ox, $G.uchain.oy) === 4
+            && !IS_CHAIN_ROCK(newchainx, newchainy)) {
             newchainx = $c.i16($c.div32(x + $G.uchain.ox, 2));
             newchainy = $c.i16($c.div32(y + $G.uchain.oy, 2));
             if (IS_CHAIN_ROCK(newchainx, newchainy)) {
@@ -814,7 +842,8 @@ export async function drop_ball(x, y) {   // ball.c:882
         u.bglyph = u.bc_order ? u.cglyph : svl.level.locations[x][y].glyph;
     }
     if (x !== u.ux || y !== u.uy) {
-        if (u.utrap && u.utraptype !== TT.INFLOOR && u.utraptype !== TT.BURIEDBALL) {
+        if (u.utrap
+            && u.utraptype !== TT.INFLOOR && u.utraptype !== TT.BURIEDBALL) {
             switch (u.utraptype) {
                 case TT.PIT:
                     await pline($C`%s%s!`, new $c.Ptr(drop_ball$pullmsg, 0), $C`pit`);
@@ -832,8 +861,12 @@ export async function drop_ball(x, y) {   // ball.c:882
                     await pline($C`%s%s!`, new $c.Ptr(drop_ball$pullmsg, 0), $C`bear trap`);
                     await set_wounded_legs(side, rn1(1000, 500));
                     if (!u.usteed) {
-                        await Your($C`%s %s is severely damaged.`, side === W.RINGL ? $C`left` : $C`right`, await body_part(LEG));
-                        await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? 1 : 2), $C`leg damage from being pulled out of a bear trap`, KILLED.BY);
+                        await Your($C`%s %s is severely damaged.`,
+                            side === W.RINGL ? $C`left` : $C`right`,
+                            await body_part(LEG));
+                        await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? 1 : 2),
+                            $C`leg damage from being pulled out of a bear trap`,
+                            KILLED.BY);
                     }
                     break;
             }
@@ -842,7 +875,11 @@ export async function drop_ball(x, y) {   // ball.c:882
         }
         u.ux0 = u.ux;
         u.uy0 = u.uy;
-        if (!Levitation() && !MON_AT(x, y) && !u.utrap && (is_pool(x, y) || (t = t_at(x, y)) && (is_pit(t.ttyp) || is_hole(t.ttyp)))) {
+        if (!Levitation() && !MON_AT(x, y) && !u.utrap
+            && (is_pool(x, y)
+            || (t = t_at(x, y))
+            && (is_pit(t.ttyp)
+            || is_hole(t.ttyp)))) {
             u.ux = x;
             u.uy = y;
         } else {
@@ -881,7 +918,9 @@ async function litter() {   // ball.c:965
         nextobj = otmp.nobj;
         if (otmp !== $G.uball && rnd(capacity) <= (otmp.owt | 0)) {
             if (await canletgo(otmp, $C``)) {
-                await You($C`drop %s and %s %s down the stairs with you.`, await yname(otmp), otmp.quan === 1 ? $C`it` : $C`they`, await otense(otmp, $C`fall`));
+                await You($C`drop %s and %s %s down the stairs with you.`,
+                    await yname(otmp), otmp.quan === 1 ? $C`it` : $C`they`,
+                    await otense(otmp, $C`fall`));
                 await setnotworn(otmp);
                 await freeinv(otmp);
                 await hitfloor(otmp, FALSE);
@@ -912,19 +951,22 @@ export async function drag_down() {   // ball.c:986
     if (forward) {
         if (rn2(6)) {
             await pline_The($C`iron ball drags you downstairs!`);
-            await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(6) + 1 | 0, 2) : rnd(6)), $C`dragged downstairs by an iron ball`, NO_KILLER_PREFIX);
+            await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(6) + 1 | 0, 2) : rnd(6)),
+                $C`dragged downstairs by an iron ball`, NO_KILLER_PREFIX);
             await litter();
         }
     } else {
         if (rn2(2)) {
             await pline_The($C`iron ball smacks into you!`);
-            await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(20) + 1 | 0, 2) : rnd(20)), $C`iron ball collision`, KILLED.BY_AN);
+            await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(20) + 1 | 0, 2) : rnd(20)), $C`iron ball collision`,
+                KILLED.BY_AN);
             await exercise(A.STR, FALSE);
             dragchance = $c.u8(dragchance - 2 | 0);
         }
         if (dragchance >= rnd(6)) {
             await pline_The($C`iron ball drags you downstairs!`);
-            await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(3) + 1 | 0, 2) : rnd(3)), $C`dragged downstairs by an iron ball`, NO_KILLER_PREFIX);
+            await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(3) + 1 | 0, 2) : rnd(3)),
+                $C`dragged downstairs by an iron ball`, NO_KILLER_PREFIX);
             await exercise(A.STR, FALSE);
             await litter();
         }
@@ -936,27 +978,47 @@ export async function drag_down() {   // ball.c:986
 export async function bc_sanity_check() {   // ball.c:1034
     let otyp = 0, onam = null, bx = 0, by = 0, cx = 0, cy = 0, bdx = 0, bdy = 0, cdx = 0, cdy = 0;
     if (Punished() && (!$G.uball || !$G.uchain)) {
-        await impossible($C`Punished without %s%s%s?`, !$G.uball ? $C`iron ball` : $C``, !$G.uball && !$G.uchain ? $C` and ` : $C``, !$G.uchain ? $C`attached chain` : $C``);
+        await impossible($C`Punished without %s%s%s?`,
+            !$G.uball ? $C`iron ball` : $C``,
+            !$G.uball && !$G.uchain ? $C` and ` : $C``,
+            !$G.uchain ? $C`attached chain` : $C``);
     } else if (!Punished() && ($G.uball || $G.uchain)) {
-        await impossible($C`Attached %s%s%s without being Punished?`, $G.uchain ? $C`chain` : $C``, $G.uchain && $G.uball ? $C` and ` : $C``, $G.uball ? $C`iron ball` : $C``);
+        await impossible($C`Attached %s%s%s without being Punished?`,
+            $G.uchain ? $C`chain` : $C``,
+            $G.uchain && $G.uball ? $C` and ` : $C``,
+            $G.uball ? $C`iron ball` : $C``);
     }
     /* ball is free when swallowed, when changing levels or during air bubble
        management on Plane of Water (both of which start and end in between
        sanity checking cycles, so shouldn't be relevant), other times? */
     const freechain = !$G.uchain || $G.uchain.where === OBJ.FREE ? 1 : 0;
     /* lie to simplify the testing logic */
-    const freeball = !$G.uball || $G.uball.where === OBJ.FREE || freechain && $G.uball.where === OBJ.INVENT ? 1 : 0;
-    if ($G.uball && ($G.uball.otyp !== HEAVY_IRON_BALL || $G.uball.where !== OBJ.FLOOR && $G.uball.where !== OBJ.INVENT && $G.uball.where !== OBJ.FREE || freeball ^ freechain || $c.and64($G.uball.owornmask, W.BALL) === 0 || $c.and64($G.uball.owornmask, ~(W.BALL | W_WEAPONS)) !== 0)) {
+    const freeball = !$G.uball || $G.uball.where === OBJ.FREE
+        || freechain && $G.uball.where === OBJ.INVENT ? 1 : 0;
+    if ($G.uball && ($G.uball.otyp !== HEAVY_IRON_BALL
+        || $G.uball.where !== OBJ.FLOOR
+        && $G.uball.where !== OBJ.INVENT
+        && $G.uball.where !== OBJ.FREE
+        || freeball ^ freechain
+        || $c.and64($G.uball.owornmask, W.BALL) === 0
+        || $c.and64($G.uball.owornmask, ~(W.BALL | W_WEAPONS)) !== 0)) {
         otyp = $G.uball.otyp;
         onam = await safe_typename(otyp);
-        await impossible($C`uball: type %d (%s), where %d, wornmask=0x%08lx`, otyp, onam, $G.uball.where, $G.uball.owornmask);
+        await impossible($C`uball: type %d (%s), where %d, wornmask=0x%08lx`,
+            otyp, onam, $G.uball.where, $G.uball.owornmask);
     }
     /* similar check to ball except can't be in inventory */
     /* [could simplify this to owornmask != W_CHAIN] */
-    if ($G.uchain && ($G.uchain.otyp !== IRON_CHAIN || $G.uchain.where !== OBJ.FLOOR && $G.uchain.where !== OBJ.FREE || freechain ^ freeball || $c.and64($G.uchain.owornmask, W.CHAIN) === 0 || $c.and64($G.uchain.owornmask, ~W.CHAIN) !== 0)) {
+    if ($G.uchain && ($G.uchain.otyp !== IRON_CHAIN
+        || $G.uchain.where !== OBJ.FLOOR
+        && $G.uchain.where !== OBJ.FREE
+        || freechain ^ freeball
+        || $c.and64($G.uchain.owornmask, W.CHAIN) === 0
+        || $c.and64($G.uchain.owornmask, ~W.CHAIN) !== 0)) {
         otyp = $G.uchain.otyp;
         onam = await safe_typename(otyp);
-        await impossible($C`uchain: type %d (%s), where %d, wornmask=0x%08lx`, otyp, onam, $G.uchain.where, $G.uchain.owornmask);
+        await impossible($C`uchain: type %d (%s), where %d, wornmask=0x%08lx`,
+            otyp, onam, $G.uchain.where, $G.uchain.owornmask);
     }
     if ($G.uball && $G.uchain && !(freeball && freechain)) {
         /* non-free chain should be under or next to the hero;
@@ -972,7 +1034,9 @@ export async function bc_sanity_check() {   // ball.c:1034
         bdx = bx - cx | 0, bdy = by - cy | 0;
         bdx = $c.abs(bdx), bdy = $c.abs(bdy);
         if (cdx > 1 || cdy > 1 || bdx > 1 || bdy > 1) {
-            await impossible($C`b&c distance: you@<%d,%d>, chain@<%d,%d>, ball@<%d,%d>`, u.ux, u.uy, cx, cy, bx, by);
+            await impossible(
+                $C`b&c distance: you@<%d,%d>, chain@<%d,%d>, ball@<%d,%d>`,
+                u.ux, u.uy, cx, cy, bx, by);
         }
     }
     /* [check bc_order too?] */

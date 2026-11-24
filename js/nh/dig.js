@@ -189,7 +189,8 @@ async function mkcavearea(rockit) {   // dig.c:88
     if (rockit) {
         await pline($C`Crash!  The ceiling collapses around you!`);
     } else {
-        await pline($C`A mysterious force %s cave around you!`, svl.level.locations[u.ux][u.uy].typ === CORR ? $C`creates a` : $C`extends the`);
+        await pline($C`A mysterious force %s cave around you!`,
+            svl.level.locations[u.ux][u.uy].typ === CORR ? $C`creates a` : $C`extends the`);
     }
     await display_nhwindow()($G.WIN_MESSAGE, TRUE);
     for (dist = 1; dist <= 2; dist = dist + 1 | 0) {
@@ -267,11 +268,22 @@ export function dig_typ(otmp, x, y) {   // dig.c:169
     const ltyp = svl.level.locations[x][y].typ;
     if (is_axe(otmp)) {
         /* axe vs tree */
-        return closed_door(x, y) ? DIGTYP.DOOR : IS_TREE(ltyp) ? DIGTYP.TREE : DIGTYP.UNDIGGABLE;
+        return closed_door(x, y) ? DIGTYP.DOOR
+            : IS_TREE(ltyp) ? DIGTYP.TREE
+            : DIGTYP.UNDIGGABLE;
     }
     /*assert(is_pick(otmp));*/
     /* pick vs tree */
-    return sobj_at(STATUE, x, y) && pick_can_reach(otmp, x, y) ? DIGTYP.STATUE : sobj_at(BOULDER, x, y) && pick_can_reach(otmp, x, y) ? DIGTYP.BOULDER : closed_door(x, y) ? DIGTYP.DOOR : IS_TREE(ltyp) ? DIGTYP.UNDIGGABLE : IS_OBSTRUCTED(ltyp) && (!svl.level.flags.arboreal || IS_WALL(ltyp)) ? DIGTYP.ROCK : DIGTYP.UNDIGGABLE;
+    return sobj_at(STATUE, x, y) && pick_can_reach(otmp, x, y)
+        ? DIGTYP.STATUE
+        : sobj_at(BOULDER, x, y) && pick_can_reach(otmp, x, y)
+        ? DIGTYP.BOULDER
+        : closed_door(x, y) ? DIGTYP.DOOR
+        : IS_TREE(ltyp) ? DIGTYP.UNDIGGABLE
+        : IS_OBSTRUCTED(ltyp)
+        && (!svl.level.flags.arboreal || IS_WALL(ltyp))
+        ? DIGTYP.ROCK
+        : DIGTYP.UNDIGGABLE;
 }
 /**
  * @returns {number} boolean
@@ -299,13 +311,16 @@ export function dig_check(madeby, x, y) {   // dig.c:207
         }
     } else if (svl.level.locations[x][y].typ === THRONE && madeby !== null) {
         return DIGCHECK.FAIL_THRONE;
-    } else if (svl.level.locations[x][y].typ === ALTAR && (madeby !== null || (altarmask_at(x, y) & AM.SANCTUM) !== 0)) {
+    } else if (svl.level.locations[x][y].typ === ALTAR
+        && (madeby !== null
+        || (altarmask_at(x, y) & AM.SANCTUM) !== 0)) {
         return DIGCHECK.FAIL_ALTAR;
     } else if (Is_airlevel(u.uz)) {
         return DIGCHECK.FAIL_AIRLEVEL;
     } else if (Is_waterlevel(u.uz)) {
         return DIGCHECK.FAIL_WATERLEVEL;
-    } else if (svl.level.locations[x][y].typ < POOL && svl.level.locations[x][y].typ !== SDOOR && (svl.level.locations[x][y].flags & W.NONDIGGABLE) !== 0) {
+    } else if (svl.level.locations[x][y].typ < POOL && svl.level.locations[x][y].typ !== SDOOR
+        && (svl.level.locations[x][y].flags & W.NONDIGGABLE) !== 0) {
         return DIGCHECK.FAIL_TOOHARD;
     } else if (ttmp && undestroyable_trap(ttmp.ttyp)) {
         return DIGCHECK.FAIL_UNDESTROYABLETRAP;
@@ -321,7 +336,8 @@ export function dig_check(madeby, x, y) {   // dig.c:207
         }
     } else if (sobj_at(BOULDER, x, y)) {
         return DIGCHECK.FAIL_BOULDER;
-    } else if (madeby === null && (ttmp || is_pool_or_lava(x, y))) {
+    } else if (madeby === null
+        && (ttmp || is_pool_or_lava(x, y))) {
         /* the block against existing traps is mainly to
            prevent broken wands from turning holes into pits */
         /* digging by player handles pools separately */
@@ -388,7 +404,10 @@ async function dig() {   // dig.c:300
     lev = $c.relem(svl.level.locations[dpx], dpy);
     /* perhaps a nymph stole your pick-axe while you were busy digging */
     /* or perhaps you teleported away */
-    if (u.uswallow || !$G.uwep || !ispick && !is_axe($G.uwep) || !on_level(svc.context.digging.level, u.uz) || (svc.context.digging.down ? dpx !== u.ux || dpy !== u.uy : !next2u(dpx, dpy))) {
+    if (u.uswallow || !$G.uwep || !ispick && !is_axe($G.uwep)
+        || !on_level(svc.context.digging.level, u.uz)
+        || (svc.context.digging.down ? dpx !== u.ux || dpy !== u.uy
+        : !next2u(dpx, dpy))) {
         return 0;
     }
     if (svc.context.digging.down) {
@@ -399,12 +418,15 @@ async function dig() {   // dig.c:300
         }
     } else {
         /* !svc.context.digging.down */
-        if (IS_TREE(lev.typ) && !may_dig(dpx, dpy) && dig_typ($G.uwep, dpx, dpy) === DIGTYP.TREE) {
+        if (IS_TREE(lev.typ) && !may_dig(dpx, dpy)
+            && dig_typ($G.uwep, dpx, dpy) === DIGTYP.TREE) {
             await pline($C`This tree seems to be petrified.`);
             return 0;
         }
-        if (IS_OBSTRUCTED(lev.typ) && !may_dig(dpx, dpy) && dig_typ($G.uwep, dpx, dpy) === DIGTYP.ROCK) {
-            await pline($C`This %s is too hard to %s.`, is_db_wall(dpx, dpy) ? $C`drawbridge` : $C`wall`, verb);
+        if (IS_OBSTRUCTED(lev.typ) && !may_dig(dpx, dpy)
+            && dig_typ($G.uwep, dpx, dpy) === DIGTYP.ROCK) {
+            await pline($C`This %s is too hard to %s.`,
+                is_db_wall(dpx, dpy) ? $C`drawbridge` : $C`wall`, verb);
             return 0;
         }
     }
@@ -416,15 +438,18 @@ async function dig() {   // dig.c:300
                     await dropx($G.uwep);
                 } else {
                     if (u.usteed) {
-                        await pline($C`%s and %s %s!`, await Yobjnam2($G.uwep, $C`bounce`), await otense($G.uwep, $C`hit`), await mon_nam(u.usteed));
+                        await pline($C`%s and %s %s!`, await Yobjnam2($G.uwep, $C`bounce`),
+                            await otense($G.uwep, $C`hit`), await mon_nam(u.usteed));
                     } else {
-                        await pline($C`Ouch!  %s and %s you!`, await Yobjnam2($G.uwep, $C`bounce`), await otense($G.uwep, $C`hit`));
+                        await pline($C`Ouch!  %s and %s you!`, await Yobjnam2($G.uwep, $C`bounce`),
+                            await otense($G.uwep, $C`hit`));
                     }
                     await set_wounded_legs(W.RINGR, 5 + rnd(5) | 0);
                 }
                 break;
             case 1:
-                await pline($C`Bang!  You hit with the broad side of %s!`, await the(await xname($G.uwep)));
+                await pline($C`Bang!  You hit with the broad side of %s!`,
+                    await the(await xname($G.uwep)));
                 await wake_nearby(FALSE);
                 break;
             default:
@@ -439,14 +464,17 @@ async function dig() {   // dig.c:300
     }
     if (svc.context.digging.down) {
         ttmp = t_at(dpx, dpy);
-        if (svc.context.digging.effort > 250 || ttmp && ttmp.ttyp === HOLE) {
+        if (svc.context.digging.effort > 250
+            || ttmp && ttmp.ttyp === HOLE) {
             await dighole(FALSE, FALSE, null);
             $c.memset(svc.context.digging, 0, 32);
             return 0;   /* done with digging */
         }
-        if (svc.context.digging.effort <= 50 || ttmp && (ttmp.ttyp === TRAPDOOR || is_pit(ttmp.ttyp))) {
+        if (svc.context.digging.effort <= 50
+            || ttmp && (ttmp.ttyp === TRAPDOOR || is_pit(ttmp.ttyp))) {
             return 1;
-        } else if (ttmp && (ttmp.ttyp === LANDMINE || ttmp.ttyp === BEAR_TRAP && !u.utrap)) {
+        } else if (ttmp && (ttmp.ttyp === LANDMINE
+            || ttmp.ttyp === BEAR_TRAP && !u.utrap)) {
             /* digging onto a set object trap triggers it;
                hero should have used #untrap first */
             await dotrap(ttmp, FORCETRAP);
@@ -465,7 +493,8 @@ async function dig() {   // dig.c:300
                 $c.sprintf(new $c.Ptr(kbuf, 0), $C`chopping off %s own %s`, genders[flags.female ? 1 : 0].his, await body_part(FOOT));
                 await losehp(Maybe_Half_Phys(dmg), new $c.Ptr(kbuf, 0), KILLED.BY);
             } else {
-                await You($C`destroy the bear trap with %s.`, await yobjnam($G.uwep, null));
+                await You($C`destroy the bear trap with %s.`,
+                    await yobjnam($G.uwep, null));
                 await deltrap(ttmp);
                 await reset_utrap(TRUE);   /* release from trap, maybe Lev or Fly */
             }
@@ -475,7 +504,9 @@ async function dig() {   // dig.c:300
         } else if (ttmp && dcresult === DIGCHECK.PASSED_DESTROY_TRAP) {
             ttmpname = trapname(ttmp.ttyp, FALSE);
             if (ispick) {
-                await You($C`destroy %s with %s.`, ttmp.tseen ? await the(ttmpname) : await an(ttmpname), await yobjnam($G.uwep, null));
+                await You($C`destroy %s with %s.`,
+                    ttmp.tseen ? await the(ttmpname) : await an(ttmpname),
+                    await yobjnam($G.uwep, null));
             }
             await deltrap(ttmp);
             /* we haven't made any progress toward a pit yet */
@@ -498,7 +529,8 @@ async function dig() {   // dig.c:300
         shopedge = in_rooms(dpx, dpy, SHOPBASE).get(0);
         digtyp = dig_typ($G.uwep, dpx, dpy);
         cleanup$: {
-            if (digtyp === DIGTYP.STATUE && (obj = sobj_at(STATUE, dpx, dpy)) !== null) {
+            if (digtyp === DIGTYP.STATUE
+                && (obj = sobj_at(STATUE, dpx, dpy)) !== null) {
                 if (await break_statue(obj)) {
                     digtxt = $C`The statue shatters.`;
                 } else {
@@ -506,7 +538,8 @@ async function dig() {   // dig.c:300
                        printed a message and updated the screen */
                     digtxt = null;
                 }
-            } else if (digtyp === DIGTYP.BOULDER && (obj = sobj_at(BOULDER, dpx, dpy)) !== null) {
+            } else if (digtyp === DIGTYP.BOULDER
+                && (obj = sobj_at(BOULDER, dpx, dpy)) !== null) {
                 await fracture_rock(obj);
                 /*[5.0: this probably isn't necessary anymore]*/
                 if ((bobj = sobj_at(BOULDER, dpx, dpy)) !== null) {
@@ -515,12 +548,14 @@ async function dig() {   // dig.c:300
                     await place_object(bobj, dpx, dpy);
                 }
                 digtxt = $C`The boulder falls apart.`;
-            } else if (lev.typ === STONE || lev.typ === SCORR || IS_TREE(lev.typ)) {
+            } else if (lev.typ === STONE || lev.typ === SCORR
+                || IS_TREE(lev.typ)) {
                 if (Is_earthlevel(u.uz)) {
                     if ($G.uwep.blessed && !rn2(3)) {
                         await mkcavearea(FALSE);
                         break cleanup$;
-                    } else if ($G.uwep.cursed && !rn2(4) || !$G.uwep.blessed && !rn2(6)) {
+                    } else if ($G.uwep.cursed && !rn2(4)
+                        || !$G.uwep.blessed && !rn2(6)) {
                         await mkcavearea(TRUE);
                         break cleanup$;
                     }
@@ -545,7 +580,8 @@ async function dig() {   // dig.c:300
                 }
                 if (svl.level.flags.is_maze_lev) {
                     lev.typ = ROOM, lev.flags = 0;
-                } else if (svl.level.flags.is_cavernous_lev && !in_town(dpx, dpy)) {
+                } else if (svl.level.flags.is_cavernous_lev
+                    && !in_town(dpx, dpy)) {
                     lev.typ = CORR, lev.flags = 0;
                 } else {
                     lev.typ = DOOR, lev.flags = (D.NODOOR) & 31;
@@ -603,10 +639,12 @@ async function dig() {   // dig.c:300
         dig_target = dig_typ($G.uwep, dpx, dpy);
         if (IS_WALL(lev.typ) || dig_target === DIGTYP.DOOR) {
             if (in_rooms(dpx, dpy, SHOPBASE).get(0)) {
-                await pline($C`This %s seems too hard to %s.`, IS_DOOR(lev.typ) ? $C`door` : $C`wall`, verb);
+                await pline($C`This %s seems too hard to %s.`,
+                    IS_DOOR(lev.typ) ? $C`door` : $C`wall`, verb);
                 return 0;
             }
-        } else if (dig_target === DIGTYP.UNDIGGABLE || dig_target === DIGTYP.ROCK && !IS_OBSTRUCTED(lev.typ)) {
+        } else if (dig_target === DIGTYP.UNDIGGABLE
+            || dig_target === DIGTYP.ROCK && !IS_OBSTRUCTED(lev.typ)) {
             return 0;   /* statue or boulder got taken */
         }
         if (!gd.did_dig_msg) {
@@ -632,7 +670,8 @@ async function furniture_handled(x, y, madeby_u) {   // dig.c:571
         await dryup(x, y, madeby_u);
     } else if (IS_SINK(lev.typ)) {
         await breaksink(x, y);
-    } else if (lev.typ === DRAWBRIDGE_DOWN || is_drawbridge_wall(x, y) >= 0) {
+    } else if (lev.typ === DRAWBRIDGE_DOWN
+        || is_drawbridge_wall(x, y) >= 0) {
         bx[0] = x;
         by[0] = y;
         /* if under the portcullis, the bridge is adjacent */
@@ -686,7 +725,8 @@ export function fillholetyp(x, y, fill_if_any) {   // dig.c:606
     if (!fill_if_any) {
         pool_cnt = $c.div32(pool_cnt, 3);   /* not as much liquid as the others */
     }
-    if (lava_cnt > (moat_cnt + pool_cnt | 0) && rn2(lava_cnt + 1 | 0) || lava_cnt && fill_if_any) {
+    if (lava_cnt > (moat_cnt + pool_cnt | 0) && rn2(lava_cnt + 1 | 0)
+        || lava_cnt && fill_if_any) {
         return LAVAPOOL;
     } else if (moat_cnt > 0 && rn2(moat_cnt + 1 | 0) || moat_cnt && fill_if_any) {
         return MOAT;
@@ -725,7 +765,8 @@ export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
         return;
     }
     if (ttyp !== PIT && (!Can_dig_down(u.uz) && !lev.candig)) {
-        await impossible($C`digactualhole: can't dig %s on this level.`, trapname(ttyp, TRUE));
+        await impossible($C`digactualhole: can't dig %s on this level.`,
+            trapname(ttyp, TRUE));
         ttyp = PIT;
     }
     /* maketrap() might change terrain type but we deliver messages after
@@ -734,7 +775,8 @@ export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
     furniture[0] = 0;
     if (IS_FURNITURE(lev.typ)) {
         /* should mirror the word used by surface() for normal floor */
-        surface_type = IS_ROOM(lev.typ) && !Is_earthlevel(u.uz) ? $C`floor` : $C`ground`;
+        surface_type = IS_ROOM(lev.typ) && !Is_earthlevel(u.uz)
+            ? $C`floor` : $C`ground`;
         if (IS_ALTAR(lev.typ)) {
             old_aligntyp = (svl.level.locations[x][y].flags & AM.MASK & AM.MASK) === 0 ? A.NONE : (svl.level.locations[x][y].flags & AM.MASK & AM.MASK) === AM.LAWFUL ? A.LAWFUL : (svl.level.locations[x][y].flags & AM.MASK & AM.MASK) - 2;
             $c.strcpy(new $c.Ptr(furniture, 0), align_str($c.i8(old_aligntyp)));
@@ -767,7 +809,8 @@ export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
             await You($C`dig %s %s the %s.`, await an(tname), in_thru, surface_type);
         }
     } else if (!madeby_obj && canseemon(madeby)) {
-        await pline($C`%s digs %s %s the %s.`, await Monnam(madeby), await an(tname), in_thru, surface_type);
+        await pline($C`%s digs %s %s the %s.`, await Monnam(madeby), await an(tname), in_thru,
+            surface_type);
     } else if (cansee(x, y) && flags.verbose) {
         if (IS_STWALL(old_typ)) {
             await pline_The($C`%s crumbles into %s.`, surface_type, await an(tname));
@@ -811,7 +854,8 @@ export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
         } else if (mtmp) {
             if (is_flyer(mtmp.data) || is_floater(mtmp.data)) {
                 if (canseemon(mtmp)) {
-                    await pline($C`%s %s over the pit.`, await Monnam(mtmp), is_flyer(mtmp.data) ? $C`flies` : $C`floats`);
+                    await pline($C`%s %s over the pit.`, await Monnam(mtmp),
+                        is_flyer(mtmp.data) ? $C`flies` : $C`floats`);
                 }
             } else if (mtmp !== madeby) {
                 await mintrap(mtmp, NO_TRAP_FLAGS);
@@ -871,7 +915,9 @@ export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
             }
             if (mtmp) {
                 /*[don't we need special sokoban handling here?]*/
-                if (!(!($c.andu64(mtmp.data.mflags1, M1.FLY) !== 0) && !(mtmp.data.mlet === S.EYE || mtmp.data.mlet === S.LIGHT) && (!($c.andu64(mtmp.data.mflags1, M1.CLING) !== 0) || !has_ceiling(u.uz))) || mtmp.wormno && count_wsegs(mtmp) > 5 || mtmp.data.msize >= MZ.HUGE) {
+                if (!(!($c.andu64(mtmp.data.mflags1, M1.FLY) !== 0) && !(mtmp.data.mlet === S.EYE || mtmp.data.mlet === S.LIGHT) && (!($c.andu64(mtmp.data.mflags1, M1.CLING) !== 0) || !has_ceiling(u.uz)))
+                    || mtmp.wormno && count_wsegs(mtmp) > 5
+                    || mtmp.data.msize >= MZ.HUGE) {
                     return;
                 }
                 if (mtmp === u.ustuck) {   /* probably a vortex */
@@ -891,7 +937,8 @@ export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
                     if (mtmp.isshk) {
                         await make_angry_shk(mtmp, 0, 0);
                     }
-                    await migrate_to_level(mtmp, ledger_no(tolevel), MIGR.RANDOM, null);
+                    await migrate_to_level(mtmp, ledger_no(tolevel),
+                        MIGR.RANDOM, null);
                 }
             }
         }
@@ -915,7 +962,9 @@ export async function liquid_flow(x, y, typ, ttmp, fillmsg) {   // dig.c:838
     /* caller should have changed levl[x][y].typ to POOL, MOAT, or LAVA */
     if (!is_pool_or_lava(x, y)) {
         if (iflags.sanity_check) {
-            await impossible($C`Insane liquid_flow(%d,%d,%s,%s).`, x, y, ttmp ? trapname(ttmp.ttyp, TRUE) : $C`no trap`, fillmsg ? fillmsg : $C`no mesg`);
+            await impossible($C`Insane liquid_flow(%d,%d,%s,%s).`, x, y,
+                ttmp ? trapname(ttmp.ttyp, TRUE) : $C`no trap`,
+                fillmsg ? fillmsg : $C`no mesg`);
         }
         return;
     }
@@ -967,18 +1016,24 @@ export async function dighole(pit_only, by_magic, cc) {   // dig.c:885
     const lev = $c.relem(svl.level.locations[dig_x], dig_y);
     const dig_check_result = dig_check(BY_YOU(), dig_x, dig_y);
     /* nohole = (!Can_dig_down(&u.uz) && !lev->candig); */
-    const nohole = dig_check_result === DIGCHECK.FAIL_CANTDIG || dig_check_result === DIGCHECK.FAIL_TOOHARD ? 1 : 0;
+    const nohole = dig_check_result === DIGCHECK.FAIL_CANTDIG
+        || dig_check_result === DIGCHECK.FAIL_TOOHARD ? 1 : 0;
     const old_typ = lev.typ;
-    if (ttmp && (undestroyable_trap(ttmp.ttyp) || nohole) || IS_OBSTRUCTED(old_typ) && old_typ !== SDOOR && (lev.flags & W.NONDIGGABLE) !== 0) {
-        await pline_The($C`%s %shere is too hard to dig in.`, surface(dig_x, dig_y), dig_x !== u.ux || dig_y !== u.uy ? $C`t` : $C``);
+    if (ttmp && (undestroyable_trap(ttmp.ttyp) || nohole)
+        || IS_OBSTRUCTED(old_typ) && old_typ !== SDOOR
+        && (lev.flags & W.NONDIGGABLE) !== 0) {
+        await pline_The($C`%s %shere is too hard to dig in.`, surface(dig_x, dig_y),
+            dig_x !== u.ux || dig_y !== u.uy ? $C`t` : $C``);
     } else if (ttmp && is_magical_trap(ttmp.ttyp)) {
         await explode(dig_x, dig_y, 0, 20 + d(3, 6) | 0, TRAP_EXPLODE, EXPL.MAGICAL);
         await deltrap(ttmp);
         await newsym(dig_x, dig_y);
     } else if (is_pool_or_lava(dig_x, dig_y)) {
-        await pline_The($C`%s sloshes furiously for a moment, then subsides.`, hliquid(is_lava(dig_x, dig_y) ? $C`lava` : $C`water`));
+        await pline_The($C`%s sloshes furiously for a moment, then subsides.`,
+            hliquid(is_lava(dig_x, dig_y) ? $C`lava` : $C`water`));
         await wake_nearby(FALSE);   /* splashing */
-    } else if (old_typ === DRAWBRIDGE_DOWN || is_drawbridge_wall(dig_x, dig_y) >= 0) {
+    } else if (old_typ === DRAWBRIDGE_DOWN
+        || is_drawbridge_wall(dig_x, dig_y) >= 0) {
         /* drawbridge_down is the platform crossing the moat when the
            bridge is extended; drawbridge_wall is the open "doorway" or
            closed "door" where the portcullis/mechanism is located */
@@ -993,8 +1048,10 @@ export async function dighole(pit_only, by_magic, cc) {   // dig.c:885
             retval = TRUE;
         }
     } else if ((boulder_here = sobj_at(BOULDER, dig_x, dig_y)) !== null) {
-        if (ttmp && is_pit(ttmp.ttyp) && rn2(2)) {
-            await pline_The($C`boulder settles into the %spit.`, dig_x !== u.ux || dig_y !== u.uy ? $C`adjacent ` : $C``);
+        if (ttmp && is_pit(ttmp.ttyp)
+            && rn2(2)) {
+            await pline_The($C`boulder settles into the %spit.`,
+                dig_x !== u.ux || dig_y !== u.uy ? $C`adjacent ` : $C``);
             ttmp.ttyp = (PIT) & 31;   /* crush spikes */
         } else {
             /*
@@ -1019,11 +1076,14 @@ export async function dighole(pit_only, by_magic, cc) {   // dig.c:885
              * We can't dig a hole here since that will destroy
              * the drawbridge.  The following is a cop-out. --dlc
              */
-            await pline_The($C`%s %shere is too hard to dig in.`, surface(dig_x, dig_y), dig_x !== u.ux || dig_y !== u.uy ? $C`t` : $C``);
+            await pline_The($C`%s %shere is too hard to dig in.`,
+                surface(dig_x, dig_y),
+                dig_x !== u.ux || dig_y !== u.uy ? $C`t` : $C``);
         } else {
             lev.flags = (((lev.flags | 0) & ~DB.UNDER) >>> 0) & 31;
             lev.flags = ((lev.flags | 0 | (typ === LAVAPOOL ? DB.LAVA : DB.MOAT)) >>> 0) & 31;
-            await liquid_flow(dig_x, dig_y, typ, ttmp, $C`As you dig, the hole fills with %s!`);
+            await liquid_flow(dig_x, dig_y, typ, ttmp,
+                $C`As you dig, the hole fills with %s!`);
             retval = TRUE;
         }
         /* the following two are here for the wand of digging */
@@ -1037,18 +1097,22 @@ export async function dighole(pit_only, by_magic, cc) {   // dig.c:885
         if (typ !== ROOM) {
             if (!await furniture_handled(dig_x, dig_y, TRUE)) {
                 lev.typ = typ;
-                await liquid_flow(dig_x, dig_y, typ, ttmp, $C`As you dig, the hole fills with %s!`);
+                await liquid_flow(dig_x, dig_y, typ, ttmp,
+                    $C`As you dig, the hole fills with %s!`);
             }
             retval = TRUE;
         } else {
             /* magical digging disarms settable traps */
-            if (by_magic && ttmp && (ttmp.ttyp === LANDMINE || ttmp.ttyp === BEAR_TRAP)) {
+            if (by_magic && ttmp
+                && (ttmp.ttyp === LANDMINE || ttmp.ttyp === BEAR_TRAP)) {
                 const otyp = ttmp.ttyp === LANDMINE ? LAND_MINE : BEARTRAP;
                 /* convert trap into buried object (deletes trap) */
                 await cnv_trap_obj(otyp, 1, ttmp, TRUE);
             }
             /* finally we get to make a hole */
-            if (nohole || pit_only || dig_check_result === DIGCHECK.PASSED_DESTROY_TRAP || dig_check_result === DIGCHECK.PASSED_PITONLY) {
+            if (nohole || pit_only
+                || dig_check_result === DIGCHECK.PASSED_DESTROY_TRAP
+                || dig_check_result === DIGCHECK.PASSED_PITONLY) {
                 await digactualhole(dig_x, dig_y, BY_YOU(), PIT);
             } else {
                 await digactualhole(dig_x, dig_y, BY_YOU(), HOLE);
@@ -1101,13 +1165,15 @@ async function dig_up_grave(cc) {   // dig.c:1027
             break;
         case 2:
             if (!Blind()) {
-                await pline($C`%s!`, Hallucination() ? $C`Dude!  The living dead` : $C`The grave's owner is very upset`);
+                await pline($C`%s!`, Hallucination() ? $C`Dude!  The living dead`
+                    : $C`The grave's owner is very upset`);
             }
             await makemon(await mkclass(S.ZOMBIE, 0), dig_x, dig_y, MM.NOMSG);
             break;
         case 3:
             if (!Blind()) {
-                await pline($C`%s!`, Hallucination() ? $C`I want my mummy` : $C`You've disturbed a tomb`);
+                await pline($C`%s!`, Hallucination() ? $C`I want my mummy`
+                    : $C`You've disturbed a tomb`);
             }
             await makemon(await mkclass(S.MUMMY, 0), dig_x, dig_y, MM.NOMSG);
             break;
@@ -1145,7 +1211,8 @@ export async function use_pick_axe(obj) {   // dig.c:1092
     if (u.utrap && u.utraptype === TT.WEB) {
         /* res==0 => no prior message;
            res==1 => just got "You now wield a pick-axe." message */
-        await pline($C`%s you can't %s while entangled in a web.`, !res ? $C`Unfortunately,` : $C`But`, verb);
+        await pline($C`%s you can't %s while entangled in a web.`,
+            !res ? $C`Unfortunately,` : $C`But`, verb);
         return res;
     }
     /* construct list of directions to show player for likely choices */
@@ -1256,15 +1323,19 @@ export async function use_pick_axe2(obj) {   // dig.c:1162
                 await You($C`need an axe to cut down a tree.`);
             } else if (IS_OBSTRUCTED(lev.typ)) {
                 await You($C`need a pick to dig rock.`);
-            } else if ((boulder = sobj_at(BOULDER, rx, ry)) !== null || sobj_at(STATUE, rx, ry)) {
+            } else if ((boulder = sobj_at(BOULDER, rx, ry)) !== null
+                || sobj_at(STATUE, rx, ry)) {
                 /* if both boulders and statues are present, the topmost
                    boulder will be shown on the map so treat it as target */
                 const what = boulder ? $C`boulder` : $C`statue`;
                 if (!ispick) {
                     const vibrate = !rn2(3) ? 1 : 0;
-                    await pline($C`Sparks fly as you whack the %s.%s`, what, vibrate ? $C`  The axe-handle vibrates violently!` : $C``);
+                    await pline($C`Sparks fly as you whack the %s.%s`, what,
+                        vibrate ? $C`  The axe-handle vibrates violently!`
+                        : $C``);
                     if (vibrate) {
-                        await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? 1 : 2), $C`axing a hard object`, KILLED.BY);
+                        await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? 1 : 2), $C`axing a hard object`,
+                            KILLED.BY);
                     }
                     await wake_nearby(FALSE);
                 } else {
@@ -1273,7 +1344,10 @@ export async function use_pick_axe2(obj) {   // dig.c:1162
                        present; pick_can_reach() returned false */
                     await You_cant($C`reach the %s.`, what);
                 }
-            } else if (u.utrap && u.utraptype === TT.PIT && trap && (trap_with_u = t_at(u.ux, u.uy)) && is_pit(trap.ttyp) && !conjoined_pits(trap, trap_with_u, FALSE)) {
+            } else if (u.utrap && u.utraptype === TT.PIT && trap
+                && (trap_with_u = t_at(u.ux, u.uy))
+                && is_pit(trap.ttyp)
+                && !conjoined_pits(trap, trap_with_u, FALSE)) {
                 const idx = xytodir(u.dx, u.dy);
                 if (idx !== DIR.ERR) {
                     const adjidx = DIR_180(idx);
@@ -1281,16 +1355,25 @@ export async function use_pick_axe2(obj) {   // dig.c:1162
                     trap.vl.v_conjoined = $c.u8(trap.vl.v_conjoined | 1 << adjidx);
                     await You($C`clear some debris from between the pits.`);
                 }
-            } else if (u.utrap && u.utraptype === TT.PIT && (trap_with_u = t_at(u.ux, u.uy)) !== null) {
-                await You($C`swing %s, but the rubble has no place to go.`, await yobjnam(obj, null));
+            } else if (u.utrap && u.utraptype === TT.PIT
+                && (trap_with_u = t_at(u.ux, u.uy)) !== null) {
+                await You($C`swing %s, but the rubble has no place to go.`,
+                    await yobjnam(obj, null));
             } else {
                 await You($C`swing %s through thin air.`, await yobjnam(obj, null));
             }
         } else {
             gd.did_dig_msg = FALSE;
             svc.context.digging.quiet = FALSE;
-            if (svc.context.digging.pos.x !== rx || svc.context.digging.pos.y !== ry || !on_level(svc.context.digging.level, u.uz) || svc.context.digging.down) {
-                if (flags.autodig && dig_target === DIGTYP.ROCK && !svc.context.digging.down && (svc.context.digging.pos.x === u.ux && svc.context.digging.pos.y === u.uy) && (svm.moves <= $c.add64(svc.context.digging.lastdigtime, 2) && svm.moves >= svc.context.digging.lastdigtime)) {
+            if (svc.context.digging.pos.x !== rx
+                || svc.context.digging.pos.y !== ry
+                || !on_level(svc.context.digging.level, u.uz)
+                || svc.context.digging.down) {
+                if (flags.autodig && dig_target === DIGTYP.ROCK
+                    && !svc.context.digging.down
+                    && (svc.context.digging.pos.x === u.ux && svc.context.digging.pos.y === u.uy)
+                    && (svm.moves <= $c.add64(svc.context.digging.lastdigtime, 2)
+                    && svm.moves >= svc.context.digging.lastdigtime)) {
                     /* avoid messages if repeated autodigging */
                     gd.did_dig_msg = TRUE;
                     svc.context.digging.quiet = TRUE;
@@ -1305,7 +1388,8 @@ export async function use_pick_axe2(obj) {   // dig.c:1162
                     await You($C`start %s.`, use_pick_axe2$d_action[dig_target]);
                 }
             } else {
-                await You($C`%s %s.`, svc.context.digging.chew ? $C`begin` : $C`continue`, use_pick_axe2$d_action[dig_target]);
+                await You($C`%s %s.`, svc.context.digging.chew ? $C`begin` : $C`continue`,
+                    use_pick_axe2$d_action[dig_target]);
                 svc.context.digging.chew = FALSE;
             }
             set_occupation(dig, verbing, 0);
@@ -1317,20 +1401,28 @@ export async function use_pick_axe2(obj) {   // dig.c:1162
         await cant_reach_floor(u.ux, u.uy, FALSE, FALSE, FALSE);
     } else if (is_pool_or_lava(u.ux, u.uy)) {
         /* Monsters which swim also happen not to be able to dig */
-        await You($C`cannot stay under%s long enough.`, is_pool(u.ux, u.uy) ? $C`water` : $C` the lava`);
-    } else if ((trap = t_at(u.ux, u.uy)) !== null && (uteetering_at_seen_pit(trap) || uescaped_shaft(trap))) {
+        await You($C`cannot stay under%s long enough.`,
+            is_pool(u.ux, u.uy) ? $C`water` : $C` the lava`);
+    } else if ((trap = t_at(u.ux, u.uy)) !== null
+        && (uteetering_at_seen_pit(trap) || uescaped_shaft(trap))) {
         await dotrap(trap, FORCEBUNGLE);
         /* might escape trap and still be teetering at brink */
         if (!u.utrap) {
             await cant_reach_floor(u.ux, u.uy, FALSE, TRUE, FALSE);
         }
-    } else if (!ispick && (!trap || trap.ttyp !== LANDMINE && trap.ttyp !== BEAR_TRAP)) {
+    } else if (!ispick
+        && (!trap || trap.ttyp !== LANDMINE
+        && trap.ttyp !== BEAR_TRAP)) {
         /* can only dig down with an axe when doing so will
            trigger or disarm a trap here */
-        await pline($C`%s merely scratches the %s.`, await Yobjnam2(obj, null), surface(u.ux, u.uy));
+        await pline($C`%s merely scratches the %s.`, await Yobjnam2(obj, null),
+            surface(u.ux, u.uy));
         await u_wipe_engr(3);
     } else {
-        if (svc.context.digging.pos.x !== u.ux || svc.context.digging.pos.y !== u.uy || !on_level(svc.context.digging.level, u.uz) || !svc.context.digging.down) {
+        if (svc.context.digging.pos.x !== u.ux
+            || svc.context.digging.pos.y !== u.uy
+            || !on_level(svc.context.digging.level, u.uz)
+            || !svc.context.digging.down) {
             svc.context.digging.chew = FALSE;
             svc.context.digging.down = TRUE;
             svc.context.digging.warned = FALSE;
@@ -1356,7 +1448,8 @@ export async function use_pick_axe2(obj) {   // dig.c:1162
  * @returns {number} boolean
  */
 function watchman_canseeu(mtmp) {   // dig.c:1362
-    if (is_watch(mtmp.data) && mtmp.mcansee && m_canseeu(mtmp) && mtmp.mpeaceful) {
+    if (is_watch(mtmp.data) && mtmp.mcansee && m_canseeu(mtmp)
+        && mtmp.mpeaceful) {
         return TRUE;
     }
     return FALSE;
@@ -1377,7 +1470,9 @@ function watchman_canseeu(mtmp) {   // dig.c:1362
 export async function watch_dig(mtmp, x, y, zap) {   // dig.c:1377
     let str = null;
     const lev = $c.relem(svl.level.locations[x], y);
-    if (in_town(x, y) && (closed_door(x, y) || lev.typ === SDOOR || IS_WALL(lev.typ) || IS_FOUNTAIN(lev.typ) || IS_TREE(lev.typ))) {
+    if (in_town(x, y)
+        && (closed_door(x, y) || lev.typ === SDOOR || IS_WALL(lev.typ)
+        || IS_FOUNTAIN(lev.typ) || IS_TREE(lev.typ))) {
         if (!mtmp) {
             mtmp = await get_iter_mons(watchman_canseeu);
         }
@@ -1453,7 +1548,10 @@ export async function mdig_tunnel(mtmp) {   // dig.c:1414
     }
     /* Only rock, trees, and walls fall through to this point. */
     if ((here.flags & W.NONDIGGABLE) !== 0) {
-        await impossible($C`mdig_tunnel:  %s at (%d,%d) is undiggable`, IS_WALL(here.typ) ? $C`wall` : IS_TREE(here.typ) ? $C`tree` : $C`stone`, mtmp.mx, mtmp.my);
+        await impossible($C`mdig_tunnel:  %s at (%d,%d) is undiggable`,
+            IS_WALL(here.typ) ? $C`wall`
+            : IS_TREE(here.typ) ? $C`tree` : $C`stone`,
+            mtmp.mx, mtmp.my);
         return FALSE;   /* still alive */
     }
     if (IS_WALL(here.typ)) {
@@ -1466,7 +1564,8 @@ export async function mdig_tunnel(mtmp) {   // dig.c:1414
         }
         if (svl.level.flags.is_maze_lev) {
             here.typ = ROOM, here.flags = 0;
-        } else if (svl.level.flags.is_cavernous_lev && !in_town(mtmp.mx, mtmp.my)) {
+        } else if (svl.level.flags.is_cavernous_lev
+            && !in_town(mtmp.mx, mtmp.my)) {
             here.typ = CORR, here.flags = 0;
         } else {
             here.typ = DOOR, here.flags = (D.NODOOR) & 31;
@@ -1479,7 +1578,8 @@ export async function mdig_tunnel(mtmp) {   // dig.c:1414
     } else {
         here.typ = CORR, here.flags = 0;
         if (pile && pile < 5) {
-            await mksobj_at(pile === 1 ? BOULDER : ROCK, mtmp.mx, mtmp.my, TRUE, FALSE);
+            await mksobj_at(pile === 1 ? BOULDER : ROCK, mtmp.mx, mtmp.my,
+                TRUE, FALSE);
         }
     }
     await newsym(mtmp.mx, mtmp.my);
@@ -1509,7 +1609,11 @@ export async function draft_message(unexpected) {   // dig.c:1504
             /* U.S. classification system uses 1-A for eligible to serve
                and 4-F for ineligible due to physical or mental defect;
                some intermediate values exist but are rarely seen */
-            await You_feel($C`like you are %s.`, ACURR(A.STR) < 6 || ACURR(A.DEX) < 6 || ACURR(A.CON) < 6 || ACURR(A.CHA) < 6 || ACURR(A.INT) < 6 || ACURR(A.WIS) < 6 ? $C`4-F` : $C`1-A`);
+            await You_feel($C`like you are %s.`,
+                ACURR(A.STR) < 6 || ACURR(A.DEX) < 6
+                || ACURR(A.CON) < 6 || ACURR(A.CHA) < 6
+                || ACURR(A.INT) < 6 || ACURR(A.WIS) < 6 ? $C`4-F`
+                : $C`1-A`);
         }
     } else {
         if (!Hallucination()) {
@@ -1551,7 +1655,8 @@ export async function zap_dig() {   // dig.c:1548
         const mtmp = u.ustuck;
         if (!is_whirly(mtmp.data)) {
             if (dmgtype_fromattack(mtmp.data, AD.DGST, AT.ENGL) !== null) {
-                await You($C`pierce %s %s wall!`, s_suffix(await mon_nam(mtmp)), await mbodypart(mtmp, STOMACH));
+                await You($C`pierce %s %s wall!`, s_suffix(await mon_nam(mtmp)),
+                    await mbodypart(mtmp, STOMACH));
             }
             if (unique_corpstat(mtmp.data)) {
                 mtmp.mhp = $c.div32(mtmp.mhp + 1 | 0, 2);
@@ -1567,7 +1672,9 @@ export async function zap_dig() {   // dig.c:1548
             if (u.dz < 0 || On_stairs(u.ux, u.uy)) {
                 if (On_stairs(u.ux, u.uy)) {
                     const stway = stairway_at(u.ux, u.uy);
-                    await pline_The($C`beam bounces off the %s and hits the %s.`, stway.isladder ? $C`ladder` : $C`stairs`, ceiling(u.ux, u.uy));
+                    await pline_The($C`beam bounces off the %s and hits the %s.`,
+                        stway.isladder ? $C`ladder` : $C`stairs`,
+                        ceiling(u.ux, u.uy));
                 }
                 await You($C`loosen a rock from the %s.`, ceiling(u.ux, u.uy));
                 await pline($C`It falls on your %s!`, await body_part(HEAD));
@@ -1591,7 +1698,8 @@ export async function zap_dig() {   // dig.c:1548
     const maze_dig = svl.level.flags.is_maze_lev && !Is_earthlevel(u.uz) ? 1 : 0;
     let zx = $c.i16(u.ux + u.dx | 0);
     let zy = $c.i16(u.uy + u.dy | 0);
-    if (u.utrap && u.utraptype === TT.PIT && (trap_with_u = t_at(u.ux, u.uy))) {
+    if (u.utrap && u.utraptype === TT.PIT
+        && (trap_with_u = t_at(u.ux, u.uy))) {
         pitdig = TRUE;
         diridx = xytodir(u.dx, u.dy);
     }
@@ -1607,7 +1715,8 @@ export async function zap_dig() {   // dig.c:1548
         if (pitdig) {
             /* we are already in a pit if this is true */
             let adjpit = t_at(zx, zy);
-            if (diridx !== DIR.ERR && !conjoined_pits(adjpit, trap_with_u, FALSE)) {
+            if (diridx !== DIR.ERR
+                && !conjoined_pits(adjpit, trap_with_u, FALSE)) {
                 digdepth = 0;   /* limited to the adjacent location only */
                 nhUse(digdepth);
                 if (!(adjpit && is_pit(adjpit.ttyp))) {
@@ -1795,7 +1904,8 @@ function adj_pit_checks(cc, msg) {   // dig.c:1763
             supporting = $C`altar`;
         } else if (On_stairs(cc.x, cc.y)) {   /* staircase up or down. On_ladder handled above. */
             supporting = $C`stairs`;
-        } else if (ltyp === DRAWBRIDGE_DOWN || ltyp === DBWALL) {   /* "raised drawbridge" */
+        } else if (ltyp === DRAWBRIDGE_DOWN
+            || ltyp === DBWALL) {   /* "raised drawbridge" */
             /* "lowered drawbridge" */
             supporting = $C`drawbridge`;
         }
@@ -1825,7 +1935,10 @@ async function pit_flow(trap, filltyp) {   // dig.c:1844
     if (trap && filltyp !== ROOM && is_pit(trap.ttyp)) {
         t.$copyFrom(trap);
         svl.level.locations[t.tx][t.ty].typ = filltyp, svl.level.locations[t.tx][t.ty].flags = 0;
-        await liquid_flow(t.tx, t.ty, filltyp, trap, t.tx === u.ux && t.ty === u.uy ? $C`Suddenly %s flows in from the adjacent pit!` : null);
+        await liquid_flow(t.tx, t.ty, filltyp, trap,
+            t.tx === u.ux && t.ty === u.uy
+            ? $C`Suddenly %s flows in from the adjacent pit!`
+            : null);
         for (idx = 0; idx < N_DIRS; idx = idx + 1 | 0) {
             if (t.vl.v_conjoined & 1 << idx) {
                 const x = $c.i16(t.tx + xdir[idx]);
@@ -1986,8 +2099,10 @@ export async function bury_an_obj(otmp, dealloced) {   // dig.c:1984
      */
     if (otmp.otyp === CORPSE) {
         /* should cancel timer if under_ice */
-    } else if ((under_ice ? otmp.oclass === POTION_CLASS : is_organic(otmp)) && !obj_resists(otmp, 5, 95)) {
-        await start_timer($c.add64(under_ice ? 0 : 250, rnd(250)), TIMER.OBJECT, ROT_ORGANIC, obj_to_any(otmp));
+    } else if ((under_ice ? otmp.oclass === POTION_CLASS : is_organic(otmp))
+        && !obj_resists(otmp, 5, 95)) {
+        await start_timer($c.add64(under_ice ? 0 : 250, rnd(250)),
+            TIMER.OBJECT, ROT_ORGANIC, obj_to_any(otmp));
         /* rusting of buried metal not yet implemented */
     }
     await add_to_buried(otmp);
@@ -2001,7 +2116,8 @@ export async function bury_an_obj(otmp, dealloced) {   // dig.c:1984
 export async function bury_objs(x, y) {   // dig.c:2050
     let otmp = null, otmp2 = null, shkp = null;
     let loss = 0;
-    const costly = (shkp = await shop_keeper(in_rooms($c.i16(x), $c.i16(y), SHOPBASE).get(0))) && await costly_spot($c.i16(x), $c.i16(y)) ? 1 : 0;
+    const costly = (shkp = await shop_keeper(in_rooms($c.i16(x), $c.i16(y), SHOPBASE).get(0)))
+        && await costly_spot($c.i16(x), $c.i16(y)) ? 1 : 0;
     if (svl.level.objects[x][y] !== null) {
         do {
             if (debugcore($C`dig.c`, TRUE)) {
@@ -2025,7 +2141,8 @@ export async function bury_objs(x, y) {   // dig.c:2050
     await newsym($c.i16(x), $c.i16(y));
     await maybe_unhide_at($c.i16(x), $c.i16(y));
     if (costly && loss) {
-        await You($C`owe %s %ld %s for burying merchandise.`, await shkname(shkp), loss, await currency(loss));
+        await You($C`owe %s %ld %s for burying merchandise.`, await shkname(shkp), loss,
+            await currency(loss));
     }
 }
 /* move objects from buriedobjlist to fobj/nexthere lists; if caller
@@ -2050,7 +2167,8 @@ export async function unearth_objs(x, y) {   // dig.c:2086
     for (otmp = svl.level.buriedobjlist; otmp; otmp = otmp2) {
         otmp2 = otmp.nobj;
         if (otmp.ox === x && otmp.oy === y) {
-            if (bball && otmp === bball && u.utrap && u.utraptype === TT.BURIEDBALL) {
+            if (bball && otmp === bball
+                && u.utrap && u.utraptype === TT.BURIEDBALL) {
                 await buried_ball_to_punishment();
             } else {
                 await obj_extract_self(otmp);
@@ -2114,7 +2232,8 @@ export async function rot_corpse(arg, timeout) {   // dig.c:2146
     } else if (in_invent) {
         if (flags.verbose) {
             const cname = await corpse_xname(obj, null, CXN.NO_PFX);
-            await Your($C`%s%s %s away%c`, obj === $G.uwep ? $C`wielded ` : $C``, cname, await otense(obj, $C`rot`), obj === $G.uwep ? 33 : 46);
+            await Your($C`%s%s %s away%c`, obj === $G.uwep ? $C`wielded ` : $C``, cname,
+                await otense(obj, $C`rot`), obj === $G.uwep ? 33 : 46);
         }
         if (obj.owornmask) {
             await remove_worn_item(obj, TRUE);
@@ -2133,9 +2252,11 @@ export async function rot_corpse(arg, timeout) {   // dig.c:2146
     if (on_floor) {
         const mtmp = svl.level.monsters[x][y];
         /* a hiding monster may be exposed */
-        if (mtmp && !OBJ_AT(x, y) && mtmp.mundetected && hides_under(mtmp.data)) {
+        if (mtmp && !OBJ_AT(x, y) && mtmp.mundetected
+            && hides_under(mtmp.data)) {
             mtmp.mundetected = 0;
-        } else if (u_at(x, y) && u.uundetected && hides_under(gy.youmonst.data)) {
+        } else if (u_at(x, y)
+            && u.uundetected && hides_under(gy.youmonst.data)) {
             await hideunder(gy.youmonst);
         }
         await newsym(x, y);

@@ -111,7 +111,8 @@ export async function dowrite(pen) {   // write.c:74
         await You($C`need hands to be able to write!`);
         return ECMD.OK;
     } else if (Glib()) {
-        await pline($C`%s from your %s.`, await Tobjnam(pen, $C`slip`), await fingers_or_gloves(FALSE));
+        await pline($C`%s from your %s.`, await Tobjnam(pen, $C`slip`),
+            await fingers_or_gloves(FALSE));
         await dropx(pen);
         return ECMD.TIME;
     }
@@ -122,14 +123,17 @@ export async function dowrite(pen) {   // write.c:74
     }
     /* can't write on a novel (unless/until it's been converted into a blank
        spellbook), but we want messages saying so to avoid "spellbook" */
-    typeword = paper.otyp === SPE_NOVEL ? $C`book` : paper.oclass === SPBOOK_CLASS ? $C`spellbook` : $C`scroll`;
+    typeword = paper.otyp === SPE_NOVEL ? $C`book`
+        : paper.oclass === SPBOOK_CLASS ? $C`spellbook`
+        : $C`scroll`;
     if (Blind()) {
         if (!paper.dknown) {
             await You($C`don't know whether that %s is blank or not.`, typeword);
             return ECMD.OK;
         } else if (paper.oclass === SPBOOK_CLASS) {
             /* can't write a magic book while blind */
-            await pline($C`%s can't create braille text.`, upstart(await ysimple_name(pen)));
+            await pline($C`%s can't create braille text.`,
+                upstart(await ysimple_name(pen)));
             return ECMD.OK;
         }
     }
@@ -174,7 +178,8 @@ export async function dowrite(pen) {   // write.c:74
             if (!strncmpi(obj_descr[objects[i].oc_name_idx].oc_name, nm, -1)) {
                 /* spellbooks can only be written by_name, so no need to
                    hold out for a 'better' by_descr match */
-                if (objects[i].oc_name_known || paper.oclass === SPBOOK_CLASS) {
+                if (objects[i].oc_name_known
+                    || paper.oclass === SPBOOK_CLASS) {
                     break found$;
                 } else {
                     /* save item in case there are no better by_descr matches */
@@ -206,7 +211,9 @@ export async function dowrite(pen) {   // write.c:74
              *   and 2/3 chance to keep previous 50:50
              *   choice; so on for higher match counts.
              */
-            if (objects[i].oc_uname && !strcmpi(objects[i].oc_uname, nm) && !(real && objects[i].oc_name_known) && !rn2(deferralchance = deferralchance + 1 | 0)) {
+            if (objects[i].oc_uname && !strcmpi(objects[i].oc_uname, nm)
+                && !(real && objects[i].oc_name_known)
+                && !rn2(deferralchance = deferralchance + 1 | 0)) {
                 deferred = i;
                 /* writing by user-assigned name is same as by description:
                    fails for books, works for scrolls (having an assigned
@@ -229,9 +236,13 @@ export async function dowrite(pen) {   // write.c:74
         fanfic = !rn2(3) ? 1 : 0;
         tearup = !rn2(3) ? 1 : 0;
         if (!fanfic) {
-            await You($C`%s to write the Great Yendorian Novel, but %s inspiration.`, !tearup ? $C`prepare` : $C`try`, !Hallucination() ? $C`lack` : $C`have too much`);
+            await You($C`%s to write the Great Yendorian Novel, but %s inspiration.`,
+                !tearup ? $C`prepare` : $C`try`,
+                !Hallucination() ? $C`lack` : $C`have too much`);
         } else {
-            await You($C`%sproduce really %s fan-fiction.`, !tearup ? $C`start to ` : $C``, !Hallucination() ? $C`lame` : $C`awesome`);
+            await You($C`%sproduce really %s fan-fiction.`,
+                !tearup ? $C`start to ` : $C``,
+                !Hallucination() ? $C`lame` : $C`awesome`);
         }
         if (!tearup) {
             await You($C`give up on the idea.`);
@@ -243,14 +254,16 @@ export async function dowrite(pen) {   // write.c:74
     } else if (i === SPE_BOOK_OF_THE_DEAD) {
         await pline($C`No mere dungeon adventurer could write that.`);
         return ECMD.TIME;
-    } else if (by_descr && paper.oclass === SPBOOK_CLASS && !objects[i].oc_name_known) {
+    } else if (by_descr && paper.oclass === SPBOOK_CLASS
+        && !objects[i].oc_name_known) {
         /* can't write unknown spellbooks by description */
         await pline($C`Unfortunately you don't have enough information to go on.`);
         return ECMD.TIME;
     }
     /* KMH, conduct */
     if (!($t1 = u.uconduct.literate, u.uconduct.literate = $c.add64($t1, 1), $t1)) {
-        await livelog_printf(LL.CONDUCT, $C`became literate by writing %s`, await an(typeword));
+        await livelog_printf(LL.CONDUCT,
+            $C`became literate by writing %s`, await an(typeword));
     }
     new_obj = await mksobj(i, FALSE, FALSE);
     new_obj.bknown = (paper.bknown && pen.bknown ? 1 : 0) & 1;
@@ -314,11 +327,15 @@ export async function dowrite(pen) {   // write.c:74
     /* else if named, then only by-descr works */
     /* else fresh knowledge of the spell works */
     /* and Luck might override after previous checks have failed */
-    if (!objects[new_obj.otyp].oc_name_known && !(by_descr && objects[new_obj.otyp].oc_encountered) && spell_knowledge !== spe_Fresh && rnl(gu.urole.mnum === PM.WIZARD && paper.oclass !== SPBOOK_CLASS || spell_knowledge === spe_GoingStale ? 5 : 15)) {
+    if (!objects[new_obj.otyp].oc_name_known
+        && !(by_descr && objects[new_obj.otyp].oc_encountered)
+        && spell_knowledge !== spe_Fresh
+        && rnl(gu.urole.mnum === PM.WIZARD && paper.oclass !== SPBOOK_CLASS || spell_knowledge === spe_GoingStale ? 5 : 15)) {
         await You($C`%s to write that.`, by_descr ? $C`fail` : $C`don't know how`);
         /* scrolls disappear, spellbooks don't */
         if (paper.oclass === SPBOOK_CLASS) {
-            await You($C`write in your best handwriting:  "My Diary", but it quickly fades.`);
+            await You(
+                $C`write in your best handwriting:  "My Diary", but it quickly fades.`);
             await update_inventory();   /* pen charges */
         } else {
             if (by_descr) {
@@ -351,7 +368,8 @@ export async function dowrite(pen) {   // write.c:74
     /* success */
     if (new_obj.oclass === SPBOOK_CLASS) {
         /* acknowledge the change in the object's description... */
-        await pline_The($C`spellbook warps strangely, then turns %s.`, new_book_description(new_obj.otyp, new $c.Ptr(namebuf, 0)));
+        await pline_The($C`spellbook warps strangely, then turns %s.`,
+            new_book_description(new_obj.otyp, new $c.Ptr(namebuf, 0)));
     }
     new_obj.blessed = (curseval > 0 ? 1 : 0) & 1;
     new_obj.cursed = (curseval < 0 ? 1 : 0) & 1;
@@ -369,7 +387,9 @@ export async function dowrite(pen) {   // write.c:74
     if (objects[new_obj.otyp].oc_name_known || by_descr) {
         await observe_object(new_obj);
     }
-    new_obj = await hold_another_object(new_obj, $C`Oops!  %s out of your grasp!`, await The(await aobjnam(new_obj, $C`slip`)), null);
+    new_obj = await hold_another_object(new_obj, $C`Oops!  %s out of your grasp!`,
+        await The(await aobjnam(new_obj, $C`slip`)),
+        null);
     nhUse(new_obj);   /* try to avoid complaint about dead assignment */
     return ECMD.TIME;
 }

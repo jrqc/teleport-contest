@@ -44,7 +44,8 @@ function veryold(fd) {   // unixunix.c:38
     if ($c.sub64(date[0], buf.st_mtimespec.tv_sec) < 259200) {
         /* recent */
         /* should be the same size as hackpid */
-        if ($c.u64($c.read(fd, new $c.Ptr(lockedpid, 0), 4)) !== 4) {   /* strange ... */
+        if ($c.u64($c.read(fd, new $c.Ptr(lockedpid, 0), 4))
+            !== 4) {   /* strange ... */
             return 0;
         }
         /* From: Rick Adams <seismo!rick> */
@@ -189,7 +190,8 @@ export async function getlock() {   // unixunix.c:103
         await error($C`cannot creat lock file (%s).`, fq_lock);
         /*NOTREACHED*/
     } else {
-        if ($c.u64($c.write(fd, new $c.FieldRef(svh, "hackpid", "i32"), 4)) !== 4) {
+        if ($c.u64($c.write(fd, new $c.FieldRef(svh, "hackpid", "i32"), 4))
+            !== 4) {
             await error($C`cannot write lock (%s)`, fq_lock);
             /*NOTREACHED*/
         }
@@ -237,7 +239,8 @@ export async function ask_about_panic_save() {   // unixunix.c:263
  */
 export function regularize(s) {   // unixunix.c:297
     let lp = null;
-    while ((lp = $c.strchr(s, 46)) !== null || (lp = $c.strchr(s, 47)) !== null || (lp = $c.strchr(s, 32)) !== null) {
+    while ((lp = $c.strchr(s, 46)) !== null || (lp = $c.strchr(s, 47)) !== null
+        || (lp = $c.strchr(s, 32)) !== null) {
         lp.set(0, 95);
     }
     /* avoid problems with 14 character file name limit */
@@ -255,7 +258,8 @@ export function regularize(s) {   // unixunix.c:297
  */
 export async function dosh() {   // unixunix.c:344
     let str = null;
-    if (!sysopt.shellers || !sysopt.shellers.get(0) || !check_user_string(sysopt.shellers)) {
+    if (!sysopt.shellers || !sysopt.shellers.get(0)
+        || !check_user_string(sysopt.shellers)) {
         /* FIXME: should no longer assume a particular command keystroke */
         await Norep($C`Unavailable command '!'.`);
         return 0;

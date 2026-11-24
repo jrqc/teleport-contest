@@ -132,8 +132,10 @@ async function throne_sit_effect() {   // sit.c:39
                 await adjattrib(rn2(A.MAX), 1, FALSE);
                 break;
             case 3:
-                await pline($C`A%s electric shock shoots through your body!`, u.uprops[SHOCK_RES].intrinsic || u.uprops[SHOCK_RES].extrinsic ? $C`n` : $C` massive`);
-                await losehp(Shock_resistance() ? rnd(6) : rnd(30), $C`electric chair`, KILLED.BY_AN);
+                await pline($C`A%s electric shock shoots through your body!`,
+                    u.uprops[SHOCK_RES].intrinsic || u.uprops[SHOCK_RES].extrinsic ? $C`n` : $C` massive`);
+                await losehp(Shock_resistance() ? rnd(6) : rnd(30), $C`electric chair`,
+                    KILLED.BY_AN);
                 await exercise(A.CON, FALSE);
                 break;
             case 4:
@@ -173,7 +175,8 @@ async function throne_sit_effect() {   // sit.c:39
                     let cnt = rnd(10);
                     /* Magical voice not affected by deafness */
                     await pline($C`A voice echoes:`);
-                    await verbalize($C`Thine audience hath been summoned, %s!`, flags.female ? $C`Dame` : $C`Sire`);
+                    await verbalize($C`Thine audience hath been summoned, %s!`,
+                        flags.female ? $C`Dame` : $C`Sire`);
                     while ($t1 = cnt, cnt = $t1 - 1 | 0, $t1) {
                         await makemon(await courtmon(), tx, ty, NO.MM_FLAGS);
                     }
@@ -182,13 +185,15 @@ async function throne_sit_effect() {   // sit.c:39
             case 8:
                 /* Magical voice not affected by deafness */
                 await pline($C`A voice echoes:`);
-                await verbalize($C`By thine Imperious order, %s...`, flags.female ? $C`Dame` : $C`Sire`);
+                await verbalize($C`By thine Imperious order, %s...`,
+                    flags.female ? $C`Dame` : $C`Sire`);
                 await do_genocide(5);   /* REALLY|ONTHRONE, see do_genocide() */
                 break;
             case 9:
                 /* Magical voice not affected by deafness */
                 await pline($C`A voice echoes:`);
-                await verbalize($C`A curse upon thee for sitting upon this most holy throne!`);
+                await verbalize(
+                    $C`A curse upon thee for sitting upon this most holy throne!`);
                 if (Luck() > 0) {
                     await make_blinded($c.add64(BlindedTimeout(), rn1(100, 250)), TRUE);
                     change_luck($c.i8(Luck() > 1 ? -rnd(2) | 0 : -1));
@@ -200,7 +205,8 @@ async function throne_sit_effect() {   // sit.c:39
                 if (Luck() < 0 || $c.and64(u.uprops[SEE_INVIS].intrinsic, INTRINSIC)) {
                     if (svl.level.flags.nommap) {
                         await pline($C`A terrible drone fills your head!`);
-                        await make_confused($c.add64($c.and64(u.uprops[CONFUSION].intrinsic, TIMEOUT), rnd(30)), FALSE);
+                        await make_confused($c.add64($c.and64(u.uprops[CONFUSION].intrinsic, TIMEOUT), rnd(30)),
+                            FALSE);
                     } else {
                         await pline($C`An image forms in your mind.`);
                         await do_mapping();
@@ -228,7 +234,8 @@ async function throne_sit_effect() {   // sit.c:39
                                 break;
                             case 0:
                                 /* no eyes */
-                                await You($C`have a very strange feeling in your %s.`, await body_part(HEAD));
+                                await You($C`have a very strange feeling in your %s.`,
+                                    await body_part(HEAD));
                                 break;
                         }
                     }
@@ -254,7 +261,8 @@ async function throne_sit_effect() {   // sit.c:39
                 break;
             case 13:
                 await Your($C`mind turns into a pretzel!`);
-                await make_confused($c.add64($c.and64(u.uprops[CONFUSION].intrinsic, TIMEOUT), rn1(7, 16)), FALSE);
+                await make_confused($c.add64($c.and64(u.uprops[CONFUSION].intrinsic, TIMEOUT), rn1(7, 16)),
+                    FALSE);
                 break;
             default:
                 await impossible($C`throne effect`);
@@ -274,13 +282,15 @@ async function throne_sit_effect() {   // sit.c:39
        only happened when teleporting back to the same point where hero
        started from.]  "Analyzing a throne" doesn't really make any sense
        but if the answer is yes than it will vanish in a puff of logic. */
-    if (!special_throne && !rn2(3) && (!wizard() || await y_n($C`Analyze throne?`) === 121)) {
+    if (!special_throne &&
+        !rn2(3) && (!wizard() || await y_n($C`Analyze throne?`) === 121)) {
         svl.level.locations[tx][ty].typ = ROOM, svl.level.locations[tx][ty].flags = 0;
         await map_background(tx, ty, FALSE);
         await newsym_force(tx, ty);
         /* "[God] promptly vanishes in a puff of logic" is from
            Douglas Adams' _The_Hitchhiker's_Guide_to_the_Galaxy_. */
-        await pline_The($C`throne %s in a puff of logic.`, cansee(tx, ty) ? $C`vanishes` : $C`has vanished`);
+        await pline_The($C`throne %s in a puff of logic.`,
+            cansee(tx, ty) ? $C`vanishes` : $C`has vanished`);
     }
 }
 /* special throne in Vlad's tower: effect is 1 to 13 inclusive */
@@ -346,7 +356,9 @@ async function special_throne_effect(effect) {   // sit.c:238
                 if (u.uhave.amulet) {
                     await You_feel($C`extremely disoriented for a moment.`);
                 } else {
-                    await schedule_goto(vs_level, UTOTYPE.NONE, null, $C`You feel extremely out of place.`);
+                    await schedule_goto(
+                        vs_level, UTOTYPE.NONE, null,
+                        $C`You feel extremely out of place.`);
                 }
                 break;
             }
@@ -387,7 +399,8 @@ async function special_throne_effect(effect) {   // sit.c:238
         case 12:
             /* acid damage */
             await pline($C`The throne is covered in acid!`);
-            await losehp(Acid_resistance() ? rnd(16) : rnd(80), $C`acidic chair`, KILLED.BY_AN);
+            await losehp(Acid_resistance() ? rnd(16) : rnd(80), $C`acidic chair`,
+                KILLED.BY_AN);
             await exercise(A.CON, FALSE);
             break;
         case 13:
@@ -408,7 +421,10 @@ async function special_throne_effect(effect) {   // sit.c:238
 async function lay_an_egg() {   // sit.c:358
     let $t1;
     if (!flags.female) {
-        await pline($C`%s can't lay eggs!`, Hallucination() ? $C`You may think you are a platypus, but a male still` : $C`Males`);
+        await pline($C`%s can't lay eggs!`,
+            Hallucination()
+            ? $C`You may think you are a platypus, but a male still`
+            : $C`Males`);
         return ECMD.OK;
     } else if (u.uhunger < objects[EGG].oc_nutrition) {
         await You($C`don't have enough energy to lay an egg.`);
@@ -418,7 +434,9 @@ async function lay_an_egg() {   // sit.c:358
             await pline($C`A splash tetra you are not.`);
             return ECMD.OK;
         }
-        if (Upolyd() && (gy.youmonst.data === mons[PM.GIANT_EEL] || gy.youmonst.data === mons[PM.ELECTRIC_EEL])) {
+        if (Upolyd()
+            && (gy.youmonst.data === mons[PM.GIANT_EEL]
+            || gy.youmonst.data === mons[PM.ELECTRIC_EEL])) {
             await You($C`yearn for the Sargasso Sea.`);
             return ECMD.OK;
         }
@@ -452,7 +470,8 @@ export async function dosit() {   // sit.c:400
                 await You($C`are already sitting on %s.`, await mon_nam(u.usteed));
                 return ECMD.OK;
             }
-            if (u.uundetected && is_hider(gy.youmonst.data) && u.umonnum !== PM.TRAPPER) {   /* trapper can stay hidden on floor */
+            if (u.uundetected && is_hider(gy.youmonst.data)
+                && u.umonnum !== PM.TRAPPER) {   /* trapper can stay hidden on floor */
                 u.uundetected = 0;   /* no longer on the ceiling */
             }
             if (!can_reach_floor(FALSE)) {
@@ -476,15 +495,19 @@ export async function dosit() {   // sit.c:400
             } else if (is_pool(u.ux, u.uy) && !Underwater()) {
                 /* water walking */
                 $goto = "in_water"; continue D1;
-            } else if (Upolyd() && u.umonnum === PM.GREMLIN && (svl.level.locations[u.ux][u.uy].typ === FOUNTAIN || is_pool(u.ux, u.uy))) {
+            } else if (Upolyd() && u.umonnum === PM.GREMLIN
+                && (svl.level.locations[u.ux][u.uy].typ === FOUNTAIN || is_pool(u.ux, u.uy))) {
                 $goto = "in_water"; continue D1;
             }
         case "in_water":
             /* ensure we're not standing on the precipice */
-            if ($goto !== "in_water" && (OBJ_AT(u.ux, u.uy) && !(uteetering_at_seen_pit(trap) || uescaped_shaft(trap)))) {
+            if ($goto !== "in_water" && (OBJ_AT(u.ux, u.uy)
+                && !(uteetering_at_seen_pit(trap) || uescaped_shaft(trap)))) {
                 obj = svl.level.objects[u.ux][u.uy];
                 if (gy.youmonst.data.mlet === S.DRAGON && obj.oclass === COIN_CLASS) {
-                    await You($C`coil up around your %shoard.`, $c.add64(obj.quan, money_cnt(gi.invent)) < Math.imul(u.ulevel, 1000) ? $C`meager ` : $C``);
+                    await You($C`coil up around your %shoard.`,
+                        $c.add64(obj.quan, money_cnt(gi.invent)) < Math.imul(u.ulevel, 1000)
+                        ? $C`meager ` : $C``);
                 } else if (obj.otyp === TOWEL) {
                     await pline($C`It's probably not a good time for a picnic...`);
                 } else {
@@ -500,7 +523,8 @@ export async function dosit() {   // sit.c:400
                             await pline($C`Squelch!`);
                         }
                         await useupf(obj, obj.quan);
-                    } else if (!(Is_box(obj) || objects[obj.otyp].oc_material === CLOTH)) {
+                    } else if (!(Is_box(obj)
+                        || objects[obj.otyp].oc_material === CLOTH)) {
                         await pline($C`It's not very comfortable...`);
                     }
                 }
@@ -508,12 +532,14 @@ export async function dosit() {   // sit.c:400
                 if (u.utrap) {
                     await exercise(A.WIS, FALSE);   /* you're getting stuck longer */
                     if (u.utraptype === TT.BEARTRAP) {
-                        await You_cant($C`sit down with your %s in the bear trap.`, await body_part(FOOT));
+                        await You_cant($C`sit down with your %s in the bear trap.`,
+                            await body_part(FOOT));
                         u.utrap = u.utrap + 1 >>> 0;
                     } else if (u.utraptype === TT.PIT) {
                         if (trap && trap.ttyp === SPIKED_PIT) {
                             await You($C`sit down on a spike.  Ouch!`);
-                            await losehp(Half_physical_damage() ? rn2(2) : 1, $C`sitting on an iron spike`, KILLED.BY);
+                            await losehp(Half_physical_damage() ? rn2(2) : 1,
+                                $C`sitting on an iron spike`, KILLED.BY);
                             await exercise(A.STR, FALSE);
                         } else {
                             await You($C`sit down in the pit.`);
@@ -529,8 +555,10 @@ export async function dosit() {   // sit.c:400
                             await burn_away_slime();
                         }
                         $t3 = rnd(4) >>> 0, u.utrap = u.utrap + $t3 >>> 0;
-                        await losehp(d(2, 10), $C`sitting in lava`, KILLED.BY);   /* lava damage */
-                    } else if (u.utraptype === TT.INFLOOR || u.utraptype === TT.BURIEDBALL) {
+                        await losehp(d(2, 10), $C`sitting in lava`,
+                            KILLED.BY);   /* lava damage */
+                    } else if (u.utraptype === TT.INFLOOR
+                        || u.utraptype === TT.BURIEDBALL) {
                         await You_cant($C`maneuver to sit!`);
                         u.utrap = u.utrap + 1 >>> 0;
                     }
@@ -541,7 +569,8 @@ export async function dosit() {   // sit.c:400
                     await You($C`%s.`, Flying() ? $C`land` : $C`sit down`);
                     await dotrap(trap, VIASITTING);
                 }
-            } else if ($goto !== "in_water" && ((Underwater() || Is_waterlevel(u.uz)) && !eggs_in_water(gy.youmonst.data))) {
+            } else if ($goto !== "in_water" && ((Underwater() || Is_waterlevel(u.uz))
+                && !eggs_in_water(gy.youmonst.data))) {
                 if (Is_waterlevel(u.uz)) {
                     await There($C`are no cushions floating nearby.`);
                 } else {
@@ -567,7 +596,8 @@ export async function dosit() {   // sit.c:400
                 }
             } else if (IS_SINK(typ)) {
                 await You(new $c.Ptr(dosit$sit_message, 0), defsyms[S.sink].explanation);
-                await Your($C`%s gets wet.`, humanoid(gy.youmonst.data) ? $C`rump` : $C`underside`);
+                await Your($C`%s gets wet.`,
+                    humanoid(gy.youmonst.data) ? $C`rump` : $C`underside`);
             } else if (IS_ALTAR(typ)) {
                 await You(new $c.Ptr(dosit$sit_message, 0), defsyms[S.altar].explanation);
                 await altar_wrath(u.ux, u.uy);
@@ -587,7 +617,8 @@ export async function dosit() {   // sit.c:400
                 }
                 await pline_The($C`%s burns you!`, hliquid($C`lava`));
                 /* lava damage */
-                await losehp(d(u.uprops[FIRE_RES].intrinsic || u.uprops[FIRE_RES].extrinsic ? 2 : 10, 10), $C`sitting on lava`, KILLED.BY);
+                await losehp(d(u.uprops[FIRE_RES].intrinsic || u.uprops[FIRE_RES].extrinsic ? 2 : 10, 10),
+                    $C`sitting on lava`, KILLED.BY);
             } else if (is_ice(u.ux, u.uy)) {
                 await You(new $c.Ptr(dosit$sit_message, 0), defsyms[S.ice].explanation);
                 if (!Cold_resistance()) {
@@ -648,7 +679,8 @@ export async function rndcurse() {   // sit.c:569
             if (!otmp || otmp.cursed) {
                 continue;   /* next target */
             }
-            if (otmp.oartifact && spec_ability(otmp, SPFX.INTEL) && rn2(10) < 8) {
+            if (otmp.oartifact && spec_ability(otmp, SPFX.INTEL)
+                && rn2(10) < 8) {
                 await pline($C`%s!`, await Tobjnam(otmp, $C`resist`));
                 continue;
             }
@@ -661,7 +693,8 @@ export async function rndcurse() {   // sit.c:569
         await update_inventory();
     }
     /* treat steed's saddle as extended part of hero's inventory */
-    if (u.usteed && !rn2(4) && (otmp = await which_armor(u.usteed, W.SADDLE)) !== null && !otmp.cursed) {
+    if (u.usteed && !rn2(4) && (otmp = await which_armor(u.usteed, W.SADDLE)) !== null
+        && !otmp.cursed) {
         /* skip if already cursed */
         if (otmp.blessed) {
             await unbless(otmp);
@@ -669,7 +702,8 @@ export async function rndcurse() {   // sit.c:569
             await curse(otmp);
         }
         if (!Blind()) {
-            await pline($C`%s %s.`, await Yobjnam2(otmp, $C`glow`), hcolor(otmp.cursed ? c_color_names.c_black : $C`brown`));
+            await pline($C`%s %s.`, await Yobjnam2(otmp, $C`glow`),
+                hcolor(otmp.cursed ? c_color_names.c_black : $C`brown`));
             otmp.bknown = (Hallucination() ? 0 : 1) & 1;   /* bypass set_bknown() */
         } else {
             otmp.bknown = 0;   /* bypass set_bknown() */
@@ -745,7 +779,8 @@ export async function attrcurse() {   // sit.c:644
                     /* might not be able to see self anymore */
                     await newsym(u.ux, u.uy);
                 }
-                await You($C`%s!`, Hallucination() ? $C`tawt you taw a puttie tat` : $C`thought you saw something`);
+                await You($C`%s!`, Hallucination() ? $C`tawt you taw a puttie tat`
+                    : $C`thought you saw something`);
                 ret = SEE_INVIS;
                 break;
             }

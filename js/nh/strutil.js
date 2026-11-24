@@ -28,7 +28,8 @@ export function strbuf_init(strbuf) {   // strutil.c:9
  */
 export async function strbuf_append(strbuf, str) {   // strutil.c:17
     const len = $c.i32($c.strlen(str)) + 1 | 0;
-    await strbuf_reserve(strbuf, len + (strbuf.str ? $c.i32($c.strlen(strbuf.str)) : 0) | 0);
+    await strbuf_reserve(strbuf,
+        len + (strbuf.str ? $c.i32($c.strlen(strbuf.str)) : 0) | 0);
     $c.strcat(strbuf.str, str);
 }
 /* strbuf_reserve() ensure strbuf->str has storage for len characters */
@@ -146,8 +147,13 @@ function pmatch_internal(patrn, strng, ci, sk) {   // strutil.c:105
         if (!p) {   /* end of pattern */
             return s === 0 ? 1 : 0;   /* matches iff end of string too */
         } else if (p === 42) {   /* wildcard reached */
-            return !patrn.get(0) || pmatch_internal(patrn, strng.add(-1), ci, sk) ? TRUE : s ? pmatch_internal(patrn.add(-1), strng, ci, sk) : FALSE;
-        } else if ((ci ? lowc(p) !== lowc(s) : p !== s) && (p !== 63 || !s)) {   /* & single-char wildcard */
+            return !patrn.get(0)
+                || pmatch_internal(patrn, strng.add(-1), ci, sk)
+                ? TRUE
+                : s ? pmatch_internal(patrn.add(-1), strng, ci, sk)
+                : FALSE;
+        } else if ((ci ? lowc(p) !== lowc(s) : p !== s)
+            && (p !== 63 || !s)) {   /* & single-char wildcard */
             /* check single character */
             return FALSE;   /* doesn't match */
         } else {

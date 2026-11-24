@@ -102,7 +102,8 @@ async function hooked_tty_getlin(query, bufp, hook) {   // getline.c:43
             /* ctrl-P, doesn't honor rebinding #prevmsg cmd */
             const sav = $G.ttyDisplay.inread;
             $G.ttyDisplay.inread = 0;
-            if (iflags.prevmsg_window === 115 || iflags.prevmsg_window === 99 && !doprev) {
+            if (iflags.prevmsg_window === 115
+                || iflags.prevmsg_window === 99 && !doprev) {
                 /* msg_window:single, or msg_window:combination while it's
                    behaving like msg_window:single */
                 if (!doprev) {
@@ -155,7 +156,8 @@ async function hooked_tty_getlin(query, bufp, hook) {   // getline.c:43
         } else if (c === 10 || c === 13) {
             /* not NEWAUTOCOMP */
             break;
-        } else if (32 <= $c.u8(c) && c !== 127 && ($c.pdiff(bufp, obufp) < BUFSZ - 1 && $c.pdiff(bufp, obufp) < COLNO)) {
+        } else if (32 <= $c.u8(c) && c !== 127
+            && ($c.pdiff(bufp, obufp) < BUFSZ - 1 && $c.pdiff(bufp, obufp) < COLNO)) {
             /* avoid isprint() - some people don't have it
                ' ' is not always a printing char */
             let i$2 = eos(bufp);
@@ -219,7 +221,8 @@ export async function xwaitforspace(s) {   // getline.c:230
     /* chars allowed besides return */
     const x = $G.ttyDisplay ? $G.ttyDisplay.dismiss_more : 10;
     $G.morc = 0;
-    while (!program_state.done_hup && (c = await tty_nhgetch()) !== -1) {
+    while (!program_state.done_hup &&
+        (c = await tty_nhgetch()) !== -1) {
         if (c === 10 || c === 13) {
             break;
         }
@@ -288,12 +291,15 @@ export async function tty_get_ext_cmd() {   // getline.c:292
      */
     $t1 = extcmd_initiator(), extcmd_char[0] = $t1, extcmd_char[1] = 0;
     buf[0] = 0;
-    await hooked_tty_getlin(new $c.Ptr(extcmd_char, 0), new $c.Ptr(buf, 0), !gi.in_doagain ? ext_cmd_getlin_hook : no_hook);
+    await hooked_tty_getlin(new $c.Ptr(extcmd_char, 0), new $c.Ptr(buf, 0),
+        !gi.in_doagain ? ext_cmd_getlin_hook : no_hook);
     mungspaces(new $c.Ptr(buf, 0));
-    const nmatches = buf[0] === 0 || buf[0] === 27 ? -1 : await extcmds_match(new $c.Ptr(buf, 0), ECM.IGNOREAC | ECM.EXACTMATCH, new $c.Ptr(ecmatches, 0));
+    const nmatches = buf[0] === 0 || buf[0] === 27 ? -1
+        : await extcmds_match(new $c.Ptr(buf, 0), ECM.IGNOREAC | ECM.EXACTMATCH, new $c.Ptr(ecmatches, 0));
     if (nmatches !== 1) {
         if (nmatches !== -1) {
-            await pline($C`%s%.60s: unknown extended command.`, visctrl(extcmd_char[0]), new $c.Ptr(buf, 0));
+            await pline($C`%s%.60s: unknown extended command.`,
+                visctrl(extcmd_char[0]), new $c.Ptr(buf, 0));
         }
         return -1;
     }

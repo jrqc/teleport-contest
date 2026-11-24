@@ -133,12 +133,18 @@ async function item_reading_classification(obj, outbuf) {   // iactions.c:86
     } else if (otyp === HAWAIIAN_SHIRT) {
         $c.strcpy(outbuf, $C`Look at the pattern on the shirt`);
     } else if (obj.oclass === SCROLL_CLASS) {
-        const magic = obj.dknown && otyp !== SCR_MAIL && (otyp !== SCR_BLANK_PAPER || !objects[otyp].oc_name_known) ? $C` to activate its magic` : $C``;
+        const magic = obj.dknown
+            && otyp !== SCR_MAIL
+            && (otyp !== SCR_BLANK_PAPER
+            || !objects[otyp].oc_name_known)
+            ? $C` to activate its magic` : $C``;
         $c.sprintf(outbuf, $C`Read this scroll%s`, magic);
     } else if (obj.oclass === SPBOOK_CLASS) {
         const novel = otyp === SPE_NOVEL ? 1 : 0;
-        const blank = otyp === SPE_BLANK_PAPER && objects[otyp].oc_name_known ? 1 : 0;
-        const tome = otyp === SPE_BOOK_OF_THE_DEAD && objects[otyp].oc_name_known ? 1 : 0;
+        const blank = otyp === SPE_BLANK_PAPER
+            && objects[otyp].oc_name_known ? 1 : 0;
+        const tome = otyp === SPE_BOOK_OF_THE_DEAD
+            && objects[otyp].oc_name_known ? 1 : 0;
         $c.sprintf(outbuf, $C`%s this %s`, novel || blank ? $C`Read` : tome ? $C`Examine` : $C`Study`, novel ? await simpleonames(obj) : tome ? $C`tome` : $C`spellbook`);
         /* "novel" or "paperback book" */
     } else {
@@ -158,7 +164,8 @@ async function ia_addmenu(win, act, let_, txt) {   // iactions.c:127
     const clr = NO_COLOR;
     any.$copyFrom(cg.zeroany);
     any.a_int = act;
-    await add_menu(win, nul_glyphinfo, any, let_, 0, ATR.NONE, clr, txt, MENU.ITEMFLAGS_NONE);
+    await add_menu(win, nul_glyphinfo, any, let_, 0,
+        ATR.NONE, clr, txt, MENU.ITEMFLAGS_NONE);
 }
 /* set up a command to execute on a specific item next */
 /**
@@ -174,7 +181,10 @@ async function itemactions_pushkeys(otmp, act) {   // iactions.c:140
         case IA.NONE:
             break;
         case IA.UNWIELD:
-            await cmdq_add_ec(CQ_CANNED, otmp === $G.uwep ? dowield : otmp === $G.uswapwep ? remarm_swapwep : otmp === $G.uquiver ? dowieldquiver : donull);   /* can't happen */
+            await cmdq_add_ec(CQ_CANNED, otmp === $G.uwep ? dowield
+                : otmp === $G.uswapwep ? remarm_swapwep
+                : otmp === $G.uquiver ? dowieldquiver
+                : donull);   /* can't happen */
             await cmdq_add_key(CQ_CANNED, HANDS_SYM);
             break;
         case IA.APPLY_OBJ:
@@ -315,7 +325,8 @@ export async function itemactions(otmp) {   // iactions.c:278
         const verb = otmp === $G.uquiver ? $C`Quiver` : $C`Wield`;
         const action = otmp === $G.uquiver ? $C`un-ready` : $C`un-wield`;
         const which = is_plural(otmp) ? $C`these` : $C`this`;
-        const what = otmp.oclass === WEAPON_CLASS || is_weptool(otmp) ? $C`weapon` : $C`item`;
+        const what = otmp.oclass === WEAPON_CLASS || is_weptool(otmp)
+            ? $C`weapon` : $C`item`;
         /*
          * TODO: if uwep is ammo, tell player that to shoot instead of toss,
          *       the corresponding launcher must be wielded;
@@ -327,18 +338,22 @@ export async function itemactions(otmp) {   // iactions.c:278
     if (otmp.oclass === COIN_CLASS) {
         await ia_addmenu(win, IA.APPLY_OBJ, 97, $C`Flip a coin`);
     } else if (otmp.otyp === CREAM_PIE) {
-        await ia_addmenu(win, IA.APPLY_OBJ, 97, $C`Hit yourself with this cream pie`);
+        await ia_addmenu(win, IA.APPLY_OBJ, 97,
+            $C`Hit yourself with this cream pie`);
     } else if (otmp.otyp === BULLWHIP) {
         await ia_addmenu(win, IA.APPLY_OBJ, 97, $C`Lash out with this whip`);
     } else if (otmp.otyp === GRAPPLING_HOOK) {
-        await ia_addmenu(win, IA.APPLY_OBJ, 97, $C`Grapple something with this hook`);
+        await ia_addmenu(win, IA.APPLY_OBJ, 97,
+            $C`Grapple something with this hook`);
     } else if (otmp.otyp === BAG_OF_TRICKS && objects[otmp.otyp].oc_name_known) {   /* bag of tricks skips this unless discovered */
         await ia_addmenu(win, IA.APPLY_OBJ, 97, $C`Reach into this bag`);
     } else if (Is_container(otmp)) {   /* bag of tricks gets here only if not yet discovered */
         await ia_addmenu(win, IA.APPLY_OBJ, 97, $C`Open this container`);
     } else if (otmp.otyp === CAN_OF_GREASE) {
         await ia_addmenu(win, IA.APPLY_OBJ, 97, $C`Use the can to grease an item`);
-    } else if (otmp.otyp === LOCK_PICK || otmp.otyp === CREDIT_CARD || otmp.otyp === SKELETON_KEY) {
+    } else if (otmp.otyp === LOCK_PICK
+        || otmp.otyp === CREDIT_CARD
+        || otmp.otyp === SKELETON_KEY) {
         await ia_addmenu(win, IA.APPLY_OBJ, 97, $C`Use this tool to pick a lock`);
     } else if (otmp.otyp === TINNING_KIT) {
         await ia_addmenu(win, IA.APPLY_OBJ, 97, $C`Use this kit to tin a corpse`);
@@ -346,7 +361,8 @@ export async function itemactions(otmp) {   // iactions.c:278
         await ia_addmenu(win, IA.APPLY_OBJ, 97, $C`Tie a pet to this leash`);
     } else if (otmp.otyp === SADDLE) {
         await ia_addmenu(win, IA.APPLY_OBJ, 97, $C`Place this saddle on a pet`);
-    } else if (otmp.otyp === MAGIC_WHISTLE || otmp.otyp === TIN_WHISTLE) {
+    } else if (otmp.otyp === MAGIC_WHISTLE
+        || otmp.otyp === TIN_WHISTLE) {
         await ia_addmenu(win, IA.APPLY_OBJ, 97, $C`Blow this whistle`);
     } else if (otmp.otyp === EUCALYPTUS_LEAF) {
         await ia_addmenu(win, IA.APPLY_OBJ, 97, $C`Use this leaf as a whistle`);
@@ -370,7 +386,8 @@ export async function itemactions(otmp) {   // iactions.c:278
             $c.sprintf(new $c.Ptr(buf, 0), $C`%s %s %s`, light, s, await simpleonames(otmp));
         }
         await ia_addmenu(win, IA.APPLY_OBJ, 97, new $c.Ptr(buf, 0));
-    } else if (otmp.otyp === OIL_LAMP || otmp.otyp === MAGIC_LAMP || otmp.otyp === BRASS_LANTERN) {
+    } else if (otmp.otyp === OIL_LAMP || otmp.otyp === MAGIC_LAMP
+        || otmp.otyp === BRASS_LANTERN) {
         $c.sprintf(new $c.Ptr(buf, 0), $C`%s this light source`, light);
         await ia_addmenu(win, IA.APPLY_OBJ, 97, new $c.Ptr(buf, 0));
     } else if (otmp.otyp === POT_OIL && objects[otmp.otyp].oc_name_known) {
@@ -383,16 +400,19 @@ export async function itemactions(otmp) {   // iactions.c:278
     } else if (otmp.otyp === EXPENSIVE_CAMERA) {
         await ia_addmenu(win, IA.APPLY_OBJ, 97, $C`Take a photograph`);
     } else if (otmp.otyp === TOWEL) {
-        await ia_addmenu(win, IA.APPLY_OBJ, 97, $C`Clean yourself off with this towel`);
+        await ia_addmenu(win, IA.APPLY_OBJ, 97,
+            $C`Clean yourself off with this towel`);
     } else if (otmp.otyp === CRYSTAL_BALL) {
         await ia_addmenu(win, IA.APPLY_OBJ, 97, $C`Peer into this crystal ball`);
     } else if (otmp.otyp === MAGIC_MARKER) {
-        await ia_addmenu(win, IA.APPLY_OBJ, 97, $C`Write on something with this marker`);
+        await ia_addmenu(win, IA.APPLY_OBJ, 97,
+            $C`Write on something with this marker`);
     } else if (otmp.otyp === FIGURINE) {
         await ia_addmenu(win, IA.APPLY_OBJ, 97, $C`Make this figurine transform`);
     } else if (otmp.otyp === UNICORN_HORN) {
         await ia_addmenu(win, IA.APPLY_OBJ, 97, $C`Use this unicorn horn`);
-    } else if (otmp.otyp === HORN_OF_PLENTY && objects[otmp.otyp].oc_name_known) {
+    } else if (otmp.otyp === HORN_OF_PLENTY
+        && objects[otmp.otyp].oc_name_known) {
         await ia_addmenu(win, IA.APPLY_OBJ, 97, $C`Blow into the horn of plenty`);
     } else if (otmp.otyp >= WOODEN_FLUTE && otmp.otyp <= DRUM_OF_EARTHQUAKE) {
         await ia_addmenu(win, IA.APPLY_OBJ, 97, $C`Play this musical instrument`);
@@ -429,10 +449,13 @@ export async function itemactions(otmp) {   // iactions.c:278
     }
     /* E: engrave with item */
     if (otmp.otyp === TOWEL) {
-        await ia_addmenu(win, IA.ENGRAVE_OBJ, 69, $C`Wipe the floor with this towel`);
+        await ia_addmenu(win, IA.ENGRAVE_OBJ, 69,
+            $C`Wipe the floor with this towel`);
     } else if (otmp.otyp === MAGIC_MARKER) {
-        await ia_addmenu(win, IA.ENGRAVE_OBJ, 69, $C`Scribble graffiti on the floor`);
-    } else if (otmp.oclass === WEAPON_CLASS || otmp.oclass === WAND_CLASS || otmp.oclass === GEM_CLASS || otmp.oclass === RING_CLASS) {
+        await ia_addmenu(win, IA.ENGRAVE_OBJ, 69,
+            $C`Scribble graffiti on the floor`);
+    } else if (otmp.oclass === WEAPON_CLASS || otmp.oclass === WAND_CLASS
+        || otmp.oclass === GEM_CLASS || otmp.oclass === RING_CLASS) {
         $c.sprintf(new $c.Ptr(buf, 0), $C`%s on the %s with %s`, otmp.oclass === WEAPON_CLASS && objects[otmp.otyp].oc_subtyp >= P.DAGGER && objects[otmp.otyp].oc_subtyp <= P.SABER || otmp.oclass === WAND_CLASS || (otmp.oclass === GEM_CLASS || otmp.oclass === RING_CLASS) && objects[otmp.otyp].oc_tough ? $C`Engrave` : $C`Write`, surface(u.ux, u.uy), otmp.quan > 1 ? $C`one of these items` : $C`this item`);
         await ia_addmenu(win, IA.ENGRAVE_OBJ, 69, new $c.Ptr(buf, 0));
     }
@@ -450,26 +473,33 @@ export async function itemactions(otmp) {   // iactions.c:278
     /* i: #adjust inventory letter; gold can't be adjusted unless there
        is some in a slot other than '$' (which shouldn't be possible) */
     if (otmp.oclass !== COIN_CLASS || await check_invent_gold($C`item-action`)) {
-        await ia_addmenu(win, IA.ADJUST_OBJ, 105, $C`Adjust inventory by assigning new letter`);
+        await ia_addmenu(win, IA.ADJUST_OBJ, 105,
+            $C`Adjust inventory by assigning new letter`);
     }
     /* I: #adjust inventory item by splitting its stack  */
     if (otmp.quan > 1 && otmp.oclass !== COIN_CLASS) {
-        await ia_addmenu(win, IA.ADJUST_STACK, 73, $C`Adjust inventory by splitting this stack`);
+        await ia_addmenu(win, IA.ADJUST_STACK, 73,
+            $C`Adjust inventory by splitting this stack`);
     }
     /* O: offer sacrifice */
     if (svl.level.locations[u.ux][u.uy].typ === ALTAR && !u.uswallow) {
         /* FIXME: this doesn't match #offer's likely candidates, which don't
            include corpses on Astral and don't include amulets off Astral */
         if (otmp.otyp === CORPSE) {
-            await ia_addmenu(win, IA.SACRIFICE, 79, $C`Offer this corpse as a sacrifice at this altar`);
-        } else if (otmp.otyp === AMULET_OF_YENDOR || otmp.otyp === FAKE_AMULET_OF_YENDOR) {
-            await ia_addmenu(win, IA.SACRIFICE, 79, $C`Offer this amulet as a sacrifice at this altar`);
+            await ia_addmenu(win, IA.SACRIFICE, 79,
+                $C`Offer this corpse as a sacrifice at this altar`);
+        } else if (otmp.otyp === AMULET_OF_YENDOR
+            || otmp.otyp === FAKE_AMULET_OF_YENDOR) {
+            await ia_addmenu(win, IA.SACRIFICE, 79,
+                $C`Offer this amulet as a sacrifice at this altar`);
         }
     }
     /* p: pay for unpaid utems */
     /* FIXME: should also handle player owned container (so not
        flagged 'unpaid') holding shop owned items */
-    if (otmp.unpaid && (mtmp = await shop_keeper(in_rooms(u.ux, u.uy, SHOPBASE).get(0))) !== null && inhishop(mtmp)) {
+    if (otmp.unpaid
+        && (mtmp = await shop_keeper(in_rooms(u.ux, u.uy, SHOPBASE).get(0))) !== null
+        && inhishop(mtmp)) {
         $c.sprintf(new $c.Ptr(buf, 0), $C`Buy this unpaid %s`, otmp.quan > 1 ? $C`stack` : $C`item`);
         await ia_addmenu(win, IA.BUY_OBJ, 112, new $c.Ptr(buf, 0));
     }
@@ -489,7 +519,8 @@ export async function itemactions(otmp) {   // iactions.c:278
             } else {
                 $c.sprintf(new $c.Ptr(buf, 0), $C`[both ring %s in use]`, await makeplural(await body_part(FINGER)));
             }
-        } else if (otmp.otyp === BLINDFOLD || otmp.otyp === TOWEL || otmp.otyp === LENSES) {
+        } else if (otmp.otyp === BLINDFOLD || otmp.otyp === TOWEL
+            || otmp.otyp === LENSES) {
             if ($G.ublindf) {
                 $c.strcpy(new $c.Ptr(buf, 0), $C`[already wearing eyewear]`);
             } else if (otmp.otyp === LENSES) {
@@ -508,7 +539,8 @@ export async function itemactions(otmp) {   // iactions.c:278
         await ia_addmenu(win, IA.QUAFF_OBJ, 113, new $c.Ptr(buf, 0));
     }
     /* Q: quiver throwable item */
-    if ((otmp.oclass === GEM_CLASS || otmp.oclass === WEAPON_CLASS) && otmp !== $G.uquiver) {
+    if ((otmp.oclass === GEM_CLASS || otmp.oclass === WEAPON_CLASS)
+        && otmp !== $G.uquiver) {
         $c.sprintf(new $c.Ptr(buf, 0), $C`Quiver this %s for easy %s with 'f'ire`, otmp.quan > 1 ? $C`stack` : $C`item`, (otmp.oclass === WEAPON_CLASS || otmp.oclass === GEM_CLASS) && objects[otmp.otyp].oc_subtyp >= -P.CROSSBOW && objects[otmp.otyp].oc_subtyp <= -P.BOW && ($G.uwep && objects[otmp.otyp].oc_subtyp === (-objects[$G.uwep.otyp].oc_subtyp | 0)) ? $C`shooting` : $C`throwing`);
         await ia_addmenu(win, IA.QUIVER_OBJ, 81, new $c.Ptr(buf, 0));
     }
@@ -522,7 +554,8 @@ export async function itemactions(otmp) {   // iactions.c:278
         /* catchall -- can't happen */
         await ia_addmenu(win, IA.TAKEOFF_OBJ, 82, new $c.Ptr(buf, 0));
     }
-    if (otmp.otyp === OIL_LAMP || otmp.otyp === MAGIC_LAMP || otmp.otyp === BRASS_LANTERN) {
+    if (otmp.otyp === OIL_LAMP || otmp.otyp === MAGIC_LAMP
+        || otmp.otyp === BRASS_LANTERN) {
         $c.sprintf(new $c.Ptr(buf, 0), $C`Rub this %s`, await simpleonames(otmp));
         await ia_addmenu(win, IA.RUB_OBJ, 82, new $c.Ptr(buf, 0));
     } else if (otmp.oclass === GEM_CLASS && is_graystone(otmp)) {
@@ -550,24 +583,31 @@ export async function itemactions(otmp) {   // iactions.c:278
     if ($c.and64(otmp.owornmask, W_ARMOR)) {
         await ia_addmenu(win, IA.TAKEOFF_OBJ, 84, $C`Take off this armor`);
     }
-    if (Is_container(otmp) && (Has_contents(otmp) || !otmp.cknown) || otmp.otyp === HORN_OF_PLENTY && (otmp.spe > 0 || !otmp.known)) {
-        await ia_addmenu(win, IA.TIP_CONTAINER, 84, $C`Tip all the contents out of this container`);
+    if (Is_container(otmp) && (Has_contents(otmp) || !otmp.cknown)
+        || otmp.otyp === HORN_OF_PLENTY && (otmp.spe > 0 || !otmp.known)) {
+        await ia_addmenu(win, IA.TIP_CONTAINER, 84,
+            $C`Tip all the contents out of this container`);
     }
     /* V: invoke */
     /* non-artifact crystal balls don't have any unique power but
        the #invoke command lists them as likely candidates */
-    if (otmp.otyp === FAKE_AMULET_OF_YENDOR && !otmp.known || otmp.oartifact || objects[otmp.otyp].oc_unique || otmp.otyp === CRYSTAL_BALL) {
-        await ia_addmenu(win, IA.INVOKE_OBJ, 86, $C`Try to invoke a unique power of this object`);
+    if (otmp.otyp === FAKE_AMULET_OF_YENDOR && !otmp.known
+        || otmp.oartifact || objects[otmp.otyp].oc_unique
+        || otmp.otyp === CRYSTAL_BALL) {
+        await ia_addmenu(win, IA.INVOKE_OBJ, 86,
+            $C`Try to invoke a unique power of this object`);
     }
     /* w: wield, hold in hands, works on everything but with different
        advice text; not mentioned for things that are already wielded */
     if (otmp === $G.uwep || cantwield(gy.youmonst.data)) {
         /* either already wielded or can't wield anything; skip 'w' */
-    } else if (otmp.oclass === WEAPON_CLASS || is_weptool(otmp) || is_wet_towel(otmp) || otmp.otyp === HEAVY_IRON_BALL) {
+    } else if (otmp.oclass === WEAPON_CLASS || is_weptool(otmp)
+        || is_wet_towel(otmp) || otmp.otyp === HEAVY_IRON_BALL) {
         $c.sprintf(new $c.Ptr(buf, 0), $C`Wield this %s as your weapon`, otmp.quan > 1 ? $C`stack` : $C`item`);
         await ia_addmenu(win, IA.WIELD_OBJ, 119, new $c.Ptr(buf, 0));
     } else if (otmp.otyp === TIN_OPENER) {
-        await ia_addmenu(win, IA.WIELD_OBJ, 119, $C`Wield the tin opener to easily open tins`);
+        await ia_addmenu(win, IA.WIELD_OBJ, 119,
+            $C`Wield the tin opener to easily open tins`);
     } else if (!already_worn) {
         /* originally this was using "hold this item in your hands" but
            there's no concept of "holding an item", plus it unwields
@@ -598,11 +638,14 @@ export async function itemactions(otmp) {   // iactions.c:278
     }
     /* x: Swap main and readied weapon */
     if (otmp === $G.uwep && $G.uswapwep) {
-        await ia_addmenu(win, IA.SWAPWEAPON, 120, $C`Swap this with your alternate weapon`);
+        await ia_addmenu(win, IA.SWAPWEAPON, 120,
+            $C`Swap this with your alternate weapon`);
     } else if (otmp === $G.uwep) {
-        await ia_addmenu(win, IA.SWAPWEAPON, 120, $C`Ready this as an alternate weapon`);
+        await ia_addmenu(win, IA.SWAPWEAPON, 120,
+            $C`Ready this as an alternate weapon`);
     } else if (otmp === $G.uswapwep) {
-        await ia_addmenu(win, IA.SWAPWEAPON, 120, $C`Swap this with your main weapon`);
+        await ia_addmenu(win, IA.SWAPWEAPON, 120,
+            $C`Swap this with your main weapon`);
     }
     /* this is based on TWOWEAPOK() in wield.c; we don't call can_two_weapon()
        because it is very verbose; attempting to two-weapon might be rejected
@@ -611,13 +654,18 @@ export async function itemactions(otmp) {   // iactions.c:278
     /* X: Toggle two-weapon mode on or off */
     /* if already two-weaponing, no special checks needed to toggle off */
     /* but if not, try to filter most "you can't do that" here */
-    if ((otmp === $G.uwep || otmp === $G.uswapwep) && (u.twoweap || could_twoweap(gy.youmonst.data) && !$G.uarms && $G.uwep && MAYBETWOWEAPON($G.uwep) && $G.uswapwep && MAYBETWOWEAPON($G.uswapwep))) {
+    if ((otmp === $G.uwep || otmp === $G.uswapwep)
+        && (u.twoweap
+        || could_twoweap(gy.youmonst.data) && !$G.uarms
+        && $G.uwep && MAYBETWOWEAPON($G.uwep)
+        && $G.uswapwep && MAYBETWOWEAPON($G.uswapwep))) {
         $c.sprintf(new $c.Ptr(buf, 0), $C`Toggle two-weapon combat %s`, u.twoweap ? $C`off` : $C`on`);
         await ia_addmenu(win, IA.TWOWEAPON, 88, new $c.Ptr(buf, 0));
     }
     /* z: Zap wand */
     if (otmp.oclass === WAND_CLASS) {
-        await ia_addmenu(win, IA.ZAP_OBJ, 122, $C`Zap this wand to release its magic`);
+        await ia_addmenu(win, IA.ZAP_OBJ, 122,
+            $C`Zap this wand to release its magic`);
     }
     /* ?: Look up an item in the game's database */
     if (await ia_checkfile(otmp)) {

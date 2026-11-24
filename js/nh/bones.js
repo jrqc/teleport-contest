@@ -84,7 +84,12 @@ function no_bones_level(lev) {   // bones.c:18
     /* no bones on the last or multiway branch levels
        in any dungeon (level 1 isn't multiway) */
     /* no bones in the invocation level */
-    return (sptr = Is_special(lev)) !== null && !sptr.boneid || !svd.dungeons[lev.dnum].boneid || Is_botlevel(lev) || Is_branchlev(lev) && lev.dlevel > 1 || In_hell(lev) && lev.dlevel === dunlevs_in_dungeon(lev) - 1 ? 1 : 0;
+    return (sptr = Is_special(lev)) !== null && !sptr.boneid
+        || !svd.dungeons[lev.dnum].boneid
+        || Is_botlevel(lev)
+        || Is_branchlev(lev) && lev.dlevel > 1
+        || In_hell(lev)
+        && lev.dlevel === dunlevs_in_dungeon(lev) - 1 ? 1 : 0;
 }
 /* Call this function for each fruit object saved in the bones level: it marks
  * that particular type of fruit as existing (the marker is that that type's
@@ -121,14 +126,16 @@ async function resetobjs(ochain, restore) {   // bones.c:51
             /* artifact bookkeeping needs to be done during
                restore; other fixups are done while saving */
             if (otmp.oartifact) {
-                if (exist_artifact(otmp.otyp, safe_oname(otmp)) || is_quest_artifact(otmp)) {
+                if (exist_artifact(otmp.otyp, safe_oname(otmp))
+                    || is_quest_artifact(otmp)) {
                     /* prevent duplicate--revert to ordinary obj */
                     otmp.oartifact = 0;
                     if (has_oname(otmp)) {
                         free_oname(otmp);
                     }
                 } else {
-                    await artifact_exists(otmp, safe_oname(otmp), TRUE, ONAME_BONES);
+                    await artifact_exists(otmp, safe_oname(otmp), TRUE,
+                        ONAME_BONES);
                 }
             } else if (has_oname(otmp)) {
                 sanitize_name(otmp.oextra.oname);
@@ -141,7 +148,11 @@ async function resetobjs(ochain, restore) {   // bones.c:51
                 }
                 /* can't use costly_spot() since its
                    result depends upon hero's location */
-                $t1 = top.where === OBJ.FLOOR && get_obj_location(top, new $c.Ptr(ox, 0), new $c.Ptr(oy, 0), 0) && inside_shop(ox[0], oy[0]) && (p = in_rooms(ox[0], oy[0], SHOPBASE)).get(0) && tended_shop($c.relem(svr.rooms, p.get(0) - ROOMOFFSET)) ? 1 : 0, otmp.no_charge = ($t1) & 1;
+                $t1 = top.where === OBJ.FLOOR
+                    && get_obj_location(top, new $c.Ptr(ox, 0), new $c.Ptr(oy, 0), 0)
+                    && inside_shop(ox[0], oy[0])
+                    && (p = in_rooms(ox[0], oy[0], SHOPBASE)).get(0)
+                    && tended_shop($c.relem(svr.rooms, p.get(0) - ROOMOFFSET)) ? 1 : 0, otmp.no_charge = ($t1) & 1;
             }
         } else {
             /* saving */
@@ -166,7 +177,11 @@ async function resetobjs(ochain, restore) {   // bones.c:51
                some manner; then we could just check the flag
                here and keep "real" names (dead pets, &c) while
                discarding player notes attached to statues.] */
-            if (has_oname(otmp) && !(otmp.oartifact || otmp.otyp === STATUE || otmp.otyp === SPE_NOVEL || otmp.otyp === CORPSE && otmp.corpsenm >= SPECIAL_PM)) {
+            if (has_oname(otmp)
+                && !(otmp.oartifact || otmp.otyp === STATUE
+                || otmp.otyp === SPE_NOVEL
+                || otmp.otyp === CORPSE
+                && otmp.corpsenm >= SPECIAL_PM)) {
                 free_oname(otmp);
             }
             if (otmp.otyp === SLIME_MOLD) {
@@ -181,7 +196,8 @@ async function resetobjs(ochain, restore) {   // bones.c:51
                 otmp.spe = 0;   /* not "laid by you" in next game */
             } else if (otmp.otyp === TIN) {
                 /* make tins of unique monster's meat be empty */
-                if (ismnum(otmp.corpsenm) && unique_corpstat($c.relem(mons, otmp.corpsenm))) {
+                if (ismnum(otmp.corpsenm)
+                    && unique_corpstat($c.relem(mons, otmp.corpsenm))) {
                     otmp.corpsenm = NON_PM;
                 }
             } else if (otmp.otyp === CORPSE || otmp.otyp === STATUE) {
@@ -191,7 +207,8 @@ async function resetobjs(ochain, restore) {   // bones.c:51
                    shopkeepers (by passing false for revival flag),
                    temple priests, and vault guards in order to
                    prevent corpse revival or statue reanimation. */
-                if (has_omonst(otmp) && cant_revive(new $c.Ptr(mnum, 0), FALSE, null)) {
+                if (has_omonst(otmp)
+                    && cant_revive(new $c.Ptr(mnum, 0), FALSE, null)) {
                     free_omonst(otmp);
                     /* mnum is now either human_zombie or doppelganger;
                        for corpses of uniques, we need to force the
@@ -238,7 +255,8 @@ async function resetobjs(ochain, restore) {   // bones.c:51
  * @param {$c.Ptr | null} namebuf char *
  */
 export function sanitize_name(namebuf) {   // bones.c:198
-    const strip_8th_bit = windowprocs.wp_id === wp_tty && !iflags.wc_eight_bit_input ? 1 : 0;
+    const strip_8th_bit = windowprocs.wp_id === wp_tty
+        && !iflags.wc_eight_bit_input ? 1 : 0;
     /* it's tempting to skip this for single-user platforms, since
        only the current player could have left these bones--except
        things like "hearse" and other bones exchange schemes make
@@ -284,7 +302,8 @@ async function give_to_nearby_mon(otmp, x, y) {   // bones.c:226
             /* This doesn't do any checks on otmp to see that it matches the
              * likes_* property, intentionally. Assume that the monster is
              * rifling through and taking things that look interesting. */
-            if (!(likes_gold(mtmp.data) || likes_gems(mtmp.data) || ($c.andu64(mtmp.data.mflags2, M2.COLLECT) !== 0 || attacktype(mtmp.data, AT.WEAP)) || likes_magic(mtmp.data))) {
+            if (!(likes_gold(mtmp.data) || likes_gems(mtmp.data)
+                || ($c.andu64(mtmp.data.mflags2, M2.COLLECT) !== 0 || attacktype(mtmp.data, AT.WEAP)) || likes_magic(mtmp.data))) {
                 continue;
             }
             nmon = nmon + 1 | 0;
@@ -428,7 +447,9 @@ export function can_make_bones() {   // bones.c:356
     }
     /* bulletproofing for endgame */
     /* fewer ghosts on low levels */
-    if (depth(u.uz) <= 0 || !rn2(1 + (depth(u.uz) >> 2) | 0) && !wizard()) {
+    if (depth(u.uz) <= 0
+        || !rn2(1 + (depth(u.uz) >> 2) | 0)
+        && !wizard()) {
         return FALSE;
     }
     /* don't let multiple restarts generate multiple copies of objects
@@ -447,7 +468,10 @@ export function can_make_bones() {   // bones.c:356
 async function remove_mon_from_bones(mtmp) {   // bones.c:390
     const mptr = mtmp.data;
     /* mptr == &mons[VLAD_THE_IMPALER] || cham == VLAD */
-    if (mtmp.iswiz || mptr === mons[PM.MEDUSA] || mptr.msound === MS.NEMESIS || mptr.msound === MS.LEADER || is_Vlad(mtmp) || mptr === mons[PM.ORACLE] && !await fixuporacle(mtmp)) {
+    if (mtmp.iswiz || mptr === mons[PM.MEDUSA]
+        || mptr.msound === MS.NEMESIS || mptr.msound === MS.LEADER
+        || is_Vlad(mtmp)
+        || mptr === mons[PM.ORACLE] && !await fixuporacle(mtmp)) {
         await mongone(mtmp);
     }
 }
@@ -529,7 +553,8 @@ export async function savebones(how, when, corpse) {   // bones.c:403
         await m_dowear(mtmp, TRUE);
     } else if (u.ugrave_arise === LEAVESTATUE) {
         /* embed your possessions in your statue */
-        otmp = await mk_named_object(STATUE, $c.relem(mons, u.umonnum), u.ux, u.uy, new $c.Ptr(svp.plname, 0));
+        otmp = await mk_named_object(STATUE, $c.relem(mons, u.umonnum), u.ux, u.uy,
+            new $c.Ptr(svp.plname, 0));
         await drop_upon_death(null, otmp, u.ux, u.uy);
         if (!otmp) {
             return;   /* couldn't make statue */
@@ -686,7 +711,8 @@ export async function getbones() {   // bones.c:630
     }
     /* wizard check added by GAN 02/05/87 */
     /* only once in three times do we find bones */
-    if (rn2(3) && !wizard()) {
+    if (rn2(3)
+        && !wizard()) {
         return 0;
     }
     if (no_bones_level(u.uz)) {
@@ -853,7 +879,9 @@ export async function fix_ghostly_obj(obj) {   // bones.c:796
         case YUMI:
         case BOOMERANG:
             /* asymmetrical weapons */
-            await You($C`make adjustments to %s to suit your %s hand.`, await the(await xname(obj)), URIGHTY() ? $C`right` : $C`left`);
+            await You($C`make adjustments to %s to suit your %s hand.`,
+                await the(await xname(obj)),
+                URIGHTY() ? $C`right` : $C`left`);
             break;
         default:
             break;
@@ -870,7 +898,8 @@ export async function newebones(mtmp) {   // bones.c:818
         $t1 = await newmextra(), mtmp.mextra = $t1;
     }
     if (!EBONES(mtmp)) {
-        $t2 = $c.asRec(await alloc(28), $T.ebones, 28), mtmp.mextra.ebones = $t2;
+        $t2 = $c.asRec(await alloc(
+            28), $T.ebones, 28), mtmp.mextra.ebones = $t2;
         $c.memset(mtmp.mextra.ebones, 0, 28);
         mtmp.mextra.ebones.parentmid = mtmp.m_id;
     }

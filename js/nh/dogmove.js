@@ -139,7 +139,8 @@ export async function droppables(mon) {   // dogmove.c:28
                 }
                 /* keep mattock in preference to pick unless pick is already
                    wielded or is an artifact and mattock isn't */
-                if (pickaxe && pickaxe.otyp === PICK_AXE && pickaxe !== wep && (!pickaxe.oartifact || obj.oartifact)) {
+                if (pickaxe && pickaxe.otyp === PICK_AXE && pickaxe !== wep
+                    && (!pickaxe.oartifact || obj.oartifact)) {
                     return pickaxe;   /* drop the one we earlier decided to keep */
                 }
             case PICK_AXE:
@@ -168,13 +169,15 @@ export async function droppables(mon) {   // dogmove.c:28
                 break;
             case SKELETON_KEY:
                 /* keep key in preference to lock-pick */
-                if (key && key.otyp === LOCK_PICK && (!key.oartifact || obj.oartifact)) {
+                if (key && key.otyp === LOCK_PICK
+                    && (!key.oartifact || obj.oartifact)) {
                     return key;   /* drop the one we earlier decided to keep */
                 }
             case LOCK_PICK:
                 /*FALLTHRU*/
                 /* keep lock-pick in preference to credit card */
-                if (key && key.otyp === CREDIT_CARD && (!key.oartifact || obj.oartifact)) {
+                if (key && key.otyp === CREDIT_CARD
+                    && (!key.oartifact || obj.oartifact)) {
                     return key;
                 }
             case CREDIT_CARD:
@@ -320,7 +323,9 @@ export async function dog_eat(mtmp, obj, x, y, devour) {   // dogmove.c:218
         await newsym(x, y);
         await newsym(mtmp.mx, mtmp.my);
     }
-    if (mtmp.data === mons[PM.KILLER_BEE] && obj.otyp === LUMP_OF_ROYAL_JELLY && (res = await bee_eat_jelly(mtmp, obj)) >= 0) {   /* bypass most of dog_eat(), including apport update */
+    if (mtmp.data === mons[PM.KILLER_BEE]
+        && obj.otyp === LUMP_OF_ROYAL_JELLY
+        && (res = await bee_eat_jelly(mtmp, obj)) >= 0) {   /* bypass most of dog_eat(), including apport update */
         return res + 1 | 0;   /* 1 -> 2, 0 -> 1; -1, keep going */
     }
     /* food items are eaten one at a time; entire stack for other stuff */
@@ -352,7 +357,8 @@ export async function dog_eat(mtmp, obj, x, y, devour) {   // dogmove.c:218
             if (tunnels(mtmp.data)) {
                 await pline_mon(mtmp, $C`%s digs in.`, await noit_Monnam(mtmp));
             } else {
-                await pline_mon(mtmp, $C`%s %s %s.`, await noit_Monnam(mtmp), devour ? $C`devours` : $C`eats`, obj_name);
+                await pline_mon(mtmp, $C`%s %s %s.`, await noit_Monnam(mtmp),
+                    devour ? $C`devours` : $C`eats`, obj_name);
             }
         } else if (seeobj) {
             obj_name = await distant_name(obj, doname);
@@ -373,7 +379,8 @@ export async function dog_eat(mtmp, obj, x, y, devour) {   // dogmove.c:218
         if (canseemon(mtmp)) {
             obj_name = await distant_name(obj, doname);   /* (see above) */
             if (flags.verbose) {
-                await pline($C`%s spits %s out in disgust!`, await Monnam(mtmp), obj_name);
+                await pline($C`%s spits %s out in disgust!`,
+                    await Monnam(mtmp), obj_name);
             }
         }
     } else {
@@ -386,7 +393,11 @@ export async function dog_eat(mtmp, obj, x, y, devour) {   // dogmove.c:218
                 /* check whether edog struct got clobbered;
                    these two values should always match if
                    edog content is still intact */
-                await impossible($C`dog_eat: pet apport <= 0 (%d, %d, %ld, %ld, %d, %u, %u)`, edog.apport, edog.dropdist, edog.droptime, svm.moves, prior_apport, mtmp.m_id, edog.parentmid);
+                await impossible($C`dog_eat: pet apport <= 0 (%d, %d, %ld, %ld, %d, %u, %u)`,
+                    edog.apport, edog.dropdist, edog.droptime,
+                    svm.moves,
+                    prior_apport,
+                    mtmp.m_id, edog.parentmid);
                 edog.apport = 1;
             }
         }
@@ -394,7 +405,8 @@ export async function dog_eat(mtmp, obj, x, y, devour) {   // dogmove.c:218
             /* edible item owned by shop has been thrown or kicked
                by hero and caught by tame or food-tameable monst */
             const oprice = await unpaid_cost(obj, COST.CONTENTS);
-            await pline($C`That %s will cost you %ld %s.`, new $c.Ptr(objnambuf, 0), oprice, await currency(oprice));
+            await pline($C`That %s will cost you %ld %s.`, new $c.Ptr(objnambuf, 0), oprice,
+                await currency(oprice));
             /* m_consume_obj() -> delobj() -> obfree() will handle the shop
                billing update */
         }
@@ -412,7 +424,8 @@ async function dog_starve(mtmp) {   // dogmove.c:348
     } else if (cansee(mtmp.mx, mtmp.my)) {
         await pline_mon(mtmp, $C`%s starves.`, await Monnam(mtmp));
     } else {
-        await You_feel($C`%s for a moment.`, Hallucination() ? $C`bummed` : $C`sad`);
+        await You_feel($C`%s for a moment.`,
+            Hallucination() ? $C`bummed` : $C`sad`);
     }
     await mondied(mtmp);
 }
@@ -448,7 +461,8 @@ async function dog_hunger(mtmp, edog) {   // dogmove.c:362
                 await You_feel($C`worried about %s.`, await y_monnam(mtmp));
             }
             await stop_occupation();
-        } else if (svm.moves > $c.add64(edog.hungrytime, DOG_STARVE) || DEADMONSTER(mtmp)) {
+        } else if (svm.moves > $c.add64(edog.hungrytime, DOG_STARVE)
+            || DEADMONSTER(mtmp)) {
             await dog_starve(mtmp);
             return TRUE;
         }
@@ -491,14 +505,20 @@ async function dog_invent(mtmp, edog, udist) {   // dogmove.c:400
     } else {
         /* avoid special items; once hero picks them up, they'll cease
            being special and become eligible for normal monst activity */
-        if ((obj = svl.level.objects[omx][omy]) !== null && !$c.strchr(new $c.Ptr(nofetch, 0), obj.oclass) && obj.otyp !== SCR_MAIL && !(is_mines_prize(obj) || is_soko_prize(obj))) {
+        if ((obj = svl.level.objects[omx][omy]) !== null
+            && !$c.strchr(new $c.Ptr(nofetch, 0), obj.oclass)
+            && obj.otyp !== SCR_MAIL
+            && !(is_mines_prize(obj) || is_soko_prize(obj))) {
             const edible = await dogfood(mtmp, obj);
             /* starving pet is more aggressive about eating */
-            if ((edible <= CADAVER || edog.mhpmax_penalty && edible === ACCFOOD) && could_reach_item(mtmp, obj.ox, obj.oy)) {
+            if ((edible <= CADAVER
+                || edog.mhpmax_penalty && edible === ACCFOOD)
+                && could_reach_item(mtmp, obj.ox, obj.oy)) {
                 return await dog_eat(mtmp, obj, omx, omy, FALSE);
             }
             carryamt = await can_carry(mtmp, obj);
-            if (carryamt > 0 && !obj.cursed && could_reach_item(mtmp, obj.ox, obj.oy)) {
+            if (carryamt > 0 && !obj.cursed
+                && could_reach_item(mtmp, obj.ox, obj.oy)) {
                 if (rn2(20) < (edog.apport + 3 | 0)) {
                     if (rn2(udist) || !rn2(edog.apport)) {
                         let otmp = obj;
@@ -513,13 +533,15 @@ async function dog_invent(mtmp, edog, udist) {   // dogmove.c:400
                                while otmp is still on floor */
                             const otmpname = await distant_name(otmp, doname);
                             if (flags.verbose) {
-                                await pline_xy(omx, omy, $C`%s picks up %s.`, await Monnam(mtmp), otmpname);
+                                await pline_xy(omx, omy, $C`%s picks up %s.`,
+                                    await Monnam(mtmp), otmpname);
                             }
                         }
                         await obj_extract_self(otmp);
                         await newsym(omx, omy);
                         await mpickobj(mtmp, otmp);
-                        if (attacktype(mtmp.data, AT.WEAP) && mtmp.weapon_check === NEED.WEAPON) {
+                        if (attacktype(mtmp.data, AT.WEAP)
+                            && mtmp.weapon_check === NEED.WEAPON) {
                             mtmp.weapon_check = NEED.HTH_WEAPON;
                             await mon_wield_item(mtmp);
                         }
@@ -582,20 +604,28 @@ async function dog_goal(mtmp, edog, after, udist, whappr) {   // dogmove.c:483
                     continue;
                 }
                 /* avoid cursed items unless starving */
-                if (cursed_object_at(nx, ny) && !(edog.mhpmax_penalty && otyp < MANFOOD)) {
+                if (cursed_object_at(nx, ny)
+                    && !(edog.mhpmax_penalty && otyp < MANFOOD)) {
                     continue;
                 }
                 /* skip completely unreachable goals */
-                if (!could_reach_item(mtmp, nx, ny) || !can_reach_location(mtmp, mtmp.mx, mtmp.my, nx, ny)) {
+                if (!could_reach_item(mtmp, nx, ny)
+                    || !can_reach_location(mtmp, mtmp.mx, mtmp.my, nx, ny)) {
                     continue;
                 }
                 if (otyp < MANFOOD) {
-                    if (otyp < gg.gtyp || dist2(nx, ny, omx, omy) < dist2(gg.gx, gg.gy, omx, omy)) {
+                    if (otyp < gg.gtyp
+                        || dist2(nx, ny, omx, omy) < dist2(gg.gx, gg.gy, omx, omy)) {
                         gg.gx = nx;
                         gg.gy = ny;
                         gg.gtyp = otyp;
                     }
-                } else if (gg.gtyp === UNDEF && in_masters_sight && !dog_has_minvent && (!svl.level.locations[omx][omy].lit || svl.level.locations[u.ux][u.uy].lit) && (otyp === MANFOOD || m_cansee(mtmp, nx, ny)) && edog.apport > rn2(8) && await can_carry(mtmp, obj) > 0) {
+                } else if (gg.gtyp === UNDEF && in_masters_sight
+                    && !dog_has_minvent
+                    && (!svl.level.locations[omx][omy].lit || svl.level.locations[u.ux][u.uy].lit)
+                    && (otyp === MANFOOD || m_cansee(mtmp, nx, ny))
+                    && edog.apport > rn2(8)
+                    && await can_carry(mtmp, obj) > 0) {
                     gg.gx = nx;
                     gg.gy = ny;
                     gg.gtyp = APPORT;
@@ -604,7 +634,8 @@ async function dog_goal(mtmp, edog, after, udist, whappr) {   // dogmove.c:483
         }
     }
     /* follow player if appropriate */
-    if (gg.gtyp === UNDEF || gg.gtyp !== DOGFOOD && gg.gtyp !== APPORT && svm.moves < edog.hungrytime) {
+    if (gg.gtyp === UNDEF || gg.gtyp !== DOGFOOD && gg.gtyp !== APPORT
+        && svm.moves < edog.hungrytime) {
         gg.gx = u.ux;
         gg.gy = u.uy;
         if (after && udist <= 4 && (gg.gx === u.ux && gg.gy === u.uy)) {
@@ -612,7 +643,8 @@ async function dog_goal(mtmp, edog, after, udist, whappr) {   // dogmove.c:483
         }
         appr = udist >= 9 ? 1 : mtmp.mflee ? -1 : 0;
         if (udist > 1) {
-            if (!(svl.level.locations[u.ux][u.uy].typ >= ROOM) || !rn2(4) || whappr || dog_has_minvent && rn2(edog.apport)) {
+            if (!(svl.level.locations[u.ux][u.uy].typ >= ROOM) || !rn2(4) || whappr
+                || dog_has_minvent && rn2(edog.apport)) {
                 appr = 1;
             }
         }
@@ -661,7 +693,8 @@ async function dog_goal(mtmp, edog, after, udist, whappr) {   // dogmove.c:483
             }
         } else {
             /* assume master hasn't moved far, and reuse previous goal */
-            if (edog && edog.ogoal.x && (edog.ogoal.x !== omx || edog.ogoal.y !== omy)) {
+            if (edog && edog.ogoal.x
+                && (edog.ogoal.x !== omx || edog.ogoal.y !== omy)) {
                 gg.gx = edog.ogoal.x;
                 gg.gy = edog.ogoal.y;
                 edog.ogoal.x = 0;
@@ -719,7 +752,8 @@ function find_targ(mtmp, dx, dy, maxdist) {   // dogmove.c:650
         if ((targ = svl.level.monsters[curx][cury]) !== null) {
             /* Is the monster visible to the pet? */
             /* if a long worm, only accept the head as a target */
-            if ((!targ.minvis || perceives(mtmp.data)) && !targ.mundetected && targ.mx === curx && targ.my === cury) {   /* not tail */
+            if ((!targ.minvis || perceives(mtmp.data)) && !targ.mundetected
+                && targ.mx === curx && targ.my === cury) {   /* not tail */
                 break;
             }
             /* If the pet can't see it, it assumes it ain't there */
@@ -765,7 +799,8 @@ function find_friends(mtmp, mtarg, maxdist) {   // dogmove.c:694
                 }
             } else {
                 /* Quest leaders and guardians are always seen */
-                if (pal.data.msound === MS.LEADER || pal.data.msound === MS.GUARDIAN) {
+                if (pal.data.msound === MS.LEADER
+                    || pal.data.msound === MS.GUARDIAN) {
                     return 1;
                 }
             }
@@ -805,7 +840,8 @@ function score_targ(mtmp, mtarg) {   // dogmove.c:738
             faith2 = FALSE;
         }
         /* Never target quest friendlies */
-        if (mtarg.data.msound === MS.LEADER || mtarg.data.msound === MS.GUARDIAN) {
+        if (mtarg.data.msound === MS.LEADER
+            || mtarg.data.msound === MS.GUARDIAN) {
             return -5000;
         }
         /* D: Fixed angelic beings using gaze attacks on coaligned priests */
@@ -840,7 +876,9 @@ function score_targ(mtmp, mtarg) {   // dogmove.c:738
         }
         /* Even weak pets with breath attacks shouldn't take on very
            low-level monsters. Wasting breath on lichens is ridiculous. */
-        if (mtarg.m_lev < 2 && mtmp.m_lev > 5 || mtmp.m_lev > 12 && mtarg.m_lev < mtmp.m_lev - 9 && u.ulevel > 8 && mtarg.m_lev < (u.ulevel - 7 | 0)) {
+        if (mtarg.m_lev < 2 && mtmp.m_lev > 5
+            || mtmp.m_lev > 12 && mtarg.m_lev < mtmp.m_lev - 9
+            && u.ulevel > 8 && mtarg.m_lev < (u.ulevel - 7 | 0)) {
             score = $c.sub64(score, 25);
         }
         /* for strength purposes, a vampshifter in weak form (vampire bat,
@@ -973,7 +1011,8 @@ export async function pet_ranged_attk(mtmp, forced) {   // dogmove.c:889
              * the targeted beast doesn't have a ranged attack,
              * nothing will happen.
              */
-            if (mstatus & M_ATTK.HIT && !(mstatus & M_ATTK.DEF_DIED) && rn2(4) && mtarg !== gy.youmonst) {
+            if (mstatus & M_ATTK.HIT && !(mstatus & M_ATTK.DEF_DIED)
+                && rn2(4) && mtarg !== gy.youmonst) {
                 /* Can monster see?  If it can, it can retaliate
                  * even if the pet is invisible, since it'll see
                  * the direction from which the ranged attack came;
@@ -1107,7 +1146,8 @@ export async function dog_move(mtmp, after) {   // dogmove.c:977
             }
             uncursedcnt = $c.i16(uncursedcnt + 1);
         }
-        better_with_displacing = should_displace(mtmp, mfp, gg.gx, gg.gy);
+        better_with_displacing = should_displace(mtmp, mfp,
+            gg.gx, gg.gy);
         chcnt = 0;
         chi = -1;
         nidist = GDIST(nix, niy);
@@ -1141,12 +1181,24 @@ export async function dog_move(mtmp, after) {   // dogmove.c:977
                  * they are willing to attack; note the >= used when comparing it.
                  */
                 balk = (mtmp.m_lev + $c.div32(Math.imul(5, mtmp.mhp), mtmp.mhpmax) | 0) - 2 | 0;
-                if (mtmp2.m_lev >= balk || mtmp2.mtame && mtmp.mtame && !Conflict() || await max_passive_dmg(mtmp2, mtmp) >= mtmp.mhp || (Math.imul(mtmp.mhp, 4) < mtmp.mhpmax || mtmp2.data.msound === MS.GUARDIAN || mtmp2.data.msound === MS.LEADER) && mtmp2.mpeaceful && !Conflict()) {
+                if (mtmp2.m_lev >= balk
+                    || mtmp2.mtame && mtmp.mtame && !Conflict()
+                    || await max_passive_dmg(mtmp2, mtmp) >= mtmp.mhp
+                    || (Math.imul(mtmp.mhp, 4) < mtmp.mhpmax
+                    || mtmp2.data.msound === MS.GUARDIAN
+                    || mtmp2.data.msound === MS.LEADER)
+                    && mtmp2.mpeaceful && !Conflict()) {
                     continue;
                 }
-                if (mtmp2.data === mons[PM.FLOATING_EYE] && rn2(10) && mtmp.mcansee && haseyes(mtmp.data) && mtmp2.mcansee && (!mtmp2.minvis || perceives(mtmp.data)) && !await mon_reflects(mtmp, $c.asArr(null, Int8Array)) || mtmp2.data === mons[PM.GELATINOUS_CUBE] && rn2(10) || touch_petrifies(mtmp2.data) && !await resists_ston(mtmp)) {
+                if (mtmp2.data === mons[PM.FLOATING_EYE] && rn2(10)
+                    && mtmp.mcansee && haseyes(mtmp.data) && mtmp2.mcansee
+                    && (!mtmp2.minvis || perceives(mtmp.data))
+                    && !await mon_reflects(mtmp, $c.asArr(null, Int8Array))
+                    || mtmp2.data === mons[PM.GELATINOUS_CUBE] && rn2(10)
+                    || touch_petrifies(mtmp2.data) && !await resists_ston(mtmp)) {
                     /* only skip this foe if a ranged attack isn't viable */
-                    if (dist2(mtmp.mx, mtmp.my, mtmp2.mx, mtmp2.my) <= 2 || best_target(mtmp, FALSE) !== mtmp2) {
+                    if (dist2(mtmp.mx, mtmp.my, mtmp2.mx, mtmp2.my) <= 2
+                        || best_target(mtmp, FALSE) !== mtmp2) {
                         continue;
                     }
                     ranged_only = TRUE;
@@ -1166,7 +1218,11 @@ export async function dog_move(mtmp, after) {   // dogmove.c:977
                     return MMOVE.DIED;
                 }
                 /* monnear check needed: long worms hit on tail */
-                if ((mstatus & (M_ATTK.HIT | M_ATTK.DEF_DIED)) === M_ATTK.HIT && rn2(4) && mtmp2.mlstmv !== svm.moves && !onscary(mtmp.mx, mtmp.my, mtmp2) && monnear(mtmp2, mtmp.mx, mtmp.my)) {
+                if ((mstatus & (M_ATTK.HIT | M_ATTK.DEF_DIED)) === M_ATTK.HIT
+                    && rn2(4)
+                    && mtmp2.mlstmv !== svm.moves
+                    && !onscary(mtmp.mx, mtmp.my, mtmp2)
+                    && monnear(mtmp2, mtmp.mx, mtmp.my)) {
                     gb.bhitpos.x = mtmp.mx, gb.bhitpos.y = mtmp.my;
                     gn.notonhead = FALSE;
                     mstatus = await mattackm(mtmp2, mtmp);   /* return attack */
@@ -1176,7 +1232,8 @@ export async function dog_move(mtmp, after) {   // dogmove.c:977
                 }
                 return MMOVE.DONE;
             }
-            if ($c.and64(mfp.info[i], ALLOW.MDISP) && MON_AT(nx, ny) && better_with_displacing && !undesirable_disp(mtmp, nx, ny)) {
+            if ($c.and64(mfp.info[i], ALLOW.MDISP) && MON_AT(nx, ny)
+                && better_with_displacing && !undesirable_disp(mtmp, nx, ny)) {
                 mtmp2$2 = svl.level.monsters[nx][ny];
                 mstatus$2 = await mdisplacem(mtmp, mtmp2$2, FALSE);   /* displace monster */
                 if (mstatus$2 & M_ATTK.DEF_DIED) {
@@ -1221,7 +1278,10 @@ export async function dog_move(mtmp, after) {   // dogmove.c:977
                 for (obj = svl.level.objects[nx][ny]; obj; obj = obj.v.v_nexthere) {
                     if (obj.cursed) {
                         cursemsg[i] = TRUE;
-                    } else if (can_reach_food && (otyp = $c.i16(await dogfood(mtmp, obj))) < MANFOOD && (otyp < ACCFOOD || edog.hungrytime <= svm.moves)) {
+                    } else if (can_reach_food
+                        && (otyp = $c.i16(await dogfood(mtmp, obj))) < MANFOOD
+                        && (otyp < ACCFOOD
+                        || edog.hungrytime <= svm.moves)) {
                         /* Note: our dog likes the food so much that he
                          * might eat it even when it conceals a cursed object */
                         nix = nx;
@@ -1235,7 +1295,8 @@ export async function dog_move(mtmp, after) {   // dogmove.c:977
             }
             /* didn't find something to eat; if we saw a cursed item and
                aren't being forced to walk on it, usually keep looking */
-            if (cursemsg[i] && !mtmp.mleashed && uncursedcnt > 0 && rn2(Math.imul(13, uncursedcnt))) {
+            if (cursemsg[i] && !mtmp.mleashed && uncursedcnt > 0
+                && rn2(Math.imul(13, uncursedcnt))) {
                 continue;
             }
             nxti$: {
@@ -1255,7 +1316,9 @@ export async function dog_move(mtmp, after) {   // dogmove.c:977
                     }
                 }
                 j = Math.imul((ndist = GDIST(nx, ny)) - nidist | 0, appr);
-                if (j === 0 && !rn2(chcnt = $c.i16(chcnt + 1)) || j < 0 || j > 0 && !whappr && (omx === nix && omy === niy && !rn2(3) || !rn2(12))) {
+                if (j === 0 && !rn2(chcnt = $c.i16(chcnt + 1)) || j < 0
+                    || j > 0 && !whappr
+                    && (omx === nix && omy === niy && !rn2(3) || !rn2(12))) {
                     nix = nx;
                     niy = ny;
                     nidist = ndist;
@@ -1278,7 +1341,8 @@ export async function dog_move(mtmp, after) {   // dogmove.c:977
         if ($c.and64(mfp.info[chi], ALLOW.U)) {
             if (mtmp.mleashed) {
                 /* play it safe */
-                await pline_mon(mtmp, $C`%s breaks loose of %s leash!`, await Monnam(mtmp), genders[pronoun_gender(mtmp, PRONOUN.HALLU)].his);
+                await pline_mon(mtmp, $C`%s breaks loose of %s leash!`,
+                    await Monnam(mtmp), genders[pronoun_gender(mtmp, PRONOUN.HALLU)].his);
                 await m_unleash(mtmp, FALSE);
             }
             await mattacku(mtmp);
@@ -1298,9 +1362,15 @@ export async function dog_move(mtmp, after) {   // dogmove.c:977
             /* describe top item of pile, not necessarily cursed item itself;
                don't use glyph_at() here--it would return the pet but we want
                to know whether an object is remembered at this map location */
-            o = !Hallucination() && svl.level.flags.hero_memory && (svl.level.locations[nix][niy].glyph === GLYPH.OBJ_OFF || svl.level.locations[nix][niy].glyph >= GLYPH.OBJ_OFF + FIRST_OBJECT - 1 && svl.level.locations[nix][niy].glyph < GLYPH.OBJ_OFF + NUM_OBJECTS || (svl.level.locations[nix][niy].glyph === GLYPH.OBJ_PILETOP_OFF || svl.level.locations[nix][niy].glyph > GLYPH.OBJ_PILETOP_OFF + FIRST_OBJECT - 1 && svl.level.locations[nix][niy].glyph < GLYPH.OBJ_PILETOP_OFF + NUM_OBJECTS) || (svl.level.locations[nix][niy].glyph > GLYPH.OBJ_OFF && svl.level.locations[nix][niy].glyph < GLYPH.OBJ_OFF + FIRST_OBJECT - 1 || svl.level.locations[nix][niy].glyph > GLYPH.OBJ_PILETOP_OFF && svl.level.locations[nix][niy].glyph < GLYPH.OBJ_PILETOP_OFF + FIRST_OBJECT - 1) || (svl.level.locations[nix][niy].glyph >= GLYPH.STATUE_MALE_OFF && svl.level.locations[nix][niy].glyph < GLYPH.STATUE_MALE_OFF + NUMMONS || svl.level.locations[nix][niy].glyph >= GLYPH.STATUE_MALE_PILETOP_OFF && svl.level.locations[nix][niy].glyph < GLYPH.STATUE_MALE_PILETOP_OFF + NUMMONS || (svl.level.locations[nix][niy].glyph >= GLYPH.STATUE_FEM_OFF && svl.level.locations[nix][niy].glyph < GLYPH.STATUE_FEM_OFF + NUMMONS || svl.level.locations[nix][niy].glyph >= GLYPH.STATUE_FEM_PILETOP_OFF && svl.level.locations[nix][niy].glyph < GLYPH.STATUE_FEM_PILETOP_OFF + NUMMONS)) || (svl.level.locations[nix][niy].glyph >= GLYPH.BODY_OFF && svl.level.locations[nix][niy].glyph < GLYPH.BODY_OFF + NUMMONS || svl.level.locations[nix][niy].glyph >= GLYPH.BODY_PILETOP_OFF && svl.level.locations[nix][niy].glyph < GLYPH.BODY_PILETOP_OFF + NUMMONS)) ? svl.level.objects[nix][niy] : null;
+            o = !Hallucination() && svl.level.flags.hero_memory
+                && (svl.level.locations[nix][niy].glyph === GLYPH.OBJ_OFF || svl.level.locations[nix][niy].glyph >= GLYPH.OBJ_OFF + FIRST_OBJECT - 1 && svl.level.locations[nix][niy].glyph < GLYPH.OBJ_OFF + NUM_OBJECTS || (svl.level.locations[nix][niy].glyph === GLYPH.OBJ_PILETOP_OFF || svl.level.locations[nix][niy].glyph > GLYPH.OBJ_PILETOP_OFF + FIRST_OBJECT - 1 && svl.level.locations[nix][niy].glyph < GLYPH.OBJ_PILETOP_OFF + NUM_OBJECTS) || (svl.level.locations[nix][niy].glyph > GLYPH.OBJ_OFF && svl.level.locations[nix][niy].glyph < GLYPH.OBJ_OFF + FIRST_OBJECT - 1 || svl.level.locations[nix][niy].glyph > GLYPH.OBJ_PILETOP_OFF && svl.level.locations[nix][niy].glyph < GLYPH.OBJ_PILETOP_OFF + FIRST_OBJECT - 1) || (svl.level.locations[nix][niy].glyph >= GLYPH.STATUE_MALE_OFF && svl.level.locations[nix][niy].glyph < GLYPH.STATUE_MALE_OFF + NUMMONS || svl.level.locations[nix][niy].glyph >= GLYPH.STATUE_MALE_PILETOP_OFF && svl.level.locations[nix][niy].glyph < GLYPH.STATUE_MALE_PILETOP_OFF + NUMMONS || (svl.level.locations[nix][niy].glyph >= GLYPH.STATUE_FEM_OFF && svl.level.locations[nix][niy].glyph < GLYPH.STATUE_FEM_OFF + NUMMONS || svl.level.locations[nix][niy].glyph >= GLYPH.STATUE_FEM_PILETOP_OFF && svl.level.locations[nix][niy].glyph < GLYPH.STATUE_FEM_PILETOP_OFF + NUMMONS)) || (svl.level.locations[nix][niy].glyph >= GLYPH.BODY_OFF && svl.level.locations[nix][niy].glyph < GLYPH.BODY_OFF + NUMMONS || svl.level.locations[nix][niy].glyph >= GLYPH.BODY_PILETOP_OFF && svl.level.locations[nix][niy].glyph < GLYPH.BODY_PILETOP_OFF + NUMMONS))
+                ? svl.level.objects[nix][niy] : null;
             what = o ? await distant_name(o, doname) : c_common_strings.c_something;
-            await pline_mon(mtmp, $C`%s %s reluctantly %s %s.`, await noit_Monnam(mtmp), await vtense(null, locomotion(mtmp.data, $C`step`)), is_flyer(mtmp.data) || is_floater(mtmp.data) ? $C`over` : $C`onto`, what);
+            await pline_mon(mtmp, $C`%s %s reluctantly %s %s.`, await noit_Monnam(mtmp),
+                await vtense(null, locomotion(mtmp.data, $C`step`)),
+                is_flyer(mtmp.data) || is_floater(mtmp.data) ? $C`over`
+                : $C`onto`,
+                what);
         }
         mon_track_add(mtmp, $c.i16(omx), $c.i16(omy));
         /* We have to know if the pet's going to do a combined eat and
@@ -1358,7 +1428,9 @@ export async function dog_move(mtmp, after) {   // dogmove.c:977
  * @returns {number} boolean
  */
 export function could_reach_item(mon, nx, ny) {   // dogmove.c:1362
-    if ((!is_pool(nx, ny) || is_swimmer(mon.data)) && (!is_lava(nx, ny) || likes_lava(mon.data)) && (!sobj_at(BOULDER, nx, ny) || throws_rocks(mon.data))) {
+    if ((!is_pool(nx, ny) || is_swimmer(mon.data))
+        && (!is_lava(nx, ny) || likes_lava(mon.data))
+        && (!sobj_at(BOULDER, nx, ny) || throws_rocks(mon.data))) {
         return TRUE;
     }
     return FALSE;
@@ -1396,10 +1468,13 @@ function can_reach_location(mon, mx, my, fx, fy) {   // dogmove.c:1379
                 continue;
             }
             /* tunnelling monsters can't do that on the rogue level */
-            if (svl.level.locations[i][j].typ < POOL && !passes_walls(mon.data) && (!may_dig($c.i16(i), $c.i16(j)) || !tunnels(mon.data) || Is_rogue_level(u.uz))) {
+            if (svl.level.locations[i][j].typ < POOL && !passes_walls(mon.data)
+                && (!may_dig($c.i16(i), $c.i16(j)) || !tunnels(mon.data)
+                || Is_rogue_level(u.uz))) {
                 continue;
             }
-            if (svl.level.locations[i][j].typ === DOOR && svl.level.locations[i][j].flags & (D.CLOSED | D.LOCKED)) {
+            if (svl.level.locations[i][j].typ === DOOR
+                && svl.level.locations[i][j].flags & (D.CLOSED | D.LOCKED)) {
                 continue;
             }
             if (!could_reach_item(mon, $c.i16(i), $c.i16(j))) {
@@ -1447,7 +1522,11 @@ export async function finish_meating(mtmp) {   // dogmove.c:1448
  * @returns {number} boolean
  */
 function mnum_leashable(mnum) {   // dogmove.c:1462
-    return mnum >= LOW_PM && mnum <= HIGH_PM && mnum !== PM.LONG_WORM && !unsolid($c.relem(mons, mnum)) && (!nolimbs($c.relem(mons, mnum)) || has_head($c.relem(mons, mnum))) ? TRUE : FALSE;
+    return mnum >= LOW_PM && mnum <= HIGH_PM
+        && mnum !== PM.LONG_WORM && !unsolid($c.relem(mons, mnum))
+        && (!nolimbs($c.relem(mons, mnum)) || has_head($c.relem(mons, mnum)))
+        ? TRUE
+        : FALSE;
 }
 /**
  * @param {$T.monst | null} mtmp struct monst *
@@ -1492,14 +1571,30 @@ export async function quickmimic(mtmp) {   // dogmove.c:1472
     mtmp.mappearance = qm[idx].mappearance;
     if (spotted || seeloc || canspotmon(mtmp)) {
         const prev_glyph = glyph_at(mtmp.mx, mtmp.my);
-        const what = M_AP_TYPE(mtmp) === M_AP.FURNITURE ? defsyms[mtmp.mappearance].explanation : M_AP_TYPE(mtmp) === M_AP.OBJECT && obj_descr[objects[mtmp.mappearance].oc_descr_idx].oc_descr ? obj_descr[objects[mtmp.mappearance].oc_descr_idx].oc_descr : M_AP_TYPE(mtmp) === M_AP.OBJECT && obj_descr[objects[mtmp.mappearance].oc_name_idx].oc_name ? obj_descr[objects[mtmp.mappearance].oc_name_idx].oc_name : M_AP_TYPE(mtmp) === M_AP.MONSTER ? pmname($c.relem(mons, mtmp.mappearance), Mgender(mtmp)) : c_common_strings.c_something;
+        const what = M_AP_TYPE(mtmp) === M_AP.FURNITURE
+            ? defsyms[mtmp.mappearance].explanation
+            : M_AP_TYPE(mtmp) === M_AP.OBJECT
+            && obj_descr[objects[mtmp.mappearance].oc_descr_idx].oc_descr
+            ? obj_descr[objects[mtmp.mappearance].oc_descr_idx].oc_descr
+            : M_AP_TYPE(mtmp) === M_AP.OBJECT
+            && obj_descr[objects[mtmp.mappearance].oc_name_idx].oc_name
+            ? obj_descr[objects[mtmp.mappearance].oc_name_idx].oc_name
+            : M_AP_TYPE(mtmp) === M_AP.MONSTER
+            ? pmname($c.relem(mons, mtmp.mappearance),
+            Mgender(mtmp))
+            : c_common_strings.c_something;
         await newsym(mtmp.mx, mtmp.my);
-        if (was_leashed && (M_AP_TYPE(mtmp) !== M_AP.MONSTER || !mnum_leashable(mtmp.mappearance | 0))) {
+        if (was_leashed
+            && (M_AP_TYPE(mtmp) !== M_AP.MONSTER
+            || !mnum_leashable(mtmp.mappearance | 0))) {
             await Your($C`leash goes slack.`);
             await m_unleash(mtmp, FALSE);
         }
         if (glyph_at(mtmp.mx, mtmp.my) !== prev_glyph) {
-            await You($C`%s %s %s where %s was!`, seeloc ? $C`see` : $C`sense that`, !$c.peq(what, c_common_strings.c_something) ? await an(what) : what, seeloc ? $C`appear` : $C`has appeared`, new $c.Ptr(buf, 0));
+            await You($C`%s %s %s where %s was!`,
+                seeloc ? $C`see` : $C`sense that`,
+                !$c.peq(what, c_common_strings.c_something) ? await an(what) : what,
+                seeloc ? $C`appear` : $C`has appeared`, new $c.Ptr(buf, 0));
         } else {
             await You($C`sense that %s feels rather %s-ish.`, new $c.Ptr(buf, 0), what);
         }

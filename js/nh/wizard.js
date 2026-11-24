@@ -76,7 +76,9 @@ const random_malediction = $c.nulls(11);
 export async function amulet() {   // wizard.c:61
     let mtmp = null, ttmp = null, amu = null;
     /* caller takes care of this check */
-    if (((amu = $G.uamul) !== null && amu.otyp === AMULET_OF_YENDOR || (amu = $G.uwep) !== null && amu.otyp === AMULET_OF_YENDOR) && !rn2(15)) {
+    if (((amu = $G.uamul) !== null && amu.otyp === AMULET_OF_YENDOR
+        || (amu = $G.uwep) !== null && amu.otyp === AMULET_OF_YENDOR)
+        && !rn2(15)) {
         for (ttmp = gf.ftrap; ttmp; ttmp = ttmp.ntrap) {
             if (ttmp.ttyp === MAGIC_PORTAL) {
                 const du = distu(ttmp.tx, ttmp.ty);
@@ -103,7 +105,8 @@ export async function amulet() {   // wizard.c:61
         if (mtmp.iswiz && mtmp.msleeping && !rn2(40)) {
             mtmp.msleeping = 0;
             if (!m_next2u(mtmp)) {
-                await You($C`get the creepy feeling that somebody noticed your taking the Amulet.`);
+                await You(
+                    $C`get the creepy feeling that somebody noticed your taking the Amulet.`);
             }
             return;
         }
@@ -129,7 +132,11 @@ export function mon_has_amulet(mtmp) {   // wizard.c:106
 export function mon_has_special(mtmp) {   // wizard.c:117
     let otmp = null;
     for (otmp = mtmp.minvent; otmp; otmp = otmp.nobj) {
-        if (otmp.otyp === AMULET_OF_YENDOR || any_quest_artifact(otmp) || otmp.otyp === BELL_OF_OPENING || otmp.otyp === CANDELABRUM_OF_INVOCATION || otmp.otyp === SPE_BOOK_OF_THE_DEAD) {
+        if (otmp.otyp === AMULET_OF_YENDOR
+            || any_quest_artifact(otmp)
+            || otmp.otyp === BELL_OF_OPENING
+            || otmp.otyp === CANDELABRUM_OF_INVOCATION
+            || otmp.otyp === SPE_BOOK_OF_THE_DEAD) {
             return 1;
         }
     }
@@ -266,7 +273,9 @@ function target_on(mask, mtmp) {   // wizard.c:236
             mtmp.mgoal.x = otmp.ox;
             mtmp.mgoal.y = otmp.oy;
             return $c.u64($c.or64(STRAT.GROUND, mask));
-        } else if ((mtmp2 = other_mon_has_arti(mtmp, otyp)) !== null && (otyp !== AMULET_OF_YENDOR || !mtmp2.iswiz && !inhistemple(mtmp2))) {
+        } else if ((mtmp2 = other_mon_has_arti(mtmp, otyp)) !== null
+            && (otyp !== AMULET_OF_YENDOR
+            || !mtmp2.iswiz && !inhistemple(mtmp2))) {
             /* when seeking the Amulet, avoid targeting the Wizard
                or temple priests (to protect Moloch's high priest) */
             mtmp.mgoal.x = mtmp2.mx;
@@ -287,7 +296,9 @@ function strategy(mtmp) {   // wizard.c:270
        lich; we don't want it teleporting to the stairs to heal
        because that will leave its shop untended */
     /* likewise for temple priests */
-    if (!is_covetous(mtmp.data) || mtmp.isshk && inhishop(mtmp) || mtmp.ispriest && inhistemple(mtmp)) {
+    if (!is_covetous(mtmp.data)
+        || mtmp.isshk && inhishop(mtmp)
+        || mtmp.ispriest && inhistemple(mtmp)) {
         return STRAT.NONE;
     }
     switch ($c.div32(Math.imul(mtmp.mhp, 3), mtmp.mhpmax)) {
@@ -405,12 +416,15 @@ export async function tactics(mtmp) {   // wizard.c:369
             /* if wounded, hole up on or near the stairs (to block them) */
             await choose_stairs(new $c.Ptr(sx, 0), new $c.Ptr(sy, 0), $c.i8($c.remu32(mtmp.m_id, 2)));
             mtmp.mavenge = 1;   /* covetous monsters attack while fleeing */
-            if (await In_W_tower(mx, my, u.uz) || mtmp.iswiz && !sx[0] && !mon_has_amulet(mtmp)) {
-                if (!await noteleport_level(mtmp) && !rn2(3 + $c.div32(mtmp.mhp, 10) | 0)) {
+            if (await In_W_tower(mx, my, u.uz)
+                || mtmp.iswiz && !sx[0] && !mon_has_amulet(mtmp)) {
+                if (!await noteleport_level(mtmp) &&
+                    !rn2(3 + $c.div32(mtmp.mhp, 10) | 0)) {
                     await rloc(mtmp, RLOC.MSG);
                 }
             } else if (sx[0] && (mx !== sx[0] || my !== sy[0])) {
-                if (!await noteleport_level(mtmp) && !await mnearto(mtmp, sx[0], sy[0], TRUE, RLOC.MSG)) {
+                if (!await noteleport_level(mtmp) &&
+                    !await mnearto(mtmp, sx[0], sy[0], TRUE, RLOC.MSG)) {
                     /* couldn't move to the target spot for some reason,
                        so stay where we are (don't actually need rloc_to()
                        because mtmp is still on the map at <mx,my>... */
@@ -450,7 +464,8 @@ export async function tactics(mtmp) {   // wizard.c:369
                 if (u_at(tx, ty) || where === STRAT.PLAYER) {
                     /* player is standing on it (or has it) */
                     mx = mtmp.mx, my = mtmp.my;
-                    if (await noteleport_level(mtmp) || !await mnearto(mtmp, tx, ty, FALSE, RLOC.MSG)) {
+                    if (await noteleport_level(mtmp) ||
+                        !await mnearto(mtmp, tx, ty, FALSE, RLOC.MSG)) {
                         await rloc_to(mtmp, mx, my);   /* no room? stay put */
                     }
                     return 0;
@@ -461,7 +476,8 @@ export async function tactics(mtmp) {   // wizard.c:369
                         await rloc_to(mtmp, tx, ty);   /* clean old pos */
                         if ((otmp = on_ground(which_arti(targ))) !== null) {
                             if (cansee(mtmp.mx, mtmp.my)) {
-                                await pline($C`%s picks up %s.`, await Monnam(mtmp), await distant_name(otmp, doname));
+                                await pline($C`%s picks up %s.`, await Monnam(mtmp),
+                                    await distant_name(otmp, doname));
                             }
                             await obj_extract_self(otmp);
                             await mpickobj(mtmp, otmp);
@@ -479,7 +495,8 @@ export async function tactics(mtmp) {   // wizard.c:369
                 } else {
                     /* a monster has it - 'port beside it. */
                     mx = mtmp.mx, my = mtmp.my;
-                    if (!await noteleport_level(mtmp) && !await mnearto(mtmp, tx, ty, FALSE, RLOC.MSG)) {
+                    if (!await noteleport_level(mtmp) &&
+                        !await mnearto(mtmp, tx, ty, FALSE, RLOC.MSG)) {
                         await rloc_to(mtmp, mx, my);   /* no room? stay put */
                     }
                     return 0;
@@ -546,7 +563,8 @@ export async function clonewiz() {   // wizard.c:517
         $t2 = ($t1 = $c.i8(mtmp2.mpeaceful = 0), mtmp2.mtame = $t1) >>> 0, mtmp2.msleeping = ($t2) & 1;
         if (!u.uhave.amulet && rn2(2)) {
             /* give clone a fake */
-            await add_to_minv(mtmp2, await mksobj(FAKE_AMULET_OF_YENDOR, TRUE, FALSE));
+            await add_to_minv(mtmp2,
+                await mksobj(FAKE_AMULET_OF_YENDOR, TRUE, FALSE));
         }
         if (!Protection_from_shape_changers()) {
             mtmp2.m_ap_type = M_AP.MONSTER;
@@ -569,7 +587,8 @@ export function pick_nasty(difcap) {   // wizard.c:538
      * We want monsters represented by uppercase on rogue level,
      * but we don't try very hard.
      */
-    if (Is_rogue_level(u.uz) && !(65 <= def_monsyms[$c.relem(mons, res).mlet].sym && def_monsyms[$c.relem(mons, res).mlet].sym <= 90)) {
+    if (Is_rogue_level(u.uz)
+        && !(65 <= def_monsyms[$c.relem(mons, res).mlet].sym && def_monsyms[$c.relem(mons, res).mlet].sym <= 90)) {
         res = nasties[rn2(44)];
     }
     /* if genocided or too difficult or out of place, try a substitute
@@ -582,14 +601,20 @@ export function pick_nasty(difcap) {   // wizard.c:538
        arch-lich and master lich are both flagged as hell-only;
        this filtering demotes arch-lich to master lich when
        outside of Gehennom (unless the latter has been genocided) */
-    if ((svm.mvitals[res].mvflags & G_GENOD) !== 0 || difcap > 0 && mons[res].difficulty >= difcap || (mons[res].geno & (Inhell() ? G_NOHELL : G_HELL)) !== 0) {
+    if ((svm.mvitals[res].mvflags & G_GENOD) !== 0
+        || difcap > 0 && mons[res].difficulty >= difcap
+        || (mons[res].geno & (Inhell() ? G_NOHELL : G_HELL)) !== 0) {
         alt = big_to_little(res);
     }
     if (alt !== res && (svm.mvitals[alt].mvflags & G_GENOD) === 0) {
         const mnam = mons[alt].pmnames[NEUTRAL];
         const lastspace = $c.strrchr(mnam, 32);
         /* only non-juveniles can become alternate choice */
-        if ($c.strncmp(mnam, $C`baby `, 5) && (!lastspace || $c.strcmp(lastspace, $C` hatchling`) && $c.strcmp(lastspace, $C` pup`) && $c.strcmp(lastspace, $C` cub`))) {
+        if ($c.strncmp(mnam, $C`baby `, 5)
+            && (!lastspace
+            || $c.strcmp(lastspace, $C` hatchling`)
+            && $c.strcmp(lastspace, $C` pup`)
+            && $c.strcmp(lastspace, $C` cub`))) {
             res = alt;
         }
     }
@@ -659,26 +684,36 @@ export async function nasty(summoner) {   // wizard.c:591
                         }
                         makeindex = pick_nasty(difcap);
                         m_cls = mons[makeindex].mlet;
-                    } while (difcap > 0 && mons[makeindex].difficulty >= difcap && attacktype($c.relem(mons, makeindex), AT.MAGC) || s_cls === S.DEMON && m_cls === S.ANGEL || s_cls === S.ANGEL && m_cls === S.DEMON);
+                    } while (difcap > 0 && mons[makeindex].difficulty >= difcap
+                        && attacktype($c.relem(mons, makeindex), AT.MAGC)
+                        || s_cls === S.DEMON && m_cls === S.ANGEL
+                        || s_cls === S.ANGEL && m_cls === S.DEMON);
                     /* do this after picking the monster to place */
-                    if (summoner && !await enexto(bypos, summoner.mux, summoner.muy, $c.relem(mons, makeindex))) {
+                    if (summoner && !await enexto(bypos, summoner.mux, summoner.muy,
+                        $c.relem(mons, makeindex))) {
                         continue;
                     }
                     /* this honors genocide but overrides extinction; it ignores
                        inside-hell-only (G_HELL) & outside-hell-only (G_NOHELL) */
-                    if ((mtmp = await makemon($c.relem(mons, makeindex), bypos.x, bypos.y, mmflags)) !== null) {
+                    if ((mtmp = await makemon($c.relem(mons, makeindex), bypos.x, bypos.y,
+                        mmflags)) !== null) {
                         $t2 = ($t1 = (mtmp.mtame = 0) >>> 0, mtmp.mpeaceful = ($t1) & 1), mtmp.msleeping = ($t2) & 1;
                         set_malign(mtmp);
                     } else {
                         /* random monster to substitute for geno'd selection;
                            unlike direct choice, not forced to be hostile [why?];
                            limit spellcasters to inhibit chain summoning */
-                        if ((mtmp = await makemon(null, bypos.x, bypos.y, mmflags)) !== null) {
+                        if ((mtmp = await makemon(null,
+                            bypos.x, bypos.y, mmflags)) !== null) {
                             m_cls = mtmp.data.mlet;
                             /* always capping for substitutes made wanton
                                genocide become too strong in the endgame */
                             /* usually */
-                            if (difcap > 0 && mtmp.data.difficulty >= difcap && rn2(u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum ? 3 : 7) && attacktype(mtmp.data, AT.MAGC) || s_cls === S.DEMON && m_cls === S.ANGEL || s_cls === S.ANGEL && m_cls === S.DEMON) {
+                            if (difcap > 0 && mtmp.data.difficulty >= difcap
+                                && rn2(u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum ? 3 : 7)
+                                && attacktype(mtmp.data, AT.MAGC)
+                                || s_cls === S.DEMON && m_cls === S.ANGEL
+                                || s_cls === S.ANGEL && m_cls === S.DEMON) {
                                 mtmp = await unmakemon(mtmp, NO.MM_FLAGS);   /* Null */
                             }
                         }
@@ -689,7 +724,8 @@ export async function nasty(summoner) {   // wizard.c:591
                            substitues for geno victims will usually be less
                            (note: Archon is not in nasties[] but could be chosen
                            as random replacement for a genocided selection) */
-                        if (mtmp.data === mons[PM.ARCH_LICH] || mtmp.data === mons[PM.ARCHON]) {
+                        if (mtmp.data === mons[PM.ARCH_LICH]
+                            || mtmp.data === mons[PM.ARCHON]) {
                             tmp = min(mons[PM.ARCHON].difficulty, mons[PM.ARCH_LICH].difficulty);   /* A:26 */
                             /* L:31 */
                             if (!difcap || difcap > tmp) {
@@ -698,7 +734,9 @@ export async function nasty(summoner) {   // wizard.c:591
                         }
                         /* delay first use of spell or breath attack */
                         $t3 = rnd(4), mtmp.mspec_used = $t3;
-                        if ((count = count + 1 | 0) >= MAXNASTIES || mtmp.data.maligntyp === 0 || sgn(mtmp.data.maligntyp) === castalign) {
+                        if ((count = count + 1 | 0) >= MAXNASTIES
+                            || mtmp.data.maligntyp === 0
+                            || sgn(mtmp.data.maligntyp) === castalign) {
                             break;
                         }
                     }
@@ -733,7 +771,9 @@ export async function resurrect() {   // wizard.c:715
         let mmtmp = new $c.FieldRef(gm, "migrating_mons", "ptr");
         while ((mtmp = mmtmp.get(0)) !== null) {
             /* if he has the Amulet, he won't bring it to you */
-            if (mtmp.iswiz && !mon_has_amulet(mtmp) && (elapsed = $c.sub64(svm.moves, mtmp.mlstmv)) > 0) {
+            if (mtmp.iswiz
+                && !mon_has_amulet(mtmp)
+                && (elapsed = $c.sub64(svm.moves, mtmp.mlstmv)) > 0) {
                 await mon_catchup_elapsed_time(mtmp, elapsed);
                 if (elapsed >= LARGEST_INT) {
                     elapsed = LARGEST_INT - 1;
@@ -832,17 +872,23 @@ export async function cuss(mtmp) {   // wizard.c:846
             /* typical bad guy action */
             await pline($C`%s laughs fiendishly.`, await Monnam(mtmp));
         } else if (u.uhave.amulet && !rn2(28)) {
-            await verbalize($C`Relinquish the amulet, %s!`, random_insult[rn2(28)]);
+            await verbalize($C`Relinquish the amulet, %s!`,
+                random_insult[rn2(28)]);
         } else if (u.uhp < 5 && !rn2(2)) {
             /* Panic */
-            await verbalize(rn2(2) ? $C`Even now thy life force ebbs, %s!` : $C`Savor thy breath, %s, it be thy last!`, random_insult[rn2(28)]);
+            await verbalize(rn2(2) ? $C`Even now thy life force ebbs, %s!`
+                : $C`Savor thy breath, %s, it be thy last!`,
+                random_insult[rn2(28)]);
         } else if (mtmp.mhp < 5 && !rn2(2)) {
             /* Parthian shot */
             await verbalize(rn2(2) ? $C`I shall return.` : $C`I'll be back.`);
         } else {
-            await verbalize($C`%s %s!`, random_malediction[rn2(11)], random_insult[rn2(28)]);
+            await verbalize($C`%s %s!`,
+                random_malediction[rn2(11)],
+                random_insult[rn2(28)]);
         }
-    } else if (is_lminion(mtmp) && !(mtmp.isminion && mtmp.mextra.emin.renegade)) {
+    } else if (is_lminion(mtmp)
+        && !(mtmp.isminion && mtmp.mextra.emin.renegade)) {
         await com_pager($C`angel_cuss`);   /* TODO: the Hallucination msg */
         /*com_pager(rn2(QTN_ANGELIC - 1 + (Hallucination ? 1 : 0))
           + QT_ANGELIC);*/

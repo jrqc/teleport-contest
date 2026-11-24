@@ -89,7 +89,8 @@ async function to_custom_symset_entry_callback(glyph, findwhat) {   // glyphs.c:
          * non-UTF color customizations
          */
         if (gs.symset[idx].name) {
-            await add_custom_urep_entry(gs.symset[idx].name, glyph, uval >>> 0, new $c.Ptr(utf8str, 0), gs.symset_which_set >>> 0);
+            await add_custom_urep_entry(gs.symset[idx].name, glyph, uval >>> 0,
+                new $c.Ptr(utf8str, 0), gs.symset_which_set >>> 0);
         } else {
             if (!($t1 = to_custom_symset_entry_callback$glyphnag, to_custom_symset_entry_callback$glyphnag = $t1 + 1 | 0, $t1)) {
                 await config_error_add($C`Unimplemented customization feature, ignoring for now`);
@@ -98,7 +99,8 @@ async function to_custom_symset_entry_callback(glyph, findwhat) {   // glyphs.c:
     }
     if (findwhat.color) {
         if (gs.symset[idx].name) {
-            await add_custom_nhcolor_entry(gs.symset[idx].name, glyph, findwhat.color, gs.symset_which_set >>> 0);
+            await add_custom_nhcolor_entry(gs.symset[idx].name, glyph,
+                findwhat.color, gs.symset_which_set >>> 0);
         } else {
             if (!($t2 = to_custom_symset_entry_callback$colornag, to_custom_symset_entry_callback$colornag = $t2 + 1 | 0, $t2)) {
                 await config_error_add($C`Unimplemented customization feature, ignoring for now`);
@@ -166,14 +168,17 @@ export async function glyphrep_to_custom_map_entries(op, glyphptr) {   // glyphs
     if (c_unicode && !c_unicode.get(0)) {
         c_unicode = null;
     }
-    if (c_colorval && (rgb = await rgbstr_to_int32(c_colorval)) !== -1 || !c_colorval) {
+    if (c_colorval && (rgb = await rgbstr_to_int32(c_colorval)) !== -1
+        || !c_colorval) {
         /* if the color 0 is an actual color, as opposed to just "not set"
            we set a marker bit outside the 24-bit range to indicate a
            valid color value 0. That allows valid color 0, but allows a
            simple checking for 0 to detect "not set". The window port that
            implements the color switch, needs to either check that bit
            or appropriately mask colors with 0xFFFFFF. */
-        to_custom_symbol_find.color = $c.u32(rgb === -1 || !c_colorval ? 0 : rgb === 0 ? nonzero_black : rgb);
+        to_custom_symbol_find.color = $c.u32(rgb === -1 || !c_colorval ? 0
+            : rgb === 0 ? nonzero_black
+            : rgb);
     }
     if (c_unicode) {
         to_custom_symbol_find.unicode_val = c_unicode;
@@ -257,12 +262,15 @@ async function glyph_find_core(id, findwhat) {   // glyphs.c:234
                         }
                         break;
                     case find_pm:
-                        if (glyph_is_monster(glyph) && mons[glyph_to_mon(glyph)].mlet === findwhat.val) {
+                        if (glyph_is_monster(glyph)
+                            && mons[glyph_to_mon(glyph)].mlet
+                            === findwhat.val) {
                             do_callback = TRUE;
                         }
                         break;
                     case find_oc:
-                        if (glyph_is_object(glyph) && glyph_to_obj(glyph) === findwhat.val) {
+                        if (glyph_is_object(glyph)
+                            && glyph_to_obj(glyph) === findwhat.val) {
                             do_callback = TRUE;
                         }
                         break;
@@ -345,7 +353,8 @@ async function init_glyph_cache() {   // glyphs.c:334
         glyphid_cache_lsize = glyphid_cache_lsize + 1 >>> 0;
         glyphid_cache_size = $c.shlu64(glyphid_cache_size, 1);
     }
-    glyphid_cache = $c.asRec(await alloc($c.u32($c.mulu64(glyphid_cache_size, 16))), $T.glyphid_cache_t, 16);
+    glyphid_cache = $c.asRec(await alloc(
+        $c.u32($c.mulu64(glyphid_cache_size, 16))), $T.glyphid_cache_t, 16);
     for (glyph = 0; glyph < glyphid_cache_size; glyph = $c.addu64(glyph, 1)) {
         $c.radd(glyphid_cache, $c.idx(glyph)).glyphnum = 0;
         $c.radd(glyphid_cache, $c.idx(glyph)).id = null;
@@ -421,7 +430,8 @@ function find_glyphid_in_cache_by_glyphnum(glyphnum) {   // glyphs.c:418
         return null;
     }
     for (idx = 0; idx < glyphid_cache_size; idx = $c.addu64(idx, 1)) {
-        if ($c.radd(glyphid_cache, $c.idx(idx)).glyphnum === glyphnum && $c.radd(glyphid_cache, $c.idx(idx)).id !== null) {
+        if ($c.radd(glyphid_cache, $c.idx(idx)).glyphnum === glyphnum
+            && $c.radd(glyphid_cache, $c.idx(idx)).id !== null) {
             /* Match found */
             return $c.radd(glyphid_cache, $c.idx(idx)).id;
         }
@@ -498,7 +508,8 @@ export async function add_custom_nhcolor_entry(customization_name, glyphidx, nhc
         gdc.details = null;
         gdc.details_end = null;
     }
-    let details = find_matching_customization(customization_name, custom_nhcolor, which_set);
+    let details = find_matching_customization(customization_name,
+        custom_nhcolor, which_set);
     if (details) {
         while (details) {
             if (details.content.ccolor.glyphidx === glyphidx) {
@@ -544,14 +555,17 @@ export async function apply_customizations(which_set, docustomize) {   // glyphs
                     if (sc.custtype === custom_ureps) {
                         gmap = $c.relem(glyphmap, details.content.urep.glyphidx);
                         if (gs.symset[which_set].handling === H_UTF8) {
-                            await set_map_u(gmap, details.content.urep.u.utf32ch, details.content.urep.u.utf8str);
+                            await set_map_u(gmap,
+                                details.content.urep.u.utf32ch,
+                                details.content.urep.u.utf8str);
                         }
                     }
                 }
                 if (iflags.customcolors && do_colors) {
                     if (sc.custtype === custom_nhcolor) {
                         gmap = $c.relem(glyphmap, details.content.ccolor.glyphidx);
-                        set_map_customcolor(gmap, details.content.ccolor.nhcolor);
+                        set_map_customcolor(gmap,
+                            details.content.ccolor.nhcolor);
                     }
                 }
                 details = details.next;
@@ -607,7 +621,8 @@ async function shuffle_customizations() {   // glyphs.c:646
                 tmp_customcolor[i] = other_customcolor;
                 tmp_color256idx[i] = other_color256idx;
                 if (other) {
-                    $t1 = $c.asRec(await alloc(16), $T.unicode_representation, 16), tmp_u[i] = $t1;
+                    $t1 = $c.asRec(await alloc(
+                        16), $T.unicode_representation, 16), tmp_u[i] = $t1;
                     tmp_u[i].$copyFrom(other);
                     if (!$c.peq(other.utf8str, $c.asArr(null, Uint8Array))) {
                         $t2 = $c.retype(await dupstr($c.retype(other.utf8str, Int8Array)), Uint8Array), tmp_u[i].utf8str = $t2;
@@ -617,7 +632,8 @@ async function shuffle_customizations() {   // glyphs.c:646
                 tmp_customcolor[i] = $c.radd(obj_glyphs, idx).customcolor;
                 tmp_color256idx[i] = $c.radd(obj_glyphs, idx).color256idx;
                 tmp_u[i] = $c.radd(obj_glyphs, idx).u;
-                if ($c.radd(obj_glyphs, idx).u !== $c.asRec(null, $T.unicode_representation, 16) || $c.radd(obj_glyphs, idx).customcolor !== 0) {
+                if ($c.radd(obj_glyphs, idx).u !== $c.asRec(null, $T.unicode_representation, 16) ||
+                    $c.radd(obj_glyphs, idx).customcolor !== 0) {
                     duplicate[idx] = i;
                     $c.radd(obj_glyphs, idx).u = null;
                     $c.radd(obj_glyphs, idx).customcolor = 0;
@@ -645,7 +661,8 @@ async function shuffle_customizations() {   // glyphs.c:646
  */
 export function find_matching_customization(customization_name, custtype, which_set) {   // glyphs.c:736
     const gdc = $c.relem(gs.sym_customizations[which_set], custtype);
-    if (gdc.custtype === custtype && gdc.customization_name && $c.strcmp(customization_name, gdc.customization_name) === 0) {
+    if (gdc.custtype === custtype && gdc.customization_name
+        && $c.strcmp(customization_name, gdc.customization_name) === 0) {
         return gdc.details;
     }
     return null;
@@ -749,7 +766,8 @@ async function parse_id(id, findwhat) {   // glyphs.c:824
             }
         }
         if (findwhat.restype === res_fill_cache) {
-            if (findwhat.reserved && $c.peq(findwhat.reserved, glyphid_cache)) {
+            if (findwhat.reserved
+                && $c.peq(findwhat.reserved, glyphid_cache)) {
                 filling_cache = TRUE;
             } else {
                 return 0;
@@ -826,7 +844,9 @@ async function parse_id(id, findwhat) {   // glyphs.c:824
                 } else if (glyph_is_body(glyph)) {
                     /* buf2 will hold the distinguishing prefix */
                     /* buf3 will hold the base name */
-                    buf2 = glyph_is_body_piletop(glyph) ? $C`piletop_body_` : $C`body_`;
+                    buf2 = glyph_is_body_piletop(glyph)
+                        ? $C`piletop_body_`
+                        : $C`body_`;
                     buf3 = monsdump[glyph_to_body_corpsenm(glyph)].nm;
                     $c.strcpy(new $c.Ptr(buf[0], 0), $C`G_`);
                     $c.strcat(new $c.Ptr(buf[0], 0), buf2);
@@ -834,7 +854,15 @@ async function parse_id(id, findwhat) {   // glyphs.c:824
                 } else if (glyph_is_statue(glyph)) {
                     /* buf2 will hold the distinguishing prefix */
                     /* buf3 will hold the base name */
-                    buf2 = glyph_is_fem_statue_piletop(glyph) ? $C`piletop_statue_of_female_` : glyph_is_fem_statue(glyph) ? $C`statue_of_female_` : glyph_is_male_statue_piletop(glyph) ? $C`piletop_statue_of_male_` : glyph_is_male_statue(glyph) ? $C`statue_of_male_` : $C``;   /* shouldn't happen */
+                    buf2 = glyph_is_fem_statue_piletop(glyph)
+                        ? $C`piletop_statue_of_female_`
+                        : glyph_is_fem_statue(glyph)
+                        ? $C`statue_of_female_`
+                        : glyph_is_male_statue_piletop(glyph)
+                        ? $C`piletop_statue_of_male_`
+                        : glyph_is_male_statue(glyph)
+                        ? $C`statue_of_male_`
+                        : $C``;   /* shouldn't happen */
                     buf3 = monsdump[glyph_to_statue_corpsenm(glyph)].nm;
                     $c.strcpy(new $c.Ptr(buf[0], 0), $C`G_`);
                     $c.strcat(new $c.Ptr(buf[0], 0), buf2);
@@ -843,7 +871,8 @@ async function parse_id(id, findwhat) {   // glyphs.c:824
                     i = glyph_to_obj(glyph);
                     /* buf2 will hold the distinguishing prefix */
                     /* buf3 will hold the base name */
-                    if (i > SCR_STINKING_CLOUD && i < SCR_MAIL || i > WAN_LIGHTNING && i < GOLD_PIECE) {
+                    if (i > SCR_STINKING_CLOUD && i < SCR_MAIL
+                        || i > WAN_LIGHTNING && i < GOLD_PIECE) {
                         skip_this_one = TRUE;
                     }
                     if (!skip_this_one) {
@@ -851,18 +880,26 @@ async function parse_id(id, findwhat) {   // glyphs.c:824
                             buf2 = $C`wand of `;
                         } else if (i >= SPE_DIG && i < SPE_BLANK_PAPER) {
                             buf2 = $C`spellbook of `;
-                        } else if (i >= SCR_ENCHANT_ARMOR && i <= SCR_STINKING_CLOUD) {
+                        } else if (i >= SCR_ENCHANT_ARMOR
+                            && i <= SCR_STINKING_CLOUD) {
                             buf2 = $C`scroll of `;
                         } else if (i >= POT_GAIN_ABILITY && i <= POT_WATER) {
-                            buf2 = i === POT_WATER ? $C`flask of n` : $C`potion of `;
-                        } else if (i >= RIN_ADORNMENT && i <= RIN_PROTECTION_FROM_SHAPE_CHAN) {
+                            buf2 = i === POT_WATER ? $C`flask of n`
+                                : $C`potion of `;
+                        } else if (i >= RIN_ADORNMENT
+                            && i <= RIN_PROTECTION_FROM_SHAPE_CHAN) {
                             buf2 = $C`ring of `;
                         } else if (i === LAND_MINE) {
                             buf2 = $C`unset `;
                         } else {
                             buf2 = $C``;
                         }
-                        buf3 = i === SCR_BLANK_PAPER ? $C`blank scroll` : i === SPE_BLANK_PAPER ? $C`blank spellbook` : i === SLIME_MOLD ? $C`slime mold` : obj_descr[i].oc_name ? obj_descr[i].oc_name : obj_descr[i].oc_descr;
+                        buf3 = i === SCR_BLANK_PAPER ? $C`blank scroll`
+                            : i === SPE_BLANK_PAPER ? $C`blank spellbook`
+                            : i === SLIME_MOLD ? $C`slime mold`
+                            : obj_descr[i].oc_name
+                            ? obj_descr[i].oc_name
+                            : obj_descr[i].oc_descr;
                         $c.strcpy(new $c.Ptr(buf[0], 0), $C`G_`);
                         if (glyph_is_normal_piletop_obj(glyph)) {
                             $c.strcat(new $c.Ptr(buf[0], 0), $C`piletop_`);
@@ -870,7 +907,9 @@ async function parse_id(id, findwhat) {   // glyphs.c:824
                         $c.strcat(new $c.Ptr(buf[0], 0), buf2);
                         $c.strcat(new $c.Ptr(buf[0], 0), buf3);
                     }
-                } else if (glyph_is_cmap(glyph) || glyph_is_cmap_zap(glyph) || glyph_is_swallow(glyph) || glyph_is_explosion(glyph)) {
+                } else if (glyph_is_cmap(glyph) || glyph_is_cmap_zap(glyph)
+                    || glyph_is_swallow(glyph)
+                    || glyph_is_explosion(glyph)) {
                     let cmap = -1;
                     /* buf2 will hold the distinguishing prefix */
                     /* buf3 will hold the base name */

@@ -280,7 +280,8 @@ export async function selection_filter_mapchar(ov, typ, lit) {   // selvar.c:248
     selection_getbounds(ov, rect);
     for (x = rect.lx; x <= rect.hx; x = x + 1 | 0) {
         for (y = rect.ly; y <= rect.hy; y = y + 1 | 0) {
-            if (selection_getpoint($c.i16(x), $c.i16(y), ov) && match_maptyps(typ, svl.level.locations[x][y].typ)) {
+            if (selection_getpoint($c.i16(x), $c.i16(y), ov)
+                && match_maptyps(typ, svl.level.locations[x][y].typ)) {
                 switch (lit) {
                     default:
                     case -2:
@@ -363,7 +364,18 @@ export async function selection_do_grow(ov, dir) {   // selvar.c:321
                way to specify diagonals is by including the two adjacent
                orthogonal directions, which effectively specifies three-
                way growth [WEST|NORTH => WEST plus WEST|NORTH plus NORTH] */
-            if (dir & W.WEST && selection_getpoint($c.i16(x + 1), y, ov) || (dir & (W.WEST | W.NORTH)) === (W.WEST | W.NORTH) && selection_getpoint($c.i16(x + 1), $c.i16(y + 1), ov) || dir & W.NORTH && selection_getpoint(x, $c.i16(y + 1), ov) || (dir & (W.NORTH | W.EAST)) === (W.NORTH | W.EAST) && selection_getpoint($c.i16(x - 1), $c.i16(y + 1), ov) || dir & W.EAST && selection_getpoint($c.i16(x - 1), y, ov) || (dir & (W.EAST | W.SOUTH)) === (W.EAST | W.SOUTH) && selection_getpoint($c.i16(x - 1), $c.i16(y - 1), ov) || dir & W.SOUTH && selection_getpoint(x, $c.i16(y - 1), ov) || (dir & (W.SOUTH | W.WEST)) === (W.SOUTH | W.WEST) && selection_getpoint($c.i16(x + 1), $c.i16(y - 1), ov)) {
+            if (dir & W.WEST && selection_getpoint($c.i16(x + 1), y, ov)
+                || (dir & (W.WEST | W.NORTH)) === (W.WEST | W.NORTH)
+                && selection_getpoint($c.i16(x + 1), $c.i16(y + 1), ov)
+                || dir & W.NORTH && selection_getpoint(x, $c.i16(y + 1), ov)
+                || (dir & (W.NORTH | W.EAST)) === (W.NORTH | W.EAST)
+                && selection_getpoint($c.i16(x - 1), $c.i16(y + 1), ov)
+                || dir & W.EAST && selection_getpoint($c.i16(x - 1), y, ov)
+                || (dir & (W.EAST | W.SOUTH)) === (W.EAST | W.SOUTH)
+                && selection_getpoint($c.i16(x - 1), $c.i16(y - 1), ov)
+                || dir & W.SOUTH && selection_getpoint(x, $c.i16(y - 1), ov)
+                || (dir & (W.SOUTH | W.WEST)) === (W.SOUTH | W.WEST)
+                && selection_getpoint($c.i16(x + 1), $c.i16(y - 1), ov)) {
                 selection_setpoint(x, y, tmp, 1);
             }
         }
@@ -585,7 +597,8 @@ export function selection_do_ellipse(ov, xc, yc, a, b, filled) {   // selvar.c:4
                 selection_setpoint($c.i16(xc - x | 0), $c.i16(yc + y | 0), ov, 1);
             }
             /* e(x+1,y-1/2) <= 0 */
-            if ($c.add64(t, $c.mul64(b2, x)) <= crit1 || $c.add64(t, $c.mul64(a2, y)) <= crit3) {
+            if ($c.add64(t, $c.mul64(b2, x)) <= crit1
+                || $c.add64(t, $c.mul64(a2, y)) <= crit3) {
                 /* e(x+1/2,y) <= 0 */
                 x = x + 1 | 0;
                 dxt = $c.add64(dxt, d2xt);
@@ -607,7 +620,8 @@ export function selection_do_ellipse(ov, xc, yc, a, b, filled) {   // selvar.c:4
     } else {
         while (y >= 0 && x <= a) {
             /* e(x+1,y-1/2) <= 0 */
-            if ($c.add64(t, $c.mul64(b2, x)) <= crit1 || $c.add64(t, $c.mul64(a2, y)) <= crit3) {
+            if ($c.add64(t, $c.mul64(b2, x)) <= crit1
+                || $c.add64(t, $c.mul64(a2, y)) <= crit3) {
                 /* e(x+1/2,y) <= 0 */
                 x = x + 1 | 0;
                 dxt = $c.add64(dxt, d2xt);
@@ -710,7 +724,8 @@ export async function selection_do_gradient(ov, x, y, x2, y2, gtyp, mind, maxd) 
                 for (dx = 0; dx < COLNO; dx = $c.add64(dx, 1)) {
                     for (dy = 0; dy < ROWNO; dy = $c.add64(dy, 1)) {
                         const d0 = line_dist_coord(x, y, x2, y2, dx, dy);
-                        if (d0 <= $c.mul64(mind, mind) || d0 <= $c.mul64(maxd, maxd) && $c.sub64(d0, $c.mul64(mind, mind)) < rn2($c.i32(dofs))) {
+                        if (d0 <= $c.mul64(mind, mind)
+                            || d0 <= $c.mul64(maxd, maxd) && $c.sub64(d0, $c.mul64(mind, mind)) < rn2($c.i32(dofs))) {
                             selection_setpoint($c.i16(dx), $c.i16(dy), ov, 1);
                         }
                     }
@@ -727,7 +742,8 @@ export async function selection_do_gradient(ov, x, y, x2, y2, gtyp, mind, maxd) 
                         const d4 = line_dist_coord(x, y, x2, y2, dx, y2);
                         const d5 = line_dist_coord(x, y, x2, y2, dx, dy);
                         const d0$2 = (d5 < ((d1 > d2 ? d1 : d2) < (d3 > d4 ? d3 : d4) ? d1 > d2 ? d1 : d2 : d3 > d4 ? d3 : d4) ? d5 : (d1 > d2 ? d1 : d2) < (d3 > d4 ? d3 : d4) ? d1 > d2 ? d1 : d2 : d3 > d4 ? d3 : d4);
-                        if (d0$2 <= $c.mul64(mind, mind) || d0$2 <= $c.mul64(maxd, maxd) && $c.sub64(d0$2, $c.mul64(mind, mind)) < rn2($c.i32(dofs))) {
+                        if (d0$2 <= $c.mul64(mind, mind)
+                            || d0$2 <= $c.mul64(maxd, maxd) && $c.sub64(d0$2, $c.mul64(mind, mind)) < rn2($c.i32(dofs))) {
                             selection_setpoint($c.i16(dx), $c.i16(dy), ov, 1);
                         }
                     }
@@ -900,7 +916,8 @@ export async function selection_from_mkroom(croom) {   // selvar.c:781
     const rmno = $c.u32($c.add64($c.rdiff(croom, svr.rooms[0]), ROOMOFFSET));
     for (y = croom.ly; y <= croom.hy; y = $c.i16(y + 1)) {
         for (x = croom.lx; x <= croom.hx; x = $c.i16(x + 1)) {
-            if (isok(x, y) && !svl.level.locations[x][y].edge && svl.level.locations[x][y].roomno === rmno) {
+            if (isok(x, y) && !svl.level.locations[x][y].edge
+                && svl.level.locations[x][y].roomno === rmno) {
                 selection_setpoint(x, y, sel, 1);
             }
         }

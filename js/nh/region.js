@@ -190,7 +190,8 @@ export async function add_mon_to_reg(reg, mon) {   // region.c:161
        only include it once no matter how segments the region contains */
     if (mon_in_region(reg, mon)) {
         if (mon.data !== mons[PM.LONG_WORM]) {
-            await impossible($C`add_mon_to_reg: %s [#%u] already in region.`, await m_monnam(mon), mon.m_id);
+            await impossible($C`add_mon_to_reg: %s [#%u] already in region.`,
+                await m_monnam(mon), mon.m_id);
         }
         return;
     }
@@ -417,7 +418,8 @@ export async function run_regions() {   // region.c:414
     /* Do it backward because the array will be modified */
     for (i = svn.n_regions - 1 | 0; i >= 0; i = i - 1 | 0) {
         if (gr.regions.get(i).ttl === 0) {
-            if ((f_indx = gr.regions.get(i).expire_f) === NO_CALLBACK || await callbacks[f_indx](gr.regions.get(i), null)) {
+            if ((f_indx = gr.regions.get(i).expire_f) === NO_CALLBACK
+                || await callbacks[f_indx](gr.regions.get(i), null)) {
                 await remove_region(gr.regions.get(i));
             }
         }
@@ -437,7 +439,8 @@ export async function run_regions() {   // region.c:414
         if (f_indx !== NO_CALLBACK) {
             for (j = 0; j < gr.regions.get(i).n_monst; j = j + 1 | 0) {
                 const mtmp = find_mid(gr.regions.get(i).monsters.get(j), FM.FMON);
-                if (!mtmp || DEADMONSTER(mtmp) || await callbacks[f_indx](gr.regions.get(i), mtmp)) {
+                if (!mtmp || DEADMONSTER(mtmp)
+                    || await callbacks[f_indx](gr.regions.get(i), mtmp)) {
                     /* The monster died, remove it from list */
                     const k = gr.regions.get(i).n_monst = $c.i16(gr.regions.get(i).n_monst - 1 | 0);
                     gr.regions.get(i).monsters.set(j, gr.regions.get(i).monsters.get(k));
@@ -457,7 +460,9 @@ export async function run_regions() {   // region.c:414
         gg.gas_cloud_diss_within = FALSE;
     }
     if (gg.gas_cloud_diss_seen) {
-        await You_see($C`%s gas cloud%s dissipate.`, gg.gas_cloud_diss_seen === 1 ? $C`a` : $C`some`, plur(gg.gas_cloud_diss_seen));
+        await You_see($C`%s gas cloud%s dissipate.`,
+            gg.gas_cloud_diss_seen === 1 ? $C`a` : $C`some`,
+            plur(gg.gas_cloud_diss_seen));
         gg.gas_cloud_diss_seen = 0;
     }
 }
@@ -477,7 +482,11 @@ export async function in_out_region(x, y) {   // region.c:480
         if (gr.regions.get(i).attach_2_u) {
             continue;
         }
-        if (inside_region(gr.regions.get(i), x, y) ? !hero_inside(gr.regions.get(i)) && (f_indx = gr.regions.get(i).can_enter_f) !== NO_CALLBACK : hero_inside(gr.regions.get(i)) && (f_indx = gr.regions.get(i).can_leave_f) !== NO_CALLBACK) {
+        if (inside_region(gr.regions.get(i), x, y)
+            ? !hero_inside(gr.regions.get(i))
+            && (f_indx = gr.regions.get(i).can_enter_f) !== NO_CALLBACK
+            : hero_inside(gr.regions.get(i))
+            && (f_indx = gr.regions.get(i).can_leave_f) !== NO_CALLBACK) {
             if (!await callbacks[f_indx](gr.regions.get(i), null)) {
                 return FALSE;
             }
@@ -488,7 +497,8 @@ export async function in_out_region(x, y) {   // region.c:480
         if (gr.regions.get(i).attach_2_u) {
             continue;
         }
-        if (hero_inside(gr.regions.get(i)) && !inside_region(gr.regions.get(i), x, y)) {
+        if (hero_inside(gr.regions.get(i))
+            && !inside_region(gr.regions.get(i), x, y)) {
             gr.regions.get(i).player_flags = (gr.regions.get(i).player_flags & 4294967294) >>> 0;
             if (gr.regions.get(i).leave_msg !== null) {
                 await pline1(gr.regions.get(i).leave_msg);
@@ -503,7 +513,8 @@ export async function in_out_region(x, y) {   // region.c:480
         if (gr.regions.get(i).attach_2_u) {
             continue;
         }
-        if (!hero_inside(gr.regions.get(i)) && inside_region(gr.regions.get(i), x, y)) {
+        if (!hero_inside(gr.regions.get(i))
+            && inside_region(gr.regions.get(i), x, y)) {
             gr.regions.get(i).player_flags = (gr.regions.get(i).player_flags | REG.HERO_INSIDE) >>> 0;
             if (gr.regions.get(i).enter_msg !== null) {
                 await pline1(gr.regions.get(i).enter_msg);
@@ -532,7 +543,11 @@ export async function m_in_out_region(mon, x, y) {   // region.c:533
         if (gr.regions.get(i).attach_2_m === mon.m_id) {
             continue;
         }
-        if (inside_region(gr.regions.get(i), x, y) ? !mon_in_region(gr.regions.get(i), mon) && (f_indx = gr.regions.get(i).can_enter_f) !== NO_CALLBACK : mon_in_region(gr.regions.get(i), mon) && (f_indx = gr.regions.get(i).can_leave_f) !== NO_CALLBACK) {
+        if (inside_region(gr.regions.get(i), x, y)
+            ? !mon_in_region(gr.regions.get(i), mon)
+            && (f_indx = gr.regions.get(i).can_enter_f) !== NO_CALLBACK
+            : mon_in_region(gr.regions.get(i), mon)
+            && (f_indx = gr.regions.get(i).can_leave_f) !== NO_CALLBACK) {
             if (!await callbacks[f_indx](gr.regions.get(i), mon)) {
                 return FALSE;
             }
@@ -543,7 +558,8 @@ export async function m_in_out_region(mon, x, y) {   // region.c:533
         if (gr.regions.get(i).attach_2_m === mon.m_id) {
             continue;
         }
-        if (mon_in_region(gr.regions.get(i), mon) && !inside_region(gr.regions.get(i), x, y)) {
+        if (mon_in_region(gr.regions.get(i), mon)
+            && !inside_region(gr.regions.get(i), x, y)) {
             remove_mon_from_reg(gr.regions.get(i), mon);
             if ((f_indx = gr.regions.get(i).leave_f) !== NO_CALLBACK) {
                 await callbacks[f_indx](gr.regions.get(i), mon);
@@ -555,7 +571,8 @@ export async function m_in_out_region(mon, x, y) {   // region.c:533
         if (gr.regions.get(i).attach_2_m === mon.m_id) {
             continue;
         }
-        if (!mon_in_region(gr.regions.get(i), mon) && inside_region(gr.regions.get(i), x, y)) {
+        if (!mon_in_region(gr.regions.get(i), mon)
+            && inside_region(gr.regions.get(i), x, y)) {
             await add_mon_to_reg(gr.regions.get(i), mon);
             if ((f_indx = gr.regions.get(i).enter_f) !== NO_CALLBACK) {
                 await callbacks[f_indx](gr.regions.get(i), mon);
@@ -570,7 +587,8 @@ export async function m_in_out_region(mon, x, y) {   // region.c:533
 export function update_player_regions() {   // region.c:582
     let i = 0;
     for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
-        if (!gr.regions.get(i).attach_2_u && inside_region(gr.regions.get(i), u.ux, u.uy)) {
+        if (!gr.regions.get(i).attach_2_u
+            && inside_region(gr.regions.get(i), u.ux, u.uy)) {
             gr.regions.get(i).player_flags = (gr.regions.get(i).player_flags | REG.HERO_INSIDE) >>> 0;
         } else {
             gr.regions.get(i).player_flags = (gr.regions.get(i).player_flags & 4294967294) >>> 0;
@@ -1003,7 +1021,8 @@ export async function inside_gas_cloud(p1, p2) {   // region.c:1091
             await make_blinded(1, FALSE);
         }
         if (!Poison_resistance()) {
-            await pline($C`%s is burning your %s!`, c_common_strings.c_Something, await makeplural(await body_part(LUNG)));
+            await pline($C`%s is burning your %s!`, c_common_strings.c_Something,
+                await makeplural(await body_part(LUNG)));
             await You($C`cough and spit blood!`);
             await wake_nearto(u.ux, u.uy, 2);
             dam = u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32((rnd(dam) + 5 | 0) + 1 | 0, 2) : rnd(dam) + 5 | 0;
@@ -1024,7 +1043,8 @@ export async function inside_gas_cloud(p1, p2) {   // region.c:1091
         mtmp = $c.asRec(p2, $T.monst, 192);
         if (await m_poisongas_ok(mtmp) !== M_POISONGAS.OK) {
             if (!is_silent(mtmp.data)) {
-                if (cansee(mtmp.mx, mtmp.my) || distu(mtmp.mx, mtmp.my) < 8) {
+                if (cansee(mtmp.mx, mtmp.my)
+                    || distu(mtmp.mx, mtmp.my) < 8) {
                     await pline($C`%s coughs!`, await Monnam(mtmp));
                 }
                 await wake_nearto(mtmp.mx, mtmp.my, 2);
@@ -1061,7 +1081,8 @@ export async function inside_gas_cloud(p1, p2) {   // region.c:1091
 function is_hero_inside_gas_cloud() {   // region.c:1168
     let i = 0;
     for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
-        if (hero_inside(gr.regions.get(i)) && gr.regions.get(i).inside_f === INSIDE_GAS_CLOUD) {
+        if (hero_inside(gr.regions.get(i))
+            && gr.regions.get(i).inside_f === INSIDE_GAS_CLOUD) {
             return TRUE;
         }
     }
@@ -1091,7 +1112,8 @@ async function make_gas_cloud(cloud, damage, inside_cloud) {   // region.c:1182
         /* FIXME: "steam" is wrong if this cloud is just the trail of
            a fog cloud's movement; changing to "vapor" would handle
            that but seems a step backward when it really is steam */
-        await You($C`are enveloped in a cloud of %s!`, damage ? $C`noxious gas` : $C`steam`);
+        await You($C`are enveloped in a cloud of %s!`,
+            damage ? $C`noxious gas` : $C`steam`);
         iflags.last_msg = PLNMSG.ENVELOPED_IN_GAS;
     }
 }
@@ -1115,7 +1137,9 @@ export async function create_gas_cloud(x, y, cloudsize, damage) {   // region.c:
     let inside_cloud = is_hero_inside_gas_cloud();
     /* a single-point cloud on hero and it deals no damage.
        probably a natural cause of being polyed. don't message about it */
-    if (!svc.context.mon_moving && u_at(x, y) && cloudsize === 1 && (!damage || damage && await m_poisongas_ok(gy.youmonst) === M_POISONGAS.OK)) {
+    if (!svc.context.mon_moving && u_at(x, y) && cloudsize === 1
+        && (!damage
+        || damage && await m_poisongas_ok(gy.youmonst) === M_POISONGAS.OK)) {
         inside_cloud = TRUE;
     }
     if (cloudsize > MAX_CLOUD_SIZE) {

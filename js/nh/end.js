@@ -131,10 +131,12 @@ export async function done1(sig_unused) {   // end.c:69
  */
 export async function done2() {   // end.c:91
     let abandon_tutorial = 0;
-    if (In_tutorial(u.uz) && await yn_function($C`Switch from the tutorial back to regular play?`, new $c.Ptr(ynchars, 0), 110, 1) === 121) {
+    if (In_tutorial(u.uz)
+        && await yn_function($C`Switch from the tutorial back to regular play?`, new $c.Ptr(ynchars, 0), 110, 1) === 121) {
         abandon_tutorial = 1;
     }
-    if (abandon_tutorial || !await paranoid_query(ParanoidQuit(), $C`Really quit without saving?`)) {
+    if (abandon_tutorial || !await paranoid_query(
+        ParanoidQuit(), $C`Really quit without saving?`)) {
         $c.signal(2, done1);
         await clear_nhwindow()($G.WIN_MESSAGE);
         await curs_on_u();
@@ -147,7 +149,8 @@ export async function done2() {   // end.c:91
             u.usleep = 0;
         }
         if (abandon_tutorial) {
-            await schedule_goto(u.ucamefrom, UTOTYPE.ATSTAIRS, $C`Resuming regular play.`, null);
+            await schedule_goto(u.ucamefrom, UTOTYPE.ATSTAIRS,
+                $C`Resuming regular play.`, null);
         }
         return ECMD.OK;
     }
@@ -202,7 +205,8 @@ async function done_hangup(sig) {   // end.c:170
 export async function done_in_by(mtmp, how) {   // end.c:186
     let buf = new Int8Array(256), shape = new Int8Array(256), reasondummy = Int8Array.of(0), p = null, reasonmid = Uint32Array.of(0);
     let mptr = mtmp.data;
-    const champtr = ismnum(mtmp.cham) ? $c.relem(mons, mtmp.cham) : mptr;
+    const champtr = ismnum(mtmp.cham) ? $c.relem(mons, mtmp.cham)
+        : mptr;
     const distorted = Hallucination() && canspotmon(mtmp) ? 1 : 0;
     const mimicker = M_AP_TYPE(mtmp) === M_AP.MONSTER ? 1 : 0;
     const imitator = mptr !== champtr || mimicker ? 1 : 0;
@@ -212,7 +216,8 @@ export async function done_in_by(mtmp, how) {   // end.c:186
     svk.killer.format = KILLED.BY_AN;
     /* "killed by the high priest of Crom" is okay,
        "killed by the high priest" alone isn't */
-    if ((mptr.geno & G_UNIQ) !== 0 && !(imitator && !mimicker) && !(mptr === mons[PM.HIGH_CLERIC] && !mtmp.ispriest)) {
+    if ((mptr.geno & G_UNIQ) !== 0 && !(imitator && !mimicker)
+        && !(mptr === mons[PM.HIGH_CLERIC] && !mtmp.ispriest)) {
         if (!type_is_pname(mptr)) {
             $c.strcat(new $c.Ptr(buf, 0), $C`the `);
         }
@@ -240,7 +245,8 @@ export async function done_in_by(mtmp, how) {   // end.c:186
                set up fake mptr for type_is_pname/the_unique_pm */
             mptr = $c.relem(mons, mtmp.mappearance);
             fakenm = pmname(mptr, Mgender(mtmp));
-        } else if (alt && strstri(realnm, $C`vampire`) && !$c.strcmp(fakenm, $C`vampire bat`)) {
+        } else if (alt && strstri(realnm, $C`vampire`)
+            && !$c.strcmp(fakenm, $C`vampire bat`)) {
             /* special case: use "vampire in bat form" in preference
                to redundant looking "vampire in vampire bat form" */
             fakenm = $C`bat`;
@@ -267,7 +273,8 @@ export async function done_in_by(mtmp, how) {   // end.c:186
         }
     } else if (mtmp.isshk) {
         const shknm = await shkname(mtmp);
-        const honorific = shkname_is_pname(mtmp) ? $C`` : mtmp.female ? $C`Ms. ` : $C`Mr. `;
+        const honorific = shkname_is_pname(mtmp) ? $C``
+            : mtmp.female ? $C`Ms. ` : $C`Mr. `;
         $c.sprintf(eos(new $c.Ptr(buf, 0)), $C`%s%s, the shopkeeper`, honorific, shknm);
         svk.killer.format = KILLED.BY;
     } else if (mtmp.ispriest || mtmp.isminion) {
@@ -282,7 +289,9 @@ export async function done_in_by(mtmp, how) {   // end.c:186
     }
     $c.strcpy(new $c.Ptr(svk.killer.name, 0), new $c.Ptr(buf, 0));
     /* might need to fix up multi_reason if 'mtmp' caused the reason */
-    if (gm.multi_reason && $c.pcmp(gm.multi_reason, new $c.Ptr(gm.multireasonbuf, 0)) > 0 && $c.pcmp(gm.multi_reason, new $c.Ptr(gm.multireasonbuf, 0).add($c.idx(128)).add(-1)) < 0) {
+    if (gm.multi_reason
+        && $c.pcmp(gm.multi_reason, new $c.Ptr(gm.multireasonbuf, 0)) > 0
+        && $c.pcmp(gm.multi_reason, new $c.Ptr(gm.multireasonbuf, 0).add($c.idx(128)).add(-1)) < 0) {
         reasonmid[0] = 0;
         /*
          * multireasonbuf[] contains 'm_id:reason' and multi_reason
@@ -300,7 +309,8 @@ export async function done_in_by(mtmp, how) {   // end.c:186
          * report the truncated helplessness reason even if some other
          * monster performs the /coup de grace/.
          */
-        if ($c.sscanf(new $c.Ptr(gm.multireasonbuf, 0), $C`%u:%c`, new $c.Ptr(reasonmid, 0), new $c.Ptr(reasondummy, 0)) === 2 && mtmp.m_id === reasonmid[0]) {
+        if ($c.sscanf(new $c.Ptr(gm.multireasonbuf, 0), $C`%u:%c`, new $c.Ptr(reasonmid, 0), new $c.Ptr(reasondummy, 0)) === 2
+            && mtmp.m_id === reasonmid[0]) {
             if ((p = $c.strchr(new $c.Ptr(gm.multireasonbuf, 0), 32)) !== null) {
                 p.set(0, 0);
             }
@@ -328,7 +338,8 @@ export async function done_in_by(mtmp, how) {   // end.c:186
     }
     /* this could happen if a high-end vampire kills the hero
        when ordinary vampires are genocided; ditto for wraiths */
-    if (u.ugrave_arise >= LOW_PM && svm.mvitals[u.ugrave_arise].mvflags & G_GENOD) {
+    if (u.ugrave_arise >= LOW_PM
+        && svm.mvitals[u.ugrave_arise].mvflags & G_GENOD) {
         u.ugrave_arise = NON_PM;
     }
     await done(how);
@@ -343,7 +354,8 @@ function fixup_death(how) {   // end.c:367
     let i = 0;
     if (gm.multi_reason) {
         for (i = 0; i < 2; i = i + 1 | 0) {
-            if (death_fixups[i].why === how && !$c.strcmp(death_fixups[i].exclude, gm.multi_reason)) {
+            if (death_fixups[i].why === how
+                && !$c.strcmp(death_fixups[i].exclude, gm.multi_reason)) {
                 if (death_fixups[i].include) {   /* substitute alternate reason */
                     gm.multi_reason = death_fixups[i].include;
                 } else {
@@ -382,17 +394,26 @@ export async function panic(str, ...$va) {   // end.c:395
             await exit_nhwindows()(null);
             iflags.window_inited = 0;   /* they're gone; force raw_print()ing */
         }
-        await raw_print()(program_state.gameover ? $C`Postgame wrapup disrupted.` : !program_state.something_worth_saving ? $C`Program initialization has failed.` : $C`Suddenly, the dungeon collapses.`);
+        await raw_print()(program_state.gameover
+            ? $C`Postgame wrapup disrupted.`
+            : !program_state.something_worth_saving
+            ? $C`Program initialization has failed.`
+            : $C`Suddenly, the dungeon collapses.`);
         /* !NOTIFY_NETHACK_BUGS */
         if (!wizard()) {
-            const maybe_rebuild = !program_state.something_worth_saving ? $C`.` : $C`\nand it may be possible to rebuild.`;
+            const maybe_rebuild = !program_state.something_worth_saving
+                ? $C`.`
+                : $C`\nand it may be possible to rebuild.`;
             // XXX this may need an update if defined(CRASHREPORT) TBD
             if (sysopt.support) {
-                await raw_printf($C`To report this error, %s%s`, sysopt.support, maybe_rebuild);
+                await raw_printf($C`To report this error, %s%s`, sysopt.support,
+                    maybe_rebuild);
             } else if (sysopt.fmtd_wizard_list) {   /* formatted SYSCF WIZARDS */
-                await raw_printf($C`To report this error, contact %s%s`, sysopt.fmtd_wizard_list, maybe_rebuild);
+                await raw_printf($C`To report this error, contact %s%s`,
+                    sysopt.fmtd_wizard_list, maybe_rebuild);
             } else {
-                await raw_printf($C`Report error to "%s"%s`, $C`wizard`, maybe_rebuild);
+                await raw_printf($C`Report error to "%s"%s`, $C`wizard`,
+                    maybe_rebuild);
             }
         }
         /* ?NOTIFY_NETHACK_BUGS */
@@ -428,7 +449,9 @@ async function should_query_disclose_option(category, defquery) {   // end.c:477
     if ((dop = $c.strchr(new $c.Ptr(disclosure_options, 0), category)) !== null) {
         const idx = $c.i32($c.pdiff(dop, new $c.Ptr(disclosure_options, 0)));
         if (idx < 0 || idx >= NUM_DISCLOSURE_OPTIONS) {
-            await impossible($C`should_query_disclose_option: bad disclosure index %d %c`, idx, category);
+            await impossible(
+                $C`should_query_disclose_option: bad disclosure index %d %c`,
+                idx, category);
             defquery.set(0, DISCLOSE_PROMPT_DEFAULT_YES);
             return 1;
         }
@@ -513,9 +536,13 @@ async function disclose(how, taken) {   // end.c:620
     }
     if (!program_state.stopprint) {
         ask = await should_query_disclose_option(97, new $c.Ptr(defquery, 0));
-        c = ask ? await yn_function($C`Do you want to see your attributes?`, new $c.Ptr(ynqchars, 0), defquery[0], 1) : defquery[0];
+        c = ask ? await yn_function($C`Do you want to see your attributes?`, new $c.Ptr(ynqchars, 0),
+            defquery[0], 1)
+            : defquery[0];
         if (c === 121) {
-            await enlightenment(BASICENLIGHTENMENT | MAGICENLIGHTENMENT, how >= PANICKED ? ENL.GAMEOVERALIVE : ENL.GAMEOVERDEAD);
+            await enlightenment(BASICENLIGHTENMENT | MAGICENLIGHTENMENT,
+                how >= PANICKED ? ENL.GAMEOVERALIVE
+                : ENL.GAMEOVERDEAD);
         }
         if (c === 113) {
             program_state.stopprint = program_state.stopprint + 1 | 0;
@@ -552,7 +579,9 @@ async function disclose(how, taken) {   // end.c:620
     }
     if (!program_state.stopprint) {
         ask = await should_query_disclose_option(111, new $c.Ptr(defquery, 0));
-        c = ask ? await yn_function($C`Do you want to see the dungeon overview?`, new $c.Ptr(ynqchars, 0), defquery[0], 1) : defquery[0];
+        c = ask ? await yn_function($C`Do you want to see the dungeon overview?`,
+            new $c.Ptr(ynqchars, 0), defquery[0], 1)
+            : defquery[0];
         if (c === 121) {
             await show_overview(how >= PANICKED ? 1 : 2, how);
         }
@@ -596,7 +625,8 @@ async function savelife(how) {   // end.c:705
        again (perhaps due to zap rebound); this text will be appended to
           "killed by <something>, while "
        in high scores entry, if any, and in logfile (but not on tombstone) */
-    gm.multi_reason = Role_if(PM.TOURIST) ? $C`being toyed with by Fate` : $C`attempting to cheat Death`;
+    gm.multi_reason = Role_if(PM.TOURIST) ? $C`being toyed with by Fate`
+        : $C`attempting to cheat Death`;
     if (u.utrap && u.utraptype === TT.LAVA) {
         await reset_utrap(0);
     }
@@ -756,7 +786,9 @@ async function artifact_score(list, counting, endwin) {   // end.c:908
     let pbuf = new Int8Array(256), otmp = null, $t1, $t2, $t3;
     /* true => add up points; false => display them */
     for (otmp = list; otmp; otmp = otmp.nobj) {
-        if (otmp.oartifact || otmp.otyp === BELL_OF_OPENING || otmp.otyp === SPE_BOOK_OF_THE_DEAD || otmp.otyp === CANDELABRUM_OF_INVOCATION) {
+        if (otmp.oartifact || otmp.otyp === BELL_OF_OPENING
+            || otmp.otyp === SPE_BOOK_OF_THE_DEAD
+            || otmp.otyp === CANDELABRUM_OF_INVOCATION) {
             const value = arti_cost(otmp);   /* zorkmid value */
             const points = $c.div64($c.mul64(value, 5), 2);   /* score value */
             if (counting) {
@@ -815,8 +847,11 @@ async function fuzzer_savelife(how) {   // end.c:946
                 /* confer temporary resistances for first 8 properties:
                    fire, cold, sleep, disint, shock, poison, acid, stone */
                 for (propidx = 1; propidx <= 8; propidx = propidx + 1 | 0) {
-                    if (!u.uprops[propidx].intrinsic && !u.uprops[propidx].extrinsic && (proptim = rn2(3)) > 0) {   /* 0..2 */
-                        set_itimeout(new $c.FieldRef(u.uprops[propidx], "intrinsic", "i64"), Math.imul(2, proptim) + 1 | 0);   /* 3 or 5 */
+                    if (!u.uprops[propidx].intrinsic
+                        && !u.uprops[propidx].extrinsic
+                        && (proptim = rn2(3)) > 0) {   /* 0..2 */
+                        set_itimeout(new $c.FieldRef(u.uprops[propidx], "intrinsic", "i64"),
+                            Math.imul(2, proptim) + 1 | 0);   /* 3 or 5 */
                     }
                 }
                 remedies = remedies + 1 | 0;
@@ -867,7 +902,9 @@ export async function done(how) {   // end.c:1021
             return;
         }
     }
-    if (program_state.panicking || program_state.done_hup || how === QUIT && program_state.stopprint) {
+    if (program_state.panicking
+        || program_state.done_hup
+        || how === QUIT && program_state.stopprint) {
         /* skip status update if panicking or disconnected
            or answer of 'q' to "Really quit?" */
         $t2 = ($t1 = disp.time_botl = 0, disp.botlx = $t1), disp.botl = $t2;
@@ -937,7 +974,9 @@ export async function done(how) {   // end.c:1021
     /* if hangup has occurred, the only possible answer to a paranoid
        query is 'no'; we want 'no' as the default for "Die?" but can't
        accept it more than once if there's no user supplying it */
-    if (!survive && (wizard() || discover()) && how <= GENOCIDED && !(program_state.done_hup && ($t4 = gd.done_seq, gd.done_seq = $c.add64($t4, 1), $t4) === gh.hero_seq) && !await paranoid_query(ParanoidDie(), $C`Die?`)) {
+    if (!survive && (wizard() || discover()) && how <= GENOCIDED
+        && !(program_state.done_hup && ($t4 = gd.done_seq, gd.done_seq = $c.add64($t4, 1), $t4) === gh.hero_seq)
+        && !await paranoid_query(ParanoidDie(), $C`Die?`)) {
         await pline($C`OK, so you don't %s.`, how === CHOKING ? $C`choke` : $C`die`);
         iflags.last_msg = PLNMSG.OK_DONT_DIE;
         await savelife(how);
@@ -1026,7 +1065,8 @@ async function really_done(how) {   // end.c:1132
         u.ugrave_arise = NON_PM - 2;   /* leave no corpse */
     } else if (how === STONING) {
         u.ugrave_arise = LEAVESTATUE;   /* statue instead of corpse */
-    } else if (how === TURNED_SLIME && !(svm.mvitals[PM.GREEN_SLIME].mvflags & G_GENOD)) {
+    } else if (how === TURNED_SLIME
+        && !(svm.mvitals[PM.GREEN_SLIME].mvflags & G_GENOD)) {
         /* it's possible to turn into slime even though green slimes
            have been genocided:  genocide could occur after hero is
            already infected or hero could eat a glob of one created
@@ -1113,7 +1153,8 @@ async function really_done(how) {   // end.c:1132
     }
     /* grave creation should be after disclosure so it doesn't have
        this grave in the current level's features for #overview */
-    if (bones_ok && u.ugrave_arise === NON_PM && !(svm.mvitals[u.umonnum].mvflags & G_NOCORPSE)) {
+    if (bones_ok && u.ugrave_arise === NON_PM
+        && !(svm.mvitals[u.umonnum].mvflags & G_NOCORPSE)) {
         /* Base corpse on race when not poly'd since original u.umonnum
            is based on role, and all role monsters are human. */
         const mnum = !Upolyd() ? gu.urace.mnum : u.umonnum;
@@ -1149,7 +1190,9 @@ async function really_done(how) {   // end.c:1132
         if (how === ASCENDED && u.ualign.type === u.ualignbase[A.ORIGINAL]) {
             /* retaining original alignment: score *= 2;
                converting, then using helm-of-OA to switch back: *= 1.5 */
-            tmp = u.ualignbase[A.CURRENT] === u.ualignbase[A.ORIGINAL] ? u.urexp : $c.div64(u.urexp, 2);
+            tmp = u.ualignbase[A.CURRENT] === u.ualignbase[A.ORIGINAL]
+                ? u.urexp
+                : $c.div64(u.urexp, 2);
             u.urexp = nowrap_add(u.urexp, tmp);
         }
     }
@@ -1157,7 +1200,11 @@ async function really_done(how) {   // end.c:1132
         /* give this feedback even if bones aren't going to be created,
            so that its presence or absence doesn't tip off the player to
            new bones or their lack; it might be a lie if makemon fails */
-        await Your($C`%s as %s...`, u.ugrave_arise !== PM.GREEN_SLIME ? $C`body rises from the dead` : $C`revenant persists`, await an(pmname($c.relem(mons, u.ugrave_arise), Ugender())));
+        await Your($C`%s as %s...`,
+            u.ugrave_arise !== PM.GREEN_SLIME
+            ? $C`body rises from the dead`
+            : $C`revenant persists`,
+            await an(pmname($c.relem(mons, u.ugrave_arise), Ugender())));
         await display_nhwindow()($G.WIN_MESSAGE, 0);
     }
     if (bones_ok) {
@@ -1266,7 +1313,8 @@ async function really_done(how) {   // end.c:1132
                 if (count === 0) {
                     continue;
                 }
-                if (objects[typ].oc_class !== GEM_CLASS || typ <= LAST_REAL_GEM) {
+                if (objects[typ].oc_class !== GEM_CLASS
+                    || typ <= LAST_REAL_GEM) {
                     const otmp = await mksobj(typ, 0, 0);
                     await discover_object(otmp.otyp, 1, 1, 0);
                     otmp.dknown = 1;   /* seen it (blindness fix) */
@@ -1387,8 +1435,11 @@ export async function container_contents(list, identified, all_containers, repor
                 }
                 $t1 = buf[1] = 32, buf[0] = $t1;   /* two leading spaces */
                 if (box.cobj && !cat) {
-                    const sortflags = (flags.sortloot === 108 || flags.sortloot === 102 ? SORTLOOT.LOOT : 0) | (flags.sortpack ? SORTLOOT.PACK : 0);
-                    sortedcobj[0] = await sortloot(new $c.FieldRef(box, "cobj", "ptr"), sortflags, 0, null);
+                    const sortflags = (flags.sortloot === 108
+                        || flags.sortloot === 102
+                        ? SORTLOOT.LOOT : 0) | (flags.sortpack ? SORTLOOT.PACK : 0);
+                    sortedcobj[0] = await sortloot(new $c.FieldRef(box, "cobj", "ptr"), sortflags, 0,
+                        null);
                     for (srtc = sortedcobj[0]; (obj = srtc.obj) !== null; srtc = $c.radd(srtc, 1)) {
                         if (identified) {
                             await discover_object(obj.otyp, 1, 1, 0);
@@ -1412,7 +1463,8 @@ export async function container_contents(list, identified, all_containers, repor
                 await display_nhwindow()(tmpwin, 1);
                 await destroy_nhwindow()(tmpwin);
                 if (all_containers) {
-                    await container_contents(box.cobj, identified, 1, reportempty);
+                    await container_contents(box.cobj, identified, 1,
+                        reportempty);
                 }
             } else if (reportempty) {
                 await pline($C`%s is empty.`, upstart(await thesimpleoname(box)));
@@ -1661,9 +1713,11 @@ export async function NH_abort(why) {   // end.c:1910
             gdb_prio = gdb_prio + 1 | 0;
         }
         if (gdb_prio > libc_prio) {
-            await NH_panictrace_gdb() || libc_prio && await NH_panictrace_libc();
+            await NH_panictrace_gdb()
+                || libc_prio && await NH_panictrace_libc();
         } else {
-            await NH_panictrace_libc() || gdb_prio && await NH_panictrace_gdb();
+            await NH_panictrace_libc()
+                || gdb_prio && await NH_panictrace_gdb();
         }
         /* VMS */
         /* overload otherwise unused priority for debug mode: 1 = show

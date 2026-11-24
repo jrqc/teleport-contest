@@ -279,7 +279,8 @@ async function choke_dialogue() {   // timeout.c:295
     const i = $c.and64(u.uprops[STRANGLED].intrinsic, TIMEOUT);
     if (i > 0 && i <= 5) {
         if (Breathless() || !rn2(50)) {
-            await urgent_pline(choke_texts2[$c.idx($c.sub64(5, i))], await body_part(NECK));
+            await urgent_pline(choke_texts2[$c.idx($c.sub64(5, i))],
+                await body_part(NECK));
         } else {
             const str = choke_texts[$c.idx($c.sub64(5, i))];
             if ($c.strchr(str, 37)) {
@@ -325,14 +326,17 @@ async function levitation_dialogue() {   // timeout.c:353
     if (ELevitation()) {
         return;
     }
-    if (!(svl.level.locations[u.ux][u.uy].typ >= DOOR) && !is_pool_or_lava(u.ux, u.uy)) {
+    if (!(svl.level.locations[u.ux][u.uy].typ >= DOOR)
+        && !is_pool_or_lava(u.ux, u.uy)) {
         return;
     }
     if ($c.rem64($c.and64(u.uprops[LEVITATION].intrinsic, TIMEOUT), 2) && i > 0 && i <= 2) {
         const s = levi_texts[$c.idx($c.sub64(2, i))];
         if ($c.strchr(s, 37)) {
-            const danger = is_pool_or_lava(u.ux, u.uy) && !Is_waterlevel(u.uz) ? 1 : 0;
-            await urgent_pline(s, danger ? $C`over` : $C`in`, danger ? surface(u.ux, u.uy) : $C`air`);
+            const danger = is_pool_or_lava(u.ux, u.uy)
+                && !Is_waterlevel(u.uz) ? 1 : 0;
+            await urgent_pline(s, danger ? $C`over` : $C`in`,
+                danger ? surface(u.ux, u.uy) : $C`air`);
         } else {
             await pline1(s);
         }
@@ -368,7 +372,8 @@ async function slime_dialogue() {   // timeout.c:389
                     await urgent_pline(new $c.Ptr(buf, 0), hcolor(c_color_names.c_green));
                 }
             } else {
-                await urgent_pline(new $c.Ptr(buf, 0), await an(Hallucination() ? await rndmonnam(null) : $C`green slime`));
+                await urgent_pline(new $c.Ptr(buf, 0), await an(Hallucination() ? await rndmonnam(null)
+                    : $C`green slime`));
             }
         } else {
             await urgent_pline($C`%s`, new $c.Ptr(buf, 0));
@@ -533,7 +538,8 @@ export async function nh_timeout() {   // timeout.c:588
     if (Role_if(PM.ARCHEOLOGIST) && $G.uarmh && $G.uarmh.otyp === FEDORA) {
         baseluck = baseluck + 1 | 0;
     }
-    if (u.uluck !== baseluck && $c.rem64(svm.moves, u.uhave.amulet || u.ugangr ? 300 : 600) === 0) {
+    if (u.uluck !== baseluck
+        && $c.rem64(svm.moves, u.uhave.amulet || u.ugangr ? 300 : 600) === 0) {
         /* Cursed luckstones stop bad luck from timing out; blessed luckstones
          * stop good luck from timing out; normal luckstones stop both;
          * neither is stopped if you don't have a luckstone.
@@ -596,7 +602,8 @@ export async function nh_timeout() {   // timeout.c:588
             u.uspellprot = $c.u8(u.uspellprot - 1);
             find_ac();
             if (!Blind()) {
-                await Norep($C`The %s haze around you %s.`, hcolor(c_color_names.c_golden), u.uspellprot ? $C`becomes less dense` : $C`disappears`);
+                await Norep($C`The %s haze around you %s.`, hcolor(c_color_names.c_golden),
+                    u.uspellprot ? $C`becomes less dense` : $C`disappears`);
             }
         }
     }
@@ -631,7 +638,8 @@ export async function nh_timeout() {   // timeout.c:588
                 case SICK:
                     /* hero might be able to bounce back from food poisoning,
                        but not other forms of illness */
-                    if ((u.usick_type & SICK_NONVOMITABLE) === 0 && rn2(100) < ACURR(A.CON)) {
+                    if ((u.usick_type & SICK_NONVOMITABLE) === 0
+                        && rn2(100) < ACURR(A.CON)) {
                         await You($C`have recovered from your illness.`);
                         await make_sick(0, null, FALSE, SICK_ALL);
                         await exercise(A.CON, FALSE);
@@ -647,7 +655,8 @@ export async function nh_timeout() {   // timeout.c:588
                         svk.killer.name[0] = 0;   /* take the default */
                     }
                     await dealloc_killer(kptr);
-                    if ((m_idx = await name_to_mon(new $c.Ptr(svk.killer.name, 0), null)) >= LOW_PM) {
+                    if ((m_idx = await name_to_mon(new $c.Ptr(svk.killer.name, 0),
+                        null)) >= LOW_PM) {
                         if (type_is_pname($c.relem(mons, m_idx))) {
                             svk.killer.format = KILLED.BY;
                         } else if (mons[m_idx].geno & G_UNIQ) {
@@ -660,7 +669,8 @@ export async function nh_timeout() {   // timeout.c:588
                     break;
                 case FAST:
                     if (!Very_fast()) {
-                        await You_feel($C`yourself slow down%s.`, Fast() ? $C` a bit` : $C``);
+                        await You_feel($C`yourself slow down%s.`,
+                            Fast() ? $C` a bit` : $C``);
                     }
                     break;
                 case CONFUSION:
@@ -699,7 +709,9 @@ export async function nh_timeout() {   // timeout.c:588
                 case INVIS:
                     await newsym(u.ux, u.uy);
                     if (!Invis() && !BInvis() && !Blind()) {
-                        await You(!See_invisible() ? $C`are no longer invisible.` : $C`can no longer see through yourself.`);
+                        await You(!See_invisible()
+                            ? $C`are no longer invisible.`
+                            : $C`can no longer see through yourself.`);
                         await stop_occupation();
                     }
                     break;
@@ -811,7 +823,8 @@ export async function nh_timeout() {   // timeout.c:588
                         svc.context.warntype.species = null;
                         svc.context.warntype.speciesidx = NON_PM;
                         if (wptr) {
-                            await You($C`are no longer warned about %s.`, await makeplural(wptr.pmnames[NEUTRAL]));
+                            await You($C`are no longer warned about %s.`,
+                                await makeplural(wptr.pmnames[NEUTRAL]));
                         }
                     }
                     break;
@@ -820,14 +833,16 @@ export async function nh_timeout() {   // timeout.c:588
                         if (stuck_in_wall()) {
                             await You_feel($C`hemmed in again.`);
                         } else {
-                            await pline($C`You're back to your %s self again.`, !Upolyd() ? $C`normal` : $C`unusual`);
+                            await pline($C`You're back to your %s self again.`,
+                                !Upolyd() ? $C`normal` : $C`unusual`);
                         }
                     }
                     break;
                 case MAGICAL_BREATHING:
                     if (!Breathless()) {
                         if (region_danger()) {
-                            await You($C`cough%s`, Poison_resistance() ? $C`.` : $C` and spit blood!`);
+                            await You($C`cough%s`,
+                                Poison_resistance() ? $C`.` : $C` and spit blood!`);
                         }
                     }
                     break;
@@ -982,15 +997,19 @@ export async function hatch_egg(arg, timeout) {   // timeout.c:1017
     if (get_obj_location(egg, new $c.Ptr(x, 0), new $c.Ptr(y, 0), 0)) {
         hatchcount = rnd($c.i32(egg.quan));
         cansee_hatchspot = cansee(x[0], y[0]) && !silent ? 1 : 0;
-        if (!(mons[mnum].geno & G_UNIQ) && !(svm.mvitals[mnum].mvflags & (G_GENOD | G_EXTINCT))) {
+        if (!(mons[mnum].geno & G_UNIQ)
+            && !(svm.mvitals[mnum].mvflags & (G_GENOD | G_EXTINCT))) {
             for (i = hatchcount; i > 0; i = i - 1 | 0) {
-                if (!await enexto(cc, x[0], y[0], $c.relem(mons, mnum)) || !(mon = await makemon($c.relem(mons, mnum), cc.x, cc.y, NO.MINVENT | MM.NOMSG))) {
+                if (!await enexto(cc, x[0], y[0], $c.relem(mons, mnum))
+                    || !(mon = await makemon($c.relem(mons, mnum), cc.x, cc.y,
+                    NO.MINVENT | MM.NOMSG))) {
                     break;
                 }
                 /* tame if your own egg hatches while you're on the
                    same dungeon level, or any dragon egg which hatches
                    while it's in your inventory */
-                if (yours && !silent || carried(egg) && mon.data.mlet === S.DRAGON) {
+                if (yours && !silent
+                    || carried(egg) && mon.data.mlet === S.DRAGON) {
                     if (await tamedog(mon, null, FALSE)) {
                         if (carried(egg) && mon.data.mlet !== S.DRAGON) {
                             mon.mtame = 20;
@@ -1043,12 +1062,18 @@ export async function hatch_egg(arg, timeout) {   // timeout.c:1017
             case OBJ.INVENT:
                 knows_egg = TRUE;   /* true even if you are blind */
                 if (!cansee_hatchspot) {
-                    await You_feel($C`%s %s from your pack!`, c_common_strings.c_something, locomotion(mon.data, $C`drop`));
+                    await You_feel($C`%s %s from your pack!`, c_common_strings.c_something,
+                        locomotion(mon.data, $C`drop`));
                 } else {
-                    await You_see($C`%s %s out of your pack!`, new $c.Ptr(monnambuf, 0), locomotion(mon.data, $C`drop`));
+                    await You_see($C`%s %s out of your pack!`, new $c.Ptr(monnambuf, 0),
+                        locomotion(mon.data, $C`drop`));
                 }
                 if (yours) {
-                    await pline($C`%s %s %s like "%s%s"`, siblings ? $C`Their` : $C`Its`, ing_suffix(cry_sound(mon)), is_silent(mon.data) || Deaf() ? $C`seems` : $C`sounds`, flags.female ? $C`mommy` : $C`daddy`, egg.spe ? $C`.` : $C`?`);
+                    await pline($C`%s %s %s like "%s%s"`,
+                        siblings ? $C`Their` : $C`Its`,
+                        ing_suffix(cry_sound(mon)),
+                        is_silent(mon.data) || Deaf() ? $C`seems` : $C`sounds`,
+                        flags.female ? $C`mommy` : $C`daddy`, egg.spe ? $C`.` : $C`?`);
                 } else if (mon.data.mlet === S.DRAGON && !Deaf()) {
                     await verbalize($C`Gleep!`);   /* Mything eggs :-) */
                 }
@@ -1064,7 +1089,8 @@ export async function hatch_egg(arg, timeout) {   // timeout.c:1017
                 if (cansee_hatchspot) {
                     /* egg carrying monster might be invisible */
                     mon2 = egg.v.v_ocarry;
-                    if (canseemon(mon2) && (!mon2.wormno || cansee(mon2.mx, mon2.my))) {
+                    if (canseemon(mon2)
+                        && (!mon2.wormno || cansee(mon2.mx, mon2.my))) {
                         $c.sprintf(new $c.Ptr(carriedby, 0), $C`%s pack`, s_suffix(await a_monnam(mon2)));
                         knows_egg = TRUE;
                     } else if (is_pool(mon.mx, mon.my)) {
@@ -1072,7 +1098,8 @@ export async function hatch_egg(arg, timeout) {   // timeout.c:1017
                     } else {
                         $c.strcpy(new $c.Ptr(carriedby, 0), $C`thin air`);
                     }
-                    await You_see($C`%s %s out of %s!`, new $c.Ptr(monnambuf, 0), locomotion(mon.data, $C`drop`), new $c.Ptr(carriedby, 0));
+                    await You_see($C`%s %s out of %s!`, new $c.Ptr(monnambuf, 0),
+                        locomotion(mon.data, $C`drop`), new $c.Ptr(carriedby, 0));
                 }
                 break;
             default:
@@ -1131,7 +1158,8 @@ export async function attach_fig_transform_timeout(figurine) {   // timeout.c:12
      */
     const i = rnd(9000) + 200 | 0;
     /* figurine will transform */
-    await start_timer(i, TIMER.OBJECT, FIG_TRANSFORM, obj_to_any(figurine));
+    await start_timer(i, TIMER.OBJECT, FIG_TRANSFORM,
+        obj_to_any(figurine));
 }
 /* give a fumble message */
 /**
@@ -1153,15 +1181,24 @@ async function slip_or_trip() {   // timeout.c:1222
           name; if not, look for rocks to trip over; trip over
           anonymous "something" if there aren't any rocks.
         */
-        let what = iflags.last_msg === PLNMSG.ONE_ITEM_HERE ? otmp.quan === 1 ? $C`it` : Hallucination() ? $C`they` : $C`them` : otmp.dknown || !Blind() ? await doname(otmp) : (otmp2 = sobj_at(ROCK, u.ux, u.uy)) === null ? c_common_strings.c_something : otmp2.quan === 1 ? $C`a rock` : $C`some rocks`;
+        let what = iflags.last_msg === PLNMSG.ONE_ITEM_HERE
+            ? otmp.quan === 1 ? $C`it`
+            : Hallucination() ? $C`they` : $C`them`
+            : otmp.dknown || !Blind()
+            ? await doname(otmp)
+            : (otmp2 = sobj_at(ROCK, u.ux, u.uy)) === null
+            ? c_common_strings.c_something
+            : otmp2.quan === 1 ? $C`a rock` : $C`some rocks`;
         if (Hallucination()) {
             what = $c.strcpy(new $c.Ptr(buf, 0), what);
             $t1 = highc(buf[0]), buf[0] = $t1;
-            await pline($C`Egads!  %s bite%s your %s!`, what, !otmp || otmp.quan === 1 ? $C`s` : $C``, await body_part(FOOT));
+            await pline($C`Egads!  %s bite%s your %s!`, what,
+                !otmp || otmp.quan === 1 ? $C`s` : $C``, await body_part(FOOT));
         } else {
             await You($C`trip over %s.`, what);
         }
-        if (!$G.uarmf && otmp.otyp === CORPSE && touch_petrifies($c.relem(mons, otmp.corpsenm)) && !Stone_resistance()) {
+        if (!$G.uarmf && otmp.otyp === CORPSE
+            && touch_petrifies($c.relem(mons, otmp.corpsenm)) && !Stone_resistance()) {
             $c.sprintf(new $c.Ptr(svk.killer.name, 0), $C`tripping over %s corpse`, await an(mons[otmp.corpsenm].pmnames[NEUTRAL]));
             await instapetrify(new $c.Ptr(svk.killer.name, 0));
         }
@@ -1173,12 +1210,20 @@ async function slip_or_trip() {   // timeout.c:1222
            "you" (second person, which won't have final 's' added) */
         /* sometimes slipping due to ice occurs during turn that hero
            has just moved off the ice; phrase things differently then */
-        await pline($C`%s %s %s the ice.`, u.usteed ? upstart(await x_monnam(u.usteed, ARTICLE.THE, null, SUPPRESS.SADDLE, FALSE)) : $C`You`, await vtense(u.usteed ? $C`steed` : $C`you`, rn2(2) ? $C`slip` : $C`slide`), is_ice(u.ux, u.uy) ? $C`on` : $C`off`);
+        await pline($C`%s %s %s the ice.`,
+            u.usteed ? upstart(await x_monnam(u.usteed, ARTICLE.THE, null,
+            SUPPRESS.SADDLE, FALSE))
+            : $C`You`,
+            await vtense(u.usteed ? $C`steed` : $C`you`, rn2(2) ? $C`slip` : $C`slide`),
+            is_ice(u.ux, u.uy) ? $C`on` : $C`off`);
         /* fumbling outside of ice while mounted always causes the hero to
            fall from the saddle (unless it is cursed), so to avoid a
            counterintuitive effect where ice makes riding _less_ hazardous,
            unconditionally dismount if fumbling is from a non-ice source */
-        if (!on_foot && ((saddle = await which_armor(u.usteed, W.SADDLE)) === null || !saddle.cursed) && (!ice_only || !rn2(3))) {
+        if (!on_foot
+            && ((saddle = await which_armor(u.usteed, W.SADDLE)) === null
+            || !saddle.cursed)
+            && (!ice_only || !rn2(3))) {
             await You($C`lose your balance.`);
             await dismount_steed(DISMOUNT.FELL);
         } else if (!rn2(10 + acurr(A.DEX))) {
@@ -1200,10 +1245,12 @@ async function slip_or_trip() {   // timeout.c:1222
         if (on_foot) {
             switch (rn2(4)) {
                 case 1:
-                    await You($C`trip over your own %s.`, Hallucination() ? $C`elbow` : await makeplural(await body_part(FOOT)));
+                    await You($C`trip over your own %s.`,
+                        Hallucination() ? $C`elbow` : await makeplural(await body_part(FOOT)));
                     break;
                 case 2:
-                    await You($C`slip %s.`, Hallucination() ? $C`on a banana peel` : $C`and nearly fall`);
+                    await You($C`slip %s.`,
+                        Hallucination() ? $C`on a banana peel` : $C`and nearly fall`);
                     break;
                 case 3:
                     await You($C`flounder.`);
@@ -1214,10 +1261,12 @@ async function slip_or_trip() {   // timeout.c:1222
             }
             /* mounted; saddle should never end up being Null here;
                don't fall off when it happens to be cursed */
-        } else if ((saddle = await which_armor(u.usteed, W.SADDLE)) === null || !saddle.cursed) {
+        } else if ((saddle = await which_armor(u.usteed, W.SADDLE)) === null
+            || !saddle.cursed) {
             switch (rn2(4)) {
                 case 1:
-                    await Your($C`%s slip out of the stirrups.`, await makeplural(await body_part(FOOT)));
+                    await Your($C`%s slip out of the stirrups.`,
+                        await makeplural(await body_part(FOOT)));
                     break;
                 case 2:
                     await You($C`let go of the reins.`);
@@ -1372,7 +1421,8 @@ export async function burn_object(arg, timeout) {   // timeout.c:1383
                         if (obj.otyp === BRASS_LANTERN) {
                             await lantern_message(obj);
                         } else {
-                            await see_lamp_flicker(obj, obj.age === 50 ? $C` considerably` : $C``);
+                            await see_lamp_flicker(obj,
+                                obj.age === 50 ? $C` considerably` : $C``);
                         }
                     }
                     break;
@@ -1439,10 +1489,15 @@ export async function burn_object(arg, timeout) {   // timeout.c:1383
                         switch (obj.where) {
                             case OBJ.INVENT:
                             case OBJ.MINVENT:
-                                await pline($C`%s%scandle%s getting short.`, new $c.Ptr(whose, 0), menorah ? $C`candelabrum's ` : $C``, many ? $C`s are` : $C` is`);
+                                await pline($C`%s%scandle%s getting short.`, new $c.Ptr(whose, 0),
+                                    menorah ? $C`candelabrum's ` : $C``,
+                                    many ? $C`s are` : $C` is`);
                                 break;
                             case OBJ.FLOOR:
-                                await You_see($C`%scandle%s getting short.`, menorah ? $C`a candelabrum's ` : many ? $C`some ` : $C`a `, many ? $C`s` : $C``);
+                                await You_see($C`%scandle%s getting short.`,
+                                    menorah ? $C`a candelabrum's ` : many ? $C`some `
+                                    : $C`a `,
+                                    many ? $C`s` : $C``);
                                 break;
                         }
                     }
@@ -1452,10 +1507,15 @@ export async function burn_object(arg, timeout) {   // timeout.c:1383
                         switch (obj.where) {
                             case OBJ.INVENT:
                             case OBJ.MINVENT:
-                                await pline($C`%s%scandle%s flame%s flicker%s low!`, new $c.Ptr(whose, 0), menorah ? $C`candelabrum's ` : $C``, many ? $C`s'` : $C`'s`, many ? $C`s` : $C``, many ? $C`` : $C`s`);
+                                await pline($C`%s%scandle%s flame%s flicker%s low!`, new $c.Ptr(whose, 0),
+                                    menorah ? $C`candelabrum's ` : $C``, many ? $C`s'` : $C`'s`,
+                                    many ? $C`s` : $C``, many ? $C`` : $C`s`);
                                 break;
                             case OBJ.FLOOR:
-                                await You_see($C`%scandle%s flame%s flicker low!`, menorah ? $C`a candelabrum's ` : many ? $C`some ` : $C`a `, many ? $C`s'` : $C`'s`, many ? $C`s` : $C``);
+                                await You_see($C`%scandle%s flame%s flicker low!`,
+                                    menorah ? $C`a candelabrum's ` : many ? $C`some `
+                                    : $C`a `,
+                                    many ? $C`s'` : $C`'s`, many ? $C`s` : $C``);
                                 break;
                         }
                     }
@@ -1469,10 +1529,12 @@ export async function burn_object(arg, timeout) {   // timeout.c:1383
                                     need_invupdate = TRUE;
                                 case OBJ.MINVENT:
                                     /*FALLTHRU*/
-                                    await pline($C`%scandelabrum's flame%s.`, new $c.Ptr(whose, 0), many ? $C`s die` : $C` dies`);
+                                    await pline($C`%scandelabrum's flame%s.`, new $c.Ptr(whose, 0),
+                                        many ? $C`s die` : $C` dies`);
                                     break;
                                 case OBJ.FLOOR:
-                                    await You_see($C`a candelabrum's flame%s die.`, many ? $C`s` : $C``);
+                                    await You_see($C`a candelabrum's flame%s die.`,
+                                        many ? $C`s` : $C``);
                                     break;
                             }
                         } else {
@@ -1482,19 +1544,24 @@ export async function burn_object(arg, timeout) {   // timeout.c:1383
                                        useupall() -> freeinv() handles it */
                                 case OBJ.MINVENT:
                                     /*FALLTHRU*/
-                                    await pline($C`%s %s consumed!`, await Yname2(obj), many ? $C`are` : $C`is`);
+                                    await pline($C`%s %s consumed!`, await Yname2(obj),
+                                        many ? $C`are` : $C`is`);
                                     break;
                                 case OBJ.FLOOR:
                                     /*
                                       You see some wax candles consumed!
                                       You see a wax candle consumed!
                                      */
-                                    await You_see($C`%s%s consumed!`, many ? $C`some ` : $C``, many ? await xname(obj) : await an(await xname(obj)));
+                                    await You_see($C`%s%s consumed!`, many ? $C`some ` : $C``,
+                                        many ? await xname(obj) : await an(await xname(obj)));
                                     need_newsym = TRUE;
                                     break;
                             }
                             /* post message */
-                            await pline(Hallucination() ? many ? $C`They shriek!` : $C`It shrieks!` : Blind() ? $C`` : many ? $C`Their flames die.` : $C`Its flame dies.`);
+                            await pline(Hallucination()
+                                ? many ? $C`They shriek!` : $C`It shrieks!`
+                                : Blind() ? $C`` : many ? $C`Their flames die.`
+                                : $C`Its flame dies.`);
                         }
                     }
                     await end_burn(obj, FALSE);
@@ -1890,7 +1957,8 @@ export async function timer_sanity_check() {   // timeout.c:2130
                     const obj_adr = fmt_ptr(obj);
                     let owhere = obj.where;
                     if (obj.timed === 0) {
-                        await impossible($C`timer sanity: untimed obj %s, timer %lu`, obj_adr, t_id);
+                        await impossible($C`timer sanity: untimed obj %s, timer %lu`,
+                            obj_adr, t_id);
                     }
                     x[0] = y[0] = 0;
                     /* if obj is in a container, possibly a nested one, figure out
@@ -1901,14 +1969,20 @@ export async function timer_sanity_check() {   // timeout.c:2130
                         }
                     }
                     (!(top !== $c.asRec(null, $T.obj, 112)) ? 1 : 0) ? $c.__assert_rtn($C`timer_sanity_check`, $C`timeout.c`, 2156, $C`top != NULL`) : 0;
-                    if (owhere === OBJ.MIGRATING || owhere === OBJ.MINVENT && !mon_is_local(top.v.v_ocarry)) {
+                    if (owhere === OBJ.MIGRATING
+                        || owhere === OBJ.MINVENT && !mon_is_local(top.v.v_ocarry)) {
                         /* migrating directly or carried by migrating monster */
                         /* not able to validate location so skip checks */
-                    } else if (!get_obj_location(obj, new $c.Ptr(x, 0), new $c.Ptr(y, 0), CONTAINED_TOO | BURIED_TOO)) {
+                    } else if (!get_obj_location(obj, new $c.Ptr(x, 0), new $c.Ptr(y, 0),
+                        CONTAINED_TOO | BURIED_TOO)) {
                         /* free? or on a shop's used-up bill? */
-                        await impossible($C`timer sanity: can't locate obj %s [where=%d], timer %lu`, obj_adr, obj.where, t_id);
+                        await impossible(
+                            $C`timer sanity: can't locate obj %s [where=%d], timer %lu`,
+                            obj_adr, obj.where, t_id);
                     } else if (!isok(x[0], y[0])) {
-                        await impossible($C`timer sanity: obj %s [where=%d] located at <%d,%d>, timer %lu`, obj_adr, obj.where, x[0], y[0], t_id);
+                        await impossible(
+                            $C`timer sanity: obj %s [where=%d] located at <%d,%d>, timer %lu`,
+                            obj_adr, obj.where, x[0], y[0], t_id);
                     }
                     break;
                 }
@@ -1931,11 +2005,16 @@ export async function timer_sanity_check() {   // timeout.c:2130
                            be frozen moat; is_ice() only checks for that when
                            the drawbridge is closed (and terrain here would be
                            DRAWBRIGE_UP) */
-                        if (curr.func_index === MELT_ICE_AWAY && !is_ice(x[0], y[0]) && !(svl.level.locations[x[0]][y[0]].typ === DRAWBRIDGE_DOWN && (svl.level.locations[x[0]][y[0]].flags & DB.UNDER) === DB.ICE)) {
-                            await impossible($C`timer sanity: melt timer %lu on non-ice %d <%d,%d>`, t_id, svl.level.locations[x[0]][y[0]].typ, x[0], y[0]);
+                        if (curr.func_index === MELT_ICE_AWAY && !is_ice(x[0], y[0])
+                            && !(svl.level.locations[x[0]][y[0]].typ === DRAWBRIDGE_DOWN
+                            && (svl.level.locations[x[0]][y[0]].flags & DB.UNDER) === DB.ICE)) {
+                            await impossible(
+                                $C`timer sanity: melt timer %lu on non-ice %d <%d,%d>`,
+                                t_id, svl.level.locations[x[0]][y[0]].typ, x[0], y[0]);
                         }
                     } else {
-                        await impossible($C`timer sanity: spot timer %lu at <%d,%d>`, t_id, x[0], y[0]);
+                        await impossible($C`timer sanity: spot timer %lu at <%d,%d>`,
+                            t_id, x[0], y[0]);
                     }
                     break;
                 }
@@ -1943,7 +2022,8 @@ export async function timer_sanity_check() {   // timeout.c:2130
                 await impossible($C`timer sanity: unexpected global timer %lu`, t_id);
                 break;
             default:
-                await impossible($C`timer sanity: unknown timer %lu, type: %d`, t_id, curr.kind);
+                await impossible($C`timer sanity: unknown timer %lu, type: %d`,
+                    t_id, curr.kind);
                 break;
         }
     }
@@ -1984,12 +2064,15 @@ export async function run_timers() {   // timeout.c:2222
  */
 export async function start_timer(when, kind, func_index, arg) {   // timeout.c:2247
     let gnu = null, dup = null, idbuf = new Int8Array(128), $t1, $t2;
-    if (kind <= TIMER.NONE || kind >= NUM_TIMER_KINDS || func_index < 0 || func_index >= NUM_TIME_FUNCS) {
+    if (kind <= TIMER.NONE || kind >= NUM_TIMER_KINDS
+        || func_index < 0 || func_index >= NUM_TIME_FUNCS) {
         await panic($C`start_timer (%s: %d)`, await kind_name(kind), func_index);
     }
     /* fail if <arg> already has a <func_index> timer running */
     for (dup = gt.timer_base; dup; dup = dup.next) {
-        if (dup.kind === kind && dup.func_index === func_index && $c.peq(dup.arg.a_void, arg.a_void)) {
+        if (dup.kind === kind
+            && dup.func_index === func_index
+            && $c.peq(dup.arg.a_void, arg.a_void)) {
             break;
         }
     }
@@ -2092,7 +2175,8 @@ export async function obj_split_timers(src, dest) {   // timeout.c:2359
     for (curr = gt.timer_base; curr; curr = next_timer) {
         next_timer = curr.next;   /* things may be inserted */
         if (curr.kind === TIMER.OBJECT && curr.arg.a_obj === src) {
-            await start_timer($c.sub64(curr.timeout, svm.moves), TIMER.OBJECT, curr.func_index, obj_to_any(dest));
+            await start_timer($c.sub64(curr.timeout, svm.moves), TIMER.OBJECT,
+                curr.func_index, obj_to_any(dest));
         }
     }
 }
@@ -2154,7 +2238,8 @@ export async function spot_stop_timers(x, y, func_index) {   // timeout.c:2416
     const where = $c.or64($c.shl64(x, 16), y);
     for (prev = null, curr = gt.timer_base; curr; curr = next_timer) {
         next_timer = curr.next;
-        if (curr.kind === TIMER.LEVEL && curr.func_index === func_index && curr.arg.a_long === where) {
+        if (curr.kind === TIMER.LEVEL && curr.func_index === func_index
+            && curr.arg.a_long === where) {
             if (prev) {
                 prev.next = curr.next;
             } else {
@@ -2184,7 +2269,8 @@ export function spot_time_expires(x, y, func_index) {   // timeout.c:2445
     let curr = null;
     const where = $c.or64($c.shl64(x, 16), y);
     for (curr = gt.timer_base; curr; curr = curr.next) {
-        if (curr.kind === TIMER.LEVEL && curr.func_index === func_index && curr.arg.a_long === where) {
+        if (curr.kind === TIMER.LEVEL && curr.func_index === func_index
+            && curr.arg.a_long === where) {
             return curr.timeout;
         }
     }

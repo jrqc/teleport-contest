@@ -166,7 +166,9 @@ export async function choose_windows(s) {   // windows.c:267
         s = tmps;
     }
     if (!winchoices[1].procs) {
-        await config_error_add($C`Window type %s not recognized.  The only choice is: %s`, s, winchoices[0].procs.name);
+        await config_error_add(
+            $C`Window type %s not recognized.  The only choice is: %s`,
+            s, winchoices[0].procs.name);
     } else {
         let first = 1;
         buf[0] = 0;
@@ -180,7 +182,8 @@ export async function choose_windows(s) {   // windows.c:267
             $c.sprintf(eos(new $c.Ptr(buf, 0)), $C`%s%s`, first ? $C`` : $C`, `, winchoices[i].procs.name);
             first = 0;
         }
-        await config_error_add($C`Window type %s not recognized.  Choices are:  %s`, s, new $c.Ptr(buf, 0));
+        await config_error_add($C`Window type %s not recognized.  Choices are:  %s`,
+            s, new $c.Ptr(buf, 0));
     }
     if (tmps) {
         $c.free(tmps);   /*, tmps = 0*/
@@ -284,7 +287,8 @@ export function nhwindows_hangup() {   // windows.c:615
     /* don't call exit_nhwindows() directly here; if a hangup occurs
        while interface code is executing, exit_nhwindows could knock
        the interface's active data structures out from under itself */
-    if (iflags.window_inited && windowprocs.win_exit_nhwindows !== hup_exit_nhwindows) {
+    if (iflags.window_inited
+        && windowprocs.win_exit_nhwindows !== hup_exit_nhwindows) {
         previnterface_exit_nhwindows = windowprocs.win_exit_nhwindows;
     }
     /* also, we have to leave the old interface's getmsghistory()
@@ -656,7 +660,8 @@ export async function genl_status_update(idx, ptr, chg, percent, color, colormas
     }
     /* if '$' is encoded, buffer length of \GXXXXNNNN is 9 greater than
        single char; we want to subtract that 9 when checking display length */
-    const lndelta = status_activefields[BL.GOLD] && $c.strstr(status_vals[BL.GOLD], $C`\\G`) ? 9 : 0;
+    const lndelta = status_activefields[BL.GOLD]
+        && $c.strstr(status_vals[BL.GOLD], $C`\\G`) ? 9 : 0;
     /* basic bot2 formats groups of second line fields into five buffers,
        then decides how to order those buffers based on comparing lengths
        of [sub]sets of them to the width of the map; we have more control
@@ -712,7 +717,8 @@ export async function genl_status_update(idx, ptr, chg, percent, color, colormas
                 }
                 $c.strcpy(nb = eos(nb), val);   /* status_vals[idx2] */
             }   /* status_activefields[idx2] */
-            if (idx2 === BL.CONDITION && pass < 4 && $c.subu64($c.strlen(new $c.Ptr(newbot2, 0)), lndelta) > COLNO) {
+            if (idx2 === BL.CONDITION && pass < 4
+                && $c.subu64($c.strlen(new $c.Ptr(newbot2, 0)), lndelta) > COLNO) {
                 break;   /* switch to next order */
             }
         }   /* i */
@@ -908,7 +914,8 @@ export function dump_redirect(onoff_flag) {   // windows.c:1366
  * @returns {number} int
  */
 export function has_color(color) {   // windows.c:1397
-    return iflags.wc_color && windowprocs.name && $c.andu64(windowprocs.wincap, WC.COLOR) && windowprocs.has_color[color] ? 1 : 0;
+    return iflags.wc_color && windowprocs.name
+        && $c.andu64(windowprocs.wincap, WC.COLOR) && windowprocs.has_color[color] ? 1 : 0;
 }
 /**
  * @param {number} glyph int
@@ -1181,7 +1188,8 @@ export async function choose_classes_menu(prompt, category, way, class_list, cla
             case 0:
                 idx = def_char_to_monclass(class_list.get(0));
                 if (!(idx >= 0 && idx < 61)) {
-                    await panic($C`choose_classes_menu: invalid monclass '%c'`, class_list.get(0));
+                    await panic($C`choose_classes_menu: invalid monclass '%c'`,
+                        class_list.get(0));
                     /*NOTREACHED*/
                 }
                 text = def_monsyms[idx].explain;
@@ -1191,7 +1199,8 @@ export async function choose_classes_menu(prompt, category, way, class_list, cla
             case 1:
                 idx = def_char_to_objclass(class_list.get(0));
                 if (!(idx >= 0 && idx < 18)) {
-                    await panic($C`choose_classes_menu: invalid objclass '%c'`, class_list.get(0));
+                    await panic($C`choose_classes_menu: invalid objclass '%c'`,
+                        class_list.get(0));
                     /*NOTREACHED*/
                 }
                 text = def_oc_syms[idx].explain;
@@ -1209,7 +1218,9 @@ export async function choose_classes_menu(prompt, category, way, class_list, cla
             }
         }
         any.a_int = class_list.get(0);
-        await add_menu(win, nul_glyphinfo, any, $c.i8(accelerator), category ? class_list.get(0) : 0, ATR.NONE, clr, new $c.Ptr(buf, 0), selected ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+        await add_menu(win, nul_glyphinfo, any, $c.i8(accelerator),
+            category ? class_list.get(0) : 0, ATR.NONE, clr, new $c.Ptr(buf, 0),
+            selected ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
         if (category > 0) {
             if (next_accelerator === 90) {
                 break;
@@ -1230,12 +1241,16 @@ export async function choose_classes_menu(prompt, category, way, class_list, cla
         /* we won't preselect this even if the incoming list is empty;
            having it selected means that it would have to be explicitly
            de-selected in order to select anything else */
-        await add_menu(win, nul_glyphinfo, any, 65, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_SKIPINVERT);
+        await add_menu(win, nul_glyphinfo, any, 65, 0,
+            ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_SKIPINVERT);
         if (!$c.strcmp(prompt, $C`Autopickup what?`)) {
-            await add_menu_str(win, $C`Note: when no choices are selected, "all" is implied.`);
+            await add_menu_str(win,
+                $C`Note: when no choices are selected, "all" is implied.`);
             /* for 'O', "toggle" should be intuitive; for 'm O', it would
                probably be better to say "Set 'autopickup' to true|false" */
-            await add_menu_str(win, flags.pickup ? $C`Toggle off 'autopickup' to not pick up anything.` : $C`Toggle on 'autopickup' to automatically pick these things up.`);
+            await add_menu_str(win, flags.pickup
+                ? $C`Toggle off 'autopickup' to not pick up anything.`
+                : $C`Toggle on 'autopickup' to automatically pick these things up.`);
         }
     }
     await end_menu()(win, prompt);
@@ -1327,7 +1342,8 @@ export async function add_menu(window, glyphinfo, identifier, ch, gch, attr$in, 
     }
     /* this is the only function that cared about this flag; remove it now */
     itemflags = (itemflags & 4294967291) >>> 0;
-    await windowprocs.win_add_menu(window, glyphinfo, identifier, ch, gch, attr[0], color[0], str, itemflags);
+    await windowprocs.win_add_menu(window, glyphinfo, identifier,
+        ch, gch, attr[0], color[0], str, itemflags);
 }
 /* insert a non-selectable, possibly highlighted line of text into a menu */
 /**
@@ -1344,7 +1360,8 @@ export async function add_menu_heading(tmpwin, buf) {   // windows.c:1816
     if (program_state.gameover) {
         attr = ATR.NONE, color = NO_COLOR;
     }
-    await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, attr, color, buf, MENU.ITEMFLAGS_SKIPMENUCOLORS);
+    await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, attr, color,
+        buf, MENU.ITEMFLAGS_SKIPMENUCOLORS);
 }
 /* insert a non-selectable, unhighlighted line of text into a menu */
 /**
@@ -1355,7 +1372,8 @@ export async function add_menu_heading(tmpwin, buf) {   // windows.c:1816
 export async function add_menu_str(tmpwin, buf) {   // windows.c:1832
     let any = new $T.any();
     any.$copyFrom(cg.zeroany);
-    await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, NO_COLOR, buf, MENU.ITEMFLAGS_NONE);
+    await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, NO_COLOR,
+        buf, MENU.ITEMFLAGS_NONE);
 }
 /**
  * @param {$c.Ptr | null} str const char *

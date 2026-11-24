@@ -26,7 +26,8 @@ export function unicode_val(cp) {   // utf8map.c:18
     let cval = 0;
     if (cp && cp.get(0)) {
         cval = dcount = 0;
-        if ((cp.get(0) === 85 || cp.get(0) === 117) && cp.get(1) === 43 && cp.get(2) && (dp = $c.strchr(new $c.Ptr(hexdd, 0), cp.get(2))) !== null) {
+        if ((cp.get(0) === 85 || cp.get(0) === 117)
+            && cp.get(1) === 43 && cp.get(2) && (dp = $c.strchr(new $c.Ptr(hexdd, 0), cp.get(2))) !== null) {
             cp = cp.add(2);   /* move past the 'U' and '+' */
             do {
                 cval = Math.imul(cval, 16) + $c.div32($c.i32($c.pdiff(dp, new $c.Ptr(hexdd, 0))), 2) | 0;
@@ -166,7 +167,8 @@ export async function add_custom_urep_entry(customization_name, glyphidx, utf32c
         gdc.details = null;
         gdc.details_end = null;
     }
-    let details = find_matching_customization(customization_name, custom_ureps, which_set);   /* FIXME */
+    let details = find_matching_customization(customization_name,
+        custom_ureps, which_set);   /* FIXME */
     if (details) {
         while (details) {
             if (details.content.urep.glyphidx === glyphidx) {
@@ -186,7 +188,8 @@ export async function add_custom_urep_entry(customization_name, glyphidx, utf32c
         }
     }
     /* create new details entry */
-    newdetails = $c.asRec(await alloc(32), $T.customization_detail, 32);
+    newdetails = $c.asRec(await alloc(
+        32), $T.customization_detail, 32);
     newdetails.content.urep.glyphidx = glyphidx;
     if (utf8str && utf8str.get(0)) {
         $t3 = $c.retype(await dupstr($c.retype(utf8str, Int8Array)), Uint8Array), newdetails.content.urep.u.utf8str = $t3;

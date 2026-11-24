@@ -420,7 +420,8 @@ async function restmonchn(nhfp) {   // restore.c:376
         const offset = mtmp.mnum;
         mtmp.data = $c.relem(mons, offset);
         if (ghostly) {
-            const mndx = mtmp.cham === NON_PM ? mtmp.data.pmidx : mtmp.cham;
+            const mndx = mtmp.cham === NON_PM ? mtmp.data.pmidx
+                : mtmp.cham;
             if (await propagate(mndx, TRUE, ghostly) === 0) {
                 /* cookie to trigger purge in getbones() */
                 mtmp.mhpmax = DEFUNCT_MONSTER;
@@ -526,7 +527,8 @@ async function restgamestate(nhfp) {   // restore.c:525
     await sfi_ulong(nhfp, new $c.Ptr(uid, 0), $C`gamestate-uid`);
     await Sfi_char(nhfp, new $c.Ptr(svn.nhuuid, 0), $C`nhuuid`, 37);
     await sfi_long(nhfp, new $c.FieldRef(svm, "moves", "i64"), $C`gamestate-moves`);
-    if (SYSOPT_CHECK_SAVE_UID() && uid[0] !== $c.getuid()) {
+    if (SYSOPT_CHECK_SAVE_UID()
+        && uid[0] !== $c.getuid()) {
         /* strange ... */
         /* for wizard mode, issue a reminder; for others, treat it
          * as an attempt to cheat and refuse to restore this file */
@@ -546,7 +548,9 @@ async function restgamestate(nhfp) {   // restore.c:525
     await Sfi_context_info(nhfp, svc.context, $C`gamestate-context`);
     relative_time_to_moves(new $c.FieldRef(svc.context, "seer_turn", "i64"));
     relative_time_to_moves(new $c.FieldRef(svc.context.digging, "lastdigtime", "i64"));
-    svc.context.warntype.species = ismnum(svc.context.warntype.speciesidx) ? $c.relem(mons, svc.context.warntype.speciesidx) : null;
+    svc.context.warntype.species = ismnum(svc.context.warntype.speciesidx)
+        ? $c.relem(mons, svc.context.warntype.speciesidx)
+        : null;
     /* context.victual.piece, .tin.tin, .spellbook.book, and .polearm.hitmon
        are pointers which get set to Null during save and will be recovered
        via corresponding o_id or m_id while objs or mons are being restored */
@@ -871,11 +875,13 @@ async function rest_stairs(nhfp) {   // restore.c:955
             break;
         }
         await Sfi_stairway(nhfp, stway, $C`stairs-stairway`);
-        if (program_state.restoring !== REST.GSTATE && stway.tolev.dnum === u.uz.dnum) {
+        if (program_state.restoring !== REST.GSTATE
+            && stway.tolev.dnum === u.uz.dnum) {
             /* stairway dlevel is relative, make it absolute */
             stway.tolev.dlevel = $c.i16(stway.tolev.dlevel + u.uz.dlevel | 0);
         }
-        await stairway_add(stway.sx, stway.sy, stway.up, stway.isladder, stway.tolev);
+        await stairway_add(stway.sx, stway.sy, stway.up, stway.isladder,
+            stway.tolev);
         const newst = stairway_at(stway.sx, stway.sy);
         if (newst) {
             newst.u_traversed = stway.u_traversed;
@@ -902,7 +908,8 @@ export async function restcemetery(nhfp, cemeteryaddr) {   // restore.c:988
     } else {
         cemeteryaddr.set(0, null);
     }
-    if ((nhfp.mode & CONVERTING) !== 0 || (nhfp.mode & UNCONVERTING) !== 0) {
+    if ((nhfp.mode & CONVERTING) !== 0
+        || (nhfp.mode & UNCONVERTING) !== 0) {
         /* free the memory */
         let nextbones = cemeteryaddr.get(0);
         while ((thisbones = nextbones) !== null) {
@@ -1020,7 +1027,8 @@ export async function getlev(nhfp, pid, lev) {   // restore.c:1046
         trap = await newtrap();
         await Sfi_trap(nhfp, trap, $C`trap`);
         if (trap.tx !== 0) {
-            if (program_state.restoring !== REST.GSTATE && trap.dst.dnum === u.uz.dnum) {
+            if (program_state.restoring !== REST.GSTATE
+                && trap.dst.dnum === u.uz.dnum) {
                 /* convert relative destination to absolute */
                 trap.dst.dlevel = $c.i16(trap.dst.dlevel + u.uz.dlevel | 0);
             }
@@ -1074,7 +1082,10 @@ export async function getlev(nhfp, pid, lev) {   // restore.c:1046
             /* reset peaceful/malign relative to new character;
                shopkeepers will reset based on name */
             if (!mtmp.isshk) {
-                $t7 = (is_unicorn(mtmp.data) && sgn(u.ualign.type) === sgn(mtmp.data.maligntyp) ? 1 : peace_minded(mtmp.data)) >>> 0, mtmp.mpeaceful = ($t7) & 1;
+                $t7 = (is_unicorn(mtmp.data)
+                    && sgn(u.ualign.type)
+                    === sgn(mtmp.data.maligntyp) ? 1
+                    : peace_minded(mtmp.data)) >>> 0, mtmp.mpeaceful = ($t7) & 1;
             }
             set_malign(mtmp);
         } else if (elapsed > 0) {
@@ -1097,14 +1108,16 @@ export async function getlev(nhfp, pid, lev) {   // restore.c:1046
     if (ghostly) {
         let stway = gs.stairs;
         while (stway) {
-            if (!stway.isladder && !stway.up && stway.tolev.dnum === u.uz.dnum) {
+            if (!stway.isladder && !stway.up
+                && stway.tolev.dnum === u.uz.dnum) {
                 break;
             }
             stway = stway.next;
         }
         /* Now get rid of all the temp fruits... */
         freefruitchn(go.oldfruit), go.oldfruit = null;
-        if (lev > ledger_no(svd.dungeon_topology.d_medusa_level) && lev < ledger_no(svd.dungeon_topology.d_stronghold_level) && !stway) {
+        if (lev > ledger_no(svd.dungeon_topology.d_medusa_level)
+            && lev < ledger_no(svd.dungeon_topology.d_stronghold_level) && !stway) {
             dest.dnum = u.uz.dnum;
             dest.dlevel = $c.i16(u.uz.dlevel + 1);
             await mazexy(cc);
@@ -1421,16 +1434,21 @@ export async function restore_menu(bannerwin) {   // restore.c:1536
             } else {
                 $c.sprintf(new $c.Ptr(menutext, 0), $C`%c %.*s`, mode, PL_NSIZ_PLUS - 1, next);
             }
-            await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(menutext, 0), MENU.ITEMFLAGS_SKIPMENUCOLORS);
+            await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr,
+                new $c.Ptr(menutext, 0), MENU.ITEMFLAGS_SKIPMENUCOLORS);
         }
         /* new game */
-        let clet = k <= 13 ? 110 : k <= 39 ? 78 : 0;
+        let clet = k <= 13 ? 110
+            : k <= 39 ? 78 : 0;
         any.a_int = -1;   /* not >= 0 */
-        await add_menu(tmpwin, nul_glyphinfo, any, $c.i8(clet), 78, ATR.NONE, clr, $C`Start a new character`, MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, $c.i8(clet), 78, ATR.NONE, clr,
+            $C`Start a new character`, MENU.ITEMFLAGS_NONE);
         /* quit */
-        clet = (k + 1 | 0) <= 16 && clet === 110 ? 113 : (k + 1 | 0) <= 42 && clet === 78 ? 81 : 0;
+        clet = (k + 1 | 0) <= 16 && clet === 110 ? 113
+            : (k + 1 | 0) <= 42 && clet === 78 ? 81 : 0;
         any.a_int = -2;
-        await add_menu(tmpwin, nul_glyphinfo, any, $c.i8(clet), 81, ATR.NONE, clr, $C`Never mind (quit)`, MENU.ITEMFLAGS_SELECTED);
+        await add_menu(tmpwin, nul_glyphinfo, any, $c.i8(clet), 81, ATR.NONE, clr,
+            $C`Never mind (quit)`, MENU.ITEMFLAGS_SELECTED);
         /* no prompt on end_menu, as we've done our own at the top */
         await end_menu()(tmpwin, null);
         if (await select_menu(tmpwin, PICK.ONE, new $c.Ptr(chosen_game, 0)) > 0) {

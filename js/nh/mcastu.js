@@ -73,7 +73,10 @@ async function cursetxt(mtmp, undirected) {   // mcastu.c:63
         /* spellcasting monsters are impolite */
         if (undirected) {
             point_msg = $C`all around, then curses`;
-        } else if (Invis() && !perceives(mtmp.data) && (mtmp.mux !== u.ux || mtmp.muy !== u.uy) || is_obj_mappear(gy.youmonst, STRANGE_OBJECT) || u.uundetected) {
+        } else if (Invis() && !perceives(mtmp.data)
+            && (mtmp.mux !== u.ux || mtmp.muy !== u.uy)
+            || is_obj_mappear(gy.youmonst, STRANGE_OBJECT)
+            || u.uundetected) {
             point_msg = $C`and curses in your general direction`;
         } else if (Displaced() && (mtmp.mux !== u.ux || mtmp.muy !== u.uy)) {
             point_msg = $C`and curses at your displaced image`;
@@ -117,7 +120,8 @@ async function choose_monster_spell(mtmp, adtyp) {   // mcastu.c:89
     }
     /* find the highest spell in the list we could cast */
     for (i = len - 1 | 0; i >= 0; i = i - 1 | 0) {
-        if (mcast_data[list.get(i)].level <= spellval && !await spell_would_be_useless(mtmp, list.get(i))) {
+        if (mcast_data[list.get(i)].level <= spellval
+            && !await spell_would_be_useless(mtmp, list.get(i))) {
             return list.get(i);
         }
     }
@@ -161,21 +165,25 @@ export async function castmu(mtmp, mattk, thinks_it_foundyou, foundyou) {   // m
             spellnum = await choose_monster_spell(mtmp, mattk.adtyp);
             /* not trying to attack?  don't allow directed spells */
             if (!thinks_it_foundyou) {
-                if (!is_undirected_spell(spellnum) || await spell_would_be_useless(mtmp, spellnum)) {
+                if (!is_undirected_spell(spellnum)
+                    || await spell_would_be_useless(mtmp, spellnum)) {
                     if (foundyou) {
-                        await impossible($C`spellcasting monster found you and doesn't know it?`);
+                        await impossible(
+                            $C`spellcasting monster found you and doesn't know it?`);
                     }
                     return M_ATTK.MISS;
                 }
                 break;
             }
-        } while ((cnt = cnt - 1 | 0) > 0 && await spell_would_be_useless(mtmp, spellnum));
+        } while ((cnt = cnt - 1 | 0) > 0
+            && await spell_would_be_useless(mtmp, spellnum));
         if (cnt === 0) {
             return M_ATTK.MISS;
         }
     }
     /* monster unable to cast spells? */
-    if (mtmp.mcan || mtmp.mspec_used || !ml || $c.andu64(mtmp.seen_resistance, cvt_adtyp_to_mseenres(mattk.adtyp))) {
+    if (mtmp.mcan || mtmp.mspec_used || !ml
+        || $c.andu64(mtmp.seen_resistance, cvt_adtyp_to_mseenres(mattk.adtyp))) {
         await cursetxt(mtmp, is_undirected_spell(spellnum));
         return M_ATTK.MISS;
     }
@@ -200,8 +208,12 @@ export async function castmu(mtmp, mattk, thinks_it_foundyou, foundyou) {   // m
      *  even when the caster has targeted the wrong spot?  Likewise
      *  for fire mis-aimed at ice.
      */
-    if (!foundyou && thinks_it_foundyou && !is_undirected_spell(spellnum)) {
-        await pline_mon(mtmp, $C`%s casts a spell at %s!`, canseemon(mtmp) ? await Monnam(mtmp) : $C`Something`, is_waterwall(mtmp.mux, mtmp.muy) ? $C`empty water` : $C`thin air`);
+    if (!foundyou && thinks_it_foundyou
+        && !is_undirected_spell(spellnum)) {
+        await pline_mon(mtmp, $C`%s casts a spell at %s!`,
+            canseemon(mtmp) ? await Monnam(mtmp) : $C`Something`,
+            is_waterwall(mtmp.mux, mtmp.muy) ? $C`empty water`
+            : $C`thin air`);
         return M_ATTK.MISS;
     }
     nomul(0);
@@ -214,7 +226,15 @@ export async function castmu(mtmp, mattk, thinks_it_foundyou, foundyou) {   // m
         return M_ATTK.MISS;
     }
     if (canspotmon(mtmp) || !is_undirected_spell(spellnum)) {
-        await pline_mon(mtmp, $C`%s casts a spell%s!`, canspotmon(mtmp) ? await Monnam(mtmp) : $C`Something`, is_undirected_spell(spellnum) ? $C`` : Invis() && !perceives(mtmp.data) && !(mtmp.mux === u.ux && mtmp.muy === u.uy) ? $C` at a spot near you` : Displaced() && !(mtmp.mux === u.ux && mtmp.muy === u.uy) ? $C` at your displaced image` : $C` at you`);
+        await pline_mon(mtmp, $C`%s casts a spell%s!`,
+            canspotmon(mtmp) ? await Monnam(mtmp) : $C`Something`,
+            is_undirected_spell(spellnum) ? $C``
+            : Invis() && !perceives(mtmp.data)
+            && !(mtmp.mux === u.ux && mtmp.muy === u.uy)
+            ? $C` at a spot near you`
+            : Displaced() && !(mtmp.mux === u.ux && mtmp.muy === u.uy)
+            ? $C` at your displaced image`
+            : $C` at you`);
     }
     /*
      * As these are spells, the damage is related to the level
@@ -223,7 +243,9 @@ export async function castmu(mtmp, mattk, thinks_it_foundyou, foundyou) {   // m
     if (!foundyou) {
         dmg = 0;
         if (mattk.adtyp !== AD.SPEL && mattk.adtyp !== AD.CLRC) {
-            await impossible($C`%s casting non-hand-to-hand version of hand-to-hand spell %d?`, await Monnam(mtmp), mattk.adtyp);
+            await impossible(
+                $C`%s casting non-hand-to-hand version of hand-to-hand spell %d?`,
+                await Monnam(mtmp), mattk.adtyp);
             return M_ATTK.MISS;
         }
     } else if (mattk.damd) {
@@ -428,13 +450,17 @@ async function mcast_summon_mons(mtmp) {   // mcastu.c:421
         await verbalize($C`Destroy the thief, my pet%s!`, plur(count));
     } else {
         const one = count === 1 ? 1 : 0;
-        const mappear = one ? $C`A monster appears` : $C`Monsters appear`;
+        const mappear = one ? $C`A monster appears`
+            : $C`Monsters appear`;
         /* messages not quite right if plural monsters created but
            only a single monster is seen */
-        if (Invis() && !perceives(mtmp.data) && (mtmp.mux !== u.ux || mtmp.muy !== u.uy)) {
-            await pline($C`%s %s a spot near you!`, mappear, one ? $C`at` : $C`around`);
+        if (Invis() && !perceives(mtmp.data)
+            && (mtmp.mux !== u.ux || mtmp.muy !== u.uy)) {
+            await pline($C`%s %s a spot near you!`, mappear,
+                one ? $C`at` : $C`around`);
         } else if (Displaced() && (mtmp.mux !== u.ux || mtmp.muy !== u.uy)) {
-            await pline($C`%s %s your displaced image!`, mappear, one ? $C`by` : $C`around`);
+            await pline($C`%s %s your displaced image!`, mappear,
+                one ? $C`by` : $C`around`);
         } else {
             await pline($C`%s from nowhere!`, mappear);
         }
@@ -476,7 +502,9 @@ async function mcast_weaken_you(mtmp, dmg) {   // mcastu.c:466
         if (Half_spell_damage()) {
             dmg = $c.div32(dmg + 1 | 0, 2);
         }
-        await losestr(rnd(dmg), await death_inflicted_by(new $c.Ptr(kbuf, 0), $C`strength loss`, mtmp), KILLED.BY);
+        await losestr(rnd(dmg),
+            await death_inflicted_by(new $c.Ptr(kbuf, 0), $C`strength loss`, mtmp),
+            KILLED.BY);
         svk.killer.name[0] = 0;   /* not killed if we get here... */
         monstunseesu(M_SEEN.MAGR);
     }
@@ -488,7 +516,8 @@ async function mcast_weaken_you(mtmp, dmg) {   // mcastu.c:466
 async function mcast_disappear(mtmp) {   // mcastu.c:490
     if (!mtmp.minvis && !mtmp.invis_blkd) {
         if (canseemon(mtmp)) {
-            await pline_mon(mtmp, $C`%s suddenly %s!`, await Monnam(mtmp), !See_invisible() ? $C`disappears` : $C`becomes transparent`);
+            await pline_mon(mtmp, $C`%s suddenly %s!`, await Monnam(mtmp),
+                !See_invisible() ? $C`disappears` : $C`becomes transparent`);
         }
         await mon_set_minvis(mtmp, FALSE);
         if (cansee(mtmp.mx, mtmp.my) && !canspotmon(mtmp)) {
@@ -667,7 +696,8 @@ async function mcast_insects(mtmp) {   // mcastu.c:645
         if (!await enexto(bypos, mtmp.mux, mtmp.muy, mtmp.data)) {
             return;
         }
-        if ((pm = await mkclass(let_, 0)) !== null && (mtmp2 = await makemon(pm, bypos.x, bypos.y, MM.ANGRY | MM.NOMSG)) !== null) {
+        if ((pm = await mkclass(let_, 0)) !== null
+            && (mtmp2 = await makemon(pm, bypos.x, bypos.y, MM.ANGRY | MM.NOMSG)) !== null) {
             success = TRUE;
             $t2 = ($t1 = (mtmp2.mtame = 0) >>> 0, mtmp2.mpeaceful = ($t1) & 1), mtmp2.msleeping = ($t2) & 1;
             set_malign(mtmp2);
@@ -691,9 +721,11 @@ async function mcast_insects(mtmp) {   // mcastu.c:645
                 what = $c.strcpy(new $c.Ptr(whatbuf, 0), what);
             }
             /* unseen caster summoned seen critter(s) */
-            const arg = newseen === (oldseen + 1 | 0) ? await an(await makesingular(what)) : new $c.Ptr(whatbuf, 0);
+            const arg = newseen === (oldseen + 1 | 0) ? await an(await makesingular(what))
+                : new $c.Ptr(whatbuf, 0);
             if (!Deaf()) {
-                await You_hear($C`someone summoning something, and %s %s.`, arg, await vtense(arg, $C`appear`));
+                await You_hear($C`someone summoning something, and %s %s.`, arg,
+                    await vtense(arg, $C`appear`));
             } else {
                 await pline($C`%s %s.`, upstart(arg), await vtense(arg, $C`appear`));
             }
@@ -708,7 +740,8 @@ async function mcast_insects(mtmp) {   // mcastu.c:645
         what = $C``;
     } else if (let_ === S.SNAKE) {
         fmt = $C`%s transforms a clump of sticks into %s!`;
-    } else if (Invis() && !perceives(mtmp.data) && (mtmp.mux !== u.ux || mtmp.muy !== u.uy)) {
+    } else if (Invis() && !perceives(mtmp.data)
+        && (mtmp.mux !== u.ux || mtmp.muy !== u.uy)) {
         fmt = $C`%s summons %s around a spot near you!`;
     } else if (Displaced() && (mtmp.mux !== u.ux || mtmp.muy !== u.uy)) {
         fmt = $C`%s summons %s around your displaced image!`;
@@ -726,7 +759,9 @@ async function mcast_blind_you() {   // mcastu.c:729
     /* note: resists_blnd() doesn't apply here */
     if (!Blinded()) {
         const num_eyes = eyecount(gy.youmonst.data);
-        await pline($C`Scales cover your %s!`, num_eyes === 1 ? await body_part(EYE) : await makeplural(await body_part(EYE)));
+        await pline($C`Scales cover your %s!`, num_eyes === 1
+            ? await body_part(EYE)
+            : await makeplural(await body_part(EYE)));
         await make_blinded(Half_spell_damage() ? 100 : 200, FALSE);
         if (!Blind()) {
             await Your($C`%s`, c_common_strings.c_vision_clears);
@@ -803,7 +838,8 @@ async function mcast_confuse_you(mtmp) {   // mcastu.c:771
  */
 async function mcast_spell(mtmp, dmg, spellnum) {   // mcastu.c:801
     if (dmg < 0) {
-        await impossible($C`monster cast spell (%d) with negative dmg (%d)?`, spellnum, dmg);
+        await impossible($C`monster cast spell (%d) with negative dmg (%d)?`,
+            spellnum, dmg);
         return;
     }
     if (dmg === 0 && !is_undirected_spell(spellnum)) {
@@ -1015,10 +1051,12 @@ export async function buzzmu(mtmp, mattk) {   // mcastu.c:989
     if (lined_up(mtmp) && rn2(3)) {
         nomul(0);
         if (canseemon(mtmp)) {
-            await pline_mon(mtmp, $C`%s zaps you with a %s!`, await Monnam(mtmp), flash_str($c.rem32($c.abs(mattk.adtyp - AD.MAGM), 10), FALSE));
+            await pline_mon(mtmp, $C`%s zaps you with a %s!`, await Monnam(mtmp),
+                flash_str($c.rem32($c.abs(mattk.adtyp - AD.MAGM), 10), FALSE));
         }
         gb.buzzer = mtmp;
-        await buzz(-10 - $c.rem32($c.abs(mattk.adtyp - AD.MAGM), 10) | 0, mattk.damn, mtmp.mx, mtmp.my, sgn(gt.tbx), sgn(gt.tby));
+        await buzz(-10 - $c.rem32($c.abs(mattk.adtyp - AD.MAGM), 10) | 0, mattk.damn,
+            mtmp.mx, mtmp.my, sgn(gt.tbx), sgn(gt.tby));
         gb.buzzer = null;
         return M_ATTK.HIT;
     }

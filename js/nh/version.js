@@ -350,7 +350,10 @@ export async function check_version(version_data, filename, complain, utdflags) 
             }
         }
         return FALSE;
-    } else if ($c.andu64(version_data.feature_set, $c.notu64(nomakedefs.ignored_features)) !== $c.andu64(nomakedefs.version_features, $c.notu64(nomakedefs.ignored_features)) || $c.andu64(utdflags, UTD.SKIP_SANITY1) === 0 && version_data.entity_count !== nomakedefs.version_sanity1) {
+    } else if ($c.andu64(version_data.feature_set, $c.notu64(nomakedefs.ignored_features))
+        !== $c.andu64(nomakedefs.version_features, $c.notu64(nomakedefs.ignored_features))
+        || $c.andu64(utdflags, UTD.SKIP_SANITY1) === 0
+        && version_data.entity_count !== nomakedefs.version_sanity1) {
         if (complain) {
             await pline($C`Configuration incompatibility for file "%s".`, filename);
             await display_nhwindow()($G.WIN_MESSAGE, TRUE);
@@ -479,7 +482,10 @@ export async function store_critical_bytes(nhfp) {   // version.c:676
     csc_count[0] = 80;
     /* int cmc = 0; */
     if (nhfp.mode & WRITING) {
-        indicate[0] = nhfp.structlevel ? 104 : nhfp.fnidx === exportascii ? 97 : 63;
+        indicate[0] = nhfp.structlevel ? 104
+            : nhfp.fnidx === exportascii
+            ? 97
+            : 63;
         await Sfo_char(nhfp, new $c.Ptr(indicate, 0), $C`indicate-format`, 1);
         await Sfo_char(nhfp, new $c.Ptr(csc_count, 0), $C`count-critical_sizes`, 1);
         const cnt = csc_count[0];
@@ -517,10 +523,13 @@ export async function uptodate(nhfp, name, utdflags) {   // version.c:713
     const quietly = $c.andu64(utdflags, UTD.QUIETLY) !== 0 ? 1 : 0;
     const verbose = name ? TRUE : FALSE;
     await Sfi_char(nhfp, new $c.Ptr(indicator, 0), $C`indicate-format`, 1);
-    if ((sfstatus = await compare_critical_bytes(nhfp, new $c.Ptr(idx_1st_mismatch, 0), utdflags)) !== SF.UPTODATE) {
+    if ((sfstatus = await compare_critical_bytes(nhfp, new $c.Ptr(idx_1st_mismatch, 0), utdflags))
+        !== SF.UPTODATE) {
         if (sfstatus > 0 && idx_1st_mismatch[0]) {
             if (!quietly) {
-                await raw_printf($C`comparison of critical bytes mismatched at %d (%s).`, critical_sizes[idx_1st_mismatch[0]].ucsize, critical_sizes[idx_1st_mismatch[0]].nm);
+                await raw_printf($C`comparison of critical bytes mismatched at %d (%s).`,
+                    critical_sizes[idx_1st_mismatch[0]].ucsize,
+                    critical_sizes[idx_1st_mismatch[0]].nm);
             }
         }
     }
@@ -564,7 +573,8 @@ export async function compare_critical_bytes(nhfp, idx_1st_mismatch, utdflags) {
     await Sfi_char(nhfp, new $c.Ptr(file_csc_count, 0), $C`count-critical_sizes`, 1);
     if (file_csc_count[0] > cnt) {
         if (!quietly) {
-            await raw_printf($C`critical byte counts do not match, file:%d, critical_sizes:%d.`, file_csc_count[0], 80);
+            await raw_printf($C`critical byte counts do not match, file:%d, critical_sizes:%d.`,
+                file_csc_count[0], 80);
         }
         return SF.CRITICAL_BYTE_COUNT_MISMATCH;
     }
@@ -578,23 +588,33 @@ export async function compare_critical_bytes(nhfp, idx_1st_mismatch, utdflags) {
             /* int */
             /* long */
             /* long long */
-            const dmfile = what_datamodel_is_this(0, cscbuf[1], cscbuf[2], cscbuf[3], cscbuf[4], cscbuf[5]);   /* ptr */
+            const dmfile = what_datamodel_is_this(0,
+                cscbuf[1],
+                cscbuf[2],
+                cscbuf[3],
+                cscbuf[4],
+                cscbuf[5]);   /* ptr */
             if (!$c.strcmp(dmfile, $C`IL32LLP64`) && !$c.strcmp(dm, $C`ILP32LL64`)) {
                 /*  Windows x64 savefile on x86 */
                 dmmismatch = SF.DM_IL32LLP64_ON_ILP32LL64;
-            } else if (!$c.strcmp(dmfile, $C`I32LP64`) && !$c.strcmp(dm, $C`ILP32LL64`)) {
+            } else if (!$c.strcmp(dmfile, $C`I32LP64`)
+                && !$c.strcmp(dm, $C`ILP32LL64`)) {
                 /* Unix 64 savefile on x86*/
                 dmmismatch = SF.DM_I32LP64_ON_ILP32LL64;
-            } else if (!$c.strcmp(dmfile, $C`ILP32LL64`) && !$c.strcmp(dm, $C`I32LP64`)) {
+            } else if (!$c.strcmp(dmfile, $C`ILP32LL64`)
+                && !$c.strcmp(dm, $C`I32LP64`)) {
                 /*  x86 savefile on Unix 64 */
                 dmmismatch = SF.DM_ILP32LL64_ON_I32LP64;
-            } else if (!$c.strcmp(dmfile, $C`ILP32LL64`) && !$c.strcmp(dm, $C`IL32LLP64`)) {
+            } else if (!$c.strcmp(dmfile, $C`ILP32LL64`)
+                && !$c.strcmp(dm, $C`IL32LLP64`)) {
                 /* x86 savefile on Windows x64 */
                 dmmismatch = SF.DM_ILP32LL64_ON_IL32LLP64;
-            } else if (!$c.strcmp(dmfile, $C`I32LP64`) && !$c.strcmp(dm, $C`IL32LLP64`)) {
+            } else if (!$c.strcmp(dmfile, $C`I32LP64`)
+                && !$c.strcmp(dm, $C`IL32LLP64`)) {
                 /* Unix 64 savefile on Windows x64 */
                 dmmismatch = SF.DM_I32LP64_ON_IL32LLP64;
-            } else if (!$c.strcmp(dmfile, $C`IL32LLP64`) && !$c.strcmp(dm, $C`I32LP64`)) {
+            } else if (!$c.strcmp(dmfile, $C`IL32LLP64`)
+                && !$c.strcmp(dm, $C`I32LP64`)) {
                 /* Windows x64 savefile on Unix 64 */
                 dmmismatch = SF.DM_IL32LLP64_ON_I32LP64;
             }

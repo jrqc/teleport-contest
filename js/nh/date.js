@@ -124,8 +124,10 @@ export async function populate_nomakedefs(version) {   // date.c:52
     $t7 = md_ignored_features(), nomakedefs.ignored_features = $t7;
     nomakedefs.version_sanity1 = version.entity_count;
     $t8 = await dupstr(mdlib_version_string(new $c.Ptr(tmpbuf2, 0), $C`.`)), nomakedefs.version_string = $t8;
-    $t9 = await dupstr(version_id_string(new $c.Ptr(tmpbuf2, 0), 256, nomakedefs.build_date)), nomakedefs.version_id = $t9;
-    $t10 = await dupstr(bannerc_string(new $c.Ptr(tmpbuf2, 0), 256, nomakedefs.build_date)), nomakedefs.copyright_banner_c = $t10;
+    $t9 = await dupstr(
+        version_id_string(new $c.Ptr(tmpbuf2, 0), 256, nomakedefs.build_date)), nomakedefs.version_id = $t9;
+    $t10 = await dupstr(
+        bannerc_string(new $c.Ptr(tmpbuf2, 0), 256, nomakedefs.build_date)), nomakedefs.copyright_banner_c = $t10;
     nomakedefs_populated = 1;
     return;
 }

@@ -221,7 +221,10 @@ async function resize_tty() {   // wintty.c:392
             /* docrt() updates it */
             /* docrt()+bot() updates it */
             /* docrt() again */
-            if (i === $G.BASE_WINDOW || i === $G.WIN_MAP || i === $G.WIN_STATUS || i === $G.WIN_MESSAGE) {   /* we fake it here */
+            if (i === $G.BASE_WINDOW
+                || i === $G.WIN_MAP
+                || i === $G.WIN_STATUS
+                || i === $G.WIN_MESSAGE) {   /* we fake it here */
                 continue;
             }
             if (wins[i] && wins[i].active) {
@@ -350,7 +353,8 @@ export async function tty_init_nhwindows(argcp, argv) {   // wintty.c:511
     /* 'statuslines' defaults to set_in_config, allowed but invisible;
        make it dynamically settable if feasible, otherwise visible */
     if ($c.andu64(tty_procs.wincap2, WC2.STATUSLINES) !== 0) {
-        await set_wc2_option_mod_status(WC2.STATUSLINES, set_in_game);
+        await set_wc2_option_mod_status(WC2.STATUSLINES,
+            set_in_game);
     }
 }
 /**
@@ -358,7 +362,8 @@ export async function tty_init_nhwindows(argcp, argv) {   // wintty.c:511
  * @returns {Promise<void>}
  */
 export async function tty_preference_update(pref) {   // wintty.c:596
-    const newstatuslines = !$c.strcmp(pref, $C`statuslines`) && iflags.window_inited ? 1 : 0;
+    const newstatuslines = !$c.strcmp(pref, $C`statuslines`)
+        && iflags.window_inited ? 1 : 0;
     if (newstatuslines) {
         await new_status_window();
         await newclipping(u.ux, u.uy);
@@ -423,7 +428,8 @@ export async function tty_askname() {   // wintty.c:651
             await tty_curs($G.BASE_WINDOW, 1, $c.i32(wins[$G.BASE_WINDOW].cury)), await cl_end();
         }
         await tty_putstr($G.BASE_WINDOW, 0, new $c.Ptr(tty_askname$who_are_you, 0));
-        await tty_curs($G.BASE_WINDOW, 14, $c.i32($c.sub64(wins[$G.BASE_WINDOW].cury, 1)));
+        await tty_curs($G.BASE_WINDOW, 14,
+            $c.i32($c.sub64(wins[$G.BASE_WINDOW].cury, 1)));
         ct = 0;
         while ((c = await tty_nhgetch()) !== 10) {
             if (c === -1) {
@@ -468,7 +474,8 @@ export async function tty_askname() {   // wintty.c:651
                 /* reject leading digit but allow digits elsewhere
                    (avoids ambiguity when character name gets
                    appended to uid to construct save file name) */
-                if (!(c >= 97 && c <= 122) && !(c >= 65 && c <= 90) && !(c >= 48 && c <= 57 && ct > 0)) {
+                if (!(c >= 97 && c <= 122) && !(c >= 65 && c <= 90)
+                    && !(c >= 48 && c <= 57 && ct > 0)) {
                     c = 95;
                 }
             }
@@ -617,7 +624,8 @@ export async function tty_create_nhwindow(type) {   // wintty.c:874
             break;
         case NHW.STATUS:
             /* status window, 2 or 3 lines long, full width, bottom of screen */
-            if (iflags.wc2_statuslines < 2 || iflags.wc2_statuslines > 3) {
+            if (iflags.wc2_statuslines < 2
+                || iflags.wc2_statuslines > 3) {
                 iflags.wc2_statuslines = 2;
             }
             newwin.offx = 0;
@@ -650,8 +658,10 @@ export async function tty_create_nhwindow(type) {   // wintty.c:874
             return WIN_ERR;
     }
     if (newwin.maxrow) {
-        $t14 = $c.asArr(await alloc($c.u32($c.mulu64($c.u64(newwin.maxrow), 8))), 'ptr'), newwin.data = $t14;
-        $t15 = $c.asArr(await alloc($c.u32($c.mulu64($c.u64(newwin.maxrow), 2))), Int16Array), newwin.datlen = $t15;
+        $t14 = $c.asArr(await alloc(
+            $c.u32($c.mulu64($c.u64(newwin.maxrow), 8))), 'ptr'), newwin.data = $t14;
+        $t15 = $c.asArr(await alloc(
+            $c.u32($c.mulu64($c.u64(newwin.maxrow), 2))), Int16Array), newwin.datlen = $t15;
         for (i = 0; i < newwin.maxrow; i = i + 1 | 0) {
             if (newwin.maxcol) {
                 /* WIN_STATUS */
@@ -699,7 +709,8 @@ async function erase_menu_or_text(window, cw, clear) {   // wintty.c:990
 function free_window_info(cw, free_data) {   // wintty.c:1011
     let i = 0, temp = null, $t1, $t2, $t3, $t4;
     if (cw.data) {
-        if ($G.WIN_MESSAGE !== WIN_ERR && cw === wins[$G.WIN_MESSAGE] && cw.rows > cw.maxrow) {
+        if ($G.WIN_MESSAGE !== WIN_ERR && cw === wins[$G.WIN_MESSAGE]
+            && cw.rows > cw.maxrow) {
             cw.maxrow = cw.rows;   /* topl data */
         }
         for (i = 0; i < cw.maxrow; i = i + 1 | 0) {
@@ -880,7 +891,8 @@ async function dmore(cw, s) {   // wintty.c:1178
             return;
         }
     } while (0);
-    await tty_curs($G.BASE_WINDOW, $G.ttyDisplay.curx + offset | 0, $G.ttyDisplay.cury);
+    await tty_curs($G.BASE_WINDOW, $G.ttyDisplay.curx + offset | 0,
+        $G.ttyDisplay.cury);
     if (flags.standout) {
         standoutbeg();
     }
@@ -940,7 +952,9 @@ async function set_all_on_page(window, page_start, page_end) {   // wintty.c:122
     for (n = 0, curr = page_start; curr !== page_end; n = n + 1 | 0, curr = curr.next) {
         /* not selectable */
         /* already selected */
-        if (!curr.identifier.a_void || curr.selected || !menuitem_invert_test(1, curr.itemflags, 0)) {
+        if (!curr.identifier.a_void
+            || curr.selected
+            || !menuitem_invert_test(1, curr.itemflags, 0)) {
             continue;
         }
         curr.selected = 1;
@@ -959,7 +973,9 @@ async function unset_all_on_page(window, page_start, page_end) {   // wintty.c:1
     for (n = 0, curr = page_start; curr !== page_end; n = n + 1 | 0, curr = curr.next) {
         /* skip if not selectable */
         /* skip if already de-selected */
-        if (!curr.identifier.a_void || !curr.selected || !menuitem_invert_test(2, curr.itemflags, 1)) {
+        if (!curr.identifier.a_void
+            || !curr.selected
+            || !menuitem_invert_test(2, curr.itemflags, 1)) {
             continue;
         }
         curr.selected = 0;
@@ -984,7 +1000,9 @@ async function invert_all_on_page(window, page_start, page_end, acc, count) {   
         /* not selectable */
         /* skip if not group 'acc' */
         /* inverting all rather than a group; skip if flagged */
-        if (!curr.identifier.a_void || (acc ? curr.gselector !== acc : !menuitem_invert_test(0, curr.itemflags, curr.selected))) {
+        if (!curr.identifier.a_void
+            || (acc ? curr.gselector !== acc
+            : !menuitem_invert_test(0, curr.itemflags, curr.selected))) {
             continue;
         }
         if (curr.selected) {
@@ -1028,7 +1046,9 @@ async function invert_all(window, page_start, page_end, acc, count) {   // wintt
            group toggling is not taking place and this item is off
            limits to bulk toggling (assumes that an item won't be
            both in a group and also subject to bulk restrictions) */
-        if (on_curr_page || !curr.identifier.a_void || (acc ? curr.gselector !== acc : !menuitem_invert_test(0, curr.itemflags, curr.selected))) {
+        if (on_curr_page || !curr.identifier.a_void
+            || (acc ? curr.gselector !== acc
+            : !menuitem_invert_test(0, curr.itemflags, curr.selected))) {
             continue;
         }
         if (curr.selected) {
@@ -1099,7 +1119,12 @@ async function process_menu_window(window, cw) {   // wintty.c:1359
                 /* '$' is both a selector "letter" and a group
                    accelerator; including it in gacc allows gold to
                    be selected via group when not on current page */
-                if (curr.gselector && (curr.gselector !== curr.selector || curr.gselector === GOLD_SYM) && !$c.strchr(new $c.Ptr(gacc, 0), curr.gselector) && (cw.how === PICK.ANY || gcnt[GSELIDX(curr.gselector)] === 1)) {
+                if (curr.gselector
+                    && (curr.gselector !== curr.selector
+                    || curr.gselector === GOLD_SYM)
+                    && !$c.strchr(new $c.Ptr(gacc, 0), curr.gselector)
+                    && (cw.how === PICK.ANY
+                    || gcnt[GSELIDX(curr.gselector)] === 1)) {
                     ($t2 = rp, rp = $t2.add(1), $t2).set(0, curr.gselector);
                     rp.set(0, 0);   /* re-terminate for strchr() */
                 }
@@ -1169,7 +1194,9 @@ async function process_menu_window(window, cw) {   // wintty.c:1359
                        lines (including fake ones that simulate grayed-out
                        entries, so we don't rely on curr->identifier here) */
                     attr_n = 0;   /* whole line */
-                    if (curr.str.get(0) && curr.str.get(1) === 32 && curr.str.get(2) && $c.strchr($C`-+#`, curr.str.get(2)) && curr.str.get(3) === 32) {   /* [0]=letter, [1]=space, [2]=[-+#], [3]=space */
+                    if (curr.str.get(0) && curr.str.get(1) === 32
+                        && curr.str.get(2) && $c.strchr($C`-+#`, curr.str.get(2))
+                        && curr.str.get(3) === 32) {   /* [0]=letter, [1]=space, [2]=[-+#], [3]=space */
                         attr_n = 4;   /* [4:N]=entry description */
                     }
                     /*
@@ -1179,11 +1206,14 @@ async function process_menu_window(window, cw) {   // wintty.c:1359
                      * actually output the character.  We're faster doing
                      * this.
                      */
-                    for (n = 0, cp = curr.str; cp.get(0) && ($G.ttyDisplay.curx = $c.i16($G.ttyDisplay.curx + 1)) < $G.ttyDisplay.cols; cp = cp.add(1), n = n + 1 | 0) {
-                        if (n === attr_n && (color !== NO_COLOR || attr !== ATR.NONE)) {
+                    for (n = 0, cp = curr.str; cp.get(0) &&
+                        ($G.ttyDisplay.curx = $c.i16($G.ttyDisplay.curx + 1)) < $G.ttyDisplay.cols; cp = cp.add(1), n = n + 1 | 0) {
+                        if (n === attr_n && (color !== NO_COLOR
+                            || attr !== ATR.NONE)) {
                             toggle_menu_attr(1, color, attr);
                         }
-                        if (n === 2 && curr.identifier.a_void !== null && curr.selected) {
+                        if (n === 2 && curr.identifier.a_void !== null
+                            && curr.selected) {
                             c = curr.count === -1 ? 42 : 35;
                             {
                                 svx = $G.ttyDisplay.curx;
@@ -1193,7 +1223,9 @@ async function process_menu_window(window, cw) {   // wintty.c:1359
                             }
                             /* all selected: '*' vs count selected: '#' */
                             $c.putchar(c);
-                        } else if (n === 2 && curr.identifier.a_void !== null && show_obj_syms && curr.glyphinfo.glyph !== NO_GLYPH) {
+                        } else if (n === 2 && curr.identifier.a_void !== null
+                            && show_obj_syms
+                            && curr.glyphinfo.glyph !== NO_GLYPH) {
                             gcolor = curr.glyphinfo.gm.sym.color;
                             /* tty_print_glyph could be used, but is overkill
                                and requires referencing the cursor location */
@@ -1241,7 +1273,8 @@ async function process_menu_window(window, cw) {   // wintty.c:1359
                  * information. Let's repair the blacked-out rows now
                  * because it looks better.
                  */
-                if (previous_page_lines !== 0 && page_lines < previous_page_lines) {
+                if (previous_page_lines !== 0
+                    && page_lines < previous_page_lines) {
                     /*
                      * +3 to leave a couple of blank rows
                      * under the menu to make it contrast well.
@@ -1404,7 +1437,9 @@ async function process_menu_window(window, cw) {   // wintty.c:1359
                             /* not selectable */
                             /* already selected */
                             /* FALSE: not currently selected */
-                            if (!curr.identifier.a_void || curr.selected || !menuitem_invert_test(1, curr.itemflags, 0)) {
+                            if (!curr.identifier.a_void
+                                || curr.selected
+                                || !menuitem_invert_test(1, curr.itemflags, 0)) {
                                 continue;
                             }
                             curr.selected = 1;
@@ -1422,7 +1457,9 @@ async function process_menu_window(window, cw) {   // wintty.c:1359
                         /* not selectable */
                         /* already de-selected */
                         /* TRUE: currently selected */
-                        if (!curr.identifier.a_void || !curr.selected || !menuitem_invert_test(2, curr.itemflags, 1)) {
+                        if (!curr.identifier.a_void
+                            || !curr.selected
+                            || !menuitem_invert_test(2, curr.itemflags, 1)) {
                             continue;
                         }
                         curr.selected = 0;
@@ -1457,8 +1494,10 @@ async function process_menu_window(window, cw) {   // wintty.c:1359
                             } else if (curr === page_end) {
                                 on_curr_page = 0;
                             }
-                            if (curr.identifier.a_void && pmatchi(new $c.Ptr(searchbuf, 0), curr.str)) {
-                                await toggle_menu_curr(window, curr, lineno, on_curr_page, counting, count);
+                            if (curr.identifier.a_void
+                                && pmatchi(new $c.Ptr(searchbuf, 0), curr.str)) {
+                                await toggle_menu_curr(window, curr, lineno, on_curr_page,
+                                    counting, count);
                                 if (cw.how === PICK.ONE) {
                                     finished = 1;
                                     break;
@@ -1480,7 +1519,8 @@ async function process_menu_window(window, cw) {   // wintty.c:1359
                         $goto = null;   // group_accel:
                         /* group accelerator; for the PICK_ONE case, we know that
                            it matches exactly one item in order to be in gacc[] */
-                        await invert_all(window, page_start, page_end, $G.morc, counting ? count : -1);
+                        await invert_all(window, page_start, page_end, $G.morc,
+                            counting ? count : -1);
                         if (cw.how === PICK.ONE) {
                             finished = 1;
                         }
@@ -1582,7 +1622,8 @@ async function process_text_window(window, cw) {   // wintty.c:1810
             await tty_curs($G.BASE_WINDOW, 1, $G.ttyDisplay.cury + 1);
             await cl_eos();
         }
-        await tty_curs($G.BASE_WINDOW, cw.offx + 1, cw.type === NHW.TEXT ? $G.ttyDisplay.rows - 1 : n);
+        await tty_curs($G.BASE_WINDOW, cw.offx + 1,
+            cw.type === NHW.TEXT ? $G.ttyDisplay.rows - 1 : n);
         await cl_end();
         await dmore(cw, new $c.Ptr(quitchars, 0));
         if ($G.morc === 27) {
@@ -1650,7 +1691,9 @@ export async function tty_display_nhwindow(window, blocking) {   // wintty.c:190
             /* cw->maxcol is a long, but its value is constrained to
                be <= ttyDisplay->cols, so is sure to fit within a short */
             s_maxcol = $c.i16(cw.maxcol);
-            cw.offx = $c.i16(cw.type === NHW.TEXT ? 0 : ((82 < $c.div32($G.ttyDisplay.cols, 2) ? 82 : $c.div32($G.ttyDisplay.cols, 2)) < $G.ttyDisplay.cols - s_maxcol - 1 ? 82 < $c.div32($G.ttyDisplay.cols, 2) ? 82 : $c.div32($G.ttyDisplay.cols, 2) : $G.ttyDisplay.cols - s_maxcol - 1));
+            cw.offx = $c.i16(cw.type === NHW.TEXT
+                ? 0
+                : ((82 < $c.div32($G.ttyDisplay.cols, 2) ? 82 : $c.div32($G.ttyDisplay.cols, 2)) < $G.ttyDisplay.cols - s_maxcol - 1 ? 82 < $c.div32($G.ttyDisplay.cols, 2) ? 82 : $c.div32($G.ttyDisplay.cols, 2) : $G.ttyDisplay.cols - s_maxcol - 1));
             /* avoid converting to uchar before calculations are finished */
             if (cw.offx < 0) {
                 cw.offx = 0;
@@ -1661,7 +1704,8 @@ export async function tty_display_nhwindow(window, blocking) {   // wintty.c:190
             if ($G.ttyDisplay.toplin === TOPLINE.NEED_MORE) {
                 await tty_display_nhwindow($G.WIN_MESSAGE, 1);
             }
-            if (cw.maxrow >= $G.ttyDisplay.rows || !iflags.menu_overlay) {
+            if (cw.maxrow >= $G.ttyDisplay.rows
+                || !iflags.menu_overlay) {
                 cw.offx = 0;
                 if (cw.offy || iflags.menu_overlay) {
                     await tty_curs(window, 1, 0);
@@ -1951,7 +1995,8 @@ export async function tty_putstr(window, attr, str) {   // wintty.c:2277
         tty_raw_print(str);
         return;
     }
-    if (str === null || cw.flags & WIN.CANCELLED && cw.type !== NHW.MESSAGE) {
+    if (str === null
+        || cw.flags & WIN.CANCELLED && cw.type !== NHW.MESSAGE) {
         return;
     }
     if (cw.type !== NHW.MESSAGE) {
@@ -2034,7 +2079,8 @@ export async function tty_putstr(window, attr, str) {   // wintty.c:2277
             break;
         case NHW.MENU:
         case NHW.TEXT:
-            if (cw.type === NHW.TEXT && $c.add64(cw.cury, cw.offy) === $G.ttyDisplay.rows - 1) {
+            if (cw.type === NHW.TEXT
+                && $c.add64(cw.cury, cw.offy) === $G.ttyDisplay.rows - 1) {
                 /* not a menu, so save memory and output 1 page at a time */
                 cw.maxcol = $G.ttyDisplay.cols;   /* force full-screen mode */
                 await tty_display_nhwindow(window, 1);
@@ -2124,7 +2170,8 @@ export async function tty_display_file(fname, complain) {   // wintty.c:2482
         } else {
             const datawin = await tty_create_nhwindow(NHW.TEXT);
             let empty = 1;
-            if (complain && nh_CD()) {
+            if (complain
+                && nh_CD()) {
                 /* attempt to scroll text below map window if there's room */
                 wins[datawin].offy = $c.i16(wins[$G.WIN_STATUS].offy + StatusRows());
                 if (wins[datawin].offy + 12 > $G.ttyDisplay.rows) {
@@ -2210,7 +2257,9 @@ export async function tty_add_menu(window, glyphinfo, identifier, ch, gch, attr,
     if (str === null) {
         return;
     }
-    if (window === WIN_ERR || (cw = wins[window]) === null || cw.type !== NHW.MENU) {
+    if (window === WIN_ERR
+        || (cw = wins[window]) === null
+        || cw.type !== NHW.MENU) {
         await panic(new $c.Ptr(winpanicstr, 0), window, $C`tty_add_menu`);
     }
     cw.nitems = $c.add64(cw.nitems, 1);
@@ -2274,7 +2323,8 @@ export async function tty_end_menu(window, prompt) {   // wintty.c:2706
     /* prompt to for menu */
     let cw = null;
     const clr = NO_COLOR;
-    if (window === WIN_ERR || (cw = wins[window]) === null || cw.type !== NHW.MENU) {
+    if (window === WIN_ERR || (cw = wins[window]) === null
+        || cw.type !== NHW.MENU) {
         /* this can happen if start_menu failed due to size requirements
            for the tty perm inventory window. It isn't a situation that
            requires a panic, just an early return. */
@@ -2289,8 +2339,11 @@ export async function tty_end_menu(window, prompt) {   // wintty.c:2706
     /* Put the prompt at the beginning of the menu. */
     if (prompt) {
         any.$copyFrom(cg.zeroany);   /* not selectable */
-        await tty_add_menu(window, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, $C``, MENU.ITEMFLAGS_NONE);
-        await tty_add_menu(window, nul_glyphinfo, any, 0, 0, tty_menu_promptstyle.attr, tty_menu_promptstyle.color, prompt, MENU.ITEMFLAGS_NONE);
+        await tty_add_menu(window, nul_glyphinfo, any, 0, 0,
+            ATR.NONE, clr, $C``, MENU.ITEMFLAGS_NONE);
+        await tty_add_menu(window, nul_glyphinfo, any, 0, 0,
+            tty_menu_promptstyle.attr, tty_menu_promptstyle.color,
+            prompt, MENU.ITEMFLAGS_NONE);
     }
     /* 52: 'a'..'z' and 'A'..'Z'; avoids selector duplication within a page */
     const lmax = min(52, $G.ttyDisplay.rows - 1);   /* # lines per page */
@@ -2380,7 +2433,8 @@ export async function tty_end_menu(window, prompt) {   // wintty.c:2706
 export async function tty_select_menu(window, how, menu_list) {   // wintty.c:2832
     let curr = null, mi = null, n = 0, $t1;
     let cw = null;
-    if (window === WIN_ERR || (cw = wins[window]) === null || cw.type !== NHW.MENU) {
+    if (window === WIN_ERR || (cw = wins[window]) === null
+        || cw.type !== NHW.MENU) {
         await panic(new $c.Ptr(winpanicstr, 0), window, $C`tty_select_menu`);
     }
     if (cw.mbehavior === MENU.BEHAVE_PERMINV) {
@@ -2740,11 +2794,13 @@ export async function docorner(xmin, ymax, ystart_between_menu_pages) {   // win
         if (y < cw.offy || (y + clipy | 0) > ROWNO) {
             continue;   /* only refresh board */
         }
-        await row_refresh($c.i16((xmin + clipx | 0) - cw.offx | 0), COLNO - 1, $c.i16((y + clipy | 0) - cw.offy | 0));
+        await row_refresh($c.i16((xmin + clipx | 0) - cw.offx | 0), COLNO - 1,
+            $c.i16((y + clipy | 0) - cw.offy | 0));
         /* only refresh board  */
     }
     end_glyphout();
-    if (ymax >= wins[$G.WIN_STATUS].offy && !ystart_between_menu_pages) {
+    if (ymax >= wins[$G.WIN_STATUS].offy
+        && !ystart_between_menu_pages) {
         /* we have wrecked the bottom line */
         disp.botlx = 1;
         await bot();
@@ -2779,7 +2835,9 @@ export function g_putch(in_ch) {   // wintty.c:3797
     } while (0);
     if (SYMHANDLING(H_UTF8)) {
         $c.putchar(ch);
-    } else if (SYMHANDLING(H_IBM) || iflags.wc_eight_bit_input && (!SYMHANDLING(H_DEC) || (in_ch & 127) < 96)) {
+    } else if (SYMHANDLING(H_IBM)
+        || iflags.wc_eight_bit_input && (!SYMHANDLING(H_DEC)
+        || (in_ch & 127) < 96)) {
         /* for DECgraphics, lower-case letters with high bit set mean
            switch character set and render with high bit clear;
            user might want 8-bits for other characters */
@@ -2923,9 +2981,13 @@ export async function tty_print_glyph(window, x, y, glyphinfo, bkglyphinfo) {   
             }
         }
         /* we don't link with termcap.o if NO_TERMS is defined */
-        if ($c.andu64(tty_procs.wincap2, WC2.EXTRACOLORS) && glyphinfo.gm.customcolor !== 0 && iflags.colorcount >= 256 && !calling_from_update_inventory) {
+        if ($c.andu64(tty_procs.wincap2, WC2.EXTRACOLORS)
+            && glyphinfo.gm.customcolor !== 0
+            && iflags.colorcount >= 256
+            && !calling_from_update_inventory) {
             if ((glyphinfo.gm.customcolor & NH_BASIC_COLOR) >>> 0 === 0) {
-                term_start_extracolor(glyphinfo.gm.customcolor, glyphinfo.gm.color256idx);
+                term_start_extracolor(glyphinfo.gm.customcolor,
+                    glyphinfo.gm.color256idx);
                 $G.ttyDisplay.colorflags = 0;
                 colordone = 1;
             } else {
@@ -2943,17 +3005,23 @@ export async function tty_print_glyph(window, x, y, glyphinfo, bkglyphinfo) {   
        BW_LAVA, BW_ICE, BW_SINK, BW_ENGR won't ever be set when color is on;
        (tried bold for ice but it didn't look very good; inverse is easier
        to see although the Valkyrie quest ends up being hard on the eyes) */
-    if (iflags.wc_color && bkglyphinfo && bkglyphinfo.framecolor !== NO_COLOR) {
+    if (iflags.wc_color
+        && bkglyphinfo && bkglyphinfo.framecolor !== NO_COLOR) {
         $G.ttyDisplay.framecolor = bkglyphinfo.framecolor;
         term_start_bgcolor(bkglyphinfo.framecolor | 0);
     } else if ((special & MG.PET) >>> 0 !== 0 && iflags.wc_hilite_pet) {
         term_start_attr(iflags.wc2_petattr);
         petattr = 1;
-    } else if (((special & MG.OBJPILE) >>> 0 !== 0 && iflags.hilite_pile || (special & MG.FEMALE) >>> 0 !== 0 && wizard() && iflags.wizmgender || (special & (MG.DETECT | MG_BW_LAVA | MG.BW_ICE | MG_BW_SINK | MG.BW_ENGR)) >>> 0 !== 0) && iflags.wc_inverse) {
+    } else if (((special & MG.OBJPILE) >>> 0 !== 0 && iflags.hilite_pile
+        || (special & MG.FEMALE) >>> 0 !== 0 && wizard() && iflags.wizmgender
+        || (special & (MG.DETECT | MG_BW_LAVA | MG.BW_ICE | MG_BW_SINK | MG.BW_ENGR)) >>> 0 !== 0)
+        && iflags.wc_inverse) {
         term_start_attr(ATR.INVERSE);
         inverse_on = 1;
     }
-    if (!glyphdone && $c.andu64(tty_procs.wincap2, WC2.U_UTF8STR) && SYMHANDLING(H_UTF8) && glyphinfo.gm.u && glyphinfo.gm.u.utf8str) {
+    if (!glyphdone
+        && $c.andu64(tty_procs.wincap2, WC2.U_UTF8STR) && SYMHANDLING(H_UTF8)
+        && glyphinfo.gm.u && glyphinfo.gm.u.utf8str) {
         /* we have a sequence to do */
         g_pututf8(glyphinfo.gm.u.utf8str);
         glyphdone = 1;
@@ -2970,7 +3038,8 @@ export async function tty_print_glyph(window, x, y, glyphinfo, bkglyphinfo) {   
         /* turn off color as well, turning off ATR_INVERSE may have done
           this already and if so, we won't know the current state unless
           we do it explicitly */
-        if ($G.ttyDisplay.color !== NO_COLOR || $G.ttyDisplay.framecolor !== NO_COLOR) {
+        if ($G.ttyDisplay.color !== NO_COLOR
+            || $G.ttyDisplay.framecolor !== NO_COLOR) {
             term_end_color();
             $t1 = $G.ttyDisplay.framecolor = NO_COLOR, $G.ttyDisplay.color = $t1;
         }
@@ -3060,7 +3129,10 @@ export async function tty_nhgetch() {   // wintty.c:4112
             await resize_tty();
         }
         program_state.getting_char = program_state.getting_char + 1 | 0;
-        i = program_state.getting_char === 1 ? await $c.getchar$async() : $c.read($c.fileno($c.__stdinp), new $c.Ptr(nestbuf, 0), 1) === 1 ? nestbuf[0] : -1;
+        i = program_state.getting_char === 1
+            ? await $c.getchar$async()
+            : $c.read($c.fileno($c.__stdinp), new $c.Ptr(nestbuf, 0), 1) === 1
+            ? nestbuf[0] : -1;
         program_state.getting_char = program_state.getting_char - 1 | 0;
         if (resize_mesg) {
             resize_mesg = 0;
@@ -3314,7 +3386,9 @@ export async function tty_status_update(fldidx, ptr, chg, percent, color, colorm
             /* should be checking for first enabled field here rather than
                just first field, but 'fieldorder' doesn't start any rows
                with fields which can be disabled so [any_row][0] suffices */
-            if (fmt.get(0) === 32 && (fldidx === fieldorder.get(0)[0] || fldidx === fieldorder.get(1)[0] || fldidx === fieldorder.get(2)[0])) {
+            if (fmt.get(0) === 32 && (fldidx === fieldorder.get(0)[0]
+                || fldidx === fieldorder.get(1)[0]
+                || fldidx === fieldorder.get(2)[0])) {
                 fmt = fmt.add(1);   /* skip leading space for first field on line */
             }
             $c.sprintf(status_vals[fldidx], fmt, text);
@@ -3329,7 +3403,9 @@ export async function tty_status_update(fldidx, ptr, chg, percent, color, colorm
     }
     /* The core botl engine sends a single blank to the window port
        for carrying-capacity when it's unused. Let's suppress that */
-    if (fldidx >= 0 && fldidx < MAXBLSTATS && tty_status[NOW][fldidx].lth === 1 && status_vals[fldidx].get(0) === 32) {
+    if (fldidx >= 0 && fldidx < MAXBLSTATS
+        && tty_status[NOW][fldidx].lth === 1
+        && status_vals[fldidx].get(0) === 32) {
         status_vals[fldidx].set(0, 0);
         tty_status[NOW][fldidx].lth = 0;
     }
@@ -3479,16 +3555,19 @@ async function check_fields(forcefields, sz) {   // wintty.c:4720
                to the right must be updated as well.  (Not necessarily
                everything; it's possible for complementary changes across
                multiple fields to put stuff further right back in sync.) */
-            if ($c.addu64($c.u64(tty_status[NOW][idx].x), tty_status[NOW][idx].lth) !== $c.addu64($c.u64(tty_status[BEFORE][idx].x), tty_status[BEFORE][idx].lth)) {
+            if ($c.addu64($c.u64(tty_status[NOW][idx].x), tty_status[NOW][idx].lth)
+                !== $c.addu64($c.u64(tty_status[BEFORE][idx].x), tty_status[BEFORE][idx].lth)) {
                 update_right = 1;
-            } else if (tty_status[NOW][idx].lth !== tty_status[BEFORE][idx].lth || tty_status[NOW][idx].x !== tty_status[BEFORE][idx].x) {
+            } else if (tty_status[NOW][idx].lth !== tty_status[BEFORE][idx].lth
+                || tty_status[NOW][idx].x !== tty_status[BEFORE][idx].x) {
                 tty_status[NOW][idx].redraw = 1;
             } else {
                 /* in case update_right is set, we're back in sync now */
                 update_right = 0;
             }
             let matchprev = 0;   /* assume failure */
-            if (valid && !update_right && !forcefields && !tty_status[NOW][idx].redraw) {
+            if (valid && !update_right && !forcefields
+                && !tty_status[NOW][idx].redraw) {
                 /*
                  * Check values against those already on the display.
                  *  - Is the additional processing time for this worth it?
@@ -3496,7 +3575,12 @@ async function check_fields(forcefields, sz) {   // wintty.c:4720
                 /* color/attr checks aren't right for 'condition'
                    and neither is examining status_vals[BL_CONDITION]
                    so skip same-contents optimization for conditions */
-                if (do_field_opt && idx !== BL.CONDITION && tty_status[NOW][idx].color === tty_status[BEFORE][idx].color && tty_status[NOW][idx].attr === tty_status[BEFORE][idx].attr) {
+                if (do_field_opt
+                    && idx !== BL.CONDITION
+                    && tty_status[NOW][idx].color
+                    === tty_status[BEFORE][idx].color
+                    && tty_status[NOW][idx].attr
+                    === tty_status[BEFORE][idx].attr) {
                     matchprev = 1;   /* assume success */
                     if (tty_status[NOW][idx].dirty) {
                         /* compare values */
@@ -3524,7 +3608,8 @@ async function check_fields(forcefields, sz) {   // wintty.c:4720
                     }
                 }
             }
-            if (forcefields || update_right || tty_status[NOW][idx].dirty && !matchprev) {
+            if (forcefields || update_right
+                || tty_status[NOW][idx].dirty && !matchprev) {
                 tty_status[NOW][idx].redraw = 1;
             }
             col = $c.i32($c.addu64($c.u64(col), tty_status[NOW][idx].lth));
@@ -3573,7 +3658,8 @@ async function tty_putstatusfield(text, x, y) {   // wintty.c:4876
     let i = 0;
     let lth = 0;
     let cw = null;
-    if ($G.WIN_STATUS === WIN_ERR || (cw = wins[$G.WIN_STATUS]) === null) {
+    if ($G.WIN_STATUS === WIN_ERR
+        || (cw = wins[$G.WIN_STATUS]) === null) {
         await panic($C`tty_putstatusfield: Invalid WinDesc\n`);
     }
     const ncols = $c.i32(cw.cols);
@@ -3720,7 +3806,8 @@ async function render_status() {   // wintty.c:5068
     let coloridx = 0;
     let attrmask = 0;
     let cw = null;
-    if ($G.WIN_STATUS === WIN_ERR || (cw = wins[$G.WIN_STATUS]) === null) {
+    if ($G.WIN_STATUS === WIN_ERR
+        || (cw = wins[$G.WIN_STATUS]) === null) {
         paniclog($C`render_status`, $C`WIN_ERR on status window.`);
         return;
     }
@@ -3742,7 +3829,8 @@ async function render_status() {   // wintty.c:5068
             let text = status_vals[idx];   /* always "" for BL_CONDITION */
             const tlth = $c.i32(tty_status[NOW][idx].lth);   /* valid for BL_CONDITION */
             if (tty_status[NOW][idx].redraw || !do_field_opt) {
-                const hitpointbar = idx === BL.TITLE && iflags.wc2_hitpointbar ? 1 : 0;
+                const hitpointbar = idx === BL.TITLE
+                    && iflags.wc2_hitpointbar ? 1 : 0;
                 if (idx === BL.CONDITION) {
                     /*
                      * +-----------------+
@@ -3764,7 +3852,8 @@ async function render_status() {   // wintty.c:5068
                         /* 'version' might follow conditions; if so, adjust
                            expectations for where conditions should end;
                            only matters when conditions are being indented */
-                        if (status_activefields[BL.VERS] && fieldorder.get(row)[i + 1 | 0] === BL.VERS) {
+                        if (status_activefields[BL.VERS]
+                            && fieldorder.get(row)[i + 1 | 0] === BL.VERS) {
                             last_col = last_col - $c.i32(tty_status[NOW][BL.VERS].lth) | 0;
                         }
                         /* line up with hunger (or where it would have
@@ -3773,7 +3862,10 @@ async function render_status() {   // wintty.c:5068
                            as-is if not even enough room for /that/; we
                            expect hunger to be on preceding row, in which
                            case its current data has been moved to [BEFORE] */
-                        if (tty_status[BEFORE][BL.HUNGER].y < row && x < tty_status[BEFORE][BL.HUNGER].x && (tty_status[BEFORE][BL.HUNGER].x + tlth | 0) < (last_col - 1 | 0)) {
+                        if (tty_status[BEFORE][BL.HUNGER].y < row
+                            && x < tty_status[BEFORE][BL.HUNGER].x
+                            && (tty_status[BEFORE][BL.HUNGER].x + tlth | 0)
+                            < (last_col - 1 | 0)) {
                             cstart = tty_status[BEFORE][BL.HUNGER].x;
                         } else if ((x + tlth | 0) < $c.sub64(cw.cols, 1)) {
                             cstart = last_col - tlth | 0;
@@ -3828,7 +3920,9 @@ async function render_status() {   // wintty.c:5068
                             }
                             let condtext = conditions[ci].text[cond_shrinklvl];
                             if (x >= cw.cols && !truncation_expected) {
-                                await impossible($C`Unexpected condition placement overflow for "%s"`, condtext);
+                                await impossible(
+                                    $C`Unexpected condition placement overflow for "%s"`,
+                                    condtext);
                                 condtext = $C``;
                                 bits = 0;   /* skip any remaining conditions */
                             }
@@ -3870,7 +3964,8 @@ async function render_status() {   // wintty.c:5068
                        that's ok as long as we don't write there */
                     if (x > cw.cols) {
                         if (!truncation_expected && !($t2 = render_status$once_only, render_status$once_only = $t2 + 1 >>> 0, $t2)) {
-                            paniclog($C`render_status()`, $C` unexpected truncation.`);
+                            paniclog($C`render_status()`,
+                                $C` unexpected truncation.`);
                         }
                         x = $c.i32(cw.cols);
                     }
@@ -3994,14 +4089,16 @@ async function render_status() {   // wintty.c:5068
                      */
                     /* if 'version' is the last field in its row, right
                        justify it (otherwise just treat it as ordinary) */
-                    if (idx === BL.VERS && fieldorder.get(row)[i + 1 | 0] === BL.FLUSH) {
+                    if (idx === BL.VERS
+                        && fieldorder.get(row)[i + 1 | 0] === BL.FLUSH) {
                         const dat$2 = cw.data.get(y).add(0);
                         /* FIXME:  there's something fishy going on here;
                            'x' ends up out of synch when conditions have
                            3rd row indentation and the indenting of version
                            overwrites them with spaces; this hides that */
                         const vx = $c.i32($c.addu64($c.u64(tty_status[BEFORE][BL.CONDITION].x), tty_status[BEFORE][BL.CONDITION].lth));
-                        if (i > 0 && fieldorder.get(row)[i - 1 | 0] === BL.CONDITION && x !== vx) {
+                        if (i > 0 && fieldorder.get(row)[i - 1 | 0] === BL.CONDITION
+                            && x !== vx) {
                             x = vx;
                             await tty_curs($G.WIN_STATUS, x, y);
                         }
@@ -4099,7 +4196,8 @@ async function render_status() {   // wintty.c:5068
             tty_status[BEFORE][idx].$copyFrom(tty_status[NOW][idx]);
         }   /* for i=..., idx=fieldorder[][i] */
         x = finalx[row][NOW];
-        if ((x < finalx[row][BEFORE] || !finalx[row][BEFORE]) && (x + 1 | 0) < cw.cols) {
+        if ((x < finalx[row][BEFORE] || !finalx[row][BEFORE])
+            && (x + 1 | 0) < cw.cols) {
             await tty_curs($G.WIN_STATUS, x + 1 | 0, y);
             await cl_end();
         }

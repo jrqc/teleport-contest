@@ -93,7 +93,8 @@ export function picking_lock(x, y) {   // lock.c:17
  * @returns {number} boolean
  */
 export function picking_at(x, y) {   // lock.c:30
-    return go.occupation === picklock && gx.xlock.door === $c.relem(svl.level.locations[x], y) ? 1 : 0;
+    return go.occupation === picklock
+        && gx.xlock.door === $c.relem(svl.level.locations[x], y) ? 1 : 0;
 }
 /* produce an occupation string appropriate for the current activity */
 /**
@@ -126,7 +127,8 @@ function lock_action() {   // lock.c:38
 async function picklock() {   // lock.c:68
     let what = null, alreadyunlocked = 0, $t1;
     if (gx.xlock.box) {
-        if (gx.xlock.box.where !== OBJ.FLOOR || gx.xlock.box.ox !== u.ux || gx.xlock.box.oy !== u.uy) {
+        if (gx.xlock.box.where !== OBJ.FLOOR
+            || gx.xlock.box.ox !== u.ux || gx.xlock.box.oy !== u.uy) {
             return gx.xlock.usedtime = 0;   /* you or it moved */
         }
     } else {
@@ -157,7 +159,9 @@ async function picklock() {   // lock.c:68
     /* using the Master Key of Thievery finds traps if its bless/curse
        state is adequate (non-cursed for rogues, blessed for others;
        checked when setting up 'xlock') */
-    if ((!gx.xlock.door ? gx.xlock.box.otrapped : (gx.xlock.door.flags & D.TRAPPED) !== 0) && gx.xlock.magic_key) {
+    if ((!gx.xlock.door ? gx.xlock.box.otrapped
+        : (gx.xlock.door.flags & D.TRAPPED) !== 0)
+        && gx.xlock.magic_key) {
         gx.xlock.chance = gx.xlock.chance + 20 | 0;   /* less effort needed next time */
         if (!gx.xlock.door) {
             if (!gx.xlock.box.tknown) {
@@ -177,7 +181,8 @@ async function picklock() {   // lock.c:68
                 what = gx.xlock.box.otyp === CHEST ? $C`chest` : $C`box`;
                 alreadyunlocked = !gx.xlock.box.olocked ? 1 : 0;
             }
-            await You($C`succeed in disarming the trap.  The %s is still %slocked.`, what, alreadyunlocked ? $C`un` : $C``);
+            await You($C`succeed in disarming the trap.  The %s is still %slocked.`,
+                what, alreadyunlocked ? $C`un` : $C``);
             await exercise(A.WIS, TRUE);
         } else {
             await You($C`stop %s.`, lock_action());
@@ -228,7 +233,9 @@ export async function breakchestlock(box, destroyit) {   // lock.c:162
         box.lknown = 1;
     } else {
         /* #force has destroyed this box (at <u.ux,u.uy>) */
-        const shkp = new $c.Ptr(u.ushops, 0).get(0) && await costly_spot(u.ux, u.uy) ? await shop_keeper(new $c.Ptr(u.ushops, 0).get(0)) : null;
+        const shkp = new $c.Ptr(u.ushops, 0).get(0) && await costly_spot(u.ux, u.uy)
+            ? await shop_keeper(new $c.Ptr(u.ushops, 0).get(0))
+            : null;
         const costly = shkp !== null ? 1 : 0;
         const peaceful_shk = costly && shkp.mpeaceful ? 1 : 0;
         let loss = 0;
@@ -239,7 +246,8 @@ export async function breakchestlock(box, destroyit) {   // lock.c:162
             if (!rn2(3) || otmp.oclass === POTION_CLASS) {
                 await chest_shatter_msg(otmp);
                 if (costly) {
-                    loss = $c.add64(loss, await stolen_value(otmp, u.ux, u.uy, peaceful_shk, TRUE));
+                    loss = $c.add64(loss, await stolen_value(otmp, u.ux, u.uy, peaceful_shk,
+                        TRUE));
                 }
                 if (otmp.quan === 1) {
                     await obfree(otmp, null);
@@ -283,11 +291,13 @@ async function forcelock() {   // lock.c:216
     }
     if (gx.xlock.picktyp) {
         /* blade */
-        if (rn2(1000 - $G.uwep.spe) > 992 - greatest_erosion($G.uwep) * 10 && !$G.uwep.cursed && !obj_resists($G.uwep, 0, 99)) {
+        if (rn2(1000 - $G.uwep.spe) > 992 - greatest_erosion($G.uwep) * 10
+            && !$G.uwep.cursed && !obj_resists($G.uwep, 0, 99)) {
             /* for a +0 weapon, probability that it survives an unsuccessful
              * attempt to force the lock is (.992)^50 = .67
              */
-            await pline($C`%sour %s broke!`, $G.uwep.quan > 1 ? $C`One of y` : $C`Y`, await xname($G.uwep));
+            await pline($C`%sour %s broke!`, $G.uwep.quan > 1 ? $C`One of y` : $C`Y`,
+                await xname($G.uwep));
             await useup($G.uwep);
             await You($C`give up your attempt to force the lock.`);
             await exercise(A.DEX, TRUE);
@@ -333,7 +343,8 @@ export function maybe_reset_pick(container) {   // lock.c:269
      * carried container will still be.  There might not be any context,
      * in which case redundantly clearing it is harmless.
      */
-    if (container ? container === gx.xlock.box : !gx.xlock.box || !carried(gx.xlock.box)) {
+    if (container ? container === gx.xlock.box
+        : !gx.xlock.box || !carried(gx.xlock.box)) {
         reset_pick();
     }
 }
@@ -459,10 +470,12 @@ export async function pick_lock(pick, rx, ry, container) {   // lock.c:358
         await You_cant($C`hold %s -- you have no hands!`, await doname(pick));
         return PICKLOCK_DID_NOTHING;
     } else if (u.uswallow) {
-        await You_cant($C`%sunlock %s.`, picktyp === CREDIT_CARD ? $C`` : $C`lock or `, await mon_nam(u.ustuck));
+        await You_cant($C`%sunlock %s.`, picktyp === CREDIT_CARD ? $C`` : $C`lock or `,
+            await mon_nam(u.ustuck));
         return PICKLOCK_DID_NOTHING;
     }
-    if (pick !== dummypick && picktyp !== SKELETON_KEY && picktyp !== LOCK_PICK && picktyp !== CREDIT_CARD) {
+    if (pick !== dummypick && picktyp !== SKELETON_KEY
+        && picktyp !== LOCK_PICK && picktyp !== CREDIT_CARD) {
         await impossible($C`picking lock with object %d?`, picktyp);
         return PICKLOCK_DID_NOTHING;
     }
@@ -471,14 +484,16 @@ export async function pick_lock(pick, rx, ry, container) {   // lock.c:358
         /* autounlock; caller has provided coordinates */
         cc.x = rx;
         cc.y = ry;
-    } else if (!await get_adjacent_loc(null, $C`Invalid location!`, u.ux, u.uy, cc)) {
+    } else if (!await get_adjacent_loc(null, $C`Invalid location!`,
+        u.ux, u.uy, cc)) {
         return PICKLOCK_DID_NOTHING;
     }
     if (cc.x === u.ux && cc.y === u.uy) {
         /* pick lock on a container */
         if (u.dz < 0 && !autounlock) {
             /* beware stale u.dz value */
-            await There($C`isn't any sort of lock up %s.`, Levitation() ? $C`here` : $C`there`);
+            await There($C`isn't any sort of lock up %s.`,
+                Levitation() ? $C`here` : $C`there`);
             return PICKLOCK_LEARNED_SOMETHING;
         } else if (is_lava(u.ux, u.uy)) {
             await pline($C`Doing that would probably melt %s.`, await yname(pick));
@@ -511,14 +526,19 @@ export async function pick_lock(pick, rx, ry, container) {   // lock.c:358
                 } else {
                     verb = $C`pick`;
                 }
-                if (autounlock && (flags.autounlock & AUTOUNLOCK.UNTRAP) >>> 0 !== 0 && await could_untrap(FALSE, TRUE) && (c = otmp.tknown ? otmp.otrapped ? 121 : 110 : await yn_function(await safe_qbuf(new $c.Ptr(qbuf, 0), $C`Check `, $C` for a trap?`, otmp, yname, ysimple_name, $C`this`), new $c.Ptr(ynqchars, 0), 113, TRUE)) !== 110) {
+                if (autounlock && (flags.autounlock & AUTOUNLOCK.UNTRAP) >>> 0 !== 0
+                    && await could_untrap(FALSE, TRUE)
+                    && (c = otmp.tknown ? otmp.otrapped ? 121 : 110
+                    : await yn_function(await safe_qbuf(new $c.Ptr(qbuf, 0), $C`Check `, $C` for a trap?`, otmp, yname, ysimple_name, $C`this`), new $c.Ptr(ynqchars, 0), 113, TRUE))
+                    !== 110) {
                     if (c === 113) {
                         return PICKLOCK_DID_NOTHING;   /* c == 'q' */
                     }
                     /* c == 'y' */
                     await untrap(FALSE, 0, 0, otmp);
                     return PICKLOCK_DID_SOMETHING;   /* even if no trap found */
-                } else if (autounlock && (flags.autounlock & AUTOUNLOCK.APPLY_KEY) >>> 0 !== 0) {
+                } else if (autounlock
+                    && (flags.autounlock & AUTOUNLOCK.APPLY_KEY) >>> 0 !== 0) {
                     c = 113;
                     if (pick !== dummypick) {
                         $c.sprintf(new $c.Ptr(qbuf, 0), $C`Unlock it with %s?`, await yname(pick));
@@ -530,7 +550,8 @@ export async function pick_lock(pick, rx, ry, container) {   // lock.c:358
                 } else {
                     /* "There is <a box> here; <verb> <it|its lock>?" */
                     $c.sprintf(new $c.Ptr(qsfx, 0), $C` here; %s %s?`, verb, it ? $C`it` : $C`its lock`);
-                    await safe_qbuf(new $c.Ptr(qbuf, 0), $C`There is `, new $c.Ptr(qsfx, 0), otmp, doname, ansimpleoname, $C`a box`);
+                    await safe_qbuf(new $c.Ptr(qbuf, 0), $C`There is `, new $c.Ptr(qsfx, 0), otmp, doname,
+                        ansimpleoname, $C`a box`);
                     otmp.lknown = 1;
                     c = await ynq(new $c.Ptr(qbuf, 0));
                     if (c === 113) {
@@ -541,13 +562,16 @@ export async function pick_lock(pick, rx, ry, container) {   // lock.c:358
                     }
                 }
                 if (otmp.obroken) {
-                    await You_cant($C`fix its broken lock with %s.`, await ansimpleoname(pick));
+                    await You_cant($C`fix its broken lock with %s.`,
+                        await ansimpleoname(pick));
                     return PICKLOCK_LEARNED_SOMETHING;
                 } else if (picktyp === CREDIT_CARD && !otmp.olocked) {
                     /* credit cards are only good for unlocking */
-                    await You_cant($C`do that with %s.`, await an(await simple_typename(picktyp)));
+                    await You_cant($C`do that with %s.`,
+                        await an(await simple_typename(picktyp)));
                     return PICKLOCK_LEARNED_SOMETHING;
-                } else if (autounlock && !await touch_artifact(pick, gy.youmonst)) {
+                } else if (autounlock
+                    && !await touch_artifact(pick, gy.youmonst)) {
                     /* note: for !autounlock, apply already did touch check */
                     return PICKLOCK_DID_SOMETHING;
                 }
@@ -588,11 +612,14 @@ export async function pick_lock(pick, rx, ry, container) {   // lock.c:358
         }
         const door = $c.relem(svl.level.locations[cc.x], cc.y);
         const mtmp = svl.level.monsters[cc.x][cc.y];
-        if (mtmp && canseemon(mtmp) && M_AP_TYPE(mtmp) !== M_AP.FURNITURE && M_AP_TYPE(mtmp) !== M_AP.OBJECT) {
-            if (picktyp === CREDIT_CARD && (mtmp.isshk || mtmp.data === mons[PM.ORACLE])) {
+        if (mtmp && canseemon(mtmp) && M_AP_TYPE(mtmp) !== M_AP.FURNITURE
+            && M_AP_TYPE(mtmp) !== M_AP.OBJECT) {
+            if (picktyp === CREDIT_CARD
+                && (mtmp.isshk || mtmp.data === mons[PM.ORACLE])) {
                 await verbalize($C`No checks, no credit, no problem.`);
             } else {
-                await pline($C`I don't think %s would appreciate that.`, await mon_nam(mtmp));
+                await pline($C`I don't think %s would appreciate that.`,
+                    await mon_nam(mtmp));
             }
             return PICKLOCK_LEARNED_SOMETHING;
         } else if (mtmp && is_door_mappear(mtmp)) {
@@ -608,7 +635,8 @@ export async function pick_lock(pick, rx, ry, container) {   // lock.c:358
             const oldlastseentyp = $c.i8(await update_mapseen_for(cc.x, cc.y));
             /* this is probably only relevant when blind */
             await feel_location(cc.x, cc.y);
-            if (door.glyph !== oldglyph || svl.lastseentyp[cc.x][cc.y] !== oldlastseentyp) {
+            if (door.glyph !== oldglyph
+                || svl.lastseentyp[cc.x][cc.y] !== oldlastseentyp) {
                 res = PICKLOCK_LEARNED_SOMETHING;
             }
             if (is_drawbridge_wall(cc.x, cc.y) >= 0) {
@@ -629,7 +657,9 @@ export async function pick_lock(pick, rx, ry, container) {   // lock.c:358
                 await pline($C`This door is broken.`);
                 return PICKLOCK_LEARNED_SOMETHING;
             default:
-                if ((flags.autounlock & AUTOUNLOCK.UNTRAP) >>> 0 !== 0 && await could_untrap(FALSE, FALSE) && (c = await ynq($C`Check this door for a trap?`)) !== 110) {
+                if ((flags.autounlock & AUTOUNLOCK.UNTRAP) >>> 0 !== 0
+                    && await could_untrap(FALSE, FALSE)
+                    && (c = await ynq($C`Check this door for a trap?`)) !== 110) {
                     if (c === 113) {
                         return PICKLOCK_DID_NOTHING;
                     }
@@ -682,7 +712,12 @@ export async function pick_lock(pick, rx, ry, container) {   // lock.c:358
  */
 export function u_have_forceable_weapon() {   // lock.c:660
     /* proper type test */
-    if (!$G.uwep || ($G.uwep.oclass === WEAPON_CLASS || is_weptool($G.uwep) ? objects[$G.uwep.otyp].oc_subtyp < P.DAGGER || objects[$G.uwep.otyp].oc_subtyp === P.FLAIL || objects[$G.uwep.otyp].oc_subtyp > P.LANCE : $G.uwep.oclass !== ROCK_CLASS)) {
+    if (!$G.uwep
+        || ($G.uwep.oclass === WEAPON_CLASS || is_weptool($G.uwep)
+        ? objects[$G.uwep.otyp].oc_subtyp < P.DAGGER
+        || objects[$G.uwep.otyp].oc_subtyp === P.FLAIL
+        || objects[$G.uwep.otyp].oc_subtyp > P.LANCE
+        : $G.uwep.oclass !== ROCK_CLASS)) {
         return FALSE;
     }
     return TRUE;
@@ -703,7 +738,12 @@ export async function doforce() {   // lock.c:676
     }
     if (!u_have_forceable_weapon()) {
         const use_plural = $G.uwep && $G.uwep.quan > 1 ? 1 : 0;
-        await You_cant($C`force anything %s weapon%s.`, !$G.uwep ? $C`when not wielding a` : $G.uwep.oclass !== WEAPON_CLASS && !is_weptool($G.uwep) ? use_plural ? $C`without proper` : $C`without a proper` : use_plural ? $C`with those` : $C`with that`, use_plural ? $C`s` : $C``);
+        await You_cant($C`force anything %s weapon%s.`,
+            !$G.uwep ? $C`when not wielding a`
+            : $G.uwep.oclass !== WEAPON_CLASS && !is_weptool($G.uwep)
+            ? use_plural ? $C`without proper` : $C`without a proper`
+            : use_plural ? $C`with those` : $C`with that`,
+            use_plural ? $C`s` : $C``);
         return ECMD.OK;
     }
     if (!can_reach_floor(TRUE)) {
@@ -726,11 +766,13 @@ export async function doforce() {   // lock.c:676
                    since we're about to set lknown, there's no need to
                    remember and then reset its current value */
                 otmp.lknown = 0;
-                await There($C`is %s here, but its lock is already %s.`, await doname(otmp), otmp.obroken ? $C`broken` : $C`unlocked`);
+                await There($C`is %s here, but its lock is already %s.`,
+                    await doname(otmp), otmp.obroken ? $C`broken` : $C`unlocked`);
                 otmp.lknown = 1;
                 continue;
             }
-            await safe_qbuf(new $c.Ptr(qbuf, 0), $C`There is `, $C` here; force its lock?`, otmp, doname, ansimpleoname, $C`a box`);
+            await safe_qbuf(new $c.Ptr(qbuf, 0), $C`There is `, $C` here; force its lock?`,
+                otmp, doname, ansimpleoname, $C`a box`);
             otmp.lknown = 1;
             const c = await ynq(new $c.Ptr(qbuf, 0));
             if (c === 113) {
@@ -766,7 +808,8 @@ export async function doforce() {   // lock.c:676
  */
 export async function stumble_on_door_mimic(x, y) {   // lock.c:759
     let mtmp = null;
-    if ((mtmp = svl.level.monsters[x][y]) && is_door_mappear(mtmp) && !Protection_from_shape_changers()) {
+    if ((mtmp = svl.level.monsters[x][y]) && is_door_mappear(mtmp)
+        && !Protection_from_shape_changers()) {
         await stumble_onto_mimic(mtmp);
         return TRUE;
     }
@@ -832,7 +875,8 @@ export async function doopen_indir(x, y) {   // lock.c:780
         const oldglyph = door.glyph;
         const oldlastseentyp = $c.i8(await update_mapseen_for(cc.x, cc.y));
         await newsym(cc.x, cc.y);
-        if (door.glyph !== oldglyph || svl.lastseentyp[cc.x][cc.y] !== oldlastseentyp) {
+        if (door.glyph !== oldglyph
+            || svl.lastseentyp[cc.x][cc.y] !== oldlastseentyp) {
             res = ECMD.TIME;   /* learned something */
         }
     }
@@ -843,7 +887,8 @@ export async function doopen_indir(x, y) {   // lock.c:780
         } else if (portcullis || door.typ === DRAWBRIDGE_DOWN) {
             await pline_The($C`drawbridge is already open.`);
         } else if (container_at(cc.x, cc.y, TRUE)) {
-            await pline($C`%s like something lootable over there.`, Blind() ? $C`Feels` : $C`Seems`);
+            await pline($C`%s like something lootable over there.`,
+                Blind() ? $C`Feels` : $C`Seems`);
         } else {
             await You($C`%s no door there.`, Blind() ? $C`feel` : $C`see`);
         }
@@ -870,12 +915,17 @@ export async function doopen_indir(x, y) {   // lock.c:780
         await pline($C`This door%s.`, mesg);
         if (locked && flags.autounlock) {
             u.dz = 0;   /* should already be 0 since hero moved toward door */
-            if ((flags.autounlock & AUTOUNLOCK.APPLY_KEY) >>> 0 !== 0 && (unlocktool = autokey(TRUE)) !== null) {
-                res = await pick_lock(unlocktool, cc.x, cc.y, null) ? ECMD.TIME : ECMD.OK;
-            } else if ((flags.autounlock & AUTOUNLOCK.KICK) >>> 0 !== 0 && !u.usteed && await ynq($C`Kick it?`) === 121) {
+            if ((flags.autounlock & AUTOUNLOCK.APPLY_KEY) >>> 0 !== 0
+                && (unlocktool = autokey(TRUE)) !== null) {
+                res = await pick_lock(unlocktool, cc.x, cc.y,
+                    null) ? ECMD.TIME : ECMD.OK;
+            } else if ((flags.autounlock & AUTOUNLOCK.KICK) >>> 0 !== 0
+                && !u.usteed
+                && await ynq($C`Kick it?`) === 121) {
                 /* kicking is different when mounted */
                 await cmdq_add_ec(CQ_CANNED, dokick);
-                await cmdq_add_dir(CQ_CANNED, $c.i8(sgn(cc.x - u.ux)), $c.i8(sgn(cc.y - u.uy)), 0);
+                await cmdq_add_dir(CQ_CANNED,
+                    $c.i8(sgn(cc.x - u.ux)), $c.i8(sgn(cc.y - u.uy)), 0);
                 /* this was 'ECMD_TIME', but time shouldn't elapse until
                    the canned kick takes place */
                 res = ECMD.OK;
@@ -994,7 +1044,8 @@ export async function doclose() {   // lock.c:957
                 oldglyph = door.glyph;
                 oldlastseentyp = $c.i8(await update_mapseen_for(x, y));
                 await feel_location(x, y);
-                if (door.glyph !== oldglyph || svl.lastseentyp[x][y] !== oldlastseentyp) {
+                if (door.glyph !== oldglyph
+                    || svl.lastseentyp[x][y] !== oldlastseentyp) {
                     res = ECMD.TIME;   /* learned something */
                 }
             }
@@ -1028,7 +1079,8 @@ export async function doclose() {   // lock.c:957
                     await pline($C`You're too small to push the door closed.`);
                     return res;
                 }
-                if (u.usteed || rn2(25) < $c.div32(ACURRSTR() + ACURR(A.DEX) + ACURR(A.CON), 3)) {
+                if (u.usteed
+                    || rn2(25) < $c.div32(ACURRSTR() + ACURR(A.DEX) + ACURR(A.CON), 3)) {
                     await pline_The($C`door closes.`);
                     door.flags = (D.CLOSED) & 31;
                     await feel_newsym(x, y);   /* the hero knows she closed it */
@@ -1143,7 +1195,8 @@ export async function doorlock(otmp, x, y) {   // lock.c:1103
                 const vis = cansee(x, y);
                 /* Can't have real locking in Rogue, so just hide doorway */
                 if (vis) {
-                    await pline($C`%s springs up in the older, more primitive doorway.`, dustcloud);
+                    await pline($C`%s springs up in the older, more primitive doorway.`,
+                        dustcloud);
                 } else {
                     await You_hear($C`a swoosh.`);
                 }
@@ -1168,7 +1221,8 @@ export async function doorlock(otmp, x, y) {   // lock.c:1103
             /* & trap doors, but is it ever OK for anything else? */
             if (t_at(x, y)) {
                 /* maketrap() clears doormask, so it should be NODOOR */
-                await pline($C`%s springs up in the doorway, but %s.`, dustcloud, quickly_dissipates);
+                await pline($C`%s springs up in the doorway, but %s.`, dustcloud,
+                    quickly_dissipates);
                 return FALSE;
             }
             switch (door.flags & ~D.TRAPPED) {
@@ -1221,7 +1275,9 @@ export async function doorlock(otmp, x, y) {   // lock.c:1103
                             if ((sawit || seeit) && !Unaware()) {
                                 await pline($C`KABOOM!!  You see a door explode.`);
                             } else if (!Deaf()) {
-                                await You_hear($C`a %s explosion.`, distu(x, y) > 49 ? $C`distant` : $C`nearby`);
+                                await You_hear($C`a %s explosion.`,
+                                    distu(x, y) > 49 ? $C`distant`
+                                    : $C`nearby`);
                             }
                         }
                     }

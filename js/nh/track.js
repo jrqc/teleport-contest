@@ -28,7 +28,8 @@ export function initrack() {   // track.c:15
 }
 /* add to track */
 export function settrack() {   // track.c:24
-    if ($G.uleft && $G.uleft.otyp === RIN_STEALTH || $G.uright && $G.uright.otyp === RIN_STEALTH) {
+    if ($G.uleft && $G.uleft.otyp === RIN_STEALTH
+        || $G.uright && $G.uright.otyp === RIN_STEALTH) {
         return;
     }
     if (utcnt[0] < UTSZ) {

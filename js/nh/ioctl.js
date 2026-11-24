@@ -65,7 +65,8 @@ export function setioctls() {   // ioctl.c:142
  */
 export async function dosuspend() {   // ioctl.c:161
     /* NB: check_user_string() is port-specific. */
-    if (!sysopt.shellers || !sysopt.shellers.get(0) || !check_user_string(sysopt.shellers)) {
+    if (!sysopt.shellers || !sysopt.shellers.get(0)
+        || !check_user_string(sysopt.shellers)) {
         await Norep($C`Suspend command not available.`);
         return 0;
     }

@@ -109,7 +109,10 @@ function good_rm_wall_doorpos(x, y, dir, room) {   // mklev.c:73
     if (!isok(x, y) || !room.needjoining) {
         return FALSE;
     }
-    if (!(svl.level.locations[x][y].typ === HWALL || svl.level.locations[x][y].typ === VWALL || svl.level.locations[x][y].typ === DOOR || svl.level.locations[x][y].typ === SDOOR)) {
+    if (!(svl.level.locations[x][y].typ === HWALL
+        || svl.level.locations[x][y].typ === VWALL
+        || svl.level.locations[x][y].typ === DOOR
+        || svl.level.locations[x][y].typ === SDOOR)) {
         return FALSE;
     }
     if (bydoor(x, y)) {
@@ -147,7 +150,8 @@ function finddpos_shift(x, y, dir, aroom) {   // mklev.c:106
         let rx = x.get(0);
         let ry = y.get(0);
         let fail = FALSE;
-        while (!fail && isok(rx, ry) && (svl.level.locations[rx][ry].typ === STONE || svl.level.locations[rx][ry].typ === CORR)) {
+        while (!fail && isok(rx, ry)
+            && (svl.level.locations[rx][ry].typ === STONE || svl.level.locations[rx][ry].typ === CORR)) {
             rx = $c.i16(rx + dx | 0);
             ry = $c.i16(ry + dy | 0);
             if (good_rm_wall_doorpos(rx, ry, dir, aroom)) {
@@ -158,7 +162,8 @@ function finddpos_shift(x, y, dir, aroom) {   // mklev.c:106
             if (!(svl.level.locations[rx][ry].typ === STONE || svl.level.locations[rx][ry].typ === CORR)) {
                 fail = TRUE;
             }
-            if (rx < aroom.lx || rx > aroom.hx || ry < aroom.ly || ry > aroom.hy) {
+            if (rx < aroom.lx || rx > aroom.hx
+                || ry < aroom.ly || ry > aroom.hy) {
                 fail = TRUE;
             }
         }
@@ -357,7 +362,8 @@ export async function add_room(lowx, lowy, hix, hiy, lit, rtype, special) {   //
     }
     /*DEBUG*/
     let croom = $c.relem(svr.rooms, svn.nroom);
-    await do_room_or_subroom(croom, lowx, lowy, hix, hiy, lit, rtype, special, TRUE);
+    await do_room_or_subroom(croom, lowx, lowy, hix, hiy, lit, rtype, special,
+        TRUE);
     croom = $c.radd(croom, 1);
     croom.hx = -1;
     svn.nroom = svn.nroom + 1 | 0;
@@ -383,7 +389,8 @@ export async function add_subroom(proom, lowx, lowy, hix, hiy, lit, rtype, speci
     }
     /*DEBUG*/
     let croom = $c.radd(gs.subrooms, gn.nsubroom);
-    await do_room_or_subroom(croom, lowx, lowy, hix, hiy, lit, rtype, special, FALSE);
+    await do_room_or_subroom(croom, lowx, lowy, hix, hiy, lit, rtype, special,
+        FALSE);
     proom.sbrooms[($t1 = proom.nsubrooms, proom.nsubrooms = $c.i8($t1 + 1), $t1)] = croom;
     croom = $c.radd(croom, 1);
     croom.hx = -1;
@@ -402,7 +409,8 @@ export async function free_luathemes(theme_group) {   // mklev.c:345
      *  all_themes  => end of game, free all themes.
      */
     for (i = 0; i < svn.n_dgns; i = i + 1 | 0) {
-        if (theme_group === tut_themes && i !== svd.dungeon_topology.d_tutorial_dnum || theme_group === most_themes && i === svd.dungeon_topology.d_astral_level.dnum) {
+        if (theme_group === tut_themes && i !== svd.dungeon_topology.d_tutorial_dnum
+            || theme_group === most_themes && i === svd.dungeon_topology.d_astral_level.dnum) {
             continue;
         }
         if (gl.luathemes[i]) {
@@ -466,7 +474,9 @@ async function makerooms() {   // mklev.c:367
                 await lua_getglobal(themes, $C`themerooms_generate`);
                 await nhl_pcall_handle(themes, 0, 0, $C`makerooms-2`, NHLpa.panic);
                 $t4 = gi.in_mk_themerooms = FALSE, iflags.in_lua = $t4;
-                if (gt.themeroom_failed && (($t5 = themeroom_tries, themeroom_tries = $t5 + 1 | 0, $t5) > 10 || svn.nroom >= 6)) {
+                if (gt.themeroom_failed
+                    && (($t5 = themeroom_tries, themeroom_tries = $t5 + 1 | 0, $t5) > 10
+                    || svn.nroom >= 6)) {
                     break;
                 }
             } else {
@@ -551,7 +561,8 @@ async function join(a, b, nxcor) {   // mklev.c:439
     org.y = $c.i16(yy + dy | 0);
     dest.x = tx;
     dest.y = ty;
-    const dig_result = await dig_corridor(org, dest, new $c.Ptr(npoints, 0), nxcor, svl.level.flags.arboreal ? ROOM : CORR, STONE);
+    const dig_result = await dig_corridor(org, dest, new $c.Ptr(npoints, 0), nxcor,
+        svl.level.flags.arboreal ? ROOM : CORR, STONE);
     /* we created at least 1 tile of corridor, even if it failed */
     if (npoints[0] > 0 && (okdoor(xx, yy) || !nxcor)) {
         await dodoor(xx, yy, croom);
@@ -688,7 +699,8 @@ async function dosdoor(x, y, aroom, type) {   // mklev.c:615
             } else {
                 svl.level.locations[x][y].flags = (D.CLOSED) & 31;
             }
-            if (svl.level.locations[x][y].flags !== D.ISOPEN && !shdoor && await level_difficulty() >= 5 && !rn2(25)) {
+            if (svl.level.locations[x][y].flags !== D.ISOPEN && !shdoor
+                && await level_difficulty() >= 5 && !rn2(25)) {
                 svl.level.locations[x][y].flags = ((svl.level.locations[x][y].flags | 0 | D.TRAPPED) >>> 0) & 31;
             }
         } else {
@@ -700,7 +712,10 @@ async function dosdoor(x, y, aroom, type) {   // mklev.c:615
             svl.level.locations[x][y].flags = (D.NODOOR) & 31;
         }
         if (svl.level.locations[x][y].flags & D.TRAPPED) {
-            if (await level_difficulty() >= 9 && !rn2(5) && !(svm.mvitals[PM.SMALL_MIMIC].mvflags & G_GONE && svm.mvitals[PM.LARGE_MIMIC].mvflags & G_GONE && svm.mvitals[PM.GIANT_MIMIC].mvflags & G_GONE)) {
+            if (await level_difficulty() >= 9 && !rn2(5)
+                && !(svm.mvitals[PM.SMALL_MIMIC].mvflags & G_GONE
+                && svm.mvitals[PM.LARGE_MIMIC].mvflags & G_GONE
+                && svm.mvitals[PM.GIANT_MIMIC].mvflags & G_GONE)) {
                 /* make a mimic instead */
                 svl.level.locations[x][y].flags = (D.NODOOR) & 31;
                 const mtmp = await makemon(await mkclass(S.MIMIC, 0), x, y, NO.MM_FLAGS);
@@ -733,16 +748,20 @@ async function dosdoor(x, y, aroom, type) {   // mklev.c:615
  */
 function cardinal_nextto_room(aroom, x, y) {   // mklev.c:681
     const rmno = $c.i32($c.add64($c.rdiff(aroom, svr.rooms[0]), ROOMOFFSET));
-    if (isok($c.i16(x - 1), y) && !svl.level.locations[x - 1][y].edge && svl.level.locations[x - 1][y].roomno === rmno) {
+    if (isok($c.i16(x - 1), y) && !svl.level.locations[x - 1][y].edge
+        && svl.level.locations[x - 1][y].roomno === rmno) {
         return TRUE;
     }
-    if (isok($c.i16(x + 1), y) && !svl.level.locations[x + 1][y].edge && svl.level.locations[x + 1][y].roomno === rmno) {
+    if (isok($c.i16(x + 1), y) && !svl.level.locations[x + 1][y].edge
+        && svl.level.locations[x + 1][y].roomno === rmno) {
         return TRUE;
     }
-    if (isok(x, $c.i16(y - 1)) && !svl.level.locations[x][y - 1].edge && svl.level.locations[x][y - 1].roomno === rmno) {
+    if (isok(x, $c.i16(y - 1)) && !svl.level.locations[x][y - 1].edge
+        && svl.level.locations[x][y - 1].roomno === rmno) {
         return TRUE;
     }
-    if (isok(x, $c.i16(y + 1)) && !svl.level.locations[x][y + 1].edge && svl.level.locations[x][y + 1].roomno === rmno) {
+    if (isok(x, $c.i16(y + 1)) && !svl.level.locations[x][y + 1].edge
+        && svl.level.locations[x][y + 1].roomno === rmno) {
         return TRUE;
     }
     return FALSE;
@@ -769,7 +788,12 @@ async function place_niche(aroom, dy, xx, yy) {   // mklev.c:701
     }
     xx.set(0, dd.x);
     yy.set(0, dd.y);
-    return isok(xx.get(0), $c.i16(yy.get(0) + dy.get(0) | 0)) && svl.level.locations[xx.get(0)][yy.get(0) + dy.get(0) | 0].typ === STONE && (isok(xx.get(0), $c.i16(yy.get(0) - dy.get(0) | 0)) && !(svl.level.locations[xx.get(0)][yy.get(0) - dy.get(0) | 0].typ >= POOL && svl.level.locations[xx.get(0)][yy.get(0) - dy.get(0) | 0].typ <= DRAWBRIDGE_UP) && !(svl.level.locations[xx.get(0)][yy.get(0) - dy.get(0) | 0].typ >= STAIRS && svl.level.locations[xx.get(0)][yy.get(0) - dy.get(0) | 0].typ <= ALTAR)) && cardinal_nextto_room(aroom, xx.get(0), yy.get(0)) ? 1 : 0;
+    return isok(xx.get(0), $c.i16(yy.get(0) + dy.get(0) | 0))
+        && svl.level.locations[xx.get(0)][yy.get(0) + dy.get(0) | 0].typ === STONE
+        && (isok(xx.get(0), $c.i16(yy.get(0) - dy.get(0) | 0))
+        && !(svl.level.locations[xx.get(0)][yy.get(0) - dy.get(0) | 0].typ >= POOL && svl.level.locations[xx.get(0)][yy.get(0) - dy.get(0) | 0].typ <= DRAWBRIDGE_UP)
+        && !(svl.level.locations[xx.get(0)][yy.get(0) - dy.get(0) | 0].typ >= STAIRS && svl.level.locations[xx.get(0)][yy.get(0) - dy.get(0) | 0].typ <= ALTAR))
+        && cardinal_nextto_room(aroom, xx.get(0), yy.get(0)) ? 1 : 0;
 }
 /**
  * @param {number} trap_type int
@@ -802,8 +826,11 @@ async function makeniche(trap_type) {   // mklev.c:740
                         ttmp.once = 1;
                     }
                     if (trap_engravings[trap_type]) {
-                        await make_engr_at(xx[0], $c.i16(yy[0] - dy[0] | 0), trap_engravings[trap_type], null, 0, DUST);
-                        await wipe_engr_at(xx[0], $c.i16(yy[0] - dy[0] | 0), 5, FALSE);   /* age it a little */
+                        await make_engr_at(xx[0], $c.i16(yy[0] - dy[0] | 0),
+                            trap_engravings[trap_type], null, 0,
+                            DUST);
+                        await wipe_engr_at(xx[0], $c.i16(yy[0] - dy[0] | 0), 5,
+                            FALSE);   /* age it a little */
                     }
                 }
             }
@@ -817,11 +844,14 @@ async function makeniche(trap_type) {   // mklev.c:740
                 if (!rn2(5) && (svl.level.locations[xx[0]][yy[0]].typ && svl.level.locations[xx[0]][yy[0]].typ <= DBWALL)) {
                     await set_levltyp(xx[0], yy[0], IRONBARS);
                     if (rn2(3)) {
-                        await mkcorpstat(CORPSE, null, await mkclass(S.HUMAN, 0), xx[0], $c.i16(yy[0] + dy[0] | 0), TRUE);
+                        await mkcorpstat(CORPSE, null,
+                            await mkclass(S.HUMAN, 0), xx[0],
+                            $c.i16(yy[0] + dy[0] | 0), TRUE);
                     }
                 }
                 if (!svl.level.flags.noteleport) {
-                    await mksobj_at(SCR_TELEPORTATION, xx[0], $c.i16(yy[0] + dy[0] | 0), TRUE, FALSE);
+                    await mksobj_at(SCR_TELEPORTATION, xx[0], $c.i16(yy[0] + dy[0] | 0), TRUE,
+                        FALSE);
                 }
                 if (!rn2(3)) {
                     await mkobj_at(RANDOM_CLASS, xx[0], $c.i16(yy[0] + dy[0] | 0), TRUE);
@@ -991,7 +1021,8 @@ async function fill_ordinary_room(croom, bonus_items) {   // mklev.c:939
        we have to check for monsters on the stairs anyway. */
     if ((u.uhave.amulet || !rn2(3)) && somexyspace(croom, pos)) {
         tmonst = await makemon(null, pos.x, pos.y, MM.NOGRP);
-        if (tmonst && tmonst.data === mons[PM.GIANT_SPIDER] && !occupied(pos.x, pos.y)) {
+        if (tmonst && tmonst.data === mons[PM.GIANT_SPIDER]
+            && !occupied(pos.x, pos.y)) {
             await maketrap(pos.x, pos.y, WEB);
         }
     }
@@ -1028,7 +1059,9 @@ async function fill_ordinary_room(croom, bonus_items) {   // mklev.c:939
         }
         /* put statues inside */
         if (!rn2(20) && somexyspace(croom, pos)) {
-            await mkcorpstat(STATUE, null, null, pos.x, pos.y, CORPSTAT.INIT);
+            await mkcorpstat(STATUE, null,
+                null, pos.x,
+                pos.y, CORPSTAT.INIT);
         }
         /*
          * bonus_items means that this is the room where the bonus item
@@ -1050,14 +1083,21 @@ async function fill_ordinary_room(croom, bonus_items) {   // mklev.c:939
          */
         if (bonus_items && somexyspace(croom, pos)) {
             uz_branch = Is_branchlev(u.uz);
-            if (uz_branch && u.uz.dnum !== svd.dungeon_topology.d_mines_dnum && (uz_branch.end1.dnum === svd.dungeon_topology.d_mines_dnum || uz_branch.end2.dnum === svd.dungeon_topology.d_mines_dnum)) {
-                await mksobj_at(rn2(5) < 3 ? FOOD_RATION : rn2(2) ? CRAM_RATION : LEMBAS_WAFER, pos.x, pos.y, TRUE, FALSE);
-            } else if (u.uz.dnum === svd.dungeon_topology.d_oracle_level.dnum && u.uz.dlevel < svd.dungeon_topology.d_oracle_level.dlevel && rn2(3)) {
+            if (uz_branch && u.uz.dnum !== svd.dungeon_topology.d_mines_dnum
+                && (uz_branch.end1.dnum === svd.dungeon_topology.d_mines_dnum
+                || uz_branch.end2.dnum === svd.dungeon_topology.d_mines_dnum)) {
+                await mksobj_at(rn2(5) < 3 ? FOOD_RATION
+                    : rn2(2) ? CRAM_RATION
+                    : LEMBAS_WAFER,
+                    pos.x, pos.y, TRUE, FALSE);
+            } else if (u.uz.dnum === svd.dungeon_topology.d_oracle_level.dnum
+                && u.uz.dlevel < svd.dungeon_topology.d_oracle_level.dlevel && rn2(3)) {
                 tryct = 0;
                 /* reverse probabilities compared to non-supply chests;
                    these are twice as likely to be chests than large
                    boxes, rather than vice versa */
-                supply_chest = await mksobj_at(rn2(3) ? CHEST : LARGE_BOX, pos.x, pos.y, FALSE, FALSE);
+                supply_chest = await mksobj_at(rn2(3) ? CHEST : LARGE_BOX,
+                    pos.x, pos.y, FALSE, FALSE);
                 $t1 = !!rn2(6) ? 1 : 0, supply_chest.olocked = ($t1) & 1;
                 do {
                     /* 50% this is a potion of healing */
@@ -1092,7 +1132,8 @@ async function fill_ordinary_room(croom, bonus_items) {   // mklev.c:939
                            times if on level 1 or 2, twice when deeper */
                         for (pass = 1; pass <= maxpass; pass = pass + 1 | 0) {
                             otmp2 = await mkobj(oclass, FALSE);
-                            if (objects[otmp.otyp].oc_oc2 <= objects[otmp2.otyp].oc_oc2) {
+                            if (objects[otmp.otyp].oc_oc2
+                                <= objects[otmp2.otyp].oc_oc2) {
                                 await dealloc_obj(otmp2);
                             } else {
                                 await dealloc_obj(otmp);
@@ -1114,7 +1155,8 @@ async function fill_ordinary_room(croom, bonus_items) {   // mklev.c:939
          */
         /*assert(svn.nroom > 0); // must be true because we're filling a room*/
         if (!skip_chests && !rn2($c.div32(Math.imul(svn.nroom, 5), 2)) && somexyspace(croom, pos)) {
-            await mksobj_at(rn2(3) ? LARGE_BOX : CHEST, pos.x, pos.y, TRUE, FALSE);
+            await mksobj_at(rn2(3) ? LARGE_BOX : CHEST,
+                pos.x, pos.y, TRUE, FALSE);
         }
         /* maybe make some graffiti */
         if (!rn2(27 + Math.imul(3, $c.abs(depth(u.uz))) | 0)) {
@@ -1177,17 +1219,21 @@ async function themerooms_post_level_generate() {   // mklev.c:1174
 function chk_okdoor(x, y) {   // mklev.c:1198
     if (svl.level.locations[x][y].typ === DOOR) {
         if (svl.level.locations[x][y].horizontal) {
-            if (isok(x, $c.i16(y - 1)) && svl.level.locations[x][y - 1].typ > TREE && (isok(x, $c.i16(y + 1)) && svl.level.locations[x][y + 1].typ <= TREE)) {
+            if (isok(x, $c.i16(y - 1)) && svl.level.locations[x][y - 1].typ > TREE
+                && (isok(x, $c.i16(y + 1)) && svl.level.locations[x][y + 1].typ <= TREE)) {
                 return FALSE;
             }
-            if (isok(x, $c.i16(y - 1)) && svl.level.locations[x][y - 1].typ <= TREE && (isok(x, $c.i16(y + 1)) && svl.level.locations[x][y + 1].typ > TREE)) {
+            if (isok(x, $c.i16(y - 1)) && svl.level.locations[x][y - 1].typ <= TREE
+                && (isok(x, $c.i16(y + 1)) && svl.level.locations[x][y + 1].typ > TREE)) {
                 return FALSE;
             }
         } else {
-            if (isok($c.i16(x - 1), y) && svl.level.locations[x - 1][y].typ > TREE && (isok($c.i16(x + 1), y) && svl.level.locations[x + 1][y].typ <= TREE)) {
+            if (isok($c.i16(x - 1), y) && svl.level.locations[x - 1][y].typ > TREE
+                && (isok($c.i16(x + 1), y) && svl.level.locations[x + 1][y].typ <= TREE)) {
                 return FALSE;
             }
-            if (isok($c.i16(x - 1), y) && svl.level.locations[x - 1][y].typ <= TREE && (isok($c.i16(x + 1), y) && svl.level.locations[x + 1][y].typ > TREE)) {
+            if (isok($c.i16(x - 1), y) && svl.level.locations[x - 1][y].typ <= TREE
+                && (isok($c.i16(x + 1), y) && svl.level.locations[x + 1][y].typ > TREE)) {
                 return FALSE;
             }
         }
@@ -1249,7 +1295,9 @@ async function makelevel() {   // mklev.c:1251
         $c.sprintf(new $c.Ptr(fillname, 0), $C`%s-fil`, gu.urole.filecode);
         $c.strcat(new $c.Ptr(fillname, 0), u.uz.dlevel < loc_lev.dlevel.dlevel ? $C`a` : $C`b`);
         await makemaz(new $c.Ptr(fillname, 0));
-    } else if (In_hell(u.uz) || rn2(5) && u.uz.dnum === svd.dungeon_topology.d_medusa_level.dnum && depth(u.uz) > depth(svd.dungeon_topology.d_medusa_level)) {
+    } else if (In_hell(u.uz)
+        || rn2(5) && u.uz.dnum === svd.dungeon_topology.d_medusa_level.dnum
+        && depth(u.uz) > depth(svd.dungeon_topology.d_medusa_level)) {
         await makemaz($C``);
     } else {
         /* otherwise, fall through - it's a "regular" level. */
@@ -1291,7 +1339,9 @@ async function makelevel() {   // mklev.c:1251
                     case "fill_vault":
                         if ($goto === "fill_vault" || await check_room(new $c.FieldRef(gv, "vault_x", "i16"), new $c.Ptr(w, 0), new $c.FieldRef(gv, "vault_y", "i16"), new $c.Ptr(h, 0), TRUE)) {
                             $goto = null;   // fill_vault:
-                            await add_room(gv.vault_x, gv.vault_y, $c.i16(gv.vault_x + w[0]), $c.i16(gv.vault_y + h[0]), TRUE, VAULT, FALSE);
+                            await add_room(gv.vault_x, gv.vault_y,
+                                $c.i16(gv.vault_x + w[0]), $c.i16(gv.vault_y + h[0]),
+                                TRUE, VAULT, FALSE);
                             svl.level.flags.has_vault = 1;
                             room_threshold = room_threshold + 1 | 0;
                             svr.rooms[svn.nroom - 1 | 0].needfill = FILL_NORMAL;
@@ -1318,27 +1368,32 @@ async function makelevel() {   // mklev.c:1251
                this step only sets the room's rtype - it doesn't fill it yet. */
             if (wizard() && nh_getenv($C`SHOPTYPE`)) {
                 await do_mkroom(SHOPBASE);
-            } else if (u_depth > 1 && u_depth < depth(svd.dungeon_topology.d_medusa_level) && svn.nroom >= room_threshold && rn2(u_depth) < 3) {
+            } else if (u_depth > 1 && u_depth < depth(svd.dungeon_topology.d_medusa_level)
+                && svn.nroom >= room_threshold && rn2(u_depth) < 3) {
                 await do_mkroom(SHOPBASE);
             } else if (u_depth > 4 && !rn2(6)) {
                 await do_mkroom(COURT);
-            } else if (u_depth > 5 && !rn2(8) && !(svm.mvitals[PM.LEPRECHAUN].mvflags & G_GONE)) {
+            } else if (u_depth > 5 && !rn2(8)
+                && !(svm.mvitals[PM.LEPRECHAUN].mvflags & G_GONE)) {
                 await do_mkroom(LEPREHALL);
             } else if (u_depth > 6 && !rn2(7)) {
                 await do_mkroom(ZOO);
             } else if (u_depth > 8 && !rn2(5)) {
                 await do_mkroom(TEMPLE);
-            } else if (u_depth > 9 && !rn2(5) && !(svm.mvitals[PM.KILLER_BEE].mvflags & G_GONE)) {
+            } else if (u_depth > 9 && !rn2(5)
+                && !(svm.mvitals[PM.KILLER_BEE].mvflags & G_GONE)) {
                 await do_mkroom(BEEHIVE);
             } else if (u_depth > 11 && !rn2(6)) {
                 await do_mkroom(MORGUE);
             } else if (u_depth > 12 && !rn2(8) && await antholemon()) {
                 await do_mkroom(ANTHOLE);
-            } else if (u_depth > 14 && !rn2(4) && !(svm.mvitals[PM.SOLDIER].mvflags & G_GONE)) {
+            } else if (u_depth > 14 && !rn2(4)
+                && !(svm.mvitals[PM.SOLDIER].mvflags & G_GONE)) {
                 await do_mkroom(BARRACKS);
             } else if (u_depth > 15 && !rn2(6)) {
                 await do_mkroom(SWAMP);
-            } else if (u_depth > 16 && !rn2(8) && !(svm.mvitals[PM.COCKATRICE].mvflags & G_GONE)) {
+            } else if (u_depth > 16 && !rn2(8)
+                && !(svm.mvitals[PM.COCKATRICE].mvflags & G_GONE)) {
                 await do_mkroom(COCKNEST);
             }
         }
@@ -1365,11 +1420,13 @@ async function makelevel() {   // mklev.c:1251
            bonus items, if there are any; if there aren't any we don't
            generate the bonus items (but levels with no fillable rooms
            typically don't have any bonus items to generate anyway) */
-        bonus_item_room_countdown = fillable_room_count ? rn2(fillable_room_count) : -1;
+        bonus_item_room_countdown = fillable_room_count
+            ? rn2(fillable_room_count) : -1;
         /* for each room: put things inside */
         for (croom = svr.rooms[0]; croom.hx > 0; croom = $c.radd(croom, 1)) {
             fillable = ROOM_IS_FILLABLE(croom);
-            await fill_ordinary_room(croom, fillable && bonus_item_room_countdown === 0 ? 1 : 0);
+            await fill_ordinary_room(croom,
+                fillable && bonus_item_room_countdown === 0 ? 1 : 0);
             if (fillable) {
                 bonus_item_room_countdown = bonus_item_room_countdown - 1 | 0;
             }
@@ -1397,7 +1454,10 @@ async function makelevel() {   // mklev.c:1251
  * @returns {number} boolean
  */
 function water_has_kelp(x, y, kelp_pool, kelp_moat) {   // mklev.c:1432
-    if (kelp_pool && (svl.level.locations[x][y].typ === POOL || svl.level.locations[x][y].typ === WATER && !Is_waterlevel(u.uz)) && !rn2(kelp_pool) || kelp_moat && svl.level.locations[x][y].typ === MOAT && !rn2(kelp_moat)) {
+    if (kelp_pool && (svl.level.locations[x][y].typ === POOL
+        || svl.level.locations[x][y].typ === WATER && !Is_waterlevel(u.uz))
+        && !rn2(kelp_pool)
+        || kelp_moat && svl.level.locations[x][y].typ === MOAT && !rn2(kelp_moat)) {
         return TRUE;
     }
     return FALSE;
@@ -1437,7 +1497,11 @@ export async function mineralize(kelp_pool, kelp_moat, goldprob, gemprob, skip_l
     }
     /* determine if it is even allowed;
        almost all special levels are excluded */
-    if (!skip_lvl_checks && (In_hell(u.uz) || In_V_tower(u.uz) || Is_rogue_level(u.uz) || svl.level.flags.arboreal || (sp = Is_special(u.uz)) !== null && !Is_oracle_level(u.uz) && (!In_mines(u.uz) || sp.flags.town))) {
+    if (!skip_lvl_checks
+        && (In_hell(u.uz) || In_V_tower(u.uz) || Is_rogue_level(u.uz)
+        || svl.level.flags.arboreal
+        || (sp = Is_special(u.uz)) !== null && !Is_oracle_level(u.uz)
+        && (!In_mines(u.uz) || sp.flags.town))) {
         return;
     }
     /* basic level-related probabilities */
@@ -1470,7 +1534,14 @@ export async function mineralize(kelp_pool, kelp_moat, goldprob, gemprob, skip_l
             } else if (svl.level.locations[x][y].typ !== STONE) {
                 /* this spot not eligible */
                 y = $c.i16(y + 1 | 0);   /* next spot isn't eligible either */
-            } else if (!(svl.level.locations[x][y].flags & W.NONDIGGABLE) && svl.level.locations[x][y - 1].typ === STONE && svl.level.locations[x + 1][y - 1].typ === STONE && svl.level.locations[x - 1][y - 1].typ === STONE && svl.level.locations[x + 1][y].typ === STONE && svl.level.locations[x - 1][y].typ === STONE && svl.level.locations[x + 1][y + 1].typ === STONE && svl.level.locations[x - 1][y + 1].typ === STONE) {
+            } else if (!(svl.level.locations[x][y].flags & W.NONDIGGABLE)
+                && svl.level.locations[x][y - 1].typ === STONE
+                && svl.level.locations[x + 1][y - 1].typ === STONE
+                && svl.level.locations[x - 1][y - 1].typ === STONE
+                && svl.level.locations[x + 1][y].typ === STONE
+                && svl.level.locations[x - 1][y].typ === STONE
+                && svl.level.locations[x + 1][y + 1].typ === STONE
+                && svl.level.locations[x - 1][y + 1].typ === STONE) {
                 if (rn2(1000) < goldprob) {
                     if ((otmp = await mksobj(GOLD_PIECE, FALSE, FALSE)) !== null) {
                         otmp.ox = x, otmp.oy = y;
@@ -1681,7 +1752,8 @@ export async function place_branch(br, x, y) {   // mklev.c:1691
             await mkportal(x, y, dest.dnum, dest.dlevel);
         }
     } else if (make_stairs) {
-        const goes_up = on_level(br.end1, u.uz) ? br.end1_up : !br.end1_up ? 1 : 0;
+        const goes_up = on_level(br.end1, u.uz) ? br.end1_up
+            : !br.end1_up ? 1 : 0;
         await stairway_add(x, y, goes_up, FALSE, dest);
         await set_levltyp(x, y, STAIRS);
         svl.level.locations[x][y].flags = (goes_up ? LA.UP : LA.DOWN) & 31;
@@ -1735,7 +1807,12 @@ function bydoor(x, y) {   // mklev.c:1750
  */
 export function okdoor(x, y) {   // mklev.c:1779
     const near_door = bydoor(x, y);
-    return (svl.level.locations[x][y].typ === HWALL || svl.level.locations[x][y].typ === VWALL) && (isok($c.i16(x - 1), y) && !(svl.level.locations[x - 1][y].typ < POOL) || isok($c.i16(x + 1), y) && !(svl.level.locations[x + 1][y].typ < POOL) || isok(x, $c.i16(y - 1)) && !(svl.level.locations[x][y - 1].typ < POOL) || isok(x, $c.i16(y + 1)) && !(svl.level.locations[x][y + 1].typ < POOL)) && !near_door ? 1 : 0;
+    return (svl.level.locations[x][y].typ === HWALL || svl.level.locations[x][y].typ === VWALL)
+        && (isok($c.i16(x - 1), y) && !(svl.level.locations[x - 1][y].typ < POOL)
+        || isok($c.i16(x + 1), y) && !(svl.level.locations[x + 1][y].typ < POOL)
+        || isok(x, $c.i16(y - 1)) && !(svl.level.locations[x][y - 1].typ < POOL)
+        || isok(x, $c.i16(y + 1)) && !(svl.level.locations[x][y + 1].typ < POOL))
+        && !near_door ? 1 : 0;
 }
 /* do we want a secret door/corridor? */
 /**
@@ -1761,7 +1838,9 @@ export async function dodoor(x, y, aroom) {   // mklev.c:1800
  * @returns {number} boolean
  */
 export function occupied(x, y) {   // mklev.c:1806
-    return t_at(x, y) || svl.level.locations[x][y].typ >= STAIRS && svl.level.locations[x][y].typ <= ALTAR || is_lava(x, y) || is_pool(x, y) || invocation_pos(x, y) ? 1 : 0;
+    return t_at(x, y) || svl.level.locations[x][y].typ >= STAIRS && svl.level.locations[x][y].typ <= ALTAR
+        || is_lava(x, y) || is_pool(x, y)
+        || invocation_pos(x, y) ? 1 : 0;
 }
 /* generate a corpse and some items on top of a trap */
 /**
@@ -1919,7 +1998,8 @@ async function traptype_rnd(mktrapflags) {   // mklev.c:1938
             }
             break;
         case LEVEL_TELEP:
-            if (lvl < 5 || svl.level.flags.noteleport || single_level_branch(u.uz)) {
+            if (lvl < 5 || svl.level.flags.noteleport
+                || single_level_branch(u.uz)) {
                 kind = NO_TRAP;
             }
             break;
@@ -2054,7 +2134,8 @@ export async function mktrap(num, mktrapflags, croom, tm) {   // mklev.c:2036
             } else if (croom && !somexyspace(croom, m)) {
                 return;
             }
-        } while (occupied(m.x, m.y) || avoid_boulder && sobj_at(BOULDER, m.x, m.y));
+        } while (occupied(m.x, m.y)
+            || avoid_boulder && sobj_at(BOULDER, m.x, m.y));
     }
     const t = await maketrap(m.x, m.y, kind);
     /* we should always get type of trap we're asking for (occupied() test
@@ -2095,7 +2176,13 @@ export async function mktrap(num, mktrapflags, croom, tm) {   // mklev.c:2036
     /* rolling boulder trap might not have a boulder if there was no
        viable path (such as when placed in the corner of a room), in
        which case tx,ty==launch.x,y; no boulder => no dead predecessor */
-    if (gi.in_mklev && kind !== NO_TRAP && !((mktrapflags & MKTRAP.NOVICTIM) >>> 0) && lvl <= rnd(4) >>> 0 && kind !== SQKY_BOARD && kind !== RUST_TRAP && !(kind === ROLLING_BOULDER_TRAP && t.launch.x === t.tx && t.launch.y === t.ty) && !is_pit(kind) && (kind < HOLE || kind === MAGIC_TRAP)) {
+    if (gi.in_mklev
+        && kind !== NO_TRAP && !((mktrapflags & MKTRAP.NOVICTIM) >>> 0)
+        && lvl <= rnd(4) >>> 0
+        && kind !== SQKY_BOARD && kind !== RUST_TRAP
+        && !(kind === ROLLING_BOULDER_TRAP
+        && t.launch.x === t.tx && t.launch.y === t.ty)
+        && !is_pit(kind) && (kind < HOLE || kind === MAGIC_TRAP)) {
         if (kind === LANDMINE) {
             /* if victim was killed by a land mine, we won't scatter objects;
                treat it as exploded, converting it into an unconcealed pit */
@@ -2130,7 +2217,8 @@ export async function mkstairs(x, y, up, croom, force) {   // mklev.c:2159
     if (ltyp !== ROOM && ltyp !== CORR && ltyp !== ICE) {
         const glyph = await back_to_glyph(x, y);
         const sidx = glyph_to_cmap(glyph);
-        await impossible($C`mkstairs:  placing stairs %s on %s at <%d,%d>`, up ? $C`up` : $C`down`, defsyms[sidx].explanation, x, y);
+        await impossible($C`mkstairs:  placing stairs %s on %s at <%d,%d>`,
+            up ? $C`up` : $C`down`, defsyms[sidx].explanation, x, y);
     }
     /*
      * We can't make a regular stair off an end of the dungeon.  This
@@ -2160,7 +2248,11 @@ function generate_stairs_room_good(croom, phase) {   // mklev.c:2201
      *  0 == allow same room as existing up/downstairs;
      * -1 == allow an unjoined room.
      */
-    return croom && (croom.needjoining || phase < 0) && (!has_dnstairs(croom) && !has_upstairs(croom) || phase < 1) && (croom.rtype === OROOM || phase < 2 && croom.rtype === THEMEROOM) ? 1 : 0;
+    return croom && (croom.needjoining || phase < 0)
+        && (!has_dnstairs(croom) && !has_upstairs(croom)
+        || phase < 1)
+        && (croom.rtype === OROOM
+        || phase < 2 && croom.rtype === THEMEROOM) ? 1 : 0;
 }
 /* find a good room to generate an up or down stairs in */
 /**
@@ -2584,7 +2676,10 @@ async function mk_knox_portal(x, y) {   // mklev.c:2624
     /* in main dungeon */
     /* but not Quest's entry */
     /* beneath 10 */
-    if (!(u.uz.dnum === svd.dungeon_topology.d_oracle_level.dnum && !await at_dgn_entrance($C`The Quest`) && (u_depth = depth(u.uz)) > 10 && u_depth < depth(svd.dungeon_topology.d_medusa_level))) {   /* and above Medusa */
+    if (!(u.uz.dnum === svd.dungeon_topology.d_oracle_level.dnum
+        && !await at_dgn_entrance($C`The Quest`)
+        && (u_depth = depth(u.uz)) > 10
+        && u_depth < depth(svd.dungeon_topology.d_medusa_level))) {   /* and above Medusa */
         return;
     }
     /* Adjust source to be current level and re-insert branch. */

@@ -125,26 +125,37 @@ export async function msummon(mon) {   // minion.c:59
             }
             return 0;
         }
-        atyp = $c.i8(mon.ispriest ? mon.mextra.epri.shralign : mon.isminion ? mon.mextra.emin.min_align : ptr.maligntyp === A.NONE ? A.NONE : sgn(ptr.maligntyp));
+        atyp = $c.i8(mon.ispriest ? mon.mextra.epri.shralign
+            : mon.isminion ? mon.mextra.emin.min_align
+            : ptr.maligntyp === A.NONE ? A.NONE
+            : sgn(ptr.maligntyp));
     } else {
         ptr = mons[PM.WIZARD_OF_YENDOR];
         atyp = $c.i8(ptr.maligntyp === A.NONE ? A.NONE : sgn(ptr.maligntyp));
     }
     if (is_dprince(ptr) || ptr === mons[PM.WIZARD_OF_YENDOR]) {
-        dtype = !rn2(20) ? await dprince(atyp) : !rn2(4) ? await dlord(atyp) : await ndemon(atyp);
-        cnt = dtype !== NON_PM && !rn2(4) && is_ndemon($c.relem(mons, dtype)) ? 2 : 1;
+        dtype = !rn2(20) ? await dprince(atyp) : !rn2(4) ? await dlord(atyp)
+            : await ndemon(atyp);
+        cnt = dtype !== NON_PM
+            && !rn2(4) && is_ndemon($c.relem(mons, dtype)) ? 2 : 1;
     } else if (is_dlord(ptr)) {
-        dtype = !rn2(50) ? await dprince(atyp) : !rn2(20) ? await dlord(atyp) : await ndemon(atyp);
-        cnt = dtype !== NON_PM && !rn2(4) && is_ndemon($c.relem(mons, dtype)) ? 2 : 1;
+        dtype = !rn2(50) ? await dprince(atyp) : !rn2(20) ? await dlord(atyp)
+            : await ndemon(atyp);
+        cnt = dtype !== NON_PM
+            && !rn2(4) && is_ndemon($c.relem(mons, dtype)) ? 2 : 1;
     } else if (ptr === mons[PM.BONE_DEVIL]) {
         dtype = PM.SKELETON;
         cnt = 1;
     } else if (is_ndemon(ptr)) {
-        dtype = !rn2(20) ? await dlord(atyp) : !rn2(6) ? await ndemon(atyp) : ptr.pmidx;
+        dtype = !rn2(20) ? await dlord(atyp) : !rn2(6) ? await ndemon(atyp)
+            : ptr.pmidx;
         cnt = 1;
     } else if (is_lminion(mon)) {
-        dtype = is_lord(ptr) && !rn2(20) ? await llord() : is_lord(ptr) || !rn2(6) ? await lminion() : ptr.pmidx;
-        cnt = dtype !== NON_PM && !rn2(4) && !is_lord($c.relem(mons, dtype)) ? 2 : 1;
+        dtype = is_lord(ptr) && !rn2(20)
+            ? await llord()
+            : is_lord(ptr) || !rn2(6) ? await lminion() : ptr.pmidx;
+        cnt = dtype !== NON_PM
+            && !rn2(4) && !is_lord($c.relem(mons, dtype)) ? 2 : 1;
     } else if (ptr === mons[PM.ANGEL]) {
         /* non-lawful angels can also summon */
         if (!rn2(6)) {
@@ -161,7 +172,8 @@ export async function msummon(mon) {   // minion.c:59
         } else {
             dtype = PM.ANGEL;
         }
-        cnt = dtype !== NON_PM && !rn2(4) && !is_lord($c.relem(mons, dtype)) ? 2 : 1;
+        cnt = dtype !== NON_PM
+            && !rn2(4) && !is_lord($c.relem(mons, dtype)) ? 2 : 1;
     }
     if (dtype === NON_PM) {
         return 0;
@@ -208,7 +220,8 @@ export async function msummon(mon) {   // minion.c:59
             if (cnt === 1 && canseemon(mtmp)) {
                 cloud[0] = null;
                 const what = msummon_environ(mtmp.data, new $c.Ptr(cloud, 0));
-                await pline($C`%s appears in a %s of %s!`, await Amonnam(mtmp), cloud[0], what);
+                await pline($C`%s appears in a %s of %s!`, await Amonnam(mtmp),
+                    cloud[0], what);
             }
         }
         cnt = cnt - 1 | 0;
@@ -257,7 +270,8 @@ export async function summon_minion(alignment, talk) {   // minion.c:198
             mon.mextra.emin.min_align = alignment;
             mon.mextra.emin.renegade = FALSE;
         }
-    } else if (mnum !== PM.SHOPKEEPER && mnum !== PM.GUARD && mnum !== PM.ALIGNED_CLERIC && mnum !== PM.HIGH_CLERIC) {
+    } else if (mnum !== PM.SHOPKEEPER && mnum !== PM.GUARD
+        && mnum !== PM.ALIGNED_CLERIC && mnum !== PM.HIGH_CLERIC) {
         /* This was mons[mnum].pxlth == 0 but is this restriction
            appropriate or necessary now that the structures are separate? */
         mon = await makemon($c.relem(mons, mnum), u.ux, u.uy, MM.EMIN | MM.NOMSG);
@@ -274,7 +288,8 @@ export async function summon_minion(alignment, talk) {   // minion.c:198
             if (!Deaf()) {
                 await pline_The($C`voice of %s booms:`, await align_gname(alignment));
             } else {
-                await You_feel($C`%s booming voice:`, s_suffix(await align_gname(alignment)));
+                await You_feel($C`%s booming voice:`,
+                    s_suffix(await align_gname(alignment)));
             }
             await verbalize($C`Thou shalt pay for thine indiscretion!`);
             if (canspotmon(mon)) {
@@ -326,7 +341,8 @@ export async function demon_talk(mtmp) {   // minion.c:263
     if (gy.youmonst.data.mlet === S.DEMON) {
         /* Won't blackmail their own. */
         if (!Deaf()) {
-            await pline($C`%s says, "Good hunting, %s."`, await Amonnam(mtmp), flags.female ? $C`Sister` : $C`Brother`);
+            await pline($C`%s says, "Good hunting, %s."`, await Amonnam(mtmp),
+                flags.female ? $C`Sister` : $C`Brother`);
         } else if (canseemon(mtmp)) {
             await pline($C`%s says something.`, await Amonnam(mtmp));
         }
@@ -354,15 +370,20 @@ export async function demon_talk(mtmp) {   // minion.c:263
             demand = $c.add64(cash, rn1(1000, 125));
         }
         if (!Deaf()) {
-            await pline($C`%s demands %ld %s for safe passage.`, await Amonnam(mtmp), demand, await currency(demand));
+            await pline($C`%s demands %ld %s for safe passage.`,
+                await Amonnam(mtmp), demand, await currency(demand));
         } else if (canseemon(mtmp)) {
             await pline($C`%s seems to be demanding something.`, await Amonnam(mtmp));
         }
         offer = 0;
-        if (!Deaf() && (offer = await bribe(mtmp, $C`How much will you offer?`)) >= demand) {
-            await pline($C`%s vanishes, laughing about cowardly mortals.`, await Amonnam(mtmp));
-        } else if (offer > 0 && rnd(Math.imul(5, acurr(A.CHA))) > $c.sub64(demand, offer)) {
-            await pline($C`%s scowls at you menacingly, then vanishes.`, await Amonnam(mtmp));
+        if (!Deaf() &&
+            (offer = await bribe(mtmp, $C`How much will you offer?`)) >= demand) {
+            await pline($C`%s vanishes, laughing about cowardly mortals.`,
+                await Amonnam(mtmp));
+        } else if (offer > 0
+            && rnd(Math.imul(5, acurr(A.CHA))) > $c.sub64(demand, offer)) {
+            await pline($C`%s scowls at you menacingly, then vanishes.`,
+                await Amonnam(mtmp));
         } else {
             await pline($C`%s gets angry...`, await Amonnam(mtmp));
             mtmp.mpeaceful = 0;
@@ -373,7 +394,9 @@ export async function demon_talk(mtmp) {   // minion.c:263
     /* if 'mtmp' is unrecognizable due to hero's hallucination,
        #chronicle will reveal its true identity -- just live with that;
        also, avoid random hallucinatory currency() units */
-    await livelog_printf(LL.UMONST, $C`bribed %s with %ld %s for safe passage`, await x_monnam(mtmp, ARTICLE.A, null, EXACT_NAME, FALSE), offer, offer === 1 ? $C`zorkmid` : $C`zorkmids`);
+    await livelog_printf(LL.UMONST, $C`bribed %s with %ld %s for safe passage`,
+        await x_monnam(mtmp, ARTICLE.A, null, EXACT_NAME, FALSE),
+        offer, offer === 1 ? $C`zorkmid` : $C`zorkmids`);
     await mongone(mtmp);
     return 1;
 }
@@ -417,7 +440,8 @@ export async function dprince(atyp) {   // minion.c:391
     let tryct = 0;
     for (tryct = !In_endgame(u.uz) ? 20 : 0; tryct > 0; tryct = tryct - 1 | 0) {
         const pm = rn1(PM.DEMOGORGON + 1 - PM.ORCUS, PM.ORCUS);
-        if (!(svm.mvitals[pm].mvflags & G_GONE) && (atyp === A.NONE || sgn(mons[pm].maligntyp) === sgn(atyp))) {
+        if (!(svm.mvitals[pm].mvflags & G_GONE)
+            && (atyp === A.NONE || sgn(mons[pm].maligntyp) === sgn(atyp))) {
             return pm;
         }
     }
@@ -431,7 +455,8 @@ export async function dlord(atyp) {   // minion.c:405
     let tryct = 0;
     for (tryct = !In_endgame(u.uz) ? 20 : 0; tryct > 0; tryct = tryct - 1 | 0) {
         const pm = rn1(PM.YEENOGHU + 1 - PM.JUIBLEX, PM.JUIBLEX);
-        if (!(svm.mvitals[pm].mvflags & G_GONE) && (atyp === A.NONE || sgn(mons[pm].maligntyp) === sgn(atyp))) {
+        if (!(svm.mvitals[pm].mvflags & G_GONE)
+            && (atyp === A.NONE || sgn(mons[pm].maligntyp) === sgn(atyp))) {
             return pm;
         }
     }
@@ -503,7 +528,8 @@ export async function lose_guardian_angel(mon) {   // minion.c:468
         mm.x = u.ux;
         mm.y = u.uy;
         if (await enexto(mm, mm.x, mm.y, mons[PM.ANGEL])) {
-            await mk_roamer(mons[PM.ANGEL], u.ualign.type, mm.x, mm.y, FALSE);
+            await mk_roamer(mons[PM.ANGEL], u.ualign.type, mm.x, mm.y,
+                FALSE);
         }
     }
 }
@@ -535,7 +561,9 @@ export async function gain_guardian_angel() {   // minion.c:498
         await verbalize($C`Thou hast been worthy of me!`);
         mm.x = u.ux;
         mm.y = u.uy;
-        if (await enexto(mm, mm.x, mm.y, mons[PM.ANGEL]) && (mtmp = await mk_roamer(mons[PM.ANGEL], u.ualign.type, mm.x, mm.y, TRUE)) !== null) {
+        if (await enexto(mm, mm.x, mm.y, mons[PM.ANGEL])
+            && (mtmp = await mk_roamer(mons[PM.ANGEL], u.ualign.type, mm.x, mm.y,
+            TRUE)) !== null) {
             mtmp.mstrategy = $c.andu64(mtmp.mstrategy, 18446744071562067967n);
             /* guardian angel -- the one case mtame doesn't imply an
              * edog structure, so we don't want to call tamedog().
@@ -569,7 +597,8 @@ export async function gain_guardian_angel() {   // minion.c:498
             if (otmp.spe < 4) {
                 $t4 = rnd(4), otmp.spe = $c.i8(otmp.spe + $t4 | 0);
             }
-            if ((otmp = await which_armor(mtmp, W.ARMS)) === null || otmp.otyp !== SHIELD_OF_REFLECTION) {
+            if ((otmp = await which_armor(mtmp, W.ARMS)) === null
+                || otmp.otyp !== SHIELD_OF_REFLECTION) {
                 await mongets(mtmp, AMULET_OF_REFLECTION);
                 await m_dowear(mtmp, TRUE);
             }

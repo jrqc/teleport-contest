@@ -172,7 +172,8 @@ export function fname_encode(legal, quotechar, s, callerbuf, bufsz) {   // files
             $c.sprintf(op, $C`%c%02X`, quotechar, sp.get(0));
             op = op.add(3);
             cnt = cnt + 3 | 0;
-        } else if ($c.strchr(legal, sp.get(0)) !== null || $c.strchr(new $c.Ptr(fname_encode$hexdigits, 0), sp.get(0)) !== null) {
+        } else if ($c.strchr(legal, sp.get(0)) !== null
+            || $c.strchr(new $c.Ptr(fname_encode$hexdigits, 0), sp.get(0)) !== null) {
             ($t1 = op, op = $t1.add(1), $t1).set(0, sp.get(0));
             op.set(0, 0);
             cnt = cnt + 1 | 0;
@@ -380,7 +381,9 @@ async function viable_nhfile(nhfp) {   // files.c:549
          * not a structlevel legacy file,
          * nor a fieldlevel file.
          */
-        if (nhfp.fd === -1 && !nhfp.fpdef || nhfp.structlevel && nhfp.fd < 0 || nhfp.fieldlevel && !nhfp.fpdef) {
+        if (nhfp.fd === -1 && !nhfp.fpdef
+            || nhfp.structlevel && nhfp.fd < 0
+            || nhfp.fieldlevel && !nhfp.fpdef) {
             /* not viable, start the cleanup */
             if (nhfp.fieldlevel) {
                 if (nhfp.fpdef) {
@@ -978,7 +981,8 @@ export async function plname_from_file(filename, without_wait_synch_per_file) { 
     }
     await nh_uncompress(new $c.Ptr(gs.SAVEF, 0));
     if ((nhfp = await open_savefile()) !== null) {
-        if ((sfstatus = await validate(nhfp, filename, without_wait_synch_per_file)) === SF.UPTODATE) {
+        if ((sfstatus = await validate(nhfp, filename,
+            without_wait_synch_per_file)) === SF.UPTODATE) {
             /* room for "name+role+race+gend+algn X" where the space before
                X is actually NUL and X is playmode: one of '-', 'X', or 'D' */
             const ln = PL_NSIZ_PLUS;
@@ -1029,7 +1033,8 @@ export async function get_saved_games() {   // files.c:1399
                 if ($c.sscanf(new $c.Ptr(entry.d_name, 0), $C`%d%63s`, new $c.Ptr(uid, 0), new $c.Ptr(name, 0)) === 2) {
                     if (uid[0] === myuid) {
                         $c.sprintf(new $c.Ptr(filename, 0), $C`save/%d%s`, uid[0], new $c.Ptr(name, 0));
-                        const r = await plname_from_file(new $c.Ptr(filename, 0), 0);
+                        const r = await plname_from_file(new $c.Ptr(filename, 0),
+                            0);
                         if (r) {
                             result.set(($t1 = j, j = $t1 + 1 | 0, $t1), r);
                         }
@@ -1083,7 +1088,9 @@ async function redirect(filename, mode, stream, uncomp) {   // files.c:1563
         if ((details = $c.strerror($c.__error().get(0))) === null) {
             details = $C``;
         }
-        $c.fprintf($c.__stderrp, $C`freopen of %s for %scompress failed; (%d) %s\n`, filename, uncomp ? $C`un` : $C``, $c.__error().get(0), details);
+        $c.fprintf($c.__stderrp,
+            $C`freopen of %s for %scompress failed; (%d) %s\n`,
+            filename, uncomp ? $C`un` : $C``, $c.__error().get(0), details);
         await nh_terminate(1);
     }
 }
@@ -1129,7 +1136,10 @@ async function problematic_savefile(sfstatus, savefilenm) {   // files.c:2015
             /*FALLTHRU*/
             for (i = 0; i < 10; i = i + 1 | 0) {
                 if (sf2msg[i].sfstatus === sfstatus) {
-                    await raw_printf($C`\n%s is %s %s\n`, savefilenm, sfstatus === SF.OUTDATED ? $C`an` : $C`a`, sf2msg[i].msg);
+                    await raw_printf($C`\n%s is %s %s\n`,
+                        savefilenm,
+                        sfstatus === SF.OUTDATED ? $C`an` : $C`a`,
+                        sf2msg[i].msg);
                     break;
                 }
             }
@@ -1199,7 +1209,8 @@ async function make_converted_name(filename) {   // files.c:2090
         if (dir) {
             let finaldirchar = c_eos(dir);
             finaldirchar = finaldirchar.add(-1);
-            if (!(finaldirchar.get(0) === 47 || finaldirchar.get(0) === 92 || finaldirchar.get(0) === 58)) {
+            if (!(finaldirchar.get(0) === 47 || finaldirchar.get(0) === 92
+                || finaldirchar.get(0) === 58)) {
                 needsep = 1;
                 ln = ln + 1 >>> 0;
             }
@@ -1277,7 +1288,8 @@ export async function lock_file(filename, whichprefix, retryct) {   // files.c:2
     lockfd = $c.open(filename, 2);
     if (lockfd === -1) {
         if (!program_state.done_hup) {
-            await raw_printf($C`Cannot open file %s.  Is NetHack installed correctly?`, filename);
+            await raw_printf($C`Cannot open file %s.  Is NetHack installed correctly?`,
+                filename);
         }
         gn.nesting = gn.nesting - 1 | 0;
         return 0;
@@ -1289,7 +1301,8 @@ export async function lock_file(filename, whichprefix, retryct) {   // files.c:2
     while ($c.fcntl(lockfd, 8, sflock) === -1) {
         if ($t1 = retryct, retryct = $t1 - 1 | 0, $t1) {
             if (!program_state.done_hup) {
-                await raw_printf($C`Waiting for release of fcntl lock on %s.  (%d retries left.)`, filename, retryct);
+                await raw_printf($C`Waiting for release of fcntl lock on %s.  (%d retries left.)`,
+                    filename, retryct);
             }
             $c.sleep(1);
         } else {
@@ -1297,7 +1310,8 @@ export async function lock_file(filename, whichprefix, retryct) {   // files.c:2
                 await raw_print()($C`I give up.  Sorry.`);
             }
             if (!program_state.done_hup) {
-                await raw_printf($C`Some other process has an unnatural grip on %s.`, filename);
+                await raw_printf($C`Some other process has an unnatural grip on %s.`,
+                    filename);
             }
             gn.nesting = gn.nesting - 1 | 0;
             return 0;
@@ -1365,7 +1379,8 @@ async function fopen_wizkit_file() {   // files.c:2465
         return fp;
     } else {
         /* access() above probably caught most problems for UNIX */
-        await raw_printf($C`Couldn't open requested wizkit file %s (%d).`, new $c.Ptr(gw.wizkit, 0), $c.__error().get(0));
+        await raw_printf($C`Couldn't open requested wizkit file %s (%d).`, new $c.Ptr(gw.wizkit, 0),
+            $c.__error().get(0));
         await wait_synch()();
     }
     /* should be only UNIX left */
@@ -1380,7 +1395,8 @@ async function fopen_wizkit_file() {   // files.c:2465
     } else if ($c.__error().get(0) !== 2) {
         /* e.g., problems when setuid NetHack can't search home
          * directory restricted to user */
-        await raw_printf($C`Couldn't open default gw.wizkit file %s (%d).`, new $c.Ptr(tmp_wizkit, 0), $c.__error().get(0));
+        await raw_printf($C`Couldn't open default gw.wizkit file %s (%d).`,
+            new $c.Ptr(tmp_wizkit, 0), $c.__error().get(0));
         await wait_synch()();
     }
     return null;
@@ -1400,7 +1416,8 @@ async function wizkit_addinv(obj) {   // files.c:2537
         obj.bknown = 1;   /* ok to bypass set_bknown() */
     }
     /* same criteria as lift_object()'s check for available inventory slot */
-    if (obj.oclass !== COIN_CLASS && inv_cnt(0) >= invlet_basic && !await merge_choice(gi.invent, obj)) {
+    if (obj.oclass !== COIN_CLASS && inv_cnt(0) >= invlet_basic
+        && !await merge_choice(gi.invent, obj)) {
         /* inventory overflow; can't just place & stack object since
            hero isn't in position yet, so schedule for arrival later */
         await add_to_migration(obj);
@@ -1453,7 +1470,8 @@ export async function read_wizkit() {   // files.c:2584
  * @returns {$T.__sFILE | null} FILE *
  */
 function fopen_sym_file() {   // files.c:2611
-    const fp = fopen_datafile($C`symbols`, $C`r`, HACKPREFIX);
+    const fp = fopen_datafile($C`symbols`, $C`r`,
+        HACKPREFIX);
     return fp;
 }
 /*
@@ -1481,7 +1499,10 @@ export async function read_sym_file(which_set) {   // files.c:2631
         /* name caller put in symset[which_set].name was not found;
            if it looks like "Default symbols", null it out and return
            success to use the default; otherwise, return failure */
-        if (gs.symset[which_set].name && (fuzzymatch(gs.symset[which_set].name, $C`Default symbols`, $C` -_`, 1) || !strcmpi(gs.symset[which_set].name, $C`default`))) {
+        if (gs.symset[which_set].name
+            && (fuzzymatch(gs.symset[which_set].name, $C`Default symbols`,
+            $C` -_`, 1)
+            || !strcmpi(gs.symset[which_set].name, $C`default`))) {
             clear_symsetentry(which_set, 1);
         }
         await config_error_done();
@@ -1493,7 +1514,9 @@ export async function read_sym_file(which_set) {   // files.c:2631
         return 1;
     }
     if (!gc.chosen_symset_end) {
-        await config_error_add($C`Missing finish for symset "%s"`, gs.symset[which_set].name ? gs.symset[which_set].name : $C`unknown`);
+        await config_error_add($C`Missing finish for symset "%s"`,
+            gs.symset[which_set].name ? gs.symset[which_set].name
+            : $C`unknown`);
     }
     await config_error_done();
     return 1;
@@ -1555,7 +1578,10 @@ export function paniclog(type, reason) {   // files.c:2801
             const now = getnow();
             const uid = $c.getuid() | 0;
             const playmode = wizard() ? 68 : discover() ? 88 : 45;
-            $c.fprintf(lfile, $C`%s %08ld %06ld %d %c: %s %s\n`, version_string(new $c.Ptr(buf, 0), 256), yyyymmdd(now), hhmmss(now), uid, playmode, type, reason);
+            $c.fprintf(lfile, $C`%s %08ld %06ld %d %c: %s %s\n`,
+                version_string(new $c.Ptr(buf, 0), 256),
+                yyyymmdd(now), hhmmss(now),
+                uid, playmode, type, reason);
             /* !PANICLOG_FMT2 */
             $c.fclose(lfile);
         }
@@ -1691,7 +1717,8 @@ export function debugcore(filename, wildcards) {   // files.c:3126
     /* check whether filename is an element of the list */
     if ((p = $c.strstr(debugfiles, filename)) !== null) {
         const l = $c.i32($c.strlen(filename));
-        if (($c.peq(p, debugfiles) || p.get(-1) === 32 || p.get(-1) === 47) && (p.get(l) === 32 || p.get(l) === 0)) {
+        if (($c.peq(p, debugfiles) || p.get(-1) === 32 || p.get(-1) === 47)
+            && (p.get(l) === 32 || p.get(l) === 0)) {
             return 1;
         }
     }
@@ -1708,7 +1735,8 @@ export async function reveal_paths(code) {   // files.c:3175
     const gamename = gh.hname && gh.hname.get(0) ? gh.hname : $C`NetHack`;
     /* sysconf file */
     buf[0] = 0;
-    await raw_printf($C`%s %s%s:`, s_suffix(gamename), $C`system configuration file`, new $c.Ptr(buf, 0));
+    await raw_printf($C`%s %s%s:`, s_suffix(gamename),
+        $C`system configuration file`, new $c.Ptr(buf, 0));
     let filep = $C`sysconf`;
     let fqn = fqname(filep, SYSCONFPREFIX, 0);
     if (fqn) {
@@ -1717,7 +1745,8 @@ export async function reveal_paths(code) {   // files.c:3175
     }
     await raw_printf($C`    "%s"`, filep);
     if (code === 1) {
-        await raw_printf($C`NOTE: The %s above is missing or inaccessible!`, $C`system configuration file`);
+        await raw_printf($C`NOTE: The %s above is missing or inaccessible!`,
+            $C`system configuration file`);
         skip_sysopt = 1;
     }
     /* !SYSCF */
@@ -1761,7 +1790,8 @@ export async function reveal_paths(code) {   // files.c:3175
         $c.strcat(new $c.Ptr(buf, 0), $C`/`);
     }
     const endp = eos(new $c.Ptr(buf, 0));
-    copynchars(endp, get_default_configfile(), $c.i32($c.subu64(255, $c.strlen(new $c.Ptr(buf, 0)))));
+    copynchars(endp, get_default_configfile(),
+        $c.i32($c.subu64(255, $c.strlen(new $c.Ptr(buf, 0)))));
     /* UNIX+__APPLE__ => MacOSX aka OSX aka macOS */
     if (envp) {
         if ($c.access(new $c.Ptr(buf, 0), 4) === -1) {
@@ -1769,15 +1799,18 @@ export async function reveal_paths(code) {   // files.c:3175
             /* read access to default failed; might be protected excessively
                but more likely it doesn't exist; try first alternate:
                "$HOME/Library/Pref..."; 'endp' points past '/' */
-            copynchars(endp, $C`Library/Preferences/NetHack Defaults`, $c.i32($c.subu64(255, $c.strlen(new $c.Ptr(buf, 0)))));
+            copynchars(endp, $C`Library/Preferences/NetHack Defaults`,
+                $c.i32($c.subu64(255, $c.strlen(new $c.Ptr(buf, 0)))));
             if ($c.access(new $c.Ptr(buf, 0), 4) === -1) {
                 /* first alternate failed, try second:
                    ".../NetHack Defaults.txt"; no 'endp', just append */
-                copynchars(eos(new $c.Ptr(buf, 0)), $C`.txt`, $c.i32($c.subu64(255, $c.strlen(new $c.Ptr(buf, 0)))));
+                copynchars(eos(new $c.Ptr(buf, 0)), $C`.txt`,
+                    $c.i32($c.subu64(255, $c.strlen(new $c.Ptr(buf, 0)))));
                 if ($c.access(new $c.Ptr(buf, 0), 4) === -1) {
                     /* second alternate failed too, so revert to the
                        original default ("$HOME/.nethackrc") for message */
-                    copynchars(endp, get_default_configfile(), $c.i32($c.subu64(255, $c.strlen(new $c.Ptr(buf, 0)))));
+                    copynchars(endp, get_default_configfile(),
+                        $c.i32($c.subu64(255, $c.strlen(new $c.Ptr(buf, 0)))));
                 }
             }
         }
@@ -1815,7 +1848,8 @@ function choose_passage(passagecnt, oid) {   // files.c:3431
             /* collect all of the N indices */
             svc.context.novel.count = passagecnt;
             for (idx = 0; idx < 30; idx = idx + 1 | 0) {
-                svc.context.novel.pasg[idx] = $c.i8($c.i16(idx < passagecnt ? idx + 1 | 0 : 0));
+                svc.context.novel.pasg[idx] = $c.i8($c.i16(idx < passagecnt
+                    ? idx + 1 | 0 : 0));
             }
         } else {
             /* collect MAXPASSAGES of the N indices */
@@ -1923,13 +1957,17 @@ export async function read_tribute(tribsection, tribtitle, tribpassage, nowin_bu
                                 scope = TITLESCOPE;
                                 if (matchedsection && !strcmpi(st$2, tribtitle)) {
                                     matchedtitle = 1;
-                                    targetpassage = !tribpassage ? choose_passage(passagecnt, oid) : tribpassage <= passagecnt ? tribpassage : 0;
+                                    targetpassage = !tribpassage
+                                        ? choose_passage(passagecnt, oid)
+                                        : tribpassage <= passagecnt
+                                        ? tribpassage : 0;
                                 } else {
                                     matchedtitle = 0;
                                 }
                             }
                         }
-                    } else if (!strncmpi(new $c.Ptr(line, 1), $C`passage `, 8)) {
+                    } else if (!strncmpi(new $c.Ptr(line, 1), $C`passage `,
+                        8)) {
                         passagenum = 0;
                         st$3 = new $c.Ptr(line, 9);   /* 9 from "%passage " */
                         mungspaces(st$3);
@@ -2065,7 +2103,13 @@ export async function livelog_add(ll_type, str) {   // files.c:3667
         const aindx = 1 - u.ualign.type;
         /* format relies on STD C's implicit concatenation of
            adjacent string literals */
-        $c.fprintf(livelogfile, $C`lltype=%ld\tname=%s\trole=%s\trace=%s\tgender=%s\talign=%s\tturns=%ld\tstarttime=%ld\tcurtime=%ld\tmessage=%s\n`, $c.and64(ll_type, sysopt.livelog), new $c.Ptr(svp.plname, 0), gu.urole.filecode, gu.urace.filecode, genders[gindx].filecode, aligns[aindx].filecode, svm.moves, timet_to_seconds($G.ubirthday), timet_to_seconds(now), str);
+        $c.fprintf(livelogfile,
+            $C`lltype=%ld\tname=%s\trole=%s\trace=%s\tgender=%s\talign=%s\tturns=%ld\tstarttime=%ld\tcurtime=%ld\tmessage=%s\n`,
+            $c.and64(ll_type, sysopt.livelog), new $c.Ptr(svp.plname, 0),
+            gu.urole.filecode, gu.urace.filecode,
+            genders[gindx].filecode, aligns[aindx].filecode,
+            svm.moves, timet_to_seconds($G.ubirthday),
+            timet_to_seconds(now), str);
         $c.fclose(livelogfile);
         await unlock_file($C`livelog`);
     }

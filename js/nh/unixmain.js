@@ -273,7 +273,8 @@ async function process_options(argc, argv) {   // unixmain.c:330
         let arg = origarg = argv.get(0);
         /* allow second dash if arg is longer than one character */
         /* "--a=b" violates the "--" ok when at least 2 chars long rule */
-        if (arg.get(0) === 45 && arg.get(1) === 45 && arg.get(2) !== 0 && (arg.get(3) !== 0 && arg.get(3) !== 61 && arg.get(3) !== 58)) {
+        if (arg.get(0) === 45 && arg.get(1) === 45 && arg.get(2) !== 0
+            && (arg.get(3) !== 0 && arg.get(3) !== 61 && arg.get(3) !== 58)) {
             arg = arg.add(1);
         }
         let l = $c.i32($c.strlen(arg));
@@ -386,7 +387,10 @@ async function process_options(argc, argv) {   // unixmain.c:330
     if (argc > 1) {
         const mxplyrs = $c.atoi(argv.get(1));
         const mx_ok = mxplyrs > 0 ? 1 : 0;
-        await config_error_add($C`%s%s%s`, mx_ok ? $C`MAXPLAYERS are set in sysconf file` : $C`Expected MAXPLAYERS, found "`, mx_ok ? $C`` : argv.get(1), mx_ok ? $C`` : $C`"`);
+        await config_error_add($C`%s%s%s`,
+            mx_ok ? $C`MAXPLAYERS are set in sysconf file`
+            : $C`Expected MAXPLAYERS, found "`,
+            mx_ok ? $C`` : argv.get(1), mx_ok ? $C`` : $C`"`);
         /* XXX This is deprecated in favor of SYSCF with MAXPLAYERS */
     }
     /* limit to compile-time limit */
@@ -406,7 +410,8 @@ async function process_options(argc, argv) {   // unixmain.c:330
 export async function chdirx(dir, wr) {   // unixmain.c:491
     /* User specified directory? */
     /* and not the default? */
-    if (dir && $c.strcmp(dir, $C`/usr/games/lib/nethackdir`)) {
+    if (dir
+        && $c.strcmp(dir, $C`/usr/games/lib/nethackdir`)) {
         /* Ron Wessels */
     } else {
         /* non-default data files is a sign that scores may not be
@@ -530,7 +535,8 @@ async function wd_message() {   // unixmain.c:656
     if (iflags.wiz_error_flag) {
         if (sysopt.wizards && sysopt.wizards.get(0)) {
             const tmp = await build_english_list(sysopt.wizards);
-            await pline($C`Only user%s %s may access debug (wizard) mode.`, $c.strchr(sysopt.wizards, 32) ? $C`s` : $C``, tmp);
+            await pline($C`Only user%s %s may access debug (wizard) mode.`,
+                $c.strchr(sysopt.wizards, 32) ? $C`s` : $C``, tmp);
             $c.free(tmp);
         } else {
             await You($C`cannot access debug (wizard) mode.`);

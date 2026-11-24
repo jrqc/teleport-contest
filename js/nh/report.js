@@ -176,7 +176,8 @@ export function swr_add_uricoded(in_, out, remaining, markp) {   // report.c:237
  */
 export async function submit_web_report(cos, msg, why) {   // report.c:290
     let temp = new Int8Array(200), temp2 = new Int8Array(200), countpp = 0, count = 0, bt = $c.nulls(20), x = 0, info = null, k = 0, line = null, xargv = $c.nulls(3), pid = 0, err = new Int8Array(400), status = Int32Array.of(0);
-    urem[0] = gc.crash_urlmax < 0 || gc.crash_urlmax > MAX_URL ? MAX_URL : MAX_URL < gc.crash_urlmax ? MAX_URL : gc.crash_urlmax;
+    urem[0] = gc.crash_urlmax < 0 || gc.crash_urlmax > MAX_URL
+        ? MAX_URL : MAX_URL < gc.crash_urlmax ? MAX_URL : gc.crash_urlmax;
     countpp = 0;   /* pre and post traceback lines */
     //  URL loaded for creating reports to the NetHack DevTeam
     // CRASHREPORTURL=https://nethack.org/links/cr-5.0.0.html
@@ -393,7 +394,10 @@ export async function submit_web_report(cos, msg, why) {   // report.c:290
  */
 export async function dobugreport() {   // report.c:461
     if (!await submit_web_report(2, null, $C`#bugreport command`)) {
-        await pline($C`Unable to send bug report.  Please visit %s instead.`, sysopt.crashreporturl && sysopt.crashreporturl.get(0) ? sysopt.crashreporturl : $C`https://www.nethack.org/`);
+        await pline($C`Unable to send bug report.  Please visit %s instead.`,
+            sysopt.crashreporturl && sysopt.crashreporturl.get(0)
+            ? sysopt.crashreporturl
+            : $C`https://www.nethack.org/`);
     }
     return ECMD.OK;
 }

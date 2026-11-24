@@ -158,7 +158,8 @@ export async function artitouch(obj) {   // quest.c:125
  * @returns {Promise<number>} boolean
  */
 export async function ok_to_quest() {   // quest.c:140
-    return (svq.quest_status.got_quest || svq.quest_status.got_thanks) && await is_pure(FALSE) > 0 || svq.quest_status.killed_leader ? 1 : 0;
+    return (svq.quest_status.got_quest || svq.quest_status.got_thanks)
+        && await is_pure(FALSE) > 0 || svq.quest_status.killed_leader ? 1 : 0;
 }
 /**
  * @returns {number} boolean
@@ -174,17 +175,23 @@ async function is_pure(talk) {   // quest.c:153
     const original_alignment = u.ualignbase[A.ORIGINAL];
     if (wizard() && talk) {
         if (u.ualign.type !== original_alignment) {
-            await You($C`are currently %s instead of %s.`, align_str(u.ualign.type), align_str(original_alignment));
+            await You($C`are currently %s instead of %s.`, align_str(u.ualign.type),
+                align_str(original_alignment));
         } else if (u.ualignbase[A.CURRENT] !== original_alignment) {
             await You($C`have converted.`);
         } else if (u.ualign.record < MIN_QUEST.ALIGN) {
-            await You($C`are currently %d and require %d.`, u.ualign.record, MIN_QUEST.ALIGN);
+            await You($C`are currently %d and require %d.`, u.ualign.record,
+                MIN_QUEST.ALIGN);
             if (await yn_function($C`adjust?`, null, 121, TRUE) === 121) {
                 u.ualign.record = MIN_QUEST.ALIGN;
             }
         }
     }
-    const purity = u.ualign.record >= MIN_QUEST.ALIGN && u.ualign.type === original_alignment && u.ualignbase[A.CURRENT] === original_alignment ? 1 : u.ualignbase[A.CURRENT] !== original_alignment ? -1 : 0;
+    const purity = u.ualign.record >= MIN_QUEST.ALIGN
+        && u.ualign.type === original_alignment
+        && u.ualignbase[A.CURRENT] === original_alignment
+        ? 1
+        : u.ualignbase[A.CURRENT] !== original_alignment ? -1 : 0;
     return purity;
 }
 /*
@@ -256,7 +263,8 @@ export async function finish_quest(obj) {   // quest.c:226
         if (obj.otyp === AMULET_OF_YENDOR) {
             await qt_pager($C`hasamulet`);
         } else if (obj.otyp === FAKE_AMULET_OF_YENDOR) {
-            await verbalize($C`Sorry to say, this is a mere imitation of the true Amulet of Yendor.`);
+            await verbalize(
+                $C`Sorry to say, this is a mere imitation of the true Amulet of Yendor.`);
         } else {
             await verbalize($C`Ah, I see you've found %s.`, await the(await xname(obj)));
         }
@@ -352,7 +360,9 @@ async function chat_with_leader(mtmp) {   // quest.c:282
                 await expulsion(FALSE);
                 /* being expelled is hardly an achievement but none of the
                    other livelog classifications fit */
-                await livelog_printf(LL.ACHIEVE, $C`%s has expelled you from the quest`, await noit_mon_nam(mtmp));
+                await livelog_printf(LL.ACHIEVE,
+                    $C`%s has expelled you from the quest`,
+                    await noit_mon_nam(mtmp));
             }
         } else if (purity === 0) {
             await qt_pager($C`badalign`);
@@ -368,7 +378,9 @@ async function chat_with_leader(mtmp) {   // quest.c:282
                clue to players who are reaching the quest for first time;
                matters most for Home 1 that has stairs down which aren't
                easily found */
-            await livelog_printf(LL.ACHIEVE, $C`%s has granted access to proceed deeper into the quest`, await noit_mon_nam(mtmp));
+            await livelog_printf(LL.ACHIEVE,
+                $C`%s has granted access to proceed deeper into the quest`,
+                await noit_mon_nam(mtmp));
         }
     }
 }
@@ -465,7 +477,8 @@ async function chat_with_guardian() {   // quest.c:441
  * @returns {Promise<void>}
  */
 async function prisoner_speaks(mtmp) {   // quest.c:451
-    if (mtmp.data === mons[PM.PRISONER] && $c.andu64(mtmp.mstrategy, STRAT_WAITMASK)) {
+    if (mtmp.data === mons[PM.PRISONER]
+        && $c.andu64(mtmp.mstrategy, STRAT_WAITMASK)) {
         /* Awaken the prisoner */
         if (canseemon(mtmp)) {
             await pline($C`%s speaks:`, await Monnam(mtmp));

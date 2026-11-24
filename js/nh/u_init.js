@@ -150,7 +150,8 @@ async function knows_class(sym) {   // u_init.c:586
             }
             /* rangers know all launchers (bows, &c), ammo (arrows, &c),
                and spears regardless of race/species, but not other weapons */
-            if (Role_if(PM.RANGER) && (!is_launcher(o) && !is_ammo(o) && !is_spear(o))) {
+            if (Role_if(PM.RANGER)
+                && (!is_launcher(o) && !is_ammo(o) && !is_spear(o))) {
                 continue;
             }
             /* rogues know daggers, regardless of racial variations */
@@ -664,7 +665,25 @@ async function ini_inv_mkobj_filter(oclass, got_level1_spellbook) {   // u_init.
     /* powerful spells are either useless to
        low level players or unbalancing; also
        spells in restricted skill categories */
-    while (otyp === WAN_WISHING || otyp === gn.nocreate || otyp === gn.nocreate2 || otyp === gn.nocreate3 || otyp === gn.nocreate4 || otyp === RIN_LEVITATION || otyp === POT_HALLUCINATION || otyp === POT_ACID || otyp === SCR_AMNESIA || otyp === SCR_FIRE || otyp === SCR_BLANK_PAPER || otyp === SPE_BLANK_PAPER || otyp === RIN_AGGRAVATE_MONSTER || otyp === RIN_HUNGER || otyp === WAN_NOTHING || otyp === RIN_POISON_RESISTANCE && Race_if(PM.ORC) || otyp === SCR_ENCHANT_WEAPON && Role_if(PM.MONK) || otyp === SPE_FORCE_BOLT && Role_if(PM.WIZARD) || obj.oclass === SPBOOK_CLASS && (objects[otyp].oc_oc2 > (got_level1_spellbook ? 3 : 1) || await restricted_spell_discipline(otyp)) || otyp === SPE_NOVEL) {
+    while (otyp === WAN_WISHING || otyp === gn.nocreate
+        || otyp === gn.nocreate2 || otyp === gn.nocreate3
+        || otyp === gn.nocreate4 || otyp === RIN_LEVITATION
+        || otyp === POT_HALLUCINATION
+        || otyp === POT_ACID
+        || otyp === SCR_AMNESIA
+        || otyp === SCR_FIRE
+        || otyp === SCR_BLANK_PAPER
+        || otyp === SPE_BLANK_PAPER
+        || otyp === RIN_AGGRAVATE_MONSTER
+        || otyp === RIN_HUNGER
+        || otyp === WAN_NOTHING
+        || otyp === RIN_POISON_RESISTANCE && Race_if(PM.ORC)
+        || otyp === SCR_ENCHANT_WEAPON && Role_if(PM.MONK)
+        || otyp === SPE_FORCE_BOLT && Role_if(PM.WIZARD)
+        || obj.oclass === SPBOOK_CLASS
+        && (objects[otyp].oc_oc2 > (got_level1_spellbook ? 3 : 1)
+        || await restricted_spell_discipline(otyp))
+        || otyp === SPE_NOVEL) {
         await dealloc_obj(obj);
         if ((trycnt = trycnt + 1 | 0) > 1000) {
             /* This lonely pancake's potential will never be realized.
@@ -696,7 +715,8 @@ async function ini_inv_obj_substitution(trop, obj) {   // u_init.c:1179
            substitutions didn't occur for randomly generated items
            (particularly food) which have racial substitutes */
         for (i = 0; inv_subs[i].race_pm !== NON_PM; i = i + 1 | 0) {
-            if (inv_subs[i].race_pm === gu.urace.mnum && obj.otyp === inv_subs[i].item_otyp) {
+            if (inv_subs[i].race_pm === gu.urace.mnum
+                && obj.otyp === inv_subs[i].item_otyp) {
                 do {
                     if (debugcore($C`u_init.c`, TRUE)) {
                         const save_plnmsg = iflags.last_msg;
@@ -741,7 +761,8 @@ async function ini_inv_adjust_obj(trop, obj) {   // u_init.c:1205
         if (obj.oclass === WEAPON_CLASS || obj.oclass === TOOL_CLASS) {
             $t4 = trquan(trop), obj.quan = $t4;
             stop = TRUE;
-        } else if (obj.oclass === GEM_CLASS && is_graystone(obj) && obj.otyp !== FLINT) {
+        } else if (obj.oclass === GEM_CLASS && is_graystone(obj)
+            && obj.otyp !== FLINT) {
             obj.quan = 1;
         }
         if (trop.trspe !== 127) {
@@ -751,7 +772,8 @@ async function ini_inv_adjust_obj(trop, obj) {   // u_init.c:1205
             }
         } else {
             /* Don't start with +0 or negative rings */
-            if (objects[obj.otyp].oc_class === RING_CLASS && objects[obj.otyp].oc_charged && obj.spe <= 0) {
+            if (objects[obj.otyp].oc_class === RING_CLASS
+                && objects[obj.otyp].oc_charged && obj.spe <= 0) {
                 $t6 = $c.i8(rne(3)), obj.spe = $t6;
             }
         }
@@ -798,7 +820,9 @@ async function ini_inv_use_obj(obj) {   // u_init.c:1251
             await setworn(obj, W.ARM);
         }
     }
-    if (obj.oclass === WEAPON_CLASS || is_weptool(obj) || obj.otyp === TIN_OPENER || obj.otyp === FLINT || obj.otyp === ROCK) {
+    if (obj.oclass === WEAPON_CLASS || is_weptool(obj)
+        || obj.otyp === TIN_OPENER
+        || obj.otyp === FLINT || obj.otyp === ROCK) {
         if (is_ammo(obj) || is_missile(obj)) {
             if (!$G.uquiver) {
                 await setuqwep(obj);

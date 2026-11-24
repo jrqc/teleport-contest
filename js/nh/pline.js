@@ -84,10 +84,12 @@ async function putmesg(line) {   // pline.c:65
     if (iflags.debug_prevent_pline) {
         return;
     }
-    if ((gp.pline_flags & URGENT_MESSAGE) >>> 0 !== 0 && $c.andu64(windowprocs.wincap2, WC2_URGENT_MESG) !== 0) {
+    if ((gp.pline_flags & URGENT_MESSAGE) >>> 0 !== 0
+        && $c.andu64(windowprocs.wincap2, WC2_URGENT_MESG) !== 0) {
         attr = attr | ATR.URGENT;
     }
-    if ((gp.pline_flags & SUPPRESS_HISTORY) >>> 0 !== 0 && $c.andu64(windowprocs.wincap2, WC2_SUPPRESS_HIST) !== 0) {
+    if ((gp.pline_flags & SUPPRESS_HISTORY) >>> 0 !== 0
+        && $c.andu64(windowprocs.wincap2, WC2_SUPPRESS_HIST) !== 0) {
         attr = attr | ATR.NOHISTORY;
     }
     await putstr()($G.WIN_MESSAGE, attr, line);
@@ -188,7 +190,9 @@ async function vpline(line, the_args) {   // pline.c:153
     /* when accessiblemsg is set and a11y.msg_loc is nonzero, use the latter
        to insert a location prefix in front of current message */
     if (a11y.accessiblemsg && isok(a11y_mesgxy.x, a11y_mesgxy.y)) {
-        dirstr = coord_desc(a11y_mesgxy.x, a11y_mesgxy.y, new $c.Ptr(dirstrbuf, 0), $c.i8(iflags.getpos_coords === 110 ? 102 : iflags.getpos_coords));
+        dirstr = coord_desc(a11y_mesgxy.x, a11y_mesgxy.y, new $c.Ptr(dirstrbuf, 0),
+            $c.i8(iflags.getpos_coords === 110
+            ? 102 : iflags.getpos_coords));
         tmp = $c.asArr(await alloc($c.u32($c.addu64($c.addu64($c.strlen(line), 3), $c.strlen(dirstr)))), Int8Array);
         $c.strcpy(tmp, dirstr);
         $c.strcat(tmp, $C`: `);
@@ -260,7 +264,9 @@ async function vpline(line, the_args) {   // pline.c:153
              * doing so out of context and probably end up seeming silly.
              * (Not an issue for no-repeat but matters for no-show.)
              */
-            if ((gp.pline_flags & URGENT_MESSAGE) >>> 0 === 0 && (msgtyp === MSGTYP.NOSHOW || msgtyp === MSGTYP.NOREP && !$c.strcmp(line, new $c.Ptr(gp.prevmsg, 0)))) {
+            if ((gp.pline_flags & URGENT_MESSAGE) >>> 0 === 0
+                && (msgtyp === MSGTYP.NOSHOW
+                || msgtyp === MSGTYP.NOREP && !$c.strcmp(line, new $c.Ptr(gp.prevmsg, 0)))) {
                 break pline_done$;
             }
         }
@@ -600,7 +606,8 @@ export async function impossible(s, ...$va) {   // pline.c:584
         await pline($C`Alternatively, contact local support: %s`, sysopt.support);
     }
     if (sysopt.crashreporturl) {
-        const report = 121 === await yn_function($C`Report now?`, new $c.Ptr(ynchars, 0), 110, FALSE) ? 1 : 0;
+        const report = 121 === await yn_function($C`Report now?`, new $c.Ptr(ynchars, 0),
+            110, FALSE) ? 1 : 0;
         await raw_print()($C``);   /* prove to the user the character was accepted */
         if (report) {
             await submit_web_report(1, $C`Impossible`, new $c.Ptr(pbuf, 0));
@@ -661,7 +668,8 @@ export async function nhassert_failed(expression, filepath, line) {   // pline.c
        but might be "device:[root.][directory]name"
        and either "[directory]" or "[root.]" or both can be delimited
        by <> rather than by []; find the last of ']', '>', and ':'  */
-    await impossible($C`nhassert(%s) failed in file '%s' at line %d`, expression, filename, line);
+    await impossible($C`nhassert(%s) failed in file '%s' at line %d`,
+        expression, filename, line);
 }
 
 export function $init() {

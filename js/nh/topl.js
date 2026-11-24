@@ -34,7 +34,8 @@ let snapshot_mesgs = null;
 export async function tty_doprev_message() {   // topl.c:20
     let prevmsg_win = 0, i = 0;
     const cw = wins[$G.WIN_MESSAGE];
-    if (iflags.prevmsg_window !== 115 && !$G.ttyDisplay.inread) {
+    if (iflags.prevmsg_window !== 115
+        && !$G.ttyDisplay.inread) {
         /* not single */
         if (iflags.prevmsg_window === 102) {
             /* full */
@@ -286,7 +287,10 @@ export async function update_topl(bp) {   // topl.c:251
     /* But messages like "You die..." deserve their own line */
     let n0 = $c.i32($c.strlen(bp));
     /* room for --More-- */
-    if (($G.ttyDisplay.toplin === TOPLINE.NEED_MORE || skip) && cw.cury === 0 && ((n0 + $c.i32($c.strlen(new $c.Ptr(gt.toplines, 0))) | 0) + 3 | 0) < (gt.tc_gbl_data.tc_CO - 8 | 0) && (notdied = $c.strncmp(bp, $C`You die`, 7)) !== 0) {
+    if (($G.ttyDisplay.toplin === TOPLINE.NEED_MORE || skip)
+        && cw.cury === 0
+        && ((n0 + $c.i32($c.strlen(new $c.Ptr(gt.toplines, 0))) | 0) + 3 | 0) < (gt.tc_gbl_data.tc_CO - 8 | 0)
+        && (notdied = $c.strncmp(bp, $C`You die`, 7)) !== 0) {
         $c.strcat(new $c.Ptr(gt.toplines, 0), $C`  `);
         $c.strcat(new $c.Ptr(gt.toplines, 0), bp);
         cw.curx = $c.add64(cw.curx, 2);
@@ -425,7 +429,8 @@ export async function tty_yn_function(query, resp, def) {   // topl.c:373
     cw = wins[$G.WIN_MESSAGE];
     doprev = 0;
     $G.yn_number = 0;
-    if ($G.ttyDisplay.toplin === TOPLINE.NEED_MORE && (cw.flags & (WIN_STOP | WIN_NOSTOP)) !== WIN_STOP) {
+    if ($G.ttyDisplay.toplin === TOPLINE.NEED_MORE
+        && (cw.flags & (WIN_STOP | WIN_NOSTOP)) !== WIN_STOP) {
         await more();
     }
     cw.flags = cw.flags & ~(WIN_STOP | WIN_NOSTOP);

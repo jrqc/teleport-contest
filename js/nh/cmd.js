@@ -560,7 +560,9 @@ export async function doextcmd() {   // cmd.c:493
             return ECMD.OK;
         }
         if (iflags.menu_requested && !accept_menu_prefix($c.relem(extcmdlist, idx))) {
-            await pline($C`'%s' prefix has no effect for the %s command.`, visctrl(cmd_from_func(do_reqmenu)), extcmdlist[idx].ef_txt);
+            await pline($C`'%s' prefix has no effect for the %s command.`,
+                visctrl(cmd_from_func(do_reqmenu)),
+                extcmdlist[idx].ef_txt);
             iflags.menu_requested = FALSE;
         }
         /* tell rhack() what command is actually executing */
@@ -628,7 +630,8 @@ export async function doextlist() {   // cmd.c:562
         await add_menu_str(menuwin, $C``);
         $c.sprintf(new $c.Ptr(buf, 0), $C`Switch to %s commands that don't autocomplete`, menumode ? $C`including` : $C`excluding`);
         any.a_int = 1;
-        await add_menu(menuwin, nul_glyphinfo, any, 97, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
+        await add_menu(menuwin, nul_glyphinfo, any, 97, 0, ATR.NONE, clr, new $c.Ptr(buf, 0),
+            MENU.ITEMFLAGS_NONE);
         if (!new $c.Ptr(searchbuf, 0).get(0)) {
             any.a_int = 2;
             /* was 's', but then using ':' handling within the interface
@@ -636,7 +639,9 @@ export async function doextlist() {   // cmd.c:562
                actual list of extended commands shown via separator lines;
                having ':' as an explicit selector overrides the default
                menu behavior for it; we retain 's' as a group accelerator */
-            await add_menu(menuwin, nul_glyphinfo, any, 58, 115, ATR.NONE, clr, $C`Search extended commands`, MENU.ITEMFLAGS_NONE);
+            await add_menu(menuwin, nul_glyphinfo, any, 58, 115, ATR.NONE,
+                clr, $C`Search extended commands`,
+                MENU.ITEMFLAGS_NONE);
         } else {
             $c.strcpy(new $c.Ptr(buf, 0), $C`Switch back from search`);
             if ($c.addu64($c.addu64($c.strlen(new $c.Ptr(buf, 0)), $c.strlen(new $c.Ptr(searchbuf, 0))), $c.strlen($C` ("")`)) < QBUFSZ) {
@@ -648,11 +653,15 @@ export async function doextlist() {   // cmd.c:562
                also want to hide it from general menu use) because it won't
                work for interfaces which support ':' to search; use as a
                general menu command takes precedence over group accelerator */
-            await add_menu(menuwin, nul_glyphinfo, any, 115, 58, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
+            await add_menu(menuwin, nul_glyphinfo, any, 115, 58, ATR.NONE,
+                clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
         }
         if (wizard()) {
             any.a_int = 4;
-            await add_menu(menuwin, nul_glyphinfo, any, 122, 0, ATR.NONE, clr, onelist ? $C`Switch to showing debugging commands in separate section` : $C`Switch to showing all alphabetically, including debugging commands`, MENU.ITEMFLAGS_NONE);
+            await add_menu(menuwin, nul_glyphinfo, any, 122, 0, ATR.NONE, clr,
+                onelist ? $C`Switch to showing debugging commands in separate section`
+                : $C`Switch to showing all alphabetically, including debugging commands`,
+                MENU.ITEMFLAGS_NONE);
         }
         await add_menu_str(menuwin, $C``);
         $t1 = menushown[1] = 0, menushown[0] = $t1;
@@ -686,14 +695,22 @@ export async function doextlist() {   // cmd.c:562
                 /* suppress part of the description for #genocided if it
                    doesn't apply during the current game */
                 /* minor optimization */
-                if (!wizard() && !discover() && (efp.flags & GENERALCMD) >>> 0 !== 0 && strstri(cmd_desc, $C`extinct`)) {
-                    cmd_desc = strsubst($c.strcpy(new $c.Ptr(descbuf, 0), cmd_desc), $C` been genocided or become extinct`, $C` been genocided`);
+                if (!wizard() && !discover()
+                    && (efp.flags & GENERALCMD) >>> 0 !== 0
+                    && strstri(cmd_desc, $C`extinct`)) {
+                    cmd_desc = strsubst($c.strcpy(new $c.Ptr(descbuf, 0), cmd_desc),
+                        $C` been genocided or become extinct`,
+                        $C` been genocided`);
                 }
                 /* if searching, skip this command if it doesn't match */
                 /* first try case-insensitive substring match */
                 /* wildcard support; most interfaces use case-insensitive
                    pmatch rather than regexp for menu searching */
-                if (new $c.Ptr(searchbuf, 0).get(0) && !strstri(efp.ef_txt, new $c.Ptr(searchbuf, 0)) && !strstri(cmd_desc, new $c.Ptr(searchbuf, 0)) && !pmatchi(new $c.Ptr(searchbuf, 0), efp.ef_txt) && !pmatchi(new $c.Ptr(searchbuf, 0), cmd_desc)) {
+                if (new $c.Ptr(searchbuf, 0).get(0)
+                    && !strstri(efp.ef_txt, new $c.Ptr(searchbuf, 0))
+                    && !strstri(cmd_desc, new $c.Ptr(searchbuf, 0))
+                    && !pmatchi(new $c.Ptr(searchbuf, 0), efp.ef_txt)
+                    && !pmatchi(new $c.Ptr(searchbuf, 0), cmd_desc)) {
                     continue;
                 }
                 /* We're about to show an item, have we shown the menu yet?
@@ -796,7 +813,9 @@ export async function extcmd_via_menu() {   // cmd.c:752
         any.$copyFrom(cg.zeroany);
         /* populate choices */
         for (efp = $c.relem(extcmdlist, 0); efp.ef_txt; efp = $c.radd(efp, 1)) {
-            if ((efp.flags & (CMD_NOT_AVAILABLE | INTERNALCMD)) >>> 0 || !((efp.flags & AUTOCOMPLETE) >>> 0) || !wizard() && (efp.flags & WIZMODECMD) >>> 0) {
+            if ((efp.flags & (CMD_NOT_AVAILABLE | INTERNALCMD)) >>> 0
+                || !((efp.flags & AUTOCOMPLETE) >>> 0)
+                || !wizard() && (efp.flags & WIZMODECMD) >>> 0) {
                 continue;
             }
             if (!matchlevel || !$c.strncmp(efp.ef_txt, new $c.Ptr(cbuf, 0), $c.u64(matchlevel))) {
@@ -838,12 +857,16 @@ export async function extcmd_via_menu() {   // cmd.c:752
             /* +4: + sizeof " or " - sizeof "" */
             /* -6: enough room for 1 space left margin
              *   + "%c - " menu selector + 1 space right margin */
-            if (accelerator !== prevaccelerator || one_per_line || acount >= 2 && $c.addu64($c.addu64($c.strlen(new $c.Ptr(prompt, 0)), 4), $c.strlen(choices[i].ef_txt)) >= 74) {
+            if (accelerator !== prevaccelerator || one_per_line
+                || acount >= 2
+                && $c.addu64($c.addu64($c.strlen(new $c.Ptr(prompt, 0)), 4), $c.strlen(choices[i].ef_txt))
+                >= 74) {
                 if (acount) {
                     /* flush extended cmds for that letter already in buf */
                     $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(fmtstr, 0), new $c.Ptr(prompt, 0));
                     any.a_char = $c.i8(prevaccelerator);
-                    await add_menu(win, nul_glyphinfo, any, any.a_char, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
+                    await add_menu(win, nul_glyphinfo, any, any.a_char,
+                        0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
                     acount = 0;
                     if (!(accelerator !== prevaccelerator || one_per_line)) {
                         wastoolong = TRUE;
@@ -865,7 +888,8 @@ export async function extcmd_via_menu() {   // cmd.c:752
             /* flush buf */
             $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(fmtstr, 0), new $c.Ptr(prompt, 0));
             any.a_char = $c.i8(prevaccelerator);
-            await add_menu(win, nul_glyphinfo, any, any.a_char, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
+            await add_menu(win, nul_glyphinfo, any, any.a_char, 0,
+                ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
         }
         nh_snprintf($C`extcmd_via_menu`, 856, new $c.Ptr(prompt, 0), 128, $C`Extended Command: %s`, new $c.Ptr(cbuf, 0));
         await end_menu()(win, new $c.Ptr(prompt, 0));
@@ -901,7 +925,8 @@ export async function domonability() {   // cmd.c:890
     const might_hide = is_hider(uptr) || hides_under(uptr) ? 1 : 0;
     let c = 0;
     if (might_hide && webmaker(uptr)) {
-        c = await yn_function($C`Hide [h] or spin a web [s]?`, new $c.Ptr(hidespinchars, 0), 113, TRUE);
+        c = await yn_function($C`Hide [h] or spin a web [s]?`,
+            new $c.Ptr(hidespinchars, 0), 113, TRUE);
         if (c === 113 || c === 27) {
             return ECMD.OK;
         }
@@ -969,12 +994,15 @@ export async function enter_explore_mode() {   // cmd.c:952
                 await You($C`cannot access explore mode.`);
                 return ECMD.OK;
             } else {
-                await pline($C`Note: normally you wouldn't be allowed into explore mode.`);
+                await pline(
+                    $C`Note: normally you wouldn't be allowed into explore mode.`);
                 /* keep going */
             }
         }
-        await pline($C`Beware!  From explore mode there will be no return to %s,`, oldmode);
-        if (await paranoid_query(ParanoidQuit(), $C`Do you want to enter explore mode?`)) {
+        await pline($C`Beware!  From explore mode there will be no return to %s,`,
+            oldmode);
+        if (await paranoid_query(ParanoidQuit(),
+            $C`Do you want to enter explore mode?`)) {
             flags.explore = TRUE;
             flags.debug = FALSE;
             await clear_nhwindow()($G.WIN_MESSAGE);
@@ -1102,19 +1130,31 @@ async function doterrain() {   // cmd.c:1098
     await start_menu()(men, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     any.a_int = 1;
-    await add_menu(men, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, $C`known map without monsters, objects, and traps`, MENU.ITEMFLAGS_SELECTED);
+    await add_menu(men, nul_glyphinfo, any, 0, 0, ATR.NONE, clr,
+        $C`known map without monsters, objects, and traps`,
+        MENU.ITEMFLAGS_SELECTED);
     any.a_int = 2;
-    await add_menu(men, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, $C`known map without monsters and objects`, MENU.ITEMFLAGS_NONE);
+    await add_menu(men, nul_glyphinfo, any, 0, 0, ATR.NONE,
+        clr, $C`known map without monsters and objects`,
+        MENU.ITEMFLAGS_NONE);
     any.a_int = 3;
-    await add_menu(men, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, $C`known map without monsters`, MENU.ITEMFLAGS_NONE);
+    await add_menu(men, nul_glyphinfo, any, 0, 0, ATR.NONE,
+        clr, $C`known map without monsters`,
+        MENU.ITEMFLAGS_NONE);
     if (discover() || wizard()) {
         any.a_int = 4;
-        await add_menu(men, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, $C`full map without monsters, objects, and traps`, MENU.ITEMFLAGS_NONE);
+        await add_menu(men, nul_glyphinfo, any, 0, 0, ATR.NONE,
+            clr, $C`full map without monsters, objects, and traps`,
+            MENU.ITEMFLAGS_NONE);
         if (wizard()) {
             any.a_int = 5;
-            await add_menu(men, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, $C`internal levl[][].typ codes in base-36`, MENU.ITEMFLAGS_NONE);
+            await add_menu(men, nul_glyphinfo, any, 0, 0, ATR.NONE,
+                clr, $C`internal levl[][].typ codes in base-36`,
+                MENU.ITEMFLAGS_NONE);
             any.a_int = 6;
-            await add_menu(men, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, $C`legend of base-36 levl[][].typ codes`, MENU.ITEMFLAGS_NONE);
+            await add_menu(men, nul_glyphinfo, any, 0, 0, ATR.NONE,
+                clr, $C`legend of base-36 levl[][].typ codes`,
+                MENU.ITEMFLAGS_NONE);
         }
     }
     await end_menu()(men, $C`View which?`);
@@ -1174,7 +1214,8 @@ function u_have_seen_whole_selection(sel) {   // cmd.c:1195
     selection_getbounds(sel, rect);
     for (x = rect.lx; x <= rect.hx; x = $c.i16(x + 1)) {
         for (y = rect.ly; y <= rect.hy; y = $c.i16(y + 1)) {
-            if (isok(x, y) && selection_getpoint(x, y, sel) && glyph_at(x, y) === GLYPH_UNEXPLORED) {
+            if (isok(x, y) && selection_getpoint(x, y, sel)
+                && glyph_at(x, y) === GLYPH_UNEXPLORED) {
                 return FALSE;
             }
         }
@@ -1192,21 +1233,25 @@ function u_have_seen_bounds_selection(sel) {   // cmd.c:1213
     selection_getbounds(sel, rect);
     for (x = rect.lx; x <= rect.hx; x = $c.i16(x + 1)) {
         y = rect.ly;
-        if (isok(x, y) && selection_getpoint(x, y, sel) && glyph_at(x, y) === GLYPH_UNEXPLORED) {
+        if (isok(x, y) && selection_getpoint(x, y, sel)
+            && glyph_at(x, y) === GLYPH_UNEXPLORED) {
             return FALSE;
         }
         y = rect.hy;
-        if (isok(x, y) && selection_getpoint(x, y, sel) && glyph_at(x, y) === GLYPH_UNEXPLORED) {
+        if (isok(x, y) && selection_getpoint(x, y, sel)
+            && glyph_at(x, y) === GLYPH_UNEXPLORED) {
             return FALSE;
         }
     }
     for (y = rect.ly; y <= rect.hy; y = $c.i16(y + 1)) {
         x = rect.lx;
-        if (isok(x, y) && selection_getpoint(x, y, sel) && glyph_at(x, y) === GLYPH_UNEXPLORED) {
+        if (isok(x, y) && selection_getpoint(x, y, sel)
+            && glyph_at(x, y) === GLYPH_UNEXPLORED) {
             return FALSE;
         }
         x = rect.hx;
-        if (isok(x, y) && selection_getpoint(x, y, sel) && glyph_at(x, y) === GLYPH_UNEXPLORED) {
+        if (isok(x, y) && selection_getpoint(x, y, sel)
+            && glyph_at(x, y) === GLYPH_UNEXPLORED) {
             return FALSE;
         }
     }
@@ -1238,7 +1283,9 @@ function u_can_see_whole_selection(sel) {   // cmd.c:1246
  */
 function dolookaround_floodfill_findroom(x, y) {   // cmd.c:1263
     const typ = svl.level.locations[x][y].typ;
-    if (IS_STWALL(typ) || IS_DOOR(typ) || IS_TREE(typ) || IS_WATERWALL(typ) || typ === LAVAWALL || typ === IRONBARS || typ === SCORR || typ === SDOOR || typ === DRAWBRIDGE_UP) {
+    if (IS_STWALL(typ) || IS_DOOR(typ) || IS_TREE(typ)
+        || IS_WATERWALL(typ) || typ === LAVAWALL || typ === IRONBARS
+        || typ === SCORR || typ === SDOOR || typ === DRAWBRIDGE_UP) {
         return FALSE;
     }
     return TRUE;
@@ -1260,11 +1307,19 @@ async function lookaround_known_room(x, y) {   // cmd.c:1276
     }
     if (u_have_seen_whole_selection(sel)) {
         const u_in = $c.i8(selection_getpoint(x, y, sel));
-        await You($C`%s %s %s.`, u_at(x, y) && u_in && u_can_see_whole_selection(sel) ? $C`are in` : u_at(x, y) ? $C`remember this as` : $C`remember that as`, await an(selection_size_description(sel, new $c.Ptr(qbuf, 0))), rmno >= 0 ? $C`room` : $C`area`);
+        await You($C`%s %s %s.`,
+            u_at(x, y) && u_in && u_can_see_whole_selection(sel) ? $C`are in`
+            : u_at(x, y) ? $C`remember this as` : $C`remember that as`,
+            await an(selection_size_description(sel, new $c.Ptr(qbuf, 0))),
+            rmno >= 0 ? $C`room` : $C`area`);
     } else if (u_have_seen_bounds_selection(sel)) {
-        await You($C`guess %s to be %s %s.`, u_at(x, y) ? $C`this` : $C`that`, await an(selection_size_description(sel, new $c.Ptr(qbuf, 0))), rmno >= 0 ? $C`room` : $C`area`);
+        await You($C`guess %s to be %s %s.`,
+            u_at(x, y) ? $C`this` : $C`that`,
+            await an(selection_size_description(sel, new $c.Ptr(qbuf, 0))),
+            rmno >= 0 ? $C`room` : $C`area`);
     } else {
-        await You($C`can't guess the size of %s area.`, u_at(x, y) ? $C`this` : $C`that`);
+        await You($C`can't guess the size of %s area.`,
+            u_at(x, y) ? $C`this` : $C`that`);
     }
     selection_free(sel, TRUE);
 }
@@ -1300,9 +1355,15 @@ export async function dolookaround() {   // cmd.c:1310
     iflags.getloc_filter = GFILTER_VIEW;
     for (y = 0; y < ROWNO; y = $c.i16(y + 1)) {
         for (x = 1; x < COLNO; x = $c.i16(x + 1)) {
-            const iscorr = corr_next2u && (glyph = glyph_at(x, y)) >= 0 && glyph_is_cmap(glyph) && ((mapsym = glyph_to_cmap(glyph)) === S.corr || mapsym === S.litcorr) ? 1 : 0;
+            const iscorr = corr_next2u
+                && (glyph = glyph_at(x, y)) >= 0
+                && glyph_is_cmap(glyph)
+                && ((mapsym = glyph_to_cmap(glyph)) === S.corr
+                || mapsym === S.litcorr) ? 1 : 0;
             /* note: GLOC_INTERESTING catches S_engrcorr */
-            if (!u_at(x, y) && (await gather_locs_interesting(x, y, GLOC.INTERESTING) || iscorr)) {
+            if (!u_at(x, y)
+                && (await gather_locs_interesting(x, y, GLOC.INTERESTING)
+                || iscorr)) {
                 const sym = 0;
                 firstmatch[0] = null;
                 cc.x = x, cc.y = y;
@@ -1526,7 +1587,8 @@ export function do_run_southwest() {   // cmd.c:1567
  */
 export async function do_reqmenu() {   // cmd.c:1575
     if (iflags.menu_requested) {
-        await Norep($C`Double %s prefix, canceled.`, visctrl(cmd_from_func(do_reqmenu)));
+        await Norep($C`Double %s prefix, canceled.`,
+            visctrl(cmd_from_func(do_reqmenu)));
         iflags.menu_requested = FALSE;
         return ECMD.CANCEL;
     }
@@ -1814,7 +1876,9 @@ async function handler_rebind_keys_add(keyfirst) {   // cmd.c:2291
         await add_menu_str(win, $C``);
     }
     any.a_int = -1;
-    await add_menu(win, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, $C`nothing: unbind the key`, MENU.ITEMFLAGS_NONE);
+    await add_menu(win, nul_glyphinfo, any, 0, 0, ATR.NONE, clr,
+        $C`nothing: unbind the key`,
+        MENU.ITEMFLAGS_NONE);
     await add_menu_str(win, $C``);
     for (i = 0; i < extcmdlist_length; i = i + 1 | 0) {
         ec = $c.relem(extcmdlist, i);
@@ -1823,7 +1887,8 @@ async function handler_rebind_keys_add(keyfirst) {   // cmd.c:2291
         }
         any.a_int = i + 1 | 0;
         $c.sprintf(new $c.Ptr(buf, 0), $C`%s: %s`, ec.ef_txt, ec.ef_desc);
-        await add_menu(win, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
+        await add_menu(win, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(buf, 0),
+            MENU.ITEMFLAGS_NONE);
     }
     if (key) {
         $c.sprintf(new $c.Ptr(buf, 0), $C`Bind '%s' to what command?`, key2txt(key, new $c.Ptr(buf2, 0)));
@@ -1865,9 +1930,11 @@ async function handler_rebind_keys_add(keyfirst) {   // cmd.c:2291
         prevcmd = cmdbind_get(key);
         if (await bind_key(key, new $c.Ptr(cmdstr, 0), TRUE)) {
             if (prevcmd && prevcmd.cmd !== ec) {
-                await pline($C`Changed key '%s' from "%s" to "%s".`, key2txt(key, new $c.Ptr(buf2, 0)), prevcmd.cmd.ef_txt, new $c.Ptr(cmdstr, 0));
+                await pline($C`Changed key '%s' from "%s" to "%s".`,
+                    key2txt(key, new $c.Ptr(buf2, 0)), prevcmd.cmd.ef_txt, new $c.Ptr(cmdstr, 0));
             } else if (!prevcmd) {
-                await pline($C`Bound key '%s' to "%s".`, key2txt(key, new $c.Ptr(buf2, 0)), new $c.Ptr(cmdstr, 0));
+                await pline($C`Bound key '%s' to "%s".`,
+                    key2txt(key, new $c.Ptr(buf2, 0)), new $c.Ptr(cmdstr, 0));
             }
         } else {
             await pline($C`Key binding failed?!`);
@@ -1886,12 +1953,15 @@ export async function handler_rebind_keys() {   // cmd.c:2408
         await start_menu()(win, MENU.BEHAVE_STANDARD);
         any.$copyFrom(cg.zeroany);
         any.a_int = 1;
-        await add_menu(win, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, $C`bind key to a command`, MENU.ITEMFLAGS_NONE);
+        await add_menu(win, nul_glyphinfo, any, 0, 0, ATR.NONE, clr,
+            $C`bind key to a command`, MENU.ITEMFLAGS_NONE);
         any.a_int = 2;
-        await add_menu(win, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, $C`bind command to a key`, MENU.ITEMFLAGS_NONE);
+        await add_menu(win, nul_glyphinfo, any, 0, 0, ATR.NONE, clr,
+            $C`bind command to a key`, MENU.ITEMFLAGS_NONE);
         if (count_bind_keys()) {
             any.a_int = 3;
-            await add_menu(win, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, $C`view changed key binds`, MENU.ITEMFLAGS_NONE);
+            await add_menu(win, nul_glyphinfo, any, 0, 0, ATR.NONE, clr,
+                $C`view changed key binds`, MENU.ITEMFLAGS_NONE);
         }
         await end_menu()(win, $C`Do what?`);
         npick = await select_menu(win, PICK.ONE, new $c.Ptr(picks, 0));
@@ -1929,7 +1999,10 @@ export async function handler_change_autocompletions() {   // cmd.c:2449
         }
         any.a_int = i + 1 | 0;
         $c.sprintf(new $c.Ptr(buf, 0), $C`%c %s: %s`, (ec.flags & AUTOCOMP_ADJ) >>> 0 ? 42 : 32, ec.ef_txt, ec.ef_desc);
-        await add_menu(win, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), (ec.flags & AUTOCOMPLETE) >>> 0 ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+        await add_menu(win, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(buf, 0),
+            (ec.flags & AUTOCOMPLETE) >>> 0
+            ? MENU.ITEMFLAGS_SELECTED :
+            MENU.ITEMFLAGS_NONE);
     }
     await end_menu()(win, $C`Which commands autocomplete?`);
     const n = await select_menu(win, PICK.ANY, new $c.Ptr(picks, 0));
@@ -2052,14 +2125,17 @@ export function key2extcmddesc(key) {   // cmd.c:2561
         }
     }
     /* finally, check whether 'key' is a command */
-    if ((cmdbind = cmdbind_get(key)) !== null && cmdbind.cmd && (txt = cmdbind.cmd.ef_txt) !== null) {
+    if ((cmdbind = cmdbind_get(key)) !== null
+        && cmdbind.cmd
+        && (txt = cmdbind.cmd.ef_txt) !== null) {
         $c.sprintf(new $c.Ptr(key2extcmddesc$key2cmdbuf, 0), $C`%s (#%s)`, cmdbind.cmd.ef_desc, txt);
         /* special case: for reqmenu prefix (normally 'm'), replace
            "prefix: request menu or modify command (#reqmenu)"
            with two-line "movement prefix:...\nnon-movement prefix:..." */
         if (!strncmpi(new $c.Ptr(key2extcmddesc$key2cmdbuf, 0), $C`prefix:`, 7) && !strcmpi(txt, $C`reqmenu`)) {
             /* relies on implicit concatenation of literal strings */
-            strsubst(new $c.Ptr(key2extcmddesc$key2cmdbuf, 0), $C`prefix:`, $C`movement prefix: move without autopickup and without attacking\nnon-movement prefix:`);   /* and rest of buf */
+            strsubst(new $c.Ptr(key2extcmddesc$key2cmdbuf, 0), $C`prefix:`,
+                $C`movement prefix: move without autopickup and without attacking\nnon-movement prefix:`);   /* and rest of buf */
         }
         /* another special case: 'txt' for '#' is "#" and showing that as
            "perform an extended command (##)" looks silly; strip "(##)" off */
@@ -2075,7 +2151,8 @@ export function key2extcmddesc(key) {   // cmd.c:2561
 export async function bind_mousebtn(btn, command) {   // cmd.c:2624
     let extcmd = null;
     if (btn < 1 || btn > NUM_MOUSE_BUTTONS) {
-        await config_error_add($C`Wrong mouse button, valid are 1-%i`, NUM_MOUSE_BUTTONS);
+        await config_error_add($C`Wrong mouse button, valid are 1-%i`,
+            NUM_MOUSE_BUTTONS);
         return FALSE;
     }
     btn = btn - 1 | 0;
@@ -2117,7 +2194,9 @@ export async function bind_key(key, command, user) {   // cmd.c:2662
     const buf = $c.asArr(await alloc($c.u32(len)), Int8Array);
     $c.strncpy(buf, command, $c.u64(len));
     /* does buf have a parameter in parenthesis? */
-    if ((p = $c.strchr(buf, 40)) !== null && (lastp = $c.strrchr(buf, 41)) !== null && $c.pcmp(lastp, p) > 0) {
+    if ((p = $c.strchr(buf, 40)) !== null
+        && (lastp = $c.strrchr(buf, 41)) !== null
+        && $c.pcmp(lastp, p) > 0) {
         p.set(0, 0);
         lastp.set(0, 0);
         /* p points to the parameter */
@@ -2248,7 +2327,8 @@ async function keylist_putcmds(datawin, docount, incl_flags, excl_flags, keys_us
         }
         const bind = cmdbind_get(key);
         if (bind && bind.cmd !== null) {
-            if (incl_flags && !((bind.cmd.flags & incl_flags >>> 0) >>> 0) || excl_flags && (bind.cmd.flags & excl_flags >>> 0) >>> 0) {
+            if (incl_flags && !((bind.cmd.flags & incl_flags >>> 0) >>> 0)
+                || excl_flags && (bind.cmd.flags & excl_flags >>> 0) >>> 0) {
                 continue;
             }
             if (docount) {
@@ -2266,7 +2346,8 @@ async function keylist_putcmds(datawin, docount, incl_flags, excl_flags, keys_us
     }
     /* also list commands that lack key assignments; most are wizard mode */
     for (extcmd = extcmdlist[0]; extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
-        if (incl_flags && !((extcmd.flags & incl_flags >>> 0) >>> 0) || excl_flags && (extcmd.flags & excl_flags >>> 0) >>> 0) {
+        if (incl_flags && !((extcmd.flags & incl_flags >>> 0) >>> 0)
+            || excl_flags && (extcmd.flags & excl_flags >>> 0) >>> 0) {
             continue;
         }
         /* can't just check for non-Null extcmd->key; it holds the
@@ -2334,7 +2415,8 @@ export async function dokeylist() {   // cmd.c:2867
     await show_direction_keys(datawin, 46, FALSE);   /* '.'==self in direct'n grid */
     if (!iflags.num_pad) {
         await putstr()(datawin, 0, $C``);
-        await putstr()(datawin, 0, $C`Ctrl+<direction> will run in specified direction until something very`);
+        await putstr()(datawin, 0,
+            $C`Ctrl+<direction> will run in specified direction until something very`);
         $c.sprintf(new $c.Ptr(buf, 0), $C`%7s %s`, $C``, $C`interesting is seen.`);
         await putstr()(datawin, 0, new $c.Ptr(buf, 0));
         $c.strcpy(new $c.Ptr(buf, 0), $C`Shift`);   /* append the rest below */
@@ -2355,7 +2437,8 @@ export async function dokeylist() {   // cmd.c:2867
         }
         j = misc_keys[i].nhkf;
         key = $c.u8(gc.Cmd.spkeys[j]);
-        if (key && !mov_seen[key] && pfx_seen[key] === j) {
+        if (key && !mov_seen[key]
+            && pfx_seen[key] === j) {
             $c.sprintf(new $c.Ptr(buf, 0), $C`%-7s %s`, key2txt(key, new $c.Ptr(buf2, 0)), misc_keys[i].desc);
             await putstr()(datawin, 0, new $c.Ptr(buf, 0));
         }
@@ -2389,17 +2472,22 @@ export async function dokeylist() {   // cmd.c:2867
     if (await keylist_putcmds(datawin, TRUE, GENERALCMD, IGNORECMD, new $c.Ptr(keys_used, 0))) {
         await putstr()(datawin, 0, $C``);
         await putstr()(datawin, 0, $C`General commands:`);
-        await keylist_putcmds(datawin, FALSE, GENERALCMD, IGNORECMD, new $c.Ptr(keys_used, 0));
+        await keylist_putcmds(datawin, FALSE, GENERALCMD,
+            IGNORECMD, new $c.Ptr(keys_used, 0));
     }
     if (await keylist_putcmds(datawin, TRUE, 0, GENERALCMD | IGNORECMD, new $c.Ptr(keys_used, 0))) {
         await putstr()(datawin, 0, $C``);
         await putstr()(datawin, 0, $C`Game commands:`);
-        await keylist_putcmds(datawin, FALSE, 0, GENERALCMD | IGNORECMD, new $c.Ptr(keys_used, 0));
+        await keylist_putcmds(datawin, FALSE, 0,
+            GENERALCMD | IGNORECMD,
+            new $c.Ptr(keys_used, 0));
     }
-    if (wizard() && await keylist_putcmds(datawin, TRUE, WIZMODECMD, INTERNALCMD, new $c.Ptr(keys_used, 0))) {
+    if (wizard() && await keylist_putcmds(datawin, TRUE,
+        WIZMODECMD, INTERNALCMD, new $c.Ptr(keys_used, 0))) {
         await putstr()(datawin, 0, $C``);
         await putstr()(datawin, 0, $C`Debug mode commands:`);
-        await keylist_putcmds(datawin, FALSE, WIZMODECMD, INTERNALCMD, new $c.Ptr(keys_used, 0));
+        await keylist_putcmds(datawin, FALSE,
+            WIZMODECMD, INTERNALCMD, new $c.Ptr(keys_used, 0));
     }
     await display_nhwindow()(datawin, FALSE);
     await destroy_nhwindow()(datawin);
@@ -2443,7 +2531,8 @@ export function cmd_from_func(fn) {   // cmd.c:3036
         }
         /* skip digits if number_pad is Off; also skip '-' unless it has
            been bound to something other than what number_pad assigns */
-        if ((i >= 48 && i <= 57 || i === 45 && fn === do_fight) && !gc.Cmd.num_pad) {
+        if ((i >= 48 && i <= 57 || i === 45 && fn === do_fight)
+            && !gc.Cmd.num_pad) {
             continue;
         }
         if (bind.cmd && bind.cmd.ef_funct === fn) {
@@ -2454,7 +2543,8 @@ export function cmd_from_func(fn) {   // cmd.c:3036
             }
         }
     }
-    if ((bind = cmdbind_get(32)) !== null && bind.cmd && bind.cmd.ef_funct === fn) {
+    if ((bind = cmdbind_get(32)) !== null && bind.cmd
+        && bind.cmd.ef_funct === fn) {
         return 32;
     }
     return ret;
@@ -2537,7 +2627,8 @@ export async function cmdname_from_func(fn, outbuf, fullname) {   // cmd.c:3106
                 if (extcmd === cmdptr) {
                     continue;
                 }
-                if ((extcmd.flags & CMD_NOT_AVAILABLE) >>> 0 !== 0 || (extcmd.flags & WIZMODECMD) >>> 0 !== 0 && !wizard()) {
+                if ((extcmd.flags & CMD_NOT_AVAILABLE) >>> 0 !== 0
+                    || (extcmd.flags & WIZMODECMD) >>> 0 !== 0 && !wizard()) {
                     continue;
                 }
                 if (!$c.strncmp(res, extcmd.ef_txt, len)) {
@@ -2623,7 +2714,8 @@ export function key2txt(c, txt) {   // cmd.c:3225
 export async function parseautocomplete(autocomplete, condition) {   // cmd.c:3244
     let efp = null, autoc = null, $t1;
     /* break off first autocomplete from the rest; parse the rest */
-    if ((autoc = $c.strchr(autocomplete, 44)) !== null || (autoc = $c.strchr(autocomplete, 58)) !== null) {
+    if ((autoc = $c.strchr(autocomplete, 44)) !== null
+        || (autoc = $c.strchr(autocomplete, 58)) !== null) {
         ($t1 = autoc, autoc = $t1.add(1), $t1).set(0, 0);
         await parseautocomplete(autoc, condition);
     }
@@ -2659,7 +2751,8 @@ export async function parseautocomplete(autocomplete, condition) {   // cmd.c:32
         }
     }
     /* not a real extended command */
-    await raw_printf($C`Bad autocomplete: invalid extended command '%s'.`, autocomplete);
+    await raw_printf($C`Bad autocomplete: invalid extended command '%s'.`,
+        autocomplete);
     await wait_synch()();
 }
 /* add changed autocompletions to the string buffer in config file format */
@@ -2783,7 +2876,9 @@ export async function reset_commands(initial) {   // cmd.c:3344
     if (updated) {
         gc.Cmd.serialno = gc.Cmd.serialno + 1 >>> 0;
     }
-    gc.Cmd.dirchars = !gc.Cmd.num_pad ? !gc.Cmd.swap_yz ? new $c.Ptr(reset_commands$sdir, 0) : new $c.Ptr(reset_commands$sdir_swap_yz, 0) : !gc.Cmd.phone_layout ? new $c.Ptr(reset_commands$ndir, 0) : new $c.Ptr(reset_commands$ndir_phone_layout, 0);
+    gc.Cmd.dirchars = !gc.Cmd.num_pad
+        ? !gc.Cmd.swap_yz ? new $c.Ptr(reset_commands$sdir, 0) : new $c.Ptr(reset_commands$sdir_swap_yz, 0)
+        : !gc.Cmd.phone_layout ? new $c.Ptr(reset_commands$ndir, 0) : new $c.Ptr(reset_commands$ndir_phone_layout, 0);
     gc.Cmd.alphadirchars = !gc.Cmd.num_pad ? gc.Cmd.dirchars : new $c.Ptr(reset_commands$sdir, 0);
     /* back up the commands & keys overwritten by new movement keys */
     for (dir = 0; dir < N_DIRS; dir = dir + 1 | 0) {
@@ -2816,7 +2911,8 @@ export async function reset_commands(initial) {   // cmd.c:3344
     for (i = 0; i < N_DIRS; i = i + 1 | 0) {
         await bind_key_fn($c.u8(gc.Cmd.dirchars.get(i)), move_funcs[i][MV.WALK]);
         if (!gc.Cmd.num_pad) {
-            await bind_key_fn($c.u8(highc(gc.Cmd.dirchars.get(i))), move_funcs[i][MV.RUN]);
+            await bind_key_fn($c.u8(highc(gc.Cmd.dirchars.get(i))),
+                move_funcs[i][MV.RUN]);
             await bind_key_fn(C(gc.Cmd.dirchars.get(i)), move_funcs[i][MV.RUSH]);
         } else {
             /* M(number) works when altmeta is on */
@@ -2867,7 +2963,8 @@ function accept_menu_prefix(ec) {   // cmd.c:3509
 export async function randomkey() {   // cmd.c:3517
     let c = 0, $t1;
     /* give ^A and ^P a high probability of being repeated */
-    if ((randomkey$last_c === C(97) || randomkey$last_c === C(112)) && program_state.input_state === commandInp && rn2(5)) {
+    if ((randomkey$last_c === C(97) || randomkey$last_c === C(112))
+        && program_state.input_state === commandInp && rn2(5)) {
         return randomkey$last_c;
     }
     switch (rn2(16)) {
@@ -3011,7 +3108,8 @@ export async function rhack(key) {   // cmd.c:3627
                 }
             }
             /* if there's no command, there's nothing to do except reset */
-            if (!key || key === -1 || key === gc.Cmd.spkeys[NHKF.ESC]) {
+            if (!key || key === -1
+                || key === gc.Cmd.spkeys[NHKF.ESC]) {
                 /* don't perform next sanity check if player typed ESC for
                    the current command, similar to handling for CMD_INSANE
                    flag below (^P and ^R) */
@@ -3044,9 +3142,14 @@ export async function rhack(key) {   // cmd.c:3627
                                 /* can_do_extcmd() already gave a message */
                                 reset_cmd_vars(TRUE);
                                 res = ECMD.OK;
-                            } else if (prefix_seen && !((tlist.flags & PREFIXCMD) >>> 0) && !((tlist.flags & (was_m_prefix ? CMD.M_PREFIX : CMD.gGF_PREFIX)) >>> 0)) {
+                            } else if (prefix_seen && !((tlist.flags & PREFIXCMD) >>> 0)
+                                && !((tlist.flags & (was_m_prefix ? CMD.M_PREFIX
+                                : CMD.gGF_PREFIX)) >>> 0)) {
                                 pfxidx = cmd_from_func(prefix_seen.ef_funct);
-                                which = pfxidx !== 0 ? visctrl(pfxidx) : prefix_seen.ef_funct === do_reqmenu ? $C`move-no-pickup or request-menu` : prefix_seen.ef_txt;
+                                which = pfxidx !== 0 ? visctrl(pfxidx)
+                                    : prefix_seen.ef_funct === do_reqmenu
+                                    ? $C`move-no-pickup or request-menu`
+                                    : prefix_seen.ef_txt;
                                 /*
                                  * We got a prefix previously and looped for another
                                  * command instead of returning, but the command we got
@@ -3054,12 +3157,17 @@ export async function rhack(key) {   // cmd.c:3627
                                  * the former call to help_dir() (for 'bad_command' below).
                                  */
                                 if (was_m_prefix) {
-                                    await custompline(SUPPRESS_HISTORY, $C`The %s command does not accept '%s' prefix.`, tlist.ef_txt, which);
+                                    await custompline(SUPPRESS_HISTORY,
+                                        $C`The %s command does not accept '%s' prefix.`,
+                                        tlist.ef_txt, which);
                                 } else {
                                     ch = tlist.key;
                                     up = ch === 60 || tlist.ef_funct === doup ? 1 : 0;
                                     down = ch === 62 || tlist.ef_funct === dodown ? 1 : 0;
-                                    await pline($C`The '%s' prefix should be followed by a movement command%s.`, which, up || down ? $C` other than up or down` : $C``);
+                                    await pline(
+                                        $C`The '%s' prefix should be followed by a movement command%s.`,
+                                        which,
+                                        up || down ? $C` other than up or down` : $C``);
                                 }
                                 res = ECMD.FAIL;
                                 prefix_seen = null;
@@ -3075,7 +3183,8 @@ export async function rhack(key) {   // cmd.c:3627
                                     if (!prefix_seen) {
                                         cmdq_clear(CQ_REPEAT);
                                     }
-                                    await cmdq_add_ec(CQ_REPEAT, tlist.ef_funct);
+                                    await cmdq_add_ec(CQ_REPEAT,
+                                        tlist.ef_funct);
                                 } else {
                                     if (func === doextcmd) {
                                         cmdq_clear(CQ_REPEAT);
@@ -3095,7 +3204,8 @@ export async function rhack(key) {   // cmd.c:3627
                                 if (ge.ext_tlist) {
                                     tlist = ge.ext_tlist, ge.ext_tlist = null;
                                     /* Add the command post-execution */
-                                    await cmdq_add_ec(CQ_REPEAT, tlist.ef_funct);
+                                    await cmdq_add_ec(CQ_REPEAT,
+                                        tlist.ef_funct);
                                     /* shift the command to first */
                                     cmdq_shift(CQ_REPEAT);
                                 }
@@ -3112,10 +3222,12 @@ export async function rhack(key) {   // cmd.c:3627
                                         was_m_prefix = TRUE;
                                     }
                                     $goto = "got_prefix_input"; continue D1;
-                                } else if (!((tlist.flags & MOVEMENTCMD) >>> 0) && gd.domove_attempting) {
+                                } else if (!((tlist.flags & MOVEMENTCMD) >>> 0)
+                                    && gd.domove_attempting) {
                                     /* not a movement command, but a move prefix earlier? */
                                     /* just do nothing */
-                                } else if ($c.and64(gd.domove_attempting, DOMOVE.RUSH | DOMOVE.WALK) !== 0 && !svc.context.travel && !dxdy_moveok()) {
+                                } else if ($c.and64(gd.domove_attempting, DOMOVE.RUSH | DOMOVE.WALK) !== 0
+                                    && !svc.context.travel && !dxdy_moveok()) {
                                     /* trying to move diagonally as a grid bug */
                                     await You_cant($C`get there from here...`);
                                     reset_cmd_vars(TRUE);
@@ -3225,7 +3337,9 @@ export function movecmd(sym, mode) {   // cmd.c:3869
         const fnc = bind.cmd.ef_funct;
         if (mode === MV.ANY) {
             for (d = N_DIRS_Z - 1; d > DIR.ERR; d = d - 1 | 0) {
-                if (fnc === move_funcs[d][MV.WALK] || fnc === move_funcs[d][MV.RUN] || fnc === move_funcs[d][MV.RUSH]) {
+                if (fnc === move_funcs[d][MV.WALK]
+                    || fnc === move_funcs[d][MV.RUN]
+                    || fnc === move_funcs[d][MV.RUSH]) {
                     break;
                 }
             }
@@ -3265,7 +3379,8 @@ export function dxdy_moveok() {   // cmd.c:3902
 export function redraw_cmd(c) {   // cmd.c:3911
     const uc = $c.u8(c);
     const bind = cmdbind_get(uc);
-    return bind && bind.cmd && bind.cmd.ef_funct === doredraw ? 1 : 0;
+    return bind && bind.cmd
+        && bind.cmd.ef_funct === doredraw ? 1 : 0;
 }
 /*
  * uses getdir() but unlike getdir() it specifically
@@ -3320,7 +3435,8 @@ export async function getdir(s) {   // cmd.c:3958
                     if (!cmdq.dirz) {
                         dirsym = gc.Cmd.dirchars.get(xytodir(cmdq.dirx, cmdq.diry));
                     } else {
-                        dirsym = gc.Cmd.dirchars.get(cmdq.dirz > 0 ? DIR.DOWN : DIR.UP);
+                        dirsym = gc.Cmd.dirchars.get(cmdq.dirz > 0 ? DIR.DOWN
+                            : DIR.UP);
                     }
                 } else if (cmdq.typ === CMDQ.KEY) {
                     dirsym = cmdq.key;
@@ -3338,7 +3454,8 @@ export async function getdir(s) {   // cmd.c:3958
             if (gi.in_doagain || readchar_queue.get(0)) {
                 dirsym = await readchar();
             } else {
-                dirsym = await yn_function(s && s.get(0) !== 94 ? s : $C`In what direction?`, null, 0, FALSE);
+                dirsym = await yn_function(s && s.get(0) !== 94 ? s : $C`In what direction?`,
+                    null, 0, FALSE);
                 /* for the fuzzer, usually force the result to be a valid direction,
                    but sometimes let it exercise the invalid direction code; we
                    don't try to enforce no-diagonal for hero in grid bug form since
@@ -3370,7 +3487,8 @@ export async function getdir(s) {   // cmd.c:3958
             }
         case "got_dirsym":
             $goto = null;   // got_dirsym:
-            if (dirsym === gc.Cmd.spkeys[NHKF.GETDIR_SELF] || dirsym === gc.Cmd.spkeys[NHKF.GETDIR_SELF2]) {
+            if (dirsym === gc.Cmd.spkeys[NHKF.GETDIR_SELF]
+                || dirsym === gc.Cmd.spkeys[NHKF.GETDIR_SELF2]) {
                 $t2 = ($t1 = u.dz = 0, u.dy = $t1), u.dx = $t2;
             } else if (dirsym === gc.Cmd.spkeys[NHKF.GETDIR_MOUSE]) {
                 /*
@@ -3430,7 +3548,8 @@ export async function getdir(s) {   // cmd.c:3958
                             /* could plug in bound values for spkeys[NHKF_GETPOS_PICK],&c
                                but that feels like overkill for something which should
                                never happen; just show their default values */
-                            await impossible($C`getpos successful but not one of [.,;:] (%d)`, pos);
+                            await impossible($C`getpos successful but not one of [.,;:] (%d)`,
+                                pos);
                             mod = 0;   /* neither CLICK_1 nor CLICK_2 */
                             pos = -1;   /* return failure */
                             break;
@@ -3445,7 +3564,10 @@ export async function getdir(s) {   // cmd.c:3958
                 if (!$c.strchr(new $c.Ptr(quitchars, 0), dirsym)) {
                     help_requested = dirsym === gc.Cmd.spkeys[NHKF.GETDIR_HELP] ? 1 : 0;
                     if (help_requested || iflags.cmdassist) {
-                        did_help = await help_dir(s && s.get(0) === 94 ? dirsym : 0, $c.u8(gc.Cmd.spkeys[NHKF.ESC]), help_requested ? null : $C`Invalid direction key!`);
+                        did_help = await help_dir(s && s.get(0) === 94 ? dirsym : 0,
+                            $c.u8(gc.Cmd.spkeys[NHKF.ESC]),
+                            help_requested ? null
+                            : $C`Invalid direction key!`);
                         if (help_requested) {
                             $goto = "retry"; continue D1;
                         }
@@ -3555,13 +3677,15 @@ async function help_dir(sym, spkey, msg) {   // cmd.c:4171
         /* '[': old 'cmdhelp' showed ESC as ^[ */
         sym = highc(sym);   /* @A-Z[ (note: letter() accepts '@') */
         const ctrl = $c.i8(sym - 65 + 1);   /* 0-27 (note: 28-31 aren't applicable) */
-        if ((explain = dowhatdoes_core(ctrl, new $c.Ptr(buf2, 0))) !== null && (!$c.strchr(new $c.Ptr(help_dir$wiz_only_list, 0), sym) || wizard())) {
+        if ((explain = dowhatdoes_core(ctrl, new $c.Ptr(buf2, 0))) !== null
+            && (!$c.strchr(new $c.Ptr(help_dir$wiz_only_list, 0), sym) || wizard())) {
             $c.sprintf(new $c.Ptr(buf, 0), $C`Are you trying to use ^%c%s?`, sym, $c.strchr(new $c.Ptr(help_dir$wiz_only_list, 0), sym) ? $C`` : $C` as specified in the Guidebook`);
             await putstr()(win, 0, new $c.Ptr(buf, 0));
             await putstr()(win, 0, $C``);
             await putstr()(win, 0, explain);
             await putstr()(win, 0, $C``);
-            await putstr()(win, 0, $C`To use that command, hold down the <Ctrl> key as a shift`);
+            await putstr()(win, 0,
+                $C`To use that command, hold down the <Ctrl> key as a shift`);
             $c.sprintf(new $c.Ptr(buf, 0), $C`and press the <%c> key.`, sym);
             await putstr()(win, 0, new $c.Ptr(buf, 0));
             await putstr()(win, 0, $C``);
@@ -3587,7 +3711,8 @@ async function help_dir(sym, spkey, msg) {   // cmd.c:4171
     if (msg) {
         /* non-null msg means that this wasn't an explicit user request */
         await putstr()(win, 0, $C``);
-        await putstr()(win, 0, $C`(Suppress this message with !cmdassist in config file.)`);
+        await putstr()(win, 0,
+            $C`(Suppress this message with !cmdassist in config file.)`);
     }
     await display_nhwindow()(win, FALSE);
     await destroy_nhwindow()(win);
@@ -3677,7 +3802,8 @@ async function mcmd_addmenu(win, act, txt) {   // cmd.c:4421
     /* TODO: fixed letters for the menu entries? */
     any.$copyFrom(cg.zeroany);
     any.a_int = act;
-    await add_menu(win, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, txt, MENU.ITEMFLAGS_NONE);
+    await add_menu(win, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, txt,
+        MENU.ITEMFLAGS_NONE);
 }
 /* command menu entries when targeting self */
 /**
@@ -3749,7 +3875,8 @@ async function there_cmd_menu_self(win, x, y, act) {   // cmd.c:4435
     }
     if ((ttmp = t_at(x, y)) !== null && ttmp.tseen) {
         if (ttmp.ttyp !== VIBRATING_SQUARE) {
-            await mcmd_addmenu(win, MCMD.UNTRAP_HERE, $C`Attempt to disarm trap`), K = K + 1 | 0;
+            await mcmd_addmenu(win, MCMD.UNTRAP_HERE,
+                $C`Attempt to disarm trap`), K = K + 1 | 0;
         }
     }
     return K;
@@ -3784,7 +3911,8 @@ async function there_cmd_menu_next2u(win, x, y, mod, act) {   // cmd.c:4524
             }
             /* unfortunately there's no tknown flag for doors (or chests)
                to remember whether a trap had been found */
-            await mcmd_addmenu(win, MCMD.UNTRAP_DOOR, $C`Search the door for a trap`), K = K + 1 | 0;
+            await mcmd_addmenu(win, MCMD.UNTRAP_DOOR,
+                $C`Search the door for a trap`), K = K + 1 | 0;
             /* [what about #force?] */
             await mcmd_addmenu(win, MCMD.KICK_DOOR, $C`Kick the door`), K = K + 1 | 0;
         } else if (dm & D.ISOPEN && mod === CLICK_2) {
@@ -3797,7 +3925,8 @@ async function there_cmd_menu_next2u(win, x, y, mod, act) {   // cmd.c:4524
     if ((ttmp = t_at(x, y)) !== null && ttmp.tseen) {
         await mcmd_addmenu(win, MCMD.LOOK_TRAP, $C`Examine trap`), K = K + 1 | 0;
         if (ttmp.ttyp !== VIBRATING_SQUARE) {
-            await mcmd_addmenu(win, MCMD.UNTRAP_TRAP, $C`Attempt to disarm trap`), K = K + 1 | 0;
+            await mcmd_addmenu(win, MCMD.UNTRAP_TRAP,
+                $C`Attempt to disarm trap`), K = K + 1 | 0;
         }
         await mcmd_addmenu(win, MCMD.MOVE_DIR, $C`Move on the trap`), K = K + 1 | 0;
     }
@@ -3809,7 +3938,8 @@ async function there_cmd_menu_next2u(win, x, y, mod, act) {   // cmd.c:4524
         mtmp = null;
     }
     if (mtmp && await which_armor(mtmp, W.SADDLE)) {
-        const mnam = await x_monnam(mtmp, ARTICLE.THE, null, SUPPRESS.SADDLE, FALSE);
+        const mnam = await x_monnam(mtmp, ARTICLE.THE, null,
+            SUPPRESS.SADDLE, FALSE);
         if (!u.usteed) {
             $c.sprintf(new $c.Ptr(buf, 0), $C`Ride %s`, mnam);
             await mcmd_addmenu(win, MCMD.RIDE, new $c.Ptr(buf, 0)), K = K + 1 | 0;
@@ -3817,7 +3947,8 @@ async function there_cmd_menu_next2u(win, x, y, mod, act) {   // cmd.c:4524
         $c.sprintf(new $c.Ptr(buf, 0), $C`Remove saddle from %s`, mnam);
         await mcmd_addmenu(win, MCMD.REMOVE_SADDLE, new $c.Ptr(buf, 0)), K = K + 1 | 0;
     }
-    if (mtmp && can_saddle(mtmp) && !await which_armor(mtmp, W.SADDLE) && carrying(SADDLE)) {
+    if (mtmp && can_saddle(mtmp) && !await which_armor(mtmp, W.SADDLE)
+        && carrying(SADDLE)) {
         $c.sprintf(new $c.Ptr(buf, 0), $C`Put saddle on %s`, await mon_nam(mtmp));
         await mcmd_addmenu(win, MCMD.APPLY_SADDLE, new $c.Ptr(buf, 0)), K = K + 1 | 0;
     }
@@ -3829,7 +3960,8 @@ async function there_cmd_menu_next2u(win, x, y, mod, act) {   // cmd.c:4524
         $c.sprintf(new $c.Ptr(buf, 0), $C`%s %s`, !(mtmp.mextra && mtmp.mextra.mgivenname) ? $C`Name` : $C`Rename`, await mon_nam(mtmp));
         await mcmd_addmenu(win, MCMD.NAME, new $c.Ptr(buf, 0)), K = K + 1 | 0;
     }
-    if (mtmp && !(mtmp.mpeaceful || mtmp.mtame) || glyph_at(x, y) === GLYPH_INVISIBLE) {
+    if (mtmp && !(mtmp.mpeaceful || mtmp.mtame)
+        || glyph_at(x, y) === GLYPH_INVISIBLE) {
         $c.sprintf(new $c.Ptr(buf, 0), $C`Attack %s`, mtmp ? await mon_nam(mtmp) : $C`unseen creature`);
         await mcmd_addmenu(win, MCMD.ATTACK_NEXT2U, new $c.Ptr(buf, 0)), K = K + 1 | 0;
         /* attacking overrides any other automatic action */
@@ -3849,7 +3981,8 @@ async function there_cmd_menu_next2u(win, x, y, mod, act) {   // cmd.c:4524
 async function there_cmd_menu_far(win, x, y, mod) {   // cmd.c:4624
     let K = 0;
     if (mod === CLICK_1) {
-        if (linedup(u.ux, u.uy, x, y, 1) && dist2(u.ux, u.uy, x, y) < 324) {
+        if (linedup(u.ux, u.uy, x, y, 1)
+            && dist2(u.ux, u.uy, x, y) < 324) {
             await mcmd_addmenu(win, MCMD.THROW_OBJ, $C`Throw something`), K = K + 1 | 0;
         }
         await mcmd_addmenu(win, MCMD.TRAVEL, $C`Travel here`), K = K + 1 | 0;
@@ -4158,7 +4291,8 @@ async function domouseaction() {   // cmd.c:4916
         }
         if (x === 0 && y === 0) {
             /* here */
-            if (svl.level.locations[u.ux][u.uy].typ === FOUNTAIN || svl.level.locations[u.ux][u.uy].typ === SINK) {
+            if (svl.level.locations[u.ux][u.uy].typ === FOUNTAIN
+                || svl.level.locations[u.ux][u.uy].typ === SINK) {
                 await cmdq_add_ec(CQ_CANNED, dodrink);
                 return ECMD.OK;
             } else if (svl.level.locations[u.ux][u.uy].typ === THRONE) {
@@ -4180,7 +4314,8 @@ async function domouseaction() {   // cmd.c:4916
         }
         /* directional commands */
         dir = xytodir(x, y);
-        if (!m_at(u.ux + x, u.uy + y) && !await test_move(u.ux, u.uy, x, y, TEST.MOVE)) {
+        if (!m_at(u.ux + x, u.uy + y)
+            && !await test_move(u.ux, u.uy, x, y, TEST.MOVE)) {
             if (svl.level.locations[u.ux + x][u.uy + y].typ === DOOR) {
                 /* slight assistance to player: choose kick/open for them */
                 if (svl.level.locations[u.ux + x][u.uy + y].flags & D.LOCKED) {
@@ -4332,7 +4467,8 @@ async function parse() {   // cmd.c:5096
            <character> not read from keyboard yet) rather than intended count
            and meta keystroke "n<count>M-<character>" */
         program_state.input_state = commandInp;
-        foo = await get_count(null, 0, LARGEST_INT, new $c.FieldRef(gc, "command_count", "i64"), GC.NOFLAGS);
+        foo = await get_count(null, 0, LARGEST_INT,
+            new $c.FieldRef(gc, "command_count", "i64"), GC.NOFLAGS);
     }
     gl.last_command_count = gc.command_count;
     if (foo === gc.Cmd.spkeys[NHKF.ESC]) {
@@ -4342,7 +4478,11 @@ async function parse() {   // cmd.c:5096
         gl.last_command_count = 0;
     } else if (gi.in_doagain) {
         gc.command_count = gl.last_command_count;
-    } else if (foo && (bind = cmdbind_get(foo & 255)) !== null && bind && bind.cmd && (bind.cmd.ef_funct === do_repeat || bind.cmd.ef_funct === doprev_message || bind.cmd.ef_funct === doextcmd)) {
+    } else if (foo && (bind = cmdbind_get(foo & 255)) !== null
+        && bind && bind.cmd
+        && (bind.cmd.ef_funct === do_repeat
+        || bind.cmd.ef_funct === doprev_message
+        || bind.cmd.ef_funct === doextcmd)) {
         /* these shouldn't go into the do-again buffer */
         /* this one might get put into the do-again buffer but
            only if the interface code tells the core to do it */
@@ -4382,7 +4522,8 @@ export async function hangup(sig_unused) {   // cmd.c:5159
        must continue running longer before attempting a hangup save. */
     program_state.done_hup = program_state.done_hup + 1 | 0;
     /* defer hangup iff game appears to be in progress */
-    if (program_state.in_moveloop && program_state.something_worth_saving) {
+    if (program_state.in_moveloop
+        && program_state.something_worth_saving) {
         return;
     }
     /* SAFERHANGUP */
@@ -4449,7 +4590,8 @@ async function readchar_core(x, y, mod) {   // cmd.c:5213
         if (sym === -1) {
             await hangup(0);   /* call end_of_input() or set program_state.done_hup */
             sym = 27;
-        } else if (sym === 27 && iflags.altmeta && program_state.input_state !== otherInp) {
+        } else if (sym === 27 && iflags.altmeta
+            && program_state.input_state !== otherInp) {
             /* iflags.altmeta: treat two character ``ESC c'' as single `M-c' but
                only when we're called by parse() [possibly via get_count()]
                or getpos() [to support Alt+digit] or getdir() [for arrow keys
@@ -4590,7 +4732,9 @@ async function doclicklook() {   // cmd.c:5381
  * @returns {number} boolean
  */
 function yn_menuable_resp(resp) {   // cmd.c:5394
-    return iflags.query_menu && iflags.window_inited && ($c.peq(resp, new $c.Ptr(ynchars, 0)) || $c.peq(resp, new $c.Ptr(ynqchars, 0)) || $c.peq(resp, new $c.Ptr(ynaqchars, 0)) || $c.peq(resp, new $c.Ptr(rightleftchars, 0)) || $c.peq(resp, new $c.Ptr(hidespinchars, 0))) ? 1 : 0;
+    return iflags.query_menu && iflags.window_inited
+        && ($c.peq(resp, new $c.Ptr(ynchars, 0)) || $c.peq(resp, new $c.Ptr(ynqchars, 0)) || $c.peq(resp, new $c.Ptr(ynaqchars, 0))
+        || $c.peq(resp, new $c.Ptr(rightleftchars, 0)) || $c.peq(resp, new $c.Ptr(hidespinchars, 0))) ? 1 : 0;
 }
 /**
  * @param {number} win winid
@@ -4603,7 +4747,10 @@ async function yn_func_menu_opt(win, key, text, def) {   // cmd.c:5402
     let any = new $T.any();
     any.$copyFrom(cg.zeroany);
     any.a_char = key;
-    await add_menu(win, nul_glyphinfo, any, key, 0, ATR.NONE, NO_COLOR, text, def === key ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+    await add_menu(win, nul_glyphinfo, any, key, 0,
+        ATR.NONE, NO_COLOR, text,
+        def === key ? MENU.ITEMFLAGS_SELECTED
+        : MENU.ITEMFLAGS_NONE);
 }
 /* use a menu to ask a specific response to a query.
    returns TRUE if the menu was shown to the user.
@@ -4749,7 +4896,8 @@ export async function yn_function(query, resp, def, addcmdq) {   // cmd.c:5471
             /* don't let this known problem kill the fuzzer */
             /*TEMP*/
             iflags.debug_fuzzer = fuzzer_impossible_continue;
-            await impossible($C`yn_function() returned '%s'; using '%s' instead`, visctrl(res[0]), visctrl($c.i8(altres)));
+            await impossible($C`yn_function() returned '%s'; using '%s' instead`,
+                visctrl(res[0]), visctrl($c.i8(altres)));
             /*TEMP*/
             iflags.debug_fuzzer = fuzzing;
         }
@@ -4778,7 +4926,10 @@ export async function paranoid_ynq(be_paranoid, prompt, accept_q) {   // cmd.c:5
         /* default of 'n' is shown for
          * the !ParanoidConfirm cases */
         let promptprefix = $C``;
-        const responsetype = ParanoidConfirm() ? accept_q ? $C`[yes|no|quit]` : $C`[yes|no]` : accept_q ? $C`[yes|n|q] (n)` : $C`[yes|n] (n)`;
+        const responsetype = ParanoidConfirm() ? accept_q ? $C`[yes|no|quit]`
+            : $C`[yes|no]`
+            : accept_q ? $C`[yes|n|q] (n)`
+            : $C`[yes|n] (n)`;
         let trylimit = 6;   /* 1 normal, 5 more with "Yes or No:" prefix */
         copynchars(new $c.Ptr(pbuf, 0), prompt, BUFSZ - 1);
         /* in addition to being paranoid about this particular

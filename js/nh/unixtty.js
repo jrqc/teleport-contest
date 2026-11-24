@@ -183,7 +183,8 @@ export function setftty() {   // unixtty.c:267
 export function intron() {   // unixtty.c:338
     /* enable kbd interrupts if enabled when game started */
     /* Ugly hack to keep from changing tty modes for non-tty games -dlc */
-    if (windowprocs.wp_id === wp_tty && $G.intr_char !== nonesuch() && curttyb.c_cc[8] !== 3) {
+    if (windowprocs.wp_id === wp_tty && $G.intr_char !== nonesuch()
+        && curttyb.c_cc[8] !== 3) {
         curttyb.c_cc[8] = 3;
         setctty();
     }

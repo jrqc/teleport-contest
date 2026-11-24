@@ -90,14 +90,19 @@ function rng_log_write(func, args, result) {   // rnd.c:72
     rng_call_count = rng_call_count + 1 | 0;
     if (rng_caller_file) {
         if (rng_caller_func) {
-            $c.fprintf(rng_logfile, $C`%d %s(%s) = %d @ %s(%s:%d)\n`, rng_call_count, func, args, result, rng_caller_func, rng_caller_file, rng_caller_line);
+            $c.fprintf(rng_logfile, $C`%d %s(%s) = %d @ %s(%s:%d)\n`,
+                rng_call_count, func, args, result,
+                rng_caller_func, rng_caller_file, rng_caller_line);
         } else {
-            $c.fprintf(rng_logfile, $C`%d %s(%s) = %d @ %s:%d\n`, rng_call_count, func, args, result, rng_caller_file, rng_caller_line);
+            $c.fprintf(rng_logfile, $C`%d %s(%s) = %d @ %s:%d\n`,
+                rng_call_count, func, args, result,
+                rng_caller_file, rng_caller_line);
         }
         /* Do NOT clear rng_caller_file here -- let internal calls from
            wrapper functions (rnz, rne, rnl) inherit the same context. */
     } else {
-        $c.fprintf(rng_logfile, $C`%d %s(%s) = %d\n`, rng_call_count, func, args, result);
+        $c.fprintf(rng_logfile, $C`%d %s(%s) = %d\n`,
+            rng_call_count, func, args, result);
     }
 }
 /**
@@ -128,7 +133,8 @@ export async function init_isaac64(seed, fn) {   // rnd.c:131
         new_rng_state[i] = $c.u8($c.andu64(seed, 255));
         seed = $c.shru64(seed, 8);
     }
-    $c.isaac64_init(rnglist[rngindx].rng_state, new $c.Ptr(new_rng_state, 0), 8);
+    $c.isaac64_init(rnglist[rngindx].rng_state, new $c.Ptr(new_rng_state, 0),
+        8);
 }
 /**
  * @param {number} x int
@@ -151,9 +157,11 @@ export function rn2_on_display_rng(x) {   // rnd.c:158
         $c.fprintf(rng_logfile, $C`%d ~drn2(%d) = %d`, rng_call_count, x, result);
         if (rng_caller_file) {
             if (rng_caller_func) {
-                $c.fprintf(rng_logfile, $C` @ %s(%s:%d)`, rng_caller_func, rng_caller_file, rng_caller_line);
+                $c.fprintf(rng_logfile, $C` @ %s(%s:%d)`,
+                    rng_caller_func, rng_caller_file, rng_caller_line);
             } else {
-                $c.fprintf(rng_logfile, $C` @ %s:%d`, rng_caller_file, rng_caller_line);
+                $c.fprintf(rng_logfile, $C` @ %s:%d`,
+                    rng_caller_file, rng_caller_line);
             }
         }
         $c.fputc(10, rng_logfile);

@@ -1936,7 +1936,8 @@ export async function mread(fd, buf, len) {   // sfstruct.c:549
     const rlen = $c.u32($c.read(fd, buf, len));
     if (rlen !== len) {
         /* means "return anyway" */
-        if (restoreinfo.mread_flags === 1 || program_state.reading_bonesfile === 1) {
+        if (restoreinfo.mread_flags === 1
+            || program_state.reading_bonesfile === 1) {
             restoreinfo.mread_flags = -1;
             return;
         } else {

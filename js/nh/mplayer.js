@@ -61,7 +61,9 @@ function dev_name() {   // mplayer.c:44
             if (!is_mplayer(mtmp.data)) {
                 continue;
             }
-            if (!$c.strncmp(developers[i], mtmp.mextra && mtmp.mextra.mgivenname ? mtmp.mextra.mgivenname : $C``, $c.strlen(developers[i]))) {
+            if (!$c.strncmp(developers[i],
+                mtmp.mextra && mtmp.mextra.mgivenname ? mtmp.mextra.mgivenname : $C``,
+                $c.strlen(developers[i]))) {
                 match = TRUE;
                 break;
             }
@@ -155,9 +157,12 @@ export async function mk_mplayer(ptr, x, y, special) {   // mplayer.c:118
         /* default equipment; much of it will be overridden below */
         let weapon = $c.i16(!rn2(2) ? LONG_SWORD : rnd_class(SPEAR, BULLWHIP));
         let armor = $c.i16(rnd_class(GRAY_DRAGON_SCALE_MAIL, YELLOW_DRAGON_SCALE_MAIL));
-        let cloak = $c.i16(!rn2(8) ? STRANGE_OBJECT : rnd_class(OILSKIN_CLOAK, CLOAK_OF_DISPLACEMENT));
-        let helm = $c.i16(!rn2(8) ? STRANGE_OBJECT : rnd_class(ELVEN_LEATHER_HELM, HELM_OF_TELEPATHY));
-        let shield = $c.i16(!rn2(8) ? STRANGE_OBJECT : rnd_class(ELVEN_SHIELD, SHIELD_OF_REFLECTION));
+        let cloak = $c.i16(!rn2(8) ? STRANGE_OBJECT
+            : rnd_class(OILSKIN_CLOAK, CLOAK_OF_DISPLACEMENT));
+        let helm = $c.i16(!rn2(8) ? STRANGE_OBJECT
+            : rnd_class(ELVEN_LEATHER_HELM, HELM_OF_TELEPATHY));
+        let shield = $c.i16(!rn2(8) ? STRANGE_OBJECT
+            : rnd_class(ELVEN_SHIELD, SHIELD_OF_REFLECTION));
         switch (ptr.pmidx) {
             case PM.ARCHEOLOGIST:
                 if (rn2(2)) {
@@ -263,7 +268,8 @@ export async function mk_mplayer(ptr, x, y, special) {   // mplayer.c:118
                     weapon = rn2(2) ? QUARTERSTAFF : ATHAME;
                 }
                 if (rn2(2)) {
-                    armor = rn2(2) ? BLACK_DRAGON_SCALE_MAIL : SILVER_DRAGON_SCALE_MAIL;
+                    armor = rn2(2) ? BLACK_DRAGON_SCALE_MAIL
+                        : SILVER_DRAGON_SCALE_MAIL;
                     cloak = CLOAK_OF_MAGIC_RESISTANCE;
                 }
                 if (rn2(4)) {
@@ -290,7 +296,8 @@ export async function mk_mplayer(ptr, x, y, special) {   // mplayer.c:118
                 otmp = await mk_artifact(otmp, A.NONE, 99, FALSE);
             }
             /* usually increase stack size if stackable weapon */
-            if (objects[otmp.otyp].oc_merge && !otmp.oartifact && monmightthrowwep(otmp)) {
+            if (objects[otmp.otyp].oc_merge && !otmp.oartifact
+                && monmightthrowwep(otmp)) {
                 $t6 = rn2(otmp.oclass === WEAPON_CLASS && objects[otmp.otyp].oc_subtyp === P.SPEAR ? 4 : 8), otmp.quan = $c.add64(otmp.quan, $t6);
             }
             $t7 = await weight(otmp) >>> 0, otmp.owt = $t7;
@@ -311,10 +318,12 @@ export async function mk_mplayer(ptr, x, y, special) {   // mplayer.c:118
             if (weapon === WAR_HAMMER) {   /* valkyrie: wimpy weapon or Mjollnir */
                 await mk_mplayer_armor(mtmp, GAUNTLETS_OF_POWER);
             } else if (rn2(8)) {
-                await mk_mplayer_armor(mtmp, $c.i16(rnd_class(LEATHER_GLOVES, GAUNTLETS_OF_DEXTERITY)));
+                await mk_mplayer_armor(mtmp, $c.i16(rnd_class(LEATHER_GLOVES,
+                    GAUNTLETS_OF_DEXTERITY)));
             }
             if (rn2(8)) {
-                await mk_mplayer_armor(mtmp, $c.i16(rnd_class(LOW_BOOTS, LEVITATION_BOOTS)));
+                await mk_mplayer_armor(mtmp, $c.i16(rnd_class(LOW_BOOTS,
+                    LEVITATION_BOOTS)));
             }
             await m_dowear(mtmp, TRUE);
             quan = rn2(3) ? rn2(3) : rn2(16);
@@ -385,7 +394,9 @@ export async function mplayer_talk(mtmp) {   // mplayer.c:356
     if (mtmp.mpeaceful) {
         return;   /* will drop to humanoid talk */
     }
-    await verbalize($C`Talk? -- %s`, mtmp.data === $c.relem(mons, gu.urole.mnum) ? mplayer_talk$same_class_msg[rn2(3)] : mplayer_talk$other_class_msg[rn2(3)]);
+    await verbalize($C`Talk? -- %s`, mtmp.data === $c.relem(mons, gu.urole.mnum)
+        ? mplayer_talk$same_class_msg[rn2(3)]
+        : mplayer_talk$other_class_msg[rn2(3)]);
 }
 
 export function $init() {

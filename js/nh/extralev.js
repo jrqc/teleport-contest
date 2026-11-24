@@ -174,16 +174,20 @@ function miniwalk(x, y) {   // extralev.c:139
     let dirs = new Int32Array(4), $t1, $t2, $t3, $t4;
     while (1) {
         let q = 0;
-        if (x > 0 && !(gr.r[x][y].doortable & XL_LEFT) && (!gr.r[x - 1][y].doortable || !rn2(10))) {
+        if (x > 0 && !(gr.r[x][y].doortable & XL_LEFT)
+            && (!gr.r[x - 1][y].doortable || !rn2(10))) {
             dirs[($t1 = q, q = $t1 + 1 | 0, $t1)] = 0;
         }
-        if (x < 2 && !(gr.r[x][y].doortable & XL_RIGHT) && (!gr.r[x + 1][y].doortable || !rn2(10))) {
+        if (x < 2 && !(gr.r[x][y].doortable & XL_RIGHT)
+            && (!gr.r[x + 1][y].doortable || !rn2(10))) {
             dirs[($t2 = q, q = $t2 + 1 | 0, $t2)] = 1;
         }
-        if (y > 0 && !(gr.r[x][y].doortable & XL_UP) && (!gr.r[x][y - 1].doortable || !rn2(10))) {
+        if (y > 0 && !(gr.r[x][y].doortable & XL_UP)
+            && (!gr.r[x][y - 1].doortable || !rn2(10))) {
             dirs[($t3 = q, q = $t3 + 1 | 0, $t3)] = 2;
         }
-        if (y < 2 && !(gr.r[x][y].doortable & XL_DOWN) && (!gr.r[x][y + 1].doortable || !rn2(10))) {
+        if (y < 2 && !(gr.r[x][y].doortable & XL_DOWN)
+            && (!gr.r[x][y + 1].doortable || !rn2(10))) {
             dirs[($t4 = q, q = $t4 + 1 | 0, $t4)] = 3;
         }
         /* Rogue levels aren't just 3 by 3 mazes; they have some extra
@@ -281,7 +285,8 @@ export async function makeroguerooms() {   // extralev.c:193
                  * level 10, but since Rogue rooms are only
                  * encountered below level 10, use !rn2(7).
                  */
-                await add_room(lowx, lowy, hix, hiy, !rn2(7) ? 1 : 0, OROOM, FALSE);
+                await add_room(lowx, lowy, hix, hiy, !rn2(7) ? 1 : 0, OROOM,
+                    FALSE);
             }
         }
     }

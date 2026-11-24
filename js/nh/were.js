@@ -48,7 +48,8 @@ export async function were_change(mon) {   // were.c:9
         return;
     }
     if (is_human(mon.data)) {
-        if (!Protection_from_shape_changers() && !rn2(night() ? flags.moonphase === FULL_MOON ? 3 : 30 : flags.moonphase === FULL_MOON ? 10 : 50)) {
+        if (!Protection_from_shape_changers()
+            && !rn2(night() ? flags.moonphase === FULL_MOON ? 3 : 30 : flags.moonphase === FULL_MOON ? 10 : 50)) {
             await new_were(mon);   /* change into animal form */
             gw.were_changes = $c.add64(gw.were_changes, 1);
             if (!Deaf() && !canseemon(mon)) {
@@ -137,12 +138,15 @@ export async function new_were(mon) {   // were.c:96
     }
     const pm = counter_were(mon.data.pmidx);
     if (pm < LOW_PM) {
-        await impossible($C`unknown lycanthrope %s.`, mon.data.pmnames[NEUTRAL]);
+        await impossible($C`unknown lycanthrope %s.`,
+            mon.data.pmnames[NEUTRAL]);
         return;
     }
     if (canseemon(mon) && !Hallucination()) {
         /* pmname()+4: skip past "were" prefix */
-        await pline($C`%s changes into a %s.`, await Monnam(mon), is_human($c.relem(mons, pm)) ? $C`human` : pmname($c.relem(mons, pm), Mgender(mon)).add(4));
+        await pline($C`%s changes into a %s.`, await Monnam(mon),
+            is_human($c.relem(mons, pm)) ? $C`human`
+            : pmname($c.relem(mons, pm), Mgender(mon)).add(4));
     }
     set_mon_data(mon, $c.relem(mons, pm));
     if (helpless(mon)) {
@@ -158,7 +162,9 @@ export async function new_were(mon) {   // were.c:96
     await possibly_unwield(mon, FALSE);
     /* vision capability isn't changing so we don't call set_apparxy() to
        update mon's idea of where hero is; peaceful check is redundant */
-    if (svc.context.mon_moving && !mon.mpeaceful && onscary(mon.mux, mon.muy, mon) && monnear(mon, mon.mux, mon.muy)) {
+    if (svc.context.mon_moving && !mon.mpeaceful
+        && onscary(mon.mux, mon.muy, mon)
+        && monnear(mon, mon.mux, mon.muy)) {
         await monflee(mon, rn1(9, 2), TRUE, TRUE);   /* 2..10 turns */
     }
 }
@@ -183,7 +189,8 @@ export async function were_summon(ptr, yours, visible, genbuf) {   // were.c:142
         switch (pm) {
             case PM.WERERAT:
             case PM.HUMAN_WERERAT:
-                typ = rn2(3) ? PM.SEWER_RAT : rn2(3) ? PM.GIANT_RAT : PM.RABID_RAT;
+                typ = rn2(3) ? PM.SEWER_RAT
+                    : rn2(3) ? PM.GIANT_RAT : PM.RABID_RAT;
                 if (genbuf) {
                     $c.strcpy(genbuf, $C`rat`);
                 }
@@ -250,7 +257,10 @@ export async function you_unwere(purify) {   // were.c:213
         await You_feel($C`purified.`);
         await set_ulycn(NON_PM);   /* cure lycanthropy */
     }
-    if (!Unchanging() && is_were(gy.youmonst.data) && !monster_nearby() && (!controllable_poly || !await paranoid_query(ParanoidWerechange(), $C`Remain in beast form?`))) {
+    if (!Unchanging() && is_were(gy.youmonst.data)
+        && !monster_nearby()
+        && (!controllable_poly
+        || !await paranoid_query(ParanoidWerechange(), $C`Remain in beast form?`))) {
         await rehumanize();
     } else if (is_were(gy.youmonst.data) && !u.mtimedone) {
         $t1 = rn1(200, 200), u.mtimedone = $t1;   /* 40% of initial were change */

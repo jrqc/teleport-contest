@@ -159,9 +159,11 @@ export function get_othersym(idx, which_set) {   // symbols.c:131
     let sym = 0;
     const oidx = idx + SYM_OFF_X | 0;
     if (which_set === ROGUESET) {
-        sym = go.ov_rogue_syms[oidx] ? go.ov_rogue_syms[oidx] : gr.rogue_syms[oidx];
+        sym = go.ov_rogue_syms[oidx] ? go.ov_rogue_syms[oidx]
+            : gr.rogue_syms[oidx];
     } else {
-        sym = go.ov_primary_syms[oidx] ? go.ov_primary_syms[oidx] : gp.primary_syms[oidx];
+        sym = go.ov_primary_syms[oidx] ? go.ov_primary_syms[oidx]
+            : gp.primary_syms[oidx];
     }
     if (!sym) {
         switch (idx) {
@@ -237,14 +239,16 @@ export function assign_graphics(whichset) {   // symbols.c:217
         case ROGUESET:
             /* Adjust graphics display characters on Rogue levels */
             for (i = 0; i < SYM_MAX; i = i + 1 | 0) {
-                gs.showsyms[i] = go.ov_rogue_syms[i] ? go.ov_rogue_syms[i] : gr.rogue_syms[i];
+                gs.showsyms[i] = go.ov_rogue_syms[i] ? go.ov_rogue_syms[i]
+                    : gr.rogue_syms[i];
             }
             gc.currentgraphics = ROGUESET;
             break;
         case PRIMARYSET:
         default:
             for (i = 0; i < SYM_MAX; i = i + 1 | 0) {
-                gs.showsyms[i] = go.ov_primary_syms[i] ? go.ov_primary_syms[i] : gp.primary_syms[i];
+                gs.showsyms[i] = go.ov_primary_syms[i] ? go.ov_primary_syms[i]
+                    : gp.primary_syms[i];
             }
             gc.currentgraphics = PRIMARYSET;
             break;
@@ -259,7 +263,8 @@ export async function switch_symbols(nondefault) {   // symbols.c:253
     let i = 0;
     if (nondefault) {
         for (i = 0; i < SYM_MAX; i = i + 1 | 0) {
-            gs.showsyms[i] = go.ov_primary_syms[i] ? go.ov_primary_syms[i] : gp.primary_syms[i];
+            gs.showsyms[i] = go.ov_primary_syms[i] ? go.ov_primary_syms[i]
+                : gp.primary_syms[i];
         }
         /* curses doesn't assign any routine to dec..._callback but
            probably does the expected initialization under the hood
@@ -520,9 +525,12 @@ export async function parse_sym_line(buf, which_set) {   // symbols.c:438
                     /* color:off */
                     if (gc.chosen_symset_start) {
                         if (bufp) {
-                            if (!strcmpi(bufp, $C`true`) || !strcmpi(bufp, $C`yes`) || !strcmpi(bufp, $C`on`)) {
+                            if (!strcmpi(bufp, $C`true`) || !strcmpi(bufp, $C`yes`)
+                                || !strcmpi(bufp, $C`on`)) {
                                 gs.symset[which_set].nocolor = 0;
-                            } else if (!strcmpi(bufp, $C`false`) || !strcmpi(bufp, $C`no`) || !strcmpi(bufp, $C`off`)) {
+                            } else if (!strcmpi(bufp, $C`false`)
+                                || !strcmpi(bufp, $C`no`)
+                                || !strcmpi(bufp, $C`off`)) {
                                 gs.symset[which_set].nocolor = 1;
                             }
                         }
@@ -602,7 +610,8 @@ export async function load_symset(s, which_set) {   // symbols.c:673
     $t1 = await dupstr(s), gs.symset[which_set].name = $t1;
     if (await read_sym_file(which_set)) {
         await switch_symbols(TRUE);
-        await apply_customizations(gc.currentgraphics >>> 0, do_custom_symbols | do_custom_colors);
+        await apply_customizations(gc.currentgraphics >>> 0,
+            do_custom_symbols | do_custom_colors);
     } else {
         clear_symsetentry(which_set, TRUE);
         return 0;
@@ -741,7 +750,8 @@ export async function parsesymbols(opts, which_set) {   // symbols.c:773
     }
     if (symp) {
         if (symp.range && symp.range !== SYM.CONTROL) {
-            if (gs.symset[which_set].handling === H_UTF8 || lowc(strval.get(0)) === 117 && strval.get(1) === 43) {
+            if (gs.symset[which_set].handling === H_UTF8
+                || lowc(strval.get(0)) === 117 && strval.get(1) === 43) {
                 nh_snprintf($C`parsesymbols`, 836, new $c.Ptr(buf, 0), 256, $C`%s:%s`, opts, strval);
                 await glyphrep_to_custom_map_entries(new $c.Ptr(buf, 0), new $c.Ptr(glyph, 0));
             } else {
@@ -789,7 +799,8 @@ export function match_sym(buf) {   // symbols.c:852
         sp = $c.radd(sp, 1);
     }
     for (i = 0; i < 10; i = i + 1 | 0) {
-        if (len >= $c.strlen(match_sym$alternates[i].altnm) && !strncmpi(buf, match_sym$alternates[i].altnm, $c.i32(len))) {
+        if (len >= $c.strlen(match_sym$alternates[i].altnm)
+            && !strncmpi(buf, match_sym$alternates[i].altnm, $c.i32(len))) {
             sp = loadsyms[0];
             while (sp.range) {
                 if (!$c.strcmp(match_sym$alternates[i].nm, sp.name)) {
@@ -848,7 +859,8 @@ export async function do_symset(rogueflag) {   // symbols.c:909
             }
         }
         if (!setcount) {
-            await There($C`are no appropriate %s symbol sets available.`, rogueflag ? $C`rogue level` : $C`primary`);
+            await There($C`are no appropriate %s symbol sets available.`,
+                rogueflag ? $C`rogue level` : $C`primary`);
             return TRUE;
         }
         $c.sprintf(new $c.Ptr(fmtstr, 0), $C`%%-%ds %%s`, biggest + 2 | 0);
@@ -859,7 +871,10 @@ export async function do_symset(rogueflag) {   // symbols.c:909
         if (!symset_name) {
             defindx = any.a_int;
         }
-        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, $C`Default Symbols`, any.a_int === defindx ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE,
+            clr, $C`Default Symbols`,
+            any.a_int === defindx ? MENU.ITEMFLAGS_SELECTED
+            : MENU.ITEMFLAGS_NONE);
         for (sl = gs.symset_list; sl; sl = sl.next) {
             /* check restrictions */
             if (rogueflag ? sl.primary : sl.rogue) {
@@ -877,7 +892,10 @@ export async function do_symset(rogueflag) {   // symbols.c:909
                     defindx = any.a_int;
                 }
                 $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(fmtstr, 0), sl.name, sl.desc ? sl.desc : $C``);
-                await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), any.a_int === defindx ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+                await add_menu(tmpwin, nul_glyphinfo, any, 0, 0,
+                    ATR.NONE, clr, new $c.Ptr(buf, 0),
+                    any.a_int === defindx ? MENU.ITEMFLAGS_SELECTED
+                    : MENU.ITEMFLAGS_NONE);
             }
         }
         $c.sprintf(new $c.Ptr(buf, 0), $C`Select %ssymbol set:`, rogueflag ? $C`rogue level ` : $C``);
@@ -974,7 +992,8 @@ export async function do_symset(rogueflag) {   // symbols.c:909
     } else if (!rogueflag) {
         assign_graphics(PRIMARYSET);
     }
-    await apply_customizations(rogueflag ? ROGUESET : PRIMARYSET, do_custom_symbols | do_custom_colors);
+    await apply_customizations(rogueflag ? ROGUESET : PRIMARYSET,
+        do_custom_symbols | do_custom_colors);
     await preference_update()($C`symset`);
     return TRUE;
 }

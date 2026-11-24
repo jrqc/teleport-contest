@@ -73,7 +73,11 @@ function init_rumors(fp) {   // rumors.c:85
     /* in file but not used here */
     $c.fgets(new $c.Ptr(line, 0), 256, fp);   /* skip "don't edit" comment */
     $c.fgets(new $c.Ptr(line, 0), 256, fp);
-    if ($c.sscanf(new $c.Ptr(line, 0), new $c.Ptr(init_rumors$rumors_header, 0), new $c.Ptr(true_count, 0), new $c.FieldRef(gt, "true_rumor_size", "i64"), new $c.FieldRef(gt, "true_rumor_start", "u64"), new $c.Ptr(false_count, 0), new $c.FieldRef(gf, "false_rumor_size", "i64"), new $c.FieldRef(gf, "false_rumor_start", "u64"), new $c.Ptr(eof_offset, 0)) === 7 && gt.true_rumor_size > 0 && gf.false_rumor_size > 0) {
+    if ($c.sscanf(new $c.Ptr(line, 0), new $c.Ptr(init_rumors$rumors_header, 0), new $c.Ptr(true_count, 0), new $c.FieldRef(gt, "true_rumor_size", "i64"),
+        new $c.FieldRef(gt, "true_rumor_start", "u64"), new $c.Ptr(false_count, 0), new $c.FieldRef(gf, "false_rumor_size", "i64"),
+        new $c.FieldRef(gf, "false_rumor_start", "u64"), new $c.Ptr(eof_offset, 0)) === 7
+        && gt.true_rumor_size > 0
+        && gf.false_rumor_size > 0) {
         gt.true_rumor_end = $c.add64($c.i64(gt.true_rumor_start), gt.true_rumor_size);
         /* assert( gt.true_rumor_end == false_rumor_start ); */
         gf.false_rumor_end = $c.add64($c.i64(gf.false_rumor_start), gf.false_rumor_size);
@@ -139,7 +143,8 @@ export async function getrumor(truth, rumor_buf, exclude_cookie) {   // rumors.c
                     return $c.strcpy(rumor_buf, $C`Oops...`);
             }
             $c.strcpy(rumor_buf, await get_rnd_line(rumors, new $c.Ptr(line, 0), 256, rn2, beginning, ending, MD_PAD.RUMORS));
-        } while (($t1 = count, count = $t1 + 1 | 0, $t1) < 50 && exclude_cookie && !$c.strncmp(rumor_buf, getrumor$cookie_marker, $c.u64(marklen)));
+        } while (($t1 = count, count = $t1 + 1 | 0, $t1) < 50 && exclude_cookie
+            && !$c.strncmp(rumor_buf, getrumor$cookie_marker, $c.u64(marklen)));
         $c.fclose(rumors);
         if (count >= 50) {
             await impossible($C`Can't find non-cookie rumor?`);
@@ -150,7 +155,8 @@ export async function getrumor(truth, rumor_buf, exclude_cookie) {   // rumors.c
         await couldnt_open_file($C`rumors`);
         gt.true_rumor_size = -1;   /* don't try to open it again */
     }
-    if (!exclude_cookie && !$c.strncmp(rumor_buf, getrumor$cookie_marker, $c.u64(marklen))) {
+    if (!exclude_cookie
+        && !$c.strncmp(rumor_buf, getrumor$cookie_marker, $c.u64(marklen))) {
         /* remove cookie_marker from the string */
         let src = rumor_buf.add(marklen);
         let dst = rumor_buf;
@@ -210,7 +216,8 @@ export async function rumor_check() {   // rumors.c:196
                 $c.sprintf(new $c.Ptr(rumor_buf, 0), $C`T %06ld %s`, ftell_rumor_start, xcrypt(new $c.Ptr(line, 0), new $c.Ptr(xbuf, 0)));
                 await putstr()(tmpwin[0], 0, new $c.Ptr(rumor_buf, 0));
                 /* find last true rumor */
-                while ($c.fgets(new $c.Ptr(line, 0), 256, rumors) && $c.ftell(rumors) < gt.true_rumor_end) {
+                while ($c.fgets(new $c.Ptr(line, 0), 256, rumors)
+                    && $c.ftell(rumors) < gt.true_rumor_end) {
                     continue;
                 }
                 if ((endp = $c.strchr(new $c.Ptr(line, 0), 10)) !== null) {
@@ -228,7 +235,8 @@ export async function rumor_check() {   // rumors.c:196
                 $c.sprintf(new $c.Ptr(rumor_buf, 0), $C`F %06ld %s`, ftell_rumor_start, xcrypt(new $c.Ptr(line, 0), new $c.Ptr(xbuf, 0)));
                 await putstr()(tmpwin[0], 0, new $c.Ptr(rumor_buf, 0));
                 /* find last false rumor */
-                while ($c.fgets(new $c.Ptr(line, 0), 256, rumors) && $c.ftell(rumors) < gf.false_rumor_end) {
+                while ($c.fgets(new $c.Ptr(line, 0), 256, rumors)
+                    && $c.ftell(rumors) < gf.false_rumor_end) {
                     continue;
                 }
                 if ((endp = $c.strchr(new $c.Ptr(line, 0), 10)) !== null) {
@@ -449,7 +457,8 @@ async function get_rnd_line(fh, buf, bufsiz, rng, startpos, endpos, padlength) {
         newl.set(0, 0);
     }
     /* decrypt line; make sure that our intermediate buffer is big enough */
-    const xbufp = $c.strlen(buf) <= 255 ? new $c.Ptr(xbuf, 0) : $c.asArr(await alloc($c.u32($c.strlen(buf)) + 1 >>> 0), Int8Array);
+    const xbufp = $c.strlen(buf) <= 255 ? new $c.Ptr(xbuf, 0)
+        : $c.asArr(await alloc($c.u32($c.strlen(buf)) + 1 >>> 0), Int8Array);
     $c.strcpy(buf, xcrypt(buf, xbufp));
     if (!$c.peq(xbufp, new $c.Ptr(xbuf, 0))) {
         $c.free(xbufp);
@@ -516,7 +525,10 @@ export async function outrumor(truth, mechanism) {   // rumors.c:529
     switch (mechanism) {
         case BY.ORACLE:
             /* Oracle delivers the rumor */
-            await pline($C`True to her word, the Oracle %ssays: `, !rn2(4) ? $C`offhandedly ` : !rn2(3) ? $C`casually ` : rn2(2) ? $C`nonchalantly ` : $C``);
+            await pline($C`True to her word, the Oracle %ssays: `,
+                !rn2(4) ? $C`offhandedly `
+                : !rn2(3) ? $C`casually `
+                : rn2(2) ? $C`nonchalantly ` : $C``);
             await verbalize1(line);
             /* [WIS exercised by getrumor()] */
             return;
@@ -624,7 +636,10 @@ export async function outoracle(special, delphi) {   // rumors.c:640
             }
             tmpwin = await create_nhwindow()(NHW.TEXT);
             if (delphi) {
-                await putstr()(tmpwin, 0, special ? $C`The Oracle scornfully takes all your gold and says:` : $C`The Oracle meditates for a moment and then intones:`);
+                await putstr()(tmpwin, 0,
+                    special
+                    ? $C`The Oracle scornfully takes all your gold and says:`
+                    : $C`The Oracle meditates for a moment and then intones:`);
             } else {
                 await putstr()(tmpwin, 0, $C`The message reads:`);
             }
@@ -678,7 +693,8 @@ export async function doconsult(oracl) {   // rumors.c:696
             break;
         case 110:
             /* don't even ask */
-            if (umoney <= minor_cost || (svo.oracle_cnt === 1 || go.oracle_flg < 0)) {
+            if (umoney <= minor_cost
+                || (svo.oracle_cnt === 1 || go.oracle_flg < 0)) {
                 return ECMD.OK;
             }
             $c.sprintf(new $c.Ptr(qbuf, 0), $C`"Then dost thou desire a major one?" (%d %s)`, major_cost, await currency(major_cost));
@@ -766,7 +782,8 @@ export async function CapitalMon(word) {   // rumors.c:791
          * check full words though: "Foo" matches "Foo" and "Foo bar" and
          * "Foo's bar" but not "Foobar".  We use case-sensitive matching.
          */
-        if (!$c.strncmp(nam, word, nln) && (!word.get(nln) || word.get(nln) === 32 || word.get(nln) === 39)) {
+        if (!$c.strncmp(nam, word, nln)
+            && (!word.get(nln) || word.get(nln) === 32 || word.get(nln) === 39)) {
             return TRUE;   /* 'word' is a capitalized monster name */
         }
     }
@@ -862,7 +879,8 @@ async function init_CapMons() {   // rumors.c:829
      */
     if (wizard() && explicitdebug($C`CapMons`)) {
         const tmpwin = await create_nhwindow()(NHW.TEXT);
-        await putstr()(tmpwin, 0, $C`Capitalized monster type names normally preceded by "the":`);
+        await putstr()(tmpwin, 0,
+            $C`Capitalized monster type names normally preceded by "the":`);
         for (i = 0; i < CapMonSiz - 1 >>> 0; i = i + 1 >>> 0) {
             $c.sprintf(new $c.Ptr(buf, 0), $C`  %.77s`, CapMons.get(i));
             await putstr()(tmpwin, 0, new $c.Ptr(buf, 0));

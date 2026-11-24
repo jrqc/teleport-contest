@@ -105,7 +105,10 @@ function randrole_filtered() {   // role.c:731
     /* this doesn't rule out impossible combinations but attempts to
        honor all the filter masks */
     for (i = 0; i < 13; i = i + 1 | 0) {   /* -1: avoid terminating element */
-        if (ok_role(i, ROLE_NONE, ROLE_NONE, ROLE_NONE) && ok_race(i, ROLE_RANDOM, ROLE_NONE, ROLE_NONE) && ok_gend(i, ROLE_NONE, ROLE_RANDOM, ROLE_NONE) && ok_align(i, ROLE_NONE, ROLE_NONE, ROLE_RANDOM)) {
+        if (ok_role(i, ROLE_NONE, ROLE_NONE, ROLE_NONE)
+            && ok_race(i, ROLE_RANDOM, ROLE_NONE, ROLE_NONE)
+            && ok_gend(i, ROLE_NONE, ROLE_RANDOM, ROLE_NONE)
+            && ok_align(i, ROLE_NONE, ROLE_NONE, ROLE_RANDOM)) {
             set[($t1 = n, n = $t1 + 1 | 0, $t1)] = i;
         }
     }
@@ -137,7 +140,8 @@ export async function str2role(str) {   // role.c:747
             return i;
         }
     }
-    if (len === 1 && (str.get(0) === 42 || str.get(0) === 64) || !strncmpi(str, new $c.Ptr(randomstr, 0), len)) {
+    if (len === 1 && (str.get(0) === 42 || str.get(0) === 64)
+        || !strncmpi(str, new $c.Ptr(randomstr, 0), len)) {
         return ROLE_RANDOM;
     }
     /* Couldn't find anything appropriate */
@@ -150,7 +154,8 @@ export async function str2role(str) {   // role.c:747
  */
 export function validrace(rolenum, racenum) {   // role.c:778
     /* Assumes validrole */
-    return racenum >= 0 && racenum < 5 && roles[rolenum].allow & races[racenum].allow & ROLE_RACEMASK ? 1 : 0;
+    return racenum >= 0 && racenum < 5
+        && roles[rolenum].allow & races[racenum].allow & ROLE_RACEMASK ? 1 : 0;
 }
 /**
  * @param {number} rolenum int
@@ -208,7 +213,8 @@ export async function str2race(str) {   // role.c:813
             return i;
         }
     }
-    if (len === 1 && (str.get(0) === 42 || str.get(0) === 64) || !strncmpi(str, new $c.Ptr(randomstr, 0), len)) {
+    if (len === 1 && (str.get(0) === 42 || str.get(0) === 64)
+        || !strncmpi(str, new $c.Ptr(randomstr, 0), len)) {
         return ROLE_RANDOM;
     }
     /* Couldn't find anything appropriate */
@@ -222,7 +228,8 @@ export async function str2race(str) {   // role.c:813
  */
 export function validgend(rolenum, racenum, gendnum) {   // role.c:844
     /* Assumes validrole and validrace */
-    return gendnum >= 0 && gendnum < ROLE_GENDERS && roles[rolenum].allow & races[racenum].allow & genders[gendnum].allow & ROLE_GENDMASK ? 1 : 0;
+    return gendnum >= 0 && gendnum < ROLE_GENDERS
+        && roles[rolenum].allow & races[racenum].allow & genders[gendnum].allow & ROLE_GENDMASK ? 1 : 0;
 }
 /**
  * @param {number} rolenum int
@@ -276,7 +283,8 @@ export async function str2gend(str) {   // role.c:880
             return i;
         }
     }
-    if (len === 1 && (str.get(0) === 42 || str.get(0) === 64) || !strncmpi(str, new $c.Ptr(randomstr, 0), len)) {
+    if (len === 1 && (str.get(0) === 42 || str.get(0) === 64)
+        || !strncmpi(str, new $c.Ptr(randomstr, 0), len)) {
         return ROLE_RANDOM;
     }
     /* Couldn't find anything appropriate */
@@ -290,7 +298,8 @@ export async function str2gend(str) {   // role.c:880
  */
 export function validalign(rolenum, racenum, alignnum) {   // role.c:907
     /* Assumes validrole and validrace */
-    return alignnum >= 0 && alignnum < ROLE_ALIGNS && roles[rolenum].allow & races[racenum].allow & aligns[alignnum].allow & AM.MASK ? 1 : 0;
+    return alignnum >= 0 && alignnum < ROLE_ALIGNS
+        && roles[rolenum].allow & races[racenum].allow & aligns[alignnum].allow & AM.MASK ? 1 : 0;
 }
 /**
  * @param {number} rolenum int
@@ -344,7 +353,8 @@ export async function str2align(str) {   // role.c:943
             return i;
         }
     }
-    if (len === 1 && (str.get(0) === 42 || str.get(0) === 64) || !strncmpi(str, new $c.Ptr(randomstr, 0), len)) {
+    if (len === 1 && (str.get(0) === 42 || str.get(0) === 64)
+        || !strncmpi(str, new $c.Ptr(randomstr, 0), len)) {
         return ROLE_RANDOM;
     }
     /* Couldn't find anything appropriate */
@@ -365,13 +375,16 @@ export function ok_role(rolenum, racenum, gendnum, alignnum) {   // role.c:971
             return FALSE;
         }
         allow = roles[rolenum].allow;
-        if (racenum >= 0 && racenum < 5 && !(allow & races[racenum].allow & ROLE_RACEMASK)) {
+        if (racenum >= 0 && racenum < 5
+            && !(allow & races[racenum].allow & ROLE_RACEMASK)) {
             return FALSE;
         }
-        if (gendnum >= 0 && gendnum < ROLE_GENDERS && !(allow & genders[gendnum].allow & ROLE_GENDMASK)) {
+        if (gendnum >= 0 && gendnum < ROLE_GENDERS
+            && !(allow & genders[gendnum].allow & ROLE_GENDMASK)) {
             return FALSE;
         }
-        if (alignnum >= 0 && alignnum < ROLE_ALIGNS && !(allow & aligns[alignnum].allow & AM.MASK)) {
+        if (alignnum >= 0 && alignnum < ROLE_ALIGNS
+            && !(allow & aligns[alignnum].allow & AM.MASK)) {
             return FALSE;
         }
         return TRUE;
@@ -382,13 +395,16 @@ export function ok_role(rolenum, racenum, gendnum, alignnum) {   // role.c:971
                 continue;
             }
             allow = roles[i].allow;
-            if (racenum >= 0 && racenum < 5 && !(allow & races[racenum].allow & ROLE_RACEMASK)) {
+            if (racenum >= 0 && racenum < 5
+                && !(allow & races[racenum].allow & ROLE_RACEMASK)) {
                 continue;
             }
-            if (gendnum >= 0 && gendnum < ROLE_GENDERS && !(allow & genders[gendnum].allow & ROLE_GENDMASK)) {
+            if (gendnum >= 0 && gendnum < ROLE_GENDERS
+                && !(allow & genders[gendnum].allow & ROLE_GENDMASK)) {
                 continue;
             }
-            if (alignnum >= 0 && alignnum < ROLE_ALIGNS && !(allow & aligns[alignnum].allow & AM.MASK)) {
+            if (alignnum >= 0 && alignnum < ROLE_ALIGNS
+                && !(allow & aligns[alignnum].allow & AM.MASK)) {
                 continue;
             }
             return TRUE;
@@ -410,7 +426,13 @@ export function pick_role(racenum, gendnum, alignnum, pickhow) {   // role.c:101
     let i = 0, set = new Int32Array(14), $t1;
     let roles_ok = 0;
     for (i = 0; i < 13; i = i + 1 | 0) {
-        if (ok_role(i, racenum, gendnum, alignnum) && ok_race(i, racenum >= 0 ? racenum : ROLE_RANDOM, gendnum, alignnum) && ok_gend(i, racenum, gendnum >= 0 ? gendnum : ROLE_RANDOM, alignnum) && ok_align(i, racenum, gendnum, alignnum >= 0 ? alignnum : ROLE_RANDOM)) {
+        if (ok_role(i, racenum, gendnum, alignnum)
+            && ok_race(i, racenum >= 0 ? racenum : ROLE_RANDOM,
+            gendnum, alignnum)
+            && ok_gend(i, racenum,
+            gendnum >= 0 ? gendnum : ROLE_RANDOM, alignnum)
+            && ok_align(i, racenum,
+            gendnum, alignnum >= 0 ? alignnum : ROLE_RANDOM)) {
             set[($t1 = roles_ok, roles_ok = $t1 + 1 | 0, $t1)] = i;
         }
     }
@@ -434,13 +456,16 @@ export function ok_race(rolenum, racenum, gendnum, alignnum) {   // role.c:1037
             return FALSE;
         }
         allow = races[racenum].allow;
-        if (rolenum >= 0 && rolenum < 13 && !(allow & roles[rolenum].allow & ROLE_RACEMASK)) {
+        if (rolenum >= 0 && rolenum < 13
+            && !(allow & roles[rolenum].allow & ROLE_RACEMASK)) {
             return FALSE;
         }
-        if (gendnum >= 0 && gendnum < ROLE_GENDERS && !(allow & genders[gendnum].allow & ROLE_GENDMASK)) {
+        if (gendnum >= 0 && gendnum < ROLE_GENDERS
+            && !(allow & genders[gendnum].allow & ROLE_GENDMASK)) {
             return FALSE;
         }
-        if (alignnum >= 0 && alignnum < ROLE_ALIGNS && !(allow & aligns[alignnum].allow & AM.MASK)) {
+        if (alignnum >= 0 && alignnum < ROLE_ALIGNS
+            && !(allow & aligns[alignnum].allow & AM.MASK)) {
             return FALSE;
         }
         return TRUE;
@@ -451,13 +476,16 @@ export function ok_race(rolenum, racenum, gendnum, alignnum) {   // role.c:1037
                 continue;
             }
             allow = races[i].allow;
-            if (rolenum >= 0 && rolenum < 13 && !(allow & roles[rolenum].allow & ROLE_RACEMASK)) {
+            if (rolenum >= 0 && rolenum < 13
+                && !(allow & roles[rolenum].allow & ROLE_RACEMASK)) {
                 continue;
             }
-            if (gendnum >= 0 && gendnum < ROLE_GENDERS && !(allow & genders[gendnum].allow & ROLE_GENDMASK)) {
+            if (gendnum >= 0 && gendnum < ROLE_GENDERS
+                && !(allow & genders[gendnum].allow & ROLE_GENDMASK)) {
                 continue;
             }
-            if (alignnum >= 0 && alignnum < ROLE_ALIGNS && !(allow & aligns[alignnum].allow & AM.MASK)) {
+            if (alignnum >= 0 && alignnum < ROLE_ALIGNS
+                && !(allow & aligns[alignnum].allow & AM.MASK)) {
                 continue;
             }
             return TRUE;
@@ -514,10 +542,12 @@ export function ok_gend(rolenum, racenum, gendnum, alignnum) {   // role.c:1107
             return FALSE;
         }
         allow = genders[gendnum].allow;
-        if (rolenum >= 0 && rolenum < 13 && !(allow & roles[rolenum].allow & ROLE_GENDMASK)) {
+        if (rolenum >= 0 && rolenum < 13
+            && !(allow & roles[rolenum].allow & ROLE_GENDMASK)) {
             return FALSE;
         }
-        if (racenum >= 0 && racenum < 5 && !(allow & races[racenum].allow & ROLE_GENDMASK)) {
+        if (racenum >= 0 && racenum < 5
+            && !(allow & races[racenum].allow & ROLE_GENDMASK)) {
             return FALSE;
         }
         return TRUE;
@@ -528,10 +558,12 @@ export function ok_gend(rolenum, racenum, gendnum, alignnum) {   // role.c:1107
                 continue;
             }
             allow = genders[i].allow;
-            if (rolenum >= 0 && rolenum < 13 && !(allow & roles[rolenum].allow & ROLE_GENDMASK)) {
+            if (rolenum >= 0 && rolenum < 13
+                && !(allow & roles[rolenum].allow & ROLE_GENDMASK)) {
                 continue;
             }
-            if (racenum >= 0 && racenum < 5 && !(allow & races[racenum].allow & ROLE_GENDMASK)) {
+            if (racenum >= 0 && racenum < 5
+                && !(allow & races[racenum].allow & ROLE_GENDMASK)) {
                 continue;
             }
             return TRUE;
@@ -589,10 +621,12 @@ export function ok_align(rolenum, racenum, gendnum, alignnum) {   // role.c:1172
             return FALSE;
         }
         allow = aligns[alignnum].allow;
-        if (rolenum >= 0 && rolenum < 13 && !(allow & roles[rolenum].allow & AM.MASK)) {
+        if (rolenum >= 0 && rolenum < 13
+            && !(allow & roles[rolenum].allow & AM.MASK)) {
             return FALSE;
         }
-        if (racenum >= 0 && racenum < 5 && !(allow & races[racenum].allow & AM.MASK)) {
+        if (racenum >= 0 && racenum < 5
+            && !(allow & races[racenum].allow & AM.MASK)) {
             return FALSE;
         }
         return TRUE;
@@ -603,10 +637,12 @@ export function ok_align(rolenum, racenum, gendnum, alignnum) {   // role.c:1172
                 continue;
             }
             allow = aligns[i].allow;
-            if (rolenum >= 0 && rolenum < 13 && !(allow & roles[rolenum].allow & AM.MASK)) {
+            if (rolenum >= 0 && rolenum < 13
+                && !(allow & roles[rolenum].allow & AM.MASK)) {
                 continue;
             }
-            if (racenum >= 0 && racenum < 5 && !(allow & races[racenum].allow & AM.MASK)) {
+            if (racenum >= 0 && racenum < 5
+                && !(allow & races[racenum].allow & AM.MASK)) {
                 continue;
             }
             return TRUE;
@@ -663,29 +699,39 @@ export function rigid_role_checks() {   // role.c:1235
          * via -uXXXX-@ or OPTIONS=role:random then choose the role
          * in here to narrow down later choices.
          */
-        $t1 = pick_role(flags.initrace, flags.initgend, flags.initalign, PICK.RANDOM), flags.initrole = $t1;
+        $t1 = pick_role(flags.initrace, flags.initgend,
+            flags.initalign, PICK.RANDOM), flags.initrole = $t1;
         if (flags.initrole < 0) {
             $t2 = randrole_filtered(), flags.initrole = $t2;
         }
     }
-    if (flags.initrace === ROLE_RANDOM && (tmp = pick_race(flags.initrole, flags.initgend, flags.initalign, PICK.RANDOM)) !== ROLE_NONE) {
+    if (flags.initrace === ROLE_RANDOM
+        && (tmp = pick_race(flags.initrole, flags.initgend,
+        flags.initalign, PICK.RANDOM)) !== ROLE_NONE) {
         flags.initrace = tmp;
     }
-    if (flags.initalign === ROLE_RANDOM && (tmp = pick_align(flags.initrole, flags.initrace, flags.initgend, PICK.RANDOM)) !== ROLE_NONE) {
+    if (flags.initalign === ROLE_RANDOM
+        && (tmp = pick_align(flags.initrole, flags.initrace,
+        flags.initgend, PICK.RANDOM)) !== ROLE_NONE) {
         flags.initalign = tmp;
     }
-    if (flags.initgend === ROLE_RANDOM && (tmp = pick_gend(flags.initrole, flags.initrace, flags.initalign, PICK.RANDOM)) !== ROLE_NONE) {
+    if (flags.initgend === ROLE_RANDOM
+        && (tmp = pick_gend(flags.initrole, flags.initrace,
+        flags.initalign, PICK.RANDOM)) !== ROLE_NONE) {
         flags.initgend = tmp;
     }
     if (flags.initrole !== ROLE_NONE) {
         if (flags.initrace === ROLE_NONE) {
-            $t3 = pick_race(flags.initrole, flags.initgend, flags.initalign, PICK.RIGID), flags.initrace = $t3;
+            $t3 = pick_race(flags.initrole, flags.initgend,
+                flags.initalign, PICK.RIGID), flags.initrace = $t3;
         }
         if (flags.initalign === ROLE_NONE) {
-            $t4 = pick_align(flags.initrole, flags.initrace, flags.initgend, PICK.RIGID), flags.initalign = $t4;
+            $t4 = pick_align(flags.initrole, flags.initrace,
+                flags.initgend, PICK.RIGID), flags.initalign = $t4;
         }
         if (flags.initgend === ROLE_NONE) {
-            $t5 = pick_gend(flags.initrole, flags.initrace, flags.initalign, PICK.RIGID), flags.initgend = $t5;
+            $t5 = pick_gend(flags.initrole, flags.initrace,
+                flags.initalign, PICK.RIGID), flags.initgend = $t5;
         }
     }
 }
@@ -803,7 +849,8 @@ export function clearrolefilter(which) {   // role.c:1358
  */
 function promptsep(buf, num_post_attribs) {   // role.c:1384
     const conjuct = $C`and `;
-    if (num_post_attribs > 1 && gr.role_post_attribs < num_post_attribs && gr.role_post_attribs > 1) {
+    if (num_post_attribs > 1 && gr.role_post_attribs < num_post_attribs
+        && gr.role_post_attribs > 1) {
         $c.strcat(buf, $C`,`);
     }
     $c.strcat(buf, $C` `);
@@ -879,7 +926,8 @@ export function root_plselection_prompt(suppliedbuf, buflen, rolenum, racenum, g
     if (racenum !== ROLE_NONE && racenum !== ROLE_RANDOM) {
         aligncount = race_alignmentcount(racenum);
     }
-    if (alignnum !== ROLE_NONE && alignnum !== ROLE_RANDOM && ok_align(rolenum, racenum, gendnum, alignnum)) {
+    if (alignnum !== ROLE_NONE && alignnum !== ROLE_RANDOM
+        && ok_align(rolenum, racenum, gendnum, alignnum)) {
         /* 'if' and 'else' had duplicate code here; probably a copy+parse
          * oversight; if a problem with filtering of random role selection
          * crops up, this is probably the place to start looking */
@@ -898,7 +946,10 @@ export function root_plselection_prompt(suppliedbuf, buflen, rolenum, racenum, g
         /* if alignment not specified, but race is specified
            and only one choice of alignment for that race then
            don't include it in the later list */
-        if (racenum !== ROLE_NONE && racenum !== ROLE_RANDOM && ok_race(rolenum, racenum, gendnum, alignnum) && aligncount > 1 || (racenum === ROLE_NONE || racenum === ROLE_RANDOM)) {
+        if (racenum !== ROLE_NONE && racenum !== ROLE_RANDOM
+            && ok_race(rolenum, racenum, gendnum, alignnum)
+            && aligncount > 1
+            || (racenum === ROLE_NONE || racenum === ROLE_RANDOM)) {
             gr.role_pa[BP.ALIGN] = 1;
             gr.role_post_attribs = $c.i8(gr.role_post_attribs + 1);
         }
@@ -912,7 +963,8 @@ export function root_plselection_prompt(suppliedbuf, buflen, rolenum, racenum, g
         if (validrole(rolenum)) {
             /* if role specified, and multiple choice of genders for it,
                and name of role itself does not distinguish gender */
-            if (rolenum !== ROLE_NONE && gendercount > 1 && !roles[rolenum].name.f) {
+            if (rolenum !== ROLE_NONE && gendercount > 1
+                && !roles[rolenum].name.f) {
                 if (donefirst) {
                     $c.strcat(new $c.Ptr(buf, 0), $C` `);
                 }
@@ -930,14 +982,16 @@ export function root_plselection_prompt(suppliedbuf, buflen, rolenum, racenum, g
         /* if gender not specified, but role is specified
                 and only one choice of gender then
                 don't include it in the later list */
-        if (validrole(rolenum) && gendercount > 1 || !validrole(rolenum)) {
+        if (validrole(rolenum) && gendercount > 1
+            || !validrole(rolenum)) {
             gr.role_pa[BP.GEND] = 1;
             gr.role_post_attribs = $c.i8(gr.role_post_attribs + 1);
         }
     }
     /* <your lawful female> */
     if (racenum !== ROLE_NONE && racenum !== ROLE_RANDOM) {
-        if (validrole(rolenum) && ok_race(rolenum, racenum, gendnum, alignnum)) {
+        if (validrole(rolenum)
+            && ok_race(rolenum, racenum, gendnum, alignnum)) {
             if (donefirst) {
                 $c.strcat(new $c.Ptr(buf, 0), $C` `);
             }
@@ -983,7 +1037,8 @@ export function root_plselection_prompt(suppliedbuf, buflen, rolenum, racenum, g
         gr.role_pa[BP.ROLE] = 1;
         gr.role_post_attribs = $c.i8(gr.role_post_attribs + 1);
     }
-    if ((racenum === ROLE_NONE || racenum === ROLE_RANDOM) && !validrole(rolenum)) {
+    if ((racenum === ROLE_NONE || racenum === ROLE_RANDOM)
+        && !validrole(rolenum)) {
         if (donefirst) {
             $c.strcat(new $c.Ptr(buf, 0), $C` `);
         }
@@ -1023,7 +1078,8 @@ export async function build_plselection_prompt(buf, buflen, rolenum, racenum, ge
         $c.strcat(new $c.Ptr(tmpbuf, 0), $C`a `);
     }
     /* <your> */
-    root_plselection_prompt(eos(new $c.Ptr(tmpbuf, 0)), (buflen >>> 0) - await Strlen_(new $c.Ptr(tmpbuf, 0), $C`build_plselection_prompt`, 1601) >>> 0 | 0, rolenum, racenum, gendnum, alignnum);
+    root_plselection_prompt(eos(new $c.Ptr(tmpbuf, 0)), (buflen >>> 0) - await Strlen_(new $c.Ptr(tmpbuf, 0), $C`build_plselection_prompt`, 1601) >>> 0 | 0,
+        rolenum, racenum, gendnum, alignnum);
     /* "Shall I pick a character's role, race, gender, and alignment for you?"
        plus " [ynaq] (y)" is a little too long for a conventional 80 columns;
        also, "pick a character's <anything>" sounds a bit stilted */
@@ -1032,7 +1088,8 @@ export async function build_plselection_prompt(buf, buflen, rolenum, racenum, ge
     /* don't bother splitting caveman/cavewoman or priest/priestess
        in order to apply possessive suffix to both halves, but do
        change "priest/priestess'" to "priest/priestess's" */
-    if ((p = strstri(buf, $C`priest/priestess'`)) !== null && p.get($c.idx(17)) === 0) {
+    if ((p = strstri(buf, $C`priest/priestess'`)) !== null
+        && p.get($c.idx(17)) === 0) {
         strkitten(buf, 115);
     }
     /* buf should now be:
@@ -1094,7 +1151,9 @@ export async function plnamesuffix() {   // role.c:1665
             /* need to ignore appended '-role-race-gender-alignment';
                'plnamelen' is non-zero when dealing with plname[] value that
                contains a username with dash(es) in it and is usually 0 */
-            i = (eptr = $c.strchr(new $c.Ptr(svp.plname, 0).add(gp.plnamelen), 45)) !== null ? $c.i32($c.pdiff(eptr, new $c.Ptr(svp.plname, 0))) : await Strlen_(new $c.Ptr(svp.plname, 0), $C`plnamesuffix`, 1680) | 0;
+            i = (eptr = $c.strchr(new $c.Ptr(svp.plname, 0).add(gp.plnamelen), 45)) !== null
+                ? $c.i32($c.pdiff(eptr, new $c.Ptr(svp.plname, 0)))
+                : await Strlen_(new $c.Ptr(svp.plname, 0), $C`plnamesuffix`, 1680) | 0;
             /* look for plname[] in the 'genericusers' space-separated list */
             if (findword(sysopt.genericusers, new $c.Ptr(svp.plname, 0), i, FALSE)) {   /* it's generic; remove it so that askname() will be called */
                 svp.plname[0] = 0;
@@ -1155,7 +1214,8 @@ export async function role_selection_prolog(which, where) {   // role.c:1726
         allowmask = roles[r].allow;
         if ((allowmask & ROLE_RACEMASK) === M2.HUMAN) {
             c = 0;   /* races[human] */
-        } else if (c >= 0 && c < 5 && !(allowmask & ROLE_RACEMASK & races[c].allow)) {
+        } else if (c >= 0 && c < 5
+            && !(allowmask & ROLE_RACEMASK & races[c].allow)) {
             c = ROLE_RANDOM;
         }
         if ((allowmask & ROLE_GENDMASK) === ROLE_MALE) {
@@ -1256,7 +1316,8 @@ export async function role_menu_extra(which, where, preselect) {   // role.c:181
                 if (c >= 0) {
                     constrainer = $C`role`;
                     forcedvalue = races[c].noun;
-                } else if (f >= 0 && (allowmask & ~gr.rfilter.mask) === races[f].selfmask) {
+                } else if (f >= 0 && (allowmask & ~gr.rfilter.mask)
+                    === races[f].selfmask) {
                     /* if there is only one race choice available due to user
                        options disallowing others, race menu entry is disabled */
                     constrainer = $C`filter`;
@@ -1278,7 +1339,8 @@ export async function role_menu_extra(which, where, preselect) {   // role.c:181
                 if (gend >= 0) {
                     constrainer = $C`role`;
                     forcedvalue = genders[gend].adj;
-                } else if (f >= 0 && (allowmask & ~gr.rfilter.mask) === genders[f].allow) {
+                } else if (f >= 0 && (allowmask & ~gr.rfilter.mask)
+                    === genders[f].allow) {
                     /* if there is only one gender choice available due to user
                        options disallowing other, gender menu entry is disabled */
                     constrainer = $C`filter`;
@@ -1316,7 +1378,8 @@ export async function role_menu_extra(which, where, preselect) {   // role.c:181
                     constrainer = $C`race`;
                 }
             }
-            if (f >= 0 && !constrainer && (AM.MASK & ~gr.rfilter.mask) === aligns[f].allow) {
+            if (f >= 0 && !constrainer
+                && (AM.MASK & ~gr.rfilter.mask) === aligns[f].allow) {
                 /* if there is only one alignment choice available due to user
                    options disallowing others, algn menu entry is disabled */
                 constrainer = $C`filter`;
@@ -1336,17 +1399,23 @@ export async function role_menu_extra(which, where, preselect) {   // role.c:181
     } else if (what) {
         any.a_int = RS_menu_arg(which);
         $c.sprintf(new $c.Ptr(buf, 0), $C`Pick%s %s first`, f >= 0 ? $C` another` : $C``, what);
-        await add_menu(where, nul_glyphinfo, any, role_menu_extra$RS_menu_let[which], 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
+        await add_menu(where, nul_glyphinfo, any, role_menu_extra$RS_menu_let[which], 0,
+            ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
     } else if (which === RS.filter) {
         any.a_int = ROLE_RANDOM - (RS.filter + 1);
         $c.sprintf(new $c.Ptr(setfiltering, 0), $C`%s role/race/&c filtering`, gotrolefilter() ? $C`Reset` : $C`Set`);
-        await add_menu(where, nul_glyphinfo, any, 126, 0, ATR.NONE, clr, new $c.Ptr(setfiltering, 0), MENU.ITEMFLAGS_NONE);
+        await add_menu(where, nul_glyphinfo, any, 126, 0, ATR.NONE,
+            clr, new $c.Ptr(setfiltering, 0), MENU.ITEMFLAGS_NONE);
     } else if (which === ROLE_RANDOM) {
         any.a_int = ROLE_RANDOM;
-        await add_menu(where, nul_glyphinfo, any, 42, 0, ATR.NONE, clr, $C`Random`, preselect ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+        await add_menu(where, nul_glyphinfo, any, 42, 0,
+            ATR.NONE, clr, $C`Random`,
+            preselect ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     } else if (which === ROLE_NONE) {
         any.a_int = ROLE_NONE;
-        await add_menu(where, nul_glyphinfo, any, 113, 0, ATR.NONE, clr, $C`Quit`, preselect ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+        await add_menu(where, nul_glyphinfo, any, 113, 0,
+            ATR.NONE, clr, $C`Quit`,
+            preselect ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     } else {
         await impossible($C`role_menu_extra: bad arg (%d)`, which);
     }
@@ -1420,7 +1489,9 @@ export async function role_init() {   // role.c:1980
         pm.maligntyp = $c.i8(Math.imul(alignmnt, 3));
         /* if gender is random, we choose it now instead of waiting
            until the leader monster is created */
-        $t5 = is_neuter(pm) ? 2 : is_female(pm) ? 1 : is_male(pm) ? 0 : rn2(100) < 50 ? 1 : 0, svq.quest_status.ldrgend = ($t5) & 3;
+        $t5 = is_neuter(pm) ? 2 : is_female(pm) ? 1 : is_male(pm)
+            ? 0
+            : rn2(100) < 50 ? 1 : 0, svq.quest_status.ldrgend = ($t5) & 3;
     }
     /* Fix up the quest guardians */
     if (gu.urole.guardnum !== NON_PM) {
@@ -1438,7 +1509,8 @@ export async function role_init() {   // role.c:1980
         pm.mflags3 = $c.u16(pm.mflags3 | (M3.WANTSARTI | M3.WAITFORU));
         /* if gender is random, we choose it now instead of waiting
            until the nemesis monster is created */
-        $t6 = is_neuter(pm) ? 2 : is_female(pm) ? 1 : is_male(pm) ? 0 : rn2(100) < 50 ? 1 : 0, svq.quest_status.nemgend = ($t6) & 3;
+        $t6 = is_neuter(pm) ? 2 : is_female(pm) ? 1
+            : is_male(pm) ? 0 : rn2(100) < 50 ? 1 : 0, svq.quest_status.nemgend = ($t6) & 3;
     }
     /* Fix up the god names */
     if (flags.pantheon === -1) {
@@ -1499,11 +1571,14 @@ export function Hello(mtmp) {   // role.c:2120
         case PM.KNIGHT:
             return $C`Salutations`;   /* Olde English */
         case PM.SAMURAI:
-            return mtmp && mtmp.data === mons[PM.SHOPKEEPER] ? $C`Irasshaimase` : $C`Konnichi wa`;   /* Japanese */
+            return mtmp && mtmp.data === mons[PM.SHOPKEEPER]
+                ? $C`Irasshaimase`
+                : $C`Konnichi wa`;   /* Japanese */
         case PM.TOURIST:
             return $C`Aloha`;   /* Hawaiian */
         case PM.VALKYRIE:
-            return mtmp && mtmp.data === mons[PM.MAIL_DAEMON] ? $C`Hallo` : $C`Velkommen`;   /* Norse */
+            return mtmp && mtmp.data === mons[PM.MAIL_DAEMON] ? $C`Hallo` :
+                $C`Velkommen`;   /* Norse */
         default:
             return $C`Hello`;
     }
@@ -1574,7 +1649,8 @@ export async function genl_player_setup(screenheight) {   // role.c:2206
      * have a specific value, but that will still require confirmation;
      * player can specify the forced ones if avoiding that is demanded.
      */
-    picksomething = flags.initrole === ROLE_NONE || flags.initrace === ROLE_NONE || flags.initgend === ROLE_NONE || flags.initalign === ROLE_NONE ? 1 : 0;
+    picksomething = flags.initrole === ROLE_NONE || flags.initrace === ROLE_NONE
+        || flags.initgend === ROLE_NONE || flags.initalign === ROLE_NONE ? 1 : 0;
     /* Used for '-@';
      * choose randomly without asking for all unspecified facets.
      */
@@ -1596,8 +1672,10 @@ export async function genl_player_setup(screenheight) {   // role.c:2206
        (valkyrie) or alignment (rogue), or race forces alignment (orc), &c */
     rigid_role_checks();
     setup_done$: {
-        if (flags.initrole === ROLE_NONE || flags.initrace === ROLE_NONE || flags.initgend === ROLE_NONE || flags.initalign === ROLE_NONE) {
-            prompt = await build_plselection_prompt(new $c.Ptr(pbuf, 0), QBUFSZ, flags.initrole, flags.initrace, flags.initgend, flags.initalign);
+        if (flags.initrole === ROLE_NONE || flags.initrace === ROLE_NONE
+            || flags.initgend === ROLE_NONE || flags.initalign === ROLE_NONE) {
+            prompt = await build_plselection_prompt(new $c.Ptr(pbuf, 0), QBUFSZ,
+                flags.initrole, flags.initrace, flags.initgend, flags.initalign);
             /* prompt[] contains "Shall I pick ... for you? [ynaq] "
                y - game picks role,&c then asks player to confirm;
                n - player manually chooses via menu selections;
@@ -1810,7 +1888,8 @@ export async function genl_player_setup(screenheight) {   // role.c:2206
                     }   /* needed race */
                 }   /* picking race */
                 if (nextpick === RS.GENDER) {
-                    nextpick = flags.initrole < 0 ? RS.ROLE : flags.initrace < 0 ? RS.RACE : RS.ALGNMNT;
+                    nextpick = flags.initrole < 0 ? RS.ROLE : flags.initrace < 0 ? RS.RACE
+                        : RS.ALGNMNT;
                     /* Select a gender, if necessary;
                        force compatibility with role/race, try for compatibility
                        with pre-selected alignment. */
@@ -1903,7 +1982,9 @@ export async function genl_player_setup(screenheight) {   // role.c:2206
                     }   /* needed gender */
                 }   /* picking gender */
                 if (nextpick === RS.ALGNMNT) {
-                    nextpick = flags.initrole < 0 ? RS.ROLE : flags.initrace < 0 ? RS.RACE : RS.GENDER;
+                    nextpick = flags.initrole < 0 ? RS.ROLE
+                        : flags.initrace < 0 ? RS.RACE
+                        : RS.GENDER;
                     /* Select an alignment, if necessary;
                        force compatibility with role/race/gender. */
                     if (flags.initalign < 0 || !validalign(flags.initrole, flags.initrace, flags.initalign)) {
@@ -2016,15 +2097,20 @@ export async function genl_player_setup(screenheight) {   // role.c:2206
                 any.$copyFrom(cg.zeroany);   /* zero out all bits */
                 /* [ynaq] menu choices */
                 any.a_int = 1;
-                await add_menu(win, nul_glyphinfo, any, 121, 0, ATR.NONE, clr, $C`Yes; start game`, MENU.ITEMFLAGS_SELECTED);
+                await add_menu(win, nul_glyphinfo, any, 121, 0,
+                    ATR.NONE, clr, $C`Yes; start game`, MENU.ITEMFLAGS_SELECTED);
                 any.a_int = 2;
-                await add_menu(win, nul_glyphinfo, any, 110, 0, ATR.NONE, clr, $C`No; choose role again`, MENU.ITEMFLAGS_NONE);
+                await add_menu(win, nul_glyphinfo, any, 110, 0,
+                    ATR.NONE, clr, $C`No; choose role again`, MENU.ITEMFLAGS_NONE);
                 if (iflags.renameallowed) {
                     any.a_int = 3;
-                    await add_menu(win, nul_glyphinfo, any, 97, 0, ATR.NONE, clr, $C`Not yet; choose another name`, MENU.ITEMFLAGS_NONE);
+                    await add_menu(win, nul_glyphinfo, any, 97, 0, ATR.NONE,
+                        clr, $C`Not yet; choose another name`,
+                        MENU.ITEMFLAGS_NONE);
                 }
                 any.a_int = -1;
-                await add_menu(win, nul_glyphinfo, any, 113, 0, ATR.NONE, clr, $C`Quit`, MENU.ITEMFLAGS_NONE);
+                await add_menu(win, nul_glyphinfo, any, 113, 0,
+                    ATR.NONE, clr, $C`Quit`, MENU.ITEMFLAGS_NONE);
                 $c.sprintf(new $c.Ptr(pbuf, 0), $C`Is this ok? [yn%sq]`, iflags.renameallowed ? $C`a` : $C``);
                 await end_menu()(win, new $c.Ptr(pbuf, 0));
                 n = await select_menu(win, PICK.ONE, new $c.Ptr(selected, 0));
@@ -2141,7 +2227,8 @@ function maybe_skip_seps(rows, aspect) {   // role.c:2777
      */
     n = n + 4 | 0;   /* title and ensuing separator, role info so far and separator */
     for (i = 0; roles[i].name.m; i = i + 1 | 0) {
-        if (ok_role(i, flags.initrace, flags.initgend, flags.initalign) && ok_race(i, flags.initrace, flags.initgend, flags.initalign) && ok_gend(i, flags.initrace, flags.initgend, flags.initalign) && ok_align(i, flags.initrace, flags.initgend, flags.initalign)) {
+        if (ok_role(i, flags.initrace, flags.initgend, flags.initalign) && ok_race(i, flags.initrace, flags.initgend, flags.initalign)
+            && ok_gend(i, flags.initrace, flags.initgend, flags.initalign) && ok_align(i, flags.initrace, flags.initgend, flags.initalign)) {
             n = n + 1 | 0;
         }
     }
@@ -2164,7 +2251,9 @@ async function plsel_startmenu(ttyrows, aspect) {   // role.c:2806
     /* whatever aspect was just chosen might force others (Orc => chaotic,
        Samurai => Human+lawful, Valkyrie => female) */
     rigid_role_checks();
-    const rolename = flags.initrole < 0 ? $C`<role>` : flags.initgend === 1 && roles[flags.initrole].name.f ? roles[flags.initrole].name.f : roles[flags.initrole].name.m;
+    const rolename = flags.initrole < 0 ? $C`<role>`
+        : flags.initgend === 1 && roles[flags.initrole].name.f ? roles[flags.initrole].name.f
+        : roles[flags.initrole].name.m;
     if (!svp.plname[0] || flags.initrole < 0 || flags.initrace < 0 || flags.initgend < 0 || flags.initalign < 0) {
         /* "<role> <race.noun> <gender> <alignment>" */
         $c.sprintf(new $c.Ptr(qbuf, 0), $C`%.20s %.20s %.20s %.20s`, rolename, flags.initrace < 0 ? $C`<race>` : races[flags.initrace].noun, flags.initgend < 0 ? $C`<gender>` : genders[flags.initgend].adj, flags.initalign < 0 ? $C`<alignment>` : aligns[flags.initalign].adj);
@@ -2202,7 +2291,10 @@ async function setup_rolemenu(win, filtering, race, gend, algn) {   // role.c:28
     any.$copyFrom(cg.zeroany);   /* zero out all bits */
     for (i = 0; roles[i].name.m; i = i + 1 | 0) {
         /* role can be constrained by any of race, gender, or alignment */
-        const role_ok = ok_role(i, race, gend, algn) && ok_race(i, race, gend, algn) && ok_gend(i, race, gend, algn) && ok_align(i, race, gend, algn) ? 1 : 0;
+        const role_ok = ok_role(i, race, gend, algn)
+            && ok_race(i, race, gend, algn)
+            && ok_gend(i, race, gend, algn)
+            && ok_align(i, race, gend, algn) ? 1 : 0;
         if (filtering && !role_ok) {
             continue;
         }
@@ -2229,7 +2321,10 @@ async function setup_rolemenu(win, filtering, race, gend, algn) {   // role.c:28
         }
         /* !filtering implies reset_role_filtering() where we want to
            mark this role as preselected if current filter excludes it */
-        await add_menu(win, nul_glyphinfo, any, thisch, 0, ATR.NONE, clr, await an(new $c.Ptr(rolenamebuf, 0)), !filtering && !role_ok ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+        await add_menu(win, nul_glyphinfo, any, thisch, 0,
+            ATR.NONE, clr, await an(new $c.Ptr(rolenamebuf, 0)),
+            !filtering && !role_ok
+            ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
         lastch = thisch;
     }
 }
@@ -2247,7 +2342,9 @@ async function setup_racemenu(win, filtering, role, gend, algn) {   // role.c:29
     any.$copyFrom(cg.zeroany);
     for (i = 0; races[i].noun; i = i + 1 | 0) {
         /* no ok_gend(); race isn't constrained by gender */
-        const race_ok = ok_race(role, i, gend, algn) && ok_role(role, i, gend, algn) && ok_align(role, i, gend, algn) ? 1 : 0;
+        const race_ok = ok_race(role, i, gend, algn)
+            && ok_role(role, i, gend, algn)
+            && ok_align(role, i, gend, algn) ? 1 : 0;
         if (filtering && !race_ok) {
             continue;
         }
@@ -2261,7 +2358,12 @@ async function setup_racemenu(win, filtering, role, gend, algn) {   // role.c:29
            capital letter as unseen accelerator;
            !filtering: resetting filter rather than picking, choose by
            capital letter since lowercase role letters will be present */
-        await add_menu(win, nul_glyphinfo, any, filtering ? this_ch : highc(this_ch), filtering ? highc(this_ch) : 0, ATR.NONE, clr, races[i].noun, !filtering && !race_ok ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+        await add_menu(win, nul_glyphinfo, any,
+            filtering ? this_ch : highc(this_ch),
+            filtering ? highc(this_ch) : 0,
+            ATR.NONE, clr, races[i].noun,
+            !filtering && !race_ok
+            ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     }
 }
 /**
@@ -2278,7 +2380,9 @@ async function setup_gendmenu(win, filtering, role, race, algn) {   // role.c:29
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < ROLE_GENDERS; i = i + 1 | 0) {
         /* no ok_align(); gender isn't constrained by alignment */
-        const gend_ok = ok_gend(role, race, i, algn) && ok_role(role, race, i, algn) && ok_race(role, race, i, algn) ? 1 : 0;
+        const gend_ok = ok_gend(role, race, i, algn)
+            && ok_role(role, race, i, algn)
+            && ok_race(role, race, i, algn) ? 1 : 0;
         if (filtering && !gend_ok) {
             continue;
         }
@@ -2290,7 +2394,12 @@ async function setup_gendmenu(win, filtering, role, race, algn) {   // role.c:29
         const this_ch = genders[i].adj.get(0);
         /* (see setup_racemenu for explanation of selector letters
            and setup_rolemenu for preselection) */
-        await add_menu(win, nul_glyphinfo, any, filtering ? this_ch : highc(this_ch), filtering ? highc(this_ch) : 0, ATR.NONE, clr, genders[i].adj, !filtering && !gend_ok ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+        await add_menu(win, nul_glyphinfo, any,
+            filtering ? this_ch : highc(this_ch),
+            filtering ? highc(this_ch) : 0,
+            ATR.NONE, clr, genders[i].adj,
+            !filtering && !gend_ok
+            ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     }
 }
 /**
@@ -2307,7 +2416,9 @@ async function setup_algnmenu(win, filtering, role, race, gend) {   // role.c:29
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < ROLE_ALIGNS; i = i + 1 | 0) {
         /* no ok_gend(); alignment isn't constrained by gender */
-        const algn_ok = ok_align(role, race, gend, i) && ok_role(role, race, gend, i) && ok_race(role, race, gend, i) ? 1 : 0;
+        const algn_ok = ok_align(role, race, gend, i)
+            && ok_role(role, race, gend, i)
+            && ok_race(role, race, gend, i) ? 1 : 0;
         if (filtering && !algn_ok) {
             continue;
         }
@@ -2319,7 +2430,12 @@ async function setup_algnmenu(win, filtering, role, race, gend) {   // role.c:29
         const this_ch = aligns[i].adj.get(0);
         /* (see setup_racemenu for explanation of selector letters
            and setup_rolemenu for preselection) */
-        await add_menu(win, nul_glyphinfo, any, filtering ? this_ch : highc(this_ch), filtering ? highc(this_ch) : 0, ATR.NONE, clr, aligns[i].adj, !filtering && !algn_ok ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+        await add_menu(win, nul_glyphinfo, any,
+            filtering ? this_ch : highc(this_ch),
+            filtering ? highc(this_ch) : 0,
+            ATR.NONE, clr, aligns[i].adj,
+            !filtering && !algn_ok
+            ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     }
 }
 

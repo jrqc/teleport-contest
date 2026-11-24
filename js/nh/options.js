@@ -235,9 +235,13 @@ export async function ask_do_tutorial() {   // options.c:430
             await start_menu()(win, MENU.BEHAVE_STANDARD);
             any.$copyFrom(cg.zeroany);
             any.a_char = 121;
-            await add_menu(win, nul_glyphinfo, any, any.a_char, 0, ATR.NONE, NO_COLOR, $C`Yes, do a tutorial`, MENU.ITEMFLAGS_NONE);
+            await add_menu(win, nul_glyphinfo, any, any.a_char, 0,
+                ATR.NONE, NO_COLOR,
+                $C`Yes, do a tutorial`, MENU.ITEMFLAGS_NONE);
             any.a_char = 110;
-            await add_menu(win, nul_glyphinfo, any, any.a_char, 0, ATR.NONE, NO_COLOR, $C`No, just start play`, MENU.ITEMFLAGS_NONE);
+            await add_menu(win, nul_glyphinfo, any, any.a_char, 0,
+                ATR.NONE, NO_COLOR,
+                $C`No, just start play`, MENU.ITEMFLAGS_NONE);
             await add_menu_str(win, $C``);
             await add_menu_str(win, new $c.Ptr(buf, 0));
             if ($t1 = pass, pass = $t1 + 1 | 0, $t1) {   /* we'll get here after <space> or <return> */
@@ -299,7 +303,8 @@ export async function parseoptions(opts, tinitial, tfrom_file) {   // options.c:
         }
     }
     if ($c.strlen(opts) > 128) {
-        await config_error_add($C`Option too long, max length is %i characters`, 128);
+        await config_error_add($C`Option too long, max length is %i characters`,
+            128);
         return FALSE;
     }
     /* strip leading and trailing white space */
@@ -342,11 +347,14 @@ export async function parseoptions(opts, tinitial, tfrom_file) {   // options.c:
          *
          */
         if (!got_match && allopt[i].name) {
-            got_match = match_optname(opts, allopt[i].name, allopt[i].minmatch, TRUE);
+            got_match = match_optname(opts, allopt[i].name,
+                allopt[i].minmatch, TRUE);
         }
         if (got_match) {
             if (!allopt[i].pfx && optlen < allopt[i].minmatch) {
-                await config_error_add($C`Ambiguous option %s, %d characters are needed to differentiate`, opts, allopt[i].minmatch);
+                await config_error_add(
+                    $C`Ambiguous option %s, %d characters are needed to differentiate`,
+                    opts, allopt[i].minmatch);
                 break;
             }
             matchidx = i;
@@ -363,7 +371,9 @@ export async function parseoptions(opts, tinitial, tfrom_file) {   // options.c:
             if (!allopt[i].alias) {
                 continue;
             }
-            got_match = match_optname(opts, allopt[i].alias, $c.i32($c.strlen(allopt[i].alias)), TRUE);
+            got_match = match_optname(opts, allopt[i].alias,
+                $c.i32($c.strlen(allopt[i].alias)),
+                TRUE);
             if (got_match) {
                 matchidx = i;
                 using_alias = TRUE;
@@ -373,7 +383,8 @@ export async function parseoptions(opts, tinitial, tfrom_file) {   // options.c:
     }
     /* allow optfn's to test whether they were called from parseoptions() */
     program_state.in_parseoptions = program_state.in_parseoptions + 1 | 0;
-    if (got_match && (matchidx >= 0 && matchidx < OPTCOUNT) && !allopt[matchidx].disregarded) {
+    if (got_match && (matchidx >= 0 && matchidx < OPTCOUNT)
+        && !allopt[matchidx].disregarded) {
         duplicate = duplicate_opt_detection(matchidx);
         if (duplicate && !allopt[matchidx].dupeok) {
             await complain_about_duplicate(matchidx);
@@ -389,7 +400,8 @@ export async function parseoptions(opts, tinitial, tfrom_file) {   // options.c:
          */
         if (allopt[matchidx].optfn) {
             op = await string_for_opt(opts, TRUE);
-            optresult = await allopt[matchidx].optfn(allopt[matchidx].idx, do_set, negated, opts, op);
+            optresult = await allopt[matchidx].optfn(allopt[matchidx].idx,
+                do_set, negated, opts, op);
             if (optresult === optn_ok) {
                 opt_set_in_config[matchidx] = TRUE;
             }
@@ -409,7 +421,9 @@ export async function parseoptions(opts, tinitial, tfrom_file) {   // options.c:
             optresult = optn_ok;
         }
     }
-    if (optresult === optn_silenterr || got_match && allopt[matchidx].disregarded || !got_match && config_unmatched_ignored()) {
+    if (optresult === optn_silenterr
+        || got_match && allopt[matchidx].disregarded
+        || !got_match && config_unmatched_ignored()) {
         return FALSE;
     }
     if (pfx_match && optresult === optn_err) {
@@ -440,7 +454,8 @@ function check_misc_menu_command(opts, op) {   // options.c:694
     /* check for menu command mapping */
     for (i = 0; default_menu_cmd_info[i].name; i = i + 1 | 0) {
         const name_to_check = default_menu_cmd_info[i].name;
-        if (match_optname(opts, name_to_check, $c.i32($c.strlen(name_to_check)), TRUE)) {
+        if (match_optname(opts, name_to_check,
+            $c.i32($c.strlen(name_to_check)), TRUE)) {
             return i;
         }
     }
@@ -486,7 +501,8 @@ async function getoptstr(optidx, ophase) {   // options.c:734
             }
         }
     }
-    if (roleoptindx >= 0 && roleoptindx < MAX_ROLEOPT && ophase >= 0 && ophase < num_opt_phases) {
+    if (roleoptindx >= 0 && roleoptindx < MAX_ROLEOPT
+        && ophase >= 0 && ophase < num_opt_phases) {
         return roleoptvals[roleoptindx][ophase];
     }
     await panic($C`bad index roleoptvals[%d][%d]`, roleoptindx, ophase);
@@ -553,7 +569,10 @@ export function freeroleoptvals() {   // options.c:787
  */
 function petname_optfn(optidx, req, negated, opts, op) {   // options.c:848
     let failsafe = new Int8Array(64);
-    const petname = optidx === opt_catname ? new $c.Ptr(gc.catname, 0) : optidx === opt_dogname ? new $c.Ptr(gd.dogname, 0) : optidx === opt_horsename ? new $c.Ptr(gh.horsename, 0) : new $c.Ptr(failsafe, 0);
+    const petname = optidx === opt_catname ? new $c.Ptr(gc.catname, 0)
+        : optidx === opt_dogname ? new $c.Ptr(gd.dogname, 0)
+        : optidx === opt_horsename ? new $c.Ptr(gh.horsename, 0)
+        : new $c.Ptr(failsafe, 0);
     if (req === do_init) {
     } else if (req === do_set) {
         if ($c.peq(op, new $c.Ptr(empty_optstr, 0)) && !negated) {
@@ -641,7 +660,8 @@ async function optfn_align_message(optidx, req, negated, opts, op) {   // option
             } else if (!strncmpi(op, $C`bottom`, 6)) {
                 iflags.wc_align_message = ALIGN.BOTTOM;
             } else {
-                await config_error_add($C`Unknown %s parameter '%s'`, allopt[optidx].name, op);
+                await config_error_add($C`Unknown %s parameter '%s'`,
+                    allopt[optidx].name, op);
                 return optn_err;
             }
         } else if (negated) {
@@ -685,7 +705,8 @@ async function optfn_align_status(optidx, req, negated, opts, op) {   // options
             } else if (!strncmpi(op, $C`bottom`, 6)) {
                 iflags.wc_align_status = ALIGN.BOTTOM;
             } else {
-                await config_error_add($C`Unknown %s parameter '%s'`, allopt[optidx].name, op);
+                await config_error_add($C`Unknown %s parameter '%s'`,
+                    allopt[optidx].name, op);
                 return optn_err;
             }
         } else if (negated) {
@@ -770,7 +791,8 @@ async function optfn_autounlock(optidx, req, negated, opts, op) {   // options.c
                 /* fuzzymatch() doesn't match leading substrings but
                    this allows "apply_key" and "applykey" to match
                    "apply-key"; "apply key" too if part of foo+bar */
-                if (str_start_is(unlocktypes[i][0], op, TRUE) || fuzzymatch(op, unlocktypes[i][0], $C` -_`, TRUE)) {
+                if (str_start_is(unlocktypes[i][0], op, TRUE)
+                    || fuzzymatch(op, unlocktypes[i][0], $C` -_`, TRUE)) {
                     matched = TRUE;
                     switch (op.get(0)) {
                         case 117:
@@ -792,13 +814,16 @@ async function optfn_autounlock(optidx, req, negated, opts, op) {   // options.c
                 }
             }
             if (!matched) {
-                await config_error_add($C`Invalid value for "%s": "%s"`, allopt[optidx].name, op);
+                await config_error_add($C`Invalid value for "%s": "%s"`,
+                    allopt[optidx].name, op);
                 return optn_silenterr;
             }
             op = nxt;
         }
         if (negated && newflags !== 0) {
-            await config_error_add($C`Invalid value combination for "%s": 'none' with some`, allopt[optidx].name);
+            await config_error_add(
+                $C`Invalid value combination for "%s": 'none' with some`,
+                allopt[optidx].name);
             return optn_silenterr;
         }
         flags.autounlock = newflags;
@@ -865,7 +890,9 @@ async function optfn_boulder(optidx, req, negated, opts, op) {   // options.c:11
         } else if (clash) {
             /* symbol chosen matches a used monster or warning
                symbol which is not good - reject it */
-            await config_error_add($C`Badoption - boulder symbol '%s' would conflict with a %s symbol`, visctrl(opts.get(0)), clash === 1 ? $C`monster` : $C`warning`);
+            await config_error_add($C`Badoption - boulder symbol '%s' would conflict with a %s symbol`,
+                visctrl(opts.get(0)),
+                clash === 1 ? $C`monster` : $C`warning`);
         } else {
             /*
              * Override the default boulder symbol.
@@ -876,7 +903,9 @@ async function optfn_boulder(optidx, req, negated, opts, op) {   // options.c:11
                initoptions_finish(), after all symset options
                have been processed */
             if (!go.opt_initial) {
-                const sym = get_othersym(SYM.BOULDER, Is_rogue_level(u.uz) ? ROGUESET : PRIMARYSET);
+                const sym = get_othersym(SYM.BOULDER,
+                    Is_rogue_level(u.uz) ? ROGUESET
+                    : PRIMARYSET);
                 if (sym) {
                     gs.showsyms[SYM.BOULDER + SYM_OFF_X] = sym;
                 }
@@ -1038,7 +1067,8 @@ async function optfn_DECgraphics(optidx, req, negated, opts, op) {   // options.
                 }
             }
             if (badflag) {
-                await config_error_add($C`Failure to load symbol set %s.`, allopt[optidx].name);
+                await config_error_add($C`Failure to load symbol set %s.`,
+                    allopt[optidx].name);
                 return optn_err;
             }
         }
@@ -1095,12 +1125,15 @@ async function optfn_disclose(optidx, req, negated, opts, op) {   // options.c:1
         }
         /* "disclose" without a value means "all with prompting"
            and negated means "none without prompting" */
-        if ($c.peq(op, new $c.Ptr(empty_optstr, 0)) || !strcmpi(op, $C`all`) || !strcmpi(op, $C`none`)) {
+        if ($c.peq(op, new $c.Ptr(empty_optstr, 0)) || !strcmpi(op, $C`all`)
+            || !strcmpi(op, $C`none`)) {
             if (!$c.peq(op, new $c.Ptr(empty_optstr, 0)) && !strcmpi(op, $C`none`)) {
                 negated = TRUE;
             }
             for (num = 0; num < NUM_DISCLOSURE_OPTIONS; num = num + 1 >>> 0) {
-                flags.end_disclose[num] = negated ? 45 : 121;
+                flags.end_disclose[num] = negated
+                    ? 45
+                    : 121;
             }
             return optn_ok;
         }
@@ -1140,7 +1173,8 @@ async function optfn_disclose(optidx, req, negated, opts, op) {   // options.c:1
             } else if (c === 32) {
                 /* do nothing */
             } else {
-                await config_error_add($C`Unknown %s parameter '%c'`, allopt[optidx].name, op.get(0));
+                await config_error_add($C`Unknown %s parameter '%c'`,
+                    allopt[optidx].name, op.get(0));
                 return optn_err;
             }
             op = op.add(1);
@@ -1384,7 +1418,8 @@ async function optfn_fruit(optidx, req, negated, opts, op) {   // options.c:1706
                         forig = await fruit_from_name(new $c.Ptr(svp.pl_fruit, 0), FALSE, null);
                     }
                     if (!forig && fnum[0] >= 100) {
-                        await config_error_add($C`Doing that so many times isn't very fruitful.`);
+                        await config_error_add(
+                            $C`Doing that so many times isn't very fruitful.`);
                         return optn_ok;
                     }
                 }
@@ -1640,18 +1675,23 @@ async function optfn_map_mode(optidx, req, negated, opts, op) {   // options.c:1
                 iflags.wc_map_mode = MAP_MODE.ASCII12x16;
             } else if (!strncmpi(op, $C`ascii10x18`, 10)) {
                 iflags.wc_map_mode = MAP_MODE.ASCII10x18;
-            } else if (!strncmpi(op, $C`fit_to_screen`, 13)) {
+            } else if (!strncmpi(op, $C`fit_to_screen`,
+                13)) {
                 iflags.wc_map_mode = MAP_MODE.ASCII_FIT_TO_SCREEN;
-            } else if (!strncmpi(op, $C`ascii_fit_to_screen`, 19)) {
+            } else if (!strncmpi(op, $C`ascii_fit_to_screen`,
+                19)) {
                 iflags.wc_map_mode = MAP_MODE.ASCII_FIT_TO_SCREEN;
-            } else if (!strncmpi(op, $C`tiles_fit_to_screen`, 19)) {
+            } else if (!strncmpi(op, $C`tiles_fit_to_screen`,
+                19)) {
                 iflags.wc_map_mode = MAP_MODE.TILES_FIT_TO_SCREEN;
             } else {
-                await config_error_add($C`Unknown %s parameter '%s'`, allopt[optidx].name, op);
+                await config_error_add($C`Unknown %s parameter '%s'`,
+                    allopt[optidx].name, op);
                 return optn_err;
             }
             if (wc_supported($C`map_mode`)) {
-                if (!iflags.wc_map_mode || save_map_mode !== iflags.wc_map_mode) {
+                if (!iflags.wc_map_mode
+                    || save_map_mode !== iflags.wc_map_mode) {
                     await preference_update()($C`map_mode`);
                 }
             }
@@ -1916,7 +1956,8 @@ async function optfn_menu_objsyms(optidx, req, negated, opts, op) {   // options
         } else if (digit(op.get(0))) {
             i = $c.atoi(op);
             if (i >= 6) {
-                await config_error_add($C`Illegal %s parameter '%s'`, allopt[optidx].name, op);
+                await config_error_add($C`Illegal %s parameter '%s'`,
+                    allopt[optidx].name, op);
                 return optn_err;
             }
             osyms = i;
@@ -1930,7 +1971,8 @@ async function optfn_menu_objsyms(optidx, req, negated, opts, op) {   // options
                 if (k >= 4) {
                     l = k;
                 }
-                if (!strncmpi(objsymvals[i].nam, op, l | 0) || i === 5 && !strncmpi(new $c.Ptr(optfn_menu_objsyms$alt5, 0), op, l5 | 0)) {
+                if (!strncmpi(objsymvals[i].nam, op, l | 0)
+                    || i === 5 && !strncmpi(new $c.Ptr(optfn_menu_objsyms$alt5, 0), op, l5 | 0)) {
                     osyms = i;
                     break;
                 }
@@ -1965,7 +2007,8 @@ async function optfn_menuinvertmode(optidx, req, negated, opts, op) {   // optio
         if (!$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
             const mode = $c.atoi(op);
             if (mode < 0 || mode > 2) {
-                await config_error_add($C`Illegal %s parameter '%s'`, allopt[optidx].name, op);
+                await config_error_add($C`Illegal %s parameter '%s'`,
+                    allopt[optidx].name, op);
                 return optn_err;
             }
             iflags.menuinvertmode = mode;
@@ -2028,7 +2071,8 @@ async function optfn_menustyle(optidx, req, negated, opts, op) {   // options.c:
                 flags.menu_style = MENU.PARTIAL;
                 break;
             default:
-                await config_error_add($C`Unknown %s parameter '%s'`, allopt[optidx].name, op);
+                await config_error_add($C`Unknown %s parameter '%s'`, allopt[optidx].name,
+                    op);
                 return optn_err;
         }
         return optn_ok;
@@ -2087,7 +2131,8 @@ async function optfn_mouse_support(optidx, req, negated, opts, op) {   // option
         } else {
             const mode = $c.atoi(op);
             if (mode < 0 || mode > 2 || mode === 0 && op.get(0) !== 48) {
-                await config_error_add($C`Illegal %s parameter '%s'`, allopt[optidx].name, op);
+                await config_error_add($C`Illegal %s parameter '%s'`,
+                    allopt[optidx].name, op);
                 return optn_err;
             } else {
                 /* mode >= 0 */
@@ -2147,7 +2192,8 @@ async function optfn_msg_window(optidx, req, negated, opts, op) {   // options.c
                 iflags.prevmsg_window = $c.i8(tmp);
                 break;
             default:
-                await config_error_add($C`Unknown %s parameter '%s'`, allopt[optidx].name, op);
+                await config_error_add($C`Unknown %s parameter '%s'`, allopt[optidx].name,
+                    op);
                 retval = optn_err;
         }
         return retval;
@@ -2183,7 +2229,8 @@ async function optfn_msghistory(optidx, req, negated, opts, op) {   // options.c
     }
     if (req === do_set) {
         op = await string_for_env_opt(allopt[optidx].name, opts, negated);
-        if (negated && $c.peq(op, new $c.Ptr(empty_optstr, 0)) || !negated && !$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
+        if (negated && $c.peq(op, new $c.Ptr(empty_optstr, 0))
+            || !negated && !$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
             $t1 = (negated ? 0 : $c.atoi(op)) >>> 0, iflags.msg_history = $t1;
         } else if (negated) {
             await bad_negation(allopt[optidx].name, TRUE);
@@ -2252,7 +2299,8 @@ async function optfn_number_pad(optidx, req, negated, opts, op) {   // options.c
         } else {
             const mode = $c.atoi(op);
             if (mode < -1 || mode > 4 || mode === 0 && op.get(0) !== 48) {
-                await config_error_add($C`Illegal %s parameter '%s'`, allopt[optidx].name, op);
+                await config_error_add($C`Illegal %s parameter '%s'`,
+                    allopt[optidx].name, op);
                 return optn_err;
             } else if (mode <= 0) {
                 iflags.num_pad = FALSE;
@@ -2277,7 +2325,10 @@ async function optfn_number_pad(optidx, req, negated, opts, op) {   // options.c
         return optn_ok;
     }
     if (req === get_val || req === get_cnf_val) {
-        const indx = gc.Cmd.num_pad ? gc.Cmd.phone_layout ? gc.Cmd.pcHack_compat ? 4 : 3 : gc.Cmd.pcHack_compat ? 2 : 1 : gc.Cmd.swap_yz ? 5 : 0;
+        const indx = gc.Cmd.num_pad
+            ? gc.Cmd.phone_layout ? gc.Cmd.pcHack_compat ? 4 : 3
+            : gc.Cmd.pcHack_compat ? 2 : 1
+            : gc.Cmd.swap_yz ? 5 : 0;
         if (req === get_val) {
             $c.strcpy(opts, optfn_number_pad$numpadmodes[indx]);
         } else {
@@ -2405,14 +2456,20 @@ async function optfn_paranoid_confirmation(optidx, req, opt_negated, opts, op) {
                    this will erroneously reject "prayconfirm:true"; too
                    bad; back when prayconfirm was in active use, tacking on
                    an explicit value to a boolean option wasn't supported */
-                await config_error_add($C`deprecated %sprayconfirm option takes no parameters (found '%s')`, opt_negated ? $C`!` : $C``, op);
+                await config_error_add(
+                    $C`deprecated %sprayconfirm option takes no parameters (found '%s')`,
+                    opt_negated ? $C`!` : $C``, op);
                 return optn_silenterr;
             }
             /* config file summary of complaints includes this in the count
                of errors; we'd prefer that it be described as a warning but
                that isn't supported [not important since this is considered
                temporary until 'prayconfirm' gets removed altogether] */
-            await config_error_add($C`%sprayconfirm option is deprecated; switching to %s:%cpray`, opt_negated ? $C`!` : $C``, allopt[optidx].name, opt_negated ? 45 : 43);
+            await config_error_add(
+                $C`%sprayconfirm option is deprecated; switching to %s:%cpray`,
+                opt_negated ? $C`!` : $C``,
+                allopt[optidx].name,
+                opt_negated ? 45 : 43);
             /* keep going */
             /* convert prayconfirm to paranoid_confirm:+pray and
                !prayconfirm to paranoid_confirm:-pray */
@@ -2431,12 +2488,14 @@ async function optfn_paranoid_confirmation(optidx, req, opt_negated, opts, op) {
                 flags.paranoia_bits = 0;
                 return optn_ok;
             } else {
-                await config_error_add($C`!%s does not accept a value`, allopt[optidx].name);
+                await config_error_add($C`!%s does not accept a value`,
+                    allopt[optidx].name);
                 return optn_silenterr;
             }
         } else if (!op.get(0)) {
             /* "paranoid_confirm" without any arguments is disallowed */
-            await config_error_add($C`%s requires a value; use 'none' to cancel all`, allopt[optidx].name);
+            await config_error_add($C`%s requires a value; use 'none' to cancel all`,
+                allopt[optidx].name);
             return optn_silenterr;
         }
         /*
@@ -2498,7 +2557,8 @@ async function optfn_paranoid_confirmation(optidx, req, opt_negated, opts, op) {
                 /* accept "nofoo" to be same as "!foo", unless "no" is
                    followed by a space or 'foo' begins with "n" (to avoid
                    confusion for "none" */
-                if (lowc(op.get(0)) === 110 && lowc(op.get(1)) === 111 && lowc(op.get(2) !== 110 && lowc(op.get(2)) !== 0 ? 1 : 0)) {
+                if (lowc(op.get(0)) === 110 && lowc(op.get(1)) === 111
+                    && lowc(op.get(2) !== 110 && lowc(op.get(2)) !== 0 ? 1 : 0)) {
                     fld_negated = TRUE;
                     op = op.add(2);   /* skip "no"; we know next char isn't space  */
                 }
@@ -2515,7 +2575,11 @@ async function optfn_paranoid_confirmation(optidx, req, opt_negated, opts, op) {
                does what we want once we've broken the space
                delimited aggregate into separate tokens */
             for (i = 0; i < 15; i = i + 1 | 0) {
-                if (match_optname(op, paranoia[i].argname, paranoia[i].argMinLen, FALSE) || paranoia[i].synonym && match_optname(op, paranoia[i].synonym, paranoia[i].synMinLen, FALSE)) {
+                if (match_optname(op, paranoia[i].argname,
+                    paranoia[i].argMinLen, FALSE)
+                    || paranoia[i].synonym
+                    && match_optname(op, paranoia[i].synonym,
+                    paranoia[i].synMinLen, FALSE)) {
                     if (!paranoia[i].flagmask) {
                         /* flagmask==0 is "none", clear all bits
                            but "+none" and "-none" are no-ops */
@@ -2533,7 +2597,8 @@ async function optfn_paranoid_confirmation(optidx, req, opt_negated, opts, op) {
             if (i === 15) {
                 /* didn't match anything, so arg is bad;
                    any flags already modified will stay modified */
-                await config_error_add($C`Unknown %s parameter '%s'`, allopt[optidx].name, op);
+                await config_error_add($C`Unknown %s parameter '%s'`,
+                    allopt[optidx].name, op);
                 return optn_silenterr;
             }
             /* move on to next token */
@@ -2550,7 +2615,9 @@ async function optfn_paranoid_confirmation(optidx, req, opt_negated, opts, op) {
         for (i = 0; paranoia[i].flagmask !== 0; i = i + 1 | 0) {
             /* hide paranoid_confirm:bones during play except for wizard
                mode; keep it for any mode if rewriting the config file */
-            if ((flags.paranoia_bits & paranoia[i].flagmask >>> 0) >>> 0 !== 0 && (paranoia[i].flagmask !== PARANOID.BONES || wizard() || req === get_cnf_val)) {
+            if ((flags.paranoia_bits & paranoia[i].flagmask >>> 0) >>> 0 !== 0
+                && (paranoia[i].flagmask !== PARANOID.BONES
+                || wizard() || req === get_cnf_val)) {
                 nh_snprintf($C`optfn_paranoid_confirmation`, 3032, eos(new $c.Ptr(tmpbuf, 0)), $c.subu64(256, $c.strlen(new $c.Ptr(tmpbuf, 0))), $C` %s`, paranoia[i].argname);
             }
         }
@@ -2595,12 +2662,16 @@ async function optfn_perminv_mode(optidx, req, negated, opts, op) {   // options
                     continue;
                 }
                 const pi1 = perminv_modes[i][1];
-                if (!strncmpi(op, pi0, ln | 0) || !strncmpi(op, pi1, ln | 0) || op.get(0) === (i + 48 | 0)) {
+                if (!strncmpi(op, pi0, ln | 0) || !strncmpi(op, pi1, ln | 0)
+                    || op.get(0) === (i + 48 | 0)) {
                     /* also accept '0'..'8' */
                     /*#ifdef TTY_PERM_INVENT*/
                     if (strstri(pi0, $C`+grid`) && !(windowprocs.wp_id === wp_tty)) {
                         i = i & ~InvSparse;
-                        await config_error_add($C`%s: unavailable perm_invent mode '%s', using '%s'`, allopt[optidx].name, pi0, perminv_modes[i][0]);
+                        await config_error_add(
+                            $C`%s: unavailable perm_invent mode '%s', using '%s'`,
+                            allopt[optidx].name, pi0,
+                            perminv_modes[i][0]);
                     }
                     iflags.perminv_mode = $c.u8(i);
                     iflags.perm_invent = TRUE;
@@ -2608,7 +2679,8 @@ async function optfn_perminv_mode(optidx, req, negated, opts, op) {   // options
                 }
             }
             if (i === 9) {
-                await config_error_add($C`Unknown %s parameter '%s'`, allopt[optidx].name, op);
+                await config_error_add($C`Unknown %s parameter '%s'`,
+                    allopt[optidx].name, op);
                 iflags.perminv_mode = InvOptNone;
                 iflags.perm_invent = FALSE;
                 retval = optn_silenterr;
@@ -2619,7 +2691,8 @@ async function optfn_perminv_mode(optidx, req, negated, opts, op) {   // options
             iflags.perm_invent = FALSE;
         }
         if (!go.opt_initial) {
-            if (iflags.perminv_mode !== old_perminv_mode || iflags.perm_invent !== old_perm_invent) {
+            if (iflags.perminv_mode !== old_perminv_mode
+                || iflags.perm_invent !== old_perm_invent) {
                 go.opt_need_redraw = TRUE;
             }
         }
@@ -2632,7 +2705,8 @@ async function optfn_perminv_mode(optidx, req, negated, opts, op) {   // options
         $c.sprintf(opts, $C`%s`, perminv_modes[iflags.perminv_mode][2]);
         /* 'op' is Null when called by handler_perminv_mode() while
            setting, non-Null when 'm O' shows current option values */
-        if (iflags.perminv_mode !== InvOptNone && !iflags.perm_invent && op) {
+        if (iflags.perminv_mode !== InvOptNone && !iflags.perm_invent
+            && op) {
             /* perminv_mode is set but isn't useful because perm_invent is
                Off; say so after squeezing out enough for it to barely fit */
             if (iflags.perminv_mode === InvOptInUse) {
@@ -2669,7 +2743,8 @@ async function optfn_petattr(optidx, req, negated, opts, op) {   // options.c:31
         } else if (!$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
             const itmp = await match_str2attr(op, FALSE);
             if (itmp === -1) {
-                await config_error_add($C`Unknown %s parameter '%s'`, allopt[optidx].name, opts);
+                await config_error_add($C`Unknown %s parameter '%s'`,
+                    allopt[optidx].name, opts);
                 retval = optn_err;
             } else {
                 iflags.wc2_petattr = itmp;
@@ -2810,7 +2885,8 @@ async function optfn_pickup_burden(optidx, req, negated, opts, op) {   // option
                     flags.pickup_burden = OVERLOADED;
                     break;
                 default:
-                    await config_error_add($C`Unknown %s parameter '%s'`, allopt[optidx].name, op);
+                    await config_error_add($C`Unknown %s parameter '%s'`,
+                        allopt[optidx].name, op);
                     return optn_err;
             }
         } else {
@@ -2857,7 +2933,8 @@ async function optfn_pickup_types(optidx, req, negated, opts, op) {   // options
             }
             await oc_to_str(new $c.Ptr(flags.inv_order, 0), new $c.Ptr(ocl, 0));
             let use_menu = TRUE;
-            if (flags.menu_style === MENU.TRADITIONAL || flags.menu_style === MENU.COMBINATION) {
+            if (flags.menu_style === MENU.TRADITIONAL
+                || flags.menu_style === MENU.COMBINATION) {
                 use_menu = FALSE;
                 $c.sprintf(new $c.Ptr(qbuf, 0), $C`New %s: [%s am] (%s)`, allopt[optidx].name, new $c.Ptr(ocl, 0), new $c.Ptr(tbuf, 0).get(0) ? new $c.Ptr(tbuf, 0) : $C`all`);
                 abuf[0] = 0;
@@ -2878,7 +2955,8 @@ async function optfn_pickup_types(optidx, req, negated, opts, op) {   // options
                 if (wizard() && !$c.strchr(new $c.Ptr(ocl, 0), VENOM_SYM)) {
                     strkitten(new $c.Ptr(ocl, 0), VENOM_SYM);
                 }
-                await choose_classes_menu($C`Autopickup what?`, 1, TRUE, new $c.Ptr(ocl, 0), new $c.Ptr(tbuf, 0));
+                await choose_classes_menu($C`Autopickup what?`,
+                    1, TRUE, new $c.Ptr(ocl, 0), new $c.Ptr(tbuf, 0));
                 op = new $c.Ptr(tbuf, 0);
             }
         }
@@ -2894,7 +2972,8 @@ async function optfn_pickup_types(optidx, req, negated, opts, op) {   // options
             while (op.get(0)) {
                 const oc_sym = def_char_to_objclass(op.get(0));
                 /* make sure all are valid obj symbols occurring once */
-                if (oc_sym !== MAXOCLASSES && !$c.strchr(new $c.Ptr(flags.pickup_types, 0), oc_sym)) {
+                if (oc_sym !== MAXOCLASSES
+                    && !$c.strchr(new $c.Ptr(flags.pickup_types, 0), oc_sym)) {
                     flags.pickup_types[num] = $c.i8(oc_sym);
                     flags.pickup_types[num = num + 1 >>> 0] = 0;
                 } else {
@@ -2903,7 +2982,8 @@ async function optfn_pickup_types(optidx, req, negated, opts, op) {   // options
                 op = op.add(1);
             }
             if (badopt) {
-                await config_error_add($C`Unknown %s parameter '%s'`, allopt[optidx].name, op);
+                await config_error_add($C`Unknown %s parameter '%s'`,
+                    allopt[optidx].name, op);
                 return optn_err;
             }
         }
@@ -2937,7 +3017,8 @@ async function optfn_pile_limit(optidx, req, negated, opts, op) {   // options.c
            "there are several/many objects here" instead of listing them
          */
         op = await string_for_opt(opts, negated);
-        if (negated && $c.peq(op, new $c.Ptr(empty_optstr, 0)) || !negated && !$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
+        if (negated && $c.peq(op, new $c.Ptr(empty_optstr, 0))
+            || !negated && !$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
             $t1 = negated ? 0 : $c.atoi(op), flags.pile_limit = $t1;
         } else if (negated) {
             await bad_negation(allopt[optidx].name, TRUE);
@@ -2979,7 +3060,8 @@ async function optfn_player_selection(optidx, req, negated, opts, op) {   // opt
             } else if (!strncmpi(op, $C`prompt`, 6)) {
                 iflags.wc_player_selection = VIA.PROMPTS;
             } else {
-                await config_error_add($C`Unknown %s parameter '%s'`, allopt[optidx].name, op);
+                await config_error_add($C`Unknown %s parameter '%s'`,
+                    allopt[optidx].name, op);
                 return optn_err;
             }
         }
@@ -3014,12 +3096,14 @@ async function optfn_playmode(optidx, req, negated, opts, op) {   // options.c:3
         }
         if (!strncmpi(op, $C`normal`, 6) || !strcmpi(op, $C`play`)) {
             $t1 = flags.explore = FALSE, flags.debug = $t1;
-        } else if (!strncmpi(op, $C`explore`, 6) || !strncmpi(op, $C`discovery`, 6)) {
+        } else if (!strncmpi(op, $C`explore`, 6)
+            || !strncmpi(op, $C`discovery`, 6)) {
             flags.debug = FALSE, flags.explore = TRUE;
         } else if (!strncmpi(op, $C`debug`, 5) || !strncmpi(op, $C`wizard`, 6)) {
             flags.debug = TRUE, flags.explore = FALSE;
         } else {
-            await config_error_add($C`Invalid value for "%s":%s`, allopt[optidx].name, op);
+            await config_error_add($C`Invalid value for "%s":%s`,
+                allopt[optidx].name, op);
             return optn_err;
         }
         return optn_ok;
@@ -3091,7 +3175,9 @@ async function optfn_roguesymset(optidx, req, negated, opts, op) {   // options.
             $t1 = await dupstr(op), gs.symset[ROGUESET].name = $t1;
             if (!await read_sym_file(ROGUESET)) {
                 clear_symsetentry(ROGUESET, TRUE);
-                await config_error_add($C`Unable to load symbol set "%s" from "%s"`, op, $C`symbols`);
+                await config_error_add(
+                    $C`Unable to load symbol set "%s" from "%s"`, op,
+                    $C`symbols`);
                 return optn_err;
             } else {
                 if (!go.opt_initial && Is_rogue_level(u.uz)) {
@@ -3182,11 +3268,13 @@ async function optfn_runmode(optidx, req, negated, opts, op) {   // options.c:36
             } else if (str_start_is($C`crawl`, op, TRUE)) {
                 flags.runmode = RUN.CRAWL;
             } else {
-                await config_error_add($C`Unknown %s parameter '%s'`, allopt[optidx].name, op);
+                await config_error_add($C`Unknown %s parameter '%s'`,
+                    allopt[optidx].name, op);
                 return optn_err;
             }
         } else {
-            await config_error_add($C`Value is mandatory for %s`, allopt[optidx].name);
+            await config_error_add($C`Value is mandatory for %s`,
+                allopt[optidx].name);
             return optn_err;
         }
         return optn_ok;
@@ -3257,12 +3345,16 @@ async function optfn_scores(optidx, req, negated, opts, op) {   // options.c:366
                     break;
                 case 45:
                     if (digit(op.add(1).get(0))) {
-                        await config_error_add($C`Values for %s:top and %s:around must not be negative`, allopt[optidx].name, allopt[optidx].name);
+                        await config_error_add(
+                            $C`Values for %s:top and %s:around must not be negative`,
+                            allopt[optidx].name,
+                            allopt[optidx].name);
                         return optn_silenterr;
                     }
                 default:
                     /*FALLTHRU*/
-                    await config_error_add($C`Unknown %s parameter '%s'`, allopt[optidx].name, op);
+                    await config_error_add($C`Unknown %s parameter '%s'`,
+                        allopt[optidx].name, op);
                     return optn_silenterr;
             }
             /* "3a" is sufficient but accept "3around" (or "3abracadabra") */
@@ -3313,7 +3405,8 @@ async function optfn_scroll_amount(optidx, req, negated, opts, op) {   // option
     if (req === do_set) {
         /* WINCAP scroll_amount:nn */
         op = await string_for_opt(opts, negated);
-        if (negated && $c.peq(op, new $c.Ptr(empty_optstr, 0)) || !negated && !$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
+        if (negated && $c.peq(op, new $c.Ptr(empty_optstr, 0))
+            || !negated && !$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
             $t1 = negated ? 1 : $c.atoi(op), iflags.wc_scroll_amount = $t1;
         } else if (negated) {
             await bad_negation(allopt[optidx].name, TRUE);
@@ -3347,7 +3440,8 @@ async function optfn_scroll_margin(optidx, req, negated, opts, op) {   // option
     if (req === do_set) {
         /* WINCAP scroll_margin:nn */
         op = await string_for_opt(opts, negated);
-        if (negated && $c.peq(op, new $c.Ptr(empty_optstr, 0)) || !negated && !$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
+        if (negated && $c.peq(op, new $c.Ptr(empty_optstr, 0))
+            || !negated && !$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
             $t1 = negated ? 5 : $c.atoi(op), iflags.wc_scroll_margin = $t1;
         } else if (negated) {
             await bad_negation(allopt[optidx].name, TRUE);
@@ -3444,7 +3538,8 @@ async function optfn_sortdiscoveries(optidx, req, negated, opts, op) {   // opti
                     flags.discosort = 97;
                     break;
                 default:
-                    await config_error_add($C`Unknown %s parameter '%s'`, allopt[optidx].name, op);
+                    await config_error_add($C`Unknown %s parameter '%s'`,
+                        allopt[optidx].name, op);
                     return optn_silenterr;
             }
         } else {
@@ -3489,7 +3584,8 @@ async function optfn_sortloot(optidx, req, negated, opts, op) {   // options.c:3
                     flags.sortloot = c;
                     break;
                 default:
-                    await config_error_add($C`Unknown %s parameter '%s'`, allopt[optidx].name, op);
+                    await config_error_add($C`Unknown %s parameter '%s'`,
+                        allopt[optidx].name, op);
                     return optn_err;
             }
         } else {
@@ -3558,7 +3654,12 @@ async function optfn_sortvanquished(optidx, req, negated, opts, op) {   // optio
         const prev_sortmode = flags.vanq_sortmode;
         /* return handler_sortvanquished(); */
         await set_vanq_order(TRUE);   /* insight.c */
-        await pline($C`'%s' %s "%s: %s".`, optname, flags.vanq_sortmode === prev_sortmode ? $C`not changed, still` : $C`changed to`, vanqorders[flags.vanq_sortmode][0], vanqorders[flags.vanq_sortmode][1]);
+        await pline($C`'%s' %s "%s: %s".`, optname,
+            flags.vanq_sortmode === prev_sortmode
+            ? $C`not changed, still`
+            : $C`changed to`,
+            vanqorders[flags.vanq_sortmode][0],
+            vanqorders[flags.vanq_sortmode][1]);
     }
     return optn_ok;
 }
@@ -3582,7 +3683,8 @@ async function optfn_statushilites(optidx, req, negated, opts, op) {   // option
             iflags.hilite_delta = 0;
         } else {
             op = await string_for_opt(opts, TRUE);
-            $t1 = $c.peq(op, new $c.Ptr(empty_optstr, 0)) || !op.get(0) ? 3 : $c.atol(op), iflags.hilite_delta = $t1;
+            $t1 = $c.peq(op, new $c.Ptr(empty_optstr, 0)) || !op.get(0) ? 3
+                : $c.atol(op), iflags.hilite_delta = $t1;
             if (iflags.hilite_delta < 0) {
                 iflags.hilite_delta = 1;
             }
@@ -3631,7 +3733,8 @@ async function optfn_statuslines(optidx, req, negated, opts, op) {   // options.
             itmp = $c.atoi(op);
         }
         if (itmp < 2 || itmp > 3) {
-            await config_error_add($C`'%s:%s' is invalid; must be 2 or 3`, allopt[optidx].name, op);
+            await config_error_add($C`'%s:%s' is invalid; must be 2 or 3`,
+                allopt[optidx].name, op);
             retval = optn_silenterr;
         } else {
             iflags.wc2_statuslines = itmp;
@@ -3707,7 +3810,9 @@ async function optfn_symset(optidx, req, negated, opts, op) {   // options.c:416
             $t1 = await dupstr(op), gs.symset[PRIMARYSET].name = $t1;
             if (!await read_sym_file(PRIMARYSET)) {
                 clear_symsetentry(PRIMARYSET, TRUE);
-                await config_error_add($C`Unable to load symbol set "%s" from "%s"`, op, $C`symbols`);
+                await config_error_add(
+                    $C`Unable to load symbol set "%s" from "%s"`, op,
+                    $C`symbols`);
                 return optn_err;
             } else {
                 if (gs.symset[PRIMARYSET].handling) {
@@ -3770,7 +3875,8 @@ async function optfn_term_cols(optidx, req, negated, opts, op) {   // options.c:
             /* just checks atol() sanity, not logical window size sanity
              */
             if (ltmp <= 0 || ltmp >= LARGEST_INT) {
-                await config_error_add($C`Invalid %s: %ld`, allopt[optidx].name, ltmp);
+                await config_error_add($C`Invalid %s: %ld`, allopt[optidx].name,
+                    ltmp);
                 retval = optn_err;
             } else {
                 iflags.wc2_term_cols = $c.i32(ltmp);
@@ -3811,7 +3917,8 @@ async function optfn_term_rows(optidx, req, negated, opts, op) {   // options.c:
             /* just checks atol() sanity, not logical window size sanity
              */
             if (ltmp <= 0 || ltmp >= LARGEST_INT) {
-                await config_error_add($C`Invalid %s: %ld`, allopt[optidx].name, ltmp);
+                await config_error_add($C`Invalid %s: %ld`, allopt[optidx].name,
+                    ltmp);
                 retval = optn_err;
             } else {
                 iflags.wc2_term_rows = $c.i32(ltmp);
@@ -3886,7 +3993,8 @@ async function optfn_tile_height(optidx, req, negated, opts, op) {   // options.
     if (req === do_set) {
         /* WINCAP tile_height:nn */
         op = await string_for_opt(opts, negated);
-        if (negated && $c.peq(op, new $c.Ptr(empty_optstr, 0)) || !negated && !$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
+        if (negated && $c.peq(op, new $c.Ptr(empty_optstr, 0))
+            || !negated && !$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
             $t1 = negated ? 0 : $c.atoi(op), iflags.wc_tile_height = $t1;
         } else if (negated) {
             await bad_negation(allopt[optidx].name, TRUE);
@@ -3922,7 +4030,8 @@ async function optfn_tile_width(optidx, req, negated, opts, op) {   // options.c
     if (req === do_set) {
         /* WINCAP tile_width:nn */
         op = await string_for_opt(opts, negated);
-        if (negated && $c.peq(op, new $c.Ptr(empty_optstr, 0)) || !negated && !$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
+        if (negated && $c.peq(op, new $c.Ptr(empty_optstr, 0))
+            || !negated && !$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
             $t1 = negated ? 0 : $c.atoi(op), iflags.wc_tile_width = $t1;
         } else if (negated) {
             await bad_negation(allopt[optidx].name, TRUE);
@@ -3983,7 +4092,8 @@ async function optfn_vary_msgcount(optidx, req, negated, opts, op) {   // option
     if (req === do_set) {
         /* WINCAP vary_msgcount:nn */
         op = await string_for_opt(opts, negated);
-        if (negated && $c.peq(op, new $c.Ptr(empty_optstr, 0)) || !negated && !$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
+        if (negated && $c.peq(op, new $c.Ptr(empty_optstr, 0))
+            || !negated && !$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
             $t1 = negated ? 0 : $c.atoi(op), iflags.wc_vary_msgcount = $t1;
         } else if (negated) {
             await bad_negation(allopt[optidx].name, TRUE);
@@ -4025,7 +4135,8 @@ async function optfn_versinfo(optidx, req, negated, opts, op) {   // options.c:4
            If branch is requested but unavailable, status_version will
            treat 4 as 1.
          */
-        const have_branch = nomakedefs.git_branch && nomakedefs.git_branch.get(0) ? 1 : 0;
+        const have_branch = nomakedefs.git_branch
+            && nomakedefs.git_branch.get(0) ? 1 : 0;
         const dflt = have_branch ? VI.BRANCH : VI.NUMBER;
         if (negated) {
             await bad_negation(allopt[optidx].name, TRUE);
@@ -4033,19 +4144,23 @@ async function optfn_versinfo(optidx, req, negated, opts, op) {   // options.c:4
         }
         op = await string_for_opt(opts, FALSE);
         if ($c.peq(op, new $c.Ptr(empty_optstr, 0))) {
-            await config_error_add($C`'%s' requires a value; defaulting to %d`, optname, dflt);
+            await config_error_add($C`'%s' requires a value; defaulting to %d`,
+                optname, dflt);
             return optn_silenterr;
         }
         const val = $c.atoi(op);
         if (!val || (val & -8) !== 0) {
-            await config_error_add($C`'%s' must be one of 1, 2, 4, or the sum of two or all three of those`, optname);
+            await config_error_add($C`'%s' must be one of 1, 2, 4, or the sum of two or all three of those`,
+                optname);
             return optn_silenterr;
         }
         flags.versinfo = val >>> 0;
     } else if (req === do_handler) {
         /* return handler_versinfo(); */
         await handler_versinfo();
-        await pline($C`'%s' %s %u.`, optname, flags.versinfo === vi ? $C`not changed, still` : $C`changed to`, flags.versinfo);
+        await pline($C`'%s' %s %u.`, optname,
+            flags.versinfo === vi ? $C`not changed, still` : $C`changed to`,
+            flags.versinfo);
     } else if (req === get_val) {
         const g = (vi & VI.NAME) >>> 0 !== 0 ? 1 : 0;
         const b = (vi & VI.BRANCH) >>> 0 !== 0 ? 1 : 0;
@@ -4110,7 +4225,8 @@ async function optfn_whatis_coord(optidx, req, negated, opts, op) {   // options
             if (c && $c.strchr(new $c.Ptr(optfn_whatis_coord$gpcoords, 0), c)) {
                 iflags.getpos_coords = c;
             } else {
-                await config_error_add($C`Unknown %s parameter '%s'`, allopt[optidx].name, op);
+                await config_error_add($C`Unknown %s parameter '%s'`,
+                    allopt[optidx].name, op);
                 return optn_err;
             }
         } else {
@@ -4157,7 +4273,8 @@ async function optfn_whatis_filter(optidx, req, negated, opts, op) {   // option
                     break;
                 default:
                     {
-                        await config_error_add($C`Unknown %s parameter '%s'`, allopt[optidx].name, op);
+                        await config_error_add($C`Unknown %s parameter '%s'`,
+                            allopt[optidx].name, op);
                         return optn_err;
                     }
             }
@@ -4206,7 +4323,8 @@ async function optfn_windowborders(optidx, req, negated, opts, op) {   // option
                 itmp = $c.atoi(op);
             }
             if (itmp < 0 || itmp > 4) {
-                await config_error_add($C`Invalid %s (should be within 0 to 4): %s`, allopt[optidx].name, opts);
+                await config_error_add($C`Invalid %s (should be within 0 to 4): %s`,
+                    allopt[optidx].name, opts);
                 retval = optn_silenterr;
             } else {
                 iflags.wc2_windowborders = itmp;
@@ -4250,7 +4368,8 @@ async function optfn_windowcolors(optidx, req, negated, opts, op) {   // options
          */
         if (!$c.peq(op = await string_for_opt(opts, FALSE), new $c.Ptr(empty_optstr, 0))) {
             if (!await wc_set_window_colors(op)) {
-                await config_error_add($C`Could not set %s '%s'`, allopt[optidx].name, op);
+                await config_error_add($C`Could not set %s '%s'`, allopt[optidx].name,
+                    op);
                 return optn_err;
             }
         }
@@ -4397,7 +4516,11 @@ async function pfxfn_font(optidx, req, negated, opts, op) {   // options.c:5039
             opttype = MENU_OPTION;
         } else if (optidx === opt_font_status) {
             opttype = STATUS_OPTION;
-        } else if (optidx === opt_font_size_map || optidx === opt_font_size_message || optidx === opt_font_size_text || optidx === opt_font_size_menu || optidx === opt_font_size_status) {
+        } else if (optidx === opt_font_size_map
+            || optidx === opt_font_size_message
+            || optidx === opt_font_size_text
+            || optidx === opt_font_size_menu
+            || optidx === opt_font_size_status) {
             if (optidx === opt_font_size_map) {
                 opttype = MAP_OPTION;
             } else if (optidx === opt_font_size_message) {
@@ -4409,13 +4532,15 @@ async function pfxfn_font(optidx, req, negated, opts, op) {   // options.c:5039
             } else if (optidx === opt_font_size_status) {
                 opttype = STATUS_OPTION;
             } else {
-                await config_error_add($C`Unknown %s parameter '%s'`, allopt[optidx].name, opts);
+                await config_error_add($C`Unknown %s parameter '%s'`,
+                    allopt[optidx].name, opts);
                 return optn_err;
             }
             if (duplicate) {
                 await complain_about_duplicate(optidx);
             }
-            if (opttype > 0 && !negated && !$c.peq(op = await string_for_opt(opts, FALSE), new $c.Ptr(empty_optstr, 0))) {
+            if (opttype > 0 && !negated
+                && !$c.peq(op = await string_for_opt(opts, FALSE), new $c.Ptr(empty_optstr, 0))) {
                 switch (opttype) {
                     case MAP_OPTION:
                         $t1 = $c.atoi(op), iflags.wc_fontsiz_map = $t1;
@@ -4436,10 +4561,12 @@ async function pfxfn_font(optidx, req, negated, opts, op) {   // options.c:5039
             }
             return optn_ok;
         } else {
-            await config_error_add($C`Unknown %s parameter '%s'`, $C`font`, opts);
+            await config_error_add($C`Unknown %s parameter '%s'`,
+                $C`font`, opts);
             return FALSE;
         }
-        if (opttype > 0 && !$c.peq(op = await string_for_opt(opts, FALSE), new $c.Ptr(empty_optstr, 0))) {
+        if (opttype > 0
+            && !$c.peq(op = await string_for_opt(opts, FALSE), new $c.Ptr(empty_optstr, 0))) {
             await wc_set_font_name(opttype, op);
             return optn_ok;
         } else if (negated) {
@@ -4528,14 +4655,22 @@ export async function optfn_boolean(optidx, req, negated, opts, op) {   // optio
         op = await string_for_opt(opts, TRUE);
         if (!$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
             if (negated) {
-                await config_error_add($C`Negated boolean '%s' should not have a parameter`, allopt[optidx].name);
+                await config_error_add(
+                    $C`Negated boolean '%s' should not have a parameter`,
+                    allopt[optidx].name);
                 return optn_silenterr;
             }
             /* length is greater than 0 or we wouldn't have gotten here */
             ln = $c.i32($c.strlen(op));
-            if (!strncmpi(op, $C`true`, ln) || !strncmpi(op, $C`yes`, ln) || !strcmpi(op, $C`on`) || digit(op.get(0)) && $c.atoi(op) === 1) {
+            if (!strncmpi(op, $C`true`, ln)
+                || !strncmpi(op, $C`yes`, ln)
+                || !strcmpi(op, $C`on`)
+                || digit(op.get(0)) && $c.atoi(op) === 1) {
                 negated = FALSE;
-            } else if (!strncmpi(op, $C`false`, ln) || !strncmpi(op, $C`no`, ln) || !strcmpi(op, $C`off`) || digit(op.get(0)) && $c.atoi(op) === 0) {
+            } else if (!strncmpi(op, $C`false`, ln)
+                || !strncmpi(op, $C`no`, ln)
+                || !strcmpi(op, $C`off`)
+                || digit(op.get(0)) && $c.atoi(op) === 0) {
                 negated = TRUE;
             } else if (!allopt[optidx].valok) {
                 await config_error_add($C`'%s' is not valid for a boolean`, opts);
@@ -4544,7 +4679,8 @@ export async function optfn_boolean(optidx, req, negated, opts, op) {   // optio
         }
         if (iflags.debug_fuzzer && !go.opt_initial) {
             /* don't randomly toggle this/these */
-            if (optidx === opt_silent || optidx === opt_perm_invent) {
+            if (optidx === opt_silent
+                || optidx === opt_perm_invent) {
                 return optn_ok;
             }
         }
@@ -4634,7 +4770,8 @@ export async function optfn_boolean(optidx, req, negated, opts, op) {   // optio
                 /*FALLTHRU*/
                 if (!wc2_supported(allopt[optidx].name)) {
                     /* not actually an error */
-                    await config_error_add($C`'%s' is not supported.`, allopt[optidx].name);
+                    await config_error_add($C`'%s' is not supported.`,
+                        allopt[optidx].name);
                     return optn_ok;
                 }
             case opt_showscore:
@@ -4722,7 +4859,8 @@ export async function optfn_boolean(optidx, req, negated, opts, op) {   // optio
            still be pending at this point (mainly for opt_need_redraw);
            give the toggled message now regardless */
         if (give_opt_msg) {
-            await pline($C`'%s' option toggled %s.`, allopt[optidx].name, !negated ? $C`on` : $C`off`);
+            await pline($C`'%s' option toggled %s.`, allopt[optidx].name,
+                !negated ? $C`on` : $C`off`);
         }
         return optn_ok;
     }
@@ -4810,7 +4948,9 @@ async function handler_menustyle() {   // options.c:5544
     for (i = 0; i < 4; i = i + 1 | 0) {
         $c.sprintf(new $c.Ptr(buf, 0), $C`%-12.12s%c%.60s`, menutype[i][0], sep, menutype[i][1]);
         any.a_int = i + 1 | 0;
-        await add_menu(tmpwin, nul_glyphinfo, any, new $c.Ptr(buf, 0).get(0), 0, ATR.NONE, clr, new $c.Ptr(buf, 0), i === flags.menu_style ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, new $c.Ptr(buf, 0).get(0), 0, ATR.NONE, clr, new $c.Ptr(buf, 0),
+            i === flags.menu_style ? MENU.ITEMFLAGS_SELECTED
+            : MENU.ITEMFLAGS_NONE);
         /* second line is prefixed by spaces that "c - " would use */
         $c.sprintf(new $c.Ptr(buf, 0), $C`%4s%-12.12s%c%.60s`, $C``, $C``, sep, menutype[i][2]);
         await add_menu_str(tmpwin, new $c.Ptr(buf, 0));
@@ -4829,7 +4969,8 @@ async function handler_menustyle() {   // options.c:5544
     await destroy_nhwindow()(tmpwin);
     const chngd = flags.menu_style !== old_menu_style ? 1 : 0;
     if (chngd || flags.verbose) {
-        await pline($C`'menustyle' %s "%s".`, chngd ? $C`changed to` : $C`is still`, menutype[flags.menu_style][0]);
+        await pline($C`'menustyle' %s "%s".`, chngd ? $C`changed to` : $C`is still`,
+            menutype[flags.menu_style][0]);
     }
     return optn_ok;
 }
@@ -4845,13 +4986,17 @@ async function handler_align_misc(optidx) {   // options.c:5586
     await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     any.a_int = ALIGN.TOP;
-    await add_menu(tmpwin, nul_glyphinfo, any, 116, 0, ATR.NONE, clr, $C`top`, MENU.ITEMFLAGS_NONE);
+    await add_menu(tmpwin, nul_glyphinfo, any, 116, 0, ATR.NONE, clr, $C`top`,
+        MENU.ITEMFLAGS_NONE);
     any.a_int = ALIGN.BOTTOM;
-    await add_menu(tmpwin, nul_glyphinfo, any, 98, 0, ATR.NONE, clr, $C`bottom`, MENU.ITEMFLAGS_NONE);
+    await add_menu(tmpwin, nul_glyphinfo, any, 98, 0, ATR.NONE, clr, $C`bottom`,
+        MENU.ITEMFLAGS_NONE);
     any.a_int = ALIGN.LEFT;
-    await add_menu(tmpwin, nul_glyphinfo, any, 108, 0, ATR.NONE, clr, $C`left`, MENU.ITEMFLAGS_NONE);
+    await add_menu(tmpwin, nul_glyphinfo, any, 108, 0, ATR.NONE, clr, $C`left`,
+        MENU.ITEMFLAGS_NONE);
     any.a_int = ALIGN.RIGHT;
-    await add_menu(tmpwin, nul_glyphinfo, any, 114, 0, ATR.NONE, clr, $C`right`, MENU.ITEMFLAGS_NONE);
+    await add_menu(tmpwin, nul_glyphinfo, any, 114, 0, ATR.NONE, clr, $C`right`,
+        MENU.ITEMFLAGS_NONE);
     $c.sprintf(new $c.Ptr(abuf, 0), $C`Select %s window placement relative to the map:`, optidx === opt_align_message ? $C`message` : $C`status`);
     await end_menu()(tmpwin, new $c.Ptr(abuf, 0));
     if (await select_menu(tmpwin, PICK.ONE, new $c.Ptr(window_pick, 0)) > 0) {
@@ -4884,7 +5029,9 @@ async function handler_autounlock(optidx) {   // options.c:5624
         $c.sprintf(new $c.Ptr(buf, 0), $C`%-10.10s%c%.40s`, unlocktypes[i][0], sep, unlocktypes[i][1]);
         const presel = (flags.autounlock & 1 << i >>> 0) >>> 0 | 0;
         any.a_int = i + 1 | 0;
-        await add_menu(tmpwin, nul_glyphinfo, any, unlocktypes[i][0].get(0), 0, ATR.NONE, clr, new $c.Ptr(buf, 0), presel ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, unlocktypes[i][0].get(0), 0,
+            ATR.NONE, clr, new $c.Ptr(buf, 0),
+            presel ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     }
     $c.sprintf(new $c.Ptr(buf, 0), $C`Select '%.20s' actions:`, optname);
     await end_menu()(tmpwin, new $c.Ptr(buf, 0));
@@ -4907,7 +5054,8 @@ async function handler_autounlock(optidx) {   // options.c:5624
     const chngd = flags.autounlock !== oldflags ? 1 : 0;
     if ((chngd || flags.verbose) && give_opt_msg) {
         await optfn_autounlock(optidx, get_val, FALSE, new $c.Ptr(buf, 0), $c.asArr(null, Int8Array));
-        await pline($C`'%s' %s '%s'.`, optname, chngd ? $C`changed to` : $C`is still`, new $c.Ptr(buf, 0));
+        await pline($C`'%s' %s '%s'.`, optname,
+            chngd ? $C`changed to` : $C`is still`, new $c.Ptr(buf, 0));
     }
     return res;
 }
@@ -4926,7 +5074,8 @@ async function handler_disclose() {   // options.c:5675
     for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i = i + 1 | 0) {
         $c.sprintf(new $c.Ptr(buf, 0), $C`%-12s[%c%c]`, handler_disclose$disclosure_names[i], flags.end_disclose[i], disclosure_options[i]);
         any.a_int = i + 1 | 0;
-        await add_menu(tmpwin, nul_glyphinfo, any, disclosure_options[i], 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, disclosure_options[i],
+            0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
         disc_cat[i] = 0;
     }
     await end_menu()(tmpwin, $C`Change which disclosure options categories:`);
@@ -4949,20 +5098,44 @@ async function handler_disclose() {   // options.c:5675
             any.$copyFrom(cg.zeroany);
             /* 'y','n',and '+' work as alternate selectors; '-' doesn't */
             any.a_char = DISCLOSE_NO_WITHOUT_PROMPT;
-            await add_menu(tmpwin, nul_glyphinfo, any, 0, any.a_char, ATR.NONE, clr, $C`Never disclose, without prompting`, c === any.a_char ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+            await add_menu(tmpwin, nul_glyphinfo, any, 0,
+                any.a_char, ATR.NONE, clr,
+                $C`Never disclose, without prompting`,
+                c === any.a_char ? MENU.ITEMFLAGS_SELECTED
+                : MENU.ITEMFLAGS_NONE);
             any.a_char = DISCLOSE_YES_WITHOUT_PROMPT;
-            await add_menu(tmpwin, nul_glyphinfo, any, 0, any.a_char, ATR.NONE, clr, $C`Always disclose, without prompting`, c === any.a_char ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+            await add_menu(tmpwin, nul_glyphinfo, any, 0,
+                any.a_char, ATR.NONE, clr,
+                $C`Always disclose, without prompting`,
+                c === any.a_char ? MENU.ITEMFLAGS_SELECTED
+                : MENU.ITEMFLAGS_NONE);
             if (handler_disclose$disclosure_names[i].get(0) === 118 || handler_disclose$disclosure_names[i].get(0) === 103) {
                 any.a_char = DISCLOSE_SPECIAL_WITHOUT_PROMPT;   /* '#' */
-                await add_menu(tmpwin, nul_glyphinfo, any, 0, any.a_char, ATR.NONE, clr, $C`Always disclose, pick sort order from menu`, c === any.a_char ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+                await add_menu(tmpwin, nul_glyphinfo, any, 0,
+                    any.a_char, ATR.NONE, clr,
+                    $C`Always disclose, pick sort order from menu`,
+                    c === any.a_char ? MENU.ITEMFLAGS_SELECTED
+                    : MENU.ITEMFLAGS_NONE);
             }
             any.a_char = DISCLOSE_PROMPT_DEFAULT_NO;
-            await add_menu(tmpwin, nul_glyphinfo, any, 0, any.a_char, ATR.NONE, clr, $C`Prompt, with default answer of "No"`, c === any.a_char ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+            await add_menu(tmpwin, nul_glyphinfo, any, 0,
+                any.a_char, ATR.NONE, clr,
+                $C`Prompt, with default answer of "No"`,
+                c === any.a_char ? MENU.ITEMFLAGS_SELECTED
+                : MENU.ITEMFLAGS_NONE);
             any.a_char = DISCLOSE_PROMPT_DEFAULT_YES;
-            await add_menu(tmpwin, nul_glyphinfo, any, 0, any.a_char, ATR.NONE, clr, $C`Prompt, with default answer of "Yes"`, c === any.a_char ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+            await add_menu(tmpwin, nul_glyphinfo, any, 0,
+                any.a_char, ATR.NONE, clr,
+                $C`Prompt, with default answer of "Yes"`,
+                c === any.a_char ? MENU.ITEMFLAGS_SELECTED
+                : MENU.ITEMFLAGS_NONE);
             if (handler_disclose$disclosure_names[i].get(0) === 118 || handler_disclose$disclosure_names[i].get(0) === 103) {
                 any.a_char = DISCLOSE_PROMPT_DEFAULT_SPECIAL;   /* '?' */
-                await add_menu(tmpwin, nul_glyphinfo, any, 0, any.a_char, ATR.NONE, clr, $C`Prompt, with default answer of "Ask" to request sort menu`, c === any.a_char ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+                await add_menu(tmpwin, nul_glyphinfo, any, 0,
+                    any.a_char, ATR.NONE, clr,
+                    $C`Prompt, with default answer of "Ask" to request sort menu`,
+                    c === any.a_char ? MENU.ITEMFLAGS_SELECTED
+                    : MENU.ITEMFLAGS_NONE);
             }
             await end_menu()(tmpwin, new $c.Ptr(buf, 0));
             const n = await select_menu(tmpwin, PICK.ONE, new $c.Ptr(disclosure_pick, 0));
@@ -4982,7 +5155,8 @@ async function handler_disclose() {   // options.c:5675
  * @returns {Promise<number>} int
  */
 async function handler_menu_headings() {   // options.c:5780
-    const gotca = await query_color_attr(iflags.menu_headings, $C`How to highlight menu headings:`);
+    const gotca = await query_color_attr(iflags.menu_headings,
+        $C`How to highlight menu headings:`);
     if (gotca) {
         /* header highlighting affects persistent inventory display */
         if (iflags.perm_invent) {
@@ -5007,7 +5181,10 @@ async function handler_menu_objsyms() {   // options.c:5795
         nh_snprintf($C`handler_menu_objsyms`, 5809, new $c.Ptr(buf, 0), 256, $C`%-12.12s%c%.60s`, objsymvals[i].nam, sep, objsymvals[i].descr);
         any.a_int = i + 1 | 0;
         const j = objsymvals[i].num;
-        await add_menu(tmpwin, nul_glyphinfo, any, $c.i8(48 + i | 0), new $c.Ptr(buf, 0).get(0), ATR.NONE, clr, new $c.Ptr(buf, 0), j === iflags.menuobjsyms ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, $c.i8(48 + i | 0), new $c.Ptr(buf, 0).get(0),
+            ATR.NONE, clr, new $c.Ptr(buf, 0),
+            j === iflags.menuobjsyms ? MENU.ITEMFLAGS_SELECTED
+            : MENU.ITEMFLAGS_NONE);
     }
     await end_menu()(tmpwin, $C`Set object symbols in menus to what?`);
     const n = await select_menu(tmpwin, PICK.ONE, new $c.Ptr(picklist, 0));
@@ -5046,7 +5223,10 @@ async function handler_msg_window() {   // options.c:5832
             }
             $c.sprintf(new $c.Ptr(buf, 0), $C`%-12.12s%c%.60s`, msgwind[i][0], sep, msgwind[i][1]);
             $t1 = c = msgwind[i][0].get(0), any.a_char = $t1;
-            await add_menu(tmpwin, nul_glyphinfo, any, new $c.Ptr(buf, 0).get(0), 0, ATR.NONE, clr, new $c.Ptr(buf, 0), c === iflags.prevmsg_window ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+            await add_menu(tmpwin, nul_glyphinfo, any, new $c.Ptr(buf, 0).get(0), 0,
+                ATR.NONE, clr, new $c.Ptr(buf, 0),
+                c === iflags.prevmsg_window ? MENU.ITEMFLAGS_SELECTED
+                : MENU.ITEMFLAGS_NONE);
             /* second line is prefixed by spaces that "c - " would use */
             $c.sprintf(new $c.Ptr(buf, 0), $C`%4s%-12.12s%c%.60s`, $C``, $C``, sep, msgwind[i][2]);
             await add_menu_str(tmpwin, new $c.Ptr(buf, 0));
@@ -5065,12 +5245,15 @@ async function handler_msg_window() {   // options.c:5832
         await destroy_nhwindow()(tmpwin);
         const chngd = iflags.prevmsg_window !== old_prevmsg_window ? 1 : 0;
         if (chngd || flags.verbose) {
-            await optfn_msg_window(opt_msg_window, get_val, FALSE, new $c.Ptr(buf, 0), new $c.Ptr(empty_optstr, 0));
-            await pline($C`'msg_window' %.20s "%.20s".`, chngd ? $C`changed to` : $C`is still`, new $c.Ptr(buf, 0));
+            await optfn_msg_window(opt_msg_window, get_val,
+                FALSE, new $c.Ptr(buf, 0), new $c.Ptr(empty_optstr, 0));
+            await pline($C`'msg_window' %.20s "%.20s".`,
+                chngd ? $C`changed to` : $C`is still`, new $c.Ptr(buf, 0));
         }
     } else {
         /* PREV_MSGS (for tty or curses) */
-        await pline($C`'%s' option is not supported for '%s'.`, allopt[opt_msg_window].name, windowprocs.name);
+        await pline($C`'%s' option is not supported for '%s'.`,
+            allopt[opt_msg_window].name, windowprocs.name);
     }
     return optn_ok;
 }
@@ -5086,7 +5269,8 @@ async function handler_number_pad() {   // options.c:5893
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < 6; i = i + 1 | 0) {
         any.a_int = i + 1 | 0;
-        await add_menu(tmpwin, nul_glyphinfo, any, $c.i8(97 + i | 0), $c.i8(48 + i | 0), ATR.NONE, clr, handler_number_pad$npchoices[i], MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, $c.i8(97 + i | 0), $c.i8(48 + i | 0),
+            ATR.NONE, clr, handler_number_pad$npchoices[i], MENU.ITEMFLAGS_NONE);
     }
     await end_menu()(tmpwin, $C`Select number_pad mode:`);
     if (await select_menu(tmpwin, PICK.ONE, new $c.Ptr(mode_pick, 0)) > 0) {
@@ -5142,7 +5326,8 @@ async function handler_paranoid_confirmation() {   // options.c:5953
            explanation; if that's been bound to something else or been
            unbound altogether, substitute the replacement in the text */
         let explain = paranoia[i].explain;
-        if (strstri(explain, $C`'m'`) && (mkey = cmd_from_func(do_reqmenu)) !== 109) {
+        if (strstri(explain, $C`'m'`)
+            && (mkey = cmd_from_func(do_reqmenu)) !== 109) {
             if (mkey) {
                 /* key for 'm' prefix */
                 $c.sprintf(new $c.Ptr(mbuf, 0), $C`'%.9s'`, visctrl(mkey));   /* .5 is enough */
@@ -5157,7 +5342,11 @@ async function handler_paranoid_confirmation() {   // options.c:5953
             explain = strsubst($c.strcpy(new $c.Ptr(ebuf, 0), explain), $C`'m'`, new $c.Ptr(mbuf, 0));
         }
         any.a_int = paranoia[i].flagmask;
-        await add_menu(tmpwin, nul_glyphinfo, any, paranoia[i].argname.get(0), 0, ATR.NONE, clr, explain, (flags.paranoia_bits & paranoia[i].flagmask >>> 0) >>> 0 ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, paranoia[i].argname.get(0),
+            0, ATR.NONE, clr, explain,
+            (flags.paranoia_bits & paranoia[i].flagmask >>> 0) >>> 0
+            ? MENU.ITEMFLAGS_SELECTED
+            : MENU.ITEMFLAGS_NONE);
     }
     await end_menu()(tmpwin, $C`Actions requiring extra confirmation:`);
     i = await select_menu(tmpwin, PICK.ANY, new $c.Ptr(paranoia_picks, 0));
@@ -5204,7 +5393,10 @@ async function handler_perminv_mode() {   // options.c:6011
         $c.sprintf(new $c.Ptr(buf, 0), $C`%s%s%s`, pi0, new $c.Ptr(sepbuf, 0), perminv_modes[i][2]);
         const let_ = (i & InvSparse) !== 0 ? highc(pi1.get(0)) : pi0.get(0);
         any.a_int = i + 1 | 0;
-        await add_menu(tmpwin, nul_glyphinfo, any, let_, $c.i8(48 + i | 0), ATR.NONE, NO_COLOR, new $c.Ptr(buf, 0), i === old_pi ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, let_, $c.i8(48 + i | 0),
+            ATR.NONE, NO_COLOR,
+            new $c.Ptr(buf, 0), i === old_pi ? MENU.ITEMFLAGS_SELECTED
+            : MENU.ITEMFLAGS_NONE);
     }
     await end_menu()(tmpwin, $C`Choose permanent inventory mode:`);
     const n = await select_menu(tmpwin, PICK.ONE, new $c.Ptr(pi_pick, 0));
@@ -5221,7 +5413,9 @@ async function handler_perminv_mode() {   // options.c:6011
         /* not ESC */
         buf[0] = 0;
         await optfn_perminv_mode(opt_perm_invent, get_val, FALSE, new $c.Ptr(buf, 0), null);
-        await pline($C`'perminv_mode' %s '%s' (%s).`, new_pi !== old_pi ? $C`changed to` : $C`is still`, perminv_modes[new_pi][0], new $c.Ptr(buf, 0));
+        await pline($C`'perminv_mode' %s '%s' (%s).`,
+            new_pi !== old_pi ? $C`changed to` : $C`is still`,
+            perminv_modes[new_pi][0], new $c.Ptr(buf, 0));
         if (new_pi !== InvOptNone && !old_perm_invent) {
             $t1 = can_set_perm_invent(), iflags.perm_invent = $t1;
         } else if (new_pi === InvOptNone && old_perm_invent) {
@@ -5252,7 +5446,8 @@ async function handler_pickup_burden() {   // options.c:6086
     for (i = 0; i < 6; i = i + 1 | 0) {
         const burden_name = burdentype[i];
         any.a_int = i + 1 | 0;
-        await add_menu(tmpwin, nul_glyphinfo, any, burden_letters.get(i), 0, ATR.NONE, clr, burden_name, MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, burden_letters.get(i),
+            0, ATR.NONE, clr, burden_name, MENU.ITEMFLAGS_NONE);
     }
     await end_menu()(tmpwin, $C`Select encumbrance level:`);
     if (await select_menu(tmpwin, PICK.ONE, new $c.Ptr(burden_pick, 0)) > 0) {
@@ -5284,7 +5479,8 @@ async function handler_runmode() {   // options.c:6124
     for (i = 0; i < 4; i = i + 1 | 0) {
         const mode_name = runmodes[i];
         any.a_int = i + 1 | 0;
-        await add_menu(tmpwin, nul_glyphinfo, any, mode_name.get(0), 0, ATR.NONE, clr, mode_name, MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, mode_name.get(0),
+            0, ATR.NONE, clr, mode_name, MENU.ITEMFLAGS_NONE);
     }
     await end_menu()(tmpwin, $C`Select run/travel display mode:`);
     if (await select_menu(tmpwin, PICK.ONE, new $c.Ptr(mode_pick, 0)) > 0) {
@@ -5321,7 +5517,11 @@ async function handler_sortloot() {   // options.c:6167
     for (i = 0; i < 3; i = i + 1 | 0) {
         const sortl_name = sortltype[i];
         any.a_char = sortl_name.get(0);
-        await add_menu(tmpwin, nul_glyphinfo, any, sortl_name.get(0), 0, ATR.NONE, clr, sortl_name, flags.sortloot === sortl_name.get(0) ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, sortl_name.get(0),
+            0, ATR.NONE, clr,
+            sortl_name, flags.sortloot === sortl_name.get(0)
+            ? MENU.ITEMFLAGS_SELECTED
+            : MENU.ITEMFLAGS_NONE);
     }
     await end_menu()(tmpwin, $C`Select loot sorting type:`);
     const n = await select_menu(tmpwin, PICK.ONE, new $c.Ptr(sortl_pick, 0));
@@ -5352,25 +5552,44 @@ async function handler_whatis_coord() {   // options.c:6206
     await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     any.a_char = GPCOORDS_COMPASS;
-    await add_menu(tmpwin, nul_glyphinfo, any, GPCOORDS_COMPASS, 0, ATR.NONE, clr, $C`compass ('east' or '3s' or '2n,4w')`, gpc === 99 ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+    await add_menu(tmpwin, nul_glyphinfo, any, GPCOORDS_COMPASS,
+        0, ATR.NONE, clr,
+        $C`compass ('east' or '3s' or '2n,4w')`,
+        gpc === 99
+        ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     any.a_char = GPCOORDS_COMFULL;
-    await add_menu(tmpwin, nul_glyphinfo, any, GPCOORDS_COMFULL, 0, ATR.NONE, clr, $C`full compass ('east' or '3south' or '2north,4west')`, gpc === 102 ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+    await add_menu(tmpwin, nul_glyphinfo, any, GPCOORDS_COMFULL,
+        0, ATR.NONE, clr,
+        $C`full compass ('east' or '3south' or '2north,4west')`,
+        gpc === 102
+        ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     any.a_char = GPCOORDS_MAP;
-    await add_menu(tmpwin, nul_glyphinfo, any, GPCOORDS_MAP, 0, ATR.NONE, clr, $C`map <x,y>`, gpc === 109 ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+    await add_menu(tmpwin, nul_glyphinfo, any, GPCOORDS_MAP,
+        0, ATR.NONE, clr, $C`map <x,y>`,
+        gpc === 109
+        ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     any.a_char = GPCOORDS_SCREEN;
-    await add_menu(tmpwin, nul_glyphinfo, any, GPCOORDS_SCREEN, 0, ATR.NONE, clr, $C`screen [row,column]`, gpc === 115 ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+    await add_menu(tmpwin, nul_glyphinfo, any, GPCOORDS_SCREEN,
+        0, ATR.NONE, clr, $C`screen [row,column]`,
+        gpc === 115
+        ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     any.a_char = GPCOORDS_NONE;
-    await add_menu(tmpwin, nul_glyphinfo, any, GPCOORDS_NONE, 0, ATR.NONE, clr, $C`none (no coordinates displayed)`, gpc === 110 ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+    await add_menu(tmpwin, nul_glyphinfo, any, GPCOORDS_NONE,
+        0, ATR.NONE, clr, $C`none (no coordinates displayed)`,
+        gpc === 110
+        ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     await add_menu_str(tmpwin, $C``);
     $c.sprintf(new $c.Ptr(buf, 0), $C`map: upper-left: <%d,%d>, lower-right: <%d,%d>%s`, 1, 0, COLNO - 1, ROWNO - 1, flags.verbose ? $C`; column 0 unused, off left edge` : $C``);
     await add_menu_str(tmpwin, new $c.Ptr(buf, 0));
     if ($c.strcmp(windowprocs.name, $C`tty`)) {   /* only show for non-tty */
-        await add_menu_str(tmpwin, $C`screen: row is offset to accommodate tty interface's use of top line`);
+        await add_menu_str(tmpwin,
+            $C`screen: row is offset to accommodate tty interface's use of top line`);
     }
     $c.sprintf(new $c.Ptr(buf, 0), $C`screen: upper-left: [%02d,%02d], lower-right: [%d,%d]%s`, 2, 1, ROWNO - 1 + 2, COLNO - 1, flags.verbose ? $C`; column 80 is not used` : $C``);
     await add_menu_str(tmpwin, new $c.Ptr(buf, 0));
     await add_menu_str(tmpwin, $C``);
-    await end_menu()(tmpwin, $C`Select coordinate display when auto-describing a map position:`);
+    await end_menu()(tmpwin,
+        $C`Select coordinate display when auto-describing a map position:`);
     if ((pick_cnt = await select_menu(tmpwin, PICK.ONE, new $c.Ptr(window_pick, 0))) > 0) {
         iflags.getpos_coords = $c.radd(window_pick[0], 0).item.a_char;
         /* PICK_ONE doesn't unselect preselected entry when
@@ -5395,12 +5614,22 @@ async function handler_whatis_filter() {   // options.c:6279
     await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     any.a_char = GFILTER_NONE + 1;
-    await add_menu(tmpwin, nul_glyphinfo, any, 110, 0, ATR.NONE, clr, $C`no filtering`, gfilt === GFILTER_NONE ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+    await add_menu(tmpwin, nul_glyphinfo, any, 110,
+        0, ATR.NONE, clr, $C`no filtering`,
+        gfilt === GFILTER_NONE
+        ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     any.a_char = GFILTER_VIEW + 1;
-    await add_menu(tmpwin, nul_glyphinfo, any, 118, 0, ATR.NONE, clr, $C`in view only`, gfilt === GFILTER_VIEW ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+    await add_menu(tmpwin, nul_glyphinfo, any, 118,
+        0, ATR.NONE, clr, $C`in view only`,
+        gfilt === GFILTER_VIEW
+        ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     any.a_char = GFILTER_AREA + 1;
-    await add_menu(tmpwin, nul_glyphinfo, any, 97, 0, ATR.NONE, clr, $C`in same area`, gfilt === GFILTER_AREA ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
-    await end_menu()(tmpwin, $C`Select location filtering when going for next/previous map position:`);
+    await add_menu(tmpwin, nul_glyphinfo, any, 97,
+        0, ATR.NONE, clr, $C`in same area`,
+        gfilt === GFILTER_AREA
+        ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+    await end_menu()(tmpwin,
+        $C`Select location filtering when going for next/previous map position:`);
     if ((pick_cnt = await select_menu(tmpwin, PICK.ONE, new $c.Ptr(window_pick, 0))) > 0) {
         iflags.getloc_filter = $c.radd(window_pick[0], 0).item.a_char - 1;
         /* PICK_ONE doesn't unselect preselected entry when
@@ -5464,22 +5693,27 @@ async function handler_autopickup_exception() {   // options.c:6331
             if (numapes) {
                 ape = ga.apelist;
                 any.$copyFrom(cg.zeroany);
-                await add_menu_heading(tmpwin, $C`Always pickup '<'; never pickup '>'`);
+                await add_menu_heading(tmpwin,
+                    $C`Always pickup '<'; never pickup '>'`);
                 for (i = 0; i < numapes && ape; i = i + 1 | 0) {
                     any.a_void = opt_idx === 1 ? null : ape;
                     /* length of pattern plus quotes (plus '<'/'>') is
                        less than BUFSZ */
                     $c.sprintf(new $c.Ptr(apebuf, 0), $C`"%c%s"`, ape.grab ? 60 : 62, ape.pattern);
-                    await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(apebuf, 0), MENU.ITEMFLAGS_NONE);
+                    await add_menu(tmpwin, nul_glyphinfo, any, 0, 0,
+                        ATR.NONE, clr, new $c.Ptr(apebuf, 0), MENU.ITEMFLAGS_NONE);
                     ape = ape.next;
                 }
             }
             $c.sprintf(new $c.Ptr(apebuf, 0), $C`%s autopickup exceptions`, opt_idx === 1 ? $C`List of` : $C`Remove which`);
             await end_menu()(tmpwin, new $c.Ptr(apebuf, 0));
-            pick_cnt = await select_menu(tmpwin, opt_idx === 1 ? PICK.NONE : PICK.ANY, new $c.Ptr(pick_list, 0));
+            pick_cnt = await select_menu(tmpwin,
+                opt_idx === 1 ? PICK.NONE : PICK.ANY,
+                new $c.Ptr(pick_list, 0));
             if (pick_cnt > 0) {
                 for (pick_idx = 0; pick_idx < pick_cnt; pick_idx = pick_idx + 1 | 0) {
-                    remove_autopickup_exception($c.asRec($c.radd(pick_list[0], pick_idx).item.a_void, $T.autopickup_exception, 32));
+                    remove_autopickup_exception(
+                        $c.asRec($c.radd(pick_list[0], pick_idx).item.a_void, $T.autopickup_exception, 32));
                 }
                 $c.free(pick_list[0]), pick_list[0] = null;
             }
@@ -5526,7 +5760,11 @@ async function handler_menu_colors() {   // options.c:6407
                 if (new $c.Ptr(mcbuf, 0).get(0) === 27) {
                     $goto = "menucolors_done"; continue D1;
                 }
-                if (new $c.Ptr(mcbuf, 0).get(0) && await test_regex_pattern(new $c.Ptr(mcbuf, 0), $C`MENUCOLORS regex`) && (mcclr = await query_color(null, NO_COLOR)) !== -1 && (mcattr = await query_attr(null, ATR.NONE)) !== -1 && !await add_menu_coloring_parsed(new $c.Ptr(mcbuf, 0), mcclr, mcattr)) {
+                if (new $c.Ptr(mcbuf, 0).get(0)
+                    && await test_regex_pattern(new $c.Ptr(mcbuf, 0), $C`MENUCOLORS regex`)
+                    && (mcclr = await query_color(null, NO_COLOR)) !== -1
+                    && (mcattr = await query_attr(null, ATR.NONE)) !== -1
+                    && !await add_menu_coloring_parsed(new $c.Ptr(mcbuf, 0), mcclr, mcattr)) {
                     await pline($C`Error adding the menu color.`);
                     await wait_synch()();
                 }
@@ -5556,12 +5794,15 @@ async function handler_menu_colors() {   // options.c:6407
                     }
                     /* combine main string and suffix */
                     $c.strcat(new $c.Ptr(mcbuf, 0), new $c.Ptr(buf, 1));   /* skip buf[]'s initial quote */
-                    await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(mcbuf, 0), MENU.ITEMFLAGS_NONE);
+                    await add_menu(tmpwin, nul_glyphinfo, any, 0, 0,
+                        ATR.NONE, clr, new $c.Ptr(mcbuf, 0), MENU.ITEMFLAGS_NONE);
                     tmp = tmp.next;
                 }
                 $c.sprintf(new $c.Ptr(mcbuf, 0), $C`%s menu colors`, opt_idx === 1 ? $C`List of` : $C`Remove which`);
                 await end_menu()(tmpwin, new $c.Ptr(mcbuf, 0));
-                pick_cnt = await select_menu(tmpwin, opt_idx === 1 ? PICK.NONE : PICK.ANY, new $c.Ptr(pick_list, 0));
+                pick_cnt = await select_menu(tmpwin,
+                    opt_idx === 1 ? PICK.NONE : PICK.ANY,
+                    new $c.Ptr(pick_list, 0));
                 if (pick_cnt > 0) {
                     for (pick_idx = 0; pick_idx < pick_cnt; pick_idx = pick_idx + 1 | 0) {
                         free_one_menu_coloring(($c.radd(pick_list[0], pick_idx).item.a_int - 1 | 0) - pick_idx | 0);
@@ -5596,7 +5837,10 @@ async function handler_msgtype() {   // options.c:6502
             if (new $c.Ptr(mtbuf, 0).get(0) === 27) {
                 return TRUE;
             }
-            if (new $c.Ptr(mtbuf, 0).get(0) && await test_regex_pattern(new $c.Ptr(mtbuf, 0), $C`MSGTYPE regex`) && (mttyp = await query_msgtype()) !== -1 && !await msgtype_add(mttyp, new $c.Ptr(mtbuf, 0))) {
+            if (new $c.Ptr(mtbuf, 0).get(0)
+                && await test_regex_pattern(new $c.Ptr(mtbuf, 0), $C`MSGTYPE regex`)
+                && (mttyp = await query_msgtype()) !== -1
+                && !await msgtype_add(mttyp, new $c.Ptr(mtbuf, 0))) {
                 await pline($C`Error adding the message type.`);
                 await wait_synch()();
             }
@@ -5620,12 +5864,15 @@ async function handler_msgtype() {   // options.c:6502
                 } else {
                     $c.strcat($c.strcat(new $c.Ptr(mtbuf, 0), tmp.pattern), $C`"`);
                 }
-                await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(mtbuf, 0), MENU.ITEMFLAGS_NONE);
+                await add_menu(tmpwin, nul_glyphinfo, any, 0, 0,
+                    ATR.NONE, clr, new $c.Ptr(mtbuf, 0), MENU.ITEMFLAGS_NONE);
                 tmp = tmp.next;
             }
             $c.sprintf(new $c.Ptr(mtbuf, 0), $C`%s message types`, opt_idx === 1 ? $C`List of` : $C`Remove which`);
             await end_menu()(tmpwin, new $c.Ptr(mtbuf, 0));
-            pick_cnt = await select_menu(tmpwin, opt_idx === 1 ? PICK.NONE : PICK.ANY, new $c.Ptr(pick_list, 0));
+            pick_cnt = await select_menu(tmpwin,
+                opt_idx === 1 ? PICK.NONE : PICK.ANY,
+                new $c.Ptr(pick_list, 0));
             if (pick_cnt > 0) {
                 for (pick_idx = 0; pick_idx < pick_cnt; pick_idx = pick_idx + 1 | 0) {
                     free_one_msgtype(($c.radd(pick_list[0], pick_idx).item.a_int - 1 | 0) - pick_idx | 0);
@@ -5653,11 +5900,17 @@ async function handler_versinfo() {   // options.c:6573
     await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     $t1 = n = VI.NUMBER, any.a_int = $t1;   /* 1 */
-    await add_menu(tmpwin, nul_glyphinfo, any, 110, $c.i8(n + 48 | 0), ATR.NONE, NO_COLOR, $C`version number`, vi & n ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+    await add_menu(tmpwin, nul_glyphinfo, any, 110, $c.i8(n + 48 | 0), ATR.NONE, NO_COLOR,
+        $C`version number`,
+        vi & n ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     $t2 = n = VI.NAME, any.a_int = $t2;   /* 2 */
-    await add_menu(tmpwin, nul_glyphinfo, any, 103, $c.i8(n + 48 | 0), ATR.NONE, NO_COLOR, $C`game name`, vi & n ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+    await add_menu(tmpwin, nul_glyphinfo, any, 103, $c.i8(n + 48 | 0), ATR.NONE, NO_COLOR,
+        $C`game name`,
+        vi & n ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     $t3 = n = VI.BRANCH, any.a_int = $t3;   /* 4 */
-    await add_menu(tmpwin, nul_glyphinfo, any, 98, $c.i8(n + 48 | 0), ATR.NONE, NO_COLOR, have_branch ? $C`development branch` : $C`(not applicable)`, vi & n ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+    await add_menu(tmpwin, nul_glyphinfo, any, 98, $c.i8(n + 48 | 0), ATR.NONE, NO_COLOR,
+        have_branch ? $C`development branch`
+        : $C`(not applicable)`, vi & n ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     await end_menu()(tmpwin, $C`Select version information flags:`);
     n = await select_menu(tmpwin, PICK.ANY, new $c.Ptr(vi_pick, 0));
     if (n > 0) {
@@ -5689,7 +5942,8 @@ async function handler_windowborders() {   // options.c:6620
         any.a_int = i + 1 | 0;
         /* index 'i' matches the numeric setting for windowborders,
            so allow corresponding digit as group accelerator */
-        await add_menu(tmpwin, nul_glyphinfo, any, $c.i8(97 + i | 0), $c.i8(48 + i | 0), ATR.NONE, clr, mode_name, MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, $c.i8(97 + i | 0), $c.i8(48 + i | 0),
+            ATR.NONE, clr, mode_name, MENU.ITEMFLAGS_NONE);
     }
     await end_menu()(tmpwin, $C`Select window borders mode:`);
     if (await select_menu(tmpwin, PICK.ONE, new $c.Ptr(mode_pick, 0)) > 0) {
@@ -5744,7 +5998,8 @@ async function string_for_env_opt(optname, opts, val_optional) {   // options.c:
  * @returns {Promise<void>}
  */
 async function bad_negation(optname, with_parameter) {   // options.c:6693
-    await config_error_add($C`The %s option may not %sbe negated.`, optname, with_parameter ? $C`both have a value and ` : $C``);
+    await config_error_add($C`The %s option may not %sbe negated.`, optname,
+        with_parameter ? $C`both have a value and ` : $C``);
 }
 /* go through all of the options and set the minmatch value
    based on what is needed for uniqueness of each individual
@@ -5780,7 +6035,8 @@ async function determine_ambiguities() {   // options.c:6703
     }
     for (i = 0; i < 217; i = i + 1 | 0) {
         const len = await Strlen_(allopt[i].name, $C`determine_ambiguities`, 6732) | 0;
-        allopt[i].minmatch = needed[i] < 3 ? 3 : needed[i] <= len ? needed[i] : len;
+        allopt[i].minmatch = needed[i] < 3 ? 3
+            : needed[i] <= len ? needed[i] : len;
     }
 }
 /**
@@ -5819,7 +6075,8 @@ export function match_optname(user_string, optn_name, min_length, val_allowed) {
     if (val_allowed) {
         len = length_without_val(user_string, len);
     }
-    return len >= min_length && !strncmpi(optn_name, user_string, len) ? 1 : 0;
+    return len >= min_length
+        && !strncmpi(optn_name, user_string, len) ? 1 : 0;
 }
 export function reset_duplicate_opt_detection() {   // options.c:6773
     let k = 0;
@@ -5853,7 +6110,10 @@ async function complain_about_duplicate(optidx) {   // options.c:6790
     if (using_alias) {
         $c.sprintf(new $c.Ptr(buf, 0), $C` (via alias: %s)`, allopt[optidx].alias);
     }
-    await config_error_add($C`%s option specified multiple times: %s%s`, allopt[optidx].opttyp === CompOpt ? $C`compound` : $C`boolean`, allopt[optidx].name, new $c.Ptr(buf, 0));
+    await config_error_add($C`%s option specified multiple times: %s%s`,
+        allopt[optidx].opttyp === CompOpt ? $C`compound`
+        : $C`boolean`,
+        allopt[optidx].name, new $c.Ptr(buf, 0));
     /* ?MACOS9 */
     return;
 }
@@ -5862,7 +6122,8 @@ async function complain_about_duplicate(optidx) {   // options.c:6790
  * @returns {Promise<void>}
  */
 async function rejectoption(optname) {   // options.c:6812
-    await pline($C`%s can be set only from NETHACKOPTIONS or %s.`, optname, get_configfile());
+    await pline($C`%s can be set only from NETHACKOPTIONS or %s.`, optname,
+        get_configfile());
 }
 /*
 
@@ -5970,12 +6231,14 @@ function escapes(cp, tp) {   // options.c:6896
             do {
                 cval = Math.imul(cval, 10) + (cp.get(0) - 48) | 0;
             } while ((cp = cp.add(1)).get(0) && $c.strchr(new $c.Ptr(escapes$dec, 0), cp.get(0)) && (dcount = dcount + 1 | 0) < 3);
-        } else if ((cp.get(1) === 111 || cp.get(1) === 79) && cp.get(2) && $c.strchr(new $c.Ptr(escapes$oct, 0), cp.get(2))) {
+        } else if ((cp.get(1) === 111 || cp.get(1) === 79) && cp.get(2)
+            && $c.strchr(new $c.Ptr(escapes$oct, 0), cp.get(2))) {
             cp = cp.add(2);   /* move past backslash and 'O' */
             do {
                 cval = Math.imul(cval, 8) + (cp.get(0) - 48) | 0;
             } while ((cp = cp.add(1)).get(0) && $c.strchr(new $c.Ptr(escapes$oct, 0), cp.get(0)) && (dcount = dcount + 1 | 0) < 3);
-        } else if ((cp.get(1) === 120 || cp.get(1) === 88) && cp.get(2) && (dp = $c.strchr(new $c.Ptr(hexdd, 0), cp.get(2))) !== null) {
+        } else if ((cp.get(1) === 120 || cp.get(1) === 88) && cp.get(2)
+            && (dp = $c.strchr(new $c.Ptr(hexdd, 0), cp.get(2))) !== null) {
             cp = cp.add(2);   /* move past backslash and 'X' */
             do {
                 cval = Math.imul(cval, 16) + $c.div32($c.i32($c.pdiff(dp, new $c.Ptr(hexdd, 0))), 2) | 0;
@@ -6182,7 +6445,8 @@ export async function initoptions_init() {   // options.c:7119
          * that situation though, so the game will use whatever is in
          * RC/NETHACKOPTIONS or resort to DEFAULT_WINDOW_SYS.
          */
-        if (windowprocs.name && !strcmpi(windowprocs.name, gc.cmdline_windowsys)) {   /* ignore any windowtype:foo in RC file or NETHACKOPTIONS */
+        if (windowprocs.name
+            && !strcmpi(windowprocs.name, gc.cmdline_windowsys)) {   /* ignore any windowtype:foo in RC file or NETHACKOPTIONS */
             iflags.windowtype_locked = TRUE;
         }
         /* shouldn't need cmdline_windowsys beyond here */
@@ -6256,7 +6520,9 @@ export async function initoptions_init() {   // options.c:7119
     /* UNIX && TTY_GRAPHICS */
     /* detect whether a "vt" terminal can handle alternate charsets */
     /* [could also check "xterm" which emulates vtXXX by default] */
-    if ((opts = nh_getenv($C`TERM`)) && !strncmpi(opts, $C`vt`, 2) && AS() && AE() && $c.strchr(gt.tc_gbl_data.tc_AS, 14) && $c.strchr(gt.tc_gbl_data.tc_AE, 15)) {
+    if ((opts = nh_getenv($C`TERM`))
+        && !strncmpi(opts, $C`vt`, 2)
+        && AS() && AE() && $c.strchr(gt.tc_gbl_data.tc_AS, 14) && $c.strchr(gt.tc_gbl_data.tc_AE, 15)) {
         if (!gs.symset[PRIMARYSET].explicitly) {
             await load_symset($C`DECGraphics`, PRIMARYSET);
         }
@@ -6341,7 +6607,8 @@ export async function initoptions_finish() {   // options.c:7324
      * slime mold or whatever custom name player assigns to that.
      */
     obj_descr[SLIME_MOLD].oc_name = $C`fruit`;
-    sym = get_othersym(SYM.BOULDER, Is_rogue_level(u.uz) ? ROGUESET : PRIMARYSET);
+    sym = get_othersym(SYM.BOULDER,
+        Is_rogue_level(u.uz) ? ROGUESET : PRIMARYSET);
     if (sym) {
         gs.showsyms[SYM.BOULDER + SYM_OFF_X] = sym;
     }
@@ -6356,7 +6623,8 @@ export async function initoptions_finish() {   // options.c:7324
      * is even initialized, so check for that too.
      */
     if (iflags.hilite_delta && !wc2_supported($C`statushilites`)) {
-        await raw_printf($C`Status highlighting not supported for %s interface.`, windowprocs.name);
+        await raw_printf($C`Status highlighting not supported for %s interface.`,
+            windowprocs.name);
         iflags.hilite_delta = 0;
     }
     await update_rest_on_space();
@@ -6366,13 +6634,15 @@ export async function initoptions_finish() {   // options.c:7324
        wc_supported() test, assume ascii_map */
     if (iflags.wc_tiled_map && !wc_supported($C`tiled_map`)) {
         iflags.wc_tiled_map = FALSE, iflags.wc_ascii_map = TRUE;
-    } else if (iflags.wc_ascii_map && !wc_supported($C`ascii_map`) && wc_supported($C`tiled_map`)) {
+    } else if (iflags.wc_ascii_map && !wc_supported($C`ascii_map`)
+        && wc_supported($C`tiled_map`)) {
         iflags.wc_ascii_map = FALSE, iflags.wc_tiled_map = TRUE;
     }
     if (glyphid_cache_status()) {
         free_glyphid_cache();
     }
-    await apply_customizations(gc.currentgraphics >>> 0, do_custom_symbols | do_custom_colors);
+    await apply_customizations(gc.currentgraphics >>> 0,
+        do_custom_symbols | do_custom_colors);
     go.opt_initial = FALSE;
     return;
 }
@@ -6408,7 +6678,8 @@ export async function allopt_array_init() {   // options.c:7405
          */
         for (i = 0; i < OPTCOUNT; i = i + 1 | 0) {
             if (allopt[i].optfn) {
-                await allopt[i].optfn(i, do_init, FALSE, new $c.Ptr(empty_optstr, 0), new $c.Ptr(empty_optstr, 0));
+                await allopt[i].optfn(i, do_init, FALSE, new $c.Ptr(empty_optstr, 0),
+                    new $c.Ptr(empty_optstr, 0));
             }
         }
         allopt_array_init$options_array_inited_already = TRUE;
@@ -6511,7 +6782,9 @@ async function warning_opts(opts, optype) {   // options.c:7521
     const length = $c.i32($c.strlen(opts));
     /* match the form obtained from PC configuration files */
     for (i = 0; i < WARNCOUNT; i = i + 1 | 0) {
-        translate[i] = i >= length ? 0 : opts.get(i) ? $c.u8(opts.get(i)) : def_warnsyms[i].sym;
+        translate[i] = i >= length ? 0
+            : opts.get(i) ? $c.u8(opts.get(i))
+            : def_warnsyms[i].sym;
     }
     assign_warnings(new $c.Ptr(translate, 0));
     return TRUE;
@@ -6548,14 +6821,18 @@ async function feature_alert_opts(op, optn) {   // options.c:7558
         if (!go.opt_initial) {
             await You_cant($C`disable new feature alerts for future versions.`);
         } else {
-            await config_error_add($C`%s=%s Invalid reference to a future version ignored`, optn, op);
+            await config_error_add(
+                $C`%s=%s Invalid reference to a future version ignored`,
+                optn, op);
         }
         return 0;
     }
     flags.suppress_alert = fnv;
     if (!go.opt_initial) {
         $c.sprintf(new $c.Ptr(buf, 0), $C`%lu.%lu.%lu`, $c.shru64(flags.suppress_alert, 24), $c.shru64($c.andu64(16711680, flags.suppress_alert), 16), $c.shru64($c.andu64(65280, flags.suppress_alert), 8));
-        await pline($C`Feature change alerts disabled for NetHack %s features and prior.`, new $c.Ptr(buf, 0));
+        await pline(
+            $C`Feature change alerts disabled for NetHack %s features and prior.`,
+            new $c.Ptr(buf, 0));
     }
     return 1;
 }
@@ -6665,7 +6942,9 @@ async function query_msgtype() {   // options.c:7701
     for (i = 0; i < 6; i = i + 1 | 0) {
         if (msgtype_names[i].descr) {
             any.a_int = msgtype_names[i].msgtyp + 1;
-            await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, msgtype_names[i].descr, MENU.ITEMFLAGS_NONE);
+            await add_menu(tmpwin, nul_glyphinfo, any, 0, 0,
+                ATR.NONE, clr,
+                msgtype_names[i].descr, MENU.ITEMFLAGS_NONE);
         }
     }
     await end_menu()(tmpwin, $C`How to show the message`);
@@ -6858,7 +7137,11 @@ async function test_regex_pattern(str, errmsg) {   // options.c:7871
 async function parse_role_opt(optidx, negated, fullname, opts, opp) {   // options.c:7905
     let op = null, negbuf = new Int8Array(256);
     /* not 'const' but never modified */
-    const which = optidx === opt_role ? RS.ROLE : optidx === opt_race ? RS.RACE : optidx === opt_gender ? RS.GENDER : optidx === opt_alignment ? RS.ALGNMNT : RS.filter;   /* none of the above */
+    const which = optidx === opt_role ? RS.ROLE
+        : optidx === opt_race ? RS.RACE
+        : optidx === opt_gender ? RS.GENDER
+        : optidx === opt_alignment ? RS.ALGNMNT
+        : RS.filter;   /* none of the above */
     let ok = FALSE;
     /*
      * Accepts multiple forms
@@ -6891,11 +7174,14 @@ async function parse_role_opt(optidx, negated, fullname, opts, opp) {   // optio
                 return FALSE;
             }
             if (!first) {
-                if (val_negated ^ prev_negated || negated && val_negated) {
-                    await config_error_add($C`Invalid mixed negation for '%s%s'`, negated ? $C`!` : $C``, fullname);
+                if (val_negated ^ prev_negated
+                    || negated && val_negated) {
+                    await config_error_add($C`Invalid mixed negation for '%s%s'`,
+                        negated ? $C`!` : $C``, fullname);
                     return FALSE;
                 } else if (!negated && !val_negated) {
-                    await config_error_add($C`Multiple role values only allowed when list is negated`);
+                    await config_error_add(
+                        $C`Multiple role values only allowed when list is negated`);
                     return FALSE;
                 }
             }
@@ -6960,7 +7246,8 @@ async function get_cnf_role_opt(optidx) {   // options.c:8021
     let phase = 0;
     let op = null;
     for (phase = num_opt_phases - 1; phase >= 0 && !op; phase = phase - 1 | 0) {
-        if (phase === cmdline_opt || phase === environ_opt || phase === builtin_opt) {
+        if (phase === cmdline_opt || phase === environ_opt
+            || phase === builtin_opt) {
             continue;
         }
         op = await getoptstr(optidx, phase);
@@ -6974,14 +7261,16 @@ async function get_cnf_role_opt(optidx) {   // options.c:8021
  */
 async function illegal_menu_cmd_key(c) {   // options.c:8037
     let j = 0;
-    if (c === 0 || c === 13 || c === 10 || c === 27 || c === 32 || digit($c.i8(c)) || letter($c.i8(c)) && c !== 64) {
+    if (c === 0 || c === 13 || c === 10 || c === 27 || c === 32
+        || digit($c.i8(c)) || letter($c.i8(c)) && c !== 64) {
         await config_error_add($C`Reserved menu command key '%s'`, visctrl($c.i8(c)));
         return TRUE;
     } else {
         /* reject default object class symbols */
         for (j = 1; j < MAXOCLASSES; j = j + 1 | 0) {
             if (c === $c.u8(def_oc_syms[j].sym)) {
-                await config_error_add($C`Menu command key '%s' is an object class`, visctrl($c.i8(c)));
+                await config_error_add($C`Menu command key '%s' is an object class`,
+                    visctrl($c.i8(c)));
                 return TRUE;
             }
         }
@@ -7121,9 +7410,15 @@ export async function fruitadd(str, replace_fruit) {   // options.c:8170
              * to tell the difference); globs might have a size prefix which
              * needs to be skipped in order to match the object type name
              */
-            globpfx = !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $C`small `, 6) || !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $C`large `, 6) ? 6 : !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $C`medium `, 7) ? 7 : !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $C`very large `, 11) ? 11 : 0;
+            globpfx = !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $C`small `, 6)
+                || !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $C`large `, 6) ? 6
+                : !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $C`medium `, 7) ? 7
+                : !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $C`very large `, 11) ? 11
+                : 0;
             for (i = svb.bases[FOOD_CLASS]; objects[i].oc_class === FOOD_CLASS; i = i + 1 | 0) {
-                if (!$c.strcmp(obj_descr[objects[i].oc_name_idx].oc_name, new $c.Ptr(svp.pl_fruit, 0)) || globpfx > 0 && !$c.strcmp(obj_descr[objects[i].oc_name_idx].oc_name, new $c.Ptr(svp.pl_fruit, globpfx))) {
+                if (!$c.strcmp(obj_descr[objects[i].oc_name_idx].oc_name, new $c.Ptr(svp.pl_fruit, 0))
+                    || globpfx > 0 && !$c.strcmp(obj_descr[objects[i].oc_name_idx].oc_name,
+                    new $c.Ptr(svp.pl_fruit, globpfx))) {
                     found = TRUE;
                     break;
                 }
@@ -7139,7 +7434,20 @@ export async function fruitadd(str, replace_fruit) {   // options.c:8170
             /* these checks for applying food attributes to actual items
                are case sensitive; "glob of foo" is caught by 'found'
                if 'foo' is a valid glob; when not valid, allow it as-is */
-            if (found || numeric || !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $C`cursed `, 7) || !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $C`uncursed `, 9) || !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $C`blessed `, 8) || !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $C`partly eaten `, 13) || !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $C`tin of `, 7) && (!$c.strcmp(new $c.Ptr(svp.pl_fruit, 0).add(7), $C`spinach`) || await name_to_mon(new $c.Ptr(svp.pl_fruit, 0).add(7), null) >= LOW_PM && await name_to_mon(new $c.Ptr(svp.pl_fruit, 0).add(7), null) < NUMMONS) || !$c.strcmp(new $c.Ptr(svp.pl_fruit, 0), $C`empty tin`) || (!$c.strcmp(new $c.Ptr(svp.pl_fruit, 0), $C`glob`) || globpfx > 0 && !$c.strcmp($C`glob`, new $c.Ptr(svp.pl_fruit, globpfx))) || (str_end_is(new $c.Ptr(svp.pl_fruit, 0), $C` corpse`) || str_end_is(new $c.Ptr(svp.pl_fruit, 0), $C` egg`)) && (await name_to_mon(new $c.Ptr(svp.pl_fruit, 0), null) >= LOW_PM && await name_to_mon(new $c.Ptr(svp.pl_fruit, 0), null) < NUMMONS)) {
+            if (found || numeric
+                || !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $C`cursed `, 7)
+                || !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $C`uncursed `, 9)
+                || !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $C`blessed `, 8)
+                || !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $C`partly eaten `, 13)
+                || !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $C`tin of `, 7)
+                && (!$c.strcmp(new $c.Ptr(svp.pl_fruit, 0).add(7), $C`spinach`)
+                || await name_to_mon(new $c.Ptr(svp.pl_fruit, 0).add(7), null) >= LOW_PM && await name_to_mon(new $c.Ptr(svp.pl_fruit, 0).add(7), null) < NUMMONS)
+                || !$c.strcmp(new $c.Ptr(svp.pl_fruit, 0), $C`empty tin`)
+                || (!$c.strcmp(new $c.Ptr(svp.pl_fruit, 0), $C`glob`)
+                || globpfx > 0 && !$c.strcmp($C`glob`, new $c.Ptr(svp.pl_fruit, globpfx)))
+                || (str_end_is(new $c.Ptr(svp.pl_fruit, 0), $C` corpse`)
+                || str_end_is(new $c.Ptr(svp.pl_fruit, 0), $C` egg`))
+                && (await name_to_mon(new $c.Ptr(svp.pl_fruit, 0), null) >= LOW_PM && await name_to_mon(new $c.Ptr(svp.pl_fruit, 0), null) < NUMMONS)) {
                 $c.strcpy(new $c.Ptr(buf, 0), new $c.Ptr(svp.pl_fruit, 0));
                 $c.strcpy(new $c.Ptr(svp.pl_fruit, 0), $C`candied `);
                 nmcpy(new $c.Ptr(svp.pl_fruit, 0).add(8), new $c.Ptr(buf, 0), PL.FSIZ - 8);
@@ -7411,12 +7719,15 @@ export async function get_option_value(optname, cnfvalid) {   // options.c:8481
     let bool_p = null, i = 0;
     for (i = 0; allopt[i].name !== null; i = i + 1 | 0) {
         if (!$c.strcmp(optname, allopt[i].name)) {
-            if (allopt[i].opttyp === BoolOpt && (bool_p = allopt[i].addr) !== null) {
+            if (allopt[i].opttyp === BoolOpt
+                && (bool_p = allopt[i].addr) !== null) {
                 $c.sprintf(new $c.Ptr(get_option_value$retbuf, 0), $C`%s`, bool_p.get(0) ? $C`true` : $C`false`);
                 return new $c.Ptr(get_option_value$retbuf, 0);
             } else if (allopt[i].opttyp === CompOpt && allopt[i].optfn) {
                 let reslt = optn_err;
-                reslt = await allopt[i].optfn(allopt[i].idx, cnfvalid ? get_cnf_val : get_val, FALSE, new $c.Ptr(get_option_value$retbuf, 0), new $c.Ptr(empty_optstr, 0));
+                reslt = await allopt[i].optfn(allopt[i].idx,
+                    cnfvalid ? get_cnf_val : get_val,
+                    FALSE, new $c.Ptr(get_option_value$retbuf, 0), new $c.Ptr(empty_optstr, 0));
                 if (reslt === optn_ok && get_option_value$retbuf[0]) {
                     return new $c.Ptr(get_option_value$retbuf, 0);
                 }
@@ -7437,14 +7748,16 @@ async function longest_option_name(startpass, endpass) {   // options.c:8508
     let longest_name_len = 0;
     for (pass = 0; pass < 2; pass = pass + 1 | 0) {
         for (i = 0; (name = allopt[i].name) !== null; i = i + 1 | 0) {
-            if (pass === 0 && (allopt[i].opttyp !== BoolOpt || !allopt[i].addr)) {
+            if (pass === 0
+                && (allopt[i].opttyp !== BoolOpt || !allopt[i].addr)) {
                 continue;
             }
             const optflags = allopt[i].setwhere | 0;
             if (optflags < startpass || optflags > endpass) {
                 continue;
             }
-            if (is_wc_option(name) && !wc_supported(name) || is_wc2_option(name) && !wc2_supported(name)) {
+            if (is_wc_option(name) && !wc_supported(name)
+                || is_wc2_option(name) && !wc2_supported(name)) {
                 continue;
             }
             const len = await Strlen_(name, $C`longest_option_name`, 8527);
@@ -7486,7 +7799,9 @@ async function doset_simple_menu() {   // options.c:8536
         }
         any.$copyFrom(cg.zeroany);
         any.a_int = -1;
-        await add_menu(tmpwin, nul_glyphinfo, any, 63, 0, ATR.NONE, NO_COLOR, gs.simple_options_help ? $C`hide help` : $C`show help`, MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, 63, 0, ATR.NONE, NO_COLOR,
+            gs.simple_options_help ? $C`hide help` : $C`show help`,
+            MENU.ITEMFLAGS_NONE);
         for (section = OptS.General; section < OptS.Advanced; section = section + 1 >>> 0) {
             any.$copyFrom(cg.zeroany);
             await add_menu_str(tmpwin, $C``);
@@ -7496,7 +7811,8 @@ async function doset_simple_menu() {   // options.c:8536
                 if (allopt[i].section !== section) {
                     continue;
                 }
-                if (is_wc_option(name) && !wc_supported(name) || is_wc2_option(name) && !wc2_supported(name)) {
+                if (is_wc_option(name) && !wc_supported(name)
+                    || is_wc2_option(name) && !wc2_supported(name)) {
                     continue;
                 }
                 any.a_int = i + 1 | 0;
@@ -7514,7 +7830,8 @@ async function doset_simple_menu() {   // options.c:8536
                     case CompOpt:
                     case OthrOpt:
                         k = i;
-                        if (allopt[i].optfn === optfn_symset && Is_rogue_level(u.uz)) {
+                        if (allopt[i].optfn === optfn_symset
+                            && Is_rogue_level(u.uz)) {
                             k = opt_roguesymset;
                             name = allopt[k].name;
                             any.a_int = k + 1 | 0;
@@ -7522,7 +7839,8 @@ async function doset_simple_menu() {   // options.c:8536
                         buf2[0] = 0;
                         reslt = optn_err;
                         if (allopt[k].optfn) {
-                            reslt = await allopt[k].optfn(allopt[k].idx, get_val, FALSE, new $c.Ptr(buf2, 0), new $c.Ptr(empty_optstr, 0));
+                            reslt = await allopt[k].optfn(allopt[k].idx, get_val,
+                                FALSE, new $c.Ptr(buf2, 0), new $c.Ptr(empty_optstr, 0));
                         }
                         $c.sprintf(new $c.Ptr(buf, 0), fmtstr, name, reslt === optn_ok && buf2[0] ? new $c.Ptr(buf2, 0) : $C`unknown`);
                         break;
@@ -7532,10 +7850,14 @@ async function doset_simple_menu() {   // options.c:8536
                 }
                 /* pickup_types is separated from autopickup due to the
                    spelling of their names; emphasize what it means */
-                if (allopt[i].idx === opt_pickup_types || allopt[i].idx === opt_pickup_thrown || allopt[i].idx === opt_pickup_stolen || allopt[i].idx === opt_dropped_nopick) {
+                if (allopt[i].idx === opt_pickup_types
+                    || allopt[i].idx === opt_pickup_thrown
+                    || allopt[i].idx === opt_pickup_stolen
+                    || allopt[i].idx === opt_dropped_nopick) {
                     $c.strcat(new $c.Ptr(buf, 0), $C`  (for autopickup)`);
                 }
-                await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, NO_COLOR, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
+                await add_menu(tmpwin, nul_glyphinfo, any, 0, 0,
+                    ATR.NONE, NO_COLOR, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
                 if (gs.simple_options_help && allopt[i].descr) {
                     $c.sprintf(new $c.Ptr(buf, 0), $C`    %s`, allopt[i].descr);
                     await add_menu_str(tmpwin, new $c.Ptr(buf, 0));
@@ -7565,7 +7887,8 @@ async function doset_simple_menu() {   // options.c:8536
             } else {
                 /* compound option */
                 if (allopt[k].has_handler && allopt[k].optfn) {
-                    reslt = await allopt[k].optfn(allopt[k].idx, do_handler, FALSE, new $c.Ptr(empty_optstr, 0), new $c.Ptr(empty_optstr, 0));
+                    reslt = await allopt[k].optfn(allopt[k].idx, do_handler, FALSE,
+                        new $c.Ptr(empty_optstr, 0), new $c.Ptr(empty_optstr, 0));
                     /* if player eventually saves options, include this one */
                     if (reslt === optn_ok && allopt[k].idx !== pfx_cond_) {
                         opt_set_in_config[k] = TRUE;
@@ -7576,7 +7899,8 @@ async function doset_simple_menu() {   // options.c:8536
                     if (abuf[0] !== 27) {
                         /* ESC */
                         $c.sprintf(new $c.Ptr(buf, 0), $C`%s:`, allopt[k].name);
-                        copynchars(eos(new $c.Ptr(buf, 0)), new $c.Ptr(abuf, 0), $c.i32($c.subu64(255, $c.strlen(new $c.Ptr(buf, 0)))));
+                        copynchars(eos(new $c.Ptr(buf, 0)), new $c.Ptr(abuf, 0),
+                            $c.i32($c.subu64(255, $c.strlen(new $c.Ptr(buf, 0)))));
                         /* pass the buck */
                         await parseoptions(new $c.Ptr(buf, 0), FALSE, FALSE);
                     }
@@ -7584,7 +7908,9 @@ async function doset_simple_menu() {   // options.c:8536
                        'picked 1' to caller which will loop for another choice */
                 }
             }
-            if (k >= 0 && abuf[0] !== 27 && (wc_supported(allopt[k].name) || wc2_supported(allopt[k].name))) {
+            if (k >= 0 && abuf[0] !== 27
+                && (wc_supported(allopt[k].name)
+                || wc2_supported(allopt[k].name))) {
                 await preference_update()(allopt[k].name);
             }
             $c.free(pick_list[0]), pick_list[0] = null;
@@ -7677,7 +8003,9 @@ export async function doset() {   // options.c:8758
                     await add_menu_str(tmpwin, new $c.Ptr(buf, 0));
                 } else {
                     any.a_int = HELP_IDX + 1;   /* handling pick_list subtracts 1 */
-                    await add_menu(tmpwin, nul_glyphinfo, any, 63, 63, ATR.NONE, clr, $C`view help for options menu`, MENU.ITEMFLAGS_SKIPINVERT);
+                    await add_menu(tmpwin, nul_glyphinfo, any, 63, 63, ATR.NONE,
+                        clr, $C`view help for options menu`,
+                        MENU.ITEMFLAGS_SKIPINVERT);
                 }
             }
         }
@@ -7698,41 +8026,51 @@ export async function doset() {   // options.c:8758
         /* first list any other non-modifiable booleans, then modifiable ones */
         for (pass = 0; pass <= 1; pass = pass + 1 | 0) {
             for (i = 0; (name = allopt[i].name) !== null; i = i + 1 | 0) {
-                if (allopt[i].opttyp === BoolOpt && (bool_p = allopt[i].addr) !== null && (allopt[i].setwhere <= set_gameview && pass === 0 || allopt[i].setwhere >= set_in_game && pass === 1)) {
+                if (allopt[i].opttyp === BoolOpt
+                    && (bool_p = allopt[i].addr) !== null
+                    && (allopt[i].setwhere <= set_gameview && pass === 0
+                    || allopt[i].setwhere >= set_in_game && pass === 1)) {
                     if ($c.peq(bool_p, new $c.FieldRef(flags, "female", "i8"))) {
                         continue;   /* obsolete */
                     }
                     if (allopt[i].setwhere === set_wizonly && !wizard()) {
                         continue;
                     }
-                    if (allopt[i].setwhere === set_wiznofuz && (!wizard() || iflags.debug_fuzzer)) {
+                    if (allopt[i].setwhere === set_wiznofuz
+                        && (!wizard() || iflags.debug_fuzzer)) {
                         continue;
                     }
-                    if (is_wc_option(name) && !wc_supported(name) || is_wc2_option(name) && !wc2_supported(name)) {
+                    if (is_wc_option(name) && !wc_supported(name)
+                        || is_wc2_option(name) && !wc2_supported(name)) {
                         continue;
                     }
                     any.a_int = pass === 0 ? 0 : (i + 1 | 0) + indexoffset | 0;
                     indent = pass === 0 && !iflags.menu_tab_sep ? $C`    ` : $C``;
                     $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(fmtstr_doset, 0), indent, name, term_for_boolean(i, bool_p));
                     if (pass === 0) {
-                        enhance_menu_text(new $c.Ptr(buf, 0), 256, pass, bool_p, $c.relem(allopt, i));
+                        enhance_menu_text(new $c.Ptr(buf, 0), 256, pass, bool_p,
+                            $c.relem(allopt, i));
                     }
-                    await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_SKIPINVERT);
+                    await add_menu(tmpwin, nul_glyphinfo, any, 0, 0,
+                        ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_SKIPINVERT);
                 }
             }
         }
         await add_menu_str(tmpwin, $C``);
-        await add_menu_heading(tmpwin, $C`Compounds (selecting will prompt for new value):`);
+        await add_menu_heading(tmpwin,
+            $C`Compounds (selecting will prompt for new value):`);
         for (pass = startpass; pass <= endpass; pass = pass + 1 | 0) {
             for (i = 0; (name = allopt[i].name) !== null; i = i + 1 | 0) {
                 if (allopt[i].opttyp !== CompOpt) {
                     continue;
                 }
                 if ((allopt[i].setwhere | 0) === pass) {
-                    if (is_wc_option(name) && !wc_supported(name) || is_wc2_option(name) && !wc2_supported(name)) {
+                    if (is_wc_option(name) && !wc_supported(name)
+                        || is_wc2_option(name) && !wc2_supported(name)) {
                         continue;
                     }
-                    await doset_add_menu(tmpwin, name, new $c.Ptr(fmtstr_doset, 0), i, pass === set_gameview ? 0 : indexoffset);
+                    await doset_add_menu(tmpwin, name, new $c.Ptr(fmtstr_doset, 0), i,
+                        pass === set_gameview ? 0 : indexoffset);
                 }
             }
         }
@@ -7744,10 +8082,12 @@ export async function doset() {   // options.c:8758
                     continue;
                 }
                 if ((allopt[i].setwhere | 0) === pass) {
-                    if (is_wc_option(name) && !wc_supported(name) || is_wc2_option(name) && !wc2_supported(name)) {
+                    if (is_wc_option(name) && !wc_supported(name)
+                        || is_wc2_option(name) && !wc2_supported(name)) {
                         continue;
                     }
-                    await doset_add_menu(tmpwin, name, new $c.Ptr(fmtstr_doset, 0), i, pass === set_gameview ? 0 : indexoffset);
+                    await doset_add_menu(tmpwin, name, new $c.Ptr(fmtstr_doset, 0), i,
+                        pass === set_gameview ? 0 : indexoffset);
                 }
             }
         }
@@ -7781,7 +8121,9 @@ export async function doset() {   // options.c:8758
                     /* compound option */
                     k = opt_indx;
                     if (allopt[k].has_handler && allopt[k].optfn) {
-                        reslt = await allopt[k].optfn(allopt[k].idx, do_handler, FALSE, new $c.Ptr(empty_optstr, 0), new $c.Ptr(empty_optstr, 0));
+                        reslt = await allopt[k].optfn(allopt[k].idx, do_handler,
+                            FALSE, new $c.Ptr(empty_optstr, 0),
+                            new $c.Ptr(empty_optstr, 0));
                         /* if player eventually saves options, include this one */
                         if (reslt === optn_ok) {
                             opt_set_in_config[k] = TRUE;
@@ -7799,7 +8141,8 @@ export async function doset() {   // options.c:8758
                         await parseoptions(new $c.Ptr(buf, 0), FALSE, FALSE);
                     }
                 }
-                if (wc_supported(allopt[opt_indx].name) || wc2_supported(allopt[opt_indx].name)) {
+                if (wc_supported(allopt[opt_indx].name)
+                    || wc2_supported(allopt[opt_indx].name)) {
                     await preference_update()(allopt[opt_indx].name);
                 }
             }
@@ -7825,7 +8168,8 @@ async function reset_needed_visuals() {   // options.c:8980
     if (go.opt_need_glyph_reset) {
         reset_glyphmap(gm_optionchange);
     }
-    if (go.opt_reset_customcolors || go.opt_update_basic_palette || go.opt_reset_customsymbols || go.opt_need_redraw) {
+    if (go.opt_reset_customcolors || go.opt_update_basic_palette
+        || go.opt_reset_customsymbols || go.opt_need_redraw) {
         if (go.opt_update_basic_palette) {
             go.opt_update_basic_palette = FALSE;
         }
@@ -7879,7 +8223,8 @@ async function doset_add_menu(win, option, fmtstr, idx, indexoffset) {   // opti
     if (i >= 0 && i < OPTCOUNT && allopt[i].name && allopt[i].optfn) {
         any.a_int = indexoffset === 0 ? 0 : (i + 1 | 0) + indexoffset | 0;
         if (allopt[i].optfn) {
-            reslt = await allopt[i].optfn(allopt[i].idx, get_val, FALSE, new $c.Ptr(buf2, 0), new $c.Ptr(empty_optstr, 0));
+            reslt = await allopt[i].optfn(allopt[i].idx, get_val,
+                FALSE, new $c.Ptr(buf2, 0), new $c.Ptr(empty_optstr, 0));
         }
         if (reslt === optn_ok && buf2[0]) {
             value = new $c.Ptr(buf2, 0);
@@ -7897,7 +8242,8 @@ async function doset_add_menu(win, option, fmtstr, idx, indexoffset) {   // opti
     /* "    " replaces "a - " -- assumes menus follow that style */
     const indent = !any.a_int ? $C`    ` : $C``;
     $c.sprintf(new $c.Ptr(buf, 0), fmtstr, indent, option, value);
-    await add_menu(win, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_SKIPINVERT);
+    await add_menu(win, nul_glyphinfo, any, 0, 0,
+        ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_SKIPINVERT);
 }
 /* display keys for menu actions; used by cmd.c '?i' and pager.c '?k' */
 /**
@@ -7918,7 +8264,8 @@ export async function show_menu_controls(win, dolist) {   // options.c:9070
         fmt = $C`%-7s %s`;
         for (i = 0; default_menu_cmd_info[i].desc; i = i + 1 | 0) {
             const ch = default_menu_cmd_info[i].cmd;
-            if ((ch === 125 || ch === 123) && !has_menu_shift) {
+            if ((ch === 125
+                || ch === 123) && !has_menu_shift) {
                 continue;
             }
             $c.sprintf(new $c.Ptr(buf, 0), fmt, visctrl(get_menu_cmd_key(ch)), default_menu_cmd_info[i].desc);
@@ -8014,7 +8361,9 @@ async function handle_add_list_remove(optname, numtotal) {   // options.c:9208
             continue;
         }
         $c.sprintf(new $c.Ptr(tmpbuf, 0), handle_add_list_remove$action_titles[i].desc, i === 1 ? await makeplural(optname) : optname);
-        await add_menu(tmpwin, nul_glyphinfo, any, handle_add_list_remove$action_titles[i].letr, 0, ATR.NONE, clr, new $c.Ptr(tmpbuf, 0), i === 3 ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, handle_add_list_remove$action_titles[i].letr,
+            0, ATR.NONE, clr, new $c.Ptr(tmpbuf, 0),
+            i === 3 ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     }
     await end_menu()(tmpwin, $C`Do what?`);
     if ((pick_cnt = await select_menu(tmpwin, PICK.ONE, new $c.Ptr(pick_list, 0))) > 0) {
@@ -8053,7 +8402,10 @@ export async function toggle_bool_option(p) {   // options.c:9278
     let i = 0, buf = new Int8Array(256);
     let ret = ECMD.FAIL;
     for (i = 0; i < OPTCOUNT; i = i + 1 | 0) {
-        if (!strncmpi(allopt[i].name, p, $c.i32($c.strlen(p))) && allopt[i].opttyp === BoolOpt && allopt[i].setwhere === set_in_game && allopt[i].addr !== null) {
+        if (!strncmpi(allopt[i].name, p, $c.i32($c.strlen(p)))
+            && allopt[i].opttyp === BoolOpt
+            && allopt[i].setwhere === set_in_game
+            && allopt[i].addr !== null) {
             $c.sprintf(new $c.Ptr(buf, 0), $C`%s%s`, allopt[i].addr.get(0) ? $C`!` : $C``, allopt[i].name);
             if (await parseoptions(new $c.Ptr(buf, 0), FALSE, FALSE)) {
                 ret = ECMD.OK;
@@ -8076,9 +8428,12 @@ export async function add_autopickup_exception(mapping) {   // options.c:9300
        for it, accepting whitespace but rejecting anything else unless it
        starts with '#" for a comment */
     end[0] = 0;
-    if ((n = $c.sscanf(mapping, $C`"<%253[^"]" %c`, new $c.Ptr(text, 0), new $c.Ptr(end, 0))) === 1 || n === 2 && end[0] === 35) {
+    if ((n = $c.sscanf(mapping, $C`"<%253[^"]" %c`, new $c.Ptr(text, 0), new $c.Ptr(end, 0))) === 1
+        || n === 2 && end[0] === 35) {
         grab = TRUE;
-    } else if ((n = $c.sscanf(mapping, $C`">%253[^"]" %c`, new $c.Ptr(text, 0), new $c.Ptr(end, 0))) === 1 || (n = $c.sscanf(mapping, $C`"%253[^"]" %c`, new $c.Ptr(text, 0), new $c.Ptr(end, 0))) === 1 || n === 2 && end[0] === 35) {
+    } else if ((n = $c.sscanf(mapping, $C`">%253[^"]" %c`, new $c.Ptr(text, 0), new $c.Ptr(end, 0))) === 1
+        || (n = $c.sscanf(mapping, $C`"%253[^"]" %c`, new $c.Ptr(text, 0), new $c.Ptr(end, 0))) === 1
+        || n === 2 && end[0] === 35) {
         grab = FALSE;
     } else {
         await config_error_add($C`%s`, new $c.Ptr(add_autopickup_exception$APE_syntax_error, 0));
@@ -8156,7 +8511,8 @@ export function sym_val(strval) {   // options.c:9385
             /* accepts '\' as backslash and ''' as single quote */
             buf[0] = strval.get(1);
             /* if backslash, handle single or double quote or second backslash */
-        } else if (strval.get(1) === 92 && strval.get(2) && strval.get(3) === 39 && $c.strchr($C`'"\\`, strval.get(2)) && !strval.get(4)) {
+        } else if (strval.get(1) === 92 && strval.get(2) && strval.get(3) === 39
+            && $c.strchr($C`'"\\`, strval.get(2)) && !strval.get(4)) {
             buf[0] = strval.get(2);
             /* not simple quote or basic backslash;
                strip closing quote and let escapes() deal with it */
@@ -8190,14 +8546,17 @@ export async function option_help() {   // options.c:9462
     }
     /* Boolean options */
     for (i = 0; allopt[i].name; i = i + 1 | 0) {
-        if (allopt[i].opttyp !== BoolOpt || !allopt[i].addr || allopt[i].setwhere === set_wizonly && !wizard()) {
+        if (allopt[i].opttyp !== BoolOpt || !allopt[i].addr
+            || allopt[i].setwhere === set_wizonly && !wizard()) {
             continue;
         }
-        if (allopt[i].setwhere === set_wiznofuz && (!wizard() || iflags.debug_fuzzer)) {
+        if (allopt[i].setwhere === set_wiznofuz
+            && (!wizard() || iflags.debug_fuzzer)) {
             continue;
         }
         optname = allopt[i].name;
-        if (is_wc_option(optname) && !wc_supported(optname) || is_wc2_option(optname) && !wc2_supported(optname)) {
+        if (is_wc_option(optname) && !wc_supported(optname)
+            || is_wc2_option(optname) && !wc2_supported(optname)) {
             continue;
         }
         await next_opt(datawin, optname);
@@ -8206,14 +8565,17 @@ export async function option_help() {   // options.c:9462
     /* Compound options */
     await putstr()(datawin, 0, $C`Compound options:`);
     for (i = 0; allopt[i].name; i = i + 1 | 0) {
-        if (allopt[i].opttyp !== CompOpt || allopt[i].setwhere === set_wizonly && !wizard()) {
+        if (allopt[i].opttyp !== CompOpt
+            || allopt[i].setwhere === set_wizonly && !wizard()) {
             continue;
         }
-        if (allopt[i].setwhere === set_wiznofuz && (!wizard() || iflags.debug_fuzzer)) {
+        if (allopt[i].setwhere === set_wiznofuz
+            && (!wizard() || iflags.debug_fuzzer)) {
             continue;
         }
         optname = allopt[i].name;
-        if (is_wc_option(optname) && !wc_supported(optname) || is_wc2_option(optname) && !wc2_supported(optname)) {
+        if (is_wc_option(optname) && !wc_supported(optname)
+            || is_wc2_option(optname) && !wc2_supported(optname)) {
             continue;
         }
         $c.sprintf(new $c.Ptr(buf2, 0), $C`\`%s'`, optname);
@@ -8382,7 +8744,9 @@ export async function all_options_strbuf(sbuf) {   // options.c:9678
                 }
                 break;
             case CompOpt:
-                if (!(allopt[i].setwhere === set_in_config || allopt[i].setwhere === set_gameview || allopt[i].setwhere === set_in_game)) {
+                if (!(allopt[i].setwhere === set_in_config
+                    || allopt[i].setwhere === set_gameview
+                    || allopt[i].setwhere === set_in_game)) {
                     break;
                 }
                 /* FIXME: get_option_value for:
@@ -8497,7 +8861,8 @@ export async function set_option_mod_status(optnam, status) {   // options.c:985
 export async function set_wc_option_mod_status(optmask, status) {   // options.c:9881
     let k = 0;
     if (SET__IS_VALUE_VALID(status)) {
-        await impossible($C`set_wc_option_mod_status: status out of range %d.`, status);
+        await impossible($C`set_wc_option_mod_status: status out of range %d.`,
+            status);
         return;
     }
     while (wc_options[k].wc_name) {
@@ -8552,7 +8917,8 @@ function wc_supported(optnam) {   // options.c:9912
 export async function set_wc2_option_mod_status(optmask, status) {   // options.c:9935
     let k = 0;
     if (SET__IS_VALUE_VALID(status)) {
-        await impossible($C`set_wc2_option_mod_status: status out of range %d.`, status);
+        await impossible($C`set_wc2_option_mod_status: status out of range %d.`,
+            status);
         return;
     }
     while (wc2_options[k].wc_name) {
@@ -8584,7 +8950,8 @@ function wc2_supported(optnam) {   // options.c:9966
     let k = 0;
     for (k = 0; wc2_options[k].wc_name; k = k + 1 | 0) {
         if (!$c.strcmp(wc2_options[k].wc_name, optnam)) {
-            return $c.andu64(windowprocs.wincap2, wc2_options[k].wc_bit) ? TRUE : FALSE;
+            return $c.andu64(windowprocs.wincap2, wc2_options[k].wc_bit) ? TRUE
+                : FALSE;
         }
     }
     return FALSE;
@@ -8707,14 +9074,17 @@ async function wc_set_window_colors(op) {   // options.c:10023
                     $t5 = await dupstr(clr >= 0 ? wc_color_name(clr) : tbg), bgp[j].set(0, $t5);
                 }
                 if (wcolors_opt[j] !== 0) {
-                    await config_error_add($C`windowcolors for %s windows specified multiple times`, wcnames[j]);
+                    await config_error_add(
+                        $C`windowcolors for %s windows specified multiple times`,
+                        wcnames[j]);
                 }
                 wcolors_opt[j] = wcolors_opt[j] + 1 | 0;
                 break;
             }
         }
         if (j === WC_COUNT) {
-            await config_error_add($C`windowcolors for unrecognized window type: %s`, wn);
+            await config_error_add($C`windowcolors for unrecognized window type: %s`,
+                wn);
         }
     }
     $G.options_set_window_colors_flag = 1;

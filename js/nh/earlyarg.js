@@ -164,7 +164,8 @@ async function lopt(arg, lflags, optname, origarg, argc_p, argv_p) {   // earlya
             if (!p || !p.get(0)) {
                 /* "-w[indowtype]" w/o '='/':' if there is a next element, use
                    it for "foo"; if not, supply a non-Null bogus value */
-                if (nextarg && (opttype === ArgValRequired || opttype === ArgValOptional)) {
+                if (nextarg
+                    && (opttype === ArgValRequired || opttype === ArgValOptional)) {
                     p = nextarg, argc_p.set(0, argc_p.get(0) - 1 | 0), argv_p.set(0, argv_p.get(0).add(1));
                 } else if (opttype === ArgValRequired) {
                     $goto = "loptrequired"; continue D1;
@@ -252,7 +253,8 @@ export async function early_options(argc_p, argv_p, hackdir_p) {   // earlyarg.c
             continue;
         }
         /* allow second dash if arg name is longer than one character */
-        if (arg.get(0) === 45 && arg.get(1) === 45 && arg.get(2) !== 0 && (arg.get(3) !== 0 && arg.get(3) !== 61 && arg.get(3) !== 58)) {
+        if (arg.get(0) === 45 && arg.get(1) === 45 && arg.get(2) !== 0
+            && (arg.get(3) !== 0 && arg.get(3) !== 61 && arg.get(3) !== 58)) {
             arg = arg.add(1);
         }
         switch (arg.get(1)) {
@@ -278,7 +280,9 @@ export async function early_options(argc_p, argv_p, hackdir_p) {   // earlyarg.c
                     /*NOTREACHED*/
                 } else {
                     oldargc = argc[0];
-                    arg = await lopt(arg, ArgValRequired | ArgNamOneLetter | ArgErrSilent, $C`-directory`, origarg, new $c.Ptr(argc, 0), new $c.Ptr(argv, 0));
+                    arg = await lopt(arg,
+                        ArgValRequired | ArgNamOneLetter | ArgErrSilent,
+                        $C`-directory`, origarg, new $c.Ptr(argc, 0), new $c.Ptr(argv, 0));
                     if (!arg) {
                         await error($C`Flag -d must be followed by a directory name.`);
                     }
@@ -296,7 +300,9 @@ export async function early_options(argc_p, argv_p, hackdir_p) {   // earlyarg.c
                 break;
             case 104:
             case 63:
-                if (await lopt(arg, ArgValDisallowed, $C`-help`, origarg, new $c.Ptr(argc, 0), new $c.Ptr(argv, 0)) || await lopt(arg, ArgValDisallowed | ArgNamOneLetter, $C`-?`, origarg, new $c.Ptr(argc, 0), new $c.Ptr(argv, 0))) {
+                if (await lopt(arg, ArgValDisallowed, $C`-help`, origarg, new $c.Ptr(argc, 0), new $c.Ptr(argv, 0))
+                    || await lopt(arg, ArgValDisallowed | ArgNamOneLetter, $C`-?`,
+                    origarg, new $c.Ptr(argc, 0), new $c.Ptr(argv, 0))) {
                     await opt_usage(hackdir_p.get(0));   /* doesn't return */
                 }
                 break;
@@ -305,7 +311,8 @@ export async function early_options(argc_p, argv_p, hackdir_p) {   // earlyarg.c
                 if (!$c.strcmp(arg, $C`-no-nethackrc`)) {   /* no abbreviation allowed */
                     arg = nhStr($C`/dev/null`);
                 } else {
-                    arg = await lopt(arg, ArgValRequired | ArgErrComplain, $C`-nethackrc`, origarg, new $c.Ptr(argc, 0), new $c.Ptr(argv, 0));
+                    arg = await lopt(arg, ArgValRequired | ArgErrComplain,
+                        $C`-nethackrc`, origarg, new $c.Ptr(argc, 0), new $c.Ptr(argv, 0));
                 }
                 if (arg) {
                     $t1 = await dupstr(arg), gc.cmdline_rcfile = $t1;
@@ -332,7 +339,9 @@ export async function early_options(argc_p, argv_p, hackdir_p) {   // earlyarg.c
                    allowed, but -s form can take more than one
                    space-separated argument and --scores=foo
                    isn't suited for that] */
-                if (await lopt(arg, ArgValDisallowed | ArgErrComplain | (origarg.get(1) !== 45 ? ArgNamOneLetter : 0), $C`-scores`, origarg, new $c.Ptr(argc, 0), new $c.Ptr(argv, 0))) {
+                if (await lopt(arg,
+                    ArgValDisallowed | ArgErrComplain | (origarg.get(1) !== 45 ? ArgNamOneLetter : 0),
+                    $C`-scores`, origarg, new $c.Ptr(argc, 0), new $c.Ptr(argv, 0))) {
                     /* at this point, argv[0] contains "-scores" or a leading
                        substring of it; prscore() (via scores_only()) expects
                        that to be in argv[1] so we adjust the pointer to make
@@ -358,7 +367,8 @@ export async function early_options(argc_p, argv_p, hackdir_p) {   // earlyarg.c
             case 119:
                 /* windowtype: "-wfoo" or "-w[indowtype]=foo"
                  * or "-w[indowtype]:foo" or "-w[indowtype] foo" */
-                arg = await lopt(arg, ArgValRequired | ArgNamOneLetter | ArgErrComplain, $C`-windowtype`, origarg, new $c.Ptr(argc, 0), new $c.Ptr(argv, 0));
+                arg = await lopt(arg, ArgValRequired | ArgNamOneLetter | ArgErrComplain,
+                    $C`-windowtype`, origarg, new $c.Ptr(argc, 0), new $c.Ptr(argv, 0));
                 if (gc.cmdline_windowsys) {
                     $c.free(gc.cmdline_windowsys);
                 }
@@ -464,7 +474,9 @@ export async function argcheck(argc, argv, e_arg) {   // earlyarg.c:450
         } else {
             userea = argv.get(i).add(1);
         }
-        match = match_optname(userea, earlyopts[idx].name, earlyopts[idx].minlength, earlyopts[idx].valallowed);
+        match = match_optname(userea, earlyopts[idx].name,
+            earlyopts[idx].minlength,
+            earlyopts[idx].valallowed);
         if (match) {
             break;
         }
@@ -501,7 +513,8 @@ export async function argcheck(argc, argv, e_arg) {   // earlyarg.c:450
                             await dump_version_info();
                             return 2;   /* done */
                         } else if (!match_optname(extended_opt, $C`show`, 4, FALSE)) {
-                            await raw_printf($C`-%sversion can only be extended with -%sversion:copy or :dump or :show.\n`, dashdash, dashdash);
+                            await raw_printf($C`-%sversion can only be extended with -%sversion:copy or :dump or :show.\n`,
+                                dashdash, dashdash);
                             /* exit after we've reported bad command line argument */
                             return 2;
                         }
@@ -600,14 +613,18 @@ async function dump_enums() {   // earlyarg.c:706
     for (i = 0; i < 11 /* NUM_ENUM_DUMPS */; i = i + 1 | 0) {
         await raw_printf($C`enum %s = {`, dump_enums$edmp[i].title);
         for (j = 0; j < dump_enums$edmp[i].szd; j = j + 1 | 0) {
-            const nmprefix = j >= (dump_enums$edmp[i].szd - dump_enums$edmp[i].unprefixed_count | 0) ? $C`` : dump_enums$edmp[i].pfx;   /* "" or "PM_" */
+            const nmprefix = j >= (dump_enums$edmp[i].szd - dump_enums$edmp[i].unprefixed_count | 0)
+                ? $C`` : dump_enums$edmp[i].pfx;   /* "" or "PM_" */
             const nmwidth = 27 - $c.i32($c.strlen(nmprefix)) | 0;   /* 27 or 24 */
             if (dump_enums$edmp[i].dumpflgs > 0) {
                 nh_snprintf($C`dump_enums`, 788, new $c.Ptr(comment, 0), 256, $C`    /* '%c' */`, $c.radd(dump_enums$ed[i], j).val >= 32 && $c.radd(dump_enums$ed[i], j).val <= 126 ? $c.radd(dump_enums$ed[i], j).val : 32);
             } else {
                 comment[0] = 0;
             }
-            await raw_printf($C`    %s%*s = %3d,%s`, nmprefix, -nmwidth | 0, $c.radd(dump_enums$ed[i], j).nm, $c.radd(dump_enums$ed[i], j).val, new $c.Ptr(comment, 0));
+            await raw_printf($C`    %s%*s = %3d,%s`,
+                nmprefix, -nmwidth | 0,
+                $c.radd(dump_enums$ed[i], j).nm, $c.radd(dump_enums$ed[i], j).val,
+                new $c.Ptr(comment, 0));
         }
         await raw_print()($C`};`);
         await raw_print()($C``);

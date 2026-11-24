@@ -191,7 +191,10 @@ export async function stinky_nemesis(mon) {   // questpgr.c:150
     if (mesg[0]) {
         /* change newlines into spaces to cope with "...noxious\nfumes..." */
         strNsubst(mesg[0], $C`\n`, $C` `, 0);
-        if (((p = strstri(mesg[0], $C`noxious`)) !== null || (p = strstri(mesg[0], $C`poisonous`)) !== null || (p = strstri(mesg[0], $C`toxic`)) !== null) && (strstri(p, $C` gas`) || strstri(p, $C` fumes`))) {
+        if (((p = strstri(mesg[0], $C`noxious`)) !== null
+            || (p = strstri(mesg[0], $C`poisonous`)) !== null
+            || (p = strstri(mesg[0], $C`toxic`)) !== null)
+            && (strstri(p, $C` gas`) || strstri(p, $C` fumes`))) {
             res = 1;
         }
         $c.free(mesg[0]);
@@ -216,11 +219,20 @@ async function qtext_pronoun(who, which) {   // questpgr.c:199
      * For %o, treat all artifacts as neuter; some have plural names,
      * which genders[] doesn't handle; cvt_buf[] already contains name.
      */
-    if (who === 111 && (strstri(new $c.Ptr(gc.cvt_buf, 0), $C`Eyes `) || strncmpi(new $c.Ptr(gc.cvt_buf, 0), await makesingular(new $c.Ptr(gc.cvt_buf, 0)), -1))) {
-        pnoun = lwhich === 104 ? $C`they` : lwhich === 105 ? $C`them` : lwhich === 106 ? $C`their` : $C`?`;
+    if (who === 111
+        && (strstri(new $c.Ptr(gc.cvt_buf, 0), $C`Eyes `)
+        || strncmpi(new $c.Ptr(gc.cvt_buf, 0), await makesingular(new $c.Ptr(gc.cvt_buf, 0)), -1))) {
+        pnoun = lwhich === 104 ? $C`they`
+            : lwhich === 105 ? $C`them`
+            : lwhich === 106 ? $C`their` : $C`?`;
     } else {
-        const godgend = who === 100 ? svq.quest_status.godgend : who === 108 ? svq.quest_status.ldrgend : who === 110 ? svq.quest_status.nemgend : 2;   /* default to neuter */
-        pnoun = lwhich === 104 ? genders[godgend].he : lwhich === 105 ? genders[godgend].him : lwhich === 106 ? genders[godgend].his : $C`?`;
+        const godgend = who === 100 ? svq.quest_status.godgend
+            : who === 108 ? svq.quest_status.ldrgend
+            : who === 110 ? svq.quest_status.nemgend
+            : 2;   /* default to neuter */
+        pnoun = lwhich === 104 ? genders[godgend].he
+            : lwhich === 105 ? genders[godgend].him
+            : lwhich === 106 ? genders[godgend].his : $C`?`;
     }
     $c.strcpy(new $c.Ptr(gc.cvt_buf, 0), pnoun);
     /* capitalize for H,I,J */
@@ -240,7 +252,8 @@ async function convert_arg(c) {   // questpgr.c:236
             str = new $c.Ptr(svp.plname, 0);
             break;
         case 99:
-            str = flags.female && gu.urole.name.f ? gu.urole.name.f : gu.urole.name.m;
+            str = flags.female && gu.urole.name.f ? gu.urole.name.f
+                : gu.urole.name.m;
             break;
         case 114:
             str = rank_of(u.ulevel, gu.urole.mnum, flags.female);
@@ -498,14 +511,16 @@ async function com_pager_core(section, msgid, showerror, rawtext) {   // questpg
         await lua_getglobal(L, $C`questtext`);
         if (!lua_istable(L, -1)) {
             if (showerror) {
-                await impossible($C`com_pager: questtext in %s is not a lua table`, $C`quest.lua`);
+                await impossible($C`com_pager: questtext in %s is not a lua table`,
+                    $C`quest.lua`);
             }
             break compagerdone$;
         }
         await lua_getfield(L, -1, section);
         if (!lua_istable(L, -1)) {
             if (showerror) {
-                await impossible($C`com_pager: questtext[%s] in %s is not a lua table`, section, $C`quest.lua`);
+                await impossible($C`com_pager: questtext[%s] in %s is not a lua table`,
+                    section, $C`quest.lua`);
             }
             break compagerdone$;
         }
@@ -525,9 +540,13 @@ async function com_pager_core(section, msgid, showerror, rawtext) {   // questpg
                 }
                 if (showerror) {
                     if (!fallback_msgid) {
-                        await impossible($C`com_pager: questtext[%s][%s] in %s is not a lua table`, section, msgid, $C`quest.lua`);
+                        await impossible(
+                            $C`com_pager: questtext[%s][%s] in %s is not a lua table`,
+                            section, msgid, $C`quest.lua`);
                     } else {
-                        await impossible($C`com_pager: questtext[%s][%s] and [][%s] in %s are not lua tables`, section, msgid, fallback_msgid, $C`quest.lua`);
+                        await impossible(
+                            $C`com_pager: questtext[%s][%s] and [][%s] in %s are not lua tables`,
+                            section, msgid, fallback_msgid, $C`quest.lua`);
                     }
                 }
                 break compagerdone$;
@@ -548,7 +567,10 @@ async function com_pager_core(section, msgid, showerror, rawtext) {   // questpg
             await lua_pop(L, 1);
             if (nelems < 2) {
                 if (showerror) {
-                    await impossible($C`com_pager: questtext[%s][%s] in %s is not an array of strings`, section, fallback_msgid ? fallback_msgid : msgid, $C`quest.lua`);
+                    await impossible(
+                        $C`com_pager: questtext[%s][%s] in %s is not an array of strings`,
+                        section, fallback_msgid ? fallback_msgid : msgid,
+                        $C`quest.lua`);
                 }
                 break compagerdone$;
             }

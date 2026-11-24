@@ -66,7 +66,8 @@ export function get_rect_ind(r) {   // rect.c:60
     const hx = r.hx;
     const hy = r.hy;
     for (i = 0, rectp = $c.radd(rect, 0); i < rect_cnt; i = i + 1 | 0, rectp = $c.radd(rectp, 1)) {
-        if (lx === rectp.lx && ly === rectp.ly && hx === rectp.hx && hy === rectp.hy) {
+        if (lx === rectp.lx && ly === rectp.ly && hx === rectp.hx
+            && hy === rectp.hy) {
             return i;
         }
     }
@@ -86,7 +87,8 @@ export function get_rect(r) {   // rect.c:82
     const hx = r.hx;
     const hy = r.hy;
     for (i = 0, rectp = $c.radd(rect, 0); i < rect_cnt; i = i + 1 | 0, rectp = $c.radd(rectp, 1)) {
-        if (lx >= rectp.lx && ly >= rectp.ly && hx <= rectp.hx && hy <= rectp.hy) {
+        if (lx >= rectp.lx && ly >= rectp.ly && hx <= rectp.hx
+            && hy <= rectp.hy) {
             return rectp;
         }
     }
@@ -113,7 +115,8 @@ export function rnd_rect() {   // rect.c:104
  * @returns {number} boolean
  */
 function intersect(r1, r2, r3) {   // rect.c:116
-    if (r2.lx > r1.hx || r2.ly > r1.hy || r2.hx < r1.lx || r2.hy < r1.ly) {
+    if (r2.lx > r1.hx || r2.ly > r1.hy || r2.hx < r1.lx
+        || r2.hy < r1.ly) {
         return FALSE;
     }
     r3.lx = r2.lx > r1.lx ? r2.lx : r1.lx;
@@ -191,12 +194,14 @@ export async function split_rects(r1, r2) {   // rect.c:182
             await split_rects($c.radd(rect, i), r);
         }
     }
-    if (r2.ly - old_r.ly - 1 > (old_r.hy < ROWNO - 1 ? 2 * YLIM : YLIM + 1) + 4) {
+    if (r2.ly - old_r.ly - 1
+        > (old_r.hy < ROWNO - 1 ? 2 * YLIM : YLIM + 1) + 4) {
         r.$copyFrom(old_r);
         r.hy = $c.i16(r2.ly - 2);
         await add_rect(r);
     }
-    if (r2.lx - old_r.lx - 1 > (old_r.hx < COLNO - 1 ? 2 * XLIM : XLIM + 1) + 4) {
+    if (r2.lx - old_r.lx - 1
+        > (old_r.hx < COLNO - 1 ? 2 * XLIM : XLIM + 1) + 4) {
         r.$copyFrom(old_r);
         r.hx = $c.i16(r2.lx - 2);
         await add_rect(r);

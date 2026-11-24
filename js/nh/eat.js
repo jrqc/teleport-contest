@@ -135,19 +135,24 @@ export function is_edible(obj) {   // eat.c:91
     }
     /* above also prevents the Amulet from being eaten, so we must never
        allow fake amulets to be eaten either [which is already the case] */
-    if (gy.youmonst.data === mons[PM.FIRE_ELEMENTAL] && is_flammable(obj)) {
+    if (gy.youmonst.data === mons[PM.FIRE_ELEMENTAL]
+        && is_flammable(obj)) {
         return TRUE;
     }
-    if (metallivorous(gy.youmonst.data) && is_metallic(obj) && (gy.youmonst.data !== mons[PM.RUST_MONSTER] || is_rustprone(obj))) {
+    if (metallivorous(gy.youmonst.data) && is_metallic(obj)
+        && (gy.youmonst.data !== mons[PM.RUST_MONSTER] || is_rustprone(obj))) {
         return TRUE;
     }
     /* Ghouls only eat non-veggy corpses or eggs (see dogfood()) */
     if (u.umonnum === PM.GHOUL) {
-        return obj.otyp === CORPSE && !vegan($c.relem(mons, obj.corpsenm)) || obj.otyp === EGG ? 1 : 0;
+        return obj.otyp === CORPSE
+            && !vegan($c.relem(mons, obj.corpsenm))
+            || obj.otyp === EGG ? 1 : 0;
     }
     /* [g-cubes can eat containers and retain all contents
         as engulfed items, but poly'd player can't do that] */
-    if (u.umonnum === PM.GELATINOUS_CUBE && is_organic(obj) && !Has_contents(obj)) {
+    if (u.umonnum === PM.GELATINOUS_CUBE && is_organic(obj)
+        && !Has_contents(obj)) {
         return TRUE;
     }
     return obj.oclass === FOOD_CLASS ? 1 : 0;
@@ -229,7 +234,8 @@ export async function eatmupdate() {   // eat.c:181
 async function food_xname(food, the_pfx) {   // eat.c:217
     let result = null;
     if (food.otyp === CORPSE) {
-        result = await corpse_xname(food, null, CXN.SINGULAR | (the_pfx ? CXN.PFX_THE : 0));
+        result = await corpse_xname(food, null,
+            CXN.SINGULAR | (the_pfx ? CXN.PFX_THE : 0));
         /* not strictly needed since pname values are capitalized
            and the() is a no-op for them */
         if (type_is_pname($c.relem(mons, food.corpsenm))) {
@@ -359,7 +365,9 @@ export async function reset_eat() {   // eat.c:309
  * @returns {number} unsigned int
  */
 export function obj_nutrition(otmp) {   // eat.c:325
-    const nut = otmp.otyp === CORPSE ? mons[otmp.corpsenm].cnutrit : otmp.globby ? otmp.owt : objects[otmp.otyp].oc_nutrition;
+    const nut = otmp.otyp === CORPSE ? mons[otmp.corpsenm].cnutrit
+        : otmp.globby ? otmp.owt
+        : objects[otmp.otyp].oc_nutrition;
     return nut;
 }
 /* nutrition increment for next byte; this used to be factored into
@@ -505,7 +513,10 @@ export function temp_resist(prop) {   // eat.c:453
     /* and not by worn gear (dragon armor) */
     /* and property is not blocked; we don't expect this, but if it
        is then the timeout doesn't matter so we won't extend that */
-    if (timeout && $c.and64(p.intrinsic, ~TIMEOUT) === 0 && !p.extrinsic && !p.blocked) {
+    if (timeout
+        && $c.and64(p.intrinsic, ~TIMEOUT) === 0
+        && !p.extrinsic
+        && !p.blocked) {
         return timeout;
     }
     return 0;
@@ -519,7 +530,11 @@ export function temp_resist(prop) {   // eat.c:453
  */
 export function eating_dangerous_corpse(res) {   // eat.c:475
     let food = null, mnum = 0;
-    if (go.occupation === eatfood && (food = svc.context.victual.piece) !== null && food.otyp === CORPSE && (mnum = food.corpsenm) >= LOW_PM && (carried(food) || obj_here(food, u.ux, u.uy))) {
+    if (go.occupation === eatfood
+        && (food = svc.context.victual.piece) !== null
+        && food.otyp === CORPSE
+        && (mnum = food.corpsenm) >= LOW_PM
+        && (carried(food) || obj_here(food, u.ux, u.uy))) {
         if (res === ACID_RES && acidic($c.relem(mons, mnum))) {
             return TRUE;
         }
@@ -582,7 +597,10 @@ async function done_eating(message) {   // eat.c:544
         }
         gn.nomovemsg = null;
     } else if (message) {
-        await You($C`finish %s %s.`, gy.youmonst.data === mons[PM.FIRE_ELEMENTAL] ? $C`consuming` : $C`eating`, await food_xname(piece, TRUE));
+        await You($C`finish %s %s.`,
+            gy.youmonst.data === mons[PM.FIRE_ELEMENTAL] ? $C`consuming`
+            : $C`eating`,
+            await food_xname(piece, TRUE));
     }
     if (piece.otyp === CORPSE || piece.globby) {
         await cpostfx(piece.corpsenm);
@@ -604,18 +622,22 @@ export async function eating_conducts(pd) {   // eat.c:576
     let $t1, $t2;
     let ll_conduct = 0;
     if (!($t1 = u.uconduct.food, u.uconduct.food = $c.add64($t1, 1), $t1)) {
-        await livelog_printf(LL.CONDUCT, $C`ate for the first time - %s`, pd.pmnames[NEUTRAL]);
+        await livelog_printf(LL.CONDUCT, $C`ate for the first time - %s`,
+            pd.pmnames[NEUTRAL]);
         ll_conduct = ll_conduct + 1 | 0;
     }
     if (!vegan(pd)) {
         if (!($t2 = u.uconduct.unvegan, u.uconduct.unvegan = $c.add64($t2, 1), $t2) && !ll_conduct) {
-            await livelog_printf(LL.CONDUCT, $C`consumed animal products (%s) for the first time`, pd.pmnames[NEUTRAL]);
+            await livelog_printf(LL.CONDUCT,
+                $C`consumed animal products (%s) for the first time`,
+                pd.pmnames[NEUTRAL]);
             ll_conduct = ll_conduct + 1 | 0;
         }
     }
     if (!vegetarian(pd)) {
         if (!u.uconduct.unvegetarian && !ll_conduct) {
-            await livelog_printf(LL.CONDUCT, $C`tasted meat (%s) for the first time`, pd.pmnames[NEUTRAL]);
+            await livelog_printf(LL.CONDUCT, $C`tasted meat (%s) for the first time`,
+                pd.pmnames[NEUTRAL]);
         }
         await violated_vegetarian();
     }
@@ -642,7 +664,8 @@ export async function eat_brains(magr, mdef, visflag, dmg_p) {   // eat.c:603
     }
     if (noncorporeal(pd)) {
         if (visflag) {
-            await pline($C`%s brain is unharmed.`, mdef === gy.youmonst ? $C`Your` : s_suffix(await Monnam(mdef)));
+            await pline($C`%s brain is unharmed.`,
+                mdef === gy.youmonst ? $C`Your` : s_suffix(await Monnam(mdef)));
         }
         return M_ATTK.MISS;   /* side-effects can't occur */
     } else if (magr === gy.youmonst) {
@@ -661,7 +684,8 @@ export async function eat_brains(magr, mdef, visflag, dmg_p) {   // eat.c:603
            tentacle-touch should have been caught before reaching this far) */
         if (magr === gy.youmonst) {
             if (!Stone_resistance() && !Stoned()) {
-                await make_stoned(5, null, KILLED.BY_AN, pmname(pd, Mgender(mdef)));
+                await make_stoned(5, null, KILLED.BY_AN,
+                    pmname(pd, Mgender(mdef)));
             }
         } else {
             /* no need to check for poly_when_stoned or Stone_resistance;
@@ -764,7 +788,8 @@ export async function eat_brains(magr, mdef, visflag, dmg_p) {   // eat.c:603
             dmg_p.set(0, dmg_p.get(0) + xtra_dmg | 0);
             give_nutrit = TRUE;
             if (dmg_p.get(0) >= mdef.mhp && visflag && canspotmon(mdef)) {
-                await pline($C`%s last thought fades away...`, s_suffix(await Monnam(mdef)));
+                await pline($C`%s last thought fades away...`,
+                    s_suffix(await Monnam(mdef)));
             }
         }
     }
@@ -793,7 +818,10 @@ async function maybe_cannibal(pm, allowmsg) {   // eat.c:758
        and also shouldn't eat current species when polymorphed
        (even if having the form of something which doesn't care
        about cannibalism--hero's innate traits aren't altered) */
-    if (!CANNIBAL_ALLOWED() && (your_race(fptr) || Upolyd() && same_race(gy.youmonst.data, fptr) || ismnum(u.ulycn) && were_beastie(pm) === u.ulycn)) {
+    if (!CANNIBAL_ALLOWED()
+        && (your_race(fptr)
+        || Upolyd() && same_race(gy.youmonst.data, fptr)
+        || ismnum(u.ulycn) && were_beastie(pm) === u.ulycn)) {
         if (allowmsg) {
             if (Upolyd() && your_race(fptr)) {
                 await You($C`have a bad feeling deep inside.`);
@@ -813,7 +841,9 @@ async function maybe_cannibal(pm, allowmsg) {   // eat.c:758
 async function cprefx(pm) {   // eat.c:791
     await maybe_cannibal(pm, TRUE);
     if (flesh_petrifies($c.relem(mons, pm))) {
-        if (!Stone_resistance() && !(poly_when_stoned(gy.youmonst.data) && await polymon(PM.STONE_GOLEM))) {
+        if (!Stone_resistance()
+            && !(poly_when_stoned(gy.youmonst.data)
+            && await polymon(PM.STONE_GOLEM))) {
             /* if food was a tin, use it up early to keep it out of bones */
             if (svc.context.tin.tin) {
                 await use_up_tin(svc.context.tin.tin);
@@ -837,7 +867,8 @@ async function cprefx(pm) {   // eat.c:791
         case PM.LARGE_CAT:
             /* cannibals are allowed to eat domestic animals without penalty */
             if (!CANNIBAL_ALLOWED()) {
-                await You_feel($C`that eating the %s was a bad idea.`, mons[pm].pmnames[NEUTRAL]);
+                await You_feel($C`that eating the %s was a bad idea.`,
+                    mons[pm].pmnames[NEUTRAL]);
                 u.uprops[AGGRAVATE_MONSTER].intrinsic = $c.or64(u.uprops[AGGRAVATE_MONSTER].intrinsic, FROMOUTSIDE);
             }
             break;
@@ -862,7 +893,9 @@ async function cprefx(pm) {   // eat.c:791
                    to normal play though because bones creation empties them */
                 /* Null for tins */
                 /* paranoia */
-                if (svc.context.victual.piece && svc.context.victual.piece.otyp === CORPSE && await revive_corpse(svc.context.victual.piece)) {
+                if (svc.context.victual.piece
+                    && svc.context.victual.piece.otyp === CORPSE
+                    && await revive_corpse(svc.context.victual.piece)) {
                     svc.context.victual.$copyFrom(zero_victual);   /* victual.piece=0, .o_id=0 */
                 }
                 return;
@@ -1086,7 +1119,8 @@ export function should_givit(type, ptr) {   // eat.c:961
     /* some intrinsics are easier to get than others */
     switch (type) {
         case POISON_RES:
-            if ((ptr === mons[PM.KILLER_BEE] || ptr === mons[PM.SCORPION]) && !rn2(4)) {
+            if ((ptr === mons[PM.KILLER_BEE] || ptr === mons[PM.SCORPION])
+                && !rn2(4)) {
                 chance = 1;
             } else {
                 chance = 15;
@@ -1241,7 +1275,8 @@ async function givit(type, ptr) {   // eat.c:1003
                 }
             } while (0);
             if (!$c.and64(u.uprops[TELEPORT_CONTROL].intrinsic, FROMOUTSIDE)) {
-                await You_feel(Hallucination() ? $C`centered in your personal space.` : $C`in control of yourself.`);
+                await You_feel(Hallucination() ? $C`centered in your personal space.`
+                    : $C`in control of yourself.`);
                 u.uprops[TELEPORT_CONTROL].intrinsic = $c.or64(u.uprops[TELEPORT_CONTROL].intrinsic, FROMOUTSIDE);
             }
             break;
@@ -1254,7 +1289,8 @@ async function givit(type, ptr) {   // eat.c:1003
                 }
             } while (0);
             if (!$c.and64(u.uprops[TELEPAT].intrinsic, FROMOUTSIDE)) {
-                await You_feel(Hallucination() ? $C`in touch with the cosmos.` : $C`a strange mental acuity.`);
+                await You_feel(Hallucination() ? $C`in touch with the cosmos.`
+                    : $C`a strange mental acuity.`);
                 u.uprops[TELEPAT].intrinsic = $c.or64(u.uprops[TELEPAT].intrinsic, FROMOUTSIDE);
                 /* If blind, make sure monsters show up. */
                 if (Blind()) {
@@ -1271,7 +1307,8 @@ async function givit(type, ptr) {   // eat.c:1003
                 }
             } while (0);
             if (!Acid_resistance()) {
-                await You_feel($C`%s.`, Hallucination() ? $C`secure from flashbacks` : $C`less concerned about being harmed by acid`);
+                await You_feel($C`%s.`, Hallucination() ? $C`secure from flashbacks`
+                    : $C`less concerned about being harmed by acid`);
             }
             incr_itimeout(new $c.FieldRef(u.uprops[ACID_RES], "intrinsic", "i64"), d(3, 6));
             break;
@@ -1284,7 +1321,8 @@ async function givit(type, ptr) {   // eat.c:1003
                 }
             } while (0);
             if (!Stone_resistance()) {
-                await You_feel($C`%s.`, Hallucination() ? $C`unusually limber` : $C`less concerned about becoming petrified`);
+                await You_feel($C`%s.`, Hallucination() ? $C`unusually limber`
+                    : $C`less concerned about becoming petrified`);
             }
             incr_itimeout(new $c.FieldRef(u.uprops[STONE_RES], "intrinsic", "i64"), d(3, 6));
             break;
@@ -1392,9 +1430,12 @@ async function cpostfx(pm) {   // eat.c:1129
             /*FALLTHRU*/
             tmp = tmp + 20 | 0;
             if (gy.youmonst.data.mlet !== S.MIMIC && !Unchanging()) {
-                const tempshape = !Hallucination() ? $C`a pile of gold` : $C`an orange`;
+                const tempshape = !Hallucination() ? $C`a pile of gold`
+                    : $C`an orange`;
                 if (!($t1 = u.uconduct.polyselfs, u.uconduct.polyselfs = $c.add64($t1, 1), $t1)) {   /* you're changing form */
-                    await livelog_printf(LL.CONDUCT, $C`changed form for the first time by mimicking %s`, tempshape);
+                    await livelog_printf(LL.CONDUCT,
+                        $C`changed form for the first time by mimicking %s`,
+                        tempshape);
                 }
                 await You_cant($C`resist the temptation to mimic %s.`, tempshape);
                 /* A pile of gold can't ride. */
@@ -1450,7 +1491,9 @@ async function cpostfx(pm) {   // eat.c:1129
                     /* most tin effects end up being skipped */
                     await lesshungry(200 + (metallivorous(gy.youmonst.data) ? 5 : 0));
                 }
-                await You($C`%s.`, pm === PM.GENETIC_ENGINEER ? $C`undergo a freakish metamorphosis` : $C`feel a change coming over you`);
+                await You($C`%s.`, pm === PM.GENETIC_ENGINEER
+                    ? $C`undergo a freakish metamorphosis`
+                    : $C`feel a change coming over you`);
                 await polyself(POLY.NOFLAGS);
             }
             break;
@@ -1496,9 +1539,11 @@ async function cpostfx(pm) {   // eat.c:1129
     /* possibly convey an intrinsic */
     if (check_intrinsics) {
         const ptr = $c.relem(mons, pm);
-        if (dmgtype(ptr, AD.STUN) || dmgtype(ptr, AD.HALU) || pm === PM.VIOLET_FUNGUS) {
+        if (dmgtype(ptr, AD.STUN) || dmgtype(ptr, AD.HALU)
+            || pm === PM.VIOLET_FUNGUS) {
             await pline($C`Oh wow!  Great stuff!`);
-            await make_hallucinated($c.add64($c.and64(u.uprops[HALLUC].intrinsic, TIMEOUT), 200), FALSE, 0);
+            await make_hallucinated($c.add64($c.and64(u.uprops[HALLUC].intrinsic, TIMEOUT), 200), FALSE,
+                0);
         }
         /* Eating magical monsters can give you some magical energy. */
         if (attacktype(ptr, AT.MAGC) || pm === PM.NEWT) {
@@ -1595,7 +1640,8 @@ async function costly_tin(alter_type) {   // eat.c:1389
     let $t1;
     /* COST_xxx */
     let tin = svc.context.tin.tin;
-    if (carried(tin) ? tin.unpaid : await costly_spot(tin.ox, tin.oy) && !tin.no_charge) {
+    if (carried(tin) ? tin.unpaid
+        : await costly_spot(tin.ox, tin.oy) && !tin.no_charge) {
         if (tin.quan > 1) {
             tin = ($t1 = await splitobj(tin, 1), svc.context.tin.tin = $t1);
             svc.context.tin.o_id = tin.o_id;
@@ -1615,7 +1661,8 @@ export function tin_variety_txt(s, tinvariety) {   // eat.c:1405
         tinvariety.set(0, -1);
         for (k = 0; k < 15; k = k + 1 | 0) {
             const l = $c.i32($c.strlen(tintxts[k].txt));
-            if (!strncmpi(s, tintxts[k].txt, l) && $c.i32($c.strlen(s)) > l && s.get(l) === 32) {
+            if (!strncmpi(s, tintxts[k].txt, l) && $c.i32($c.strlen(s)) > l
+                && s.get(l) === 32) {
                 tinvariety.set(0, k);
                 return l + 1 | 0;
             }
@@ -1669,7 +1716,10 @@ export function set_tin_variety(obj, forcetype) {   // eat.c:1461
     let r = 0;
     const mnum = obj.corpsenm;
     /* empty or already spinach */
-    if (forcetype === SPINACH_TIN || forcetype === HEALTHY_TIN && (mnum === NON_PM || !vegetarian($c.relem(mons, mnum)))) {
+    if (forcetype === SPINACH_TIN
+        || forcetype === HEALTHY_TIN
+        && (mnum === NON_PM
+        || !vegetarian($c.relem(mons, mnum)))) {
         /* replace meat */
         obj.corpsenm = NON_PM;   /* not based on any monster */
         obj.spe = 1;   /* spinach */
@@ -1756,7 +1806,9 @@ async function consume_tin(mesg) {   // eat.c:1528
         const mnum = tin.corpsenm;
         if (mnum === NON_PM) {
             if (Hallucination()) {
-                await pline($C`It's full of %s.`, rn2(2) ? $C`air elemental souffle` : $C`dehydrated water`);
+                await pline($C`It's full of %s.`,
+                    rn2(2) ? $C`air elemental souffle`
+                    : $C`dehydrated water`);
             } else {
                 await pline($C`It turns out to be empty.`);
             }
@@ -1770,7 +1822,8 @@ async function consume_tin(mesg) {   // eat.c:1528
             return;
         }
         let which = 0;   /* 0=>plural, 1=>as-is, 2=>"the" prefix */
-        if ((mnum === PM.COCKATRICE || mnum === PM.CHICKATRICE) && (Stone_resistance() || Hallucination())) {
+        if ((mnum === PM.COCKATRICE || mnum === PM.CHICKATRICE)
+            && (Stone_resistance() || Hallucination())) {
             what = $C`chicken`;
             which = 1;   /* suppress pluralization */
         } else if (Hallucination()) {
@@ -1845,12 +1898,15 @@ async function consume_tin(mesg) {   // eat.c:1528
                slippery when eating a greasy tin, but we'll go with that... */
             const alreadyglib = $c.i32($c.and64(u.uprops[GLIB].intrinsic, TIMEOUT));
             await make_glib(alreadyglib + rn1(11, 5) | 0);   /* 5..15 */
-            await pline($C`Eating %s food made your %s %s slippery.`, tintxts[r].txt, await fingers_or_gloves(TRUE), alreadyglib ? $C`even more` : $C`very`);
+            await pline($C`Eating %s food made your %s %s slippery.`,
+                tintxts[r].txt, await fingers_or_gloves(TRUE),
+                alreadyglib ? $C`even more` : $C`very`);
         }
     } else {
         /* spinach... */
         if (tin.cursed) {
-            await pline($C`It contains some decaying%s%s substance.`, Blind() ? $C`` : $C` `, Blind() ? $C`` : hcolor(c_color_names.c_green));
+            await pline($C`It contains some decaying%s%s substance.`,
+                Blind() ? $C`` : $C` `, Blind() ? $C`` : hcolor(c_color_names.c_green));
         } else {
             await pline($C`It contains spinach.`);
             await observe_object(tin);
@@ -1880,13 +1936,18 @@ async function consume_tin(mesg) {   // eat.c:1528
                occurs due to already being at maximum, but we won't
                get it if at-maximum and fixed-abil both apply */
             /* no gain, feel like another character from Popeye */
-            await pline($C`This makes you feel like %s!`, Hallucination() ? $C`Swee'pea` : !Fixed_abil() ? $C`Popeye` : flags.female ? $C`Olive Oyl` : $C`Bluto`);
+            await pline($C`This makes you feel like %s!`,
+                Hallucination() ? $C`Swee'pea`
+                : !Fixed_abil() ? $C`Popeye`
+                : flags.female ? $C`Olive Oyl` : $C`Bluto`);
         }
         await gainstr(tin, 0, FALSE);
         tin = ($t3 = await costly_tin(COST.OPEN), svc.context.tin.tin = $t3);
         /* blessed */
         /* uncursed */
-        nutamt = tin.blessed ? 600 : !tin.cursed ? 400 + rnd(200) | 0 : 200 + rnd(400) | 0;   /* cursed */
+        nutamt = tin.blessed ? 600
+            : !tin.cursed ? 400 + rnd(200) | 0
+            : 200 + rnd(400) | 0;   /* cursed */
         if (always_eat) {
             nutamt = nutamt + 5 | 0;   /* metallivorous hero also eats the tin itself */
         }
@@ -1906,7 +1967,9 @@ async function consume_tin(mesg) {   // eat.c:1528
 async function opentin() {   // eat.c:1703
     let $t1;
     /* perhaps it was stolen (although that should cause interruption) */
-    if (!carried(svc.context.tin.tin) && (!obj_here(svc.context.tin.tin, u.ux, u.uy) || !can_reach_floor(TRUE))) {
+    if (!carried(svc.context.tin.tin)
+        && (!obj_here(svc.context.tin.tin, u.ux, u.uy)
+        || !can_reach_floor(TRUE))) {
         return 0;   /* %% probably we should use tinoid */
     }
     if (($t1 = svc.context.tin.usedtime, svc.context.tin.usedtime = $t1 + 1 | 0, $t1) >= 50) {
@@ -1944,7 +2007,8 @@ async function start_tin(otmp) {   // eat.c:1723
                    access); 1 turn delay case is non-deterministic:  getting
                    interrupted and retrying might yield another 1 turn delay
                    or might open immediately on 2nd (or 3rd, 4th, ...) try */
-                tmp = $G.uwep && $G.uwep.blessed && $G.uwep.otyp === TIN_OPENER ? 0 : rn2(2);
+                tmp = $G.uwep && $G.uwep.blessed && $G.uwep.otyp === TIN_OPENER ? 0
+                    : rn2(2);
                 if (!tmp) {
                     mesg = $C`The tin opens like magic!`;
                 } else {
@@ -2024,7 +2088,8 @@ export async function Hear_again() {   // eat.c:1801
  */
 async function rottenfood(obj) {   // eat.c:1813
     let what = null, where = null;
-    await pline($C`Blecch!  %s %s!`, is_rottable(obj) ? $C`Rotten` : $C`Awful`, await foodword(obj));
+    await pline($C`Blecch!  %s %s!`,
+        is_rottable(obj) ? $C`Rotten` : $C`Awful`, await foodword(obj));
     if (!rn2(4)) {
         if (Hallucination()) {
             await You_feel($C`rather trippy.`);
@@ -2072,20 +2137,26 @@ async function eatcorpse(otmp) {   // eat.c:1855
     const mnum = otmp.corpsenm;
     let rotted = 0;
     let ll_conduct = 0;
-    const slimeable = mnum === PM.GREEN_SLIME && !Slimed() && !Unchanging() && !slimeproof(gy.youmonst.data) ? 1 : 0;
+    const slimeable = mnum === PM.GREEN_SLIME && !Slimed() && !Unchanging()
+        && !slimeproof(gy.youmonst.data) ? 1 : 0;
     const glob = otmp.globby ? TRUE : FALSE;
     (!(mnum >= LOW_PM && mnum < NUMMONS) ? 1 : 0) ? $c.__assert_rtn($C`eatcorpse`, $C`eat.c`, 1865, $C`ismnum(mnum)`) : 0;
-    const stoneable = flesh_petrifies($c.relem(mons, mnum)) && !Stone_resistance() && !poly_when_stoned(gy.youmonst.data) ? 1 : 0;
+    const stoneable = flesh_petrifies($c.relem(mons, mnum)) && !Stone_resistance()
+        && !poly_when_stoned(gy.youmonst.data) ? 1 : 0;
     /* KMH, conduct */
     if (!vegan($c.relem(mons, mnum))) {
         if (!($t1 = u.uconduct.unvegan, u.uconduct.unvegan = $c.add64($t1, 1), $t1)) {
-            await livelog_printf(LL.CONDUCT, $C`consumed animal products for the first time, by eating %s`, await an(await food_xname(otmp, FALSE)));
+            await livelog_printf(LL.CONDUCT,
+                $C`consumed animal products for the first time, by eating %s`,
+                await an(await food_xname(otmp, FALSE)));
             ll_conduct = ll_conduct + 1 | 0;
         }
     }
     if (!vegetarian($c.relem(mons, mnum))) {
         if (!u.uconduct.unvegetarian && !ll_conduct) {
-            await livelog_printf(LL.CONDUCT, $C`tasted meat for the first time, by eating %s`, await an(await food_xname(otmp, FALSE)));
+            await livelog_printf(LL.CONDUCT,
+                $C`tasted meat for the first time, by eating %s`,
+                await an(await food_xname(otmp, FALSE)));
         }
         await violated_vegetarian();
     }
@@ -2102,7 +2173,11 @@ async function eatcorpse(otmp) {   // eat.c:1855
     if (!glob && !stoneable && !slimeable && rotted > 5) {
         const cannibal = await maybe_cannibal(mnum, FALSE);
         /* tp++; -- early return makes this unnecessary */
-        await pline($C`Ulch - that %s was tainted%s!`, mons[mnum].mlet === S.FUNGUS ? $C`fungoid vegetation` : vegetarian($c.relem(mons, mnum)) ? $C`protoplasm` : $C`meat`, cannibal ? $C`, you cannibal` : $C``);
+        await pline($C`Ulch - that %s was tainted%s!`,
+            mons[mnum].mlet === S.FUNGUS ? $C`fungoid vegetation`
+            : vegetarian($c.relem(mons, mnum)) ? $C`protoplasm`
+            : $C`meat`,
+            cannibal ? $C`, you cannibal` : $C``);
         if (await Sick_resistance()) {
             await pline($C`It doesn't seem at all sickening, though...`);
         } else {
@@ -2111,7 +2186,8 @@ async function eatcorpse(otmp) {   // eat.c:1855
             if (Sick() && sick_time > u.uprops[SICK].intrinsic) {
                 sick_time = u.uprops[SICK].intrinsic > 1 ? $c.sub64(u.uprops[SICK].intrinsic, 1) : 1;
             }
-            await make_sick(sick_time, await corpse_xname(otmp, $C`rotted`, CXN.NORMAL), TRUE, SICK_VOMITABLE);
+            await make_sick(sick_time, await corpse_xname(otmp, $C`rotted`, CXN.NORMAL),
+                TRUE, SICK_VOMITABLE);
             await pline($C`(It must have died too long ago to be safe to eat.)`);
         }
         if (carried(otmp)) {
@@ -2123,12 +2199,15 @@ async function eatcorpse(otmp) {   // eat.c:1855
     } else if (acidic($c.relem(mons, mnum)) && !Acid_resistance()) {
         tp = tp + 1 | 0;
         await You($C`have a very bad case of stomach acid.`);   /* not body_part() */
-        await losehp(rnd(15), !glob ? $C`acidic corpse` : $C`acidic glob`, KILLED.BY_AN);   /* acid damage */
+        await losehp(rnd(15), !glob ? $C`acidic corpse` : $C`acidic glob`,
+            KILLED.BY_AN);   /* acid damage */
     } else if (poisonous($c.relem(mons, mnum)) && rn2(5)) {
         tp = tp + 1 | 0;
         await pline($C`Ecch - that must have been poisonous!`);
         if (!Poison_resistance()) {
-            await poison_strdmg(rnd(4), rnd(15), !glob ? $C`poisonous corpse` : $C`poisonous glob`, KILLED.BY_AN);
+            await poison_strdmg(rnd(4), rnd(15),
+                !glob ? $C`poisonous corpse` : $C`poisonous glob`,
+                KILLED.BY_AN);
         } else {
             await You($C`seem unaffected by the poison.`);
         }
@@ -2164,7 +2243,8 @@ async function eatcorpse(otmp) {   // eat.c:1855
         if (!retcode) {
             await consume_oeaten(otmp, 2);   /* oeaten >>= 2 */
         }
-    } else if ((mnum === PM.COCKATRICE || mnum === PM.CHICKATRICE) && (Stone_resistance() || Hallucination())) {
+    } else if ((mnum === PM.COCKATRICE || mnum === PM.CHICKATRICE)
+        && (Stone_resistance() || Hallucination())) {
         await pline($C`This tastes just like chicken!`);
     } else if (mnum === PM.FLOATING_EYE && u.umonnum === PM.RAVEN) {
         await You($C`peck the eyeball with delight.`);
@@ -2172,8 +2252,16 @@ async function eatcorpse(otmp) {   // eat.c:1855
         /* we've already delivered a message; don't add "it tastes okay" */
     } else {
         /* yummy is always False for omnivores, palatable always True */
-        const yummy = vegan($c.relem(mons, mnum)) ? !carnivorous(gy.youmonst.data) && herbivorous(gy.youmonst.data) ? 1 : 0 : carnivorous(gy.youmonst.data) && !herbivorous(gy.youmonst.data) ? 1 : 0;
-        const palatable = (vegetarian($c.relem(mons, mnum)) ? herbivorous(gy.youmonst.data) : carnivorous(gy.youmonst.data)) && rn2(10) && (rotted < 1 || !rn2($c.i32(rotted) + 1 | 0)) ? 1 : 0;
+        const yummy = vegan($c.relem(mons, mnum))
+            ? !carnivorous(gy.youmonst.data)
+            && herbivorous(gy.youmonst.data) ? 1 : 0
+            : carnivorous(gy.youmonst.data)
+            && !herbivorous(gy.youmonst.data) ? 1 : 0;
+        const palatable = (vegetarian($c.relem(mons, mnum))
+            ? herbivorous(gy.youmonst.data)
+            : carnivorous(gy.youmonst.data))
+            && rn2(10)
+            && (rotted < 1 || !rn2($c.i32(rotted) + 1 | 0)) ? 1 : 0;
         let pmxnam = await food_xname(otmp, FALSE);
         /* first char: T = tastes ... , I = is ... */
         /* veggies are always just "okay" */
@@ -2185,7 +2273,17 @@ async function eatcorpse(otmp) {   // eat.c:1855
         }
         /* tiger reference is to TV ads for "Frosted Flakes",
            breakfast cereal targeted at kids by "Tony the tiger" */
-        await pline($C`%s%s %s %s%c`, type_is_pname($c.relem(mons, mnum)) ? $C`` : the_unique_pm($c.relem(mons, mnum)) ? $C`The ` : $C`This `, pmxnam, use_is ? $C`is` : $C`tastes`, Hallucination() ? yummy ? u.umonnum === PM.TIGER ? $C`gr-r-reat` : $C`gnarly` : palatable ? $C`copacetic` : $C`grody` : yummy ? $C`delicious` : palatable ? palat_msg.add(1) : $C`terrible`, yummy || !palatable ? 33 : 46);
+        await pline($C`%s%s %s %s%c`,
+            type_is_pname($c.relem(mons, mnum))
+            ? $C`` : the_unique_pm($c.relem(mons, mnum)) ? $C`The ` : $C`This `,
+            pmxnam,
+            use_is ? $C`is` : $C`tastes`,
+            Hallucination()
+            ? yummy ? u.umonnum === PM.TIGER ? $C`gr-r-reat` : $C`gnarly`
+            : palatable ? $C`copacetic` : $C`grody`
+            : yummy ? $C`delicious` : palatable ?
+            palat_msg.add(1) : $C`terrible`,
+            yummy || !palatable ? 33 : 46);
     }
     return retcode;
 }
@@ -2264,7 +2362,8 @@ async function start_eating(otmp, already_partly_eaten) {   // eat.c:2022
     }
     if ((svc.context.victual.usedtime = svc.context.victual.usedtime + 1 | 0) >= svc.context.victual.reqtime) {
         /* print "finish eating" message if they just resumed -dlc */
-        await done_eating(svc.context.victual.reqtime > 1 || already_partly_eaten ? TRUE : FALSE);
+        await done_eating(svc.context.victual.reqtime > 1
+            || already_partly_eaten ? TRUE : FALSE);
         return;
     }
     $c.sprintf(new $c.Ptr(start_eating$msgbuf, 0), $C`eating %s`, await food_xname(otmp, TRUE));
@@ -2326,7 +2425,8 @@ async function fprefx(otmp) {   // eat.c:2099
                 /* nutrition 800 */
                 /* 200+800 remains below 1000+1, the satiation threshold */
                 if (u.uhunger <= 200) {
-                    await pline($C`%s!`, Hallucination() ? $C`Oh wow, like, superior, man` : $C`This food really hits the spot`);
+                    await pline($C`%s!`, Hallucination() ? $C`Oh wow, like, superior, man`
+                        : $C`This food really hits the spot`);
                 } else if (u.uhunger < 700) {
                     /* 700-1+800 remains below 1500, the choking threshold which
                        triggers "you're having a hard time getting it down" feedback */
@@ -2338,7 +2438,8 @@ async function fprefx(otmp) {   // eat.c:2099
                 if (carnivorous(gy.youmonst.data) && !humanoid(gy.youmonst.data)) {
                     await pline($C`This tripe ration is surprisingly good!`);
                 } else if (u.umonnum !== u.umonster ? $c.andu64(gy.youmonst.data.mflags2, M2.ORC) !== 0 : gu.urace.mnum === PM.ORC) {
-                    await pline(Hallucination() ? $C`Tastes great!  Less filling!` : $C`Mmm, tripe... not bad!`);
+                    await pline(Hallucination() ? $C`Tastes great!  Less filling!`
+                        : $C`Mmm, tripe... not bad!`);
                 } else {
                     await pline($C`Yak - dog food!`);
                     await more_experienced(1, 0);
@@ -2346,7 +2447,8 @@ async function fprefx(otmp) {   // eat.c:2099
                     /* not cannibalism, but we use similar criteria
                        for deciding whether to be sickened by this meal */
                     if (rn2(2) && !CANNIBAL_ALLOWED()) {
-                        await make_vomiting(rn2(svc.context.victual.reqtime) + 14 | 0, FALSE);
+                        await make_vomiting(rn2(svc.context.victual.reqtime) + 14 | 0,
+                            FALSE);
                     }
                 }
                 break;
@@ -2373,8 +2475,11 @@ async function fprefx(otmp) {   // eat.c:2099
             default:
             case "give_feedback":
                 /*FALLTHRU*/
-                if ($goto !== "give_feedback" && (otmp.otyp === SLIME_MOLD && !otmp.cursed && otmp.spe === svc.context.current_fruit)) {
-                    await pline($C`My, this is a %s %s!`, Hallucination() ? $C`primo` : $C`yummy`, await singular(otmp, xname));
+                if ($goto !== "give_feedback" && (otmp.otyp === SLIME_MOLD && !otmp.cursed
+                    && otmp.spe === svc.context.current_fruit)) {
+                    await pline($C`My, this is a %s %s!`,
+                        Hallucination() ? $C`primo` : $C`yummy`,
+                        await singular(otmp, xname));
                 } else if ($goto !== "give_feedback" && (otmp.otyp === APPLE && otmp.cursed && !Sleep_resistance())) {
                     /* skip core joke; feedback deferred til fpostfx() */
                     /* KMH -- Why should Unix have all the fun?
@@ -2388,11 +2493,23 @@ async function fprefx(otmp) {   // eat.c:2099
                     } else {
                         /* based on an old Usenet joke, a fake a.out manual page */
                         x = rnd(100);
-                        await pline($C`%s -- core dumped.`, x <= 75 ? $C`Segmentation fault` : x <= 99 ? $C`Bus error` : $C`Yo' mama`);
+                        await pline($C`%s -- core dumped.`,
+                            x <= 75
+                            ? $C`Segmentation fault`
+                            : x <= 99
+                            ? $C`Bus error`
+                            : $C`Yo' mama`);
                     }
                 } else {
                     $goto = null;   // give_feedback:
-                    await pline($C`This %s is %s`, await singular(otmp, xname), otmp.cursed ? Hallucination() ? $C`grody!` : $C`terrible!` : otmp.otyp === CRAM_RATION || otmp.otyp === K_RATION || otmp.otyp === C_RATION ? $C`bland.` : Hallucination() ? $C`gnarly!` : $C`delicious!`);
+                    await pline($C`This %s is %s`, await singular(otmp, xname),
+                        otmp.cursed
+                        ? Hallucination() ? $C`grody!` : $C`terrible!`
+                        : otmp.otyp === CRAM_RATION
+                        || otmp.otyp === K_RATION
+                        || otmp.otyp === C_RATION
+                        ? $C`bland.`
+                        : Hallucination() ? $C`gnarly!` : $C`delicious!`);
                 }
                 break;   /* default */
         }
@@ -2450,7 +2567,8 @@ function bounded_increase(old, inc, typ) {   // eat.c:2221
  * @returns {Promise<void>}
  */
 async function accessory_has_effect(otmp) {   // eat.c:2258
-    await pline($C`Magic spreads through your body as you digest the %s.`, otmp.oclass === RING_CLASS ? $C`ring` : $C`amulet`);
+    await pline($C`Magic spreads through your body as you digest the %s.`,
+        otmp.oclass === RING_CLASS ? $C`ring` : $C`amulet`);
 }
 /**
  * @param {$T.obj | null} otmp struct obj *
@@ -2484,16 +2602,19 @@ async function eataccessory(otmp) {   // eat.c:2265
                     case RIN_SEE_INVISIBLE:
                         await set_mimic_blocking();
                         await see_monsters();
-                        if (Invis() && !oldprop && !ESee_invisible() && !perceives(gy.youmonst.data) && !Blind()) {
+                        if (Invis() && !oldprop && !ESee_invisible()
+                            && !perceives(gy.youmonst.data) && !Blind()) {
                             await newsym(u.ux, u.uy);
                             await pline($C`Suddenly you can see yourself.`);
                             await makeknown(typ);
                         }
                         break;
                     case RIN_INVISIBILITY:
-                        if (!oldprop && !EInvis() && !BInvis() && !See_invisible() && !Blind()) {
+                        if (!oldprop && !EInvis() && !BInvis() && !See_invisible()
+                            && !Blind()) {
                             await newsym(u.ux, u.uy);
-                            await Your($C`body takes on a %s transparency...`, Hallucination() ? $C`normal` : $C`strange`);
+                            await Your($C`body takes on a %s transparency...`,
+                                Hallucination() ? $C`normal` : $C`strange`);
                             await makeknown(typ);
                         }
                         break;
@@ -2531,18 +2652,23 @@ async function eataccessory(otmp) {   // eat.c:2265
                 break;
             case RIN_INCREASE_ACCURACY:
                 await accessory_has_effect(otmp);
-                $t1 = $c.i8(bounded_increase(u.uhitinc, otmp.spe, RIN_INCREASE_ACCURACY)), u.uhitinc = $t1;
+                $t1 = $c.i8(bounded_increase(u.uhitinc, otmp.spe,
+                    RIN_INCREASE_ACCURACY)), u.uhitinc = $t1;
                 break;
             case RIN_INCREASE_DAMAGE:
                 await accessory_has_effect(otmp);
-                $t2 = $c.i8(bounded_increase(u.udaminc, otmp.spe, RIN_INCREASE_DAMAGE)), u.udaminc = $t2;
+                $t2 = $c.i8(bounded_increase(u.udaminc, otmp.spe,
+                    RIN_INCREASE_DAMAGE)), u.udaminc = $t2;
                 break;
             case RIN_PROTECTION:
             case AMULET_OF_GUARDING:
                 await accessory_has_effect(otmp);
                 u.uprops[PROTECTION].intrinsic = $c.or64(u.uprops[PROTECTION].intrinsic, FROMOUTSIDE);
                 /* fixed amount for amulet */
-                $t3 = bounded_increase(u.ublessed, typ === RIN_PROTECTION ? otmp.spe : 2, typ), u.ublessed = $t3;
+                $t3 = bounded_increase(u.ublessed,
+                    typ === RIN_PROTECTION ? otmp.spe
+                    : 2,
+                    typ), u.ublessed = $t3;
                 disp.botl = TRUE;
                 break;
             case RIN_FREE_ACTION:
@@ -2559,7 +2685,8 @@ async function eataccessory(otmp) {   // eat.c:2265
                 await accessory_has_effect(otmp);
                 await makeknown(typ);
                 await change_sex();
-                await You($C`are suddenly very %s!`, flags.female ? $C`feminine` : $C`masculine`);
+                await You($C`are suddenly very %s!`,
+                    flags.female ? $C`feminine` : $C`masculine`);
                 disp.botl = TRUE;
                 break;
             case AMULET_OF_UNCHANGING:
@@ -2627,7 +2754,8 @@ async function eatspecial() {   // eat.c:2414
             await pline($C`This junk mail is less than satisfying.`);
         } else if (otmp.otyp === SCR_SCARE_MONSTER) {   /* to eat scroll, hero is currently polymorphed into a monster */
             await pline($C`Yuck%c`, otmp.blessed ? 33 : 46);
-        } else if (otmp.oclass === SCROLL_CLASS && await objdescr_is(otmp, $C`YUM YUM`)) {
+        } else if (otmp.oclass === SCROLL_CLASS
+            && await objdescr_is(otmp, $C`YUM YUM`)) {
             /* check description after checking for specific scrolls */
             await pline($C`Yum%c`, otmp.blessed ? 33 : 46);
         } else {
@@ -2645,7 +2773,8 @@ async function eatspecial() {   // eat.c:2414
     /* KMH -- idea by "Tommy the Terrorist" */
     if (otmp.otyp === TRIDENT && !otmp.cursed) {
         /* sugarless chewing gum which used to be heavily advertised on TV */
-        await pline(Hallucination() ? $C`Four out of five dentists agree.` : $C`That was pure chewing satisfaction!`);
+        await pline(Hallucination() ? $C`Four out of five dentists agree.`
+            : $C`That was pure chewing satisfaction!`);
         await exercise(A.WIS, TRUE);
     }
     if (otmp.otyp === FLINT && !otmp.cursed) {
@@ -2681,7 +2810,8 @@ async function foodword(otmp) {   // eat.c:2498
     if (otmp.oclass === FOOD_CLASS) {
         return $C`food`;
     }
-    if (otmp.oclass === GEM_CLASS && objects[otmp.otyp].oc_material === GLASS && otmp.dknown) {
+    if (otmp.oclass === GEM_CLASS && objects[otmp.otyp].oc_material === GLASS
+        && otmp.dknown) {
         await makeknown(otmp.otyp);
     }
     return foodwords[objects[otmp.otyp].oc_material];
@@ -2700,7 +2830,8 @@ async function fpostfx(otmp) {   // eat.c:2510
             }
             break;
         case CARROT:
-            if (!u.uswallow || !attacktype_fordmg(u.ustuck.data, AT.ENGL, AD.BLND)) {
+            if (!u.uswallow
+                || !attacktype_fordmg(u.ustuck.data, AT.ENGL, AD.BLND)) {
                 await make_blinded(u.ucreamed, TRUE);
             }
             break;
@@ -2708,12 +2839,14 @@ async function fpostfx(otmp) {   // eat.c:2510
             await outrumor(bcsign(otmp), BY.COOKIE);
             if (!Blind()) {
                 if (!($t1 = u.uconduct.literate, u.uconduct.literate = $c.add64($t1, 1), $t1)) {
-                    await livelog_printf(LL.CONDUCT, $C`became literate by reading the fortune inside a cookie`);
+                    await livelog_printf(LL.CONDUCT,
+                        $C`became literate by reading the fortune inside a cookie`);
                 }
             }
             break;
         case LUMP_OF_ROYAL_JELLY:
-            if (gy.youmonst.data === mons[PM.KILLER_BEE] && !Unchanging() && await polymon(PM.QUEEN_BEE)) {
+            if (gy.youmonst.data === mons[PM.KILLER_BEE] && !Unchanging()
+                && await polymon(PM.QUEEN_BEE)) {
                 break;
             }
             /* This stuff seems to be VERY healthy! */
@@ -2746,11 +2879,15 @@ async function fpostfx(otmp) {   // eat.c:2510
             }
             break;
         case EGG:
-            if (ismnum(otmp.corpsenm) && flesh_petrifies($c.relem(mons, otmp.corpsenm))) {
-                if (!Stone_resistance() && !(poly_when_stoned(gy.youmonst.data) && await polymon(PM.STONE_GOLEM))) {
+            if (ismnum(otmp.corpsenm)
+                && flesh_petrifies($c.relem(mons, otmp.corpsenm))) {
+                if (!Stone_resistance()
+                    && !(poly_when_stoned(gy.youmonst.data)
+                    && await polymon(PM.STONE_GOLEM))) {
                     if (!Stoned()) {
                         $c.sprintf(new $c.Ptr(svk.killer.name, 0), $C`%s egg`, mons[otmp.corpsenm].pmnames[NEUTRAL]);
-                        await make_stoned(5, null, KILLED.BY_AN, new $c.Ptr(svk.killer.name, 0));
+                        await make_stoned(5, null, KILLED.BY_AN,
+                            new $c.Ptr(svk.killer.name, 0));
                     }
                 }
                 /* note: no "tastes like chicken" message for eggs */
@@ -2808,9 +2945,13 @@ async function edibility_prompts(otmp) {   // eat.c:2627
     let rotted = 0;
     $c.strcpy(new $c.Ptr(foodsmell, 0), await Tobjnam(otmp, $C`smell`));
     $c.strcpy(new $c.Ptr(it_or_they, 0), otmp.quan === 1 ? $C`it` : $C`they`);
-    if (cadaver || otmp.otyp === EGG || otmp.otyp === TIN || otmp.otyp === GLOB_OF_GREEN_SLIME) {
+    if (cadaver || otmp.otyp === EGG || otmp.otyp === TIN
+        || otmp.otyp === GLOB_OF_GREEN_SLIME) {
         /* These checks must match those in eatcorpse() */
-        stoneorslime = ismnum(mnum) && flesh_petrifies($c.relem(mons, mnum)) && !Stone_resistance() && !poly_when_stoned(gy.youmonst.data) ? 1 : 0;
+        stoneorslime = ismnum(mnum)
+            && flesh_petrifies($c.relem(mons, mnum))
+            && !Stone_resistance()
+            && !poly_when_stoned(gy.youmonst.data) ? 1 : 0;
         if (mnum === PM.GREEN_SLIME || otmp.otyp === GLOB_OF_GREEN_SLIME) {
             stoneorslime = !Unchanging() && !slimeproof(gy.youmonst.data) ? 1 : 0;
         }
@@ -2852,18 +2993,26 @@ async function edibility_prompts(otmp) {   // eat.c:2627
     } else if (otmp.otyp === APPLE && otmp.cursed && !Sleep_resistance()) {
         /* causes sleep, for long enough to be dangerous */
         nh_snprintf($C`edibility_prompts`, 2698, new $c.Ptr(buf, 0), 256, $C`%s like %s might have been poisoned.`, new $c.Ptr(foodsmell, 0), new $c.Ptr(it_or_they, 0));
-    } else if (cadaver && !vegetarian($c.relem(mons, mnum)) && !u.uconduct.unvegetarian && Role_if(PM.MONK)) {
+    } else if (cadaver && !vegetarian($c.relem(mons, mnum))
+        && !u.uconduct.unvegetarian && Role_if(PM.MONK)) {
         nh_snprintf($C`edibility_prompts`, 2701, new $c.Ptr(buf, 0), 256, $C`%s unhealthy.`, new $c.Ptr(foodsmell, 0));
     } else if (cadaver && acidic($c.relem(mons, mnum)) && !Acid_resistance()) {
         nh_snprintf($C`edibility_prompts`, 2703, new $c.Ptr(buf, 0), 256, $C`%s rather acidic.`, new $c.Ptr(foodsmell, 0));
-    } else if (Upolyd() && u.umonnum === PM.RUST_MONSTER && is_metallic(otmp) && otmp.oerodeproof) {
+    } else if (Upolyd() && u.umonnum === PM.RUST_MONSTER && is_metallic(otmp)
+        && otmp.oerodeproof) {
         nh_snprintf($C`edibility_prompts`, 2707, new $c.Ptr(buf, 0), 256, $C`%s disgusting to you right now.`, new $c.Ptr(foodsmell, 0));
         /*
          * Breaks conduct, but otherwise safe.
          */
-    } else if (!u.uconduct.unvegan && (material === LEATHER || material === BONE || material === DRAGON_HIDE || material === WAX || cadaver && !vegan($c.relem(mons, mnum)))) {
+    } else if (!u.uconduct.unvegan
+        && (material === LEATHER || material === BONE
+        || material === DRAGON_HIDE || material === WAX
+        || cadaver && !vegan($c.relem(mons, mnum)))) {
         nh_snprintf($C`edibility_prompts`, 2717, new $c.Ptr(buf, 0), 256, $C`%s foul and unfamiliar to you.`, new $c.Ptr(foodsmell, 0));
-    } else if (!u.uconduct.unvegetarian && (material === LEATHER || material === BONE || material === DRAGON_HIDE || cadaver && !vegetarian($c.relem(mons, mnum)))) {
+    } else if (!u.uconduct.unvegetarian
+        && (material === LEATHER || material === BONE
+        || material === DRAGON_HIDE
+        || cadaver && !vegetarian($c.relem(mons, mnum)))) {
         nh_snprintf($C`edibility_prompts`, 2722, new $c.Ptr(buf, 0), 256, $C`%s unfamiliar to you.`, new $c.Ptr(foodsmell, 0));
     }
     if (new $c.Ptr(buf, 0).get(0)) {
@@ -2890,7 +3039,8 @@ async function doeat_nonfood(otmp) {   // eat.c:2734
     /* Note: gold weighs 1 pt. for each 1000 pieces (see
        pickup.c) so gold and non-gold is consistent. */
     if (otmp.oclass === COIN_CLASS) {
-        basenutrit = otmp.quan > 200000 ? 2000 : $c.i32($c.div64(otmp.quan, 100));
+        basenutrit = otmp.quan > 200000 ? 2000
+            : $c.i32($c.div64(otmp.quan, 100));
     } else if (otmp.oclass === BALL_CLASS || otmp.oclass === CHAIN_CLASS) {
         basenutrit = await weight(otmp);
     } else {
@@ -2905,17 +3055,23 @@ async function doeat_nonfood(otmp) {   // eat.c:2734
     svc.context.victual.eating = 1;   /* needed for lesshungry() */
     if (!($t1 = u.uconduct.food, u.uconduct.food = $c.add64($t1, 1), $t1)) {
         ll_conduct = ll_conduct + 1 | 0;
-        await livelog_printf(LL.CONDUCT, $C`ate for the first time (%s)`, await food_xname(otmp, FALSE));
+        await livelog_printf(LL.CONDUCT, $C`ate for the first time (%s)`,
+            await food_xname(otmp, FALSE));
     }
     const material = objects[otmp.otyp].oc_material;
-    if (material === LEATHER || material === BONE || material === DRAGON_HIDE || material === WAX) {
+    if (material === LEATHER || material === BONE
+        || material === DRAGON_HIDE || material === WAX) {
         if (!($t2 = u.uconduct.unvegan, u.uconduct.unvegan = $c.add64($t2, 1), $t2) && !ll_conduct) {
-            await livelog_printf(LL.CONDUCT, $C`consumed animal products for the first time, by eating %s`, await an(await food_xname(otmp, FALSE)));
+            await livelog_printf(LL.CONDUCT,
+                $C`consumed animal products for the first time, by eating %s`,
+                await an(await food_xname(otmp, FALSE)));
             ll_conduct = ll_conduct + 1 | 0;
         }
         if (material !== WAX) {
             if (!u.uconduct.unvegetarian && !ll_conduct) {
-                await livelog_printf(LL.CONDUCT, $C`tasted meat by-products for the first time, by eating %s`, await an(await food_xname(otmp, FALSE)));
+                await livelog_printf(LL.CONDUCT,
+                    $C`tasted meat by-products for the first time, by eating %s`,
+                    await an(await food_xname(otmp, FALSE)));
             }
             await violated_vegetarian();
         }
@@ -2934,7 +3090,14 @@ async function doeat_nonfood(otmp) {   // eat.c:2734
             await You($C`seem unaffected by the poison.`);
         }
     } else if (!nodelicious) {
-        await pline($C`%s%s is delicious!`, obj_is_pname(otmp) && otmp.oartifact < ART.ORB_OF_DETECTION ? $C`` : $C`This `, otmp.oclass === COIN_CLASS ? await foodword(otmp) : await singular(otmp, xname));
+        await pline($C`%s%s is delicious!`,
+            obj_is_pname(otmp)
+            && otmp.oartifact < ART.ORB_OF_DETECTION
+            ? $C``
+            : $C`This `,
+            otmp.oclass === COIN_CLASS
+            ? await foodword(otmp)
+            : await singular(otmp, xname));
     }
     await eatspecial();
     return ECMD.TIME;
@@ -2961,7 +3124,9 @@ export async function doeat() {   // eat.c:2817
     if (u.uedibility) {
         const res = await edibility_prompts(otmp[0]);
         if (res) {
-            await Your($C`%s stops tingling and your sense of smell returns to normal.`, await body_part(NOSE));
+            await Your(
+                $C`%s stops tingling and your sense of smell returns to normal.`,
+                await body_part(NOSE));
             u.uedibility = 0;
             if (res === 1) {
                 return ECMD.OK;
@@ -2988,14 +3153,17 @@ export async function doeat() {   // eat.c:2817
     if (!is_edible(otmp[0])) {
         await You($C`cannot eat that!`);
         return ECMD.OK;
-    } else if ($c.and64(otmp[0].owornmask, W_ARMOR | W.TOOL | W.AMUL | W.SADDLE) !== 0) {
+    } else if ($c.and64(otmp[0].owornmask, W_ARMOR | W.TOOL | W.AMUL | W.SADDLE)
+        !== 0) {
         /* let them eat rings */
         await You_cant($C`eat %s you're wearing.`, c_common_strings.c_something);
         return ECMD.OK;
-    } else if (!(carried(otmp[0]) ? await retouch_object(new $c.Ptr(otmp, 0), FALSE) : await touch_artifact(otmp[0], gy.youmonst))) {
+    } else if (!(carried(otmp[0]) ? await retouch_object(new $c.Ptr(otmp, 0), FALSE)
+        : await touch_artifact(otmp[0], gy.youmonst))) {
         return ECMD.TIME;   /* got blasted so use a turn */
     }
-    if (is_metallic(otmp[0]) && u.umonnum === PM.RUST_MONSTER && otmp[0].oerodeproof) {
+    if (is_metallic(otmp[0]) && u.umonnum === PM.RUST_MONSTER
+        && otmp[0].oerodeproof) {
         otmp[0].rknown = (TRUE) & 1;
         if (otmp[0].quan > 1) {
             if (!carried(otmp[0])) {
@@ -3017,7 +3185,8 @@ export async function doeat() {   // eat.c:2817
             await set_bknown(otmp[0], 1);   /* for ring; welded() does this for weapon */
             await You($C`spit out %s.`, await the(await xname(otmp[0])));
         } else {
-            await You($C`spit %s out onto the %s.`, await the(await xname(otmp[0])), surface(u.ux, u.uy));
+            await You($C`spit %s out onto the %s.`, await the(await xname(otmp[0])),
+                surface(u.ux, u.uy));
             if (carried(otmp[0])) {
                 /* no need to check for leash in use; it's not metallic */
                 if (otmp[0].owornmask) {
@@ -3043,7 +3212,8 @@ export async function doeat() {   // eat.c:2817
         return await doeat_nonfood(otmp[0]);
     }
     if (otmp[0] === svc.context.victual.piece) {
-        const one_bite_left = (svc.context.victual.usedtime + 1 | 0) >= svc.context.victual.reqtime ? 1 : 0;
+        const one_bite_left = (svc.context.victual.usedtime + 1 | 0)
+            >= svc.context.victual.reqtime ? 1 : 0;
         /* If they weren't able to choke, they don't suddenly become able to
          * choke just because they were interrupted.  On the other hand, if
          * they were able to choke before, if they lost food it's possible
@@ -3064,7 +3234,8 @@ export async function doeat() {   // eat.c:2817
            "you finish eating" message when done; use different wording
            for resuming with one bite remaining instead of trying to
            determine whether or not "you finish" is going to be given */
-        await You($C`%s your meal.`, !one_bite_left ? $C`resume` : $C`consume the last bite of`);
+        await You($C`%s your meal.`,
+            !one_bite_left ? $C`resume` : $C`consume the last bite of`);
         if (otmp[0]) {
             await start_eating(otmp[0], FALSE);
         }
@@ -3079,7 +3250,8 @@ export async function doeat() {   // eat.c:2817
     }
     /* KMH, conduct */
     if (!($t1 = u.uconduct.food, u.uconduct.food = $c.add64($t1, 1), $t1)) {
-        await livelog_printf(LL.CONDUCT, $C`ate for the first time - %s`, await food_xname(otmp[0], FALSE));
+        await livelog_printf(LL.CONDUCT, $C`ate for the first time - %s`,
+            await food_xname(otmp[0], FALSE));
         ll_conduct = ll_conduct + 1 | 0;
     }
     const already_partly_eaten = otmp[0].oeaten ? TRUE : FALSE;
@@ -3114,12 +3286,16 @@ export async function doeat() {   // eat.c:2817
         switch (objects[otmp[0].otyp].oc_material) {
             case FLESH:
                 if (!($t2 = u.uconduct.unvegan, u.uconduct.unvegan = $c.add64($t2, 1), $t2) && !ll_conduct) {
-                    await livelog_printf(LL.CONDUCT, $C`consumed animal products for the first time, by eating %s`, await an(await food_xname(otmp[0], FALSE)));
+                    await livelog_printf(LL.CONDUCT,
+                        $C`consumed animal products for the first time, by eating %s`,
+                        await an(await food_xname(otmp[0], FALSE)));
                     ll_conduct = ll_conduct + 1 | 0;
                 }
                 if (otmp[0].otyp !== EGG) {
                     if (!u.uconduct.unvegetarian && !ll_conduct) {
-                        await livelog_printf(LL.CONDUCT, $C`tasted meat for the first time, by eating %s`, await an(await food_xname(otmp[0], FALSE)));
+                        await livelog_printf(LL.CONDUCT,
+                            $C`tasted meat for the first time, by eating %s`,
+                            await an(await food_xname(otmp[0], FALSE)));
                     }
                     await violated_vegetarian();
                 }
@@ -3127,15 +3303,23 @@ export async function doeat() {   // eat.c:2817
             default:
                 /*eggs*/
                 /*milk*/
-                if (otmp[0].otyp === PANCAKE || otmp[0].otyp === FORTUNE_COOKIE || otmp[0].otyp === CREAM_PIE || otmp[0].otyp === CANDY_BAR || otmp[0].otyp === LUMP_OF_ROYAL_JELLY) {
+                if (otmp[0].otyp === PANCAKE || otmp[0].otyp === FORTUNE_COOKIE
+                    || otmp[0].otyp === CREAM_PIE || otmp[0].otyp === CANDY_BAR
+                    || otmp[0].otyp === LUMP_OF_ROYAL_JELLY) {
                     if (!($t3 = u.uconduct.unvegan, u.uconduct.unvegan = $c.add64($t3, 1), $t3) && !ll_conduct) {
-                        await livelog_printf(LL.CONDUCT, $C`consumed animal products (%s) for the first time`, await food_xname(otmp[0], FALSE));
+                        await livelog_printf(LL.CONDUCT,
+                            $C`consumed animal products (%s) for the first time`,
+                            await food_xname(otmp[0], FALSE));
                     }
                 }
                 break;
         }
         svc.context.victual.reqtime = objects[otmp[0].otyp].oc_delay;
-        if (otmp[0].otyp !== FORTUNE_COOKIE && (otmp[0].cursed || !nonrotting_food(otmp[0].otyp) && $c.sub64(svm.moves, otmp[0].age) > (otmp[0].blessed ? 50 : 30) && (otmp[0].oeroded || !rn2(7)))) {
+        if (otmp[0].otyp !== FORTUNE_COOKIE
+            && (otmp[0].cursed || !nonrotting_food(otmp[0].otyp)
+            && $c.sub64(svm.moves, otmp[0].age)
+            > (otmp[0].blessed ? 50 : 30)
+            && (otmp[0].oeroded || !rn2(7)))) {
             if (await rottenfood(otmp[0])) {
                 otmp[0].oeroded = (TRUE) & 3;
                 dont_start = TRUE;
@@ -3147,7 +3331,9 @@ export async function doeat() {   // eat.c:2817
                 return ECMD.TIME;
             }
         } else {
-            await You($C`%s %s.`, svc.context.victual.reqtime === 1 ? $C`eat` : $C`begin eating`, await doname(otmp[0]));
+            await You($C`%s %s.`,
+                svc.context.victual.reqtime === 1 ? $C`eat` : $C`begin eating`,
+                await doname(otmp[0]));
         }
     }
     /* re-calc the nutrition */
@@ -3159,7 +3345,9 @@ export async function doeat() {   // eat.c:2817
             iflags.last_msg = save_plnmsg;
         }
     } while (0);
-    $t4 = basenutrit === 0 ? 0 : await rounddiv($c.mul64(svc.context.victual.reqtime, otmp[0].oeaten), basenutrit), svc.context.victual.reqtime = $t4;
+    $t4 = basenutrit === 0 ? 0
+        : await rounddiv($c.mul64(svc.context.victual.reqtime, otmp[0].oeaten),
+        basenutrit), svc.context.victual.reqtime = $t4;
     do {
         if (debugcore($C`eat.c`, TRUE)) {
             const save_plnmsg$2 = iflags.last_msg;
@@ -3212,7 +3400,8 @@ export async function use_tin_opener(obj) {   // eat.c:3098
     }
     if (obj !== $G.uwep) {
         if (obj.cursed && obj.bknown) {
-            if (await yn_function(await safe_qbuf(new $c.Ptr(qbuf, 0), $C`Really wield `, $C`?`, obj, doname, thesimpleoname, $C`that`), new $c.Ptr(ynqchars, 0), 113, TRUE) !== 121) {
+            if (await yn_function(await safe_qbuf(new $c.Ptr(qbuf, 0), $C`Really wield `, $C`?`, obj, doname, thesimpleoname, $C`that`), new $c.Ptr(ynqchars, 0), 113, TRUE)
+                !== 121) {
                 return ECMD.OK;
             }
         }
@@ -3249,8 +3438,10 @@ async function bite() {   // eat.c:3133
     if (svc.context.victual.nmod < 0) {
         /*-svc.context.victual.nmod*/
         await lesshungry(adj_victual_nutrition());
-        await consume_oeaten(svc.context.victual.piece, svc.context.victual.nmod);   /* -= -nmod */
-    } else if (svc.context.victual.nmod > 0 && $c.rem32(svc.context.victual.usedtime, svc.context.victual.nmod)) {
+        await consume_oeaten(svc.context.victual.piece,
+            svc.context.victual.nmod);   /* -= -nmod */
+    } else if (svc.context.victual.nmod > 0
+        && $c.rem32(svc.context.victual.usedtime, svc.context.victual.nmod)) {
         await lesshungry(1);
         await consume_oeaten(svc.context.victual.piece, -1);   /* -= 1 */
     }
@@ -3271,7 +3462,11 @@ export async function gethungry() {   // eat.c:3163
        will need to wear an Amulet of Unchanging so still burn a small
        amount of nutrition in the 'moves % 20' ring/amulet check below */
     /* slow metabolic rate while asleep */
-    if ((!Unaware() || !rn2(10)) && (carnivorous(gy.youmonst.data) || herbivorous(gy.youmonst.data) || metallivorous(gy.youmonst.data)) && !Slow_digestion()) {
+    if ((!Unaware() || !rn2(10))
+        && (carnivorous(gy.youmonst.data)
+        || herbivorous(gy.youmonst.data)
+        || metallivorous(gy.youmonst.data))
+        && !Slow_digestion()) {
         u.uhunger = u.uhunger - 1 | 0;   /* ordinary food consumption */
     }
     /*
@@ -3288,7 +3483,8 @@ export async function gethungry() {   // eat.c:3163
     if ($c.rem32(accessorytime, 2)) {
         /* odd */
         /* Regeneration uses up food, unless due to an artifact */
-        if ($c.and64(u.uprops[REGENERATION].intrinsic, ~FROMFORM) || $c.and64(u.uprops[REGENERATION].extrinsic, ~(W.ARTI | W.WEP))) {
+        if ($c.and64(u.uprops[REGENERATION].intrinsic, ~FROMFORM)
+            || $c.and64(u.uprops[REGENERATION].extrinsic, ~(W.ARTI | W.WEP))) {
             u.uhunger = u.uhunger - 1 | 0;
         }
         if (near_capacity() > SLT_ENCUMBER) {
@@ -3331,7 +3527,9 @@ export async function gethungry() {   // eat.c:3163
                    turns; because of that, wearing two (non-slow digestion)
                    rings plus the armor consumes more nutrition that one
                    non-slow digestion ring plus ring of slow digestion */
-                if (Slow_digestion() && (!$G.uright || $G.uright.otyp !== RIN_SLOW_DIGESTION) && (!$G.uleft || $G.uleft.otyp !== RIN_SLOW_DIGESTION)) {
+                if (Slow_digestion()
+                    && (!$G.uright || $G.uright.otyp !== RIN_SLOW_DIGESTION)
+                    && (!$G.uleft || $G.uleft.otyp !== RIN_SLOW_DIGESTION)) {
                     u.uhunger = u.uhunger - 1 | 0;
                 }
                 break;
@@ -3344,7 +3542,14 @@ export async function gethungry() {   // eat.c:3163
                    treated as supplying "MC" when only one matters;
                    note: amulet of guarding overrides both +0 rings and
                    is caught by the (EProtection & ~W_RINGx) == 0L tests */
-                if ($G.uleft && $G.uleft.otyp !== MEAT_RING && ($G.uleft.spe || !objects[$G.uleft.otyp].oc_charged || $G.uleft.otyp === RIN_PROTECTION && ($c.and64(u.uprops[PROTECTION].extrinsic, ~W.RINGL) === 0 || $c.and64(u.uprops[PROTECTION].extrinsic, ~W.RINGL) === W.RINGR && $G.uright && $G.uright.otyp === RIN_PROTECTION && !$G.uright.spe))) {
+                if ($G.uleft && $G.uleft.otyp !== MEAT_RING
+                    && ($G.uleft.spe
+                    || !objects[$G.uleft.otyp].oc_charged
+                    || $G.uleft.otyp === RIN_PROTECTION
+                    && ($c.and64(u.uprops[PROTECTION].extrinsic, ~W.RINGL) === 0
+                    || $c.and64(u.uprops[PROTECTION].extrinsic, ~W.RINGL) === W.RINGR
+                    && $G.uright && $G.uright.otyp === RIN_PROTECTION
+                    && !$G.uright.spe))) {
                     u.uhunger = u.uhunger - 1 | 0;
                 }
                 break;
@@ -3354,7 +3559,11 @@ export async function gethungry() {   // eat.c:3163
                 }
                 break;
             case 12:
-                if ($G.uright && $G.uright.otyp !== MEAT_RING && ($G.uright.spe || !objects[$G.uright.otyp].oc_charged || $G.uright.otyp === RIN_PROTECTION && $c.and64(u.uprops[PROTECTION].extrinsic, ~W.RINGR) === 0)) {
+                if ($G.uright && $G.uright.otyp !== MEAT_RING
+                    && ($G.uright.spe
+                    || !objects[$G.uright.otyp].oc_charged
+                    || $G.uright.otyp === RIN_PROTECTION
+                    && $c.and64(u.uprops[PROTECTION].extrinsic, ~W.RINGR) === 0)) {
                     u.uhunger = u.uhunger - 1 | 0;
                 }
                 break;
@@ -3408,14 +3617,18 @@ export async function lesshungry(num) {   // eat.c:3289
         /* Have lesshungry() report when you're nearly full so all eating
          * warns when you're about to choke.
          */
-        if (u.uhunger >= 1500 && !Hunger() && (!svc.context.victual.eating || svc.context.victual.eating && !svc.context.victual.fullwarn)) {
+        if (u.uhunger >= 1500 && !Hunger()
+            && (!svc.context.victual.eating
+            || svc.context.victual.eating
+            && !svc.context.victual.fullwarn)) {
             await pline($C`You're having a hard time getting all of it down.`);
             gn.nomovemsg = $C`You're finally finished.`;
             if (!svc.context.victual.eating) {
                 gm.multi = -2;
             } else {
                 svc.context.victual.fullwarn = 1;
-                if (svc.context.victual.canchoke && (svc.context.victual.reqtime - svc.context.victual.usedtime | 0) > 1) {
+                if (svc.context.victual.canchoke
+                    && (svc.context.victual.reqtime - svc.context.victual.usedtime | 0) > 1) {
                     /* food with one bite left will not survive a stop */
                     if (!await paranoid_query(ParanoidEating(), $C`Continue eating?`)) {
                         await reset_eat();
@@ -3461,7 +3674,10 @@ export async function reset_faint() {   // eat.c:3354
  */
 export async function newuhs(incr) {   // eat.c:3362
     const h = u.uhunger;
-    let newhs = h > 1000 ? SATIATED : h > 150 ? NOT_HUNGRY : h > 50 ? HUNGRY : h > 0 ? WEAK : FAINTING;
+    let newhs = h > 1000
+        ? SATIATED
+        : h > 150 ? NOT_HUNGRY
+        : h > 50 ? HUNGRY : h > 0 ? WEAK : FAINTING;
     /* While you're eating, you may pass from WEAK to HUNGRY to NOT_HUNGRY.
      * This should not produce the message "you only feel hungry now";
      * that message should only appear if HUNGRY is an endpoint.  Therefore
@@ -3556,24 +3772,36 @@ export async function newuhs(incr) {   // eat.c:3362
         switch (newhs) {
             case HUNGRY:
                 if (Hallucination()) {
-                    await You(!incr ? $C`now have a lesser case of the munchies.` : $C`are getting the munchies.`);
+                    await You(!incr ? $C`now have a lesser case of the munchies.`
+                        : $C`are getting the munchies.`);
                 } else {
-                    await You($C`%s.`, !incr ? $C`only feel hungry now` : u.uhunger < 145 ? $C`feel hungry` : $C`are beginning to feel hungry`);
+                    await You($C`%s.`, !incr ? $C`only feel hungry now`
+                        : u.uhunger < 145 ? $C`feel hungry`
+                        : $C`are beginning to feel hungry`);
                 }
-                if (incr && go.occupation && (go.occupation !== eatfood && go.occupation !== opentin)) {
+                if (incr && go.occupation
+                    && (go.occupation !== eatfood && go.occupation !== opentin)) {
                     await stop_occupation();
                 }
                 end_running(TRUE);
                 break;
             case WEAK:
                 if (Hallucination()) {
-                    await pline(!incr ? $C`You still have the munchies.` : $C`The munchies are interfering with your motor capabilities.`);
-                } else if (incr && (Role_if(PM.WIZARD) || Race_if(PM.ELF) || Role_if(PM.VALKYRIE))) {
-                    await pline($C`%s needs food, badly!`, Role_if(PM.WIZARD) || Role_if(PM.VALKYRIE) ? gu.urole.name.m : $C`Elf`);
+                    await pline(!incr ? $C`You still have the munchies.`
+                        : $C`The munchies are interfering with your motor capabilities.`);
+                } else if (incr && (Role_if(PM.WIZARD) || Race_if(PM.ELF)
+                    || Role_if(PM.VALKYRIE))) {
+                    await pline($C`%s needs food, badly!`,
+                        Role_if(PM.WIZARD) || Role_if(PM.VALKYRIE)
+                        ? gu.urole.name.m
+                        : $C`Elf`);
                 } else {
-                    await You($C`%s weak.`, !incr ? $C`are still` : u.uhunger < 45 ? $C`feel` : $C`are beginning to feel`);
+                    await You($C`%s weak.`, !incr ? $C`are still`
+                        : u.uhunger < 45 ? $C`feel`
+                        : $C`are beginning to feel`);
                 }
-                if (incr && go.occupation && (go.occupation !== eatfood && go.occupation !== opentin)) {
+                if (incr && go.occupation
+                    && (go.occupation !== eatfood && go.occupation !== opentin)) {
                     await stop_occupation();
                 }
                 end_running(TRUE);
@@ -3626,7 +3854,8 @@ function offer_ok(obj) {   // eat.c:3539
     if (obj.oclass !== FOOD_CLASS && obj.oclass !== AMULET_CLASS) {
         return GETOBJ.EXCLUDE;
     }
-    if (obj.otyp !== CORPSE && obj.otyp !== AMULET_OF_YENDOR && obj.otyp !== FAKE_AMULET_OF_YENDOR) {
+    if (obj.otyp !== CORPSE && obj.otyp !== AMULET_OF_YENDOR
+        && obj.otyp !== FAKE_AMULET_OF_YENDOR) {
         return GETOBJ.EXCLUDE_SELECTABLE;
     }
     /* suppress corpses on astral, amulets elsewhere
@@ -3676,7 +3905,10 @@ export async function floorfood(verb, corpsecheck) {   // eat.c:3579
          * any suitable items */
         /* if we can't touch floor objects then use invent food only;
            same when 'm' prefix is used--for #eat, it means "skip floor food" */
-        if (iflags.menu_requested || !can_reach_floor(TRUE) || feeding && u.usteed || is_pool_or_lava(u.ux, u.uy) && (Wwalking() || is_clinger(uptr) || Flying() && !Breathless())) {
+        if (iflags.menu_requested
+            || !can_reach_floor(TRUE) || feeding && u.usteed
+            || is_pool_or_lava(u.ux, u.uy)
+            && (Wwalking() || is_clinger(uptr) || Flying() && !Breathless())) {
             break skipfloor$;
         }
         if (feeding && metallivorous(uptr)) {
@@ -3711,7 +3943,8 @@ export async function floorfood(verb, corpsecheck) {   // eat.c:3579
                 c = 110;
                 $c.strcpy(new $c.Ptr(qbuf, 0), $C`There are iron bars here`);
                 if (nodig || u.uhunger > 1500) {
-                    await pline($C`%s but you %s eat them.`, new $c.Ptr(qbuf, 0), nodig ? $C`cannot` : $C`are too full to`);
+                    await pline($C`%s but you %s eat them.`, new $c.Ptr(qbuf, 0),
+                        nodig ? $C`cannot` : $C`are too full to`);
                 } else {
                     $c.strcat(new $c.Ptr(qbuf, 0), !svc.context.digging.chew || !(svc.context.digging.pos.x === u.ux && svc.context.digging.pos.y === u.uy) || !on_level(svc.context.digging.level, u.uz) ? $C`; eat them?` : $C`; resume eating them?`);
                     c = await yn_function(new $c.Ptr(qbuf, 0), new $c.Ptr(ynqchars, 0), 110, TRUE);
@@ -3723,7 +3956,8 @@ export async function floorfood(verb, corpsecheck) {   // eat.c:3579
                 }
                 getobj_else = getobj_else + 1 | 0;
             }
-            if (uptr !== mons[PM.RUST_MONSTER] && (gold = g_at(u.ux, u.uy)) !== null) {
+            if (uptr !== mons[PM.RUST_MONSTER]
+                && (gold = g_at(u.ux, u.uy)) !== null) {
                 if (gold.quan === 1) {
                     $c.sprintf(new $c.Ptr(qbuf, 0), $C`There is 1 gold piece here; eat it?`);
                 } else {
@@ -3739,7 +3973,11 @@ export async function floorfood(verb, corpsecheck) {   // eat.c:3579
         }
         /* Is there some food (probably a heavy corpse) here on the ground? */
         for (otmp = svl.level.objects[u.ux][u.uy]; otmp; otmp = otmp.v.v_nexthere) {
-            if (corpsecheck ? otmp.otyp === CORPSE && (corpsecheck === 1 || tinnable(otmp)) : feeding ? otmp.oclass !== COIN_CLASS && is_edible(otmp) : otmp.oclass === FOOD_CLASS) {
+            if (corpsecheck
+                ? otmp.otyp === CORPSE
+                && (corpsecheck === 1 || tinnable(otmp))
+                : feeding ? otmp.oclass !== COIN_CLASS && is_edible(otmp)
+                : otmp.oclass === FOOD_CLASS) {
                 one = otmp.quan === 1 ? 1 : 0;
                 /* if blind and without gloves, attempting to eat (or tin or
                    offer) a cockatrice corpse is fatal before asking whether
@@ -3755,7 +3993,8 @@ export async function floorfood(verb, corpsecheck) {   // eat.c:3579
                    "There are <N objects> here; <verb> one?" */
                 $c.sprintf(new $c.Ptr(qbuf, 0), $C`There %s `, await otense(otmp, $C`are`));
                 $c.sprintf(new $c.Ptr(qsfx, 0), $C` here; %s %s?`, verb, one ? $C`it` : $C`one`);
-                await safe_qbuf(new $c.Ptr(qbuf, 0), new $c.Ptr(qbuf, 0), new $c.Ptr(qsfx, 0), otmp, doname, ansimpleoname, one ? c_common_strings.c_something : $C`things`);
+                await safe_qbuf(new $c.Ptr(qbuf, 0), new $c.Ptr(qbuf, 0), new $c.Ptr(qsfx, 0), otmp, doname, ansimpleoname,
+                    one ? c_common_strings.c_something : $C`things`);
                 if ((c = await yn_function(new $c.Ptr(qbuf, 0), new $c.Ptr(ynqchars, 0), 110, TRUE)) === 121) {
                     return otmp;
                 } else if (c === 113) {
@@ -3836,7 +4075,8 @@ export async function vomit() {   // eat.c:3736
         if (acidic(gy.youmonst.data)) {
             /* TODO: if there's a web here, destroy that too (before ice) */
             if (is_ice(u.ux, u.uy)) {
-                await melt_ice(u.ux, u.uy, $C`Your stomach acid melts straight through the ice!`);
+                await melt_ice(u.ux, u.uy,
+                    $C`Your stomach acid melts straight through the ice!`);
             }
         }
     }
@@ -3851,7 +4091,9 @@ export async function eaten_stat(base, obj) {   // eat.c:3788
     const full_amount = obj_nutrition(obj);
     let uneaten_amt = obj.oeaten;
     if (uneaten_amt > full_amount) {
-        await impossible($C`partly eaten food (%ld) more nutritious than untouched food (%ld)`, uneaten_amt, full_amount);
+        await impossible(
+            $C`partly eaten food (%ld) more nutritious than untouched food (%ld)`,
+            uneaten_amt, full_amount);
         uneaten_amt = full_amount;
     }
     base = $c.i32(full_amount ? $c.div64($c.mul64(base, uneaten_amt), full_amount) : 0);
@@ -3873,7 +4115,9 @@ export async function consume_oeaten(obj, amt) {   // eat.c:3808
         } else {
             $c.sprintf(new $c.Ptr(itembuf, 0), $C`%d`, otyp);
         }
-        await impossible($C`oeaten: attempting to set 0 nutrition food (%s) partially eaten`, new $c.Ptr(itembuf, 0));
+        await impossible(
+            $C`oeaten: attempting to set 0 nutrition food (%s) partially eaten`,
+            new $c.Ptr(itembuf, 0));
         return;
     }
     /*
@@ -3929,7 +4173,8 @@ export async function consume_oeaten(obj, amt) {   // eat.c:3808
  */
 export async function maybe_finished_meal(stopping) {   // eat.c:3877
     /* in case consume_oeaten() has decided that the food is all gone */
-    if (go.occupation === eatfood && svc.context.victual.usedtime >= svc.context.victual.reqtime) {
+    if (go.occupation === eatfood
+        && svc.context.victual.usedtime >= svc.context.victual.reqtime) {
         if (stopping) {
             go.occupation = null;   /* for do_reset_eat */
         }
@@ -3978,7 +4223,8 @@ export function Popeye(threat) {   // eat.c:3920
     }
     const otin = svc.context.tin.tin;
     /* make sure hero still has access to tin */
-    if (!carried(otin) && (!obj_here(otin, u.ux, u.uy) || !can_reach_floor(TRUE))) {
+    if (!carried(otin)
+        && (!obj_here(otin, u.ux, u.uy) || !can_reach_floor(TRUE))) {
         return FALSE;
     }
     /* unknown tin is assumed to be helpful */
@@ -3993,7 +4239,8 @@ export function Popeye(threat) {   // eat.c:3920
             return mndx !== NON_PM || otin.spe === 1 ? 1 : 0;
         case STONED:
             /* flesh from lizards and acidic critters stops petrification */
-            return ismnum(mndx) && (mndx === PM.LIZARD || acidic($c.relem(mons, mndx))) ? 1 : 0;
+            return ismnum(mndx)
+                && (mndx === PM.LIZARD || acidic($c.relem(mons, mndx))) ? 1 : 0;
         case SLIMED:
             /* polymorph into a fiery monster */
             return polyfood(otin);

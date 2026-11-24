@@ -184,14 +184,17 @@ async function mkveggy_at(sx, sy) {   // shknam.c:443
 async function mkshobj_at(shp, sx, sy, mkspecl) {   // shknam.c:454
     let mtmp = null, ptr = null;
     /* 3.6 tribute */
-    if (mkspecl && (!$c.strcmp(shp.name, $C`rare books`) || !$c.strcmp(shp.name, $C`second-hand bookstore`))) {
+    if (mkspecl && (!$c.strcmp(shp.name, $C`rare books`)
+        || !$c.strcmp(shp.name, $C`second-hand bookstore`))) {
         const novel = await mksobj_at(SPE_NOVEL, $c.i16(sx), $c.i16(sy), FALSE, FALSE);
         if (novel) {
             svc.context.tribute.bookstock = (TRUE) & 1;
         }
         return;
     }
-    if (rn2(100) < depth(u.uz) && !MON_AT(sx, sy) && (ptr = await mkclass(S.MIMIC, 0)) !== null && (mtmp = await makemon(ptr, $c.i16(sx), $c.i16(sy), NO.MM_FLAGS)) !== null) {
+    if (rn2(100) < depth(u.uz) && !MON_AT(sx, sy)
+        && (ptr = await mkclass(S.MIMIC, 0)) !== null
+        && (mtmp = await makemon(ptr, $c.i16(sx), $c.i16(sy), NO.MM_FLAGS)) !== null) {
         /* nothing */
     } else {
         const atype = get_shop_item($c.i32($c.rdiff(shp, shtypes[0])));
@@ -213,7 +216,8 @@ function nameshk(shk, nlp) {   // shknam.c:487
     let i = 0, trycnt = 0, names_avail = 0, mtmp = null, sptr = null;
     let shname = null;
     let name_wanted = shk.m_id | 0;
-    if ($c.peq(nlp, new $c.Ptr(shklight, 0)) && In_mines(u.uz) && (sptr = Is_special(u.uz)) !== null && sptr.flags.town) {
+    if ($c.peq(nlp, new $c.Ptr(shklight, 0)) && In_mines(u.uz)
+        && (sptr = Is_special(u.uz)) !== null && sptr.flags.town) {
         /* special-case minetown lighting shk */
         shname = $C`+Izchak`;
         shk.female = (FALSE) & 1;
@@ -319,13 +323,17 @@ function good_shopdoor(sroom, sx, sy) {   // shknam.c:582
         /* check that the shopkeeper placement is sane */
         if (sroom.irregular) {
             const rmno = $c.i32($c.add64($c.rdiff(sroom, svr.rooms[0]), ROOMOFFSET));
-            if (isok($c.i16(sx.get(0) - 1), sy.get(0)) && !svl.level.locations[sx.get(0) - 1][sy.get(0)].edge && svl.level.locations[sx.get(0) - 1][sy.get(0)].roomno === rmno) {
+            if (isok($c.i16(sx.get(0) - 1), sy.get(0)) && !svl.level.locations[sx.get(0) - 1][sy.get(0)].edge
+                && svl.level.locations[sx.get(0) - 1][sy.get(0)].roomno === rmno) {
                 sx.set(0, $c.i16(sx.get(0) - 1));
-            } else if (isok($c.i16(sx.get(0) + 1), sy.get(0)) && !svl.level.locations[sx.get(0) + 1][sy.get(0)].edge && svl.level.locations[sx.get(0) + 1][sy.get(0)].roomno === rmno) {
+            } else if (isok($c.i16(sx.get(0) + 1), sy.get(0)) && !svl.level.locations[sx.get(0) + 1][sy.get(0)].edge
+                && svl.level.locations[sx.get(0) + 1][sy.get(0)].roomno === rmno) {
                 sx.set(0, $c.i16(sx.get(0) + 1));
-            } else if (isok(sx.get(0), $c.i16(sy.get(0) - 1)) && !svl.level.locations[sx.get(0)][sy.get(0) - 1].edge && svl.level.locations[sx.get(0)][sy.get(0) - 1].roomno === rmno) {
+            } else if (isok(sx.get(0), $c.i16(sy.get(0) - 1)) && !svl.level.locations[sx.get(0)][sy.get(0) - 1].edge
+                && svl.level.locations[sx.get(0)][sy.get(0) - 1].roomno === rmno) {
                 sy.set(0, $c.i16(sy.get(0) - 1));
-            } else if (isok(sx.get(0), $c.i16(sy.get(0) + 1)) && !svl.level.locations[sx.get(0)][sy.get(0) + 1].edge && svl.level.locations[sx.get(0)][sy.get(0) + 1].roomno === rmno) {
+            } else if (isok(sx.get(0), $c.i16(sy.get(0) + 1)) && !svl.level.locations[sx.get(0)][sy.get(0) + 1].edge
+                && svl.level.locations[sx.get(0)][sy.get(0) + 1].roomno === rmno) {
                 sy.set(0, $c.i16(sy.get(0) + 1));
             } else {
                 continue;
@@ -361,8 +369,10 @@ async function shkinit(shp, sroom) {   // shknam.c:628
         if (wizard()) {
             let j = sroom.doorct;
             await impossible($C`Where is shopdoor?`);
-            await pline($C`Room at (%d,%d),(%d,%d).`, sroom.lx, sroom.ly, sroom.hx, sroom.hy);
-            await pline($C`doormax=%d doorct=%d fdoor=%d`, gd.doorindex, sroom.doorct, sh);
+            await pline($C`Room at (%d,%d),(%d,%d).`, sroom.lx, sroom.ly, sroom.hx,
+                sroom.hy);
+            await pline($C`doormax=%d doorct=%d fdoor=%d`, gd.doorindex, sroom.doorct,
+                sh);
             while ($t1 = j, j = $t1 - 1 | 0, $t1) {
                 await pline($C`door [%d,%d]`, $c.radd(svd.doors, sh).x, $c.radd(svd.doors, sh).y);
                 sh = sh + 1 | 0;
@@ -399,7 +409,9 @@ async function shkinit(shp, sroom) {   // shknam.c:628
     if ($c.peq(shp.shknms, new $c.Ptr(shkrings, 0))) {
         await mongets(shk, TOUCHSTONE);
     }
-    if ($c.peq(shp.shknms, new $c.Ptr(shktools, 0)) || $c.peq(shp.shknms, new $c.Ptr(shkwands, 0)) || $c.peq(shp.shknms, new $c.Ptr(shkrings, 0)) && rn2(2) || $c.peq(shp.shknms, new $c.Ptr(shkgeneral, 0)) && rn2(5)) {
+    if ($c.peq(shp.shknms, new $c.Ptr(shktools, 0)) || $c.peq(shp.shknms, new $c.Ptr(shkwands, 0)) ||
+        $c.peq(shp.shknms, new $c.Ptr(shkrings, 0)) && rn2(2) ||
+        $c.peq(shp.shknms, new $c.Ptr(shkgeneral, 0)) && rn2(5)) {
         await mongets(shk, SCR_CHARGING);
     }
     nameshk(shk, shp.shknms);
@@ -415,10 +427,15 @@ async function shkinit(shp, sroom) {   // shknam.c:628
  */
 function stock_room_goodpos(sroom, rmno, sh, sx, sy) {   // shknam.c:695
     if (sroom.irregular) {
-        if (svl.level.locations[sx][sy].edge || svl.level.locations[sx][sy].roomno !== rmno || distmin($c.i16(sx), $c.i16(sy), $c.radd(svd.doors, sh).x, $c.radd(svd.doors, sh).y) <= 1) {
+        if (svl.level.locations[sx][sy].edge
+            || svl.level.locations[sx][sy].roomno !== rmno
+            || distmin($c.i16(sx), $c.i16(sy), $c.radd(svd.doors, sh).x, $c.radd(svd.doors, sh).y) <= 1) {
             return FALSE;
         }
-    } else if (sx === sroom.lx && $c.radd(svd.doors, sh).x === (sx - 1 | 0) || sx === sroom.hx && $c.radd(svd.doors, sh).x === (sx + 1 | 0) || sy === sroom.ly && $c.radd(svd.doors, sh).y === (sy - 1 | 0) || sy === sroom.hy && $c.radd(svd.doors, sh).y === (sy + 1 | 0)) {
+    } else if (sx === sroom.lx && $c.radd(svd.doors, sh).x === (sx - 1 | 0)
+        || sx === sroom.hx && $c.radd(svd.doors, sh).x === (sx + 1 | 0)
+        || sy === sroom.ly && $c.radd(svd.doors, sh).y === (sy - 1 | 0)
+        || sy === sroom.hy && $c.radd(svd.doors, sh).y === (sy + 1 | 0)) {
         return FALSE;
     }
     /* only generate items on solid floor squares */
@@ -479,7 +496,8 @@ export async function stock_room(shp_indx, sroom) {   // shknam.c:718
         $c.sprintf(new $c.Ptr(buf, 0), $C`Closed for inventory`);
         await make_engr_at($c.i16(m), $c.i16(n), new $c.Ptr(buf, 0), null, 0, DUST);
         if (svl.level.locations[m][n].typ !== CORR && svl.level.locations[m][n].typ !== ROOM) {
-            $t1 = Is_special(u.uz) || in_rooms($c.i16(m), $c.i16(n), 0).get(0) ? ROOM : CORR, svl.level.locations[m][n].typ = $t1;
+            $t1 = Is_special(u.uz)
+                || in_rooms($c.i16(m), $c.i16(n), 0).get(0) ? ROOM : CORR, svl.level.locations[m][n].typ = $t1;
         }
     }
     if (svc.context.tribute.enabled && !svc.context.tribute.bookstock) {
@@ -501,7 +519,8 @@ export async function stock_room(shp_indx, sroom) {   // shknam.c:718
         for (sy = sroom.ly; sy <= sroom.hy; sy = sy + 1 | 0) {
             if (stock_room_goodpos(sroom, rmno, sh, sx, sy)) {
                 stockcount = stockcount + 1 | 0;
-                await mkshobj_at(shp, sx, sy, stockcount && stockcount === specialspot ? 1 : 0);
+                await mkshobj_at(shp, sx, sy,
+                    stockcount && stockcount === specialspot ? 1 : 0);
             }
         }
     }
@@ -535,7 +554,9 @@ export function saleable(shkp, obj) {   // shknam.c:805
             if (veggy_item(obj, 0)) {
                 return TRUE;
             }
-        } else if (shp.iprobs[i].itype < 0 ? shp.iprobs[i].itype === (-obj.otyp | 0) : shp.iprobs[i].itype === obj.oclass) {
+        } else if (shp.iprobs[i].itype < 0
+            ? shp.iprobs[i].itype === (-obj.otyp | 0)
+            : shp.iprobs[i].itype === obj.oclass) {
             return TRUE;
         }
     }

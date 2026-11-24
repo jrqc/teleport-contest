@@ -156,11 +156,13 @@ export async function adjattrib(ndx, incr, msgflg) {   // attrib.c:117
     if (ACURR(ndx) === old_acurr) {
         if (msgflg === 0 && flags.verbose) {
             if (u.acurr.a[ndx] === old_abase && u.amax.a[ndx] === old_amax) {
-                await pline($C`You're %s as %s as you can get.`, abonflg ? $C`currently` : $C`already`, attrstr);
+                await pline($C`You're %s as %s as you can get.`,
+                    abonflg ? $C`currently` : $C`already`, attrstr);
             } else {
                 /* current stayed the same but base value changed, or
                    base is at minimum and reduction caused max to drop */
-                await Your($C`innate %s has %s.`, attrname[ndx], incr > 0 ? $C`improved` : $C`declined`);
+                await Your($C`innate %s has %s.`, attrname[ndx],
+                    incr > 0 ? $C`improved` : $C`declined`);
             }
         }
         return FALSE;
@@ -194,7 +196,8 @@ export async function gainstr(otmp, incr, givemsg) {   // attrib.c:203
             num = 1;
         }
     }
-    await adjattrib(A.STR, otmp && otmp.cursed ? -num | 0 : num, givemsg ? -1 : 1);
+    await adjattrib(A.STR, otmp && otmp.cursed ? -num | 0 : num,
+        givemsg ? -1 : 1);
 }
 /* strength loss, may kill you; cause may be poison or monster like 'a' */
 /**
@@ -307,7 +310,9 @@ export async function poisoned(reason, typ, pkiller, fatal, thrown_weapon) {   /
     if (!blast && !strstri(reason, $C`poison`)) {
         const plural = reason.get($c.idx($c.subu64($c.strlen(reason), 1))) === 115 ? 1 : 0;
         /* avoid "The" Orcus's sting was poisoned... */
-        await pline($C`%s%s %s poisoned!`, $c.isupper($c.u8(reason.get(0))) ? $C`` : $C`The `, reason, plural ? $C`were` : $C`was`);
+        await pline($C`%s%s %s poisoned!`,
+            $c.isupper($c.u8(reason.get(0))) ? $C`` : $C`The `, reason,
+            plural ? $C`were` : $C`was`);
     }
     if (Poison_resistance()) {
         if (blast) {
@@ -323,7 +328,8 @@ export async function poisoned(reason, typ, pkiller, fatal, thrown_weapon) {   /
         if (!type_is_pname($c.relem(mons, i))) {
             pkiller = await the(pkiller);
         }
-    } else if (!strncmpi(pkiller, $C`the `, 4) || !strncmpi(pkiller, $C`an `, 3) || !strncmpi(pkiller, $C`a `, 2)) {
+    } else if (!strncmpi(pkiller, $C`the `, 4) || !strncmpi(pkiller, $C`an `, 3)
+        || !strncmpi(pkiller, $C`a `, 2)) {
         /*[ does this need a plural check too? ]*/
         kprefix = KILLED.BY;
     }
@@ -439,7 +445,8 @@ export async function restore_attrib() {   // attrib.c:455
      */
     for (i = 0; i < A.MAX; i = i + 1 | 0) {
         /* all temporary losses/gains */
-        const equilibrium = i === A.STR && u.uhs >= WEAK || i === A.DEX && Wounded_legs() ? -1 : 0;
+        const equilibrium = i === A.STR && u.uhs >= WEAK
+            || i === A.DEX && Wounded_legs() ? -1 : 0;
         if (u.atemp.a[i] !== equilibrium && u.atime.a[i] !== 0) {
             if (!(u.atime.a[i] = $c.i8(u.atime.a[i] - 1))) {
                 /* countdown for change */
@@ -506,7 +513,11 @@ export async function exercise(i, inc_or_dec) {   // attrib.c:489
 async function exerper() {   // attrib.c:521
     if (!$c.rem64(svm.moves, 10)) {
         /* Hunger Checks */
-        const hs = u.uhunger > 1000 ? SATIATED : u.uhunger > 150 ? NOT_HUNGRY : u.uhunger > 50 ? HUNGRY : u.uhunger > 0 ? WEAK : FAINTING;
+        const hs = u.uhunger > 1000 ? SATIATED
+            : u.uhunger > 150 ? NOT_HUNGRY
+            : u.uhunger > 50 ? HUNGRY
+            : u.uhunger > 0 ? WEAK
+            : FAINTING;
         do {
             if (debugcore($C`attrib.c`, TRUE)) {
                 const save_plnmsg = iflags.last_msg;
@@ -674,7 +685,9 @@ export async function exerchk() {   // attrib.c:598
                     /* if you actually changed an attrib - zero accumulation */
                     $t1 = $c.i8(ax = 0), u.aexe.a[i] = $t1;
                     /* then print an explanation */
-                    await You($C`%s %s.`, mod_val > 0 ? $C`must have been` : $C`haven't been`, exertext[i][mod_val > 0 ? 0 : 1]);
+                    await You($C`%s %s.`,
+                        mod_val > 0 ? $C`must have been` : $C`haven't been`,
+                        exertext[i][mod_val > 0 ? 0 : 1]);
                 }
             }
             /* this used to be ``AEXE(i) /= 2'' but that would produce
@@ -722,7 +735,9 @@ function init_attr_role_redist(np, addition) {   // attrib.c:699
     const adj = addition ? 1 : -1;
     while ((addition ? np > 0 : np < 0) && tryct < 100) {
         const i = rnd_attr();
-        if (i >= A.MAX || (addition ? u.acurr.a[i] >= ATTRMAX(i) : u.acurr.a[i] <= gu.urace.attrmin[i])) {
+        if (i >= A.MAX
+            || (addition ? u.acurr.a[i] >= ATTRMAX(i)
+            : u.acurr.a[i] <= gu.urace.attrmin[i])) {
             tryct = tryct + 1 | 0;
             continue;
         }
@@ -923,10 +938,12 @@ export function is_innate(propidx) {   // attrib.c:880
     }
     /* knight has intrinsic jumping, but extrinsic is more versatile so
        ignore innateness if equipment is going to claim responsibility */
-    if (propidx === JUMPING && Role_if(PM.KNIGHT) && !u.uprops[propidx].extrinsic) {
+    if (propidx === JUMPING && Role_if(PM.KNIGHT)
+        && !u.uprops[propidx].extrinsic) {
         return FROM_ROLE;
     }
-    if (propidx === BLINDED && !haseyes(gy.youmonst.data) || propidx === BLND_RES && $c.and64(u.uprops[BLND_RES].intrinsic, FROMFORM) !== 0) {
+    if (propidx === BLINDED && !haseyes(gy.youmonst.data)
+        || propidx === BLND_RES && $c.and64(u.uprops[BLND_RES].intrinsic, FROMFORM) !== 0) {
         return FROM_FORM;
     }
     return FROM_NONE;
@@ -960,7 +977,8 @@ export async function from_what(propidx) {   // attrib.c:905
              * There are exceptions.  Versatile jumping from spell or boots
              * takes priority over knight's innate but limited jumping.
              */
-            if (propidx === BLINDED && u.uroleplay.blind || propidx === DEAF && u.uroleplay.deaf) {
+            if (propidx === BLINDED && u.uroleplay.blind
+                || propidx === DEAF && u.uroleplay.deaf) {
                 $c.sprintf(new $c.Ptr(from_what$buf, 0), $C` from birth`);
             } else if (innateness === FROM_ROLE || innateness === FROM_RACE) {
                 $c.strcpy(new $c.Ptr(from_what$buf, 0), $C` innately`);
@@ -974,18 +992,22 @@ export async function from_what(propidx) {   // attrib.c:905
                 $c.strcpy(new $c.Ptr(from_what$buf, 0), $C` from your creature form`);
             } else if (propidx === FAST && Very_fast()) {
                 $c.sprintf(new $c.Ptr(from_what$buf, 0), new $c.Ptr(from_what$because_of, 0), $c.and64(u.uprops[FAST].intrinsic, TIMEOUT) !== 0 ? $C`a potion or spell` : $c.and64(u.uprops[FAST].extrinsic, W.ARMF) !== 0 && $G.uarmf.dknown && objects[$G.uarmf.otyp].oc_name_known ? await ysimple_name($G.uarmf) : u.uprops[FAST].extrinsic ? $C`worn equipment` : c_common_strings.c_something);
-            } else if (wizard() && (obj = what_gives(new $c.FieldRef(u.uprops[propidx], "extrinsic", "i64"))) !== null) {
+            } else if (wizard()
+                && (obj = what_gives(new $c.FieldRef(u.uprops[propidx], "extrinsic", "i64"))) !== null) {
                 /* speed boots */
                 $c.sprintf(new $c.Ptr(from_what$buf, 0), new $c.Ptr(from_what$because_of, 0), obj.oartifact ? await bare_artifactname(obj) : await ysimple_name(obj));
             } else if (propidx === BLINDED && Blindfolded_only()) {
                 $c.sprintf(new $c.Ptr(from_what$buf, 0), new $c.Ptr(from_what$because_of, 0), await ysimple_name($G.ublindf));
-            } else if (propidx === BLINDED && u.ucreamed && BlindedTimeout() === u.ucreamed && !EBlinded() && !$c.and64(u.uprops[BLINDED].intrinsic, ~TIMEOUT)) {
+            } else if (propidx === BLINDED && u.ucreamed
+                && BlindedTimeout() === u.ucreamed
+                && !EBlinded() && !$c.and64(u.uprops[BLINDED].intrinsic, ~TIMEOUT)) {
                 $c.sprintf(new $c.Ptr(from_what$buf, 0), $C`due to goop covering your %s`, await body_part(FACE));
             }
             /* remove some verbosity and/or redundancy */
             if ((p = strstri(new $c.Ptr(from_what$buf, 0), $C` pair of `)) !== null) {
                 copynchars(p.add(1), p.add(9), BUFSZ);   /* overlapping buffers ok */
-            } else if (propidx === STRANGLED && (p = strstri(new $c.Ptr(from_what$buf, 0), $C` of strangulation`)) !== null) {
+            } else if (propidx === STRANGLED
+                && (p = strstri(new $c.Ptr(from_what$buf, 0), $C` of strangulation`)) !== null) {
                 p.set(0, 0);
             }
         } else {
@@ -1257,7 +1279,8 @@ export function acurr(chridx) {   // attrib.c:1200
             result = max(tmp, 3);
         }
     } else if (chridx === A.CHA) {
-        if (tmp < 18 && (gy.youmonst.data.mlet === S.NYMPH || u.umonnum === PM.AMOROUS_DEMON)) {
+        if (tmp < 18 && (gy.youmonst.data.mlet === S.NYMPH
+            || u.umonnum === PM.AMOROUS_DEMON)) {
             result = 18;
         }
     } else if (chridx === A.CON) {
@@ -1374,13 +1397,15 @@ export async function uchangealign(newalign, reason) {   // attrib.c:1320
     disp.botl = TRUE;   /* status line needs updating */
     if (reason === A_CG.CONVERT) {
         /* conversion via altar */
-        await livelog_printf(LL.ALIGNMENT, $C`permanently converted to %s`, aligns[1 - newalign | 0].adj);
+        await livelog_printf(LL.ALIGNMENT, $C`permanently converted to %s`,
+            aligns[1 - newalign | 0].adj);
         u.ualignbase[A.CURRENT] = $c.i8(newalign);
         /* worn helm of opposite alignment might block change */
         if (!$G.uarmh || $G.uarmh.otyp !== HELM_OF_OPPOSITE_ALIGNMENT) {
             u.ualign.type = u.ualignbase[A.CURRENT];
         }
-        await You($C`have a %ssense of a new direction.`, u.ualign.type !== oldalign ? $C`sudden ` : $C``);
+        await You($C`have a %ssense of a new direction.`,
+            u.ualign.type !== oldalign ? $C`sudden ` : $C``);
     } else {
         /* putting on or taking off a helm of opposite alignment */
         u.ualign.type = $c.i8(newalign);
@@ -1392,9 +1417,12 @@ export async function uchangealign(newalign, reason) {   // attrib.c:1320
                 await summon_furies(Is_astralevel(u.uz) ? 0 : 1);
             }
             /* don't livelog taking it back off */
-            await livelog_printf(LL.ALIGNMENT, $C`used a helm to turn %s`, aligns[1 - newalign | 0].adj);
+            await livelog_printf(LL.ALIGNMENT, $C`used a helm to turn %s`,
+                aligns[1 - newalign | 0].adj);
         } else if (reason === A_CG.HELM_OFF) {
-            await Your($C`mind is %s.`, Hallucination() ? $C`much of a muchness` : $C`back in sync with your body`);
+            await Your($C`mind is %s.`, Hallucination()
+                ? $C`much of a muchness`
+                : $C`back in sync with your body`);
         }
     }
     if (u.ualign.type !== oldalign) {

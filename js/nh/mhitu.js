@@ -109,8 +109,11 @@ export async function hitmsg(mtmp, mattk) {   // mhitu.c:29
     let Monst_name = await Monnam(mtmp);
     /* Note: if opposite gender, "seductively";
        if same gender, "engagingly" for nymph, normal msg for others. */
-    if ((compat = could_seduce(mtmp, gy.youmonst, mattk)) !== 0 && !mtmp.mcan && !mtmp.mspec_used) {
-        await pline_mon(mtmp, $C`%s %s you %s.`, Monst_name, !Blind() ? $C`smiles at` : !Deaf() ? $C`talks to` : $C`touches`, compat === 2 ? $C`engagingly` : $C`seductively`);
+    if ((compat = could_seduce(mtmp, gy.youmonst, mattk)) !== 0
+        && !mtmp.mcan && !mtmp.mspec_used) {
+        await pline_mon(mtmp, $C`%s %s you %s.`, Monst_name,
+            !Blind() ? $C`smiles at` : !Deaf() ? $C`talks to` : $C`touches`,
+            compat === 2 ? $C`engagingly` : $C`seductively`);
     } else {
         switch (mattk.aatyp) {
             case AT.BITE:
@@ -143,7 +146,10 @@ export async function hitmsg(mtmp, mattk) {   // mhitu.c:29
                 verb = $C`hits`;
         }
         /* if a monster hits more than once with similar attack, say so */
-        const again = mtmp.m_id === gh.hitmsg_mid && gh.hitmsg_prev !== $c.asRec(null, $T.attack, 4) && mattk === $c.radd(gh.hitmsg_prev, 1) && mattk.aatyp === gh.hitmsg_prev.aatyp ? $C` again` : $C``;
+        const again = mtmp.m_id === gh.hitmsg_mid
+            && gh.hitmsg_prev !== $c.asRec(null, $T.attack, 4)
+            && mattk === $c.radd(gh.hitmsg_prev, 1)
+            && mattk.aatyp === gh.hitmsg_prev.aatyp ? $C` again` : $C``;
         await pline_mon(mtmp, $C`%s %s%s%s`, Monst_name, verb, again, punct);
     }
     gh.hitmsg_mid = mtmp.m_id;
@@ -165,7 +171,8 @@ async function missmu(mtmp, nearmiss, mattk) {   // mhitu.c:85
     if (could_seduce(mtmp, gy.youmonst, mattk) && !mtmp.mcan) {
         await pline_mon(mtmp, $C`%s pretends to be friendly.`, await Monnam(mtmp));
     } else {
-        await pline_mon(mtmp, $C`%s %smisses!`, await Monnam(mtmp), nearmiss && flags.verbose ? $C`just ` : $C``);
+        await pline_mon(mtmp, $C`%s %smisses!`, await Monnam(mtmp),
+            nearmiss && flags.verbose ? $C`just ` : $C``);
     }
     await stop_occupation();
 }
@@ -184,9 +191,13 @@ export function mswings_verb(mwep, bash) {   // mhitu.c:105
        give a mix of thrust and swing (caller doesn't care either way) */
     const otyp = mwep.otyp;
     const lash = objects[otyp].oc_subtyp === P.WHIP || is_wet_towel(mwep) ? 1 : 0;
-    const thrust = (objects[otyp].oc_dir & PIERCE) !== 0 && ((objects[otyp].oc_dir & ~PIERCE) === 0 || !rn2(2)) ? 1 : 0;
+    const thrust = (objects[otyp].oc_dir & PIERCE) !== 0
+        && ((objects[otyp].oc_dir & ~PIERCE) === 0 || !rn2(2)) ? 1 : 0;
     /*sigh*/
-    const verb = bash ? $C`bashes with` : lash ? $C`lashes` : thrust ? $C`thrusts` : $C`swings`;
+    const verb = bash ? $C`bashes with`
+        : lash ? $C`lashes`
+        : thrust ? $C`thrusts`
+        : $C`swings`;
     /* (might have caller also pass attacker's formatted name so that
        if hallucination makes that be plural, we could use vtense() to
        adjust the result to match) */
@@ -204,7 +215,10 @@ async function mswings(mtmp, otemp, bash) {   // mhitu.c:130
     /* attacker's weapon */
     /* True: polearm used at too close range */
     if (flags.verbose && !Blind() && mon_visible(mtmp)) {
-        await pline_mon(mtmp, $C`%s %s %s%s %s.`, await Monnam(mtmp), mswings_verb(otemp, bash), otemp.quan > 1 ? $C`one of ` : $C``, genders[pronoun_gender(mtmp, PRONOUN.HALLU)].his, await xname(otemp));
+        await pline_mon(mtmp, $C`%s %s %s%s %s.`, await Monnam(mtmp),
+            mswings_verb(otemp, bash),
+            otemp.quan > 1 ? $C`one of ` : $C``,
+            genders[pronoun_gender(mtmp, PRONOUN.HALLU)].his, await xname(otemp));
     }
 }
 /* return how a poison attack was delivered */
@@ -220,7 +234,9 @@ export function mpoisons_subj(mtmp, mattk) {   // mhitu.c:145
            it's better than "sting" when not a stinging attack... */
         return !mwep || !mwep.otrapped ? $C`attack` : $C`weapon`;
     } else {
-        return mattk.aatyp === AT.TUCH ? $C`contact` : mattk.aatyp === AT.GAZE ? $C`gaze` : mattk.aatyp === AT.BITE ? $C`bite` : $C`sting`;
+        return mattk.aatyp === AT.TUCH ? $C`contact`
+            : mattk.aatyp === AT.GAZE ? $C`gaze`
+            : mattk.aatyp === AT.BITE ? $C`bite` : $C`sting`;
     }
 }
 /* called when your intrinsic speed is taken away */
@@ -254,7 +270,8 @@ async function wildmiss(mtmp, mattk) {   // mhitu.c:176
        impossible can be given, if warranted, before the early returns */
     if (!unotseen && !unotthere && !usubmerged) {
         /* this used to be the 'else' case below */
-        await impossible($C`%s attacks you without knowing your location?`, await Some_Monnam(mtmp));
+        await impossible($C`%s attacks you without knowing your location?`,
+            await Some_Monnam(mtmp));
         return;
     }
     /* no map_invisible() -- no way to tell where _this_ is coming from */
@@ -266,12 +283,18 @@ async function wildmiss(mtmp, mattk) {   // mhitu.c:176
         return;
     }
     /* maybe it's attacking an image around the corner? */
-    const compat = mattk.adtyp === AD.SEDU || mattk.adtyp === AD.SSEX ? could_seduce(mtmp, gy.youmonst, mattk) : 0;
+    const compat = mattk.adtyp === AD.SEDU || mattk.adtyp === AD.SSEX
+        ? could_seduce(mtmp, gy.youmonst, mattk) : 0;
     const Monst_name = await Monnam(mtmp);
     set_msg_xy(mtmp.mx, mtmp.my);
     if (unotseen) {
         /* !mtmp->cansee || (Invis && !perceives(mtmp->data)) */
-        const swings = mattk.aatyp === AT.BITE ? $C`snaps` : mattk.aatyp === AT.KICK ? $C`kicks` : mattk.aatyp === AT.STNG || mattk.aatyp === AT.BUTT || nolimbs(mtmp.data) ? $C`lunges` : $C`swings`;
+        const swings = mattk.aatyp === AT.BITE ? $C`snaps`
+            : mattk.aatyp === AT.KICK ? $C`kicks`
+            : mattk.aatyp === AT.STNG
+            || mattk.aatyp === AT.BUTT
+            || nolimbs(mtmp.data) ? $C`lunges`
+            : $C`swings`;
         if (compat) {
             await pline($C`%s tries to touch you and misses!`, Monst_name);
         } else {
@@ -283,7 +306,10 @@ async function wildmiss(mtmp, mattk) {   // mhitu.c:176
                     await pline($C`%s attacks a spot beside you.`, Monst_name);
                     break;
                 case 2:
-                    await pline($C`%s strikes at %s!`, Monst_name, is_waterwall(mtmp.mux, mtmp.muy) ? $C`empty water` : $C`thin air`);
+                    await pline($C`%s strikes at %s!`, Monst_name,
+                        is_waterwall(mtmp.mux, mtmp.muy)
+                        ? $C`empty water`
+                        : $C`thin air`);
                     break;
                 default:
                     await pline($C`%s %s wildly!`, Monst_name, swings);
@@ -294,12 +320,15 @@ async function wildmiss(mtmp, mattk) {   // mhitu.c:176
         /* Displaced */
         /* give 'displaced' message even if hero is Blind */
         if (compat) {
-            await pline($C`%s smiles %s at your %sdisplaced image...`, Monst_name, compat === 2 ? $C`engagingly` : $C`seductively`, Invis() ? $C`invisible ` : $C``);
+            await pline($C`%s smiles %s at your %sdisplaced image...`, Monst_name,
+                compat === 2 ? $C`engagingly` : $C`seductively`,
+                Invis() ? $C`invisible ` : $C``);
         } else {
             /* Note:  if you're both invisible and displaced, only
              * monsters which see invisible will attack your displaced
              * image, since the displaced image is also invisible. */
-            await pline($C`%s strikes at your %sdisplaced image and misses you!`, Monst_name, Invis() ? $C`invisible ` : $C``);
+            await pline($C`%s strikes at your %sdisplaced image and misses you!`,
+                Monst_name, Invis() ? $C`invisible ` : $C``);
         }
     } else if (usubmerged) {
         /* Underwater */
@@ -308,7 +337,8 @@ async function wildmiss(mtmp, mattk) {   // mhitu.c:176
         if (compat) {
             await pline($C`%s reaches towards your distorted image.`, Monst_name);
         } else {
-            await pline($C`%s is fooled by water reflections and misses!`, Monst_name);
+            await pline($C`%s is fooled by water reflections and misses!`,
+                Monst_name);
         }
     } else {
         /*NOTREACHED*/
@@ -392,7 +422,10 @@ export async function getmattk(magr, mdef, indx, prev_result, alt_attk_buf) {   
     /* prevent a monster with two consecutive disease or hunger attacks
        from hitting with both of them on the same turn; if the first has
        already hit, switch to a stun attack for the second */
-    if (indx > 0 && prev_result.get(indx - 1 | 0) > M_ATTK.MISS && (attk.adtyp === AD.DISE || attk.adtyp === AD.PEST || attk.adtyp === AD.FAMN) && attk.adtyp === mptr.mattk[indx - 1 | 0].adtyp) {
+    if (indx > 0 && prev_result.get(indx - 1 | 0) > M_ATTK.MISS
+        && (attk.adtyp === AD.DISE || attk.adtyp === AD.PEST
+        || attk.adtyp === AD.FAMN)
+        && attk.adtyp === mptr.mattk[indx - 1 | 0].adtyp) {
         alt_attk_buf.$copyFrom(attk);
         attk = alt_attk_buf;
         attk.adtyp = AD.STUN;
@@ -419,12 +452,16 @@ export async function getmattk(magr, mdef, indx, prev_result, alt_attk_buf) {   
         /* holders/engulfers who release the hero have mspec_used set to rnd(2)
            and can't re-hold/re-engulf until it has been decremented to zero;
            likewise for transformation by genetic engineer */
-    } else if (magr.mspec_used && (attk.aatyp === AT.ENGL || attk.aatyp === AT.HUGS || attk.adtyp === AD.STCK || attk.adtyp === AD.POLY)) {
+    } else if (magr.mspec_used && (attk.aatyp === AT.ENGL
+        || attk.aatyp === AT.HUGS
+        || attk.adtyp === AD.STCK
+        || attk.adtyp === AD.POLY)) {
         const wimpy = attk.damd === 0 ? 1 : 0;   /* lichen, violet fungus */
         /* can't re-engulf or re-grab yet; switch to simpler attack */
         alt_attk_buf.$copyFrom(attk);
         attk = alt_attk_buf;
-        if (attk.adtyp === AD.ACID || attk.adtyp === AD.ELEC || attk.adtyp === AD.COLD || attk.adtyp === AD.FIRE) {
+        if (attk.adtyp === AD.ACID || attk.adtyp === AD.ELEC
+            || attk.adtyp === AD.COLD || attk.adtyp === AD.FIRE) {
             attk.aatyp = AT.TUCH;
         } else {
             attk.aatyp = AT.CLAW;   /* attack message will be "<foo> hits" */
@@ -441,7 +478,15 @@ export async function getmattk(magr, mdef, indx, prev_result, alt_attk_buf) {   
            if weapon is sufficiently interesting; a few unique creatures
            have two weapon attacks where one does physical damage and other
            doesn't--avoid forcing physical damage for those */
-    } else if (indx === 0 && magr !== gy.youmonst && attk.aatyp === AT.WEAP && attk.adtyp !== AD.PHYS && !(mptr.mattk[1].aatyp === AT.WEAP && mptr.mattk[1].adtyp === AD.PHYS) && (magr.mcan || weap && (weap.otyp === CORPSE && touch_petrifies($c.relem(mons, weap.corpsenm)) || is_art(weap, ART.STORMBRINGER) || is_art(weap, ART.VORPAL_BLADE)))) {
+    } else if (indx === 0 && magr !== gy.youmonst
+        && attk.aatyp === AT.WEAP && attk.adtyp !== AD.PHYS
+        && !(mptr.mattk[1].aatyp === AT.WEAP
+        && mptr.mattk[1].adtyp === AD.PHYS)
+        && (magr.mcan
+        || weap && (weap.otyp === CORPSE
+        && touch_petrifies($c.relem(mons, weap.corpsenm))
+        || is_art(weap, ART.STORMBRINGER)
+        || is_art(weap, ART.VORPAL_BLADE)))) {
         alt_attk_buf.$copyFrom(attk);
         attk = alt_attk_buf;
         attk.adtyp = AD.PHYS;
@@ -449,7 +494,9 @@ export async function getmattk(magr, mdef, indx, prev_result, alt_attk_buf) {   
            they won't use the spell for monster vs monster so become impotent
            against cold resistant foes; change the touch damage from cold to
            physical if target will resist */
-    } else if (indx === 0 && attk.aatyp === AT.TUCH && attk.adtyp === AD.COLD && (udefend ? Cold_resistance() : await resists_cold(mdef)) && mdef.data !== mons[PM.SHADE]) {
+    } else if (indx === 0 && attk.aatyp === AT.TUCH && attk.adtyp === AD.COLD
+        && (udefend ? Cold_resistance() : await resists_cold(mdef))
+        && mdef.data !== mons[PM.SHADE]) {
         /* don't substitute if target is immune to normal damage */
         alt_attk_buf.$copyFrom(attk);
         attk = alt_attk_buf;
@@ -575,7 +622,8 @@ export async function mattacku(mtmp) {   // mhitu.c:491
                 return 1;
             }
             /* make sure steed is still alive and within range */
-            if ((i & M_ATTK.DEF_DIED) !== 0 || !u.usteed || !m_next2u(mtmp)) {
+            if ((i & M_ATTK.DEF_DIED) !== 0 || !u.usteed
+                || !m_next2u(mtmp)) {
                 return 0;
             }
             /* Let your steed retaliate */
@@ -599,7 +647,10 @@ export async function mattacku(mtmp) {   // mhitu.c:491
             svl.level.monsters[mtmp.mx][mtmp.my] = null;
             /* a fish won't voluntarily swap positions
                when it's in water and hero is over land */
-            if (!await enexto(cc, u.ux, u.uy, gy.youmonst.data) || mtmp.data.mlet === S.EEL && is_pool(mtmp.mx, mtmp.my) && !is_pool(u.ux, u.uy)) {
+            if (!await enexto(cc, u.ux, u.uy, gy.youmonst.data)
+                || mtmp.data.mlet === S.EEL
+                && is_pool(mtmp.mx, mtmp.my)
+                && !is_pool(u.ux, u.uy)) {
                 /* couldn't find any spot for hero; this used to
                    kill off attacker, but now we just give a "miss"
                    message and keep both mtmp and hero at their
@@ -629,15 +680,18 @@ export async function mattacku(mtmp) {   // mhitu.c:491
             }
             const obj = await which_armor(mtmp, W.ARMH);
             if (hard_helmet(obj)) {
-                await Your($C`blow glances off %s %s.`, s_suffix(await mon_nam(mtmp)), helm_simple_name(obj));
+                await Your($C`blow glances off %s %s.`, s_suffix(await mon_nam(mtmp)),
+                    helm_simple_name(obj));
             } else {
                 if ((3 + find_mac(mtmp) | 0) <= rnd(20)) {
-                    await pline($C`%s is hit by a falling piercer (you)!`, await Monnam(mtmp));
+                    await pline($C`%s is hit by a falling piercer (you)!`,
+                        await Monnam(mtmp));
                     if (($t1 = d(3, 6), mtmp.mhp = mtmp.mhp - $t1 | 0) < 1) {
                         await killed(mtmp);
                     }
                 } else {
-                    await pline($C`%s is almost hit by a falling piercer (you)!`, await Monnam(mtmp));
+                    await pline($C`%s is almost hit by a falling piercer (you)!`,
+                        await Monnam(mtmp));
                 }
             }
         } else {
@@ -652,7 +706,9 @@ export async function mattacku(mtmp) {   // mhitu.c:491
                  * zap the "laid by you" momentarily instead.
                  */
                 const obj$2 = svl.level.objects[u.ux][u.uy];
-                if (obj$2 || u.umonnum === PM.TRAPPER || gy.youmonst.data.mlet === S.EEL && is_pool(u.ux, u.uy)) {
+                if (obj$2 || u.umonnum === PM.TRAPPER
+                    || gy.youmonst.data.mlet === S.EEL
+                    && is_pool(u.ux, u.uy)) {
                     let save_spe = 0;   /* suppress warning */
                     if (obj$2) {
                         save_spe = obj$2.spe;
@@ -662,10 +718,19 @@ export async function mattacku(mtmp) {   // mhitu.c:491
                     }
                     /* note that m_monnam() overrides hallucination, which is
                        what we want when message is from mtmp's perspective */
-                    if (gy.youmonst.data.mlet === S.EEL || u.umonnum === PM.TRAPPER) {
-                        await pline($C`Wait, %s!  There's a hidden %s named %s there!`, await m_monnam(mtmp), pmname(gy.youmonst.data, Ugender()), new $c.Ptr(svp.plname, 0));
+                    if (gy.youmonst.data.mlet === S.EEL
+                        || u.umonnum === PM.TRAPPER) {
+                        await pline(
+                            $C`Wait, %s!  There's a hidden %s named %s there!`,
+                            await m_monnam(mtmp),
+                            pmname(gy.youmonst.data, Ugender()), new $c.Ptr(svp.plname, 0));
                     } else {
-                        await pline($C`Wait, %s!  There's a %s named %s hiding under %s!`, await m_monnam(mtmp), pmname(gy.youmonst.data, Ugender()), new $c.Ptr(svp.plname, 0), await doname(svl.level.objects[u.ux][u.uy]));
+                        await pline(
+                            $C`Wait, %s!  There's a %s named %s hiding under %s!`,
+                            await m_monnam(mtmp),
+                            pmname(gy.youmonst.data, Ugender()),
+                            new $c.Ptr(svp.plname, 0),
+                            await doname(svl.level.objects[u.ux][u.uy]));
                     }
                     if (obj$2) {
                         obj$2.spe = $c.i8(save_spe);
@@ -679,7 +744,8 @@ export async function mattacku(mtmp) {   // mhitu.c:491
         return 0;
     }
     /* hero might be a mimic, concealed via #monster */
-    if (gy.youmonst.data.mlet === S.MIMIC && U_AP_TYPE() && !range2[0] && foundyou[0] && !u.uswallow) {
+    if (gy.youmonst.data.mlet === S.MIMIC && U_AP_TYPE() && !range2[0]
+        && foundyou[0] && !u.uswallow) {
         const sticky = sticks(gy.youmonst.data);
         if (!canspotmon(mtmp)) {
             await map_invisible(mtmp.mx, mtmp.my);
@@ -688,7 +754,8 @@ export async function mattacku(mtmp) {   // mhitu.c:491
             await pline($C`It gets stuck on you.`);
         } else {
             /* see note about m_monnam() above */
-            await pline($C`Wait, %s!  That's a %s named %s!`, await m_monnam(mtmp), pmname(gy.youmonst.data, Ugender()), new $c.Ptr(svp.plname, 0));
+            await pline($C`Wait, %s!  That's a %s named %s!`, await m_monnam(mtmp),
+                pmname(gy.youmonst.data, Ugender()), new $c.Ptr(svp.plname, 0));
         }
         if (sticky) {
             await set_ustuck(mtmp);
@@ -704,10 +771,16 @@ export async function mattacku(mtmp) {   // mhitu.c:491
             await map_invisible(mtmp.mx, mtmp.my);
         }
         if (!youseeit[0]) {
-            await pline($C`%s %s!`, c_common_strings.c_Something, likes_gold(mtmp.data) && gy.youmonst.mappearance === GOLD_PIECE ? $C`tries to pick you up` : $C`disturbs you`);
+            await pline($C`%s %s!`, c_common_strings.c_Something,
+                likes_gold(mtmp.data)
+                && gy.youmonst.mappearance === GOLD_PIECE
+                ? $C`tries to pick you up`
+                : $C`disturbs you`);
         } else {
             /* see note about m_monnam() above */
-            await pline($C`Wait, %s!  That %s is really %s named %s!`, await m_monnam(mtmp), await mimic_obj_name(gy.youmonst), await an(pmname($c.relem(mons, u.umonnum), Ugender())), new $c.Ptr(svp.plname, 0));
+            await pline($C`Wait, %s!  That %s is really %s named %s!`, await m_monnam(mtmp),
+                await mimic_obj_name(gy.youmonst),
+                await an(pmname($c.relem(mons, u.umonnum), Ugender())), new $c.Ptr(svp.plname, 0));
         }
         if (gm.multi < 0) {
             /* this should always be the case */
@@ -739,7 +812,8 @@ export async function mattacku(mtmp) {   // mhitu.c:491
     /* when not cancelled and not in current form due to shapechange, many
        demons can summon more demons and were creatures can summon critters;
        also, were creature might change from human to animal or vice versa */
-    if (mtmp.cham === NON_PM && !mtmp.mcan && !range2[0] && (is_demon(mdat) || is_were(mdat))) {
+    if (mtmp.cham === NON_PM && !mtmp.mcan && !range2[0]
+        && (is_demon(mdat) || is_were(mdat))) {
         const already_fleeing = mtmp.mflee !== 0 ? 1 : 0;
         await summonmu(mtmp, youseeit[0]);
         /* were-creature might have changed to beast form; if that has
@@ -758,7 +832,8 @@ export async function mattacku(mtmp) {   // mhitu.c:491
             await pline_mon(mtmp, $C`%s loosens its grip slightly.`, await Monnam(mtmp));
         } else if (!range2[0]) {
             if (youseeit[0] || sensemon(mtmp)) {
-                await pline($C`%s starts to attack you, but pulls back.`, await Monnam(mtmp));
+                await pline($C`%s starts to attack you, but pulls back.`,
+                    await Monnam(mtmp));
             } else {
                 await You_feel($C`%s move nearby.`, c_common_strings.c_something);
             }
@@ -796,7 +871,10 @@ export async function mattacku(mtmp) {   // mhitu.c:491
         }
         mon_currwep = null;
         const mattk = await getmattk(mtmp, gy.youmonst, i, new $c.Ptr(sum, 0), alt_attk);
-        if (u.uswallow && mattk.aatyp !== AT.ENGL || skipnonmagc && mattk.aatyp !== AT.MAGC || gs.skipdrin && mattk.aatyp === AT.TENT && mattk.adtyp === AD.DRIN) {
+        if (u.uswallow && mattk.aatyp !== AT.ENGL
+            || skipnonmagc && mattk.aatyp !== AT.MAGC
+            || gs.skipdrin && mattk.aatyp === AT.TENT
+            && mattk.adtyp === AD.DRIN) {
             continue;
         }
         switch (mattk.aatyp) {
@@ -811,13 +889,16 @@ export async function mattacku(mtmp) {   // mhitu.c:491
                 if (mattk.aatyp === AT.KICK && mtrapped_in_pit(mtmp)) {
                     continue L1;
                 }
-                if (!range2[0] && (!MON_WEP(mtmp) || mtmp.mconf || Conflict() || !touch_petrifies(gy.youmonst.data))) {
+                if (!range2[0] && (!MON_WEP(mtmp) || mtmp.mconf || Conflict()
+                    || !touch_petrifies(gy.youmonst.data))) {
                     if (foundyou[0]) {
                         if (tmp > (j = rnd(20 + i | 0))) {
-                            if (unsolid(gy.youmonst.data) && await failed_grab(mtmp, gy.youmonst, mattk)) {
+                            if (unsolid(gy.youmonst.data)
+                                && await failed_grab(mtmp, gy.youmonst, mattk)) {
                                 continue L1;
                             }
-                            if (mattk.aatyp !== AT.KICK || !thick_skinned(gy.youmonst.data)) {
+                            if (mattk.aatyp !== AT.KICK
+                                || !thick_skinned(gy.youmonst.data)) {
                                 $t2 = await hitmu(mtmp, mattk), sum[i] = $t2;
                             }
                         } else {
@@ -833,7 +914,8 @@ export async function mattacku(mtmp) {   // mhitu.c:491
             case AT.HUGS:
                 /* automatic if prev two attacks succeed */
                 /* Note: if displaced, prev attacks never succeeded */
-                if (!range2[0] && i >= 2 && sum[i - 1 | 0] && sum[i - 2 | 0] || mtmp === u.ustuck) {
+                if (!range2[0] && i >= 2 && sum[i - 1 | 0] && sum[i - 2 | 0]
+                    || mtmp === u.ustuck) {
                     if (!await failed_grab(mtmp, gy.youmonst, mattk)) {
                         $t3 = await hitmu(mtmp, mattk), sum[i] = $t3;
                     }
@@ -856,7 +938,8 @@ export async function mattacku(mtmp) {   // mhitu.c:491
             case AT.ENGL:
                 if (!range2[0]) {
                     if (foundyou[0]) {
-                        if (u.uswallow || !mtmp.mspec_used && tmp > (j = rnd(20 + i | 0))) {
+                        if (u.uswallow
+                            || !mtmp.mspec_used && tmp > (j = rnd(20 + i | 0))) {
                             /* force swallowing monster to be displayed
                                even when hero is moving away */
                             await flush_screen(1);
@@ -868,11 +951,14 @@ export async function mattacku(mtmp) {   // mhitu.c:491
                         await pline_mon(mtmp, $C`%s gulps some air!`, await Monnam(mtmp));
                     } else {
                         if (youseeit[0]) {
-                            await pline_mon(mtmp, $C`%s lunges forward and recoils!`, await Monnam(mtmp));
+                            await pline_mon(mtmp, $C`%s lunges forward and recoils!`,
+                                await Monnam(mtmp));
                         } else {
                             if (is_whirly(mtmp.data)) {
                             }
-                            await You_hear($C`a %s nearby.`, is_whirly(mtmp.data) ? $C`rushing noise` : $C`splat`);
+                            await You_hear($C`a %s nearby.`,
+                                is_whirly(mtmp.data) ? $C`rushing noise`
+                                : $C`splat`);
                         }
                     }
                 }
@@ -910,7 +996,10 @@ export async function mattacku(mtmp) {   // mhitu.c:491
                     if (foundyou[0]) {
                         mon_currwep = mtmp.mw;
                         if (mon_currwep) {
-                            const bash = (mon_currwep.oclass === WEAPON_CLASS || mon_currwep.oclass === TOOL_CLASS) && (objects[mon_currwep.otyp].oc_subtyp === P.POLEARMS || objects[mon_currwep.otyp].oc_subtyp === P.LANCE || is_art(mon_currwep, ART.SNICKERSNEE)) && !is_art(mon_currwep, ART.SNICKERSNEE) && m_next2u(mtmp) ? 1 : 0;
+                            const bash = (mon_currwep.oclass === WEAPON_CLASS || mon_currwep.oclass === TOOL_CLASS) && (objects[mon_currwep.otyp].oc_subtyp === P.POLEARMS || objects[mon_currwep.otyp].oc_subtyp === P.LANCE || is_art(mon_currwep, ART.SNICKERSNEE))
+                                && !is_art(mon_currwep,
+                                ART.SNICKERSNEE)
+                                && m_next2u(mtmp) ? 1 : 0;
                             hittmp = await hitval(mon_currwep, gy.youmonst);
                             tmp = tmp + hittmp | 0;
                             await mswings(mtmp, mon_currwep, bash);
@@ -1019,7 +1108,8 @@ async function summonmu(mtmp, youseeit) {   // mhitu.c:956
                 }
             } else {
                 if (!Deaf()) {
-                    await pline($C`%s %s!`, c_common_strings.c_Something, await makeplural(growl_sound(mtmp)));
+                    await pline($C`%s %s!`, c_common_strings.c_Something,
+                        await makeplural(growl_sound(mtmp)));
                     from_nowhere = $C``;
                 } else {
                     from_nowhere = $C` from nowhere`;
@@ -1050,7 +1140,8 @@ export async function diseasemu(mdat) {   // mhitu.c:1033
         await You_feel($C`a slight illness.`);
         return FALSE;
     } else {
-        await make_sick(Sick() ? $c.add64($c.div64(u.uprops[SICK].intrinsic, 3), 1) : (rn2(acurr(A.CON)) + 20 | 0), mdat.pmnames[NEUTRAL], TRUE, SICK_NONVOMITABLE);
+        await make_sick(Sick() ? $c.add64($c.div64(u.uprops[SICK].intrinsic, 3), 1) : (rn2(acurr(A.CON)) + 20 | 0),
+            mdat.pmnames[NEUTRAL], TRUE, SICK_NONVOMITABLE);
         return TRUE;
     }
 }
@@ -1074,10 +1165,17 @@ export async function u_slip_free(mtmp, mattk) {   // mhitu.c:1047
     }
     /* if your cloak/armor is greased, monster slips off; this
        protection might fail (33% chance) when the armor is cursed */
-    if (obj && (obj.greased || obj.otyp === OILSKIN_CLOAK) && (!obj.cursed || rn2(3))) {
+    if (obj && (obj.greased || obj.otyp === OILSKIN_CLOAK)
+        && (!obj.cursed || rn2(3))) {
         /* avoid "slippery slippery cloak"
            for undiscovered oilskin cloak */
-        await pline_mon(mtmp, $C`%s %s your %s %s!`, await Monnam(mtmp), mattk.adtyp === AD.WRAP ? $C`slips off of` : $C`grabs you, but cannot hold onto`, obj.greased ? $C`greased` : $C`slippery`, obj.greased || objects[obj.otyp].oc_name_known ? await xname(obj) : cloak_simple_name(obj));
+        await pline_mon(mtmp, $C`%s %s your %s %s!`, await Monnam(mtmp),
+            mattk.adtyp === AD.WRAP ? $C`slips off of`
+            : $C`grabs you, but cannot hold onto`,
+            obj.greased ? $C`greased` : $C`slippery`,
+            obj.greased || objects[obj.otyp].oc_name_known
+            ? await xname(obj)
+            : cloak_simple_name(obj));
         if (obj.greased && !rn2(2)) {
             await pline_The($C`grease wears off.`);
             obj.greased = 0;
@@ -1098,7 +1196,8 @@ export function magic_negation(mon) {   // mhitu.c:1089
     /* high priests have innate protection */
     const is_you = mon === gy.youmonst ? 1 : 0;
     let via_amul = FALSE;
-    let gotprot = is_you ? u.uprops[PROTECTION].extrinsic !== 0 ? 1 : 0 : mon.data === mons[PM.HIGH_CLERIC] ? 1 : 0;
+    let gotprot = is_you ? u.uprops[PROTECTION].extrinsic !== 0 ? 1 : 0
+        : mon.data === mons[PM.HIGH_CLERIC] ? 1 : 0;
     for (o = is_you ? gi.invent : mon.minvent; o; o = o.nobj) {
         /* a_can field is only applicable for armor (which must be worn) */
         if ($c.and64(o.owornmask, W_ARMOR) !== 0) {
@@ -1133,7 +1232,9 @@ export function magic_negation(mon) {   // mhitu.c:1089
         /* intrinsic Protection is weaker (play balance; obtaining divine
            protection is too easy); it confers minimum mc 1 instead of 0 */
         /* aligned priests and angels have innate intrinsic Protection */
-        if (is_you && (HProtection() && u.ublessed > 0 || u.uspellprot) || (mon.data === mons[PM.ALIGNED_CLERIC] || is_minion(mon.data))) {
+        if (is_you && (HProtection() && u.ublessed > 0 || u.uspellprot)
+            || (mon.data === mons[PM.ALIGNED_CLERIC]
+            || is_minion(mon.data))) {
             mc = 1;
         }
     }
@@ -1189,7 +1290,8 @@ async function hitmu(mtmp, mattk) {   // mhitu.c:1144
         $t2 = d(mattk.damn, mattk.damd), mhm.damage = mhm.damage + $t2 | 0;   /* extra dmg */
     }
     await mhitm_adtyping(mtmp, mattk, gy.youmonst, mhm);
-    await mhitm_knockback(mtmp, gy.youmonst, mattk, new $c.FieldRef(mhm, "hitflags", "i32"), mtmp.mw !== null ? 1 : 0);
+    await mhitm_knockback(mtmp, gy.youmonst, mattk, new $c.FieldRef(mhm, "hitflags", "i32"),
+        mtmp.mw !== null ? 1 : 0);
     if (mhm.done) {
         return mhm.hitflags;
     }
@@ -1210,7 +1312,9 @@ async function hitmu(mtmp, mattk) {   // mhitu.c:1144
     if (mhm.damage > 0) {
         /* [Half_physical_damage isn't applied to mhm.permdmg] */
         /* Mitre of Holiness, even if not currently blessed */
-        if (Half_physical_damage() || Role_if(PM.CLERIC) && $G.uarmh && is_quest_artifact($G.uarmh) && mon_hates_blessings(mtmp)) {
+        if (Half_physical_damage()
+            || Role_if(PM.CLERIC) && $G.uarmh && is_quest_artifact($G.uarmh)
+            && mon_hates_blessings(mtmp)) {
             mhm.damage = $c.div32(mhm.damage + 1 | 0, 2);
         }
         if (mhm.permdmg) {
@@ -1267,7 +1371,9 @@ async function hitmu(mtmp, mattk) {   // mhitu.c:1144
  */
 export async function gulp_blnd_check() {   // mhitu.c:1273
     let mattk = null;
-    if (!Blinded() && u.uswallow && (mattk = attacktype_fordmg(u.ustuck.data, AT.ENGL, AD.BLND)) && await can_blnd(u.ustuck, gy.youmonst, mattk.aatyp, null)) {
+    if (!Blinded() && u.uswallow
+        && (mattk = attacktype_fordmg(u.ustuck.data, AT.ENGL, AD.BLND))
+        && await can_blnd(u.ustuck, gy.youmonst, mattk.aatyp, null)) {
         u.uswldtim = u.uswldtim + 1 >>> 0;   /* compensate for gulpmu change */
         await gulpmu(u.ustuck, mattk);
         return TRUE;
@@ -1314,15 +1420,26 @@ async function gulpmu(mtmp, mattk) {   // mhitu.c:1289
             /* none (some 'v', already whirling) */
             /* ochre 'j', Juiblex */
             /* none (all AT_ENGL are already covered) */
-            await urgent_pline($C`%s %s forward and plucks you off %s!`, await Some_Monnam(mtmp), is_animal(mtmp.data) ? $C`lunges` : is_whirly(mtmp.data) ? $C`whirls` : unsolid(mtmp.data) ? $C`flows` : amorphous(mtmp.data) ? $C`oozes` : $C`surges`, new $c.Ptr(buf, 0));
+            await urgent_pline($C`%s %s forward and plucks you off %s!`,
+                await Some_Monnam(mtmp),
+                is_animal(mtmp.data) ? $C`lunges`
+                : is_whirly(mtmp.data) ? $C`whirls`
+                : unsolid(mtmp.data) ? $C`flows`
+                : amorphous(mtmp.data) ? $C`oozes`
+                : $C`surges`,
+                new $c.Ptr(buf, 0));
             await dismount_steed(DISMOUNT.ENGULFED);
         } else {
-            await urgent_pline($C`%s %s!`, await Monnam(mtmp), dmgtype_fromattack(mtmp.data, AD.DGST, AT.ENGL) !== null ? $C`swallows you whole` : dmgtype_fromattack(mtmp.data, AD.WRAP, AT.ENGL) !== null ? $C`folds itself around you` : $C`engulfs you`);
+            await urgent_pline($C`%s %s!`, await Monnam(mtmp),
+                dmgtype_fromattack(mtmp.data, AD.DGST, AT.ENGL) !== null ? $C`swallows you whole`
+                : dmgtype_fromattack(mtmp.data, AD.WRAP, AT.ENGL) !== null ? $C`folds itself around you`
+                : $C`engulfs you`);
         }
         await stop_occupation();
         reset_occupations();   /* behave as if you had moved */
         if (u.utrap) {
-            await You($C`are released from the %s!`, u.utraptype === TT.WEB ? $C`web` : $C`trap`);
+            await You($C`are released from the %s!`,
+                u.utraptype === TT.WEB ? $C`web` : $C`trap`);
             await reset_utrap(FALSE);
         }
         const i = number_leashed();
@@ -1409,19 +1526,28 @@ async function gulpmu(mtmp, mattk) {   // mhitu.c:1289
                     tmp = Math.imul(tmp, 2);   /* sorry */
                 }
             } else {
-                await pline($C`%s%s digests you!`, await Monnam(mtmp), u.uswldtim === 2 ? $C` thoroughly` : u.uswldtim === 1 ? $C` utterly` : $C``);
+                await pline($C`%s%s digests you!`, await Monnam(mtmp),
+                    u.uswldtim === 2 ? $C` thoroughly`
+                    : u.uswldtim === 1 ? $C` utterly` : $C``);
                 await exercise(A.STR, FALSE);
             }
             break;
         case AD.PHYS:
             physical_damage = TRUE;
             if (mtmp.data === mons[PM.FOG_CLOUD]) {
-                await You($C`are laden with moisture and %s`, flaming(gy.youmonst.data) ? $C`are smoldering out!` : Breathless() ? $C`find it mildly uncomfortable.` : amphibious(gy.youmonst.data) ? $C`feel comforted.` : $C`can barely breathe!`);
+                await You($C`are laden with moisture and %s`,
+                    flaming(gy.youmonst.data)
+                    ? $C`are smoldering out!`
+                    : Breathless() ? $C`find it mildly uncomfortable.`
+                    : amphibious(gy.youmonst.data)
+                    ? $C`feel comforted.`
+                    : $C`can barely breathe!`);
                 if ((Amphibious() || Breathless()) && !flaming(gy.youmonst.data)) {
                     tmp = 0;
                 }
             } else {
-                await You($C`are %s!`, dmgtype_fromattack(mtmp.data, AD.WRAP, AT.ENGL) !== null ? $C`being squashed` : $C`pummeled with debris`);
+                await You($C`are %s!`, dmgtype_fromattack(mtmp.data, AD.WRAP, AT.ENGL) !== null ? $C`being squashed`
+                    : $C`pummeled with debris`);
                 await exercise(A.STR, FALSE);
             }
             break;
@@ -1545,15 +1671,21 @@ async function gulpmu(mtmp, mattk) {   // mhitu.c:1289
     if (!u.uswallow) {
         /* life-saving has already expelled swallowed hero */
     } else if (touch_petrifies(gy.youmonst.data) && !await resists_ston(mtmp)) {
-        await pline($C`%s very hurriedly %s you!`, await Monnam(mtmp), dmgtype_fromattack(mtmp.data, AD.DGST, AT.ENGL) !== null ? $C`regurgitates` : dmgtype_fromattack(mtmp.data, AD.WRAP, AT.ENGL) !== null ? $C`releases` : $C`expels`);
+        await pline($C`%s very hurriedly %s you!`, await Monnam(mtmp),
+            dmgtype_fromattack(mtmp.data, AD.DGST, AT.ENGL) !== null ? $C`regurgitates`
+            : dmgtype_fromattack(mtmp.data, AD.WRAP, AT.ENGL) !== null ? $C`releases`
+            : $C`expels`);
         await expels(mtmp, mtmp.data, FALSE);
     } else if (!u.uswldtim || gy.youmonst.data.msize >= MZ.HUGE) {
         /* As of 3.6.2: u.uswldtim used to be set to 0 by life-saving but it
            expels now so the !u.uswldtim case is no longer possible;
            however, polymorphing into a huge form while already
            swallowed is still possible */
-        await You($C`get %s!`, dmgtype_fromattack(mtmp.data, AD.DGST, AT.ENGL) !== null ? $C`regurgitated` : dmgtype_fromattack(mtmp.data, AD.WRAP, AT.ENGL) !== null ? $C`released` : $C`expelled`);
-        if (flags.verbose && (dmgtype_fromattack(mtmp.data, AD.DGST, AT.ENGL) !== null && Slow_digestion())) {
+        await You($C`get %s!`, dmgtype_fromattack(mtmp.data, AD.DGST, AT.ENGL) !== null ? $C`regurgitated`
+            : dmgtype_fromattack(mtmp.data, AD.WRAP, AT.ENGL) !== null ? $C`released`
+            : $C`expelled`);
+        if (flags.verbose
+            && (dmgtype_fromattack(mtmp.data, AD.DGST, AT.ENGL) !== null && Slow_digestion())) {
             await pline($C`Obviously %s doesn't like your taste.`, await mon_nam(mtmp));
         }
         await expels(mtmp, mtmp.data, FALSE);
@@ -1575,7 +1707,10 @@ async function explmu(mtmp, mattk, ufound) {   // mhitu.c:1591
     let tmp = d(mattk.damn, mattk.damd);
     let not_affected = await defended(mtmp, mattk.adtyp);
     if (!ufound) {
-        await pline($C`%s explodes at a spot in %s!`, canseemon(mtmp) ? await Monnam(mtmp) : $C`It`, is_waterwall(mtmp.mux, mtmp.muy) ? $C`empty water` : $C`thin air`);
+        await pline($C`%s explodes at a spot in %s!`,
+            canseemon(mtmp) ? await Monnam(mtmp) : $C`It`,
+            is_waterwall(mtmp.mux, mtmp.muy) ? $C`empty water`
+            : $C`thin air`);
     } else {
         await hitmsg(mtmp, mattk);
     }
@@ -1604,7 +1739,9 @@ async function explmu(mtmp, mattk, ufound) {   // mhitu.c:1591
             }
             break;
         case AD.HALU:
-            not_affected = $c.i8(not_affected | (Blind() || (u.umonnum === PM.BLACK_LIGHT || u.umonnum === PM.VIOLET_FUNGUS || dmgtype(gy.youmonst.data, AD.STUN)) ? 1 : 0));
+            not_affected = $c.i8(not_affected | (Blind() || (u.umonnum === PM.BLACK_LIGHT
+                || u.umonnum === PM.VIOLET_FUNGUS
+                || dmgtype(gy.youmonst.data, AD.STUN)) ? 1 : 0));
             if (ufound && !not_affected) {
                 if (!Hallucination()) {
                     await You($C`are caught in a blast of kaleidoscopic light!`);
@@ -1641,7 +1778,8 @@ export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
     let react = -1;
     let cancelled = mtmp.mcan !== 0 ? 1 : 0;
     let already = FALSE;
-    const mcanseeu = canseemon(mtmp) && couldsee(mtmp.mx, mtmp.my) && mtmp.mcansee ? 1 : 0;
+    const mcanseeu = canseemon(mtmp) && couldsee(mtmp.mx, mtmp.my)
+        && mtmp.mcansee ? 1 : 0;
     if ($c.andu64(mtmp.seen_resistance, cvt_adtyp_to_mseenres(mattk.adtyp))) {
         return M_ATTK.MISS;
     }
@@ -1675,7 +1813,10 @@ export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
                 if (is_medusa && Hallucination() && !rn2(3)) {
                     await pline($C`Someone seems overdue for a serpent cut.`);
                 } else {
-                    await pline_mon(mtmp, $C`%s %s.`, await Monnam(mtmp), is_medusa && mtmp.mcan && !react ? $C`doesn't look all that ugly` : $C`gazes ineffectually`);
+                    await pline_mon(mtmp, $C`%s %s.`, await Monnam(mtmp),
+                        is_medusa && mtmp.mcan && !react
+                        ? $C`doesn't look all that ugly`
+                        : $C`gazes ineffectually`);
                 }
                 break;
             }
@@ -1683,15 +1824,19 @@ export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
                 /* hero has line of sight to Medusa and she's not blind */
                 const useeit = $c.i8(canseemon(mtmp));
                 if (useeit) {
-                    await ureflects($C`%s gaze is reflected by your %s.`, s_suffix(await Monnam(mtmp)));
+                    await ureflects($C`%s gaze is reflected by your %s.`,
+                        s_suffix(await Monnam(mtmp)));
                 }
-                if (await mon_reflects(mtmp, !useeit ? null : $C`The gaze is reflected away by %s %s!`)) {
+                if (await mon_reflects(mtmp, !useeit ? null
+                    : $C`The gaze is reflected away by %s %s!`)) {
                     break;
                 }
                 if (!m_canseeu(mtmp)) {
                     /* probably you're invisible */
                     if (useeit) {
-                        await pline($C`%s doesn't seem to notice that %s gaze was reflected.`, await Monnam(mtmp), genders[pronoun_gender(mtmp, PRONOUN.HALLU)].his);
+                        await pline(
+                            $C`%s doesn't seem to notice that %s gaze was reflected.`,
+                            await Monnam(mtmp), genders[pronoun_gender(mtmp, PRONOUN.HALLU)].his);
                     }
                     break;
                 }
@@ -1705,7 +1850,8 @@ export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
                 }
                 return M_ATTK.AGR_DIED;
             }
-            if (canseemon(mtmp) && couldsee(mtmp.mx, mtmp.my) && !Stone_resistance() && !Unaware()) {
+            if (canseemon(mtmp) && couldsee(mtmp.mx, mtmp.my)
+                && !Stone_resistance() && !Unaware()) {
                 await You($C`meet %s gaze.`, s_suffix(await mon_nam(mtmp)));
                 await stop_occupation();
                 if (poly_when_stoned(gy.youmonst.data) && await polymon(PM.STONE_GOLEM)) {
@@ -1726,7 +1872,8 @@ export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
                     const conf = d(3, 4);
                     $t1 = mtmp.mspec_used + (conf + rn2(6) | 0) | 0, mtmp.mspec_used = $t1;
                     if (!u.uprops[CONFUSION].intrinsic) {
-                        await pline_mon(mtmp, $C`%s gaze confuses you!`, s_suffix(await Monnam(mtmp)));
+                        await pline_mon(mtmp, $C`%s gaze confuses you!`,
+                            s_suffix(await Monnam(mtmp)));
                     } else {
                         await You($C`are getting more and more confused.`);
                     }
@@ -1750,7 +1897,8 @@ export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
             }
             break;
         case AD.BLND:
-            if (canseemon(mtmp) && !await resists_blnd(gy.youmonst) && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= BOLT_LIM * BOLT_LIM) {
+            if (canseemon(mtmp) && !await resists_blnd(gy.youmonst)
+                && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= BOLT_LIM * BOLT_LIM) {
                 if (cancelled) {
                     react = rn1(2, 2);   /* "puzzled" || "dazzled" */
                     already = mtmp.mcansee === 0 ? 1 : 0;
@@ -1787,7 +1935,8 @@ export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
                     let dmg = d(2, 6);
                     const orig_dmg = dmg;
                     const lev = mtmp.m_lev;
-                    await pline_mon(mtmp, $C`%s attacks you with a fiery gaze!`, await Monnam(mtmp));
+                    await pline_mon(mtmp, $C`%s attacks you with a fiery gaze!`,
+                        await Monnam(mtmp));
                     await stop_occupation();
                     if (Fire_resistance()) {
                         await shieldeff(u.ux, u.uy);
@@ -1827,7 +1976,10 @@ export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
         }
         /* cancelled/hallucinatory feedback; monster might look "confused",
            "stunned",&c but we don't actually set corresponding attribute */
-        await pline_mon(mtmp, $C`%s looks %s%s.`, await Monnam(mtmp), !rn2(3) ? $C`` : already ? $C`quite ` : !rn2(2) ? $C`a bit ` : $C`somewhat `, gazemu$reactions[react]);
+        await pline_mon(mtmp, $C`%s looks %s%s.`, await Monnam(mtmp),
+            !rn2(3) ? $C`` : already ? $C`quite `
+            : !rn2(2) ? $C`a bit ` : $C`somewhat `,
+            gazemu$reactions[react]);
     }
     return M_ATTK.MISS;
 }
@@ -1897,7 +2049,10 @@ export function could_seduce(magr, mdef, mattk) {   // mhitu.c:1934
         defperc = perceives(mdef.data);
         gendef = $c.i16(gender(mdef));
     }
-    let adtyp = mattk ? mattk.adtyp : dmgtype(pagr, AD.SSEX) ? AD.SSEX : dmgtype(pagr, AD.SEDU) ? AD.SEDU : AD.PHYS;
+    let adtyp = mattk ? mattk.adtyp
+        : dmgtype(pagr, AD.SSEX) ? AD.SSEX
+        : dmgtype(pagr, AD.SEDU) ? AD.SEDU
+        : AD.PHYS;
     if (adtyp === AD.SSEX && !SYSOPT_SEDUCE()) {
         adtyp = AD.SEDU;
     }
@@ -1908,7 +2063,8 @@ export function could_seduce(magr, mdef, mattk) {   // mhitu.c:1934
        for seduction, both pass the could_seduce() test;
        incubi/succubi have three attacks, their claw attacks for damage
        don't pass the test */
-    if (pagr.mlet !== S.NYMPH && pagr !== mons[PM.AMOROUS_DEMON] || adtyp !== AD.SEDU && adtyp !== AD.SSEX && adtyp !== AD.SITM) {
+    if (pagr.mlet !== S.NYMPH && pagr !== mons[PM.AMOROUS_DEMON]
+        || adtyp !== AD.SEDU && adtyp !== AD.SSEX && adtyp !== AD.SITM) {
         return 0;
     }
     return genagr === 1 - gendef ? 1 : pagr.mlet === S.NYMPH ? 2 : 0;
@@ -1920,15 +2076,18 @@ export function could_seduce(magr, mdef, mattk) {   // mhitu.c:1934
  */
 export async function doseduce(mon) {   // mhitu.c:1985
     let ring = null, nring = null, qbuf = new Int8Array(128), Who = new Int8Array(128), cost = 0, $t1, $t2, $t3, $t4, $t5, $t6;
-    const fem = mon.data === mons[PM.AMOROUS_DEMON] && Mgender(mon) === FEMALE ? 1 : 0;   /* otherwise incubus */
+    const fem = mon.data === mons[PM.AMOROUS_DEMON]
+        && Mgender(mon) === FEMALE ? 1 : 0;   /* otherwise incubus */
     /* True iff no armor */
     let tried_gloves = 0;
     if (mon.mcan || mon.mspec_used) {
-        await pline_mon(mon, $C`%s acts as though %s has got a %sheadache.`, await Monnam(mon), genders[pronoun_gender(mon, PRONOUN.HALLU)].he, mon.mcan ? $C`severe ` : $C``);
+        await pline_mon(mon, $C`%s acts as though %s has got a %sheadache.`,
+            await Monnam(mon), genders[pronoun_gender(mon, PRONOUN.HALLU)].he, mon.mcan ? $C`severe ` : $C``);
         return 0;
     }
     if (unresponsive()) {
-        await pline_mon(mon, $C`%s seems dismayed at your lack of response.`, await Monnam(mon));
+        await pline_mon(mon, $C`%s seems dismayed at your lack of response.`,
+            await Monnam(mon));
         return 0;
     }
     const seewho = $c.i8(canseemon(mon));
@@ -1963,13 +2122,16 @@ export async function doseduce(mon) {   // mhitu.c:1985
             }
             /* confirmation prompt when charisma is high bypassed if deaf */
             if (!Deaf() && rn2(20) < ACURR(A.CHA)) {
-                await safe_qbuf(new $c.Ptr(qbuf, 0), $C`"That `, $C` looks pretty.  May I have it?"`, ring, xname, simpleonames, $C`ring`);
+                await safe_qbuf(new $c.Ptr(qbuf, 0), $C`"That `,
+                    $C` looks pretty.  May I have it?"`, ring,
+                    xname, simpleonames, $C`ring`);
                 await makeknown(RIN_ADORNMENT);
                 if (await y_n(new $c.Ptr(qbuf, 0)) === 110) {
                     continue;
                 }
             } else {
-                await pline($C`%s decides she'd like %s, and takes it.`, new $c.Ptr(Who, 0), await yname(ring));
+                await pline($C`%s decides she'd like %s, and takes it.`,
+                    new $c.Ptr(Who, 0), await yname(ring));
             }
             await makeknown(RIN_ADORNMENT);
             /* might be in left or right ring slot or weapon/alt-wep/quiver */
@@ -1979,7 +2141,8 @@ export async function doseduce(mon) {   // mhitu.c:1985
             await freeinv(ring);
             await mpickobj(mon, ring);
         } else {
-            if ($G.uleft && $G.uright && $G.uleft.otyp === RIN_ADORNMENT && $G.uright.otyp === RIN_ADORNMENT) {
+            if ($G.uleft && $G.uright && $G.uleft.otyp === RIN_ADORNMENT
+                && $G.uright.otyp === RIN_ADORNMENT) {
                 break;
             }
             if (ring === $G.uleft || ring === $G.uright) {
@@ -1996,28 +2159,34 @@ export async function doseduce(mon) {   // mhitu.c:1985
             }
             /* confirmation prompt when charisma is high bypassed if deaf */
             if (!Deaf() && rn2(20) < ACURR(A.CHA)) {
-                await safe_qbuf(new $c.Ptr(qbuf, 0), $C`"That `, $C` looks pretty.  Would you wear it for me?"`, ring, xname, simpleonames, $C`ring`);
+                await safe_qbuf(new $c.Ptr(qbuf, 0), $C`"That `,
+                    $C` looks pretty.  Would you wear it for me?"`,
+                    ring, xname, simpleonames, $C`ring`);
                 await makeknown(RIN_ADORNMENT);
                 if (await y_n(new $c.Ptr(qbuf, 0)) === 110) {
                     continue;
                 }
             } else {
-                await pline($C`%s decides you'd look prettier wearing %s,`, new $c.Ptr(Who, 0), await yname(ring));
+                await pline($C`%s decides you'd look prettier wearing %s,`,
+                    new $c.Ptr(Who, 0), await yname(ring));
                 await pline($C`and puts it on your finger.`);
             }
             await makeknown(RIN_ADORNMENT);
             if (!$G.uright) {
-                await pline($C`%s puts %s on your right %s.`, new $c.Ptr(Who, 0), await the(await xname(ring)), await body_part(HAND));
+                await pline($C`%s puts %s on your right %s.`,
+                    new $c.Ptr(Who, 0), await the(await xname(ring)), await body_part(HAND));
                 await setworn(ring, W.RINGR);
             } else if (!$G.uleft) {
-                await pline($C`%s puts %s on your left %s.`, new $c.Ptr(Who, 0), await the(await xname(ring)), await body_part(HAND));
+                await pline($C`%s puts %s on your left %s.`,
+                    new $c.Ptr(Who, 0), await the(await xname(ring)), await body_part(HAND));
                 await setworn(ring, W.RINGL);
             } else if ($G.uright && $G.uright.otyp !== RIN_ADORNMENT) {
                 /* note: the "replaces" message might be inaccurate if
                    hero's location changes and the process gets interrupted,
                    but trying to figure that out in advance in order to use
                    alternate wording is not worth the effort */
-                await pline($C`%s replaces %s with %s.`, new $c.Ptr(Who, 0), await yname($G.uright), await yname(ring));
+                await pline($C`%s replaces %s with %s.`,
+                    new $c.Ptr(Who, 0), await yname($G.uright), await yname(ring));
                 await Ring_gone($G.uright);
                 /* ring removal might cause loss of levitation which could
                    drop hero onto trap that transports hero somewhere else */
@@ -2027,7 +2196,8 @@ export async function doseduce(mon) {   // mhitu.c:1985
                 await setworn(ring, W.RINGR);
             } else if ($G.uleft && $G.uleft.otyp !== RIN_ADORNMENT) {
                 /* see "replaces" note above */
-                await pline($C`%s replaces %s with %s.`, new $c.Ptr(Who, 0), await yname($G.uleft), await yname(ring));
+                await pline($C`%s replaces %s with %s.`,
+                    new $c.Ptr(Who, 0), await yname($G.uleft), await yname(ring));
                 await Ring_gone($G.uleft);
                 if (u.utotype || !m_next2u(mon)) {
                     return 1;
@@ -2041,7 +2211,11 @@ export async function doseduce(mon) {   // mhitu.c:1985
         }
     }
     const naked = !$G.uarmc && !$G.uarmf && !$G.uarmg && !$G.uarms && !$G.uarmh && !$G.uarmu ? 1 : 0;
-    await urgent_pline($C`%s %s%s.`, new $c.Ptr(Who, 0), Deaf() ? $C`seems to murmur into your ear` : naked ? $C`murmurs sweet nothings into your ear` : $C`murmurs in your ear`, naked ? $C`` : $C`, while helping you undress`);
+    await urgent_pline($C`%s %s%s.`, new $c.Ptr(Who, 0),
+        Deaf() ? $C`seems to murmur into your ear`
+        : naked ? $C`murmurs sweet nothings into your ear`
+        : $C`murmurs in your ear`,
+        naked ? $C`` : $C`, while helping you undress`);
     await mayberem(mon, new $c.Ptr(Who, 0), $G.uarmc, cloak_simple_name($G.uarmc));
     if (!$G.uarmc) {
         await mayberem(mon, new $c.Ptr(Who, 0), $G.uarm, suit_simple_name($G.uarm));
@@ -2067,7 +2241,8 @@ export async function doseduce(mon) {   // mhitu.c:1985
     if ($G.uarm || $G.uarmc) {
         if (!Deaf()) {
             if (!(ld() && mon.female)) {
-                await verbalize($C`You're such a %s; I wish...`, flags.female ? $C`sweet lady` : $C`nice guy`);
+                await verbalize($C`You're such a %s; I wish...`,
+                    flags.female ? $C`sweet lady` : $C`nice guy`);
             } else {
                 const yourgloves = u_carried_gloves();
                 /* have her call your gloves by their correct
@@ -2075,7 +2250,11 @@ export async function doseduce(mon) {   // mhitu.c:1985
                 if (yourgloves) {
                     await observe_object(yourgloves);
                 }
-                await verbalize($C`Well, then you owe me %s%s!`, yourgloves ? await yname(yourgloves) : $C`twelve pairs of gloves`, yourgloves ? $C` and eleven more pairs of gloves` : $C``);
+                await verbalize($C`Well, then you owe me %s%s!`,
+                    yourgloves ? await yname(yourgloves)
+                    : $C`twelve pairs of gloves`,
+                    yourgloves ? $C` and eleven more pairs of gloves`
+                    : $C``);
             }
         } else if (seewho) {
             await pline_mon(mon, $C`%s appears to sigh.`, await Monnam(mon));
@@ -2090,7 +2269,9 @@ export async function doseduce(mon) {   // mhitu.c:1985
         adjalign(1);
     }
     /* by this point you have discovered mon's identity, blind or not... */
-    await urgent_pline($C`Time stands still while you and %s lie in each other's arms...`, await noit_mon_nam(mon));
+    await urgent_pline(
+        $C`Time stands still while you and %s lie in each other's arms...`,
+        await noit_mon_nam(mon));
     /* 3.6.1: a combined total for charisma plus intelligence of 35-1
        used to guarantee successful outcome; now total maxes out at 32
        as far as deciding what will happen; chance for bad outcome when
@@ -2098,7 +2279,8 @@ export async function doseduce(mon) {   // mhitu.c:1985
     const attr_tot = ACURR(A.CHA) + ACURR(A.INT);
     if (rn2(35) > min(attr_tot, 32)) {
         /* Don't bother with mspec_used here... it didn't get tired! */
-        await pline($C`%s seems to have enjoyed it more than you...`, await noit_Monnam(mon));
+        await pline($C`%s seems to have enjoyed it more than you...`,
+            await noit_Monnam(mon));
         switch (rn2(5)) {
             case 0:
                 await You_feel($C`drained of energy.`);
@@ -2184,9 +2366,11 @@ export async function doseduce(mon) {   // mhitu.c:1985
     if (mon.mtame) {
         /* don't charge */
     } else if (rn2(20) < ACURR(A.CHA)) {
-        await pline($C`%s demands that you pay %s, but you refuse...`, await noit_Monnam(mon), genders[pronoun_gender(mon, PRONOUN.NO_IT | PRONOUN.HALLU)].him);
+        await pline($C`%s demands that you pay %s, but you refuse...`,
+            await noit_Monnam(mon), genders[pronoun_gender(mon, PRONOUN.NO_IT | PRONOUN.HALLU)].him);
     } else if (u.umonnum === PM.LEPRECHAUN) {
-        await pline_mon(mon, $C`%s tries to take your gold, but fails...`, await noit_Monnam(mon));
+        await pline_mon(mon, $C`%s tries to take your gold, but fails...`,
+            await noit_Monnam(mon));
     } else {
         const umoney = money_cnt(gi.invent);
         if (umoney > LARGEST_INT - 10) {
@@ -2210,7 +2394,8 @@ export async function doseduce(mon) {   // mhitu.c:1985
                 await pline($C`No charge.`);
             }
         } else {
-            await pline_mon(mon, $C`%s takes %ld %s for services rendered!`, await noit_Monnam(mon), cost, await currency(cost));
+            await pline_mon(mon, $C`%s takes %ld %s for services rendered!`,
+                await noit_Monnam(mon), cost, await currency(cost));
             await money2mon(mon, cost);
             disp.botl = TRUE;
         }
@@ -2254,7 +2439,18 @@ async function mayberem(mon, seducer, obj, str) {   // mhitu.c:2309
     } else {
         $c.sprintf(new $c.Ptr(hairbuf, 0), $C`let me run my fingers through your %s`, await body_part(HAIR));
         /* obj == uarmh */
-        await verbalize($C`Take off your %s; %s.`, str, obj === $G.uarm ? $C`let's get a little closer` : obj === $G.uarmc || obj === $G.uarms ? $C`it's in the way` : obj === $G.uarmf ? $C`let me rub your feet` : obj === $G.uarmg ? $C`they're too clumsy` : obj === $G.uarmu ? $C`let me massage you` : new $c.Ptr(hairbuf, 0));
+        await verbalize($C`Take off your %s; %s.`, str,
+            obj === $G.uarm
+            ? $C`let's get a little closer`
+            : obj === $G.uarmc || obj === $G.uarms
+            ? $C`it's in the way`
+            : obj === $G.uarmf
+            ? $C`let me rub your feet`
+            : obj === $G.uarmg
+            ? $C`they're too clumsy`
+            : obj === $G.uarmu
+            ? $C`let me massage you`
+            : new $c.Ptr(hairbuf, 0));
     }
     await remove_worn_item(obj, TRUE);
 }
@@ -2288,7 +2484,9 @@ async function assess_dmg(mtmp, tmp) {   // mhitu.c:2355
 export function mon_avoiding_this_attack(mtmp, attkidx) {   // mhitu.c:2393
     const ptr = mtmp.data;
     let typ = -1;
-    if (attkidx >= 0 && (typ = get_atkdam_type(ptr.mattk[attkidx].adtyp)) >= 0 && $c.andu64(mtmp.seen_resistance, cvt_adtyp_to_mseenres($c.u8(typ)))) {
+    if (attkidx >= 0
+        && (typ = get_atkdam_type(ptr.mattk[attkidx].adtyp)) >= 0
+        && $c.andu64(mtmp.seen_resistance, cvt_adtyp_to_mseenres($c.u8(typ)))) {
         return TRUE;
     }
     return FALSE;
@@ -2307,7 +2505,9 @@ export function ranged_attk_available(mtmp) {   // mhitu.c:2413
     let typ = -1;
     const ptr = mtmp.data;
     for (i = 0; i < NATTK; i = i + 1 | 0) {
-        if (DISTANCE_ATTK_TYPE(ptr.mattk[i].aatyp) && (typ = get_atkdam_type(ptr.mattk[i].adtyp)) >= 0 && $c.andu64(mtmp.seen_resistance, cvt_adtyp_to_mseenres($c.u8(typ))) === 0) {
+        if (DISTANCE_ATTK_TYPE(ptr.mattk[i].aatyp)
+            && (typ = get_atkdam_type(ptr.mattk[i].adtyp)) >= 0
+            && $c.andu64(mtmp.seen_resistance, cvt_adtyp_to_mseenres($c.u8(typ))) === 0) {
             return TRUE;
         }
     }
@@ -2338,7 +2538,8 @@ async function passiveum(olduasmon, mtmp, mattk) {   // mhitu.c:2435
         if (i >= NATTK) {
             return M_ATTK.HIT;
         }
-        if (olduasmon.mattk[i].aatyp === AT.NONE || olduasmon.mattk[i].aatyp === AT.BOOM) {
+        if (olduasmon.mattk[i].aatyp === AT.NONE
+            || olduasmon.mattk[i].aatyp === AT.BOOM) {
             oldu_mattk = $c.relem(olduasmon.mattk, i);
         }
     }
@@ -2356,7 +2557,8 @@ async function passiveum(olduasmon, mtmp, mattk) {   // mhitu.c:2435
                 /* temporary? hack for sequencing issue:  "your acid"
                    looks strange coming immediately after player has
                    been told that hero has reverted to normal form */
-                await pline_mon(mtmp, $C`%s is splashed by %s%s!`, await Monnam(mtmp), !Upolyd() ? $C`` : $C`your `, hliquid($C`acid`));
+                await pline_mon(mtmp, $C`%s is splashed by %s%s!`, await Monnam(mtmp),
+                    !Upolyd() ? $C`` : $C`your `, hliquid($C`acid`));
                 if (await resists_acid(mtmp)) {
                     await pline_mon(mtmp, $C`%s is not affected.`, await Monnam(mtmp));
                     tmp = 0;
@@ -2380,7 +2582,10 @@ async function passiveum(olduasmon, mtmp, mattk) {   // mhitu.c:2435
                 if (mtmp.mw !== null) {
                     wornitems = $c.or64(wornitems, W.ARMG);
                 }
-                if (!await resists_ston(mtmp) && (protector === 0 || protector !== -1 && $c.and64(wornitems, protector) !== protector)) {
+                if (!await resists_ston(mtmp)
+                    && (protector === 0
+                    || protector !== -1
+                    && $c.and64(wornitems, protector) !== protector)) {
                     if (poly_when_stoned(mtmp.data)) {
                         await mon_to_stone(mtmp);
                         return 1;
@@ -2430,14 +2635,19 @@ async function passiveum(olduasmon, mtmp, mattk) {   // mhitu.c:2435
                     if (!rn2(4)) {
                         tmp = 127;
                     }
-                    if (mtmp.mcansee && haseyes(mtmp.data) && rn2(3) && (perceives(mtmp.data) || !Invis())) {
+                    if (mtmp.mcansee && haseyes(mtmp.data) && rn2(3)
+                        && (perceives(mtmp.data) || !Invis())) {
                         if (Blind()) {
-                            await pline($C`As a blind %s, you cannot defend yourself.`, pmname(gy.youmonst.data, flags.female ? FEMALE : MALE));
+                            await pline($C`As a blind %s, you cannot defend yourself.`,
+                                pmname(gy.youmonst.data,
+                                flags.female ? FEMALE : MALE));
                         } else {
-                            if (await mon_reflects(mtmp, $C`Your gaze is reflected by %s %s.`)) {
+                            if (await mon_reflects(mtmp,
+                                $C`Your gaze is reflected by %s %s.`)) {
                                 return 1;
                             }
-                            await pline_mon(mtmp, $C`%s is frozen by your gaze!`, await Monnam(mtmp));
+                            await pline_mon(mtmp, $C`%s is frozen by your gaze!`,
+                                await Monnam(mtmp));
                             paralyze_monst(mtmp, tmp);
                             return M_ATTK.AGR_DONE;
                         }
@@ -2471,7 +2681,8 @@ async function passiveum(olduasmon, mtmp, mattk) {   // mhitu.c:2435
                 /* Yellow mold */
                 if (!mtmp.mstun) {
                     mtmp.mstun = 1;
-                    await pline_mon(mtmp, $C`%s %s.`, await Monnam(mtmp), await makeplural(stagger(mtmp.data, $C`stagger`)));
+                    await pline_mon(mtmp, $C`%s %s.`, await Monnam(mtmp),
+                        await makeplural(stagger(mtmp.data, $C`stagger`)));
                 }
                 tmp = 0;
                 break;
@@ -2494,7 +2705,8 @@ async function passiveum(olduasmon, mtmp, mattk) {   // mhitu.c:2435
                     tmp = 0;
                     break;
                 }
-                await pline_mon(mtmp, $C`%s is jolted with your electricity!`, await Monnam(mtmp));
+                await pline_mon(mtmp, $C`%s is jolted with your electricity!`,
+                    await Monnam(mtmp));
                 break;
             default:
                 tmp = 0;
@@ -2516,7 +2728,8 @@ export async function cloneu() {   // mhitu.c:2616
     if (svm.mvitals[mndx].mvflags & G_EXTINCT) {
         return null;
     }
-    let mon = await makemon(gy.youmonst.data, u.ux, u.uy, NO.MINVENT | MM.EDOG | MM.NOMSG);
+    let mon = await makemon(gy.youmonst.data, u.ux, u.uy,
+        NO.MINVENT | MM.EDOG | MM.NOMSG);
     if (!mon) {
         return null;
     }

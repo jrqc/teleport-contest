@@ -35,7 +35,8 @@ const dm = $c.recArray($T.datamodel_information, 5);
 async function nh_qsort_idx_cmp(va, vb) {   // hacklib.c:19
     const a = $c.asRec(va, $T.nh_qsort_index, 8);
     const b = $c.asRec(vb, $T.nh_qsort_index, 8);
-    const c = await nh_qsort_cmp_fn(nh_qsort_base.add($c.idx($c.mulu64(a.idx, nh_qsort_size))), nh_qsort_base.add($c.idx($c.mulu64(b.idx, nh_qsort_size))));
+    const c = await nh_qsort_cmp_fn(nh_qsort_base.add($c.idx($c.mulu64(a.idx, nh_qsort_size))),
+        nh_qsort_base.add($c.idx($c.mulu64(b.idx, nh_qsort_size))));
     if (c) {
         return c;
     }
@@ -434,7 +435,9 @@ export function ing_suffix(s) {   // hacklib.c:427
     $c.strcpy(new $c.Ptr(ing_suffix$buf, 0), s);
     let p = eos(new $c.Ptr(ing_suffix$buf, 0));
     $t2 = ($t1 = p.add(1).set(0, 0), p.set(0, $t1)), onoff[0] = $t2;
-    if ($c.pcmp(p, new $c.Ptr(ing_suffix$buf, 3)) >= 0 && !strcmpi(p.add(-3), $C` on`) || $c.pcmp(p, new $c.Ptr(ing_suffix$buf, 4)) >= 0 && !strcmpi(p.add(-4), $C` off`) || $c.pcmp(p, new $c.Ptr(ing_suffix$buf, 5)) >= 0 && !strcmpi(p.add(-5), $C` with`)) {
+    if ($c.pcmp(p, new $c.Ptr(ing_suffix$buf, 3)) >= 0 && !strcmpi(p.add(-3), $C` on`)
+        || $c.pcmp(p, new $c.Ptr(ing_suffix$buf, 4)) >= 0 && !strcmpi(p.add(-4), $C` off`)
+        || $c.pcmp(p, new $c.Ptr(ing_suffix$buf, 5)) >= 0 && !strcmpi(p.add(-5), $C` with`)) {
         p = $c.strrchr(new $c.Ptr(ing_suffix$buf, 0), 32);
         $c.strcpy(new $c.Ptr(onoff, 0), p);
         p.set(0, 0);
@@ -442,7 +445,8 @@ export function ing_suffix(s) {   // hacklib.c:427
     if ($c.pcmp(p, new $c.Ptr(ing_suffix$buf, 2)) >= 0 && !strcmpi(p.add(-2), $C`er`)) {
         /* slither + ing */
         /* nothing here */
-    } else if ($c.pcmp(p, new $c.Ptr(ing_suffix$buf, 3)) >= 0 && !$c.strchr(new $c.Ptr(ing_suffix$vowel, 0), p.add(-1).get(0)) && $c.strchr(new $c.Ptr(ing_suffix$vowel, 0), p.add(-2).get(0)) && !$c.strchr(new $c.Ptr(ing_suffix$vowel, 0), p.add(-3).get(0))) {
+    } else if ($c.pcmp(p, new $c.Ptr(ing_suffix$buf, 3)) >= 0 && !$c.strchr(new $c.Ptr(ing_suffix$vowel, 0), p.add(-1).get(0))
+        && $c.strchr(new $c.Ptr(ing_suffix$vowel, 0), p.add(-2).get(0)) && !$c.strchr(new $c.Ptr(ing_suffix$vowel, 0), p.add(-3).get(0))) {
         /* tip -> tipp + ing */
         p.set(0, p.add(-1).get(0));
         p.add(1).set(0, 0);
@@ -687,7 +691,9 @@ export function findword(list, word, wordlen, ignorecase) {   // hacklib.c:665
         if (!p.get(0)) {
             break;
         }
-        if ((ignorecase ? !strncmpi(p, word, wordlen) : !$c.strncmp(p, word, $c.u64(wordlen))) && (p.get(wordlen) === 0 || p.get(wordlen) === 32)) {
+        if ((ignorecase ? !strncmpi(p, word, wordlen)
+            : !$c.strncmp(p, word, $c.u64(wordlen)))
+            && (p.get(wordlen) === 0 || p.get(wordlen) === 32)) {
             return p;
         }
         p = $c.strchr(p.add(1), 32);
@@ -702,7 +708,8 @@ export function findword(list, word, wordlen, ignorecase) {   // hacklib.c:665
 export function ordin(n) {   // hacklib.c:689
     /* note: should be non-negative */
     const dd = $c.rem32(n, 10);
-    return dd === 0 || dd > 3 || $c.div32($c.rem32(n, 100), 10) === 1 ? $C`th` : dd === 1 ? $C`st` : dd === 2 ? $C`nd` : $C`rd`;
+    return dd === 0 || dd > 3 || $c.div32($c.rem32(n, 100), 10) === 1 ? $C`th`
+        : dd === 1 ? $C`st` : dd === 2 ? $C`nd` : $C`rd`;
 }
 /* one compiler complains about
    result of ?: for format string */
@@ -1071,7 +1078,9 @@ export function datamodel(retidx) {   // hacklib.c:1046
 export function what_datamodel_is_this(retidx, szshort, szint, szlong, szll, szptr) {   // hacklib.c:1064
     let i = 0;
     for (i = 1; i < 5; i = i + 1 | 0) {
-        if (szshort === dm[i].sz[0] && szint === dm[i].sz[1] && szlong === dm[i].sz[2] && szll === dm[i].sz[3] && szptr === dm[i].sz[4]) {
+        if (szshort === dm[i].sz[0] && szint === dm[i].sz[1]
+            && szlong === dm[i].sz[2] && szll === dm[i].sz[3]
+            && szptr === dm[i].sz[4]) {
             return retidx === 0 ? dm[i].datamodel : dm[i].dmplatform;
         }
     }

@@ -117,7 +117,8 @@ async function md_start(startp) {   // mail.c:149
      * hero.
      */
     while (stway) {
-        if (stway.tolev.dnum === u.uz.dnum && couldsee(stway.sx, stway.sy)) {
+        if (stway.tolev.dnum === u.uz.dnum
+            && couldsee(stway.sx, stway.sy)) {
             startp.x = stway.sx;
             startp.y = stway.sy;
             return TRUE;
@@ -145,7 +146,10 @@ async function md_start(startp) {   // mail.c:149
                         max_distance = dd;
                         startp.y = $c.i16(row);
                         startp.x = gv.viz_rmin.get(row);
-                    } else if (await enexto(testcc, gv.viz_rmin.get(row), $c.i16(row), null) && !cansee(testcc.x, testcc.y) && couldsee(testcc.x, testcc.y)) {
+                    } else if (await enexto(testcc, gv.viz_rmin.get(row), $c.i16(row),
+                        null)
+                        && !cansee(testcc.x, testcc.y)
+                        && couldsee(testcc.x, testcc.y)) {
                         max_distance = dd;
                         startp.$copyFrom(testcc);
                     }
@@ -156,7 +160,10 @@ async function md_start(startp) {   // mail.c:149
                         max_distance = dd;
                         startp.y = $c.i16(row);
                         startp.x = gv.viz_rmax.get(row);
-                    } else if (await enexto(testcc, gv.viz_rmax.get(row), $c.i16(row), null) && !cansee(testcc.x, testcc.y) && couldsee(testcc.x, testcc.y)) {
+                    } else if (await enexto(testcc, gv.viz_rmax.get(row), $c.i16(row),
+                        null)
+                        && !cansee(testcc.x, testcc.y)
+                        && couldsee(testcc.x, testcc.y)) {
                         max_distance = dd;
                         startp.$copyFrom(testcc);
                     }
@@ -197,7 +204,8 @@ async function md_stop(stopp, startp) {   // mail.c:248
             }
             if (accessible(x, y) && !MON_AT(x, y)) {
                 const distance = $c.i16(dist2(x, y, startp.x, startp.y));
-                if (min_distance < 0 || distance < min_distance || distance === min_distance && rn2(2)) {
+                if (min_distance < 0 || distance < min_distance
+                    || distance === min_distance && rn2(2)) {
                     stopp.x = x;
                     stopp.y = y;
                     min_distance = distance;
@@ -250,7 +258,8 @@ async function md_rush(md, tx, ty) {   // mail.c:288
         let d1 = dist2($c.i16(fx), $c.i16(fy), $c.i16(tx), $c.i16(ty));
         for (dx = -1; dx <= 1; dx = dx + 1 | 0) {
             for (dy = -1; dy <= 1; dy = dy + 1 | 0) {
-                if ((dx || dy) && isok($c.i16(fx + dx | 0), $c.i16(fy + dy | 0)) && !(svl.level.locations[fx + dx | 0][fy + dy | 0].typ <= DBWALL)) {
+                if ((dx || dy) && isok($c.i16(fx + dx | 0), $c.i16(fy + dy | 0))
+                    && !(svl.level.locations[fx + dx | 0][fy + dy | 0].typ <= DBWALL)) {
                     const d2 = dist2($c.i16(fx + dx | 0), $c.i16(fy + dy | 0), $c.i16(tx), $c.i16(ty));
                     if (d2 < d1) {
                         d1 = d2;
@@ -368,7 +377,8 @@ async function newmail(info) {   // mail.c:399
                     }
                 }
                 await display_nhwindow()($G.WIN_MESSAGE, FALSE);
-                obj = await hold_another_object(obj, $C`Oops!`, null, null);
+                obj = await hold_another_object(obj, $C`Oops!`, null,
+                    null);
                 nhUse(obj);
             }
         }
@@ -401,7 +411,8 @@ async function newmail(info) {   // mail.c:399
  */
 export async function ckmailstatus() {   // mail.c:550
     ck_server_admin_msg();
-    if (!mailbox || u.uswallow || !flags.biff || svm.moves < $c.add64(laststattime, MAILCKFREQ)) {
+    if (!mailbox || u.uswallow || !flags.biff
+        || svm.moves < $c.add64(laststattime, MAILCKFREQ)) {
         return;
     }
     laststattime = svm.moves;

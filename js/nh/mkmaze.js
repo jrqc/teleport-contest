@@ -112,7 +112,9 @@ function iswall(x, y) {   // mkmaze.c:45
         return 0;
     }
     const type = svl.level.locations[x][y].typ;
-    return IS_WALL(type) || IS_DOOR(type) || type === LAVAWALL || type === WATER || type === SDOOR || type === IRONBARS ? 1 : 0;
+    return IS_WALL(type) || IS_DOOR(type)
+        || type === LAVAWALL || type === WATER
+        || type === SDOOR || type === IRONBARS ? 1 : 0;
 }
 /* used to determine if wall spines can join this location */
 /**
@@ -168,7 +170,8 @@ export async function set_levltyp(x, y, newtyp) {   // mkmaze.c:77
                 await obj_ice_effects(x, y, TRUE);
                 await spot_stop_timers(x, y, MELT_ICE_AWAY);
             }
-            if (IS_FOUNTAIN(oldtyp) !== IS_FOUNTAIN(newtyp) || IS_SINK(oldtyp) !== IS_SINK(newtyp)) {
+            if (IS_FOUNTAIN(oldtyp) !== IS_FOUNTAIN(newtyp)
+                || IS_SINK(oldtyp) !== IS_SINK(newtyp)) {
                 count_level_features();   /* level.flags.nfountains,nsinks */
             }
             return TRUE;
@@ -233,7 +236,8 @@ function extend_spine(locale, wall_there, dx, dy) {   // mkmaze.c:166
         /* wall in that direction */
         if (dx) {
             /* EW are wall/stone */
-            if (locale.get(1)[0] && locale.get(1)[2] && locale.get(nx)[0] && locale.get(nx)[2]) {
+            if (locale.get(1)[0] && locale.get(1)[2]
+                && locale.get(nx)[0] && locale.get(nx)[2]) {
                 /* diag are wall/stone */
                 spine = 0;
             } else {
@@ -242,7 +246,8 @@ function extend_spine(locale, wall_there, dx, dy) {   // mkmaze.c:166
         } else {
             /* dy */
             /* NS are wall/stone */
-            if (locale.get(0)[1] && locale.get(2)[1] && locale.get(0)[ny] && locale.get(2)[ny]) {
+            if (locale.get(0)[1] && locale.get(2)[1]
+                && locale.get(0)[ny] && locale.get(2)[ny]) {
                 /* diag are wall/stone */
                 spine = 0;
             } else {
@@ -277,7 +282,10 @@ async function wall_cleanup(x1, y1, x2, y2) {   // mkmaze.c:198
             const lev = $c.relem(svl.level.locations[x], y);
             const type = $c.u8(lev.typ);
             if (IS_WALL(type) && type !== DBWALL) {
-                if (is_solid($c.i16(x - 1), $c.i16(y - 1)) && is_solid($c.i16(x - 1), y) && is_solid($c.i16(x - 1), $c.i16(y + 1)) && is_solid(x, $c.i16(y - 1)) && is_solid(x, $c.i16(y + 1)) && is_solid($c.i16(x + 1), $c.i16(y - 1)) && is_solid($c.i16(x + 1), y) && is_solid($c.i16(x + 1), $c.i16(y + 1))) {
+                if (is_solid($c.i16(x - 1), $c.i16(y - 1)) && is_solid($c.i16(x - 1), y)
+                    && is_solid($c.i16(x - 1), $c.i16(y + 1)) && is_solid(x, $c.i16(y - 1))
+                    && is_solid(x, $c.i16(y + 1)) && is_solid($c.i16(x + 1), $c.i16(y - 1))
+                    && is_solid($c.i16(x + 1), y) && is_solid($c.i16(x + 1), $c.i16(y + 1))) {
                     lev.typ = STONE;
                 }
             }
@@ -314,7 +322,9 @@ export async function fix_wall_spines(x1, y1, x2, y2) {   // mkmaze.c:229
             }
             /* set the locations TRUE if rock or wall or out of bounds */
             /* for baalz insect */
-            const loc_f = x >= gb.bughack.inarea.x1 && x <= gb.bughack.inarea.x2 && y >= gb.bughack.inarea.y1 && y <= gb.bughack.inarea.y2 ? iswall : iswall_or_stone;
+            const loc_f = x >= gb.bughack.inarea.x1 && x <= gb.bughack.inarea.x2 && y >= gb.bughack.inarea.y1 && y <= gb.bughack.inarea.y2
+                ? iswall
+                : iswall_or_stone;
             $t1 = await loc_f($c.i16(x - 1), $c.i16(y - 1)), locale[0][0] = $t1;
             $t2 = await loc_f(x, $c.i16(y - 1)), locale[1][0] = $t2;
             $t3 = await loc_f($c.i16(x + 1), $c.i16(y - 1)), locale[2][0] = $t3;
@@ -386,7 +396,8 @@ async function okay(x, y, dir) {   // mkmaze.c:297
                 await panic($C`mz_move: bad direction %d`, dir);
         }
     } while (0);
-    if (x < 3 || y < 3 || x > gx.x_maze_max || y > gy.y_maze_max || svl.level.locations[x][y].typ !== STONE) {
+    if (x < 3 || y < 3 || x > gx.x_maze_max || y > gy.y_maze_max
+        || svl.level.locations[x][y].typ !== STONE) {
         return FALSE;
     }
     return TRUE;
@@ -410,7 +421,12 @@ function maze0xy(cc) {   // mkmaze.c:309
 export function is_exclusion_zone(type, x, y) {   // mkmaze.c:317
     let ez = sve.exclusion_zones;
     while (ez) {
-        if ((type === LR.DOWNTELE && (ez.zonetype === LR.DOWNTELE || ez.zonetype === LR.TELE) || type === LR.UPTELE && (ez.zonetype === LR.UPTELE || ez.zonetype === LR.TELE) || type === ez.zonetype) && (x >= ez.lx && x <= ez.hx && y >= ez.ly && y <= ez.hy)) {
+        if ((type === LR.DOWNTELE
+            && (ez.zonetype === LR.DOWNTELE || ez.zonetype === LR.TELE)
+            || type === LR.UPTELE
+            && (ez.zonetype === LR.UPTELE || ez.zonetype === LR.TELE)
+            || type === ez.zonetype)
+            && (x >= ez.lx && x <= ez.hx && y >= ez.ly && y <= ez.hy)) {
             return TRUE;
         }
         ez = ez.next;
@@ -433,7 +449,12 @@ export function is_exclusion_zone(type, x, y) {   // mkmaze.c:317
  * @returns {number} boolean
  */
 export function bad_location(x, y, nlx, nly, nhx, nhy) {   // mkmaze.c:341
-    return occupied(x, y) || within_bounded_area(x, y, nlx, nly, nhx, nhy) || !(svl.level.locations[x][y].typ === CORR && svl.level.flags.is_maze_lev || svl.level.locations[x][y].typ === ROOM || svl.level.locations[x][y].typ === AIR) ? 1 : 0;
+    return occupied(x, y)
+        || within_bounded_area(x, y, nlx, nly, nhx, nhy)
+        || !(svl.level.locations[x][y].typ === CORR
+        && svl.level.flags.is_maze_lev
+        || svl.level.locations[x][y].typ === ROOM
+        || svl.level.locations[x][y].typ === AIR) ? 1 : 0;
 }
 /* pick a location in area (lx, ly, hx, hy) but not in (nlx, nly, nhx, nhy)
    and place something (based on rtype) in that region */
@@ -513,7 +534,8 @@ export async function place_lregion(lx, ly, hx, hy, nlx, nly, nhx, nhy, rtype, l
  */
 async function put_lregion_here(x, y, nlx, nly, nhx, nhy, rtype, oneshot, lev) {   // mkmaze.c:413
     let mtmp = null;
-    if (bad_location(x, y, nlx, nly, nhx, nhy) || is_exclusion_zone(rtype, x, y)) {
+    if (bad_location(x, y, nlx, nly, nhx, nhy)
+        || is_exclusion_zone(rtype, x, y)) {
         if (!oneshot) {
             return FALSE;   /* caller should try again */
         } else {
@@ -527,7 +549,8 @@ async function put_lregion_here(x, y, nlx, nly, nhx, nhy, rtype, oneshot, lev) {
                 }
                 await deltrap(t);
             }
-            if (bad_location(x, y, nlx, nly, nhx, nhy) || is_exclusion_zone(rtype, x, y)) {
+            if (bad_location(x, y, nlx, nly, nhx, nhy)
+                || is_exclusion_zone(rtype, x, y)) {
                 return FALSE;
             }
         }
@@ -614,12 +637,14 @@ async function baalz_fixup() {   // mkmaze.c:475
                 }
             } else if (svl.level.locations[x][y].typ === IRONBARS) {
                 /* novelty effect; allowing digging in front of 'eyes' */
-                if (isok($c.i16(x - 1 | 0), $c.i16(y)) && (svl.level.locations[x - 1 | 0][y].flags & W.NONDIGGABLE) !== 0) {
+                if (isok($c.i16(x - 1 | 0), $c.i16(y))
+                    && (svl.level.locations[x - 1 | 0][y].flags & W.NONDIGGABLE) !== 0) {
                     svl.level.locations[x - 1 | 0][y].flags = (((svl.level.locations[x - 1 | 0][y].flags | 0) & ~W.NONDIGGABLE) >>> 0) & 31;
                     if (isok($c.i16(x - 2 | 0), $c.i16(y))) {
                         svl.level.locations[x - 2 | 0][y].flags = (((svl.level.locations[x - 2 | 0][y].flags | 0) & ~W.NONDIGGABLE) >>> 0) & 31;
                     }
-                } else if (isok($c.i16(x + 1 | 0), $c.i16(y)) && (svl.level.locations[x + 1 | 0][y].flags & W.NONDIGGABLE) !== 0) {
+                } else if (isok($c.i16(x + 1 | 0), $c.i16(y))
+                    && (svl.level.locations[x + 1 | 0][y].flags & W.NONDIGGABLE) !== 0) {
                     svl.level.locations[x + 1 | 0][y].flags = (((svl.level.locations[x + 1 | 0][y].flags | 0) & ~W.NONDIGGABLE) >>> 0) & 31;
                     if (isok($c.i16(x + 2 | 0), $c.i16(y))) {
                         svl.level.locations[x + 2 | 0][y].flags = (((svl.level.locations[x + 2 | 0][y].flags | 0) & ~W.NONDIGGABLE) >>> 0) & 31;
@@ -628,12 +653,16 @@ async function baalz_fixup() {   // mkmaze.c:475
             }
         }
     }
-    await wallification($c.i16(max(gb.bughack.inarea.x1 - 2, 1)), $c.i16(max(gb.bughack.inarea.y1 - 2, 0)), $c.i16(gb.bughack.inarea.x2 + 2 < COLNO - 1 ? gb.bughack.inarea.x2 + 2 : COLNO - 1), $c.i16(gb.bughack.inarea.y2 + 2 < ROWNO - 1 ? gb.bughack.inarea.y2 + 2 : ROWNO - 1));
+    await wallification($c.i16(max(gb.bughack.inarea.x1 - 2, 1)),
+        $c.i16(max(gb.bughack.inarea.y1 - 2, 0)),
+        $c.i16(gb.bughack.inarea.x2 + 2 < COLNO - 1 ? gb.bughack.inarea.x2 + 2 : COLNO - 1),
+        $c.i16(gb.bughack.inarea.y2 + 2 < ROWNO - 1 ? gb.bughack.inarea.y2 + 2 : ROWNO - 1));
     /* bughack hack for rear-most legs on baalz level; first joint on
        both top and bottom gets a bogus extra connection to room area,
        producing unwanted rectangles; change back to separated legs */
     x = gb.bughack.delarea.x1, y = gb.bughack.delarea.y1;
-    if (isok($c.i16(x), $c.i16(y)) && (svl.level.locations[x][y].typ === TLWALL || svl.level.locations[x][y].typ === TRWALL) && isok($c.i16(x), $c.i16(y + 1 | 0)) && svl.level.locations[x][y + 1 | 0].typ === TUWALL) {
+    if (isok($c.i16(x), $c.i16(y)) && (svl.level.locations[x][y].typ === TLWALL || svl.level.locations[x][y].typ === TRWALL)
+        && isok($c.i16(x), $c.i16(y + 1 | 0)) && svl.level.locations[x][y + 1 | 0].typ === TUWALL) {
         svl.level.locations[x][y].typ = svl.level.locations[x][y].typ === TLWALL ? BRCORNER : BLCORNER;
         svl.level.locations[x][y + 1 | 0].typ = HWALL;
         if ((mtmp = svl.level.monsters[x][y]) !== null) {   /* something at temporary pool... */
@@ -641,7 +670,8 @@ async function baalz_fixup() {   // mkmaze.c:475
         }
     }
     x = gb.bughack.delarea.x2, y = gb.bughack.delarea.y2;
-    if (isok($c.i16(x), $c.i16(y)) && (svl.level.locations[x][y].typ === TLWALL || svl.level.locations[x][y].typ === TRWALL) && isok($c.i16(x), $c.i16(y - 1 | 0)) && svl.level.locations[x][y - 1 | 0].typ === TDWALL) {
+    if (isok($c.i16(x), $c.i16(y)) && (svl.level.locations[x][y].typ === TLWALL || svl.level.locations[x][y].typ === TRWALL)
+        && isok($c.i16(x), $c.i16(y - 1 | 0)) && svl.level.locations[x][y - 1 | 0].typ === TDWALL) {
         svl.level.locations[x][y].typ = svl.level.locations[x][y].typ === TLWALL ? TRCORNER : TLCORNER;
         svl.level.locations[x][y - 1 | 0].typ = HWALL;
         if ((mtmp = svl.level.monsters[x][y]) !== null) {   /* something at temporary pool... */
@@ -690,7 +720,9 @@ export async function fixup_special() {   // mkmaze.c:570
                 case "place_it":
                     /*FALLTHRU*/
                     $goto = null;   // place_it:
-                    await place_lregion(r.inarea.x1, r.inarea.y1, r.inarea.x2, r.inarea.y2, r.delarea.x1, r.delarea.y1, r.delarea.x2, r.delarea.y2, r.rtype, lev);
+                    await place_lregion(r.inarea.x1, r.inarea.y1, r.inarea.x2,
+                        r.inarea.y2, r.delarea.x1, r.delarea.y1,
+                        r.delarea.x2, r.delarea.y2, r.rtype, lev);
                     break;
                 case LR.TELE:
                 case LR.UPTELE:
@@ -738,7 +770,9 @@ export async function fixup_special() {   // mkmaze.c:570
             if (goodpos($c.i16(x), $c.i16(y), null, 0)) {
                 tryct2 = 0;
                 otmp = await mk_tt_object(STATUE, $c.i16(x), $c.i16(y));
-                while ((tryct2 = tryct2 + 1 | 0) < 100 && otmp && (poly_when_stoned($c.relem(mons, otmp.corpsenm)) || ($c.relem(mons, otmp.corpsenm).mresists & MR.STONE) !== 0)) {
+                while ((tryct2 = tryct2 + 1 | 0) < 100 && otmp
+                    && (poly_when_stoned($c.relem(mons, otmp.corpsenm))
+                    || ($c.relem(mons, otmp.corpsenm).mresists & MR.STONE) !== 0)) {
                     /* set_corpsenm() handles weight too */
                     await set_corpsenm(otmp, await rndmonnum());
                 }
@@ -748,11 +782,14 @@ export async function fixup_special() {   // mkmaze.c:570
             otmp = await mk_tt_object(STATUE, $c.i16(somex(croom)), $c.i16(somey(croom)));
         } else {
             /* Medusa statues don't contain books */
-            otmp = await mkcorpstat(STATUE, null, null, $c.i16(somex(croom)), $c.i16(somey(croom)), CORPSTAT.NONE);
+            otmp = await mkcorpstat(STATUE, null, null,
+                $c.i16(somex(croom)), $c.i16(somey(croom)), CORPSTAT.NONE);
         }
         if (otmp) {
             tryct = 0;
-            while ((tryct = tryct + 1 | 0) < 100 && (($c.relem(mons, otmp.corpsenm).mresists & MR.STONE) !== 0 || poly_when_stoned($c.relem(mons, otmp.corpsenm)))) {
+            while ((tryct = tryct + 1 | 0) < 100
+                && (($c.relem(mons, otmp.corpsenm).mresists & MR.STONE) !== 0
+                || poly_when_stoned($c.relem(mons, otmp.corpsenm)))) {
                 /* set_corpsenm() handles weight too */
                 await set_corpsenm(otmp, await rndmonnum());
             }
@@ -863,7 +900,8 @@ async function migr_booty_item(otyp, gang) {   // mkmaze.c:780
         $c.strcpy(otmp.oextra.oname, gang);
         if (objects[otyp].oc_class === FOOD_CLASS) {
             if (otyp === SLIME_MOLD) {
-                $t1 = $c.i8(await fruitadd(orcfruit[rn2(2)], null)), otmp.spe = $t1;
+                $t1 = $c.i8(await fruitadd(orcfruit[rn2(2)],
+                    null)), otmp.spe = $t1;
             }
             $t2 = rn2(3), otmp.quan = $c.add64(otmp.quan, $t2);
             $t3 = await weight(otmp) >>> 0, otmp.owt = $t3;
@@ -908,7 +946,10 @@ async function stolen_booty() {   // mkmaze.c:799
            (K-/C-rations do too, but we want to include those) */
         /* exclude food items which utilize obj->corpsenm because
            that field is going to be overloaded for delivery purposes */
-        if (otyp !== LEMBAS_WAFER && (objects[otyp].oc_prob !== 0 || otyp === C_RATION || otyp === K_RATION) && otyp !== CORPSE && otyp !== EGG && otyp !== TIN) {
+        if (otyp !== LEMBAS_WAFER
+            && (objects[otyp].oc_prob !== 0
+            || otyp === C_RATION || otyp === K_RATION)
+            && otyp !== CORPSE && otyp !== EGG && otyp !== TIN) {
             await migr_booty_item(otyp, gang);
         }
     }
@@ -966,7 +1007,9 @@ async function stolen_booty() {   // mkmaze.c:799
 function maze_inbounds(x, y) {   // mkmaze.c:894
     /* isok() test is superfluous here (unless something has
        clobbered the static *_maze_max variables) */
-    return x >= 2 && y >= 2 && x < gx.x_maze_max && y < gy.y_maze_max && isok(x, y) ? 1 : 0;
+    return x >= 2 && y >= 2
+        && x < gx.x_maze_max && y < gy.y_maze_max
+        && isok(x, y) ? 1 : 0;
 }
 /**
  * @param {number} typ xint16
@@ -1046,7 +1089,8 @@ async function maze_remove_deadends(typ) {   // mkmaze.c:904
                         idx2 = $c.i16(idx2 + 1);
                         continue;
                     }
-                    if (!(svl.level.locations[dx][dy].typ >= DOOR) && svl.level.locations[dx2][dy2].typ >= DOOR) {
+                    if (!(svl.level.locations[dx][dy].typ >= DOOR)
+                        && svl.level.locations[dx2][dy2].typ >= DOOR) {
                         dirok[($t1 = idx, idx = $c.i16($t1 + 1), $t1)] = $c.i8(dir);
                         idx2 = $c.i16(idx2 + 1);
                     }
@@ -1154,10 +1198,13 @@ export async function create_maze(corrwid, wallthick, rmdeadends) {   // mkmaze.
             const mx = $c.rem32(x, 2) ? corrwid : x === 2 || x === Math.imul(rdx, 2) ? 1 : wallthick;
             ry = y = 2;
             while (ry < gy.y_maze_max) {
-                const my = $c.rem32(y, 2) ? corrwid : y === 2 || y === Math.imul(rdy, 2) ? 1 : wallthick;
+                const my = $c.rem32(y, 2) ? corrwid
+                    : y === 2 || y === Math.imul(rdy, 2) ? 1
+                    : wallthick;
                 for (dx = 0; dx < mx; dx = dx + 1 | 0) {
                     for (dy = 0; dy < my; dy = dy + 1 | 0) {
-                        if ((rx + dx | 0) >= gx.x_maze_max || (ry + dy | 0) >= gy.y_maze_max) {
+                        if ((rx + dx | 0) >= gx.x_maze_max
+                            || (ry + dy | 0) >= gy.y_maze_max) {
                             break;
                         }
                         svl.level.locations[rx + dx | 0][ry + dy | 0].typ = tmpmap[x][y];
@@ -1191,7 +1238,8 @@ export async function pick_vibrasquare_location() {   // mkmaze.c:1042
      */
     const x_range = ((gx.x_maze_max - x_maze_min | 0) - 2 * INVPOS_X_MARGIN | 0) - 1 | 0;
     const y_range = ((gy.y_maze_max - y_maze_min | 0) - 2 * INVPOS_Y_MARGIN | 0) - 1 | 0;
-    if (x_range <= INVPOS_X_MARGIN || y_range <= INVPOS_Y_MARGIN || Math.imul(x_range, y_range) <= INVPOS_DISTANCE * INVPOS_DISTANCE) {
+    if (x_range <= INVPOS_X_MARGIN || y_range <= INVPOS_Y_MARGIN
+        || Math.imul(x_range, y_range) <= INVPOS_DISTANCE * INVPOS_DISTANCE) {
         do {
             if (debugcore($C`mkmaze.c`, TRUE)) {
                 const save_plnmsg = iflags.last_msg;
@@ -1209,7 +1257,11 @@ export async function pick_vibrasquare_location() {   // mkmaze.c:1042
         if ((trycnt = trycnt + 1 | 0) > 1000) {
             break;
         }
-    } while ((stway = stairway_find_dir(TRUE)) !== null && (x === stway.sx || y === stway.sy || $c.abs(x - stway.sx) === $c.abs(y - stway.sy) || distmin(x, y, stway.sx, stway.sy) <= INVPOS_DISTANCE || !(svl.level.locations[x][y].typ > DOOR) || occupied(x, y)));
+    } while ((stway = stairway_find_dir(TRUE)) !== null
+        && (x === stway.sx || y === stway.sy
+        || $c.abs(x - stway.sx) === $c.abs(y - stway.sy)
+        || distmin(x, y, stway.sx, stway.sy) <= INVPOS_DISTANCE
+        || !(svl.level.locations[x][y].typ > DOOR) || occupied(x, y)));
     /*(direct line)*/
     svi.inv_pos.x = x;
     svi.inv_pos.y = y;
@@ -1742,7 +1794,8 @@ export async function movebubbles() {   // mkmaze.c:1539
     for (b = movebubbles$up ? svb.bbubbles : ge.ebubbles; b; b = movebubbles$up ? b.next : b.prev) {
         const rx = rn2(3);
         const ry = rn2(3);
-        await mv_bubble(b, $c.i16(b.dx + 1 - (!b.dx ? rx : rx ? 1 : 0) | 0), $c.i16(b.dy + 1 - (!b.dy ? ry : ry ? 1 : 0) | 0), FALSE);
+        await mv_bubble(b, $c.i16(b.dx + 1 - (!b.dx ? rx : rx ? 1 : 0) | 0),
+            $c.i16(b.dy + 1 - (!b.dy ? ry : ry ? 1 : 0) | 0), FALSE);
     }
     /* put attached ball&chain back */
     if (Is_waterlevel(u.uz) && Punished()) {
@@ -1851,7 +1904,12 @@ export async function restore_waterlevel(nhfp) {   // mkmaze.c:1750
         program_state.something_worth_saving = 0;
         /* during restore, information about what level this is might not
            be available so we're wishy-washy about what we describe */
-        await impossible($C`No %s to restore?`, Is_waterlevel(u.uz) || Is_waterlevel(gu.uz_save) ? $C`air bubbles` : Is_airlevel(u.uz) || Is_airlevel(gu.uz_save) ? $C`clouds` : $C`air bubbles or clouds`);
+        await impossible($C`No %s to restore?`,
+            Is_waterlevel(u.uz) || Is_waterlevel(gu.uz_save)
+            ? $C`air bubbles`
+            : Is_airlevel(u.uz) || Is_airlevel(gu.uz_save)
+            ? $C`clouds`
+            : $C`air bubbles or clouds`);
         program_state.something_worth_saving = 1;
     }
 }
@@ -1873,7 +1931,8 @@ async function set_wportal() {   // mkmaze.c:1802
 async function setup_waterlevel() {   // mkmaze.c:1812
     let x = 0, y = 0, xskip = 0, yskip = 0;
     if (!Is_waterlevel(u.uz) && !Is_airlevel(u.uz)) {
-        await panic($C`setup_waterlevel(): [%d:%d] neither 'Water' nor 'Air'`, u.uz.dnum, u.uz.dlevel);
+        await panic($C`setup_waterlevel(): [%d:%d] neither 'Water' nor 'Air'`,
+            u.uz.dnum, u.uz.dlevel);
     }
     /* ouch, hardcoded... (file scope statics and used in bxmin,bymax,&c) */
     svx.xmin = 3;
@@ -2037,11 +2096,13 @@ async function mv_bubble(b, dx, dy, ini) {   // mkmaze.c:1952
             b.y = $c.i16(gbymin());
         }
         if (b.x + b.bm[0] - 1 > gbxmax()) {
-            await pline($C`bubble xmax: x = %d, xmax = %d`, b.x + b.bm[0] - 1, gbxmax());
+            await pline($C`bubble xmax: x = %d, xmax = %d`, b.x + b.bm[0] - 1,
+                gbxmax());
             b.x = $c.i16((gbxmax() - b.bm[0] | 0) + 1 | 0);
         }
         if (b.y + b.bm[1] - 1 > gbymax()) {
-            await pline($C`bubble ymax: y = %d, ymax = %d`, b.y + b.bm[1] - 1, gbymax());
+            await pline($C`bubble ymax: y = %d, ymax = %d`, b.y + b.bm[1] - 1,
+                gbymax());
             b.y = $c.i16((gbymax() - b.bm[1] | 0) + 1 | 0);
         }
         /* bounce if we're trying to move off the border */

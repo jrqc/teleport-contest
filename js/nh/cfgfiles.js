@@ -98,7 +98,8 @@ export async function do_write_config_file() {   // cfgfiles.c:169
         $c.fclose(fp);
         strbuf_empty(buf);
         if (wrote !== len) {
-            await pline($C`An error occurred, wrote only partial data (%zu/%zu).`, wrote, len);
+            await pline($C`An error occurred, wrote only partial data (%zu/%zu).`,
+                wrote, len);
         }
     }
     return ECMD.OK;
@@ -158,7 +159,8 @@ async function fopen_config_file(filename, src) {   // cfgfiles.c:223
             return fp;
         } else {
             /* access() above probably caught most problems for UNIX */
-            await raw_printf($C`Couldn't open requested config file %s (%d).`, new $c.Ptr(configfile, 0), $c.__error().get(0));
+            await raw_printf($C`Couldn't open requested config file %s (%d).`,
+                new $c.Ptr(configfile, 0), $c.__error().get(0));
             await wait_synch()();
         }
     }
@@ -208,7 +210,8 @@ async function fopen_config_file(filename, src) {   // cfgfiles.c:223
         if ((details = $c.strerror($c.__error().get(0))) === null) {
             details = $C``;
         }
-        await raw_printf($C`Couldn't open default config file %s %s(%d).`, new $c.Ptr(configfile, 0), details, $c.__error().get(0));
+        await raw_printf($C`Couldn't open default config file %s %s(%d).`,
+            new $c.Ptr(configfile, 0), details, $c.__error().get(0));
         await wait_synch()();
     }
     /* !VMS => Unix */
@@ -971,7 +974,8 @@ async function cnf_line_PORTABLE_DEVICE_PATHS(bufp) {   // cfgfiles.c:1134
  * @returns {Promise<number>} boolean
  */
 async function cnf_line_BOULDER(bufp) {   // cfgfiles.c:1156
-    await get_uchars(bufp, new $c.Ptr(go.ov_primary_syms, SYM.BOULDER + SYM_OFF_X), TRUE, 1, $C`BOULDER`);
+    await get_uchars(bufp, new $c.Ptr(go.ov_primary_syms, SYM.BOULDER + SYM_OFF_X),
+        TRUE, 1, $C`BOULDER`);
     return TRUE;
 }
 /**
@@ -1200,7 +1204,8 @@ export async function config_erradd(buf) {   // cfgfiles.c:1544
     if (!program_state.config_error_ready) {
         /* either very early, where pline() will use raw_print(), or
            player gave bad value when prompted by interactive 'O' command */
-        await pline($C`%s%s%s`, !iflags.window_inited ? $C`config_error_add: ` : $C``, buf, punct);
+        await pline($C`%s%s%s`, !iflags.window_inited ? $C`config_error_add: ` : $C``,
+            buf, punct);
         await wait_synch()();
         return;
     }
@@ -1222,7 +1227,8 @@ export async function config_erradd(buf) {   // cfgfiles.c:1544
     } else {
         lineno[0] = 0;
     }
-    await pline($C`%s %s%s%s`, config_error_data.secure ? $C`Error:` : $C` *`, new $c.Ptr(lineno, 0), buf, punct);
+    await pline($C`%s %s%s%s`, config_error_data.secure ? $C`Error:` : $C` *`,
+        new $c.Ptr(lineno, 0), buf, punct);
 }
 /**
  * @returns {Promise<number>} int
@@ -1242,7 +1248,9 @@ export async function config_error_done() {   // cfgfiles.c:1592
     }
     if (n) {
         const cmdline = !$c.strcmp(new $c.Ptr(config_error_data.source, 0), $C`command line`) ? 1 : 0;
-        await pline($C`\n%d error%s %s %s.\n`, n, plur(n), cmdline ? $C`on` : $C`in`, new $c.Ptr(config_error_data.source, 0).get(0) ? new $c.Ptr(config_error_data.source, 0) : new $c.Ptr(configfile, 0));
+        await pline($C`\n%d error%s %s %s.\n`, n, plur(n), cmdline ? $C`on` : $C`in`,
+            new $c.Ptr(config_error_data.source, 0).get(0) ? new $c.Ptr(config_error_data.source, 0)
+            : new $c.Ptr(configfile, 0));
         await wait_synch()();
     }
     config_error_data = tmp.next;
@@ -1349,7 +1357,8 @@ async function parse_conf_buf(p, proc) {   // cfgfiles.c:1693
                 p.ep.set(0, 0);
             }
             /* trim off spaces at end of line */
-            while ($c.pcmp(p.ep, p.inbuf) >= 0 && (p.ep.get(0) === 32 || p.ep.get(0) === 9 || p.ep.get(0) === 13)) {
+            while ($c.pcmp(p.ep, p.inbuf) >= 0
+                && (p.ep.get(0) === 32 || p.ep.get(0) === 9 || p.ep.get(0) === 13)) {
                 ($t4 = p.ep, p.ep = $t4.add(-1), $t4).set(0, 0);
             }
             if (!config_error_nextline(p.inbuf)) {
@@ -1549,7 +1558,9 @@ export async function rcfile() {   // cfgfiles.c:1894
        from potentially overflowing buffers */
     if (nameval && $c.i32($c.strlen(nameval)) >= 128) {
         await config_error_init(TRUE, namesrc, FALSE);
-        await config_error_add($C`nethackrc file name "%.40s"... too long; using default`, nameval);
+        await config_error_add(
+            $C`nethackrc file name "%.40s"... too long; using default`,
+            nameval);
         await config_error_done();
         nameval = namesrc = null;   /* revert to default nethackrc */
     }

@@ -220,7 +220,10 @@ export function stuck_in_wall() {   // pray.c:161
                 continue;
             }
             const y = u.uy + j | 0;
-            if (!isok($c.i16(x), $c.i16(y)) || svl.level.locations[x][y].typ < POOL && (svl.level.locations[x][y].typ !== SDOOR && svl.level.locations[x][y].typ !== SCORR) || blocked_boulder(i, j) && !throws_rocks(gy.youmonst.data)) {
+            if (!isok($c.i16(x), $c.i16(y))
+                || svl.level.locations[x][y].typ < POOL
+                && (svl.level.locations[x][y].typ !== SDOOR && svl.level.locations[x][y].typ !== SCORR)
+                || blocked_boulder(i, j) && !throws_rocks(gy.youmonst.data)) {
                 count = count + 1 | 0;
             }
         }
@@ -282,7 +285,9 @@ async function in_trouble() {   // pray.c:198
     if (stuck_in_wall()) {
         return TROUBLE_STUCK_IN_WALL;
     }
-    if (Cursed_obj($G.uarmf, LEVITATION_BOOTS) || await stuck_ring($G.uleft, RIN_LEVITATION) || await stuck_ring($G.uright, RIN_LEVITATION)) {
+    if (Cursed_obj($G.uarmf, LEVITATION_BOOTS)
+        || await stuck_ring($G.uleft, RIN_LEVITATION)
+        || await stuck_ring($G.uright, RIN_LEVITATION)) {
         return TROUBLE_CURSED_LEVITATION;
     }
     if (nohands(gy.youmonst.data) || !await freehand()) {
@@ -292,7 +297,8 @@ async function in_trouble() {   // pray.c:198
         if (await welded($G.uwep)) {
             return TROUBLE_UNUSEABLE_HANDS;
         }
-        if (Upolyd() && nohands(gy.youmonst.data) && (!Unchanging() || (otmp = unchanger()) !== null && otmp.cursed)) {
+        if (Upolyd() && nohands(gy.youmonst.data)
+            && (!Unchanging() || (otmp = unchanger()) !== null && otmp.cursed)) {
             return TROUBLE_UNUSEABLE_HANDS;
         }
     }
@@ -305,7 +311,8 @@ async function in_trouble() {   // pray.c:198
     if (Punished() || u.utrap && u.utraptype === TT.BURIEDBALL) {
         return TROUBLE_PUNISHED;
     }
-    if (Cursed_obj($G.uarmg, GAUNTLETS_OF_FUMBLING) || Cursed_obj($G.uarmf, FUMBLE_BOOTS)) {
+    if (Cursed_obj($G.uarmg, GAUNTLETS_OF_FUMBLING)
+        || Cursed_obj($G.uarmf, FUMBLE_BOOTS)) {
         return TROUBLE_FUMBLING;
     }
     if (await worst_cursed_item()) {
@@ -318,7 +325,9 @@ async function in_trouble() {   // pray.c:198
             return TROUBLE_SADDLE;
         }
     }
-    if (BlindedTimeout() > 1 && !$c.and64(u.uprops[BLINDED].intrinsic, ~TIMEOUT) && (!u.uswallow || !attacktype_fordmg(u.ustuck.data, AT.ENGL, AD.BLND))) {
+    if (BlindedTimeout() > 1 && !$c.and64(u.uprops[BLINDED].intrinsic, ~TIMEOUT)
+        && (!u.uswallow
+        || !attacktype_fordmg(u.ustuck.data, AT.ENGL, AD.BLND))) {
         return TROUBLE_BLIND;
     }
     /* deafness isn't its own trouble; healing magic cures deafness
@@ -384,7 +393,8 @@ async function worst_cursed_item() {   // pray.c:288
         otmp = $G.uarm;
         /* if worn helmet of opposite alignment is making you an adherent
            of the current god, he/she/it won't uncurse that for you */
-    } else if ($G.uarmh && $G.uarmh.cursed && $G.uarmh.otyp !== HELM_OF_OPPOSITE_ALIGNMENT) {
+    } else if ($G.uarmh && $G.uarmh.cursed
+        && $G.uarmh.otyp !== HELM_OF_OPPOSITE_ALIGNMENT) {
         /* helmet */
         otmp = $G.uarmh;
     } else if ($G.uarmf && $G.uarmf.cursed) {
@@ -443,7 +453,9 @@ async function fix_curse_trouble(otmp, what) {   // pray.c:349
         }
     }
     if (!Blind() || otmp === $G.ublindf && Blindfolded_only()) {
-        await pline($C`%s %s.`, what ? what : await Yobjnam2(otmp, $C`softly glow`), hcolor(c_color_names.c_amber));
+        await pline($C`%s %s.`,
+            what ? what : await Yobjnam2(otmp, $C`softly glow`),
+            hcolor(c_color_names.c_amber));
         iflags.last_msg = PLNMSG.OBJ_GLOWS;
         otmp.bknown = (!Hallucination() ? 1 : 0) & 1;   /* ok to skip set_bknown() */
     }
@@ -522,7 +534,8 @@ async function fix_worst_trouble(trouble) {   // pray.c:373
             break;
         case TROUBLE_COLLAPSING:
             /* override Fixed_abil; uncurse that if feasible */
-            await You_feel($C`%sstronger.`, u.amax.a[A.STR] - u.acurr.a[A.STR] > 6 ? $C`much ` : $C``);
+            await You_feel($C`%sstronger.`,
+                u.amax.a[A.STR] - u.acurr.a[A.STR] > 6 ? $C`much ` : $C``);
             u.acurr.a[A.STR] = u.amax.a[A.STR];
             disp.botl = TRUE;
             if (Fixed_abil()) {
@@ -703,7 +716,8 @@ async function fix_worst_trouble(trouble) {   // pray.c:373
  */
 async function god_zaps_you(resp_god) {   // pray.c:610
     if (u.uswallow) {
-        await pline($C`Suddenly a bolt of lightning comes down at you from the heavens!`);
+        await pline(
+            $C`Suddenly a bolt of lightning comes down at you from the heavens!`);
         await pline($C`It strikes %s!`, await mon_nam(u.ustuck));
         if (!await resists_elec(u.ustuck)) {
             await pline($C`%s fries to a crisp!`, await Monnam(u.ustuck));
@@ -738,7 +752,8 @@ async function god_zaps_you(resp_god) {   // pray.c:610
     }
     await pline($C`%s is not deterred...`, await align_gname(resp_god));
     if (u.uswallow) {
-        await pline($C`A wide-angle disintegration beam aimed at you hits %s!`, await mon_nam(u.ustuck));
+        await pline($C`A wide-angle disintegration beam aimed at you hits %s!`,
+            await mon_nam(u.ustuck));
         if (!await resists_disint(u.ustuck)) {
             await pline($C`%s disintegrates into a pile of dust!`, await Monnam(u.ustuck));
             await xkilled(u.ustuck, XKILL.NOMSG | XKILL.NOCORPSE | XKILL.NOCONDUCT);
@@ -750,13 +765,16 @@ async function god_zaps_you(resp_god) {   // pray.c:610
         /* disintegrate shield and body armor before disintegrating
          * the impudent mortal, like black dragon breath -3.
          */
-        if ($G.uarms && !$c.and64(u.uprops[REFLECTING].extrinsic, W.ARMS) && !$c.and64(u.uprops[DISINT_RES].extrinsic, W.ARMS)) {
+        if ($G.uarms && !$c.and64(u.uprops[REFLECTING].extrinsic, W.ARMS)
+            && !$c.and64(u.uprops[DISINT_RES].extrinsic, W.ARMS)) {
             await disintegrate_arm($G.uarms);
         }
-        if ($G.uarmc && !$c.and64(u.uprops[REFLECTING].extrinsic, W.ARMC) && !$c.and64(u.uprops[DISINT_RES].extrinsic, W.ARMC)) {
+        if ($G.uarmc && !$c.and64(u.uprops[REFLECTING].extrinsic, W.ARMC)
+            && !$c.and64(u.uprops[DISINT_RES].extrinsic, W.ARMC)) {
             await disintegrate_arm($G.uarmc);
         }
-        if ($G.uarm && !$c.and64(u.uprops[REFLECTING].extrinsic, W.ARM) && !$c.and64(u.uprops[DISINT_RES].extrinsic, W.ARM) && !$G.uarmc) {
+        if ($G.uarm && !$c.and64(u.uprops[REFLECTING].extrinsic, W.ARM) && !$c.and64(u.uprops[DISINT_RES].extrinsic, W.ARM)
+            && !$G.uarmc) {
             await disintegrate_arm($G.uarm);
         }
         if ($G.uarmu && !$G.uarm && !$G.uarmc) {
@@ -786,7 +804,8 @@ async function god_zaps_you(resp_god) {   // pray.c:610
  * @returns {Promise<void>}
  */
 async function fry_by_god(resp_god, via_disintegration) {   // pray.c:694
-    await You($C`%s!`, !via_disintegration ? $C`fry to a crisp` : $C`disintegrate into a pile of dust`);
+    await You($C`%s!`, !via_disintegration ? $C`fry to a crisp`
+        : $C`disintegrate into a pile of dust`);
     svk.killer.format = KILLED.BY;
     $c.sprintf(new $c.Ptr(svk.killer.name, 0), $C`the wrath of %s`, await align_gname(resp_god));
     await done(DIED);
@@ -806,7 +825,9 @@ async function angrygods(resp_god) {   // pray.c:704
     if (resp_god !== u.ualign.type) {
         maxanger = $c.div32(u.ualign.record, 2) + (Luck() > 0 ? $c.div32(-Luck() | 0, 3) : -Luck() | 0) | 0;
     } else {
-        maxanger = Math.imul(3, u.ugangr) + (Luck() > 0 || u.ualign.record >= STRIDENT ? $c.div32(-Luck() | 0, 3) : -Luck() | 0) | 0;
+        maxanger = Math.imul(3, u.ugangr) + (Luck() > 0 || u.ualign.record >= STRIDENT
+            ? $c.div32(-Luck() | 0, 3)
+            : -Luck() | 0) | 0;
     }
     if (maxanger < 1) {
         maxanger = 1;   /* possible if bad align & good luck */
@@ -816,12 +837,17 @@ async function angrygods(resp_god) {   // pray.c:704
     switch (rn2(maxanger)) {
         case 0:
         case 1:
-            await You_feel($C`that %s is %s.`, await align_gname(resp_god), Hallucination() ? $C`bummed` : $C`displeased`);
+            await You_feel($C`that %s is %s.`, await align_gname(resp_god),
+                Hallucination() ? $C`bummed` : $C`displeased`);
             break;
         case 2:
         case 3:
             await godvoice(resp_god, null);
-            await pline($C`"Thou %s, %s."`, ugod_is_angry() && resp_god === u.ualign.type ? $C`hast strayed from the path` : $C`art arrogant`, gy.youmonst.data.mlet === S.HUMAN ? $C`mortal` : $C`creature`);
+            await pline($C`"Thou %s, %s."`,
+                ugod_is_angry() && resp_god === u.ualign.type
+                ? $C`hast strayed from the path`
+                : $C`art arrogant`,
+                gy.youmonst.data.mlet === S.HUMAN ? $C`mortal` : $C`creature`);
             await verbalize($C`Thou must relearn thy lessons!`);
             await adjattrib(A.WIS, -1, FALSE);
             await losexp(null);
@@ -846,9 +872,13 @@ async function angrygods(resp_god) {   // pray.c:704
         case 7:
         case 8:
             await godvoice(resp_god, null);
-            await verbalize($C`Thou durst %s me?`, svl.level.locations[u.ux][u.uy].typ === ALTAR && a_align(u.ux, u.uy) !== resp_god ? $C`scorn` : $C`call upon`);
+            await verbalize($C`Thou durst %s me?`,
+                svl.level.locations[u.ux][u.uy].typ === ALTAR && a_align(u.ux, u.uy) !== resp_god
+                ? $C`scorn`
+                : $C`call upon`);
             /* [why isn't this using verbalize()?] */
-            await pline($C`"Then die, %s!"`, gy.youmonst.data.mlet === S.HUMAN ? $C`mortal` : $C`creature`);
+            await pline($C`"Then die, %s!"`,
+                gy.youmonst.data.mlet === S.HUMAN ? $C`mortal` : $C`creature`);
             await summon_minion(resp_god, FALSE);
             break;
         default:
@@ -874,9 +904,13 @@ async function at_your_feet(str) {   // pray.c:788
     }
     if (u.uswallow) {
         /* barrier between you and the floor */
-        await pline($C`%s %s into %s %s.`, str, await vtense(str, $C`drop`), s_suffix(await mon_nam(u.ustuck)), await mbodypart(u.ustuck, STOMACH));
+        await pline($C`%s %s into %s %s.`, str, await vtense(str, $C`drop`),
+            s_suffix(await mon_nam(u.ustuck)), await mbodypart(u.ustuck, STOMACH));
     } else {
-        await pline($C`%s %s %s your %s!`, str, await vtense(str, Blind() ? $C`land` : $C`appear`), Levitation() ? $C`beneath` : $C`at`, await makeplural(await body_part(FOOT)));
+        await pline($C`%s %s %s your %s!`, str,
+            await vtense(str, Blind() ? $C`land` : $C`appear`),
+            Levitation() ? $C`beneath` : $C`at`,
+            await makeplural(await body_part(FOOT)));
     }
 }
 /**
@@ -894,9 +928,13 @@ async function gcrownu() {   // pray.c:805
     let class_gift = STRANGE_OBJECT;
     /* 3.3.[01] had this in the A_NEUTRAL case,
        preventing chaotic wizards from receiving a spellbook */
-    if (Role_if(PM.WIZARD) && !u_wield_art(ART.VORPAL_BLADE) && !u_wield_art(ART.STORMBRINGER) && !carrying(SPE_FINGER_OF_DEATH)) {
+    if (Role_if(PM.WIZARD)
+        && !u_wield_art(ART.VORPAL_BLADE)
+        && !u_wield_art(ART.STORMBRINGER)
+        && !carrying(SPE_FINGER_OF_DEATH)) {
         class_gift = SPE_FINGER_OF_DEATH;
-    } else if (Role_if(PM.MONK) && (!$G.uwep || !$G.uwep.oartifact) && !carrying(SPE_RESTORE_ABILITY)) {
+    } else if (Role_if(PM.MONK) && (!$G.uwep || !$G.uwep.oartifact)
+        && !carrying(SPE_RESTORE_ABILITY)) {
         /* monks rarely wield a weapon */
         class_gift = SPE_RESTORE_ABILITY;
     }
@@ -906,22 +944,30 @@ async function gcrownu() {   // pray.c:805
         case A.LAWFUL:
             u.uevent.uhand_of_elbereth = 1;
             await verbalize($C`I crown thee...  The Hand of Elbereth!`);
-            await livelog_printf(LL.DIVINEGIFT, $C`was crowned "The Hand of Elbereth" by %s`, await u_gname());
+            await livelog_printf(LL.DIVINEGIFT,
+                $C`was crowned "The Hand of Elbereth" by %s`,
+                await u_gname());
             break;
         case A.NEUTRAL:
             u.uevent.uhand_of_elbereth = 2;
             in_hand = u_wield_art(ART.VORPAL_BLADE);
-            already_exists = exist_artifact(LONG_SWORD, artiname(ART.VORPAL_BLADE));
+            already_exists = exist_artifact(LONG_SWORD,
+                artiname(ART.VORPAL_BLADE));
             await verbalize($C`Thou shalt be my Envoy of Balance!`);
-            await livelog_printf(LL.DIVINEGIFT, $C`became %s Envoy of Balance`, s_suffix(await u_gname()));
+            await livelog_printf(LL.DIVINEGIFT, $C`became %s Envoy of Balance`,
+                s_suffix(await u_gname()));
             break;
         case A.CHAOTIC:
             u.uevent.uhand_of_elbereth = 3;
             in_hand = u_wield_art(ART.STORMBRINGER);
-            already_exists = exist_artifact(RUNESWORD, artiname(ART.STORMBRINGER));
-            what = already_exists && !in_hand || class_gift !== STRANGE_OBJECT ? $C`take lives` : $C`steal souls`;
+            already_exists = exist_artifact(RUNESWORD,
+                artiname(ART.STORMBRINGER));
+            what = already_exists && !in_hand || class_gift !== STRANGE_OBJECT
+                ? $C`take lives`
+                : $C`steal souls`;
             await verbalize($C`Thou art chosen to %s for My Glory!`, what);
-            await livelog_printf(LL.DIVINEGIFT, $C`was chosen to %s for the Glory of %s`, what, await u_gname());
+            await livelog_printf(LL.DIVINEGIFT, $C`was chosen to %s for the Glory of %s`,
+                what, await u_gname());
             break;
     }
     if (objects[class_gift].oc_class === SPBOOK_CLASS) {
@@ -940,7 +986,8 @@ async function gcrownu() {   // pray.c:805
         u.ugifts = u.ugifts + 1 | 0;
         /* not an artifact, but treat like one for this situation;
            classify as a spoiler in case player hasn't IDed the book yet */
-        await livelog_printf(LL.DIVINEGIFT | LL.ARTIFACT | LL_SPOILER, $C`was bestowed with %s`, new $c.Ptr(bbuf, 0));
+        await livelog_printf(LL.DIVINEGIFT | LL.ARTIFACT | LL_SPOILER,
+            $C`was bestowed with %s`, new $c.Ptr(bbuf, 0));
         /* when getting a new book for known spell, enhance
            currently wielded weapon rather than the book */
         if (known_spell(class_gift) !== spe_Unknown && ok_wep($G.uwep)) {
@@ -956,10 +1003,13 @@ async function gcrownu() {   // pray.c:805
                 if (!Blind()) {
                     await Your($C`sword shines brightly for a moment.`);
                 }
-                obj = await oname(obj, artiname(ART.EXCALIBUR), ONAME_GIFT | ONAME_KNOW_ARTI);
+                obj = await oname(obj, artiname(ART.EXCALIBUR),
+                    ONAME_GIFT | ONAME_KNOW_ARTI);
                 if (is_art(obj, ART.EXCALIBUR)) {
                     u.ugifts = u.ugifts + 1 | 0;
-                    await livelog_printf(LL.DIVINEGIFT | LL.ARTIFACT, $C`had %s wielded %s transformed into %s`, genders[flags.female ? 1 : 0].his, new $c.Ptr(lbuf, 0), artiname(ART.EXCALIBUR));
+                    await livelog_printf(LL.DIVINEGIFT | LL.ARTIFACT,
+                        $C`had %s wielded %s transformed into %s`,
+                        genders[flags.female ? 1 : 0].his, new $c.Ptr(lbuf, 0), artiname(ART.EXCALIBUR));
                 }
             }
             /* acquire Excalibur's skill regardless of weapon or gift */
@@ -976,12 +1026,15 @@ async function gcrownu() {   // pray.c:805
                 await observe_object(obj);
             } else if (!already_exists) {
                 obj = await mksobj(LONG_SWORD, FALSE, FALSE);
-                obj = await oname(obj, artiname(ART.VORPAL_BLADE), ONAME_GIFT | ONAME_KNOW_ARTI);
+                obj = await oname(obj, artiname(ART.VORPAL_BLADE),
+                    ONAME_GIFT | ONAME_KNOW_ARTI);
                 obj.spe = 1;
                 await at_your_feet($C`A sword`);
                 await dropy(obj);
                 u.ugifts = u.ugifts + 1 | 0;
-                await livelog_printf(LL.DIVINEGIFT | LL.ARTIFACT, $C`was bestowed with %s`, artiname(ART.VORPAL_BLADE));
+                await livelog_printf(LL.DIVINEGIFT | LL.ARTIFACT,
+                    $C`was bestowed with %s`,
+                    artiname(ART.VORPAL_BLADE));
             }
             /* acquire Vorpal Blade's skill regardless of weapon or gift */
             unrestrict_weapon_skill(P.LONG_SWORD);
@@ -999,12 +1052,15 @@ async function gcrownu() {   // pray.c:805
                     await observe_object(obj);
                 } else if (!already_exists) {
                     obj = await mksobj(RUNESWORD, FALSE, FALSE);
-                    obj = await oname(obj, artiname(ART.STORMBRINGER), ONAME_GIFT | ONAME_KNOW_ARTI);
+                    obj = await oname(obj, artiname(ART.STORMBRINGER),
+                        ONAME_GIFT | ONAME_KNOW_ARTI);
                     obj.spe = 1;
                     await at_your_feet(await An(new $c.Ptr(swordbuf, 0)));
                     await dropy(obj);
                     u.ugifts = u.ugifts + 1 | 0;
-                    await livelog_printf(LL.DIVINEGIFT | LL.ARTIFACT, $C`was bestowed with %s`, artiname(ART.STORMBRINGER));
+                    await livelog_printf(LL.DIVINEGIFT | LL.ARTIFACT,
+                        $C`was bestowed with %s`,
+                        artiname(ART.STORMBRINGER));
                 }
                 /* acquire Stormbringer's skill regardless of weapon or gift */
                 unrestrict_weapon_skill(P.BROAD_SWORD);
@@ -1050,7 +1106,8 @@ async function give_spell() {   // pray.c:999
     const otmp = await mkobj(SPBOOK_no_NOVEL, TRUE);
     while ((trycnt = trycnt - 1 | 0) > 0) {
         if (otmp.otyp !== SPE_BLANK_PAPER) {
-            if (known_spell(otmp.otyp) <= spe_Unknown && !(u.weapon_skills[spell_skilltype(otmp.otyp)].skill === P.ISRESTRICTED)) {
+            if (known_spell(otmp.otyp) <= spe_Unknown
+                && !(u.weapon_skills[spell_skilltype(otmp.otyp)].skill === P.ISRESTRICTED)) {
                 break;   /* forgotten or not yet known */
             }
         } else {
@@ -1058,7 +1115,8 @@ async function give_spell() {   // pray.c:999
                if hero has a magic marker to write something on it
                (doesn't matter if marker is out of charges); it will
                become discovered (below) without needing to be read */
-            if (!objects[SPE_BLANK_PAPER].oc_name_known || carrying(MAGIC_MARKER)) {
+            if (!objects[SPE_BLANK_PAPER].oc_name_known
+                || carrying(MAGIC_MARKER)) {
                 break;
             }
         }
@@ -1069,7 +1127,8 @@ async function give_spell() {   // pray.c:999
      * receiving the book for it, unless it's already well known.
      * The chance is not influenced by whether hero is illiterate.
      */
-    if (otmp.otyp !== SPE_BLANK_PAPER && !rn2(4) && (spe_knowledge = known_spell(otmp.otyp)) !== spe_Fresh) {
+    if (otmp.otyp !== SPE_BLANK_PAPER && !rn2(4)
+        && (spe_knowledge = known_spell(otmp.otyp)) !== spe_Fresh) {
         /* force_learn_spell() should only return '\0' if the book
            is blank paper or the spell is known and has retention
            of spe_Fresh, so no 'else' case is needed here */
@@ -1083,9 +1142,13 @@ async function give_spell() {   // pray.c:999
                and without any spellbook on hand a novice player
                might not recognize that 'spe_name' is a spell */
             if (spe_knowledge === spe_Unknown) {
-                await pline($C`Divine knowledge of %s fills your mind!  Spell '%c'.`, spe_name, spe_let);
+                await pline($C`Divine knowledge of %s fills your mind!  Spell '%c'.`,
+                    spe_name, spe_let);
             } else {
-                await Your($C`knowledge of spell '%c' - %s is %s.`, spe_let, spe_name, spe_knowledge === spe_Forgotten ? $C`restored` : $C`refreshed`);
+                await Your($C`knowledge of spell '%c' - %s is %s.`,
+                    spe_let, spe_name,
+                    spe_knowledge === spe_Forgotten ? $C`restored`
+                    : $C`refreshed`);
             }
         }
         await obfree(otmp, null);   /* discard the book */
@@ -1114,7 +1177,12 @@ async function pleased(g_align) {   // pray.c:1071
     /* don't use p_trouble, worst trouble may get fixed while praying */
     let trouble = await in_trouble();   /* what's your worst difficulty? */
     let pat_on_head = 0;
-    await You_feel($C`that %s is %s.`, await align_gname(g_align), u.ualign.record >= DEVOUT ? Hallucination() ? $C`pleased as punch` : $C`well-pleased` : u.ualign.record >= STRIDENT ? Hallucination() ? $C`ticklish` : $C`pleased` : Hallucination() ? $C`full` : $C`satisfied`);
+    await You_feel($C`that %s is %s.`, await align_gname(g_align),
+        u.ualign.record >= DEVOUT
+        ? Hallucination() ? $C`pleased as punch` : $C`well-pleased`
+        : u.ualign.record >= STRIDENT
+        ? Hallucination() ? $C`ticklish` : $C`pleased`
+        : Hallucination() ? $C`full` : $C`satisfied`);
     /* not your deity */
     if (svl.level.locations[u.ux][u.uy].typ === ALTAR && gp.p_aligntyp !== u.ualign.type) {
         adjalign(-1);
@@ -1199,27 +1267,33 @@ async function pleased(g_align) {   // pray.c:1071
             case 0:
                 break;
             case 1:
-                if ($G.uwep && (await welded($G.uwep) || $G.uwep.oclass === WEAPON_CLASS || is_weptool($G.uwep))) {
+                if ($G.uwep && (await welded($G.uwep) || $G.uwep.oclass === WEAPON_CLASS
+                    || is_weptool($G.uwep))) {
                     new $c.Ptr(repair_buf, 0).set(0, 0);
                     if ($G.uwep.oeroded || $G.uwep.oeroded2) {
                         $c.sprintf(new $c.Ptr(repair_buf, 0), $C` and %s now as good as new`, await otense($G.uwep, $C`are`));
                     }
                     if ($G.uwep.cursed) {
                         if (!Blind()) {
-                            await pline($C`%s %s%s.`, await Yobjnam2($G.uwep, $C`softly glow`), hcolor(c_color_names.c_amber), new $c.Ptr(repair_buf, 0));
+                            await pline($C`%s %s%s.`, await Yobjnam2($G.uwep, $C`softly glow`),
+                                hcolor(c_color_names.c_amber), new $c.Ptr(repair_buf, 0));
                             iflags.last_msg = PLNMSG.OBJ_GLOWS;
                         } else {
-                            await You_feel($C`the power of %s over %s.`, await u_gname(), await yname($G.uwep));
+                            await You_feel($C`the power of %s over %s.`, await u_gname(),
+                                await yname($G.uwep));
                         }
                         await uncurse($G.uwep);
                         $G.uwep.bknown = 1;   /* ok to bypass set_bknown() */
                         new $c.Ptr(repair_buf, 0).set(0, 0);
                     } else if (!$G.uwep.blessed) {
                         if (!Blind()) {
-                            await pline($C`%s with %s aura%s.`, await Yobjnam2($G.uwep, $C`softly glow`), await an(hcolor(c_color_names.c_light_blue)), new $c.Ptr(repair_buf, 0));
+                            await pline($C`%s with %s aura%s.`,
+                                await Yobjnam2($G.uwep, $C`softly glow`),
+                                await an(hcolor(c_color_names.c_light_blue)), new $c.Ptr(repair_buf, 0));
                             iflags.last_msg = PLNMSG.OBJ_GLOWS;
                         } else {
-                            await You_feel($C`the blessing of %s over %s.`, await u_gname(), await yname($G.uwep));
+                            await You_feel($C`the blessing of %s over %s.`, await u_gname(),
+                                await yname($G.uwep));
                         }
                         await bless($G.uwep);
                         $G.uwep.bknown = 1;   /* ok to bypass set_bknown() */
@@ -1232,7 +1306,8 @@ async function pleased(g_align) {   // pray.c:1071
                         /* only give this message if we didn't just bless
                            or uncurse (which has already given a message) */
                         if (new $c.Ptr(repair_buf, 0).get(0)) {
-                            await pline($C`%s as good as new!`, await Yobjnam2($G.uwep, Blind() ? $C`feel` : $C`look`));
+                            await pline($C`%s as good as new!`,
+                                await Yobjnam2($G.uwep, Blind() ? $C`feel` : $C`look`));
                         }
                     }
                     await update_inventory();
@@ -1246,8 +1321,11 @@ async function pleased(g_align) {   // pray.c:1071
                 if (!u.uevent.uopened_dbridge && !u.uevent.gehennom_entered) {
                     if (u.uevent.uheard_tune < 1) {
                         await godvoice(g_align, null);
-                        await verbalize($C`Hark, %s!`, is_human(gy.youmonst.data) ? $C`mortal` : $C`creature`);
-                        await verbalize($C`To enter the castle, thou must play the right tune!`);
+                        await verbalize($C`Hark, %s!`, is_human(gy.youmonst.data)
+                            ? $C`mortal`
+                            : $C`creature`);
+                        await verbalize(
+                            $C`To enter the castle, thou must play the right tune!`);
                         u.uevent.uheard_tune = (u.uevent.uheard_tune + 1 >>> 0) & 3;
                         break;
                     } else if (u.uevent.uheard_tune < 2) {
@@ -1313,9 +1391,12 @@ async function pleased(g_align) {   // pray.c:1071
                     for (otmp = gi.invent; otmp; otmp = nextobj) {
                         nextobj = otmp.nobj;
                         /* [see worst_cursed_item()] */
-                        if (otmp.cursed && (otmp !== $G.uarmh || $G.uarmh.otyp !== HELM_OF_OPPOSITE_ALIGNMENT)) {
+                        if (otmp.cursed
+                            && (otmp !== $G.uarmh
+                            || $G.uarmh.otyp !== HELM_OF_OPPOSITE_ALIGNMENT)) {
                             if (!Blind()) {
-                                await pline($C`%s %s.`, await Yobjnam2(otmp, $C`softly glow`), hcolor(c_color_names.c_amber));
+                                await pline($C`%s %s.`, await Yobjnam2(otmp, $C`softly glow`),
+                                    hcolor(c_color_names.c_amber));
                                 iflags.last_msg = PLNMSG.OBJ_GLOWS;
                                 otmp.bknown = 1;   /* ok to bypass set_bknown() */
                                 any = any + 1 | 0;
@@ -1330,7 +1411,8 @@ async function pleased(g_align) {   // pray.c:1071
                 }
             case 5:
                 {
-                    await godvoice(u.ualign.type, $C`Thou hast pleased me with thy progress,`);
+                    await godvoice(u.ualign.type,
+                        $C`Thou hast pleased me with thy progress,`);
                     if (!$c.and64(u.uprops[TELEPAT].intrinsic, INTRINSIC)) {
                         u.uprops[TELEPAT].intrinsic = $c.or64(u.uprops[TELEPAT].intrinsic, FROMOUTSIDE);
                         await pline(new $c.Ptr(pleased$msg, 0), $C`Telepathy`);
@@ -1412,7 +1494,8 @@ async function water_prayer(bless_water) {   // pray.c:1387
     const bc_known = !(Blind() || Hallucination()) ? 1 : 0;
     for (otmp = svl.level.objects[u.ux][u.uy]; otmp; otmp = otmp.v.v_nexthere) {
         /* turn water into (un)holy water */
-        if (otmp.otyp === POT_WATER && (bless_water ? !otmp.blessed : !otmp.cursed)) {
+        if (otmp.otyp === POT_WATER
+            && (bless_water ? !otmp.blessed : !otmp.cursed)) {
             otmp.blessed = (bless_water >>> 0) & 1;
             otmp.cursed = (!bless_water ? 1 : 0) & 1;
             otmp.bknown = (bc_known >>> 0) & 1;   /* ok to bypass set_bknown() */
@@ -1422,7 +1505,11 @@ async function water_prayer(bless_water) {   // pray.c:1387
         }
     }
     if (!Blind() && changed) {
-        await pline($C`%s potion%s on the altar glow%s %s for a moment.`, other && changed > 1 ? $C`Some of the` : other ? $C`One of the` : $C`The`, other || changed > 1 ? $C`s` : $C``, changed > 1 ? $C`` : $C`s`, bless_water ? hcolor(c_color_names.c_light_blue) : hcolor(c_color_names.c_black));
+        await pline($C`%s potion%s on the altar glow%s %s for a moment.`,
+            other && changed > 1 ? $C`Some of the`
+            : other ? $C`One of the` : $C`The`,
+            other || changed > 1 ? $C`s` : $C``, changed > 1 ? $C`` : $C`s`,
+            bless_water ? hcolor(c_color_names.c_light_blue) : hcolor(c_color_names.c_black));
     }
     return changed > 0 ? 1 : 0;
 }
@@ -1438,7 +1525,8 @@ async function godvoice(g_align, words) {   // pray.c:1415
     } else {
         words = $C``;
     }
-    await pline_The($C`voice of %s %s: %s%s%s`, await align_gname(g_align), godvoices[rn2(4)], quot, words, quot);
+    await pline_The($C`voice of %s %s: %s%s%s`, await align_gname(g_align),
+        godvoices[rn2(4)], quot, words, quot);
 }
 /**
  * @param {number} g_align aligntyp
@@ -1474,13 +1562,19 @@ async function consume_offering(otmp) {   // pray.c:1446
                 await Your($C`sacrifice puffs up, swelling bigger and bigger, and pops!`);
                 break;
             case 2:
-                await Your($C`sacrifice collapses into a cloud of dancing particles and fades away!`);
+                await Your(
+                    $C`sacrifice collapses into a cloud of dancing particles and fades away!`);
                 break;
         }
     } else if (Blind() && u.ualign.type === A.LAWFUL) {
         await Your($C`sacrifice disappears!`);
     } else {
-        await Your($C`sacrifice is consumed in a %s!`, u.ualign.type === A.LAWFUL ? $C`flash of light` : u.ualign.type === A.NEUTRAL ? $C`plume of smoke` : $C`burst of flame`);
+        await Your($C`sacrifice is consumed in a %s!`,
+            u.ualign.type === A.LAWFUL
+            ? $C`flash of light`
+            : u.ualign.type === A.NEUTRAL
+            ? $C`plume of smoke`
+            : $C`burst of flame`);
     }
     if (carried(otmp)) {
         await useup(otmp);
@@ -1507,7 +1601,11 @@ async function offer_too_soon(altaralign) {   // pray.c:1480
     }
     /* if on track, give a big hint */
     /* else headed towards celestial disgrace */
-    await You_feel($C`%s.`, Hallucination() ? $C`homesick` : altaralign === u.ualign.type ? $C`an urge to return to the surface` : $C`ashamed`);
+    await You_feel($C`%s.`, Hallucination()
+        ? $C`homesick`
+        : altaralign === u.ualign.type
+        ? $C`an urge to return to the surface`
+        : $C`ashamed`);
 }
 /**
  * @param {number} highaltar boolean
@@ -1527,7 +1625,8 @@ export async function desecrate_altar(highaltar, altaralign) {   // pray.c:1501
         u.ugangr = u.ugangr + 5 | 0;
     }
     await You_feel($C`the air around you grow charged...`);
-    await pline($C`Suddenly, you realize that %s has noticed you...`, await align_gname(altaralign));
+    await pline($C`Suddenly, you realize that %s has noticed you...`,
+        await align_gname(altaralign));
     $c.sprintf(new $c.Ptr(gvbuf, 0), $C`So, mortal!  You dare desecrate my %s!`, highaltar ? $C`High Temple` : $C`altar`);
     await godvoice(altaralign, new $c.Ptr(gvbuf, 0));
     /* Throw everything we have at the player */
@@ -1575,7 +1674,8 @@ async function offer_real_amulet(otmp, altaralign) {   // pray.c:1529
         /* And the opposing team picks you up and carries you off
            on their shoulders. */
         adjalign(-99);
-        await pline($C`%s accepts your gift, and gains dominion over %s...`, await a_gname(), await u_gname());
+        await pline($C`%s accepts your gift, and gains dominion over %s...`,
+            await a_gname(), await u_gname());
         await pline($C`%s is enraged...`, await u_gname());
         await pline($C`Fortunately, %s permits you to live...`, await a_gname());
         await pline(new $c.Ptr(offer_real_amulet$cloud_of_smoke, 0), hcolor(c_color_names.c_orange));
@@ -1588,8 +1688,10 @@ async function offer_real_amulet(otmp, altaralign) {   // pray.c:1529
         await pline($C`An invisible choir sings, and you are bathed in radiance...`);
         await godvoice(altaralign, $C`Mortal, thou hast done well!`);
         await display_nhwindow()($G.WIN_MESSAGE, FALSE);
-        await verbalize($C`In return for thy service, I grant thee the gift of Immortality!`);
-        await You($C`ascend to the status of Demigod%s...`, flags.female ? $C`dess` : $C``);
+        await verbalize(
+            $C`In return for thy service, I grant thee the gift of Immortality!`);
+        await You($C`ascend to the status of Demigod%s...`,
+            flags.female ? $C`dess` : $C``);
         await done(ASCENDED);
         /*NOTREACHED*/
     }
@@ -1620,7 +1722,8 @@ async function offer_fake_amulet(otmp, highaltar, altaralign) {   // pray.c:1602
     }
     await You_hear($C`a nearby thunderclap.`);
     if (!otmp.known) {
-        await You($C`realize you have made a %s.`, Hallucination() ? $C`boo-boo` : $C`mistake`);
+        await You($C`realize you have made a %s.`,
+            Hallucination() ? $C`boo-boo` : $C`mistake`);
         otmp.known = (TRUE) & 1;
         change_luck(-1);
     } else {
@@ -1645,7 +1748,8 @@ async function offer_different_alignment_altar(otmp, altaralign) {   // pray.c:1
     /* Is this a conversion ? */
     /* An unaligned altar in Gehennom will always elicit rejection. */
     if (ugod_is_angry() || altaralign === A.NONE && Inhell()) {
-        if (u.ualignbase[A.CURRENT] === u.ualignbase[A.ORIGINAL] && altaralign !== A.NONE) {
+        if (u.ualignbase[A.CURRENT] === u.ualignbase[A.ORIGINAL]
+            && altaralign !== A.NONE) {
             await You($C`have a strong feeling that %s is angry...`, await u_gname());
             await consume_offering(otmp);
             await pline($C`%s accepts your allegiance.`, await a_gname());
@@ -1678,20 +1782,26 @@ async function offer_different_alignment_altar(otmp, altaralign) {   // pray.c:1
             }
             await newsym(u.ux, u.uy);   /* in case Invisible to self */
             if (!Blind()) {
-                await pline_The($C`altar glows %s.`, hcolor(u.ualign.type === A.LAWFUL ? c_color_names.c_white : u.ualign.type ? c_color_names.c_black : $C`gray`));
+                await pline_The($C`altar glows %s.`,
+                    hcolor(u.ualign.type === A.LAWFUL ? c_color_names.c_white
+                    : u.ualign.type ? c_color_names.c_black
+                    : $C`gray`));
             }
-            if (rnl(u.ulevel) > 6 && u.ualign.record > 0 && rnd(u.ualign.record) > $c.div64($c.mul64(3, ALIGNLIM()), 4)) {
+            if (rnl(u.ulevel) > 6 && u.ualign.record > 0
+                && rnd(u.ualign.record) > $c.div64($c.mul64(3, ALIGNLIM()), 4)) {
                 await summon_minion(altaralign, TRUE);
             }
             /* anger priest; test handles bones files */
-            if ((pri = findpriest(temple_occupied(new $c.Ptr(u.urooms, 0)))) && !p_coaligned(pri)) {
+            if ((pri = findpriest(temple_occupied(new $c.Ptr(u.urooms, 0))))
+                && !p_coaligned(pri)) {
                 await angry_priest();
             }
         } else {
             await pline($C`Unluckily, you feel the power of %s decrease.`, await u_gname());
             change_luck(-1);
             await exercise(A.WIS, FALSE);
-            if (rnl(u.ulevel) > 6 && u.ualign.record > 0 && rnd(u.ualign.record) > $c.div64($c.mul64(7, ALIGNLIM()), 8)) {
+            if (rnl(u.ulevel) > 6 && u.ualign.record > 0
+                && rnd(u.ualign.record) > $c.div64($c.mul64(7, ALIGNLIM()), 8)) {
                 await summon_minion(altaralign, TRUE);
             }
         }
@@ -1712,7 +1822,8 @@ async function sacrifice_your_race(otmp, highaltar, altaralign) {   // pray.c:16
         await pline($C`You'll regret this infamous offense!`);
         await exercise(A.WIS, FALSE);
     }
-    if (highaltar && (altaralign !== A.CHAOTIC || u.ualign.type !== A.CHAOTIC)) {
+    if (highaltar
+        && (altaralign !== A.CHAOTIC || u.ualign.type !== A.CHAOTIC)) {
         await desecrate_altar(highaltar, altaralign);
         return;
     } else if (altaralign !== A.CHAOTIC && altaralign !== A.NONE) {
@@ -1725,7 +1836,9 @@ async function sacrifice_your_race(otmp, highaltar, altaralign) {   // pray.c:16
         /* Human sacrifice on a chaotic or unaligned altar */
         /* is equivalent to demon summoning */
         if (altaralign === A.CHAOTIC && u.ualign.type !== A.CHAOTIC) {
-            await pline($C`The blood floods the altar, which vanishes in %s cloud!`, await an(hcolor(c_color_names.c_black)));
+            await pline(
+                $C`The blood floods the altar, which vanishes in %s cloud!`,
+                await an(hcolor(c_color_names.c_black)));
             svl.level.locations[u.ux][u.uy].typ = ROOM;
             svl.level.locations[u.ux][u.uy].flags = 0;
             await newsym(u.ux, u.uy);
@@ -1737,7 +1850,8 @@ async function sacrifice_your_race(otmp, highaltar, altaralign) {   // pray.c:16
             change_luck(altaralign === A.NONE ? -2 : 2);
             demonless_msg = $C`blood coagulates`;
         }
-        if ((pm = await dlord(altaralign)) !== NON_PM && (dmon = await makemon($c.relem(mons, pm), u.ux, u.uy, MM.NOMSG)) !== null) {
+        if ((pm = await dlord(altaralign)) !== NON_PM
+            && (dmon = await makemon($c.relem(mons, pm), u.ux, u.uy, MM.NOMSG)) !== null) {
             $c.strcpy(new $c.Ptr(dbuf, 0), await a_monnam(dmon));
             if (!strncmpi(new $c.Ptr(dbuf, 0), $C`it`, -1)) {
                 $c.strcpy(new $c.Ptr(dbuf, 0), $C`something dreadful`);
@@ -1793,7 +1907,8 @@ async function bestow_artifact(max_giftvalue) {   // pray.c:1781
     }
     if (do_bestow) {
         /* mk_artifact() with NULL obj and a_align() arg can return NULL */
-        const otmp = await mk_artifact(null, a_align(u.ux, u.uy), max_giftvalue, TRUE);
+        const otmp = await mk_artifact(null, a_align(u.ux, u.uy),
+            max_giftvalue, TRUE);
         if (otmp) {
             await artifact_origin(otmp, ONAME_GIFT | ONAME_KNOW_ARTI);
             if (otmp.spe < 0) {
@@ -1813,7 +1928,10 @@ async function bestow_artifact(max_giftvalue) {   // pray.c:1781
             u.ugifts = u.ugifts + 1 | 0;
             $t1 = rnz(300 + Math.imul(50, nartifacts) | 0), u.ublesscnt = $t1;
             await exercise(A.WIS, TRUE);
-            await livelog_printf(LL.DIVINEGIFT | LL.ARTIFACT, $C`was bestowed with %s by %s`, artiname(otmp.oartifact), await align_gname(u.ualign.type));
+            await livelog_printf(LL.DIVINEGIFT | LL.ARTIFACT,
+                $C`was bestowed with %s by %s`,
+                artiname(otmp.oartifact),
+                await align_gname(u.ualign.type));
             /* make sure we can use this weapon */
             unrestrict_weapon_skill(weapon_type(otmp));
             if (!Hallucination() && !Blind()) {
@@ -1832,7 +1950,8 @@ async function bestow_artifact(max_giftvalue) {   // pray.c:1781
  */
 async function sacrifice_value(otmp) {   // pray.c:1839
     let value = 0;
-    if (otmp.corpsenm === PM.ACID_BLOB || svm.moves <= $c.add64(await peek_at_iced_corpse_age(otmp), 50)) {
+    if (otmp.corpsenm === PM.ACID_BLOB
+        || svm.moves <= $c.add64(await peek_at_iced_corpse_age(otmp), 50)) {
         value = mons[otmp.corpsenm].difficulty + 1;
         if (otmp.oeaten) {
             value = await eaten_stat(value, otmp);
@@ -1847,7 +1966,8 @@ async function sacrifice_value(otmp) {   // pray.c:1839
 export async function dosacrifice() {   // pray.c:1854
     const altaralign = a_align(u.ux, u.uy);
     if (!(svl.level.locations[u.ux][u.uy].typ === ALTAR) || u.uswallow) {
-        await You($C`are not %s an altar.`, Levitation() || Flying() ? $C`over` : $C`on`);
+        await You($C`are not %s an altar.`,
+            Levitation() || Flying() ? $C`over` : $C`on`);
         return ECMD.OK;
     } else if (u.uprops[CONFUSION].intrinsic || u.uprops[STUNNED].intrinsic) {
         await You($C`are too impaired to perform the rite.`);
@@ -1896,7 +2016,8 @@ async function eval_offering(otmp, altaralign) {   // pray.c:1899
            bonus for wraith to chaotics too because they are sacrificing
            something valuable (unless hero refuses to eat such things) */
         /* reaching this side of the 'or' means hero is chaotic */
-        if (u.ualign.type !== A.CHAOTIC || ptr === mons[PM.WRAITH] && u.uconduct.unvegetarian) {
+        if (u.ualign.type !== A.CHAOTIC
+            || ptr === mons[PM.WRAITH] && u.uconduct.unvegetarian) {
             value = value + 1 | 0;
         }
     } else if (is_unicorn(ptr)) {
@@ -1904,7 +2025,9 @@ async function eval_offering(otmp, altaralign) {   // pray.c:1899
         if (unicalign === altaralign) {
             /* When same as altar, always a very bad action.
              */
-            await pline($C`Such an action is an insult to %s!`, unicalign === A.CHAOTIC ? $C`chaos` : unicalign ? $C`law` : $C`balance`);
+            await pline($C`Such an action is an insult to %s!`,
+                unicalign === A.CHAOTIC ? $C`chaos`
+                : unicalign ? $C`law` : $C`balance`);
             await adjattrib(A.WIS, -1, TRUE);
             return -1;
         } else if (u.ualign.type === altaralign) {
@@ -1954,7 +2077,9 @@ async function offer_corpse(otmp, highaltar, altaralign) {   // pray.c:1959
     /* Highest corpse value (besides Wiz) */
     /* KMH, conduct */
     if (!($t1 = u.uconduct.gnostic, u.uconduct.gnostic = $c.add64($t1, 1), $t1)) {
-        await livelog_printf(LL.CONDUCT, $C`rejected atheism by offering %s on an altar of %s`, await corpse_xname(otmp, null, CXN.ARTICLE), await a_gname());
+        await livelog_printf(LL.CONDUCT, $C`rejected atheism by offering %s on an altar of %s`,
+            await corpse_xname(otmp, null, CXN.ARTICLE),
+            await a_gname());
     }
     /* you're handling this corpse, even if it was killed upon the altar
      */
@@ -1969,7 +2094,9 @@ async function offer_corpse(otmp, highaltar, altaralign) {   // pray.c:1959
         await sacrifice_your_race(otmp, highaltar, altaralign);
         return;
     }
-    if (has_omonst(otmp) && (mtmp = await get_mtraits(otmp, FALSE)) !== null && mtmp.mtame) {
+    if (has_omonst(otmp)
+        && (mtmp = await get_mtraits(otmp, FALSE)) !== null
+        && mtmp.mtame) {
         /* mtmp is a temporary pointer to a tame monster's attributes,
          * not a real monster */
         await pline($C`So this is how you repay loyalty?`);
@@ -2007,12 +2134,15 @@ async function offer_corpse(otmp, highaltar, altaralign) {   // pray.c:1959
         }
         if (u.ugangr !== saved_anger) {
             if (u.ugangr) {
-                await pline($C`%s seems %s.`, await u_gname(), Hallucination() ? $C`groovy` : $C`slightly mollified`);
+                await pline($C`%s seems %s.`, await u_gname(),
+                    Hallucination() ? $C`groovy` : $C`slightly mollified`);
                 if (u.uluck < 0) {
                     change_luck(1);
                 }
             } else {
-                await pline($C`%s seems %s.`, await u_gname(), Hallucination() ? $C`cosmic (not a new fact)` : $C`mollified`);
+                await pline($C`%s seems %s.`, await u_gname(),
+                    Hallucination() ? $C`cosmic (not a new fact)`
+                    : $C`mollified`);
                 if (u.uluck < 0) {
                     u.uluck = 0;
                 }
@@ -2082,9 +2212,13 @@ async function offer_corpse(otmp, highaltar, altaralign) {   // pray.c:1959
         }
         if (u.uluck !== orig_luck) {
             if (Blind()) {
-                await You($C`think %s brushed your %s.`, c_common_strings.c_something, await body_part(FOOT));
+                await You($C`think %s brushed your %s.`, c_common_strings.c_something,
+                    await body_part(FOOT));
             } else {
-                await You(Hallucination() ? $C`see crabgrass at your %s.  A funny thing in a dungeon.` : $C`glimpse a four-leaf clover at your %s.`, await makeplural(await body_part(FOOT)));
+                await You(Hallucination()
+                    ? $C`see crabgrass at your %s.  A funny thing in a dungeon.`
+                    : $C`glimpse a four-leaf clover at your %s.`,
+                    await makeplural(await body_part(FOOT)));
             }
         }
     }
@@ -2100,9 +2234,11 @@ export async function can_pray(praying) {   // pray.c:2124
     gp.p_aligntyp = svl.level.locations[u.ux][u.uy].typ === ALTAR ? a_align(u.ux, u.uy) : u.ualign.type;
     $t1 = await in_trouble(), gp.p_trouble = $t1;
     /* ok if chaotic or none (Moloch) */
-    if (is_demon(gy.youmonst.data) && (gp.p_aligntyp === A.LAWFUL || gp.p_aligntyp !== A.NEUTRAL)) {
+    if (is_demon(gy.youmonst.data)
+        && (gp.p_aligntyp === A.LAWFUL || gp.p_aligntyp !== A.NEUTRAL)) {
         if (praying) {
-            await pline_The($C`very idea of praying to a %s god is repugnant to you.`, gp.p_aligntyp ? $C`lawful` : $C`neutral`);
+            await pline_The($C`very idea of praying to a %s god is repugnant to you.`,
+                gp.p_aligntyp ? $C`lawful` : $C`neutral`);
         }
         return FALSE;
     }
@@ -2118,7 +2254,9 @@ export async function can_pray(praying) {   // pray.c:2124
     }
     if (gp.p_aligntyp === A.NONE) {   /* praying to Moloch */
         gp.p_type = -2;
-    } else if (gp.p_trouble > 0 ? u.ublesscnt > 200 : gp.p_trouble < 0 ? u.ublesscnt > 100 : u.ublesscnt > 0) {   /* not in trouble */
+    } else if (gp.p_trouble > 0 ? u.ublesscnt > 200
+        : gp.p_trouble < 0 ? u.ublesscnt > 100
+        : u.ublesscnt > 0) {   /* not in trouble */
         /* big trouble */
         /* minor difficulty */
         gp.p_type = 0;   /* too soon... */
@@ -2132,7 +2270,9 @@ export async function can_pray(praying) {   // pray.c:2124
             gp.p_type = 3;
         }
     }
-    if (is_undead(gy.youmonst.data) && !Inhell() && (gp.p_aligntyp === A.LAWFUL || gp.p_aligntyp === A.NEUTRAL && !rn2(10))) {
+    if (is_undead(gy.youmonst.data) && !Inhell()
+        && (gp.p_aligntyp === A.LAWFUL
+        || gp.p_aligntyp === A.NEUTRAL && !rn2(10))) {
         gp.p_type = -1;
     }
     /* Note:  when !praying, the random factor for neutrals makes the
@@ -2147,7 +2287,9 @@ export async function can_pray(praying) {   // pray.c:2124
 async function pray_revive() {   // pray.c:2177
     let otmp = null;
     for (otmp = svl.level.objects[u.ux][u.uy]; otmp; otmp = otmp.v.v_nexthere) {
-        if ((otmp.otyp === CORPSE || otmp.otyp === STATUE) && has_omonst(otmp) && otmp.oextra.omonst.mtame && !otmp.oextra.omonst.isminion) {
+        if ((otmp.otyp === CORPSE || otmp.otyp === STATUE)
+            && has_omonst(otmp)
+            && otmp.oextra.omonst.mtame && !otmp.oextra.omonst.isminion) {
             break;
         }
     }
@@ -2172,7 +2314,8 @@ export async function dopray() {   // pray.c:2199
      * than just "y" (will also require "no" to decline).
      */
     if (ParanoidPray()) {
-        ok = await paranoid_query(ParanoidConfirm(), $C`Are you sure you want to pray?`);
+        ok = await paranoid_query(ParanoidConfirm(),
+            $C`Are you sure you want to pray?`);
         /* clear command recall buffer; otherwise ^A to repeat p(ray) would
            do so without confirmation (if 'ok') or do nothing (if '!ok') */
         if (!ok) {   /* declined the "are you sure?" confirmation */
@@ -2241,7 +2384,8 @@ async function prayer_done() {   // pray.c:2276
     u.uinvulnerable = (FALSE) & 1;
     if (gp.p_type === -2) {
         /* praying at an unaligned altar, not necessarily in Gehennom */
-        await You($C`%s diabolical laughter all around you...`, !Deaf() ? $C`hear` : $C`intuit`);
+        await You($C`%s diabolical laughter all around you...`,
+            !Deaf() ? $C`hear` : $C`intuit`);
         await wake_nearby(FALSE);
         adjalign(-2);
         await exercise(A.WIS, FALSE);
@@ -2252,7 +2396,10 @@ async function prayer_done() {   // pray.c:2276
         }   /* else use regular Inhell result below */
     } else if (gp.p_type === -1) {
         /* praying while poly'd into an undead creature while non-chaotic */
-        await godvoice(alignment, alignment === A.LAWFUL ? $C`Vile creature, thou durst call upon me?` : $C`Walk no more, perversion of nature!`);
+        await godvoice(alignment,
+            alignment === A.LAWFUL
+            ? $C`Vile creature, thou durst call upon me?`
+            : $C`Walk no more, perversion of nature!`);
         await You_feel($C`like you are falling apart.`);
         /* KMH -- Gods have mastery over unchanging */
         await rehumanize();
@@ -2262,7 +2409,8 @@ async function prayer_done() {   // pray.c:2276
         return 1;
     }
     if (Inhell()) {
-        await pline($C`Since you are in Gehennom, %s can't help you.`, await align_gname(alignment));
+        await pline($C`Since you are in Gehennom, %s can't help you.`,
+            await align_gname(alignment));
         /* haltingly aligned is least likely to anger */
         if (u.ualign.record <= 0 || rnl(u.ualign.record)) {
             await angrygods(u.ualign.type);
@@ -2310,10 +2458,13 @@ async function maybe_turn_mon_iter(mtmp) {   // pray.c:2347
     /* 3.6.3: used to use cansee() here but the purpose is to prevent
        #turn operating through walls, not to require that the hero be
        able to see the target location */
-    if (!couldsee(mtmp.mx, mtmp.my) || dist2(mtmp.mx, mtmp.my, u.ux, u.uy) > turn_undead_range) {
+    if (!couldsee(mtmp.mx, mtmp.my)
+        || dist2(mtmp.mx, mtmp.my, u.ux, u.uy) > turn_undead_range) {
         return;
     }
-    if (!mtmp.mpeaceful && (is_undead(mtmp.data) || is_vampshifter(mtmp) || is_demon(mtmp.data) && u.ulevel > 15)) {
+    if (!mtmp.mpeaceful
+        && (is_undead(mtmp.data) || is_vampshifter(mtmp)
+        || is_demon(mtmp.data) && u.ulevel > 15)) {
         mtmp.msleeping = 0;
         if (u.uprops[CONFUSION].intrinsic) {
             if (!($t1 = turn_undead_msg_cnt, turn_undead_msg_cnt = $t1 + 1 | 0, $t1)) {
@@ -2383,13 +2534,17 @@ export async function doturn() {   // pray.c:2414
     /* [What about needing free hands (does #turn involve any gesturing)?] */
     if (!can_chant(gy.youmonst)) {
         /* "evilness": "demons and undead" is too verbose and too precise */
-        await You($C`are %s upon %s to turn aside evilness.`, Strangled() ? $C`not able to call` : $C`incapable of calling`, Gname);
+        await You($C`are %s upon %s to turn aside evilness.`,
+            Strangled() ? $C`not able to call` : $C`incapable of calling`, Gname);
         /* violates agnosticism due to intent; conduct tracking is not
            supposed to affect play but we make an exception here:  use a
            move if this is the first time agnostic conduct has been broken */
         return u.uconduct.gnostic === 1 ? ECMD.TIME : ECMD.OK;
     }
-    if (u.ualign.type !== A.CHAOTIC && (is_demon(gy.youmonst.data) || is_undead(gy.youmonst.data) || is_vampshifter(gy.youmonst)) || u.ugangr > 6) {
+    if (u.ualign.type !== A.CHAOTIC
+        && (is_demon(gy.youmonst.data)
+        || is_undead(gy.youmonst.data) || is_vampshifter(gy.youmonst))
+        || u.ugangr > 6) {
         /* "Die, mortal!" */
         await pline($C`For some reason, %s seems to ignore you.`, Gname);
         await aggravate();
@@ -2399,7 +2554,8 @@ export async function doturn() {   // pray.c:2414
     if (Inhell()) {
         /* not actually calling upon Moloch but use alternate
            phrasing anyway if hallucinatory feedback says it's him */
-        await pline($C`Since you are in Gehennom, %s %s help you.`, Gname, !$c.strcmp(Gname, Moloch) ? $C`won't` : $C`can't`);
+        await pline($C`Since you are in Gehennom, %s %s help you.`,
+            Gname, !$c.strcmp(Gname, Moloch) ? $C`won't` : $C`can't`);
         await aggravate();
         return ECMD.TIME;
     }
@@ -2439,7 +2595,8 @@ export function altarmask_at(x, y) {   // pray.c:2490
     let res = 0;
     if (isok(x, y)) {
         const mon = svl.level.monsters[x][y];
-        if (mon && M_AP_TYPE(mon) === M_AP.FURNITURE && mon.mappearance === S.altar) {
+        if (mon && M_AP_TYPE(mon) === M_AP.FURNITURE
+            && mon.mappearance === S.altar) {
             res = has_mcorpsenm(mon) ? mon.mextra.mcorpsenm : 0;
         } else if (svl.level.locations[x][y].typ === ALTAR) {
             res = svl.level.locations[x][y].flags;
@@ -2592,7 +2749,11 @@ export async function altar_wrath(x, y) {   // pray.c:2652
         await adjattrib(A.WIS, -1, FALSE);
         u.ualign.record = u.ualign.record - 1 | 0;
     } else {
-        await pline($C`%s %s%s:`, !Deaf() ? $C`A voice (could it be` : $C`Despite your deafness, you seem to hear`, await align_gname(altaralign), !Deaf() ? $C`?) whispers` : $C` say`);
+        await pline($C`%s %s%s:`,
+            !Deaf() ? $C`A voice (could it be`
+            : $C`Despite your deafness, you seem to hear`,
+            await align_gname(altaralign),
+            !Deaf() ? $C`?) whispers` : $C` say`);
         await verbalize($C`Thou shalt pay, infidel!`);
         /* higher luck is more likely to be reduced; as it approaches -5
            the chance to lose another point drops down, eventually to 0 */

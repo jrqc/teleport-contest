@@ -453,7 +453,8 @@ export async function cutworm(worm, x, y, cuttier) {   // worm.c:373
         svl.level.monsters[x][y] = worm;   /* place the "head" segment back */
         if (svc.context.mon_moving) {
             if (canspotmon(worm)) {
-                await pline($C`Part of %s tail has been cut off.`, s_suffix(await mon_nam(worm)));
+                await pline($C`Part of %s tail has been cut off.`,
+                    s_suffix(await mon_nam(worm)));
             }
         } else {
             await You($C`cut part of the tail off of %s.`, await mon_nam(worm));
@@ -520,7 +521,9 @@ export async function detect_wsegs(worm, use_detection_glyph) {   // worm.c:503
     let curr = wtails[worm.wormno];
     const what_tail = u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : PM.LONG_WORM_TAIL;
     while (curr !== wheads[worm.wormno]) {
-        const num = use_detection_glyph ? detected_monnum_to_glyph(what_tail, worm.female ? FEMALE : MALE) : worm.mtame ? petnum_to_glyph(what_tail, worm.female ? FEMALE : MALE) : monnum_to_glyph(what_tail, worm.female ? FEMALE : MALE);
+        const num = use_detection_glyph ? detected_monnum_to_glyph(what_tail, worm.female ? FEMALE : MALE)
+            : worm.mtame ? petnum_to_glyph(what_tail, worm.female ? FEMALE : MALE)
+            : monnum_to_glyph(what_tail, worm.female ? FEMALE : MALE);
         await show_glyph(curr.wx, curr.wy, num);
         curr = curr.nseg;
     }
@@ -673,7 +676,9 @@ export async function sanity_check_worm(worm) {   // worm.c:639
         if (!isok($c.i16(x), $c.i16(y))) {
             await impossible($C`worm seg not isok <%d,%d>`, x, y);
         } else if (svl.level.monsters[x][y] !== worm) {
-            await impossible($C`mon (%s) at seg location is not worm (%s)`, fmt_ptr(svl.level.monsters[x][y]), fmt_ptr(worm));
+            await impossible($C`mon (%s) at seg location is not worm (%s)`,
+                fmt_ptr(svl.level.monsters[x][y]),
+                fmt_ptr(worm));
         }
         curr = curr.nseg;
     }
@@ -739,7 +744,9 @@ export async function place_worm_tail_randomly(worm, x, y) {   // worm.c:738
            should either have same coordinates or have seg->wx==0
            to indicate that it is not currently on the map */
         if (curr.wx && (curr.wx !== worm.mx || curr.wy !== worm.my)) {
-            await impossible($C`place_worm_tail_randomly: tail segment at <%d,%d>, worm at <%d,%d>`, curr.wx, curr.wy, worm.mx, worm.my);
+            await impossible(
+                $C`place_worm_tail_randomly: tail segment at <%d,%d>, worm at <%d,%d>`,
+                curr.wx, curr.wy, worm.mx, worm.my);
             if (svl.level.monsters[curr.wx][curr.wy] === worm) {
                 svl.level.monsters[curr.wx][curr.wy] = null;
             }

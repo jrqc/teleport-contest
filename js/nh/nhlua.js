@@ -148,7 +148,8 @@ export async function l_nhcore_done() {   // nhlua.c:161
  * @returns {Promise<void>}
  */
 export async function l_nhcore_call(callidx) {   // nhlua.c:171
-    if (callidx < 0 || callidx >= NUM_NHCORE_CALLS || !gl.luacore || !nhcore_call_available[callidx]) {
+    if (callidx < 0 || callidx >= NUM_NHCORE_CALLS || !gl.luacore
+        || !nhcore_call_available[callidx]) {
         return;
     }
     await lua_getglobal(gl.luacore, $C`nhcore`);
@@ -377,7 +378,8 @@ async function nhl_gettrap(L) {   // nhlua.c:418
             await nhl_add_table_entry_int(L, $C`tx`, ttmp.tx);
             await nhl_add_table_entry_int(L, $C`ty`, ttmp.ty);
             await nhl_add_table_entry_int(L, $C`ttyp`, ttmp.ttyp);
-            await nhl_add_table_entry_str(L, $C`ttyp_name`, get_trapname_bytype(ttmp.ttyp));
+            await nhl_add_table_entry_str(L, $C`ttyp_name`,
+                get_trapname_bytype(ttmp.ttyp));
             await nhl_add_table_entry_bool(L, $C`tseen`, ttmp.tseen);
             await nhl_add_table_entry_bool(L, $C`madeby_u`, ttmp.madeby_u);
             await nhl_add_table_entry_bool(L, $C`once`, ttmp.once);
@@ -478,7 +480,8 @@ async function nhl_getmap(L) {   // nhlua.c:532
         /* FIXME: some should be boolean values */
         await nhl_add_table_entry_int(L, $C`glyph`, svl.level.locations[x[0]][y[0]].glyph);
         await nhl_add_table_entry_int(L, $C`typ`, svl.level.locations[x[0]][y[0]].typ);
-        await nhl_add_table_entry_str(L, $C`typ_name`, levltyp_to_name(svl.level.locations[x[0]][y[0]].typ));
+        await nhl_add_table_entry_str(L, $C`typ_name`,
+            levltyp_to_name(svl.level.locations[x[0]][y[0]].typ));
         $c.sprintf(new $c.Ptr(buf, 0), $C`%c`, splev_typ2chr(svl.level.locations[x[0]][y[0]].typ));
         await nhl_add_table_entry_str(L, $C`mapchr`, new $c.Ptr(buf, 0));
         await nhl_add_table_entry_int(L, $C`seenv`, svl.level.locations[x[0]][y[0]].seenv);
@@ -493,26 +496,40 @@ async function nhl_getmap(L) {   // nhlua.c:532
         await lua_pushstring(L, $C`flags`);
         await lua_newtable(L);
         if (svl.level.locations[x[0]][y[0]].typ === DOOR) {
-            await nhl_add_table_entry_bool(L, $C`nodoor`, svl.level.locations[x[0]][y[0]].flags === D.NODOOR ? 1 : 0);
-            await nhl_add_table_entry_bool(L, $C`broken`, svl.level.locations[x[0]][y[0]].flags & D.BROKEN);
-            await nhl_add_table_entry_bool(L, $C`isopen`, svl.level.locations[x[0]][y[0]].flags & D.ISOPEN);
-            await nhl_add_table_entry_bool(L, $C`closed`, svl.level.locations[x[0]][y[0]].flags & D.CLOSED);
-            await nhl_add_table_entry_bool(L, $C`locked`, svl.level.locations[x[0]][y[0]].flags & D.LOCKED);
-            await nhl_add_table_entry_bool(L, $C`trapped`, svl.level.locations[x[0]][y[0]].flags & D.TRAPPED);
+            await nhl_add_table_entry_bool(L, $C`nodoor`,
+                svl.level.locations[x[0]][y[0]].flags === D.NODOOR ? 1 : 0);
+            await nhl_add_table_entry_bool(L, $C`broken`,
+                svl.level.locations[x[0]][y[0]].flags & D.BROKEN);
+            await nhl_add_table_entry_bool(L, $C`isopen`,
+                svl.level.locations[x[0]][y[0]].flags & D.ISOPEN);
+            await nhl_add_table_entry_bool(L, $C`closed`,
+                svl.level.locations[x[0]][y[0]].flags & D.CLOSED);
+            await nhl_add_table_entry_bool(L, $C`locked`,
+                svl.level.locations[x[0]][y[0]].flags & D.LOCKED);
+            await nhl_add_table_entry_bool(L, $C`trapped`,
+                svl.level.locations[x[0]][y[0]].flags & D.TRAPPED);
         } else if (svl.level.locations[x[0]][y[0]].typ === ALTAR) {
             /* TODO: bits 0, 1, 2 */
-            await nhl_add_table_entry_bool(L, $C`shrine`, svl.level.locations[x[0]][y[0]].flags & AM.SHRINE);
+            await nhl_add_table_entry_bool(L, $C`shrine`,
+                svl.level.locations[x[0]][y[0]].flags & AM.SHRINE);
         } else if (svl.level.locations[x[0]][y[0]].typ === THRONE) {
-            await nhl_add_table_entry_bool(L, $C`looted`, svl.level.locations[x[0]][y[0]].flags & T_LOOTED);
+            await nhl_add_table_entry_bool(L, $C`looted`,
+                svl.level.locations[x[0]][y[0]].flags & T_LOOTED);
         } else if (svl.level.locations[x[0]][y[0]].typ === TREE) {
-            await nhl_add_table_entry_bool(L, $C`looted`, svl.level.locations[x[0]][y[0]].flags & TREE_LOOTED);
-            await nhl_add_table_entry_bool(L, $C`swarm`, svl.level.locations[x[0]][y[0]].flags & TREE_SWARM);
+            await nhl_add_table_entry_bool(L, $C`looted`,
+                svl.level.locations[x[0]][y[0]].flags & TREE_LOOTED);
+            await nhl_add_table_entry_bool(L, $C`swarm`,
+                svl.level.locations[x[0]][y[0]].flags & TREE_SWARM);
         } else if (svl.level.locations[x[0]][y[0]].typ === FOUNTAIN) {
-            await nhl_add_table_entry_bool(L, $C`looted`, svl.level.locations[x[0]][y[0]].flags & F_LOOTED);
-            await nhl_add_table_entry_bool(L, $C`warned`, svl.level.locations[x[0]][y[0]].flags & F_WARNED);
+            await nhl_add_table_entry_bool(L, $C`looted`,
+                svl.level.locations[x[0]][y[0]].flags & F_LOOTED);
+            await nhl_add_table_entry_bool(L, $C`warned`,
+                svl.level.locations[x[0]][y[0]].flags & F_WARNED);
         } else if (svl.level.locations[x[0]][y[0]].typ === SINK) {
-            await nhl_add_table_entry_bool(L, $C`pudding`, svl.level.locations[x[0]][y[0]].flags & S.LPUDDING);
-            await nhl_add_table_entry_bool(L, $C`dishwasher`, svl.level.locations[x[0]][y[0]].flags & S.LDWASHER);
+            await nhl_add_table_entry_bool(L, $C`pudding`,
+                svl.level.locations[x[0]][y[0]].flags & S.LPUDDING);
+            await nhl_add_table_entry_bool(L, $C`dishwasher`,
+                svl.level.locations[x[0]][y[0]].flags & S.LDWASHER);
             await nhl_add_table_entry_bool(L, $C`ring`, svl.level.locations[x[0]][y[0]].flags & S.LRING);
         }
         /* TODO: drawbridges, walls, ladders, room=>ICED_xxx */
@@ -676,7 +693,10 @@ async function nhl_menu(L) {   // nhlua.c:723
         if (key.get(0)) {
             any.a_char = key.get(0);
         }
-        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, str, defval.get(0) && key.get(0) && defval.get(0) === key.get(0) ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, str,
+            defval.get(0) && key.get(0) && defval.get(0) === key.get(0)
+            ? MENU.ITEMFLAGS_SELECTED
+            : MENU.ITEMFLAGS_NONE);
         await lua_pop(L, 1);   /* removes 'value'; keeps 'key' for next iteration */
     }
     await end_menu()(tmpwin, prompt);
@@ -684,7 +704,8 @@ async function nhl_menu(L) {   // nhlua.c:723
     await destroy_nhwindow()(tmpwin);
     if (pick_cnt > 0) {
         buf[0] = $c.radd(picks[0], 0).item.a_char;
-        if (pick === PICK.ONE && pick_cnt > 1 && defval.get(0) && defval.get(0) === $c.radd(picks[0], 0).item.a_char) {
+        if (pick === PICK.ONE && pick_cnt > 1 && defval.get(0)
+            && defval.get(0) === $c.radd(picks[0], 0).item.a_char) {
             buf[0] = $c.radd(picks[0], 1).item.a_char;
         }
         buf[1] = 0;
@@ -858,7 +879,10 @@ async function nhl_rnglog_set_lua_caller(L, fallback) {   // nhlua.c:949
             let src_len = $c.strlen(new $c.Ptr(ar.short_src, 0));
             /* Lua string chunks render as [string "(name.lua)"].
                Normalize to plain "name.lua" for readable RNG logs. */
-            if (src_len >= 11 && !$c.strncmp(src_start, $C`[string "`, 9) && src_start.get($c.idx($c.subu64(src_len, 2))) === 34 && src_start.get($c.idx($c.subu64(src_len, 1))) === 93) {
+            if (src_len >= 11
+                && !$c.strncmp(src_start, $C`[string "`, 9)
+                && src_start.get($c.idx($c.subu64(src_len, 2))) === 34
+                && src_start.get($c.idx($c.subu64(src_len, 1))) === 93) {
                 src_start = src_start.add(9);
                 src_len = $c.subu64(src_len, 11);
             }
@@ -866,14 +890,19 @@ async function nhl_rnglog_set_lua_caller(L, fallback) {   // nhlua.c:949
                 src_start = src_start.add(1);
                 src_len = $c.subu64(src_len, 1);
             }
-            if (src_len >= 2 && src_start.get(0) === 40 && src_start.get($c.idx($c.subu64(src_len, 1))) === 41) {
+            if (src_len >= 2
+                && src_start.get(0) === 40
+                && src_start.get($c.idx($c.subu64(src_len, 1))) === 41) {
                 src_start = src_start.add(1);
                 src_len = $c.subu64(src_len, 2);
             }
             nh_snprintf($C`nhl_rnglog_set_lua_caller`, 1001, new $c.Ptr(nhl_rnglog_set_lua_caller$rnglog_src1buf, 0), 256, $C`%.*s`, $c.i32(src_len), src_start);
         }
         line1 = ar.currentline;
-        if (ar.name && ar.name.get(0) && (ar.name.get(0) >= 65 && ar.name.get(0) <= 90 || ar.name.get(0) >= 97 && ar.name.get(0) <= 122 || ar.name.get(0) === 95)) {
+        if (ar.name && ar.name.get(0)
+            && (ar.name.get(0) >= 65 && ar.name.get(0) <= 90
+            || ar.name.get(0) >= 97 && ar.name.get(0) <= 122
+            || ar.name.get(0) === 95)) {
             nh_snprintf($C`nhl_rnglog_set_lua_caller`, 1008, new $c.Ptr(nhl_rnglog_set_lua_caller$rnglog_name1buf, 0), 256, $C`%s`, ar.name);
             name1 = new $c.Ptr(nhl_rnglog_set_lua_caller$rnglog_name1buf, 0);
         }
@@ -883,7 +912,10 @@ async function nhl_rnglog_set_lua_caller(L, fallback) {   // nhlua.c:949
         if (new $c.Ptr(ar2.short_src, 0) && new $c.Ptr(ar2.short_src, 0).get(0)) {
             let src_start$2 = new $c.Ptr(ar2.short_src, 0);
             let src_len$2 = $c.strlen(new $c.Ptr(ar2.short_src, 0));
-            if (src_len$2 >= 11 && !$c.strncmp(src_start$2, $C`[string "`, 9) && src_start$2.get($c.idx($c.subu64(src_len$2, 2))) === 34 && src_start$2.get($c.idx($c.subu64(src_len$2, 1))) === 93) {
+            if (src_len$2 >= 11
+                && !$c.strncmp(src_start$2, $C`[string "`, 9)
+                && src_start$2.get($c.idx($c.subu64(src_len$2, 2))) === 34
+                && src_start$2.get($c.idx($c.subu64(src_len$2, 1))) === 93) {
                 src_start$2 = src_start$2.add(9);
                 src_len$2 = $c.subu64(src_len$2, 11);
             }
@@ -891,14 +923,19 @@ async function nhl_rnglog_set_lua_caller(L, fallback) {   // nhlua.c:949
                 src_start$2 = src_start$2.add(1);
                 src_len$2 = $c.subu64(src_len$2, 1);
             }
-            if (src_len$2 >= 2 && src_start$2.get(0) === 40 && src_start$2.get($c.idx($c.subu64(src_len$2, 1))) === 41) {
+            if (src_len$2 >= 2
+                && src_start$2.get(0) === 40
+                && src_start$2.get($c.idx($c.subu64(src_len$2, 1))) === 41) {
                 src_start$2 = src_start$2.add(1);
                 src_len$2 = $c.subu64(src_len$2, 2);
             }
             nh_snprintf($C`nhl_rnglog_set_lua_caller`, 1037, new $c.Ptr(nhl_rnglog_set_lua_caller$rnglog_src2buf, 0), 256, $C`%.*s`, $c.i32(src_len$2), src_start$2);
         }
         line2 = ar2.currentline;
-        if (ar2.name && ar2.name.get(0) && (ar2.name.get(0) >= 65 && ar2.name.get(0) <= 90 || ar2.name.get(0) >= 97 && ar2.name.get(0) <= 122 || ar2.name.get(0) === 95)) {
+        if (ar2.name && ar2.name.get(0)
+            && (ar2.name.get(0) >= 65 && ar2.name.get(0) <= 90
+            || ar2.name.get(0) >= 97 && ar2.name.get(0) <= 122
+            || ar2.name.get(0) === 95)) {
             nh_snprintf($C`nhl_rnglog_set_lua_caller`, 1044, new $c.Ptr(nhl_rnglog_set_lua_caller$rnglog_parentbuf, 0), 256, $C`%s`, ar2.name);
             name2 = new $c.Ptr(nhl_rnglog_set_lua_caller$rnglog_parentbuf, 0);
         }
@@ -983,7 +1020,9 @@ async function nhl_is_genocided(L) {   // nhlua.c:1124
     if (argc === 1) {
         const paramstr = await luaL_checkstring(L, 1);
         const i = await name_to_mon(paramstr, new $c.Ptr(mgend, 0));
-        lua_pushboolean(L, i !== NON_PM && svm.mvitals[i].mvflags & G_GENOD ? TRUE : FALSE);
+        lua_pushboolean(L, i !== NON_PM
+            && svm.mvitals[i].mvflags & G_GENOD
+            ? TRUE : FALSE);
     } else {
         await nhl_error(L, $C`Wrong args`);
     }
@@ -1296,7 +1335,8 @@ export async function get_nh_lua_variables() {   // nhlua.c:1451
     }
     await lua_getglobal(gl.luacore, $C`get_variables_string`);
     if (lua_type(gl.luacore, -1) === LUA.TFUNCTION) {
-        if (await nhl_pcall_handle(gl.luacore, 0, 1, $C`get_nh_lua_variables`, NHLpa.impossible)) {
+        if (await nhl_pcall_handle(gl.luacore, 0, 1, $C`get_nh_lua_variables`,
+            NHLpa.impossible)) {
             return key;
         }
         key = await dupstr(await lua_tostring(gl.luacore, -1));
@@ -1576,7 +1616,8 @@ async function nhl_timer_start_at(L) {   // nhlua.c:1766
     if (timer_is_pos(timertype) && isok(x[0], y[0])) {
         const where = $c.or64($c.shl64(x[0], 16), y[0]);
         await spot_stop_timers(x[0], y[0], timertype);
-        await start_timer(when, TIMER.LEVEL, MELT_ICE_AWAY, long_to_any(where));
+        await start_timer(when, TIMER.LEVEL, MELT_ICE_AWAY,
+            long_to_any(where));
     }
     return 0;
 }
@@ -1735,7 +1776,9 @@ async function nhl_gamestate(L) {   // nhlua.c:1876
         $c.memset(svs.spl_book[0], 0, 344);
         gg.gmst_stored = TRUE;
     } else {
-        await impossible($C`nhl_gamestate: inconsistent state (%s vs %s)`, reststate ? $C`restore` : $C`save`, gg.gmst_stored ? $C`already stored` : $C`not stored`);
+        await impossible($C`nhl_gamestate: inconsistent state (%s vs %s)`,
+            reststate ? $C`restore` : $C`save`,
+            gg.gmst_stored ? $C`already stored` : $C`not stored`);
     }
     await update_inventory();
     return 0;
@@ -1949,17 +1992,20 @@ export async function nhl_pcall(L, nargs, nresults, name) {   // nhlua.c:2263
         await lua_remove(L, 1);   /* remove handler */
         if (nud[0] && nud[0].perpcall && gl.loglua) {
             ic = Math.imul(nud[0].statctr, NHL_SB.STEPSIZE) >>> 0;   // an approximation
-            await livelog_printf(LL.DEBUG, $C`LUASTATS PCAL %d:%s %ld`, nud[0].sid, nud[0].name, ic);
+            await livelog_printf(LL.DEBUG, $C`LUASTATS PCAL %d:%s %ld`, nud[0].sid,
+                nud[0].name, ic);
         }
         if (nud[0] && nud[0].memlimit && gl.loglua) {
-            await livelog_printf(LL.DEBUG, $C`LUASTATS PMEM %d:%s %lu`, nud[0].sid, nud[0].name, await nhl_getmeminuse(L));
+            await livelog_printf(LL.DEBUG, $C`LUASTATS PMEM %d:%s %lu`, nud[0].sid,
+                nud[0].name, await nhl_getmeminuse(L));
         }
         return rv;
     } catch ($e) {
         if (!$c.isLongJmpTo($e, $t1)) throw $e;
         /* panic, because we don't know if the game state is corrupt */
         /* XXX can we get a lua stack trace as well? */
-        await panic($C`Lua time exceeded %d:%s`, nud[0].sid, nud[0].name ? nud[0].name : $C`(unknown)`);
+        await panic($C`Lua time exceeded %d:%s`, nud[0].sid,
+            nud[0].name ? nud[0].name : $C`(unknown)`);
     }
 }
 /**
@@ -1978,11 +2024,14 @@ export async function nhl_pcall_handle(L, nargs, nresults, name, npa) {   // nhl
         /* XXX can we get a lua stack trace as well? */
         switch (npa) {
             case NHLpa.panic:
-                await panic($C`Lua error %d:%s %s`, nud[0].sid, nud[0].name ? nud[0].name : $C`(unknown)`, await lua_tostring(L, -1));
+                await panic($C`Lua error %d:%s %s`, nud[0].sid,
+                    nud[0].name ? nud[0].name : $C`(unknown)`, await lua_tostring(L, -1));
                 /*NOTREACHED*/
                 break;
             case NHLpa.impossible:
-                await impossible($C`Lua error: %d:%s %s`, nud[0].sid, nud[0].name ? nud[0].name : $C`(unknown)`, await lua_tostring(L, -1));
+                await impossible($C`Lua error: %d:%s %s`, nud[0].sid,
+                    nud[0].name ? nud[0].name : $C`(unknown)`,
+                    await lua_tostring(L, -1));
                 /* Drop the error.  If the caller cares, use nhl_pcall(). */
                 await lua_pop(L, 1);
         }
@@ -2034,7 +2083,8 @@ export async function nhl_loadlua(L, fname) {   // nhlua.c:2338
              * in use, and fseek(SEEK_END) only yields an upper bound on
              * the actual amount of data in that situation.]
              */
-            if ((cnt = $c.i64($c.fread(bufin, 1, $c.u64($c.i32(buflen) < LOADCHUNKSIZE ? $c.i32(buflen) : LOADCHUNKSIZE), fh))) < 0) {
+            if ((cnt = $c.i64($c.fread(bufin, 1, $c.u64($c.i32(buflen) < LOADCHUNKSIZE ? $c.i32(buflen) : LOADCHUNKSIZE), fh)))
+                < 0) {
                 break;
             }
             buflen = $c.sub64(buflen, cnt);   /* set up for next iteration, if any */
@@ -2079,7 +2129,8 @@ export async function nhl_loadlua(L, fname) {   // nhlua.c:2338
         $c.fclose(fh);
         llret = await luaL_loadbufferx(L, buf, $c.strlen(buf), altfname, null);
         if (llret !== LUA.OK) {
-            await impossible($C`luaL_loadbuffer: Error loading %s: %s`, altfname, await lua_tostring(L, -1));
+            await impossible($C`luaL_loadbuffer: Error loading %s: %s`, altfname,
+                await lua_tostring(L, -1));
             ret = FALSE;
             break give_up$;
         } else {
@@ -2105,7 +2156,9 @@ export async function nhl_init(sbi) {   // nhlua.c:2449
     /* It would be nice to import EXPECTED from each build system. XXX */
     /* And it would be nice to do it only once, but it's cheap. */
     if (0) {
-        await panic($C`sandbox doesn't know this Lua version: this=%d != expected=%d `, LUA_VERSION_RELEASE_NUM, 50408);
+        await panic(
+            $C`sandbox doesn't know this Lua version: this=%d != expected=%d `,
+            LUA_VERSION_RELEASE_NUM, 50408);
     }
     const L = await nhlL_newstate(sbi, $C`nhl_init`);
     if (!L) {
@@ -2150,10 +2203,12 @@ export async function nhl_done(L) {   // nhlua.c:2522
         if (gl.loglua) {
             if (nud[0] && nud[0].osteps) {
                 const ic = Math.imul(nud[0].statctr, NHL_SB.STEPSIZE) >>> 0;   // an approximation
-                await livelog_printf(LL.DEBUG, $C`LUASTATS DONE %d:%s %ld`, nud[0].sid, nud[0].name, ic);
+                await livelog_printf(LL.DEBUG, $C`LUASTATS DONE %d:%s %ld`, nud[0].sid,
+                    nud[0].name, ic);
             }
             if (nud[0] && nud[0].memlimit && !nud[0].perpcall) {
-                await livelog_printf(LL.DEBUG, $C`LUASTATS DMEM %d:%s %lu`, nud[0].sid, nud[0].name, await nhl_getmeminuse(L));
+                await livelog_printf(LL.DEBUG, $C`LUASTATS DMEM %d:%s %lu`, nud[0].sid,
+                    nud[0].name, await nhl_getmeminuse(L));
             }
         }
         await lua_close(L);

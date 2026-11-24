@@ -162,7 +162,8 @@ async function l_selection_setpoint(L) {   // nhlsel.c:159
     } else {
         crd = SP_COORD_PACK(x[0], y[0]);
     }
-    await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, crd);
+    await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), ANY_LOC,
+        gc.coder ? gc.coder.croom : null, crd);
     selection_setpoint(x[0], y[0], sel, val);
     await lua_settop(L, 1);
     return 1;
@@ -210,7 +211,8 @@ async function l_selection_getpoint(L) {   // nhlsel.c:224
     } else {
         crd = SP_COORD_PACK(x[0], y[0]);
     }
-    await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, crd);
+    await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), ANY_LOC,
+        gc.coder ? gc.coder.croom : null, crd);
     const val = selection_getpoint(x[0], y[0], sel);
     await lua_settop(L, 0);
     lua_pushnumber(L, val);
@@ -469,8 +471,10 @@ async function l_selection_line(L) {   // nhlsel.c:509
     if (!await params_sel_2coords(L, new $c.Ptr(sel, 0), new $c.Ptr(x1, 0), new $c.Ptr(y1, 0), new $c.Ptr(x2, 0), new $c.Ptr(y2, 0))) {
         await nhl_error(L, $C`selection.line: illegal arguments`);
     }
-    await get_location_coord(new $c.Ptr(x1, 0), new $c.Ptr(y1, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, SP_COORD_PACK(x1[0], y1[0]));
-    await get_location_coord(new $c.Ptr(x2, 0), new $c.Ptr(y2, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, SP_COORD_PACK(x2[0], y2[0]));
+    await get_location_coord(new $c.Ptr(x1, 0), new $c.Ptr(y1, 0), ANY_LOC, gc.coder ? gc.coder.croom : null,
+        SP_COORD_PACK(x1[0], y1[0]));
+    await get_location_coord(new $c.Ptr(x2, 0), new $c.Ptr(y2, 0), ANY_LOC, gc.coder ? gc.coder.croom : null,
+        SP_COORD_PACK(x2[0], y2[0]));
     await l_selection_clone(L);
     sel[0] = await l_selection_check(L, 2);
     selection_do_line(x1[0], y1[0], x2[0], y2[0], sel[0]);
@@ -487,8 +491,10 @@ async function l_selection_rect(L) {   // nhlsel.c:531
     if (!await params_sel_2coords(L, new $c.Ptr(sel, 0), new $c.Ptr(x1, 0), new $c.Ptr(y1, 0), new $c.Ptr(x2, 0), new $c.Ptr(y2, 0))) {
         await nhl_error(L, $C`selection.rect: illegal arguments`);
     }
-    await get_location_coord(new $c.Ptr(x1, 0), new $c.Ptr(y1, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, SP_COORD_PACK(x1[0], y1[0]));
-    await get_location_coord(new $c.Ptr(x2, 0), new $c.Ptr(y2, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, SP_COORD_PACK(x2[0], y2[0]));
+    await get_location_coord(new $c.Ptr(x1, 0), new $c.Ptr(y1, 0), ANY_LOC, gc.coder ? gc.coder.croom : null,
+        SP_COORD_PACK(x1[0], y1[0]));
+    await get_location_coord(new $c.Ptr(x2, 0), new $c.Ptr(y2, 0), ANY_LOC, gc.coder ? gc.coder.croom : null,
+        SP_COORD_PACK(x2[0], y2[0]));
     await l_selection_clone(L);
     sel[0] = await l_selection_check(L, 2);
     selection_do_line(x1[0], y1[0], x2[0], y1[0], sel[0]);
@@ -511,8 +517,10 @@ async function l_selection_fillrect(L) {   // nhlsel.c:559
     if (!await params_sel_2coords(L, new $c.Ptr(sel, 0), new $c.Ptr(x1, 0), new $c.Ptr(y1, 0), new $c.Ptr(x2, 0), new $c.Ptr(y2, 0))) {
         await nhl_error(L, $C`selection.fillrect: illegal arguments`);
     }
-    await get_location_coord(new $c.Ptr(x1, 0), new $c.Ptr(y1, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, SP_COORD_PACK(x1[0], y1[0]));
-    await get_location_coord(new $c.Ptr(x2, 0), new $c.Ptr(y2, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, SP_COORD_PACK(x2[0], y2[0]));
+    await get_location_coord(new $c.Ptr(x1, 0), new $c.Ptr(y1, 0), ANY_LOC, gc.coder ? gc.coder.croom : null,
+        SP_COORD_PACK(x1[0], y1[0]));
+    await get_location_coord(new $c.Ptr(x2, 0), new $c.Ptr(y2, 0), ANY_LOC, gc.coder ? gc.coder.croom : null,
+        SP_COORD_PACK(x2[0], y2[0]));
     await l_selection_clone(L);
     sel[0] = await l_selection_check(L, 2);
     if (x1[0] === x2[0]) {
@@ -560,8 +568,10 @@ async function l_selection_randline(L) {   // nhlsel.c:591
         await l_selection_new(L);
         await l_selection_check(L, 1);
     }
-    await get_location_coord(new $c.Ptr(x1, 0), new $c.Ptr(y1, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, SP_COORD_PACK(x1[0], y1[0]));
-    await get_location_coord(new $c.Ptr(x2, 0), new $c.Ptr(y2, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, SP_COORD_PACK(x2[0], y2[0]));
+    await get_location_coord(new $c.Ptr(x1, 0), new $c.Ptr(y1, 0), ANY_LOC, gc.coder ? gc.coder.croom : null,
+        SP_COORD_PACK(x1[0], y1[0]));
+    await get_location_coord(new $c.Ptr(x2, 0), new $c.Ptr(y2, 0), ANY_LOC, gc.coder ? gc.coder.croom : null,
+        SP_COORD_PACK(x2[0], y2[0]));
     await l_selection_clone(L);
     const sel = await l_selection_check(L, 2);
     selection_do_randline(x1[0], y1[0], x2[0], y2[0], $c.i8(roughness), 12, sel);
@@ -670,7 +680,8 @@ async function l_selection_flood(L) {   // nhlsel.c:726
         await nhl_error(L, $C`wrong parameters`);
         /*NOTREACHED*/
     }
-    await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, SP_COORD_PACK(x[0], y[0]));
+    await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), ANY_LOC, gc.coder ? gc.coder.croom : null,
+        SP_COORD_PACK(x[0], y[0]));
     if (isok(x[0], y[0])) {
         set_floodfillchk_match_under(svl.level.locations[x[0]][y[0]].typ);
         await selection_floodfill(sel, x[0], y[0], diagonals);
@@ -719,7 +730,8 @@ async function l_selection_circle(L) {   // nhlsel.c:762
         await nhl_error(L, $C`wrong parameters`);
         /*NOTREACHED*/
     }
-    await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, SP_COORD_PACK(x[0], y[0]));
+    await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), ANY_LOC, gc.coder ? gc.coder.croom : null,
+        SP_COORD_PACK(x[0], y[0]));
     selection_do_ellipse(sel, x[0], y[0], r, r, !filled ? 1 : 0);
     await lua_settop(L, 1);
     return 1;
@@ -770,7 +782,8 @@ async function l_selection_ellipse(L) {   // nhlsel.c:810
         await nhl_error(L, $C`wrong parameters`);
         /*NOTREACHED*/
     }
-    await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, SP_COORD_PACK(x[0], y[0]));
+    await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), ANY_LOC, gc.coder ? gc.coder.croom : null,
+        SP_COORD_PACK(x[0], y[0]));
     selection_do_ellipse(sel, x[0], y[0], r1, r2, !filled ? 1 : 0);
     await lua_settop(L, 1);
     return 1;
@@ -859,7 +872,8 @@ async function l_selection_iterate(L) {   // nhlsel.c:925
                         lua_pushvalue(L, 2);
                         lua_pushinteger(L, tmpx[0]);
                         lua_pushinteger(L, tmpy[0]);
-                        if (await nhl_pcall_handle(L, 2, 0, $C`l_selection_iterate`, NHLpa.impossible)) {
+                        if (await nhl_pcall_handle(L, 2, 0, $C`l_selection_iterate`,
+                            NHLpa.impossible)) {
                             /* abort loops to prevent possible error cascade */
                             break out$;
                         }

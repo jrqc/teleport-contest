@@ -138,7 +138,8 @@ export async function setworn(obj, mask) {   // worn.c:73
                      * wp_mask should be same as mask at this point.
                      */
                     if ($c.and64(wp.w_mask, ~(W.SWAPWEP | W.QUIVER))) {
-                        if (obj.oclass === WEAPON_CLASS || is_weptool(obj) || mask !== W.WEP) {
+                        if (obj.oclass === WEAPON_CLASS || is_weptool(obj)
+                            || mask !== W.WEP) {
                             p = objects[obj.otyp].oc_oprop;
                             u.uprops[p].extrinsic = $c.or64(u.uprops[p].extrinsic, wp.w_mask);
                             if ((p = w_blocks(obj, mask)) !== 0) {
@@ -158,7 +159,8 @@ export async function setworn(obj, mask) {   // worn.c:73
         /* tux -> tuxedo -> "monkey suit" -> monk's suit */
         iflags.tux_penalty = $G.uarm && Role_if(PM.MONK) && gu.urole.spelarmr ? 1 : 0;
     }
-    if (flags.weaponstatus && $c.and64(mask, W.WEP) !== 0 || flags.armorstatus && $c.and64(mask, W_ARMOR) !== 0) {
+    if (flags.weaponstatus && $c.and64(mask, W.WEP) !== 0
+        || flags.armorstatus && $c.and64(mask, W_ARMOR) !== 0) {
         disp.botl = TRUE;
     }
     await update_inventory();
@@ -201,7 +203,8 @@ export async function setnotworn(obj) {   // worn.c:150
     if (!$G.uarm) {
         iflags.tux_penalty = FALSE;
     }
-    if (flags.weaponstatus && $c.and64(unworn, W.WEP) !== 0 || flags.armorstatus && $c.and64(unworn, W_ARMOR) !== 0) {
+    if (flags.weaponstatus && $c.and64(unworn, W.WEP) !== 0
+        || flags.armorstatus && $c.and64(unworn, W_ARMOR) !== 0) {
         disp.botl = TRUE;
     }
     await update_inventory();
@@ -414,7 +417,9 @@ export async function check_wornmask_slots() {   // worn.c:355
             /* embedded scales owornmask is W_ARM|I_SPECIAL so would
                give a false complaint about item other than uarm having
                W_ARM bit set if we didn't screen it out here */
-            if (otmp !== o && $c.and64(otmp.owornmask, m) !== 0 && (m !== W.ARM || otmp !== $G.uskin || $c.and64(otmp.owornmask, I_SPECIAL) === 0)) {
+            if (otmp !== o && $c.and64(otmp.owornmask, m) !== 0
+                && (m !== W.ARM || otmp !== $G.uskin
+                || $c.and64(otmp.owornmask, I_SPECIAL) === 0)) {
                 $c.sprintf(new $c.Ptr(whybuf, 0), $C`%s [0x%08lx] has %s mask 0x%08lx bit set`, await simpleonames(otmp), otmp.owornmask, wp.w_what, m);
                 await impossible($C`Worn-slot insanity: %s.`, new $c.Ptr(whybuf, 0));
             }
@@ -507,7 +512,8 @@ export async function mon_adjust_speed(mon, adjust, obj) {   // worn.c:488
         mon.mspeed = (mon.permspeed) & 3;
     }
     /* no message if monster is immobile (temp or perm) or unseen */
-    if (give_msg && (mon.mspeed !== oldspeed || petrify) && mon.data.mmove && !(mon.mfrozen || mon.msleeping) && canseemon(mon)) {
+    if (give_msg && (mon.mspeed !== oldspeed || petrify) && mon.data.mmove
+        && !(mon.mfrozen || mon.msleeping) && canseemon(mon)) {
         /* fast to slow (skipping intermediate state) or vice versa */
         const howmuch = mon.mspeed + oldspeed >>> 0 === MFAST + MSLOW ? $C`much ` : $C``;
         if (petrify) {
@@ -517,9 +523,11 @@ export async function mon_adjust_speed(mon, adjust, obj) {   // worn.c:488
                 await pline_mon(mon, $C`%s is slowing down.`, await Monnam(mon));
             }
         } else if (adjust > 0 || mon.mspeed === MFAST) {
-            await pline_mon(mon, $C`%s is suddenly moving %sfaster.`, await Monnam(mon), howmuch);
+            await pline_mon(mon, $C`%s is suddenly moving %sfaster.`,
+                await Monnam(mon), howmuch);
         } else {
-            await pline_mon(mon, $C`%s seems to be moving %sslower.`, await Monnam(mon), howmuch);
+            await pline_mon(mon, $C`%s seems to be moving %sslower.`,
+                await Monnam(mon), howmuch);
         }
         /* might discover an object if we see the speed change happen */
         if (obj !== null) {
@@ -734,7 +742,9 @@ export async function m_dowear(mon, creation) {   // worn.c:757
     }
     /* give mummies a chance to wear their wrappings
      * and let skeletons wear their initial armor */
-    if (mindless(mon.data) && (!creation || mon.data.mlet !== S.MUMMY && mon.data !== mons[PM.SKELETON])) {
+    if (mindless(mon.data)
+        && (!creation || mon.data.mlet !== S.MUMMY
+        && mon.data !== mons[PM.SKELETON])) {
         return;
     }
     await m_dowear_type(mon, W.AMUL, creation, FALSE);
@@ -798,7 +808,10 @@ async function m_dowear_type(mon, flag, creation, racialexception) {   // worn.c
         L1: for (obj = mon.minvent; obj; obj = obj.nobj) {
             switch (flag) {
                 case W.AMUL:
-                    if (obj.oclass !== AMULET_CLASS || obj.otyp !== AMULET_OF_LIFE_SAVING && obj.otyp !== AMULET_OF_REFLECTION && obj.otyp !== AMULET_OF_GUARDING) {
+                    if (obj.oclass !== AMULET_CLASS
+                        || obj.otyp !== AMULET_OF_LIFE_SAVING
+                        && obj.otyp !== AMULET_OF_REFLECTION
+                        && obj.otyp !== AMULET_OF_GUARDING) {
                         continue L1;
                     }
                     /* for 'best' to be non-Null, it must be an amulet of guarding;
@@ -826,7 +839,8 @@ async function m_dowear_type(mon, flag, creation, racialexception) {   // worn.c
                     }
                     /* avoid mummy wrapping if it will allow hero to see mon (unless
                        this is a new mummy; an invisible one is feasible via ^G) */
-                    if (mon.minvis && (obj.otyp === MUMMY_WRAPPING && 1 ? INVIS : obj.otyp === CORNUTHAUM && 0 && !(gu.urole.mnum === PM.WIZARD) ? CLAIRVOYANT : is_art(obj, ART.EYES_OF_THE_OVERWORLD) && 0 ? BLINDED : 0) === INVIS && !See_invisible() && !creation) {
+                    if (mon.minvis && (obj.otyp === MUMMY_WRAPPING && 1 ? INVIS : obj.otyp === CORNUTHAUM && 0 && !(gu.urole.mnum === PM.WIZARD) ? CLAIRVOYANT : is_art(obj, ART.EYES_OF_THE_OVERWORLD) && 0 ? BLINDED : 0) === INVIS
+                        && !See_invisible() && !creation) {
                         continue L1;
                     }
                     break;
@@ -837,7 +851,8 @@ async function m_dowear_type(mon, flag, creation, racialexception) {   // worn.c
                     /* changing alignment is not implemented for monsters;
                        priests and minions could change alignment but wouldn't
                        want to, so they reject helms of opposite alignment */
-                    if (obj.otyp === HELM_OF_OPPOSITE_ALIGNMENT && (mon.ispriest || mon.isminion)) {
+                    if (obj.otyp === HELM_OF_OPPOSITE_ALIGNMENT
+                        && (mon.ispriest || mon.isminion)) {
                         continue L1;
                     }
                     /* (flimsy exception matches polyself handling) */
@@ -878,7 +893,8 @@ async function m_dowear_type(mon, flag, creation, racialexception) {   // worn.c
              * it would forget spe and once again think the object is better
              * than what it already has.
              */
-            if (best && (ARM_BONUS(best) + extra_pref(mon, best) | 0) >= (ARM_BONUS(obj) + extra_pref(mon, obj) | 0)) {
+            if (best && (ARM_BONUS(best) + extra_pref(mon, best) | 0)
+                >= (ARM_BONUS(obj) + extra_pref(mon, obj) | 0)) {
                 continue;
             }
             best = obj;
@@ -888,7 +904,8 @@ async function m_dowear_type(mon, flag, creation, racialexception) {   // worn.c
         return;
     }
     /* same auto-cursing behavior as for hero */
-    autocurse = (best.otyp === HELM_OF_OPPOSITE_ALIGNMENT || best.otyp === DUNCE_CAP) && !best.cursed ? 1 : 0;
+    autocurse = (best.otyp === HELM_OF_OPPOSITE_ALIGNMENT
+        || best.otyp === DUNCE_CAP) && !best.cursed ? 1 : 0;
     /* if wearing a cloak, account for the time spent removing
        and re-wearing it when putting on a suit or shirt */
     if ((flag === W.ARM || flag === W.ARMU) && $c.and64(mon.misc_worn_check, W.ARMC)) {
@@ -928,7 +945,9 @@ async function m_dowear_type(mon, flag, creation, racialexception) {   // worn.c
             }
             await pline_mon(mon, $C`%s%s puts on %s.`, await Monnam(mon), new $c.Ptr(buf, 0), new $c.Ptr(newarm, 0));
             if (autocurse) {
-                await pline($C`%s %s %s %s for a moment.`, s_suffix(await Monnam(mon)), await simpleonames(best), await otense(best, $C`glow`), hcolor(c_color_names.c_black));
+                await pline($C`%s %s %s %s for a moment.`, s_suffix(await Monnam(mon)),
+                    await simpleonames(best), await otense(best, $C`glow`),
+                    hcolor(c_color_names.c_black));
             }
         }   /* can see it */
         m_delay = m_delay + objects[best.otyp].oc_delay | 0;
@@ -957,9 +976,11 @@ async function m_dowear_type(mon, flag, creation, racialexception) {   // worn.c
         if (!creation && best.lamplit && cansee(mon.mx, mon.my)) {
             adesc = arti_light_description(best);
             if (sawmon) {   /* could already see monster */
-                await pline($C`%s %s to shine %s.`, await Yname2(best), await otense(best, $C`begin`), adesc);
+                await pline($C`%s %s to shine %s.`, await Yname2(best),
+                    await otense(best, $C`begin`), adesc);
             } else if (canseemon(mon)) {   /* didn't see it until new light */
-                await pline($C`%s %s shining %s.`, await Yname2(best), await otense(best, $C`are`), adesc);
+                await pline($C`%s %s shining %s.`, await Yname2(best),
+                    await otense(best, $C`are`), adesc);
             } else if (sawloc) {   /* saw location but not invisible monster */
                 await pline($C`%s begins to shine %s.`, c_common_strings.c_Something, adesc);
             } else {
@@ -1173,13 +1194,15 @@ export async function mon_break_armor(mon, polyspot) {   // worn.c:1177
     const ppronoun = genders[pronoun_gender(mon, PRONOUN.HALLU)].his;
     if (breakarm(mdat)) {
         if ((otmp = await which_armor(mon, W.ARM)) !== null) {
-            if (Is_dragon_scales(otmp) && mdat === Dragon_scales_to_pm(otmp) || Is_dragon_mail(otmp) && mdat === Dragon_mail_to_pm(otmp)) {
+            if (Is_dragon_scales(otmp) && mdat === Dragon_scales_to_pm(otmp)
+                || Is_dragon_mail(otmp) && mdat === Dragon_mail_to_pm(otmp)) {
                 /* no message here;
                    "the dragon merges with his scaly armor" is odd
                    and the monster's previous form is already gone */
             } else {
                 if (vis) {
-                    await pline_mon(mon, $C`%s breaks out of %s armor!`, await Monnam(mon), ppronoun);
+                    await pline_mon(mon, $C`%s breaks out of %s armor!`,
+                        await Monnam(mon), ppronoun);
                 } else {
                     await You_hear($C`a cracking sound.`);
                 }
@@ -1187,15 +1210,18 @@ export async function mon_break_armor(mon, polyspot) {   // worn.c:1177
             await m_useup(mon, otmp);
         }
         /* mummy wrapping adapts to small and very big sizes */
-        if ((otmp = await which_armor(mon, W.ARMC)) !== null && (otmp.otyp !== MUMMY_WRAPPING || !WrappingAllowed(mdat))) {
+        if ((otmp = await which_armor(mon, W.ARMC)) !== null
+            && (otmp.otyp !== MUMMY_WRAPPING || !WrappingAllowed(mdat))) {
             if (otmp.oartifact) {
                 if (vis) {
-                    await pline_mon(mon, $C`%s %s falls off!`, s_suffix(await Monnam(mon)), cloak_simple_name(otmp));
+                    await pline_mon(mon, $C`%s %s falls off!`, s_suffix(await Monnam(mon)),
+                        cloak_simple_name(otmp));
                 }
                 await m_lose_armor(mon, otmp, polyspot);
             } else {
                 if (vis) {
-                    await pline_mon(mon, $C`%s %s tears apart!`, s_suffix(await Monnam(mon)), cloak_simple_name(otmp));
+                    await pline_mon(mon, $C`%s %s tears apart!`, s_suffix(await Monnam(mon)),
+                        cloak_simple_name(otmp));
                 } else {
                     await You_hear($C`a ripping sound.`);
                 }
@@ -1204,7 +1230,8 @@ export async function mon_break_armor(mon, polyspot) {   // worn.c:1177
         }
         if ((otmp = await which_armor(mon, W.ARMU)) !== null) {
             if (vis) {
-                await pline_mon(mon, $C`%s shirt rips to shreds!`, s_suffix(await Monnam(mon)));
+                await pline_mon(mon, $C`%s shirt rips to shreds!`,
+                    s_suffix(await Monnam(mon)));
             } else {
                 await You_hear($C`a ripping sound.`);
             }
@@ -1215,19 +1242,24 @@ export async function mon_break_armor(mon, polyspot) {   // worn.c:1177
         const passes_thru_clothes = !(mdat.msize <= MZ.SMALL) ? 1 : 0;
         if ((otmp = await which_armor(mon, W.ARM)) !== null) {
             if (vis) {
-                await pline_mon(mon, $C`%s armor falls around %s!`, s_suffix(await Monnam(mon)), pronoun);
+                await pline_mon(mon, $C`%s armor falls around %s!`,
+                    s_suffix(await Monnam(mon)), pronoun);
             } else {
                 await You_hear($C`a thud.`);
             }
             await m_lose_armor(mon, otmp, polyspot);
         }
         /* mummy wrapping adapts to small and very big sizes */
-        if ((otmp = await which_armor(mon, W.ARMC)) !== null && (otmp.otyp !== MUMMY_WRAPPING || !WrappingAllowed(mdat))) {
+        if ((otmp = await which_armor(mon, W.ARMC)) !== null
+            && (otmp.otyp !== MUMMY_WRAPPING || !WrappingAllowed(mdat))) {
             if (vis) {
                 if (is_whirly(mon.data)) {
-                    await pline_mon(mon, $C`%s %s falls, unsupported!`, s_suffix(await Monnam(mon)), cloak_simple_name(otmp));
+                    await pline_mon(mon, $C`%s %s falls, unsupported!`,
+                        s_suffix(await Monnam(mon)), cloak_simple_name(otmp));
                 } else {
-                    await pline_mon(mon, $C`%s shrinks out of %s %s!`, await Monnam(mon), ppronoun, cloak_simple_name(otmp));
+                    await pline_mon(mon, $C`%s shrinks out of %s %s!`,
+                        await Monnam(mon), ppronoun,
+                        cloak_simple_name(otmp));
                 }
             }
             await m_lose_armor(mon, otmp, polyspot);
@@ -1235,9 +1267,11 @@ export async function mon_break_armor(mon, polyspot) {   // worn.c:1177
         if ((otmp = await which_armor(mon, W.ARMU)) !== null) {
             if (vis) {
                 if (passes_thru_clothes) {
-                    await pline_mon(mon, $C`%s seeps right through %s shirt!`, await Monnam(mon), ppronoun);
+                    await pline_mon(mon, $C`%s seeps right through %s shirt!`,
+                        await Monnam(mon), ppronoun);
                 } else {
-                    await pline_mon(mon, $C`%s becomes much too small for %s shirt!`, await Monnam(mon), ppronoun);
+                    await pline_mon(mon, $C`%s becomes much too small for %s shirt!`,
+                        await Monnam(mon), ppronoun);
                 }
             }
             await m_lose_armor(mon, otmp, polyspot);
@@ -1247,13 +1281,16 @@ export async function mon_break_armor(mon, polyspot) {   // worn.c:1177
         /* [caller needs to handle weapon checks] */
         if ((otmp = await which_armor(mon, W.ARMG)) !== null) {
             if (vis) {
-                await pline_mon(mon, $C`%s drops %s gloves%s!`, await Monnam(mon), ppronoun, MON_WEP(mon) ? $C` and weapon` : $C``);
+                await pline_mon(mon, $C`%s drops %s gloves%s!`,
+                    await Monnam(mon), ppronoun,
+                    MON_WEP(mon) ? $C` and weapon` : $C``);
             }
             await m_lose_armor(mon, otmp, polyspot);
         }
         if ((otmp = await which_armor(mon, W.ARMS)) !== null) {
             if (vis) {
-                await pline_mon(mon, $C`%s can no longer hold %s shield!`, await Monnam(mon), ppronoun);
+                await pline_mon(mon, $C`%s can no longer hold %s shield!`,
+                    await Monnam(mon), ppronoun);
             } else {
                 await You_hear($C`a clank.`);
             }
@@ -1262,9 +1299,11 @@ export async function mon_break_armor(mon, polyspot) {   // worn.c:1177
     }
     if (handless_or_tiny || has_horns(mdat)) {
         /* flimsy test for horns matches polyself handling */
-        if ((otmp = await which_armor(mon, W.ARMH)) !== null && (handless_or_tiny || !is_flimsy(otmp))) {
+        if ((otmp = await which_armor(mon, W.ARMH)) !== null
+            && (handless_or_tiny || !is_flimsy(otmp))) {
             if (vis) {
-                await pline_mon(mon, $C`%s helmet falls to the %s!`, s_suffix(await Monnam(mon)), surface(mon.mx, mon.my));
+                await pline_mon(mon, $C`%s helmet falls to the %s!`,
+                    s_suffix(await Monnam(mon)), surface(mon.mx, mon.my));
             } else {
                 await You_hear($C`a clank.`);
             }
@@ -1275,9 +1314,12 @@ export async function mon_break_armor(mon, polyspot) {   // worn.c:1177
         if ((otmp = await which_armor(mon, W.ARMF)) !== null) {
             if (vis) {
                 if (is_whirly(mon.data)) {
-                    await pline_mon(mon, $C`%s boots fall away!`, s_suffix(await Monnam(mon)));
+                    await pline_mon(mon, $C`%s boots fall away!`,
+                        s_suffix(await Monnam(mon)));
                 } else {
-                    await pline_mon(mon, $C`%s boots %s off %s feet!`, s_suffix(await Monnam(mon)), verysmall(mdat) ? $C`slide` : $C`are pushed`, ppronoun);
+                    await pline_mon(mon, $C`%s boots %s off %s feet!`,
+                        s_suffix(await Monnam(mon)),
+                        verysmall(mdat) ? $C`slide` : $C`are pushed`, ppronoun);
                 }
             }
             await m_lose_armor(mon, otmp, polyspot);

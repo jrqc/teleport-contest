@@ -161,7 +161,8 @@ export async function match_str2clr(str, suppress_msg) {   // coloratt.c:349
        (also junk like "_l i-gh_t---b l u e" but we won't worry about that);
        also copes with trailing space; caller has removed any leading space */
     for (i = 0; i < 27; i = i + 1 | 0) {
-        if (colornames[i].name && fuzzymatch(str, colornames[i].name, $C` -_`, TRUE)) {
+        if (colornames[i].name
+            && fuzzymatch(str, colornames[i].name, $C` -_`, TRUE)) {
             c = colornames[i].color;
             break;
         }
@@ -186,7 +187,8 @@ export async function match_str2attr(str, complain) {   // coloratt.c:374
     let i = 0;
     let a = -1;
     for (i = 0; i < 11; i = i + 1 | 0) {
-        if (attrnames[i].name && fuzzymatch(str, attrnames[i].name, $C` -_`, TRUE)) {
+        if (attrnames[i].name
+            && fuzzymatch(str, attrnames[i].name, $C` -_`, TRUE)) {
             a = attrnames[i].attr;
             break;
         }
@@ -218,7 +220,10 @@ export async function query_attr(prompt, dflt_attr) {   // coloratt.c:396
             break;
         }
         any.a_int = i + 1 | 0;
-        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, attrnames[i].attr, clr, attrnames[i].name, attrnames[i].attr === dflt_attr ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0,
+            attrnames[i].attr, clr, attrnames[i].name,
+            attrnames[i].attr === dflt_attr ? MENU.ITEMFLAGS_SELECTED
+            : MENU.ITEMFLAGS_NONE);
     }
     await end_menu()(tmpwin, prompt && prompt.get(0) ? prompt : $C`Pick an attribute`);
     const pick_cnt = await select_menu(tmpwin, allow_many ? PICK.ANY : PICK.ONE, new $c.Ptr(picks, 0));
@@ -294,7 +299,10 @@ export async function query_color(prompt, dflt_color) {   // coloratt.c:475
             break;
         }
         any.a_int = i + 1 | 0;
-        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, NO_COLOR, colornames[i].name, colornames[i].color === dflt_color ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0,
+            ATR.NONE, NO_COLOR, colornames[i].name,
+            colornames[i].color === dflt_color ? MENU.ITEMFLAGS_SELECTED
+            : MENU.ITEMFLAGS_NONE);
     }
     await end_menu()(tmpwin, prompt && prompt.get(0) ? prompt : $C`Pick a color`);
     const pick_cnt = await select_menu(tmpwin, PICK.ONE, new $c.Ptr(picks, 0));
@@ -536,7 +544,9 @@ export async function check_enhanced_colors(buf) {   // coloratt.c:723
             $c.memcpy(altbuf.add($c.idx(greyoffset)), $C`gray`, 4);
         }
         for (color = 0; color < 155; color = color + 1 | 0) {
-            if (fuzzymatch(buf, colortable[color].name, $C` -_`, TRUE) || altbuf && fuzzymatch(altbuf, colortable[color].name, $C` -_`, TRUE)) {
+            if (fuzzymatch(buf, colortable[color].name, $C` -_`, TRUE)
+                || altbuf && fuzzymatch(altbuf, colortable[color].name,
+                $C` -_`, TRUE)) {
                 retcolor = colortable_to_int32($c.relem(colortable, color));
                 break;
             }
@@ -573,7 +583,9 @@ export function wc_color_name(colorindx) {   // coloratt.c:764
             result = new $c.Ptr(wc_color_name$hexcolor, 0);
             /* override hex value if this is a named color */
             for (indx = 16; indx < 155; indx = indx + 1 | 0) {
-                if (colortable[indx].r === r && colortable[indx].g === g && colortable[indx].b === b) {
+                if (colortable[indx].r === r
+                    && colortable[indx].g === g
+                    && colortable[indx].b === b) {
                     result = colortable[indx].name;
                     break;
                 }
@@ -630,7 +642,10 @@ export async function rgbstr_to_int32(rgbstr) {   // coloratt.c:813
             }
         }
         /* sanity checks */
-        if (c_r && c_g && c_b && ($c.strlen(c_r) > 0 && $c.strlen(c_r) < 4) && ($c.strlen(c_g) > 0 && $c.strlen(c_g) < 4) && ($c.strlen(c_b) > 0 && $c.strlen(c_b) < 4)) {
+        if (c_r && c_g && c_b
+            && ($c.strlen(c_r) > 0 && $c.strlen(c_r) < 4)
+            && ($c.strlen(c_g) > 0 && $c.strlen(c_g) < 4)
+            && ($c.strlen(c_b) > 0 && $c.strlen(c_b) < 4)) {
             const r = $c.atoi(c_r);
             const g = $c.atoi(c_g);
             const b = $c.atoi(c_b);

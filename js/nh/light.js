@@ -65,7 +65,8 @@ export async function new_light_source(x, y, range, type, id) {   // light.c:62
 async function new_light_core(x, y, range, type, id) {   // light.c:69
     let ls = null;
     /* camera flash uses radius 0 and passes Null object */
-    if (range > MAX_RADIUS || range < 0 || range === 0 && (type !== LS_OBJECT || id.a_obj !== null)) {
+    if (range > MAX_RADIUS || range < 0
+        || range === 0 && (type !== LS_OBJECT || id.a_obj !== null)) {
         await impossible($C`new_light_source:  illegal range %d`, range);
         return null;
     }
@@ -122,7 +123,8 @@ export async function del_light_source(type, id) {   // light.c:99
     if (curr) {
         await delete_ls(curr);
     } else {
-        await impossible($C`del_light_source: not found type=%d, id=%s`, type, fmt_ptr(id.a_obj));
+        await impossible($C`del_light_source: not found type=%d, id=%s`, type,
+            fmt_ptr(id.a_obj));
     }
 }
 /* remove a light source from the light_base list and free it */
@@ -169,7 +171,8 @@ export function do_light_sources(cs_rows) {   // light.c:169
          */
         if (ls.type === LS_OBJECT) {
             /* camera flash; caller has set ls->{x,y} */
-            if (ls.range === 0 || get_obj_location(ls.id.a_obj, new $c.FieldRef(ls, "x", "i16"), new $c.FieldRef(ls, "y", "i16"), 0)) {
+            if (ls.range === 0
+                || get_obj_location(ls.id.a_obj, new $c.FieldRef(ls, "x", "i16"), new $c.FieldRef(ls, "y", "i16"), 0)) {
                 ls.flags = $c.i16(ls.flags | LSF_SHOW);
             }
         } else if (ls.type === LS_MONSTER) {
@@ -229,7 +232,8 @@ export function do_light_sources(cs_rows) {   // light.c:169
                     }
                 } else {
                     for (x = min_x; x <= max_x; x = $c.i16(x + 1)) {
-                        if (ls.x === x && ls.y === y || clear_path(ls.x, ls.y, x, y)) {
+                        if (ls.x === x && ls.y === y
+                            || clear_path(ls.x, ls.y, x, y)) {
                             row.set(x, $c.u8(row.get(x) | TEMP_LIT));
                         }
                     }
@@ -276,7 +280,10 @@ export async function show_transient_light(obj, x, y) {   // light.c:257
         }
         (!(obj !== $c.asRec(null, $T.obj, 112)) ? 1 : 0) ? $c.__assert_rtn($C`show_transient_light`, $C`light.c`, 285, $C`obj != NULL`) : 0;   /* necessary condition to get into this 'else' */
         if (!ls || obj.where !== OBJ.FREE) {
-            await impossible($C`transient light %s %s %s not %s?`, obj.lamplit ? $C`lit` : $C`unlit`, await simpleonames(obj), await otense(obj, $C`are`), !ls ? $C`a light source` : $C`free`);
+            await impossible($C`transient light %s %s %s not %s?`,
+                obj.lamplit ? $C`lit` : $C`unlit`,
+                await simpleonames(obj), await otense(obj, $C`are`),
+                !ls ? $C`a light source` : $C`free`);
             return;
         }
     }
@@ -445,7 +452,8 @@ export async function save_light_sources(nhfp, range) {   // light.c:421
         await Sfo_int(nhfp, new $c.Ptr(count, 0), $C`lightsource-count`);
         const actual = await maybe_write_ls(nhfp, range, TRUE);
         if (actual !== count[0]) {
-            await panic($C`counted %d light sources, wrote %d! [range=%d]`, count[0], actual, range);
+            await panic($C`counted %d light sources, wrote %d! [range=%d]`, count[0],
+                actual, range);
         }
     }
     if (release_data(nhfp)) {
@@ -463,7 +471,8 @@ export async function save_light_sources(nhfp, range) {   // light.c:421
                         break;
                     default:
                         is_global = 0;
-                        await impossible($C`save_light_sources: bad type (%d) [range=%d]`, curr.type, range);
+                        await impossible($C`save_light_sources: bad type (%d) [range=%d]`,
+                            curr.type, range);
                         break;
                 }
             }
@@ -555,7 +564,8 @@ export async function relink_light_sources(ghostly) {   // light.c:517
                     }
                 }
                 if (which !== 0) {
-                    await panic($C`relink_light_sources: can't find %c_id %u`, which, nid[0]);
+                    await panic($C`relink_light_sources: can't find %c_id %u`,
+                        which, nid[0]);
                 }
             } else {
                 await panic($C`relink_light_sources: bad type (%d)`, ls.type);
@@ -592,7 +602,8 @@ async function maybe_write_ls(nhfp, range, write_it) {   // light.c:571
                 break;
             default:
                 is_global = 0;
-                await impossible($C`maybe_write_ls: bad type (%d) [range=%d]`, ls.type, range);
+                await impossible($C`maybe_write_ls: bad type (%d) [range=%d]`, ls.type,
+                    range);
                 break;
         }
         /* if global and not doing local, or vice versa, count it */
@@ -650,7 +661,8 @@ async function write_ls(nhfp, ls) {   // light.c:634
                 ls.id.$copyFrom(cg.zeroany);
                 ls.id.a_uint = otmp.o_id;
                 if (find_oid(ls.id.a_uint) !== otmp) {
-                    await impossible($C`write_ls: can't find obj #%u!`, ls.id.a_uint);
+                    await impossible($C`write_ls: can't find obj #%u!`,
+                        ls.id.a_uint);
                     ls.flags = $c.i16(ls.flags | LSF_IS_PROBLEMATIC);
                 }
             } else {
@@ -674,11 +686,15 @@ async function write_ls(nhfp, ls) {   // light.c:634
                     ls.id.$copyFrom(cg.zeroany);
                     ls.id.a_uint = mtmp.m_id;
                     if (find_mid(ls.id.a_uint, monloc) !== mtmp) {
-                        await impossible($C`write_ls: can't find mon%s #%u!`, DEADMONSTER(mtmp) ? $C` because it's dead` : $C``, ls.id.a_uint);
+                        await impossible($C`write_ls: can't find mon%s #%u!`,
+                            DEADMONSTER(mtmp) ? $C` because it's dead`
+                            : $C``,
+                            ls.id.a_uint);
                         ls.flags = $c.i16(ls.flags | LSF_IS_PROBLEMATIC);
                     }
                 } else {
-                    await impossible($C`write_ls: stashed monst ptr not in any chain`);
+                    await impossible(
+                        $C`write_ls: stashed monst ptr not in any chain`);
                     ls.flags = $c.i16(ls.flags | LSF_IS_PROBLEMATIC);
                 }
             }
@@ -771,7 +787,8 @@ export function obj_sheds_light(obj) {   // light.c:763
  * @returns {number} boolean
  */
 export function obj_is_burning(obj) {   // light.c:771
-    return obj.lamplit && (ignitable(obj) || artifact_light(obj)) ? 1 : 0;
+    return obj.lamplit && (ignitable(obj)
+        || artifact_light(obj)) ? 1 : 0;
 }
 /* copy the light source(s) attached to src, and attach it/them to dest */
 /**

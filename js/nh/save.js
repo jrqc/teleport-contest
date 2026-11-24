@@ -313,7 +313,8 @@ async function savegamestate(nhfp) {   // save.c:265
     relative_time_to_moves(new $c.FieldRef(svc.context.digging, "lastdigtime", "i64"));
     await Sfo_flag(nhfp, flags, $C`gamestate-flags`);
     $t1 = getnow(), urealtime.finish_time = $t1;
-    $t2 = timet_delta(urealtime.finish_time, urealtime.start_timing), urealtime.realtime = $c.add64(urealtime.realtime, $t2);
+    $t2 = timet_delta(urealtime.finish_time,
+        urealtime.start_timing), urealtime.realtime = $c.add64(urealtime.realtime, $t2);
     await sfo_long(nhfp, new $c.FieldRef(svw, "wreserve", "i64"), $C`wreserve`);
     await Sfo_int32(nhfp, new $c.FieldRef(svw, "wtreserved", "i32"), $C`wtreserved`);
     await Sfo_you(nhfp, u, $C`gamestate-you`);
@@ -339,7 +340,8 @@ async function savegamestate(nhfp) {   // save.c:265
     for (i = 0; i < NUMMONS; i = i + 1 | 0) {
         await Sfo_mvitals(nhfp, $c.relem(svm.mvitals, i), $C`gamestate-mvitals`);
     }
-    await save_dungeon(nhfp, !!update_file(nhfp) ? 1 : 0, !!release_data(nhfp) ? 1 : 0);
+    await save_dungeon(nhfp, !!update_file(nhfp) ? 1 : 0,
+        !!release_data(nhfp) ? 1 : 0);
     await savelevchn(nhfp);
     await Sfo_q_score(nhfp, svq.quest_status, $C`gamestate-quest_status`);
     for (i = 0; i < MAXSPELL + 1; i = i + 1 | 0) {
@@ -704,7 +706,8 @@ async function save_stairs(nhfp) {   // save.c:665
     buflen[0] = 24;
     while (stway) {
         if (update_file(nhfp)) {
-            const use_relative = program_state.restoring !== REST.GSTATE && stway.tolev.dnum === u.uz.dnum ? 1 : 0;
+            const use_relative = program_state.restoring !== REST.GSTATE
+                && stway.tolev.dnum === u.uz.dnum ? 1 : 0;
             if (use_relative) {
                 /* make dlevel relative to current level */
                 stway.tolev.dlevel = $c.i16(stway.tolev.dlevel - u.uz.dlevel | 0);
@@ -842,7 +845,8 @@ async function saveobjchn(nhfp, obj_p) {   // save.c:762
             /* clear 'uball' and 'uchain' pointers if resetting their mask;
                could also do same for other worn items but don't need to */
             if ($c.and64(otmp.owornmask, W.BALL | W.CHAIN) !== 0) {
-                await setworn(null, $c.and64(otmp.owornmask, W.BALL | W.CHAIN));
+                await setworn(null,
+                    $c.and64(otmp.owornmask, W.BALL | W.CHAIN));
             }
             otmp.owornmask = 0;   /* no longer care */
             program_state.freeingdata = program_state.freeingdata + 1 | 0;
@@ -969,7 +973,8 @@ async function savemonchn(nhfp, mtmp) {   // save.c:884
  */
 async function savetrapchn(nhfp, trap) {   // save.c:920
     while (trap) {
-        const use_relative = program_state.restoring !== REST.GSTATE && trap.dst.dnum === u.uz.dnum ? 1 : 0;
+        const use_relative = program_state.restoring !== REST.GSTATE
+            && trap.dst.dnum === u.uz.dnum ? 1 : 0;
         const trap2 = trap.ntrap;
         if (use_relative) {
             trap.dst.dlevel = $c.i16(trap.dst.dlevel - u.uz.dlevel | 0);   /* make it relative */

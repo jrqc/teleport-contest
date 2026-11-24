@@ -176,7 +176,8 @@ export function do_statusline1() {   // botl.c:48
         let k = 0;
         $c.strcpy(new $c.Ptr(mbot, 0), pmname($c.relem(mons, u.umonnum), (u.umonnum !== u.umonster ? u.mfemale : flags.female) ? 1 : 0));
         while (mbot[k] !== 0) {
-            if ((k === 0 || k > 0 && mbot[k - 1 | 0] === 32) && 97 <= mbot[k] && mbot[k] <= 122) {
+            if ((k === 0 || k > 0 && mbot[k - 1 | 0] === 32) && 97 <= mbot[k]
+                && mbot[k] <= 122) {
                 mbot[k] = $c.i8(mbot[k] + -32 | 0);
             }
             k = k + 1 | 0;
@@ -330,7 +331,9 @@ export async function do_statusline2() {   // botl.c:101
         nh_snprintf($C`do_statusline2`, 229, new $c.Ptr(do_statusline2$newbot2, 0), 256, $C`%s %s %s %s %s%s`, new $c.Ptr(do_statusline2$dloc, 0), new $c.Ptr(do_statusline2$hlth, 0), new $c.Ptr(do_statusline2$expr, 0), new $c.Ptr(do_statusline2$tmmv, 0), new $c.Ptr(do_statusline2$cond, 0), new $c.Ptr(do_statusline2$vers, 0));
     } else {
         if ($c.addu64($c.addu64($c.addu64($c.addu64($c.addu64($c.addu64($c.addu64($c.addu64($c.addu64(dln, 1), hln), 1), xln), 1), tln), 1), cln), vrn) > 200) {
-            await panic($C`bot2: second status line exceeds MAXCO (%u > %d)`, $c.u32($c.addu64($c.addu64($c.addu64($c.addu64($c.addu64($c.addu64($c.addu64($c.addu64($c.addu64(dln, 1), hln), 1), xln), 1), tln), 1), cln), vrn)), 200);
+            await panic($C`bot2: second status line exceeds MAXCO (%u > %d)`,
+                $c.u32($c.addu64($c.addu64($c.addu64($c.addu64($c.addu64($c.addu64($c.addu64($c.addu64($c.addu64(dln, 1), hln), 1), xln), 1), tln), 1), cln), vrn)),
+                200);
         } else if ($c.addu64($c.addu64($c.addu64($c.addu64($c.addu64($c.addu64($c.subu64(dln, dx), 1), hln), 1), xln), 1), cln) <= COLNO) {
             nh_snprintf($C`do_statusline2`, 238, new $c.Ptr(do_statusline2$newbot2, 0), 256, $C`%s %s %s %s %s%s`, new $c.Ptr(do_statusline2$dloc, 0), new $c.Ptr(do_statusline2$hlth, 0), new $c.Ptr(do_statusline2$expr, 0), new $c.Ptr(do_statusline2$cond, 0), new $c.Ptr(do_statusline2$tmmv, 0), new $c.Ptr(do_statusline2$vers, 0));
         } else if ($c.addu64($c.addu64($c.addu64($c.addu64($c.subu64(dln, dx), 1), hln), 1), cln) <= COLNO) {
@@ -353,7 +356,8 @@ export async function bot() {   // botl.c:253
     }
     /* dosave() flags completion by setting u.uhp to -1; suppress_map_output()
        covers program_state.restoring and is used for status as well as map */
-    if (u.uhp !== -1 && gy.youmonst.data && iflags.status_updates && !suppress_map_output()) {
+    if (u.uhp !== -1 && gy.youmonst.data
+        && iflags.status_updates && !suppress_map_output()) {
         if (VIA_WINDOWPORT()) {
             await bot_via_windowport();
         } else {
@@ -423,7 +427,8 @@ export function rank_to_xlev(rank) {   // botl.c:315
      *  8 =>   30
      * We return the low end of each range.
      */
-    return rank < 1 ? 1 : rank < 2 ? 3 : rank < 8 ? Math.imul(rank, 4) - 2 | 0 : 30;
+    return rank < 1 ? 1 : rank < 2 ? 3
+        : rank < 8 ? Math.imul(rank, 4) - 2 | 0 : 30;
 }
 /**
  * @param {number} lev int
@@ -477,7 +482,8 @@ export async function title_to_mon(str, rank_indx, title_length) {   // botl.c:3
     for (i = 0; roles[i].name.m; i = i + 1 | 0) {
         /* loop through each of the rank titles for role #i */
         for (j = 0; j < 9; j = j + 1 | 0) {
-            if (roles[i].rank[j].m && str_start_is(str, roles[i].rank[j].m, TRUE)) {
+            if (roles[i].rank[j].m
+                && str_start_is(str, roles[i].rank[j].m, TRUE)) {
                 if (rank_indx) {
                     rank_indx.set(0, j);
                 }
@@ -486,7 +492,8 @@ export async function title_to_mon(str, rank_indx, title_length) {   // botl.c:3
                 }
                 return roles[i].mnum;
             }
-            if (roles[i].rank[j].f && str_start_is(str, roles[i].rank[j].f, TRUE)) {
+            if (roles[i].rank[j].f
+                && str_start_is(str, roles[i].rank[j].f, TRUE)) {
                 if (rank_indx) {
                     rank_indx.set(0, j);
                 }
@@ -580,13 +587,16 @@ export async function weapon_status(outbuf) {   // botl.c:481
            otherwise make no assumptions */
         /* empty handed means "gloves only" */
         /* bare hands */
-        res = $G.uarmg ? $C`Empty-hnd` : humanoid(gy.youmonst.data) ? $C`Bare-hnds` : $C`No-weapon`;
+        res = $G.uarmg ? $C`Empty-hnd`
+            : humanoid(gy.youmonst.data) ? $C`Bare-hnds`
+            : $C`No-weapon`;
     } else if (u.twoweap) {
         /* two-weaponing implies hands and a weapon or wep-tool
            (not other odd stuff) in each hand */
         res = $C`Dual-weps`;
         /* note: dual wielding two lances doesn't produce double joust */
-        if (u.usteed && (weapon_type($G.uwep) === P.LANCE || weapon_type($G.uswapwep) === P.LANCE)) {
+        if (u.usteed && (weapon_type($G.uwep) === P.LANCE
+            || weapon_type($G.uswapwep) === P.LANCE)) {
             res = $C`Dual+joust`;   /* lance behaves specially when mounted */
         }
     } else {
@@ -631,7 +641,8 @@ export async function weapon_status(outbuf) {   // botl.c:481
                     break;
             }
         }
-        if (($G.uwep.oclass === WEAPON_CLASS || is_weptool($G.uwep)) && bimanual($G.uwep) && res.get(0) !== 50 && strncmpi(res, $C`two`, 3)) {
+        if (($G.uwep.oclass === WEAPON_CLASS || is_weptool($G.uwep))
+            && bimanual($G.uwep) && res.get(0) !== 50 && strncmpi(res, $C`two`, 3)) {
             $c.strcat(outbuf, $C`2H-`);
         }
         $c.strcpy(p = eos(outbuf), res), res = outbuf;
@@ -697,7 +708,12 @@ export function armor_status(armbuf) {   // botl.c:559
      * call it to scan whole inventory looking for sources of protection.
      * This is a hack for efficiency to avoid that during status updates.
      */
-    if ($G.uright && $G.uright.otyp === RIN_PROTECTION || $G.uleft && $G.uleft.otyp === RIN_PROTECTION || $G.uamul && $G.uamul.otyp === AMULET_OF_GUARDING || $G.uarmc && $G.uarmc.otyp === CLOAK_OF_PROTECTION || $G.uarmh && $G.uarmh.oartifact === ART.MITRE_OF_HOLINESS || $G.uwep && $G.uwep.oartifact === ART.TSURUGI_OF_MURAMASA) {
+    if ($G.uright && $G.uright.otyp === RIN_PROTECTION
+        || $G.uleft && $G.uleft.otyp === RIN_PROTECTION
+        || $G.uamul && $G.uamul.otyp === AMULET_OF_GUARDING
+        || $G.uarmc && $G.uarmc.otyp === CLOAK_OF_PROTECTION
+        || $G.uarmh && $G.uarmh.oartifact === ART.MITRE_OF_HOLINESS
+        || $G.uwep && $G.uwep.oartifact === ART.TSURUGI_OF_MURAMASA) {
         strkitten(armbuf, 43);
     }
     return upstart(armbuf);
@@ -837,7 +853,8 @@ async function bot_via_windowport() {   // botl.c:962
         gv.valset[BL.VERS] = FALSE;
     }
     if (!gv.valset[BL.VERS]) {
-        status_version(gb.blstats[idx][BL.VERS].val, $c.u64(gb.blstats[idx][BL.VERS].valwidth), FALSE);
+        status_version(gb.blstats[idx][BL.VERS].val,
+            $c.u64(gb.blstats[idx][BL.VERS].valwidth), FALSE);
         gv.valset[BL.VERS] = TRUE;
     }
     /* Conditions */
@@ -880,7 +897,8 @@ async function bot_via_windowport() {   // botl.c:962
         /* if in-lava or tethered is disabled and the condition applies,
            lump it in with trapped */
         if (condtests[bl_trapped].enabled) {
-            condtests[bl_trapped].test = !condtests[bl_inlava].test && !condtests[bl_tethered].test ? 1 : 0;
+            condtests[bl_trapped].test = !condtests[bl_inlava].test
+                && !condtests[bl_tethered].test ? 1 : 0;
         }
     }
     $t13 = ($t12 = condtests[bl_holding].test = FALSE, condtests[bl_held].test = $t12), condtests[bl_grab].test = $t13;
@@ -969,12 +987,15 @@ async function bot_via_windowport() {   // botl.c:962
                 $t15 = cache_avail[1] = FALSE, cache_reslt[1] = $t15;
             }
         } while (0);
-        if (condtests[bl_unconsc].enabled && cache_nomovemsg && !cache_avail[0]) {
+        if (condtests[bl_unconsc].enabled
+            && cache_nomovemsg && !cache_avail[0]) {
             $t16 = !u.usleep && unconscious() ? 1 : 0, cache_reslt[0] = $t16;
             cache_avail[0] = TRUE;
         }
-        if (condtests[bl_parlyz].enabled && cache_multi_reason && !cache_avail[1]) {
-            $t17 = !$c.strncmp(cache_multi_reason, $C`paralyzed`, 9) || !$c.strncmp(cache_multi_reason, $C`frozen`, 6) ? 1 : 0, cache_reslt[1] = $t17;
+        if (condtests[bl_parlyz].enabled
+            && cache_multi_reason && !cache_avail[1]) {
+            $t17 = !$c.strncmp(cache_multi_reason, $C`paralyzed`, 9)
+                || !$c.strncmp(cache_multi_reason, $C`frozen`, 6) ? 1 : 0, cache_reslt[1] = $t17;
             cache_avail[1] = TRUE;
         }
         if (cache_avail[0] && cache_reslt[0]) {
@@ -992,7 +1013,8 @@ async function bot_via_windowport() {   // botl.c:962
     for (i = 0; i < CONDITION_COUNT; i = i + 1 | 0) {
         /* && i != bl_holding  */
         /* uncomment to suppress UHold */
-        if (condtests[i].enabled && condtests[i].test) {
+        if (condtests[i].enabled
+            && condtests[i].test) {
             gb.blstats[idx][BL.CONDITION].a.a_ulong = $c.oru64(gb.blstats[idx][BL.CONDITION].a.a_ulong, $c.u64(conditions[i].mask));
         }
     }
@@ -1039,7 +1061,8 @@ async function stat_update_time() {   // botl.c:1285
     gv.valset[fld] = FALSE;
     await eval_notify_windowport_field(fld, new $c.Ptr(gv.valset, 0), idx);
     if ($c.andu64(windowprocs.wincap2, WC2_FLUSH_STATUS) !== 0) {
-        await status_update()(BL.FLUSH, null, 0, 0, NO_COLOR, null);
+        await status_update()(BL.FLUSH, null, 0, 0,
+            NO_COLOR, null);
     }
     return;
 }
@@ -1053,7 +1076,8 @@ async function stat_update_time() {   // botl.c:1285
 export async function condopt(idx, addr, negated) {   // botl.c:1303
     let i = 0;
     /* sanity check */
-    if (idx < 0 || idx >= CONDITION_COUNT || addr && !$c.peq(addr, new $c.FieldRef(condtests[idx], "choice", "i8"))) {
+    if (idx < 0 || idx >= CONDITION_COUNT
+        || addr && !$c.peq(addr, new $c.FieldRef(condtests[idx], "choice", "i8"))) {
         return;
     }
     if (!addr) {
@@ -1146,7 +1170,8 @@ export async function cond_menu() {   // botl.c:1376
         any.$copyFrom(cg.zeroany);
         any.a_int = 1;
         $c.sprintf(new $c.Ptr(mbuf, 0), $C`change sort order from "%s" to "%s"`, cond_menu$menutitle[gc.condmenu_sortorder], cond_menu$menutitle[1 - gc.condmenu_sortorder | 0]);
-        await add_menu(tmpwin, nul_glyphinfo, any, 83, 0, ATR.NONE, clr, new $c.Ptr(mbuf, 0), MENU.ITEMFLAGS_SKIPINVERT);
+        await add_menu(tmpwin, nul_glyphinfo, any, 83, 0, ATR.NONE,
+            clr, new $c.Ptr(mbuf, 0), MENU.ITEMFLAGS_SKIPINVERT);
         any.$copyFrom(cg.zeroany);
         $c.sprintf(new $c.Ptr(mbuf, 0), $C`sorted %s`, cond_menu$menutitle[gc.condmenu_sortorder]);
         await add_menu_heading(tmpwin, new $c.Ptr(mbuf, 0));
@@ -1156,7 +1181,9 @@ export async function cond_menu() {   // botl.c:1376
             any.$copyFrom(cg.zeroany);
             any.a_int = idx + 2 | 0;   /* avoid zero and the sort change pick */
             condtests[idx].choice = FALSE;
-            await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(mbuf, 0), condtests[idx].enabled ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+            await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(mbuf, 0),
+                condtests[idx].enabled
+                ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
         }
         await end_menu()(tmpwin, $C`Choose status conditions to toggle`);
         res = await select_menu(tmpwin, PICK.ANY, new $c.Ptr(picks, 0));
@@ -1219,7 +1246,8 @@ export function opt_next_cond(indx, outbuf) {   // botl.c:1460
      * if #saveoptions got used in some later session where doset()
      * wasn't used to choose their preferred order.
      */
-    if (condtests[indx].opt === opt_in && condtests[indx].enabled || condtests[indx].opt === opt_out && !condtests[indx].enabled) {
+    if (condtests[indx].opt === opt_in && condtests[indx].enabled
+        || condtests[indx].opt === opt_out && !condtests[indx].enabled) {
         $c.sprintf(outbuf, $C`%scond_%s`, condtests[indx].enabled ? $C`` : $C`!`, condtests[indx].useroption);
     }
     return TRUE;
@@ -1254,9 +1282,15 @@ async function eval_notify_windowport_field(fld, valsetlist, idx) {   // botl.c:
        hasn't changed and has no percentage rules (in case HPmax
        has changed when HP hasn't, where we ordinarily wouldn't
        update HP so would miss an update of the hitpoint bar) */
-    if ((chg || gu.update_all || fld === BL.XP) && curr.percent_matters && curr.thresholds || fld === BL.HP && iflags.wc2_hitpointbar) {
+    if ((chg || gu.update_all || fld === BL.XP)
+        && curr.percent_matters
+        && curr.thresholds
+        || fld === BL.HP && iflags.wc2_hitpointbar) {
         const fldmax = curr.idxmax;
-        pc = fldmax === BL.EXP ? await exp_percentage() : fldmax >= 0 && fldmax < MAXBLSTATS ? await percentage(curr, $c.relem(gb.blstats[idx], fldmax)) : 0;   /* bullet proofing; can't get here */
+        pc = fldmax === BL.EXP ? await exp_percentage()
+            : fldmax >= 0 && fldmax < MAXBLSTATS
+            ? await percentage(curr, $c.relem(gb.blstats[idx], fldmax))
+            : 0;   /* bullet proofing; can't get here */
         if (pc !== prev.percent_value) {
             chg = pc < prev.percent_value ? -1 : 1;
         }
@@ -1282,7 +1316,9 @@ async function eval_notify_windowport_field(fld, valsetlist, idx) {   // botl.c:
      * Setting 'chg = 2' is enough to render the field properly, but
      * not to honor an initial highlight, so force 'gu.update_all = TRUE'.
      */
-    if (fld === BL.GOLD && (svc.context.rndencode !== eval_notify_windowport_field$oldrndencode || gs.showsyms[COIN_CLASS + SYM_OFF_O] !== eval_notify_windowport_field$oldgoldsym)) {
+    if (fld === BL.GOLD
+        && (svc.context.rndencode !== eval_notify_windowport_field$oldrndencode
+        || gs.showsyms[COIN_CLASS + SYM_OFF_O] !== eval_notify_windowport_field$oldgoldsym)) {
         gu.update_all = TRUE;   /* chg = 2; */
         eval_notify_windowport_field$oldrndencode = svc.context.rndencode;
         eval_notify_windowport_field$oldgoldsym = gs.showsyms[COIN_CLASS + SYM_OFF_O];
@@ -1309,7 +1345,9 @@ async function eval_notify_windowport_field(fld, valsetlist, idx) {   // botl.c:
                 if (chg === 1 && fld === BL.XP) {
                     chg = await compare_blstats(prev, curr);
                 }
-                $t3 = get_hilite(idx, fld, curr.a, chg, pc, new $c.Ptr(color, 0)), curr.hilite_rule = $t3;
+                $t3 = get_hilite(idx, fld,
+                    curr.a,
+                    chg, pc, new $c.Ptr(color, 0)), curr.hilite_rule = $t3;
                 prev.hilite_rule = curr.hilite_rule;
                 if (chg === 2) {
                     color[0] = NO_COLOR;
@@ -1317,10 +1355,12 @@ async function eval_notify_windowport_field(fld, valsetlist, idx) {   // botl.c:
                 }
             }
             /* STATUS_HILITES */
-            await status_update()(fld, curr.val, chg, pc, color[0], null);
+            await status_update()(fld, curr.val,
+                chg, pc, color[0], null);
         } else {
             /* Color for conditions is done through gc.cond_hilites[] */
-            await status_update()(fld, new $c.FieldRef(curr.a, "a_ulong", "u64"), chg, pc, color[0], new $c.Ptr(gc.cond_hilites, 0));
+            await status_update()(fld, new $c.FieldRef(curr.a, "a_ulong", "u64"),
+                chg, pc, color[0], new $c.Ptr(gc.cond_hilites, 0));
         }
         $t4 = prev.chg = TRUE, curr.chg = $t4;
         updated = TRUE;
@@ -1340,7 +1380,15 @@ async function evaluate_and_notify_windowport(valsetlist, idx) {   // botl.c:162
      */
     for (i = 0; i < MAXBLSTATS; i = i + 1 | 0) {
         const fld = initblstats[i].fld;
-        if (fld === BL.SCORE && !flags.showscore || fld === BL.EXP && !flags.showexp || fld === BL.TIME && !flags.time || fld === BL.HD && !Upolyd() || (fld === BL.XP || fld === BL.EXP) && Upolyd() || fld === BL.VERS && !flags.showvers || fld === BL.TERRAIN && !flags.terrainstatus || fld === BL.WEAPON && !flags.weaponstatus || fld === BL.ARMOR && !flags.armorstatus) {
+        if (fld === BL.SCORE && !flags.showscore
+            || fld === BL.EXP && !flags.showexp
+            || fld === BL.TIME && !flags.time
+            || fld === BL.HD && !Upolyd()
+            || (fld === BL.XP || fld === BL.EXP) && Upolyd()
+            || fld === BL.VERS && !flags.showvers
+            || fld === BL.TERRAIN && !flags.terrainstatus
+            || fld === BL.WEAPON && !flags.weaponstatus
+            || fld === BL.ARMOR && !flags.armorstatus) {
             continue;
         }
         if (await eval_notify_windowport_field(fld, valsetlist, idx)) {
@@ -1371,9 +1419,12 @@ async function evaluate_and_notify_windowport(valsetlist, idx) {   // botl.c:162
      *
      */
     if (disp.botlx && $c.andu64(windowprocs.wincap2, WC2_RESET_STATUS) !== 0) {
-        await status_update()(BL.RESET, null, 0, 0, NO_COLOR, null);
-    } else if ((updated || disp.botlx) && $c.andu64(windowprocs.wincap2, WC2_FLUSH_STATUS) !== 0) {
-        await status_update()(BL.FLUSH, null, 0, 0, NO_COLOR, null);
+        await status_update()(BL.RESET, null, 0, 0,
+            NO_COLOR, null);
+    } else if ((updated || disp.botlx)
+        && $c.andu64(windowprocs.wincap2, WC2_FLUSH_STATUS) !== 0) {
+        await status_update()(BL.FLUSH, null, 0, 0,
+            NO_COLOR, null);
     }
     $t2 = ($t1 = disp.time_botl = FALSE, disp.botlx = $t1), disp.botl = $t2;
     gu.update_all = FALSE;
@@ -1397,9 +1448,19 @@ export async function status_initialize(reassessment) {   // botl.c:1683
     }
     for (i = 0; i < MAXBLSTATS; i = i + 1 | 0) {
         const fld = initblstats[i].fld;
-        const fldenabl = fld === BL.SCORE ? flags.showscore : fld === BL.TIME ? flags.time : fld === BL.EXP ? flags.showexp && !Upolyd() ? 1 : 0 : fld === BL.XP ? !Upolyd() ? 1 : 0 : fld === BL.HD ? Upolyd() : fld === BL.VERS ? flags.showvers : fld === BL.WEAPON ? flags.weaponstatus : fld === BL.ARMOR ? flags.armorstatus : fld === BL.TERRAIN ? flags.terrainstatus : TRUE;
+        const fldenabl = fld === BL.SCORE ? flags.showscore
+            : fld === BL.TIME ? flags.time
+            : fld === BL.EXP ? flags.showexp && !Upolyd() ? 1 : 0
+            : fld === BL.XP ? !Upolyd() ? 1 : 0
+            : fld === BL.HD ? Upolyd()
+            : fld === BL.VERS ? flags.showvers
+            : fld === BL.WEAPON ? flags.weaponstatus
+            : fld === BL.ARMOR ? flags.armorstatus
+            : fld === BL.TERRAIN ? flags.terrainstatus
+            : TRUE;
         const fieldname = initblstats[i].fldname;
-        const fieldfmt = fld === BL.TITLE && iflags.wc2_hitpointbar ? $C`%-30.30s` : initblstats[i].fldfmt;
+        const fieldfmt = fld === BL.TITLE && iflags.wc2_hitpointbar ? $C`%-30.30s`
+            : initblstats[i].fldfmt;
         status_enablefield()(fld, fieldname, fieldfmt, fldenabl);
     }
     gu.update_all = TRUE;
@@ -1486,11 +1547,16 @@ async function init_blstats() {   // botl.c:1759
 async function compare_blstats(bl1, bl2) {   // botl.c:1809
     let result = 0;
     if (!bl1 || !bl2) {
-        await panic($C`compare_blstat: bad istat pointer %s, %s`, fmt_ptr(bl1), fmt_ptr(bl2));
+        await panic($C`compare_blstat: bad istat pointer %s, %s`,
+            fmt_ptr(bl1), fmt_ptr(bl2));
     }
     let anytype = bl1.anytype | 0;
-    if ((!bl1.a.a_void || !bl2.a.a_void) && (anytype === ANY.IPTR || anytype === ANY.UPTR || anytype === ANY.LPTR || anytype === ANY.ULPTR)) {
-        await panic($C`compare_blstat: invalid pointer %s, %s`, fmt_ptr(bl1.a.a_void), fmt_ptr(bl2.a.a_void));
+    if ((!bl1.a.a_void || !bl2.a.a_void)
+        && (anytype === ANY.IPTR || anytype === ANY.UPTR
+        || anytype === ANY.LPTR || anytype === ANY.ULPTR)) {
+        await panic($C`compare_blstat: invalid pointer %s, %s`,
+            fmt_ptr(bl1.a.a_void),
+            fmt_ptr(bl2.a.a_void));
     }
     /* cheat; terrain is highlighted as a string but we have a handy int
        reflecting its value to use when checking for changes */
@@ -1498,33 +1564,43 @@ async function compare_blstats(bl1, bl2) {   // botl.c:1809
         anytype = ANY.INT;
     }
     const fld = bl1.fld;
-    const use_rawval = fld === BL.HP || fld === BL.HPMAX || fld === BL.ENE || fld === BL.ENEMAX || fld === BL.GOLD ? 1 : 0;
+    const use_rawval = fld === BL.HP || fld === BL.HPMAX
+        || fld === BL.ENE || fld === BL.ENEMAX
+        || fld === BL.GOLD ? 1 : 0;
     const a1 = use_rawval ? bl1.rawval : bl1.a;
     const a2 = use_rawval ? bl2.rawval : bl2.a;
     switch (anytype) {
         case ANY.INT:
-            result = a1.a_int < a2.a_int ? 1 : a1.a_int > a2.a_int ? -1 : 0;
+            result = a1.a_int < a2.a_int ? 1
+                : a1.a_int > a2.a_int ? -1 : 0;
             break;
         case ANY.IPTR:
-            result = a1.a_iptr.get(0) < a2.a_iptr.get(0) ? 1 : a1.a_iptr.get(0) > a2.a_iptr.get(0) ? -1 : 0;
+            result = a1.a_iptr.get(0) < a2.a_iptr.get(0) ? 1
+                : a1.a_iptr.get(0) > a2.a_iptr.get(0) ? -1 : 0;
             break;
         case ANY.LONG:
-            result = a1.a_long < a2.a_long ? 1 : a1.a_long > a2.a_long ? -1 : 0;
+            result = a1.a_long < a2.a_long ? 1
+                : a1.a_long > a2.a_long ? -1 : 0;
             break;
         case ANY.LPTR:
-            result = a1.a_lptr.get(0) < a2.a_lptr.get(0) ? 1 : a1.a_lptr.get(0) > a2.a_lptr.get(0) ? -1 : 0;
+            result = a1.a_lptr.get(0) < a2.a_lptr.get(0) ? 1
+                : a1.a_lptr.get(0) > a2.a_lptr.get(0) ? -1 : 0;
             break;
         case ANY.UINT:
-            result = a1.a_uint < a2.a_uint ? 1 : a1.a_uint > a2.a_uint ? -1 : 0;
+            result = a1.a_uint < a2.a_uint ? 1
+                : a1.a_uint > a2.a_uint ? -1 : 0;
             break;
         case ANY.UPTR:
-            result = a1.a_uptr.get(0) < a2.a_uptr.get(0) ? 1 : a1.a_uptr.get(0) > a2.a_uptr.get(0) ? -1 : 0;
+            result = a1.a_uptr.get(0) < a2.a_uptr.get(0) ? 1
+                : a1.a_uptr.get(0) > a2.a_uptr.get(0) ? -1 : 0;
             break;
         case ANY.ULONG:
-            result = a1.a_ulong < a2.a_ulong ? 1 : a1.a_ulong > a2.a_ulong ? -1 : 0;
+            result = a1.a_ulong < a2.a_ulong ? 1
+                : a1.a_ulong > a2.a_ulong ? -1 : 0;
             break;
         case ANY.ULPTR:
-            result = a1.a_ulptr.get(0) < a2.a_ulptr.get(0) ? 1 : a1.a_ulptr.get(0) > a2.a_ulptr.get(0) ? -1 : 0;
+            result = a1.a_ulptr.get(0) < a2.a_ulptr.get(0) ? 1
+                : a1.a_ulptr.get(0) > a2.a_ulptr.get(0) ? -1 : 0;
             break;
         case ANY.STR:
             result = sgn($c.strcmp(bl1.val, bl2.val));
@@ -1646,7 +1722,8 @@ async function percentage(bl, maxbl) {   // botl.c:1977
     let ival = 0, mval = 0, lval = 0, uval = 0, ulval = 0;
     let result = 0;
     if (!bl || !maxbl) {
-        await impossible($C`percentage: bad istat pointer %s, %s`, fmt_ptr(bl), fmt_ptr(maxbl));
+        await impossible($C`percentage: bad istat pointer %s, %s`,
+            fmt_ptr(bl), fmt_ptr(maxbl));
         return 0;
     }
     const fld = bl.fld;
@@ -1697,7 +1774,8 @@ async function percentage(bl, maxbl) {   // botl.c:1977
        from a non-zero input; note: if we ever change to something like
        ((((1000 * val) / max) + 5) / 10) for a rounded result, we'll
        also need to check for and convert false 100 to 99 */
-    if (result === 0 && (ival !== 0 || lval !== 0 || uval !== 0 || ulval !== 0)) {
+    if (result === 0
+        && (ival !== 0 || lval !== 0 || uval !== 0 || ulval !== 0)) {
         result = 1;
     }
     return result;
@@ -1752,10 +1830,13 @@ export async function exp_percent_changing() {   // botl.c:2090
         const curr = gb.blstats[gn.now_or_before_idx][BL.XP];
         /* TODO: [see eval_notify_windowport_field() about percent_matters
            and the check against 'thresholds'] */
-        if (curr.percent_matters && curr.thresholds && (pc = await exp_percentage()) !== curr.percent_value) {
+        if (curr.percent_matters
+            && curr.thresholds
+            && (pc = await exp_percentage()) !== curr.percent_value) {
             a.$copyFrom(cg.zeroany);
             a.a_int = u.ulevel;
-            const rule = get_hilite(gn.now_or_before_idx, BL.XP, a, 0, pc, new $c.Ptr(color_dummy, 0));
+            const rule = get_hilite(gn.now_or_before_idx, BL.XP,
+                a, 0, pc, new $c.Ptr(color_dummy, 0));
             if (rule !== curr.hilite_rule) {
                 return TRUE;   /* caller should set 'disp.botl' to True */
             }
@@ -1825,7 +1906,8 @@ function fldname_to_bl_indx(name) {   // botl.c:2221
         if (!nmatches) {
             /* check aliases */
             for (i = 0; fieldids_alias[i].fieldname; i = i + 1 | 0) {
-                if (fuzzymatch(fieldids_alias[i].fieldname, name, $C` -_`, TRUE)) {
+                if (fuzzymatch(fieldids_alias[i].fieldname, name,
+                    $C` -_`, TRUE)) {
                     fld = fieldids_alias[i].fldid;
                     nmatches = nmatches + 1 | 0;
                 }
@@ -1892,7 +1974,9 @@ export function status_eval_next_unhilite() {   // botl.c:2279
             continue;   /* just process other gb.blstats[][].time and .chg */
         }
         const this_unhilite = curr.time;
-        if (this_unhilite > 0 && (next_unhilite === 0 || this_unhilite < next_unhilite) && hilite_reset_needed(curr, $c.add64(this_unhilite, 1))) {
+        if (this_unhilite > 0
+            && (next_unhilite === 0 || this_unhilite < next_unhilite)
+            && hilite_reset_needed(curr, $c.add64(this_unhilite, 1))) {
             next_unhilite = this_unhilite;
             if (next_unhilite < gb.bl_hilite_moves) {
                 disp.botl = TRUE;
@@ -1918,7 +2002,10 @@ export function reset_status_hilites() {   // botl.c:2321
  * @returns {number} boolean
  */
 function noneoftheabove(hl_text) {   // botl.c:2336
-    if (fuzzymatch(hl_text, $C`none of the above`, $C`" -_`, TRUE) || fuzzymatch(hl_text, $C`(polymorphed)`, $C`"()`, TRUE) || fuzzymatch(hl_text, $C`none of the above (polymorphed)`, $C`" -_()`, TRUE)) {
+    if (fuzzymatch(hl_text, $C`none of the above`, $C`" -_`, TRUE)
+        || fuzzymatch(hl_text, $C`(polymorphed)`, $C`"()`, TRUE)
+        || fuzzymatch(hl_text, $C`none of the above (polymorphed)`,
+        $C`" -_()`, TRUE)) {
         return TRUE;
     }
     return FALSE;
@@ -2006,19 +2093,27 @@ function get_hilite(idx, fldidx, vp, chg, pc, colorptr) {   // botl.c:2364
                         exactmatch = perc_or_abs = TRUE;
                     } else if (exactmatch) {
                         /* already found best fit, skip lt,ge,&c */
-                    } else if (hl.rel === LT_VALUE && pc < hl.value.a_int && hl.value.a_int <= min_pc) {
+                    } else if (hl.rel === LT_VALUE
+                        && pc < hl.value.a_int
+                        && hl.value.a_int <= min_pc) {
                         rule = hl;
                         min_pc = hl.value.a_int;
                         perc_or_abs = TRUE;
-                    } else if (hl.rel === LE_VALUE && pc <= hl.value.a_int && hl.value.a_int <= min_pc) {
+                    } else if (hl.rel === LE_VALUE
+                        && pc <= hl.value.a_int
+                        && hl.value.a_int <= min_pc) {
                         rule = hl;
                         min_pc = hl.value.a_int;
                         perc_or_abs = TRUE;
-                    } else if (hl.rel === GT_VALUE && pc > hl.value.a_int && hl.value.a_int >= max_pc) {
+                    } else if (hl.rel === GT_VALUE
+                        && pc > hl.value.a_int
+                        && hl.value.a_int >= max_pc) {
                         rule = hl;
                         max_pc = hl.value.a_int;
                         perc_or_abs = TRUE;
-                    } else if (hl.rel === GE_VALUE && pc >= hl.value.a_int && hl.value.a_int >= max_pc) {
+                    } else if (hl.rel === GE_VALUE
+                        && pc >= hl.value.a_int
+                        && hl.value.a_int >= max_pc) {
                         rule = hl;
                         max_pc = hl.value.a_int;
                         perc_or_abs = TRUE;
@@ -2047,50 +2142,68 @@ function get_hilite(idx, fldidx, vp, chg, pc, colorptr) {   // botl.c:2364
                      * one, be sure to make a corresponding change in the other.
                      */
                     if (dt === ANY.INT) {
-                        if (hl.rel === EQ_VALUE && hl.value.a_int === value.a_int) {
+                        if (hl.rel === EQ_VALUE
+                            && hl.value.a_int === value.a_int) {
                             rule = hl;
                             min_ival = max_ival = hl.value.a_int;
                             exactmatch = perc_or_abs = TRUE;
                         } else if (exactmatch) {
                             /* already found best fit, skip lt,ge,&c */
-                        } else if (hl.rel === LT_VALUE && value.a_int < hl.value.a_int && hl.value.a_int <= min_ival) {
+                        } else if (hl.rel === LT_VALUE
+                            && value.a_int < hl.value.a_int
+                            && hl.value.a_int <= min_ival) {
                             rule = hl;
                             min_ival = hl.value.a_int;
                             perc_or_abs = TRUE;
-                        } else if (hl.rel === LE_VALUE && value.a_int <= hl.value.a_int && hl.value.a_int <= min_ival) {
+                        } else if (hl.rel === LE_VALUE
+                            && value.a_int <= hl.value.a_int
+                            && hl.value.a_int <= min_ival) {
                             rule = hl;
                             min_ival = hl.value.a_int;
                             perc_or_abs = TRUE;
-                        } else if (hl.rel === GT_VALUE && value.a_int > hl.value.a_int && hl.value.a_int >= max_ival) {
+                        } else if (hl.rel === GT_VALUE
+                            && value.a_int > hl.value.a_int
+                            && hl.value.a_int >= max_ival) {
                             rule = hl;
                             max_ival = hl.value.a_int;
                             perc_or_abs = TRUE;
-                        } else if (hl.rel === GE_VALUE && value.a_int >= hl.value.a_int && hl.value.a_int >= max_ival) {
+                        } else if (hl.rel === GE_VALUE
+                            && value.a_int >= hl.value.a_int
+                            && hl.value.a_int >= max_ival) {
                             rule = hl;
                             max_ival = hl.value.a_int;
                             perc_or_abs = TRUE;
                         }
                     } else {
                         /* ANY_LONG */
-                        if (hl.rel === EQ_VALUE && hl.value.a_long === value.a_long) {
+                        if (hl.rel === EQ_VALUE
+                            && hl.value.a_long === value.a_long) {
                             rule = hl;
                             min_lval = max_lval = hl.value.a_long;
                             exactmatch = perc_or_abs = TRUE;
                         } else if (exactmatch) {
                             /* already found best fit, skip lt,ge,&c */
-                        } else if (hl.rel === LT_VALUE && value.a_long < hl.value.a_long && hl.value.a_long <= min_lval) {
+                        } else if (hl.rel === LT_VALUE
+                            && value.a_long < hl.value.a_long
+                            && hl.value.a_long <= min_lval) {
                             rule = hl;
                             min_lval = hl.value.a_long;
                             perc_or_abs = TRUE;
-                        } else if (hl.rel === LE_VALUE && value.a_long <= hl.value.a_long && hl.value.a_long <= min_lval) {
+                        } else if (hl.rel === LE_VALUE
+                            && value.a_long <= hl.value.a_long
+                            && hl.value.a_long <= min_lval) {
                             rule = hl;
                             min_lval = hl.value.a_long;
                             perc_or_abs = TRUE;
-                        } else if (hl.rel === GT_VALUE && value.a_long > hl.value.a_long && hl.value.a_long >= max_lval) {
+                        } else if (hl.rel === GT_VALUE
+                            && value.a_long > hl.value.a_long
+                            && hl.value.a_long >= max_lval) {
                             rule = hl;
                             max_lval = hl.value.a_long;
                             perc_or_abs = TRUE;
-                        } else if (hl.rel === GE_VALUE && value.a_long >= hl.value.a_long && hl.value.a_long >= max_lval) {
+                        } else if (hl.rel === GE_VALUE
+                            && value.a_long >= hl.value.a_long
+                            && hl.value.a_long >= max_lval) {
                             rule = hl;
                             max_lval = hl.value.a_long;
                             perc_or_abs = TRUE;
@@ -2109,7 +2222,8 @@ function get_hilite(idx, fldidx, vp, chg, pc, colorptr) {   // botl.c:2364
                             exactmatch = TRUE;
                         } else if (exactmatch) {
                             /* already found best fit, skip "noneoftheabove" */
-                        } else if (fldidx === BL.TITLE && Upolyd() && noneoftheabove(new $c.Ptr(hl.textmatch, 0))) {
+                        } else if (fldidx === BL.TITLE
+                            && Upolyd() && noneoftheabove(new $c.Ptr(hl.textmatch, 0))) {
                             rule = hl;
                         }
                     }
@@ -2340,7 +2454,8 @@ async function query_arrayvalue(querystr, arr, arrmin, arrmax) {   // botl.c:274
         }
         any.$copyFrom(cg.zeroany);
         any.a_int = i + adj | 0;
-        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, arr.get(i), MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE,
+            clr, arr.get(i), MENU.ITEMFLAGS_NONE);
     }
     await end_menu()(tmpwin, querystr);
     const res = await select_menu(tmpwin, PICK.ONE, new $c.Ptr(picks, 0));
@@ -2456,13 +2571,19 @@ async function parse_status_hl2(s, from_configfile) {   // botl.c:2814
                 up = TRUE;
             }
             changed = TRUE;
-        } else if (fld === BL.CAP && is_fld_arrayvalues(new $c.Ptr(s.get(sidx), 0), new $c.Ptr(enc_stat, 0), SLT_ENCUMBER, OVERLOADED + 1, new $c.Ptr(kidx, 0))) {
+        } else if (fld === BL.CAP
+            && is_fld_arrayvalues(new $c.Ptr(s.get(sidx), 0), new $c.Ptr(enc_stat, 0),
+            SLT_ENCUMBER, OVERLOADED + 1,
+            new $c.Ptr(kidx, 0))) {
             txt = enc_stat[kidx[0]];
             txtval = TRUE;
-        } else if (fld === BL.ALIGN && is_fld_arrayvalues(new $c.Ptr(s.get(sidx), 0), new $c.Ptr(parse_status_hl2$aligntxt, 0), 0, 3, new $c.Ptr(kidx, 0))) {
+        } else if (fld === BL.ALIGN
+            && is_fld_arrayvalues(new $c.Ptr(s.get(sidx), 0), new $c.Ptr(parse_status_hl2$aligntxt, 0), 0, 3, new $c.Ptr(kidx, 0))) {
             txt = parse_status_hl2$aligntxt[kidx[0]];
             txtval = TRUE;
-        } else if (fld === BL.HUNGER && is_fld_arrayvalues(new $c.Ptr(s.get(sidx), 0), new $c.Ptr(parse_status_hl2$hutxt, 0), SATIATED, STARVED + 1, new $c.Ptr(kidx, 0))) {
+        } else if (fld === BL.HUNGER
+            && is_fld_arrayvalues(new $c.Ptr(s.get(sidx), 0), new $c.Ptr(parse_status_hl2$hutxt, 0),
+            SATIATED, STARVED + 1, new $c.Ptr(kidx, 0))) {
             txt = hu_stat[kidx[0]];   /* store hu_stat[] val, not hutxt[] */
             txtval = TRUE;
         } else if (!strncmpi(new $c.Ptr(s.get(sidx), 0), $C`changed`, -1)) {
@@ -2498,18 +2619,29 @@ async function parse_status_hl2(s, from_configfile) {   // botl.c:2814
             /* AC is the only field where negative values make sense but
                accept >-1 for other fields; reject <0 for non-AC */
             /* percentages have another more comprehensive check below */
-            if (dt === ANY.INT && (hilite.value.a_int < (fld === BL.AC ? -128 : grt ? -1 : lt ? 1 : 0) || hilite.value.a_int > (percent ? lt ? 101 : 100 : LARGEST_INT))) {
-                await config_error_add($C`%s'%s%d%s'%s`, new $c.Ptr(threshold_value, 0), op, hilite.value.a_int, percent ? $C`%` : $C``, new $c.Ptr(is_out_of_range, 0));
+            if (dt === ANY.INT
+                && (hilite.value.a_int
+                < (fld === BL.AC ? -128 : grt ? -1 : lt ? 1 : 0)
+                || hilite.value.a_int > (percent ? lt ? 101 : 100
+                : LARGEST_INT))) {
+                await config_error_add($C`%s'%s%d%s'%s`, new $c.Ptr(threshold_value, 0),
+                    op, hilite.value.a_int, percent ? $C`%` : $C``,
+                    new $c.Ptr(is_out_of_range, 0));
                 return FALSE;
-            } else if (dt === ANY.LONG && hilite.value.a_long < (grt ? -1 : lt ? 1 : 0)) {
-                await config_error_add($C`%s'%s%ld'%s`, new $c.Ptr(threshold_value, 0), op, hilite.value.a_long, new $c.Ptr(is_out_of_range, 0));
+            } else if (dt === ANY.LONG
+                && hilite.value.a_long < (grt ? -1 : lt ? 1 : 0)) {
+                await config_error_add($C`%s'%s%ld'%s`, new $c.Ptr(threshold_value, 0),
+                    op, hilite.value.a_long, new $c.Ptr(is_out_of_range, 0));
                 return FALSE;
             }
         } else if (initblstats[fld].anytype === ANY.STR) {
             txt = new $c.Ptr(s.get(sidx), 0);
             txtval = TRUE;
         } else {
-            await config_error_add(has_ltgt_percentnumber(new $c.Ptr(s.get(sidx), 0)) ? $C`Wrong format '%s', expected a threshold number or percent` : $C`Unknown behavior '%s'`, new $c.Ptr(s.get(sidx), 0));
+            await config_error_add(has_ltgt_percentnumber(new $c.Ptr(s.get(sidx), 0))
+                ? $C`Wrong format '%s', expected a threshold number or percent`
+                : $C`Unknown behavior '%s'`,
+                new $c.Ptr(s.get(sidx), 0));
             return FALSE;
         }
         /* relationships {LT_VALUE, LE_VALUE, EQ_VALUE, GE_VALUE, GT_VALUE} */
@@ -2529,15 +2661,33 @@ async function parse_status_hl2(s, from_configfile) {   // botl.c:2814
             hilite.rel = LT_VALUE;
         }
         if (initblstats[fld].anytype === ANY.STR && (percent || numeric)) {
-            await config_error_add($C`Field '%s' does not support numeric values`, initblstats[fld].fldname);
+            await config_error_add($C`Field '%s' does not support numeric values`,
+                initblstats[fld].fldname);
             return FALSE;
         }
         if (percent) {
             if (initblstats[fld].idxmax < 0) {
-                await config_error_add($C`Cannot use percent with '%s'`, initblstats[fld].fldname);
+                await config_error_add($C`Cannot use percent with '%s'`,
+                    initblstats[fld].fldname);
                 return FALSE;
-            } else if (hilite.value.a_int < -1 || hilite.value.a_int === -1 && hilite.value.a_int !== GT_VALUE || hilite.value.a_int === 0 && hilite.rel === LT_VALUE || hilite.value.a_int === 100 && hilite.rel === GT_VALUE || hilite.value.a_int === 101 && hilite.value.a_int !== LT_VALUE || hilite.value.a_int > 101) {
-                await config_error_add($C`hilite_status: invalid percentage value '%s%d%%'`, hilite.rel === LT_VALUE ? $C`<` : hilite.rel === LE_VALUE ? $C`<=` : hilite.rel === GT_VALUE ? $C`>` : hilite.rel === GE_VALUE ? $C`>=` : $C`=`, hilite.value.a_int);
+            } else if (hilite.value.a_int < -1
+                || hilite.value.a_int === -1
+                && hilite.value.a_int !== GT_VALUE
+                || hilite.value.a_int === 0
+                && hilite.rel === LT_VALUE
+                || hilite.value.a_int === 100
+                && hilite.rel === GT_VALUE
+                || hilite.value.a_int === 101
+                && hilite.value.a_int !== LT_VALUE
+                || hilite.value.a_int > 101) {
+                await config_error_add(
+                    $C`hilite_status: invalid percentage value '%s%d%%'`,
+                    hilite.rel === LT_VALUE ? $C`<`
+                    : hilite.rel === LE_VALUE ? $C`<=`
+                    : hilite.rel === GT_VALUE ? $C`>`
+                    : hilite.rel === GE_VALUE ? $C`>=`
+                    : $C`=`,
+                    hilite.value.a_int);
                 return FALSE;
             }
         }
@@ -2628,7 +2778,8 @@ async function query_conditions() {   // botl.c:3109
     for (i = 0; i < 30; i = i + 1 | 0) {
         any.$copyFrom(cg.zeroany);
         any.a_ulong = $c.u64(conditions[i].mask);
-        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, conditions[i].text[0], MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE,
+            clr, conditions[i].text[0], MENU.ITEMFLAGS_NONE);
     }
     await end_menu()(tmpwin, $C`Choose status conditions`);
     const res = await select_menu(tmpwin, PICK.ANY, new $c.Ptr(picks, 0));
@@ -3015,13 +3166,15 @@ async function status_hilite_linestr_gather_conditions() {   // botl.c:3488
             atr$2[0] = HL.NONE;
             split_clridx(cond_maps[i].clratr | 0, new $c.Ptr(clr$2, 0), new $c.Ptr(atr$2, 0));
             if (clr$2[0] !== NO_COLOR || atr$2[0] !== HL.NONE) {
-                strNsubst($c.strcpy(new $c.Ptr(clrbuf, 0), clr2colorname(clr$2[0])), $C` `, $C`-`, 0);
+                strNsubst($c.strcpy(new $c.Ptr(clrbuf, 0), clr2colorname(clr$2[0])),
+                    $C` `, $C`-`, 0);
                 const tmpattr = hlattr2attrname(atr$2[0], new $c.Ptr(attrbuf, 0), BUFSZ);
                 if (tmpattr) {
                     $c.sprintf(eos(new $c.Ptr(clrbuf, 0)), $C`&%s`, tmpattr);
                 }
                 nh_snprintf($C`status_hilite_linestr_gather_conditions`, 3562, new $c.Ptr(condbuf, 0), 256, $C`condition/%s/%s`, conditionbitmask2str(cond_maps[i].bm), new $c.Ptr(clrbuf, 0));
-                await status_hilite_linestr_add(BL.CONDITION, null, cond_maps[i].bm, new $c.Ptr(condbuf, 0));
+                await status_hilite_linestr_add(BL.CONDITION, null,
+                    cond_maps[i].bm, new $c.Ptr(condbuf, 0));
             }
         }
     }
@@ -3054,7 +3207,12 @@ async function status_hilite2str(hl) {   // botl.c:3590
     }
     behavebuf[0] = 0;
     clrbuf[0] = 0;
-    const op = hl.rel === LT_VALUE ? $C`<` : hl.rel === LE_VALUE ? $C`<=` : hl.rel === GT_VALUE ? $C`>` : hl.rel === GE_VALUE ? $C`>=` : hl.rel === EQ_VALUE ? $C`=` : null;
+    const op = hl.rel === LT_VALUE ? $C`<`
+        : hl.rel === LE_VALUE ? $C`<=`
+        : hl.rel === GT_VALUE ? $C`>`
+        : hl.rel === GE_VALUE ? $C`>=`
+        : hl.rel === EQ_VALUE ? $C`=`
+        : null;
     switch (hl.behavior) {
         case BL_TH.VAL_PERCENTAGE:
             if (op) {
@@ -3127,12 +3285,14 @@ async function status_hilite_menu_choose_field() {   // botl.c:3672
     const tmpwin = await create_nhwindow()(NHW.MENU);
     await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     for (i = 0; i < MAXBLSTATS; i = i + 1 | 0) {
-        if (initblstats[i].fld === BL.SCORE && !gb.blstats[0][BL.SCORE].thresholds) {
+        if (initblstats[i].fld === BL.SCORE
+            && !gb.blstats[0][BL.SCORE].thresholds) {
             continue;
         }
         any.$copyFrom(cg.zeroany);
         any.a_int = i + 1 | 0;
-        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, initblstats[i].fldname, MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE,
+            clr, initblstats[i].fldname, MENU.ITEMFLAGS_NONE);
     }
     await end_menu()(tmpwin, $C`Select a hilite field:`);
     const res = await select_menu(tmpwin, PICK.ONE, new $c.Ptr(picks, 0));
@@ -3165,46 +3325,55 @@ async function status_hilite_menu_choose_behavior(fld) {   // botl.c:3707
         any.$copyFrom(cg.zeroany);
         $t1 = onlybeh = BL_TH.ALWAYS_HILITE, any.a_int = $t1;
         $c.sprintf(new $c.Ptr(buf, 0), $C`Always highlight %s`, initblstats[fld].fldname);
-        await add_menu(tmpwin, nul_glyphinfo, any, 97, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, 97, 0, ATR.NONE,
+            clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
         nopts = nopts + 1 | 0;
     }
     if (fld === BL.CONDITION) {
         any.$copyFrom(cg.zeroany);
         $t2 = onlybeh = BL_TH.CONDITION, any.a_int = $t2;
-        await add_menu(tmpwin, nul_glyphinfo, any, 98, 0, ATR.NONE, clr, $C`Bitmask of conditions`, MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, 98, 0, ATR.NONE,
+            clr, $C`Bitmask of conditions`, MENU.ITEMFLAGS_NONE);
         nopts = nopts + 1 | 0;
     }
     if (fld !== BL.CONDITION && fld !== BL.VERS) {
         any.$copyFrom(cg.zeroany);
         $t3 = onlybeh = BL_TH.UPDOWN, any.a_int = $t3;
         $c.sprintf(new $c.Ptr(buf, 0), $C`%s value changes`, initblstats[fld].fldname);
-        await add_menu(tmpwin, nul_glyphinfo, any, 99, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, 99, 0, ATR.NONE,
+            clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
         nopts = nopts + 1 | 0;
     }
-    if (fld !== BL.CAP && fld !== BL.HUNGER && (at === ANY.INT || at === ANY.LONG)) {
+    if (fld !== BL.CAP && fld !== BL.HUNGER
+        && (at === ANY.INT || at === ANY.LONG)) {
         any.$copyFrom(cg.zeroany);
         $t4 = onlybeh = BL_TH.VAL_ABSOLUTE, any.a_int = $t4;
-        await add_menu(tmpwin, nul_glyphinfo, any, 110, 0, ATR.NONE, clr, $C`Number threshold`, MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, 110, 0, ATR.NONE,
+            clr, $C`Number threshold`, MENU.ITEMFLAGS_NONE);
         nopts = nopts + 1 | 0;
     }
     if (initblstats[fld].idxmax >= 0) {
         any.$copyFrom(cg.zeroany);
         $t5 = onlybeh = BL_TH.VAL_PERCENTAGE, any.a_int = $t5;
-        await add_menu(tmpwin, nul_glyphinfo, any, 112, 0, ATR.NONE, clr, $C`Percentage threshold`, MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, 112, 0, ATR.NONE,
+            clr, $C`Percentage threshold`, MENU.ITEMFLAGS_NONE);
         nopts = nopts + 1 | 0;
     }
     if (fld === BL.HP) {
         any.$copyFrom(cg.zeroany);
         $t6 = onlybeh = BL_TH.CRITICALHP, any.a_int = $t6;
         $c.sprintf(new $c.Ptr(buf, 0), $C`Highlight critically low %s`, initblstats[fld].fldname);
-        await add_menu(tmpwin, nul_glyphinfo, any, 67, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, 67, 0, ATR.NONE,
+            clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
         nopts = nopts + 1 | 0;
     }
-    if (initblstats[fld].anytype === ANY.STR || fld === BL.CAP || fld === BL.HUNGER) {
+    if (initblstats[fld].anytype === ANY.STR
+        || fld === BL.CAP || fld === BL.HUNGER) {
         any.$copyFrom(cg.zeroany);
         $t7 = onlybeh = BL_TH.TEXTMATCH, any.a_int = $t7;
         $c.sprintf(new $c.Ptr(buf, 0), $C`%s text match`, initblstats[fld].fldname);
-        await add_menu(tmpwin, nul_glyphinfo, any, 116, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, 116, 0, ATR.NONE,
+            clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
         nopts = nopts + 1 | 0;
     }
     $c.sprintf(new $c.Ptr(buf, 0), $C`Select %s field hilite behavior:`, initblstats[fld].fldname);
@@ -3248,12 +3417,14 @@ async function status_hilite_menu_choose_updownboth(fld, str, ltok, gtok) {   //
         }
         any.$copyFrom(cg.zeroany);
         any.a_int = 10 + LT_VALUE;
-        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE,
+            clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
         if (str) {
             $c.sprintf(new $c.Ptr(buf, 0), $C`%s or %s`, str, fld === BL.AC ? $C`better (lower)` : $C`less`);
             any.$copyFrom(cg.zeroany);
             any.a_int = 10 + LE_VALUE;
-            await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
+            await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE,
+                clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
         }
     }
     if (str) {
@@ -3263,13 +3434,15 @@ async function status_hilite_menu_choose_updownboth(fld, str, ltok, gtok) {   //
     }
     any.$copyFrom(cg.zeroany);
     any.a_int = 10 + EQ_VALUE;
-    await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
+    await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE,
+        clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
     if (gtok) {
         if (str) {
             $c.sprintf(new $c.Ptr(buf, 0), $C`%s or %s`, str, fld === BL.AC ? $C`worse (higher)` : $C`more`);
             any.$copyFrom(cg.zeroany);
             any.a_int = 10 + GE_VALUE;
-            await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
+            await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE,
+                clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
         }
         if (str) {
             $c.sprintf(new $c.Ptr(buf, 0), $C`%s than %s`, fld === BL.AC ? $C`Worse (higher)` : $C`More`, str);
@@ -3278,7 +3451,8 @@ async function status_hilite_menu_choose_updownboth(fld, str, ltok, gtok) {   //
         }
         any.$copyFrom(cg.zeroany);
         any.a_int = 10 + GT_VALUE;
-        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr,
+            new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
     }
     $c.sprintf(new $c.Ptr(buf, 0), $C`Select field %s value:`, initblstats[fld].fldname);
     await end_menu()(tmpwin, new $c.Ptr(buf, 0));
@@ -3340,7 +3514,8 @@ async function status_hilite_menu_add(origfld) {   // botl.c:3890
                 await pline($C`That's enough tries.`);
                 return FALSE;
             }
-            if (behavior === BL_TH.VAL_PERCENTAGE || behavior === BL_TH.VAL_ABSOLUTE) {
+            if (behavior === BL_TH.VAL_PERCENTAGE
+                || behavior === BL_TH.VAL_ABSOLUTE) {
                 gotnum = FALSE;
                 percent = behavior === BL_TH.VAL_PERCENTAGE ? 1 : 0;
                 lt_gt_eq = NO_LTEQGT;   /* not set up yet */
@@ -3357,7 +3532,9 @@ async function status_hilite_menu_add(origfld) {   // botl.c:3890
                 /* allow user to enter "<50%" or ">50" or just "50"
                    or <=50% or >=50 or =50 */
                 if (inp.get(0) === 62 || inp.get(0) === 60 || inp.get(0) === 61) {
-                    lt_gt_eq = inp.get(0) === 62 ? inp.get(1) === 61 ? GE_VALUE : GT_VALUE : inp.get(0) === 60 ? inp.get(1) === 61 ? LE_VALUE : LT_VALUE : EQ_VALUE;
+                    lt_gt_eq = inp.get(0) === 62 ? inp.get(1) === 61 ? GE_VALUE : GT_VALUE
+                        : inp.get(0) === 60 ? inp.get(1) === 61 ? LE_VALUE : LT_VALUE
+                        : EQ_VALUE;
                     ($t2 = inp, inp = $t2.add(1), $t2).set(0, 32);
                     numstart = numstart.add(1);
                     if (lt_gt_eq === GE_VALUE || lt_gt_eq === LE_VALUE) {
@@ -3390,14 +3567,20 @@ async function status_hilite_menu_add(origfld) {   // botl.c:3890
                     await pline($C`Is that an invisible number?`);
                     $goto = "choose_value"; continue D1;
                 }
-                op = lt_gt_eq === LT_VALUE ? $C`<` : lt_gt_eq === LE_VALUE ? $C`<=` : lt_gt_eq === GT_VALUE ? $C`>` : lt_gt_eq === GE_VALUE ? $C`>=` : lt_gt_eq === EQ_VALUE ? $C`=` : $C``;   /* didn't specify lt_gt_eq with number */
+                op = lt_gt_eq === LT_VALUE ? $C`<`
+                    : lt_gt_eq === LE_VALUE ? $C`<=`
+                    : lt_gt_eq === GT_VALUE ? $C`>`
+                    : lt_gt_eq === GE_VALUE ? $C`>=`
+                    : lt_gt_eq === EQ_VALUE ? $C`=`
+                    : $C``;   /* didn't specify lt_gt_eq with number */
                 aval.$copyFrom(cg.zeroany);
                 dt = (percent ? ANY.INT : initblstats[fld].anytype) | 0;
                 s_to_anything(aval, numstart, dt);
                 if (percent) {
                     val = aval.a_int;
                     if (initblstats[fld].idxmax === -1) {
-                        await pline($C`Field '%s' does not support percentage values.`, initblstats[fld].fldname);
+                        await pline($C`Field '%s' does not support percentage values.`,
+                            initblstats[fld].fldname);
                         behavior = BL_TH.VAL_ABSOLUTE;
                         $goto = "choose_value"; continue D1;
                     }
@@ -3406,7 +3589,10 @@ async function status_hilite_menu_add(origfld) {   // botl.c:3890
                        deliberate use of those should be uncommon enough for
                        that to be palatable; for 0 and 100, choose_updown_both()
                        will prevent useless operations */
-                    if (val < 0 && (val !== -1 || lt_gt_eq !== GT_VALUE) || val === 0 && lt_gt_eq === LT_VALUE || val === 100 && lt_gt_eq === GT_VALUE || val > 100 && (val !== 101 || lt_gt_eq !== LT_VALUE)) {
+                    if (val < 0 && (val !== -1 || lt_gt_eq !== GT_VALUE)
+                        || val === 0 && lt_gt_eq === LT_VALUE
+                        || val === 100 && lt_gt_eq === GT_VALUE
+                        || val > 100 && (val !== 101 || lt_gt_eq !== LT_VALUE)) {
                         await pline($C`'%s%d%%' is not a valid percent value.`, op, val);
                         $goto = "choose_value"; continue D1;
                     }
@@ -3415,17 +3601,27 @@ async function status_hilite_menu_add(origfld) {   // botl.c:3890
                         $c.strcat(numstart, $C`%`);
                     }
                     /* reject negative values except for AC and >-1; reject 0 for < */
-                } else if (dt === ANY.INT && aval.a_int < (fld === BL.AC ? -128 : lt_gt_eq === GT_VALUE ? -1 : lt_gt_eq === LT_VALUE ? 1 : 0)) {
-                    await pline($C`%s'%s%d'%s`, new $c.Ptr(threshold_value, 0), op, aval.a_int, new $c.Ptr(is_out_of_range, 0));
+                } else if (dt === ANY.INT
+                    && aval.a_int < (fld === BL.AC ? -128
+                    : lt_gt_eq === GT_VALUE ? -1
+                    : lt_gt_eq === LT_VALUE ? 1 : 0)) {
+                    await pline($C`%s'%s%d'%s`, new $c.Ptr(threshold_value, 0),
+                        op, aval.a_int, new $c.Ptr(is_out_of_range, 0));
                     $goto = "choose_value"; continue D1;
-                } else if (dt === ANY.LONG && aval.a_long < (lt_gt_eq === GT_VALUE ? -1 : lt_gt_eq === LT_VALUE ? 1 : 0)) {
-                    await pline($C`%s'%s%ld'%s`, new $c.Ptr(threshold_value, 0), op, aval.a_long, new $c.Ptr(is_out_of_range, 0));
+                } else if (dt === ANY.LONG
+                    && aval.a_long < (lt_gt_eq === GT_VALUE ? -1
+                    : lt_gt_eq === LT_VALUE ? 1 : 0)) {
+                    await pline($C`%s'%s%ld'%s`, new $c.Ptr(threshold_value, 0),
+                        op, aval.a_long, new $c.Ptr(is_out_of_range, 0));
                     $goto = "choose_value"; continue D1;
                 }
                 if (lt_gt_eq === NO_LTEQGT) {
-                    ltok = dt === ANY.INT ? aval.a_int > 0 || fld === BL.AC ? 1 : 0 : aval.a_long > 0 ? 1 : 0;
+                    ltok = dt === ANY.INT
+                        ? aval.a_int > 0 || fld === BL.AC ? 1 : 0
+                        : aval.a_long > 0 ? 1 : 0;
                     gtok = !percent || aval.a_long < 100 ? 1 : 0;
-                    lt_gt_eq = await status_hilite_menu_choose_updownboth(fld, new $c.Ptr(inbuf, 0), ltok, gtok);
+                    lt_gt_eq = await status_hilite_menu_choose_updownboth(fld, new $c.Ptr(inbuf, 0),
+                        ltok, gtok);
                     if (lt_gt_eq === NO_LTEQGT) {
                         $goto = "choose_value"; continue D1;
                     }
@@ -3438,7 +3634,8 @@ async function status_hilite_menu_add(origfld) {   // botl.c:3890
                 if (initblstats[fld].anytype !== ANY.STR) {
                     ltok$2 = fld !== BL.TIME ? 1 : 0;
                     gtok$2 = TRUE;
-                    lt_gt_eq = await status_hilite_menu_choose_updownboth(fld, null, ltok$2, gtok$2);
+                    lt_gt_eq = await status_hilite_menu_choose_updownboth(fld, null,
+                        ltok$2, gtok$2);
                     if (lt_gt_eq === NO_LTEQGT) {
                         $goto = "choose_behavior"; continue D1;
                     }
@@ -3468,14 +3665,17 @@ async function status_hilite_menu_add(origfld) {   // botl.c:3890
             } else if (behavior === BL_TH.TEXTMATCH) {
                 $c.sprintf(new $c.Ptr(qry_buf, 0), $C`%s %s text value to match:`, fld === BL.CAP || fld === BL.ALIGN || fld === BL.HUNGER || fld === BL.TITLE ? $C`Choose` : $C`Enter`, initblstats[fld].fldname);
                 if (fld === BL.CAP) {
-                    rv = await query_arrayvalue(new $c.Ptr(qry_buf, 0), new $c.Ptr(enc_stat, 0), SLT_ENCUMBER, OVERLOADED + 1);
+                    rv = await query_arrayvalue(new $c.Ptr(qry_buf, 0),
+                        new $c.Ptr(enc_stat, 0),
+                        SLT_ENCUMBER, OVERLOADED + 1);
                     if (rv < SLT_ENCUMBER) {
                         $goto = "choose_behavior"; continue D1;
                     }
                     hilite.rel = TXT_VALUE;
                     $c.strcpy(new $c.Ptr(hilite.textmatch, 0), enc_stat[rv]);
                 } else if (fld === BL.ALIGN) {
-                    rv$2 = await query_arrayvalue(new $c.Ptr(qry_buf, 0), new $c.Ptr(status_hilite_menu_add$aligntxt, 0), 0, 3);
+                    rv$2 = await query_arrayvalue(new $c.Ptr(qry_buf, 0),
+                        new $c.Ptr(status_hilite_menu_add$aligntxt, 0), 0, 3);
                     if (rv$2 < 0) {
                         $goto = "choose_behavior"; continue D1;
                     }
@@ -3593,7 +3793,8 @@ async function status_hilite_menu_add(origfld) {   // botl.c:3890
                 if (tmpattr) {
                     $c.sprintf(eos(new $c.Ptr(clrbuf, 0)), $C`&%s`, tmpattr);
                 }
-                await pline($C`Added hilite condition/%s/%s`, conditionbitmask2str(cond), new $c.Ptr(clrbuf, 0));
+                await pline($C`Added hilite condition/%s/%s`,
+                    conditionbitmask2str(cond), new $c.Ptr(clrbuf, 0));
             } else {
                 hilite.coloridx = clr | atr << 8;
                 hilite.anytype = initblstats[fld].anytype;
@@ -3694,7 +3895,8 @@ async function status_hilite_menu_fld(fld) {   // botl.c:4357
             if (hlstr.fld === fld) {
                 any.$copyFrom(cg.zeroany);
                 any.a_int = hlstr.id;
-                await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(hlstr.str, 0), MENU.ITEMFLAGS_NONE);
+                await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE,
+                    clr, new $c.Ptr(hlstr.str, 0), MENU.ITEMFLAGS_NONE);
             }
             hlstr = hlstr.next;
         }
@@ -3707,7 +3909,8 @@ async function status_hilite_menu_fld(fld) {   // botl.c:4357
     if (count) {
         any.$copyFrom(cg.zeroany);
         any.a_int = -1;
-        await add_menu(tmpwin, nul_glyphinfo, any, 88, 0, ATR.NONE, clr, $C`Remove selected hilites`, MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, 88, 0, ATR.NONE, clr,
+            $C`Remove selected hilites`, MENU.ITEMFLAGS_NONE);
     }
     if (fld === BL.SCORE) {
         /* suppress 'Z - Add a new hilite' for 'score' when SCORE_ON_BOTL
@@ -3717,7 +3920,8 @@ async function status_hilite_menu_fld(fld) {   // botl.c:4357
     } else {
         any.$copyFrom(cg.zeroany);
         any.a_int = -2;
-        await add_menu(tmpwin, nul_glyphinfo, any, 90, 0, ATR.NONE, clr, $C`Add new hilites`, MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, 90, 0, ATR.NONE,
+            clr, $C`Add new hilites`, MENU.ITEMFLAGS_NONE);
     }
     $c.sprintf(new $c.Ptr(buf, 0), $C`Current %s hilites:`, initblstats[fld].fldname);
     await end_menu()(tmpwin, new $c.Ptr(buf, 0));
@@ -3799,7 +4003,9 @@ export async function status_hilite_menu() {   // botl.c:4498
         if (countall) {
             any.$copyFrom(cg.zeroany);
             any.a_int = -1;
-            await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, $C`View all hilites in config format`, MENU.ITEMFLAGS_NONE);
+            await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE,
+                clr, $C`View all hilites in config format`,
+                MENU.ITEMFLAGS_NONE);
             await add_menu_str(tmpwin, $C``);
         }
         for (i = 0; i < MAXBLSTATS; i = i + 1 | 0) {
@@ -3818,7 +4024,8 @@ export async function status_hilite_menu() {   // botl.c:4498
             if (count) {
                 $c.sprintf(eos(new $c.Ptr(buf, 0)), $C` (%d defined)`, count);
             }
-            await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
+            await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE,
+                clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
         }
         await end_menu()(tmpwin, $C`Status hilites:`);
         if ((res = await select_menu(tmpwin, PICK.ONE, new $c.Ptr(picks, 0))) > 0) {

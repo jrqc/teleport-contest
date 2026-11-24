@@ -337,13 +337,16 @@ export async function moveloop_core() {   // allmain.c:177
                 if (u.uinvulnerable) {
                     /* for the moment at least, you're in tiptop shape */
                     mvl_wtcap = UNENCUMBERED;
-                } else if (!Upolyd() ? u.uhp < u.uhpmax : u.mh < u.mhmax || gy.youmonst.data.mlet === S.EEL) {
+                } else if (!Upolyd() ? u.uhp < u.uhpmax
+                    : u.mh < u.mhmax
+                    || gy.youmonst.data.mlet === S.EEL) {
                     /* maybe heal */
                     await regen_hp(mvl_wtcap);
                 }
                 /* moving around while encumbered is hard work */
                 if (mvl_wtcap > MOD_ENCUMBER && u.umoved) {
-                    if (!(mvl_wtcap < EXT_ENCUMBER ? $c.rem64(svm.moves, 30) : $c.rem64(svm.moves, 10))) {
+                    if (!(mvl_wtcap < EXT_ENCUMBER ? $c.rem64(svm.moves, 30)
+                        : $c.rem64(svm.moves, 10))) {
                         await overexert_hp();
                     }
                 }
@@ -363,12 +366,14 @@ export async function moveloop_core() {   // allmain.c:177
                         }
                     }
                     /* delayed change may not be valid anymore */
-                    if (mvl_change === 1 && !Polymorph() || mvl_change === 2 && u.ulycn === NON_PM) {
+                    if (mvl_change === 1 && !Polymorph()
+                        || mvl_change === 2 && u.ulycn === NON_PM) {
                         mvl_change = 0;
                     }
                     if (Polymorph() && !rn2(100)) {
                         mvl_change = 1;
-                    } else if (ismnum(u.ulycn) && !Upolyd() && !rn2(80 - Math.imul(20, night()) | 0)) {
+                    } else if (ismnum(u.ulycn) && !Upolyd()
+                        && !rn2(80 - Math.imul(20, night()) | 0)) {
                         mvl_change = 2;
                     }
                     if (mvl_change && !Unchanging()) {
@@ -383,7 +388,8 @@ export async function moveloop_core() {   // allmain.c:177
                         }
                     }
                 }
-                if (Searching() && !svl.level.flags.noautosearch && gm.multi >= 0) {
+                if (Searching() && !svl.level.flags.noautosearch
+                    && gm.multi >= 0) {
                     await dosearch0(1);
                 }
                 if (Warning()) {
@@ -452,7 +458,8 @@ export async function moveloop_core() {   // allmain.c:177
             status_eval_next_unhilite();
         }
         if (svm.moves >= svc.context.seer_turn) {
-            if ((u.uhave.amulet || Clairvoyant()) && !In_endgame(u.uz) && !BClairvoyant()) {
+            if ((u.uhave.amulet || Clairvoyant()) && !In_endgame(u.uz)
+                && !BClairvoyant()) {
                 await do_vicinity_map(null);
             }
             /* we maintain this counter even when clairvoyance isn't
@@ -502,7 +509,8 @@ export async function moveloop_core() {   // allmain.c:177
             if (u.uswallow) {
                 await swallowed(0);
             }
-        } else if (Unblind_telepat() || Warning() || Warn_of_mon() || any_visible_region()) {
+        } else if (Unblind_telepat() || Warning() || Warn_of_mon()
+            || any_visible_region()) {
             /* this is needed for the case where you saw a monster
                due to being next to it while it's in a gas cloud
                and then you moved away; it should no longer be seen
@@ -567,7 +575,9 @@ export async function moveloop_core() {   // allmain.c:177
        once with correct vision data, not twice (overshoot+correct) */
     await cliparound()(u.ux, u.uy);
     /* when running in non-tport mode, this gets done through domove() */
-    if ((!svc.context.run || flags.runmode === RUN.TPORT) && (gm.multi && (!svc.context.travel ? !$c.rem64(gm.multi, 7) : !$c.rem64(svm.moves, 7)))) {
+    if ((!svc.context.run || flags.runmode === RUN.TPORT)
+        && (gm.multi && (!svc.context.travel ? !$c.rem64(gm.multi, 7)
+        : !$c.rem64(svm.moves, 7)))) {
         if (flags.time && svc.context.run) {
             disp.botl = TRUE;
         }
@@ -592,7 +602,8 @@ async function maybe_do_tutorial() {   // allmain.c:567
     if (await ask_do_tutorial()) {
         assign_level(u.ucamefrom, u.uz);
         iflags.nofollowers = TRUE;
-        await schedule_goto(sp.dlevel, UTOTYPE.NONE, $C`Entering the tutorial.`, null);
+        await schedule_goto(sp.dlevel, UTOTYPE.NONE,
+            $C`Entering the tutorial.`, null);
         await deferred_goto();
         await vision_recalc(0);
         await docrt();
@@ -618,7 +629,9 @@ export async function moveloop(resuming) {   // allmain.c:587
  */
 async function regen_pw(wtcap) {   // allmain.c:600
     let $t1;
-    if (u.uen < u.uenmax && (wtcap < MOD_ENCUMBER && !$c.rem64(svm.moves, $c.div32(Math.imul(MAXULEV + 8 - u.ulevel | 0, Role_if(PM.WIZARD) ? 3 : 4), 6)) || Energy_regeneration())) {
+    if (u.uen < u.uenmax
+        && (wtcap < MOD_ENCUMBER
+        && !$c.rem64(svm.moves, $c.div32(Math.imul(MAXULEV + 8 - u.ulevel | 0, Role_if(PM.WIZARD) ? 3 : 4), 6)) || Energy_regeneration())) {
         let upper = $c.div32(ACURR(A.WIS) + ACURR(A.INT), 15) + 1 | 0;
         if (EMagical_breathing()) {
             upper = upper + 2 | 0;
@@ -646,10 +659,13 @@ async function regen_hp(wtcap) {   // allmain.c:625
         if (u.mh < 1) {
             /* shouldn't happen... */
             await rehumanize();
-        } else if (gy.youmonst.data.mlet === S.EEL && !is_pool(u.ux, u.uy) && !Is_waterlevel(u.uz) && !Breathless()) {
+        } else if (gy.youmonst.data.mlet === S.EEL
+            && !is_pool(u.ux, u.uy) && !Is_waterlevel(u.uz)
+            && !Breathless()) {
             /* eel out of water loses hp, similar to monster eels;
                as hp gets lower, rate of further loss slows down */
-            if (u.mh > 1 && !Regeneration() && rn2(u.mh) > rn2(8) && (!Half_physical_damage() || !$c.rem64(svm.moves, 2))) {
+            if (u.mh > 1 && !Regeneration() && rn2(u.mh) > rn2(8)
+                && (!Half_physical_damage() || !$c.rem64(svm.moves, 2))) {
                 heal = -1;
             }
         } else if (u.mh < u.mhmax) {
@@ -874,14 +890,20 @@ export async function welcome(new_game) {   // allmain.c:854
     if (new_game || u.ualignbase[A.ORIGINAL] !== u.ualignbase[A.CURRENT] || adrift) {
         $c.sprintf(eos(new $c.Ptr(buf, 0)), $C` %s%s`, adrift ? $C`adrift ` : $C``, adrift ? align_str(u.ualign.type) : align_str(u.ualignbase[A.CURRENT]));
     }
-    if (!gu.urole.name.f && (new_game ? (gu.urole.allow & ROLE_GENDMASK) === (ROLE_MALE | ROLE_FEMALE) : currentgend !== flags.initgend)) {
+    if (!gu.urole.name.f
+        && (new_game
+        ? (gu.urole.allow & ROLE_GENDMASK) === (ROLE_MALE | ROLE_FEMALE)
+        : currentgend !== flags.initgend)) {
         $c.sprintf(eos(new $c.Ptr(buf, 0)), $C` %s`, genders[currentgend].adj);
     }
     $c.sprintf(eos(new $c.Ptr(buf, 0)), $C` %s %s`, gu.urace.adj, currentgend && gu.urole.name.f ? gu.urole.name.f : gu.urole.name.m);
-    await pline(new_game ? $C`%s %s, welcome to NetHack!  You are a%s.` : $C`%s %s, the%s, welcome back to NetHack!`, Hello(null), new $c.Ptr(svp.plname, 0), new $c.Ptr(buf, 0));
+    await pline(new_game ? $C`%s %s, welcome to NetHack!  You are a%s.`
+        : $C`%s %s, the%s, welcome back to NetHack!`,
+        Hello(null), new $c.Ptr(svp.plname, 0), new $c.Ptr(buf, 0));
     if (new_game) {
         /* guarantee that 'major' event category is never empty */
-        await livelog_printf(LL.ACHIEVE, $C`%s the%s entered the dungeon`, new $c.Ptr(svp.plname, 0), new $c.Ptr(buf, 0));
+        await livelog_printf(LL.ACHIEVE, $C`%s the%s entered the dungeon`,
+            new $c.Ptr(svp.plname, 0), new $c.Ptr(buf, 0));
     } else {
         /* if restoring in Gehennom, give same hot/smoky message as when
            first entering it */

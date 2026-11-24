@@ -141,7 +141,9 @@ const cant_reach = new Int8Array(33);
  */
 export async function do_blinding_ray(obj$in) {   // apply.c:61
     const obj = [obj$in];
-    const mtmp = await bhit(u.dx, u.dy, COLNO, FLASHED_LIGHT, null, null, new $c.Ptr(obj, 0));
+    const mtmp = await bhit(u.dx, u.dy, COLNO, FLASHED_LIGHT,
+        null,
+        null, new $c.Ptr(obj, 0));
     obj[0].ox = u.ux, obj[0].oy = u.uy;   /* flash_hits_mon() wants this */
     if (mtmp) {
         await flash_hits_mon(mtmp, obj[0]);
@@ -173,9 +175,11 @@ async function use_camera(obj) {   // apply.c:79
     if (obj.cursed && !rn2(2)) {
         await zapyourself(obj, TRUE);
     } else if (u.uswallow) {
-        await You($C`take a picture of %s %s.`, s_suffix(await mon_nam(u.ustuck)), await mbodypart(u.ustuck, STOMACH));
+        await You($C`take a picture of %s %s.`, s_suffix(await mon_nam(u.ustuck)),
+            await mbodypart(u.ustuck, STOMACH));
     } else if (u.dz) {
-        await You($C`take a picture of the %s.`, u.dz > 0 ? surface(u.ux, u.uy) : ceiling(u.ux, u.uy));
+        await You($C`take a picture of the %s.`,
+            u.dz > 0 ? surface(u.ux, u.uy) : ceiling(u.ux, u.uy));
     } else if (!u.dx && !u.dy) {
         /* TODO:  we ought to have a "selfie" joke here... */
         await zapyourself(obj, TRUE);
@@ -202,7 +206,8 @@ async function use_towel(obj) {   // apply.c:112
             case 2:
                 old = $c.and64(u.uprops[GLIB].intrinsic, TIMEOUT);
                 await make_glib($c.i32(old) + rn1(10, 3) | 0);   /* + 3..12 */
-                await Your($C`%s %s!`, await makeplural(await body_part(HAND)), old ? $C`are filthier than ever` : $C`get slimy`);
+                await Your($C`%s %s!`, await makeplural(await body_part(HAND)),
+                    old ? $C`are filthier than ever` : $C`get slimy`);
                 if (is_wet_towel(obj)) {
                     await dry_a_towel(obj, -1, drying_feedback);
                 }
@@ -211,12 +216,17 @@ async function use_towel(obj) {   // apply.c:112
                 if (!$G.ublindf) {
                     old = u.ucreamed;
                     $t1 = rn1(10, 3) >>> 0, u.ucreamed = u.ucreamed + $t1 >>> 0;
-                    await pline($C`Yecch!  Your %s %s gunk on it!`, await body_part(FACE), old ? $C`has more` : $C`now has`);
+                    await pline($C`Yecch!  Your %s %s gunk on it!`, await body_part(FACE),
+                        old ? $C`has more` : $C`now has`);
                     await make_blinded($c.sub64($c.add64(BlindedTimeout(), u.ucreamed), old), TRUE);
                 } else {
-                    const what = $G.ublindf.otyp === LENSES ? $C`lenses` : obj.otyp === $G.ublindf.otyp ? $C`other towel` : $C`blindfold`;
+                    const what = $G.ublindf.otyp === LENSES
+                        ? $C`lenses`
+                        : obj.otyp === $G.ublindf.otyp ? $C`other towel`
+                        : $C`blindfold`;
                     if ($G.ublindf.cursed) {
-                        await You($C`push your %s %s.`, what, rn2(2) ? $C`cock-eyed` : $C`crooked`);
+                        await You($C`push your %s %s.`, what,
+                            rn2(2) ? $C`cock-eyed` : $C`crooked`);
                     } else {
                         const saved_ublindf = $G.ublindf;
                         await You($C`push your %s off.`, what);
@@ -234,7 +244,8 @@ async function use_towel(obj) {   // apply.c:112
     }
     if (Glib()) {
         await make_glib(0);
-        await You($C`wipe off your %s.`, !$G.uarmg ? await makeplural(await body_part(HAND)) : gloves_simple_name($G.uarmg));
+        await You($C`wipe off your %s.`,
+            !$G.uarmg ? await makeplural(await body_part(HAND)) : gloves_simple_name($G.uarmg));
         if (is_wet_towel(obj)) {
             await dry_a_towel(obj, -1, drying_feedback);
         }
@@ -256,7 +267,8 @@ async function use_towel(obj) {   // apply.c:112
         }
         return ECMD.TIME;
     }
-    await Your($C`%s and %s are already clean.`, await body_part(FACE), await makeplural(await body_part(HAND)));
+    await Your($C`%s and %s are already clean.`, await body_part(FACE),
+        await makeplural(await body_part(HAND)));
     return ECMD.OK;
 }
 /* maybe give a stethoscope message based on floor objects */
@@ -340,7 +352,9 @@ async function its_dead(rx, ry, resp) {   // apply.c:198
                 }
             } while (corpse && !reviver);
         }
-        await You($C`determine that %s unfortunate being%s %s%s dead.`, one ? here ? $C`this` : $C`that` : here ? $C`these` : $C`those`, one ? $C`` : $C`s`, one ? $C`is` : $C`are`, reviver ? $C` mostly` : $C``);
+        await You($C`determine that %s unfortunate being%s %s%s dead.`,
+            one ? here ? $C`this` : $C`that` : here ? $C`these` : $C`those`,
+            one ? $C`` : $C`s`, one ? $C`is` : $C`are`, reviver ? $C` mostly` : $C``);
         return TRUE;
     } else {
         /* statue */
@@ -379,7 +393,8 @@ async function its_dead(rx, ry, resp) {   // apply.c:198
  */
 async function use_stethoscope(obj) {   // apply.c:318
     let mtmp = null, res = Int32Array.of(0), dummyobj = new $T.obj(), odummy = null;
-    const interference = u.uswallow && is_whirly(u.ustuck.data) && !rn2(gu.urole.mnum === PM.HEALER ? 10 : 3) ? 1 : 0;
+    const interference = u.uswallow && is_whirly(u.ustuck.data)
+        && !rn2(gu.urole.mnum === PM.HEALER ? 10 : 3) ? 1 : 0;
     if (nohands(gy.youmonst.data)) {
         await You($C`have no hands!`);   /* not `body_part(HAND)' */
         return ECMD.OK;
@@ -441,7 +456,8 @@ async function use_stethoscope(obj) {   // apply.c:318
         return ECMD.OK;
     }
     if ((mtmp = svl.level.monsters[rx][ry]) !== null) {
-        const mnm = await x_monnam(mtmp, ARTICLE.A, null, SUPPRESS.IT | SUPPRESS.INVISIBLE, FALSE);
+        const mnm = await x_monnam(mtmp, ARTICLE.A, null,
+            SUPPRESS.IT | SUPPRESS.INVISIBLE, FALSE);
         /* gb.bhitpos needed by mstatusline() iff mtmp is a long worm */
         gb.bhitpos.x = rx, gb.bhitpos.y = ry;
         gn.notonhead = mtmp.mx !== rx || mtmp.my !== ry ? 1 : 0;
@@ -469,7 +485,8 @@ async function use_stethoscope(obj) {   // apply.c:318
                     } else {
                         what = await simple_typename(odummy.otyp);
                     }
-                    use_plural = is_boots(odummy) || is_gloves(odummy) || odummy.otyp === LENSES ? 1 : 0;
+                    use_plural = is_boots(odummy) || is_gloves(odummy)
+                        || odummy.otyp === LENSES ? 1 : 0;
                     break;
                 case M_AP.MONSTER:
                     /* ignore Hallucination here */
@@ -480,7 +497,9 @@ async function use_stethoscope(obj) {   // apply.c:318
                     break;
             }
             await seemimic(mtmp);
-            await pline($C`%s %s %s really %s.`, use_plural ? $C`Those` : $C`That`, what, use_plural ? $C`are` : $C`is`, mnm);
+            await pline($C`%s %s %s really %s.`,
+                use_plural ? $C`Those` : $C`That`, what,
+                use_plural ? $C`are` : $C`is`, mnm);
         } else if (flags.verbose && !canspotmon(mtmp)) {
             await There($C`is %s there.`, mnm);
         }
@@ -542,14 +561,18 @@ async function use_magic_whistle(obj) {   // apply.c:495
     if (!can_blow(gy.youmonst)) {
         await You($C`are incapable of using the whistle.`);
     } else if (obj.cursed && !rn2(2)) {
-        await You($C`produce a %shigh-%s.`, Underwater() ? $C`very ` : $C``, Deaf() ? $C`frequency vibration` : $C`pitched humming noise`);
+        await You($C`produce a %shigh-%s.`, Underwater() ? $C`very ` : $C``,
+            Deaf() ? $C`frequency vibration` : $C`pitched humming noise`);
         await wake_nearby(TRUE);
         if (!rn2(2) && !await noteleport_level(gy.youmonst)) {
             await tele_to_rnd_pet();
         }
     } else {
         /* it's magic!  it works underwater too (at a higher pitch) */
-        await You(Deaf() ? new $c.Ptr(alt_whistle_str, 0) : new $c.Ptr(whistle_str, 0), Hallucination() ? $C`normal` : Underwater() && !Deaf() ? $C`strange, high-pitched` : $C`strange`);
+        await You(Deaf() ? new $c.Ptr(alt_whistle_str, 0) : new $c.Ptr(whistle_str, 0),
+            Hallucination() ? $C`normal`
+            : Underwater() && !Deaf() ? $C`strange, high-pitched`
+            : $C`strange`);
         await magic_whistled(obj);
     }
 }
@@ -769,7 +792,8 @@ export async function m_unleash(mtmp, feedback) {   // apply.c:726
     let otmp = null;
     if (feedback) {
         if (canseemon(mtmp)) {
-            await pline_mon(mtmp, $C`%s pulls free of %s leash!`, await Monnam(mtmp), genders[pronoun_gender(mtmp, PRONOUN.HALLU)].his);
+            await pline_mon(mtmp, $C`%s pulls free of %s leash!`,
+                await Monnam(mtmp), genders[pronoun_gender(mtmp, PRONOUN.HALLU)].his);
         } else {
             await Your($C`leash falls slack.`);
         }
@@ -797,7 +821,9 @@ export function unleash_all() {   // apply.c:746
  * @returns {number} boolean
  */
 export function leashable(mtmp) {   // apply.c:761
-    return mtmp.mnum !== PM.LONG_WORM && !unsolid(mtmp.data) && (!nolimbs(mtmp.data) || has_head(mtmp.data)) ? 1 : 0;
+    return mtmp.mnum !== PM.LONG_WORM
+        && !unsolid(mtmp.data)
+        && (!nolimbs(mtmp.data) || has_head(mtmp.data)) ? 1 : 0;
 }
 /**
  * @param {$T.obj | null} obj struct obj *
@@ -811,7 +837,12 @@ async function use_leash(obj) {   // apply.c:769
            it from the engulfer versus from some other creature
            (note: the two in-use cases can't actually occur; all
            leashes are released when the hero gets engulfed) */
-        await You_cant(!obj.corpsenm ? $C`leash %s from inside.` : obj.corpsenm === (u.ustuck.m_id | 0) ? $C`unleash %s from inside.` : $C`unleash anything from inside %s.`, await noit_mon_nam(u.ustuck));
+        await You_cant(!obj.corpsenm
+            ? $C`leash %s from inside.`
+            : obj.corpsenm === (u.ustuck.m_id | 0)
+            ? $C`unleash %s from inside.`
+            : $C`unleash anything from inside %s.`,
+            await noit_mon_nam(u.ustuck));
         return ECMD.OK;
     }
     if (!obj.corpsenm && number_leashed() >= MAXLEASHED) {
@@ -858,24 +889,29 @@ async function use_leash_core(obj, mtmp, cc, spotmon) {   // apply.c:821
            (and also that it doesn't change location by retry time) */
         await map_invisible(cc.x, cc.y);
     } else if (!mtmp.mtame) {
-        await pline($C`%s %s leashed!`, await Monnam(mtmp), !obj.corpsenm ? $C`cannot be` : $C`is not`);
+        await pline($C`%s %s leashed!`, await Monnam(mtmp),
+            !obj.corpsenm ? $C`cannot be` : $C`is not`);
     } else if (!obj.corpsenm) {
         /* applying a leash which isn't currently in use */
         if (mtmp.mleashed) {
-            await pline($C`This %s is already leashed.`, spotmon ? await l_monnam(mtmp) : $C`creature`);
+            await pline($C`This %s is already leashed.`,
+                spotmon ? await l_monnam(mtmp) : $C`creature`);
         } else if (unsolid(mtmp.data)) {
             await pline($C`The leash would just fall off.`);
         } else if (nolimbs(mtmp.data) && !has_head(mtmp.data)) {
-            await pline($C`%s has no extremities the leash would fit.`, await Monnam(mtmp));
+            await pline($C`%s has no extremities the leash would fit.`,
+                await Monnam(mtmp));
         } else if (!leashable(mtmp)) {
             let lmonnam = await l_monnam(mtmp);
             if (cc.x !== mtmp.mx || cc.y !== mtmp.my) {
                 $c.sprintf(new $c.Ptr(lmonbuf, 0), $C`%s tail`, s_suffix(lmonnam));
                 lmonnam = new $c.Ptr(lmonbuf, 0);
             }
-            await pline($C`The leash won't fit onto %s%s.`, spotmon ? $C`your ` : $C``, lmonnam);
+            await pline($C`The leash won't fit onto %s%s.`, spotmon ? $C`your ` : $C``,
+                lmonnam);
         } else {
-            await You($C`slip the leash around %s%s.`, spotmon ? $C`your ` : $C``, await l_monnam(mtmp));
+            await You($C`slip the leash around %s%s.`, spotmon ? $C`your ` : $C``,
+                await l_monnam(mtmp));
             mtmp.mleashed = 1;
             obj.corpsenm = mtmp.m_id | 0;
             mtmp.msleeping = 0;
@@ -892,7 +928,8 @@ async function use_leash_core(obj, mtmp, cc, spotmon) {   // apply.c:821
             mtmp.mleashed = 0;
             obj.corpsenm = 0;
             await update_inventory();
-            await You($C`remove the leash from %s%s.`, spotmon ? $C`your ` : $C``, await l_monnam(mtmp));
+            await You($C`remove the leash from %s%s.`,
+                spotmon ? $C`your ` : $C``, await l_monnam(mtmp));
         }
     }
 }
@@ -931,7 +968,8 @@ async function mleashed_next2u(mtmp) {   // apply.c:891
             mtmp.mleashed = 0;
             otmp.corpsenm = 0;
             await update_inventory();
-            await You_feel($C`%s leash go slack.`, number_leashed() > 1 ? $C`a` : $C`the`);
+            await You_feel($C`%s leash go slack.`,
+                number_leashed() > 1 ? $C`a` : $C`the`);
         }
     }
     return FALSE;
@@ -966,11 +1004,13 @@ export async function check_leash(x, y) {   // apply.c:931
             otmp.corpsenm = 0;
             continue;
         }
-        if (dist2(u.ux, u.uy, mtmp.mx, mtmp.my) > dist2(x, y, mtmp.mx, mtmp.my)) {
+        if (dist2(u.ux, u.uy, mtmp.mx, mtmp.my)
+            > dist2(x, y, mtmp.mx, mtmp.my)) {
             if (!um_dist(mtmp.mx, mtmp.my, 3)) {
                 /* still close enough */
             } else if (otmp.cursed && !breathless(mtmp.data)) {
-                if (um_dist(mtmp.mx, mtmp.my, 5) || ($t1 = rnd(2), mtmp.mhp = mtmp.mhp - $t1 | 0) <= 0) {
+                if (um_dist(mtmp.mx, mtmp.my, 5)
+                    || ($t1 = rnd(2), mtmp.mhp = mtmp.mhp - $t1 | 0) <= 0) {
                     const save_pacifism = u.uconduct.killer;
                     await Your($C`leash chokes %s to death!`, await mon_nam(mtmp));
                     /* hero might not have intended to kill pet, but
@@ -983,7 +1023,8 @@ export async function check_leash(x, y) {   // apply.c:931
                         u.uconduct.killer = save_pacifism;
                     }
                 } else {
-                    await pline_mon(mtmp, $C`%s is choked by the leash!`, await Monnam(mtmp));
+                    await pline_mon(mtmp, $C`%s is choked by the leash!`,
+                        await Monnam(mtmp));
                     /* tameness eventually drops to 1 here (never 0) */
                     if (mtmp.mtame && rn2(mtmp.mtame)) {
                         mtmp.mtame = $c.i8(mtmp.mtame - 1);
@@ -1023,7 +1064,15 @@ export function beautiful() {   // apply.c:997
     /* don't bother complaining about the sexism; NetHack is not real life */
     /* 25 is the maximum possible */
     /* note: not "splendiferous" */
-    const res = cha >= 25 ? $C`sublime` : cha >= 19 ? $C`splendorous` : cha >= 16 ? poly_gender() === 1 ? $C`beautiful` : $C`handsome` : cha >= 14 ? poly_gender() === 1 ? $C`winsome` : $C`amiable` : cha >= 11 ? $C`cute` : cha >= 9 ? $C`plain` : cha >= 6 ? $C`homely` : cha >= 4 ? $C`ugly` : $C`hideous`;   /* 3 is the minimum possible */
+    const res = cha >= 25 ? $C`sublime`
+        : cha >= 19 ? $C`splendorous`
+        : cha >= 16 ? poly_gender() === 1 ? $C`beautiful` : $C`handsome`
+        : cha >= 14 ? poly_gender() === 1 ? $C`winsome` : $C`amiable`
+        : cha >= 11 ? $C`cute`
+        : cha >= 9 ? $C`plain`
+        : cha >= 6 ? $C`homely`
+        : cha >= 4 ? $C`ugly`
+        : $C`hideous`;   /* 3 is the minimum possible */
     return res;
 }
 /**
@@ -1067,7 +1116,8 @@ async function use_mirror(obj$in) {   // apply.c:1018
                     }
                     gn.nomovemsg = null;   /* default, "you can move again" */
                 }
-            } else if (is_vampire(gy.youmonst.data) || is_vampshifter(gy.youmonst)) {
+            } else if (is_vampire(gy.youmonst.data)
+                || is_vampshifter(gy.youmonst)) {
                 await You($C`don't have a reflection.`);
             } else if (u.umonnum === PM.UMBER_HULK) {
                 await pline($C`Huh?  That doesn't look like you!`);
@@ -1088,23 +1138,29 @@ async function use_mirror(obj$in) {   // apply.c:1018
     }
     if (u.uswallow) {
         if (useeit) {
-            await You($C`reflect %s %s.`, s_suffix(await mon_nam(u.ustuck)), await mbodypart(u.ustuck, STOMACH));
+            await You($C`reflect %s %s.`, s_suffix(await mon_nam(u.ustuck)),
+                await mbodypart(u.ustuck, STOMACH));
         }
         return ECMD.TIME;
     }
     if (Underwater()) {
         if (useeit) {
-            await You($C`%s.`, Hallucination() ? $C`give the fish a chance to fix their makeup` : $C`reflect the murky water`);
+            await You($C`%s.`,
+                Hallucination() ? $C`give the fish a chance to fix their makeup`
+                : $C`reflect the murky water`);
         }
         return ECMD.TIME;
     }
     if (u.dz) {
         if (useeit) {
-            await You($C`reflect the %s.`, u.dz > 0 ? surface(u.ux, u.uy) : ceiling(u.ux, u.uy));
+            await You($C`reflect the %s.`,
+                u.dz > 0 ? surface(u.ux, u.uy) : ceiling(u.ux, u.uy));
         }
         return ECMD.TIME;
     }
-    const mtmp = await bhit(u.dx, u.dy, COLNO, INVIS_BEAM, null, null, new $c.Ptr(obj, 0));
+    const mtmp = await bhit(u.dx, u.dy, COLNO, INVIS_BEAM,
+        null,
+        null, new $c.Ptr(obj, 0));
     if (!mtmp || !haseyes(mtmp.data) || gn.notonhead) {
         return ECMD.TIME;
     }
@@ -1119,7 +1175,8 @@ async function use_mirror(obj$in) {   // apply.c:1018
     const mlet = mtmp.data.mlet;
     if (mtmp.msleeping) {
         if (vis) {
-            await pline($C`%s is too tired to look at your %s.`, await Monnam(mtmp), mirror);
+            await pline($C`%s is too tired to look at your %s.`, await Monnam(mtmp),
+                mirror);
         }
     } else if (!mtmp.mcansee) {
         if (vis) {
@@ -1132,7 +1189,9 @@ async function use_mirror(obj$in) {   // apply.c:1018
         /* infravision doesn't produce an image in the mirror */
     } else if ((how_seen & SEENMON) >>> 0 === MONSEEN.INFRAVIS) {
         if (vis) {   /* (redundant) */
-            await pline($C`%s in the dark.`, await monverbself(mtmp, await Monnam(mtmp), $C`are`, $C`too far away to see`));
+            await pline($C`%s in the dark.`,
+                await monverbself(mtmp, await Monnam(mtmp), $C`are`,
+                $C`too far away to see`));
         }
         /* some monsters do special things */
     } else if (mlet === S.VAMPIRE || mlet === S.GHOST || is_vampshifter(mtmp)) {
@@ -1164,11 +1223,14 @@ async function use_mirror(obj$in) {   // apply.c:1018
             await pline($C`%s confuses itself!`, await Monnam(mtmp));
         }
         mtmp.mconf = 1;
-    } else if (monable && (mlet === S.NYMPH || mtmp.data === mons[PM.AMOROUS_DEMON])) {
+    } else if (monable && (mlet === S.NYMPH
+        || mtmp.data === mons[PM.AMOROUS_DEMON])) {
         if (vis) {
             /* "She" or "He" */
             /* "<mon> admires self in your mirror " */
-            await pline($C`%s in your %s.`, await monverbself(mtmp, await Monnam(mtmp), $C`admire`, null), mirror);
+            await pline($C`%s in your %s.`,
+                await monverbself(mtmp, await Monnam(mtmp), $C`admire`, null),
+                mirror);
             await pline($C`%s takes it!`, upstart($c.strcpy(new $c.Ptr(buf, 0), genders[pronoun_gender(mtmp, PRONOUN.HALLU)].he)));
         } else {
             await pline($C`It steals your %s!`, mirror);
@@ -1179,13 +1241,16 @@ async function use_mirror(obj$in) {   // apply.c:1018
         if (!await tele_restrict(mtmp)) {
             await rloc(mtmp, RLOC.MSG);
         }
-    } else if (!is_unicorn(mtmp.data) && !humanoid(mtmp.data) && !is_demon(mtmp.data) && (!mtmp.minvis || perceives(mtmp.data)) && rn2(5)) {
+    } else if (!is_unicorn(mtmp.data) && !humanoid(mtmp.data)
+        && !is_demon(mtmp.data)
+        && (!mtmp.minvis || perceives(mtmp.data)) && rn2(5)) {
         let do_react = TRUE;
         if (mtmp.mfrozen) {
             if (vis) {
                 await You($C`discern no obvious reaction from %s.`, await mon_nam(mtmp));
             } else {
-                await You_feel($C`a bit silly gesturing the mirror in that direction.`);
+                await You_feel(
+                    $C`a bit silly gesturing the mirror in that direction.`);
             }
             do_react = FALSE;
         }
@@ -1197,9 +1262,11 @@ async function use_mirror(obj$in) {   // apply.c:1018
         }
     } else if (!Blind()) {
         if (mtmp.minvis && !See_invisible()) {
-        } else if (mtmp.minvis && !perceives(mtmp.data) || !haseyes(mtmp.data) || gn.notonhead || !mtmp.mcansee) {
+        } else if (mtmp.minvis && !perceives(mtmp.data)
+            || !haseyes(mtmp.data) || gn.notonhead || !mtmp.mcansee) {
             /* redundant: can't get here if these are true */
-            await pline($C`%s doesn't seem to notice %s reflection.`, await Monnam(mtmp), genders[pronoun_gender(mtmp, PRONOUN.HALLU)].his);
+            await pline($C`%s doesn't seem to notice %s reflection.`, await Monnam(mtmp),
+                genders[pronoun_gender(mtmp, PRONOUN.HALLU)].his);
         } else {
             await pline($C`%s ignores %s reflection.`, await Monnam(mtmp), genders[pronoun_gender(mtmp, PRONOUN.HALLU)].his);
         }
@@ -1216,7 +1283,9 @@ async function use_bell(optr) {   // apply.c:1202
     let wakem = FALSE;
     let learno = FALSE;
     const ordinary = obj.otyp !== BELL_OF_OPENING || !obj.spe ? 1 : 0;
-    const invoking = obj.otyp === BELL_OF_OPENING && invocation_pos(u.ux, u.uy) && !On_stairs(u.ux, u.uy) ? 1 : 0;
+    const invoking = obj.otyp === BELL_OF_OPENING
+        && invocation_pos(u.ux, u.uy)
+        && !On_stairs(u.ux, u.uy) ? 1 : 0;
     await You($C`ring %s.`, await the(await xname(obj)));
     if (Underwater() || u.uswallow && ordinary) {
         await pline($C`But the sound is muffled.`);
@@ -1226,7 +1295,12 @@ async function use_bell(optr) {   // apply.c:1202
         learno = TRUE;   /* help player figure out why */
     } else if (ordinary) {
         /* note: once any of them are gone, we stop all of them */
-        if (obj.cursed && !rn2(4) && !(svm.mvitals[PM.WOOD_NYMPH].mvflags & G_GONE) && !(svm.mvitals[PM.WATER_NYMPH].mvflags & G_GONE) && !(svm.mvitals[PM.MOUNTAIN_NYMPH].mvflags & G_GONE) && (mtmp = await makemon(await mkclass(S.NYMPH, 0), u.ux, u.uy, NO.MINVENT | MM.NOMSG)) !== null) {
+        if (obj.cursed && !rn2(4)
+            && !(svm.mvitals[PM.WOOD_NYMPH].mvflags & G_GONE)
+            && !(svm.mvitals[PM.WATER_NYMPH].mvflags & G_GONE)
+            && !(svm.mvitals[PM.MOUNTAIN_NYMPH].mvflags & G_GONE)
+            && (mtmp = await makemon(await mkclass(S.NYMPH, 0), u.ux, u.uy,
+            NO.MINVENT | MM.NOMSG)) !== null) {
             await You($C`summon %s!`, await a_monnam(mtmp));
             if (!obj_resists(obj, 93, 100)) {
                 await pline($C`%s shattered!`, await Tobjnam(obj, $C`have`));
@@ -1329,7 +1403,8 @@ async function use_candelabrum(obj) {   // apply.c:1319
             }
         }
         if (otmp) {
-            await pline($C`To attach candles, apply them instead of the %s.`, await xname(obj));
+            await pline($C`To attach candles, apply them instead of the %s.`,
+                await xname(obj));
         }
         return;
     }
@@ -1339,17 +1414,21 @@ async function use_candelabrum(obj) {   // apply.c:1319
     }
     if (u.uswallow || obj.cursed) {
         if (!Blind()) {
-            await pline_The($C`%s %s for a moment, then %s.`, s, await vtense(s, $C`flicker`), await vtense(s, $C`die`));
+            await pline_The($C`%s %s for a moment, then %s.`, s, await vtense(s, $C`flicker`),
+                await vtense(s, $C`die`));
         }
         return;
     }
     if (obj.spe < 7) {
-        await There($C`%s only %d %s in %s.`, await vtense(s, $C`are`), obj.spe, s, await the(await xname(obj)));
+        await There($C`%s only %d %s in %s.`, await vtense(s, $C`are`), obj.spe, s,
+            await the(await xname(obj)));
         if (!Blind()) {
-            await pline($C`%s lit.  %s dimly.`, obj.spe === 1 ? $C`It is` : $C`They are`, await Tobjnam(obj, $C`shine`));
+            await pline($C`%s lit.  %s dimly.`, obj.spe === 1 ? $C`It is` : $C`They are`,
+                await Tobjnam(obj, $C`shine`));
         }
     } else {
-        await pline($C`%s's %s burn%s`, await The(await xname(obj)), s, Blind() ? $C`.` : $C` brightly!`);
+        await pline($C`%s's %s burn%s`, await The(await xname(obj)), s,
+            Blind() ? $C`.` : $C` brightly!`);
     }
     if (!invocation_pos(u.ux, u.uy) || On_stairs(u.ux, u.uy)) {
         await pline_The($C`%s %s being rapidly consumed!`, s, await vtense(s, $C`are`));
@@ -1402,7 +1481,8 @@ async function use_candle(optr) {   // apply.c:1387
         $c.strcpy(q, $C` to `);
     }
     /* last, format final "attach candles to candelabrum?" query */
-    if (await yn_function(await safe_qbuf(new $c.Ptr(qbuf, 0), new $c.Ptr(qbuf, 0), $C`?`, otmp, yname, thesimpleoname, $C`it`), new $c.Ptr(ynchars, 0), 110, TRUE) === 110) {
+    if (await yn_function(await safe_qbuf(new $c.Ptr(qbuf, 0), new $c.Ptr(qbuf, 0), $C`?`, otmp, yname, thesimpleoname, $C`it`), new $c.Ptr(ynchars, 0), 110, TRUE)
+        === 110) {
         await use_lamp(obj);
         return;
     } else {
@@ -1422,7 +1502,8 @@ async function use_candle(optr) {   // apply.c:1387
         if (was_lamplit) {
             await end_burn(obj, TRUE);
         }
-        await You($C`attach %ld%s %s to %s.`, obj.quan, !otmp.spe ? $C`` : $C` more`, s, await the(await xname(otmp)));
+        await You($C`attach %ld%s %s to %s.`, obj.quan, !otmp.spe ? $C`` : $C` more`, s,
+            await the(await xname(otmp)));
         if (!otmp.spe || otmp.age > obj.age) {
             otmp.age = obj.age;
         }
@@ -1434,10 +1515,14 @@ async function use_candle(optr) {   // apply.c:1387
         }
         if (obj.unpaid) {
             const shkp = await shop_keeper(in_rooms(u.ux, u.uy, SHOPBASE).get(0));
-            await verbalize($C`You %s %s, you bought %s!`, otmp.lamplit ? $C`burn` : $C`use`, obj.quan > 1 ? $C`them` : $C`it`, obj.quan > 1 ? $C`them` : $C`it`);
+            await verbalize($C`You %s %s, you bought %s!`,
+                otmp.lamplit ? $C`burn` : $C`use`,
+                obj.quan > 1 ? $C`them` : $C`it`,
+                obj.quan > 1 ? $C`them` : $C`it`);
         }
         if (obj.quan < 7 && otmp.spe === 7) {
-            await pline($C`%s now has seven%s candles attached.`, await The(await xname(otmp)), otmp.lamplit ? $C` lit` : $C``);
+            await pline($C`%s now has seven%s candles attached.`, await The(await xname(otmp)),
+                otmp.lamplit ? $C` lit` : $C``);
         }
         /* candelabrum's light range might increase */
         if (otmp.lamplit) {
@@ -1459,11 +1544,14 @@ async function use_candle(optr) {   // apply.c:1387
 export async function snuff_candle(otmp) {   // apply.c:1472
     let buf = new Int8Array(256), x = Int16Array.of(0), y = Int16Array.of(0);
     const candle = Is_candle(otmp);
-    if ((candle || otmp.otyp === CANDELABRUM_OF_INVOCATION) && otmp.lamplit) {
+    if ((candle || otmp.otyp === CANDELABRUM_OF_INVOCATION)
+        && otmp.lamplit) {
         const many = candle ? otmp.quan > 1 ? 1 : 0 : otmp.spe > 1 ? 1 : 0;
         get_obj_location(otmp, new $c.Ptr(x, 0), new $c.Ptr(y, 0), 0);
         if (otmp.where === OBJ.MINVENT ? cansee(x[0], y[0]) : !Blind()) {
-            await pline($C`%s%scandle%s flame%s extinguished.`, await Shk_Your(new $c.Ptr(buf, 0), otmp), candle ? $C`` : $C`candelabrum's `, many ? $C`s'` : $C`'s`, many ? $C`s are` : $C` is`);
+            await pline($C`%s%scandle%s flame%s extinguished.`, await Shk_Your(new $c.Ptr(buf, 0), otmp),
+                candle ? $C`` : $C`candelabrum's `, many ? $C`s'` : $C`'s`,
+                many ? $C`s are` : $C` is`);
         }
         await end_burn(otmp, TRUE);
         return TRUE;
@@ -1480,7 +1568,8 @@ export async function snuff_candle(otmp) {   // apply.c:1472
 export async function snuff_lit(obj) {   // apply.c:1497
     let x = Int16Array.of(0), y = Int16Array.of(0);
     if (obj.lamplit) {
-        if (obj.otyp === OIL_LAMP || obj.otyp === MAGIC_LAMP || obj.otyp === BRASS_LANTERN || obj.otyp === POT_OIL) {
+        if (obj.otyp === OIL_LAMP || obj.otyp === MAGIC_LAMP
+            || obj.otyp === BRASS_LANTERN || obj.otyp === POT_OIL) {
             get_obj_location(obj, new $c.Ptr(x, 0), new $c.Ptr(y, 0), 0);
             if (obj.where === OBJ.MINVENT ? cansee(x[0], y[0]) : !Blind()) {
                 await pline($C`%s %s out!`, await Yname2(obj), await otense(obj, $C`go`));
@@ -1515,21 +1604,29 @@ export async function splash_lit(obj) {   // apply.c:1518
             uhearit = !Deaf() ? 1 : 0;
             /* underwater light sources aren't allowed but if hero
                is just entering water, Underwater won't be set yet */
-            dunk = is_pool(u.ux, u.uy) && (!Levitation() && !Flying() && !Wwalking() || Is_waterlevel(u.uz)) ? 1 : 0;
+            dunk = is_pool(u.ux, u.uy)
+                && (!Levitation() && !Flying() && !Wwalking()
+                || Is_waterlevel(u.uz)) ? 1 : 0;
             snuff = FALSE;
-        } else if (obj.where === OBJ.MINVENT && (mtmp = obj.v.v_ocarry, humanoid(mtmp.data))) {
+        } else if (obj.where === OBJ.MINVENT
+            && (mtmp = obj.v.v_ocarry, humanoid(mtmp.data))) {
             /* don't assume that lit lantern has been swallowed;
                a nymph might have stolen it or picked it up */
             useeit = get_obj_location(obj, new $c.Ptr(x, 0), new $c.Ptr(y, 0), 0) && cansee(x[0], y[0]) ? 1 : 0;
             uhearit = couldsee(x[0], y[0]) && distu(x[0], y[0]) < 25 ? 1 : 0;
-            dunk = is_pool(mtmp.mx, mtmp.my) && (!is_flyer(mtmp.data) && !is_floater(mtmp.data) || Is_waterlevel(u.uz)) ? 1 : 0;
+            dunk = is_pool(mtmp.mx, mtmp.my)
+                && (!is_flyer(mtmp.data) && !is_floater(mtmp.data)
+                || Is_waterlevel(u.uz)) ? 1 : 0;
             snuff = FALSE;
             if (useeit) {
                 set_msg_xy(x[0], y[0]);
             }
         }
         if (useeit || uhearit) {
-            await pline($C`%s %s%s%s.`, await Yname2(obj), uhearit ? $C`crackles` : $C``, uhearit && useeit ? $C` and ` : $C``, useeit ? $C`flickers` : $C``);
+            await pline($C`%s %s%s%s.`, await Yname2(obj),
+                uhearit ? $C`crackles` : $C``,
+                uhearit && useeit ? $C` and ` : $C``,
+                useeit ? $C`flickers` : $C``);
         }
         if (!dunk && !snuff) {
             return FALSE;
@@ -1556,7 +1653,10 @@ export async function catch_lit(obj) {   // apply.c:1577
         /* spe==0 => no candles attached */
         /* age_is_relative && age==0 && still-exists means out of fuel */
         /* lantern is classified as ignitable() but not by fire */
-        if ((obj.otyp === MAGIC_LAMP || obj.otyp === CANDELABRUM_OF_INVOCATION) && obj.spe === 0 || age_is_relative(obj) && obj.age === 0 || obj.otyp === BRASS_LANTERN) {
+        if ((obj.otyp === MAGIC_LAMP
+            || obj.otyp === CANDELABRUM_OF_INVOCATION) && obj.spe === 0
+            || age_is_relative(obj) && obj.age === 0
+            || obj.otyp === BRASS_LANTERN) {
             return FALSE;
         }
         if (obj.otyp === CANDELABRUM_OF_INVOCATION && obj.cursed) {
@@ -1564,7 +1664,8 @@ export async function catch_lit(obj) {   // apply.c:1577
         }
         /* once lit, cursed lamp is as good as non-cursed one, so failure
            to light is a minor inconvenience to make cursed be worse */
-        if ((obj.otyp === OIL_LAMP || obj.otyp === MAGIC_LAMP) && obj.cursed && !rn2(2)) {
+        if ((obj.otyp === OIL_LAMP || obj.otyp === MAGIC_LAMP)
+            && obj.cursed && !rn2(2)) {
             return FALSE;
         }
         if (obj.where === OBJ.INVENT || cansee(x[0], y[0])) {
@@ -1572,7 +1673,9 @@ export async function catch_lit(obj) {   // apply.c:1577
                 set_msg_xy(x[0], y[0]);
             }
             /* "catches light!" or "feels warm." */
-            await pline($C`%s %s %s`, await Yname2(obj), await otense(obj, Blind() ? $C`feel` : $C`catch`), Blind() ? $C`warm.` : $C`light!`);
+            await pline($C`%s %s %s`, await Yname2(obj),
+                await otense(obj, Blind() ? $C`feel` : $C`catch`),
+                Blind() ? $C`warm.` : $C`light!`);
         }
         if (obj.otyp === POT_OIL) {
             await makeknown(obj.otyp);
@@ -1581,7 +1684,9 @@ export async function catch_lit(obj) {   // apply.c:1577
             const shkp = await shop_keeper(in_rooms(u.ux, u.uy, SHOPBASE).get(0));
             /* if it catches while you have it, then it's your tough luck */
             await check_unpaid(obj);
-            await verbalize($C`That's in addition to the cost of %s %s, of course.`, await yname(obj), obj.quan === 1 ? $C`itself` : $C`themselves`);
+            await verbalize($C`That's in addition to the cost of %s %s, of course.`,
+                await yname(obj),
+                obj.quan === 1 ? $C`itself` : $C`themselves`);
             await bill_dummy_object(obj);
         }
         await begin_burn(obj, FALSE);
@@ -1596,7 +1701,10 @@ export async function catch_lit(obj) {   // apply.c:1577
  */
 async function use_lamp(obj) {   // apply.c:1628
     let buf = new Int8Array(256);
-    const lamp = obj.otyp === OIL_LAMP || obj.otyp === MAGIC_LAMP ? $C`lamp` : obj.otyp === BRASS_LANTERN ? $C`lantern` : null;
+    const lamp = obj.otyp === OIL_LAMP
+        || obj.otyp === MAGIC_LAMP ? $C`lamp`
+        : obj.otyp === BRASS_LANTERN ? $C`lantern`
+        : null;
     /*
      * When blind, lamps' and candles' on/off state can be distinguished
      * by heat.  For brass lantern assume that there is an on/off switch
@@ -1612,11 +1720,14 @@ async function use_lamp(obj) {   // apply.c:1628
         return;
     }
     if (Underwater()) {
-        await pline($C`%s.`, !Is_candle(obj) ? $C`This is not a diving lamp` : $C`Sorry, fire and water don't mix`);
+        await pline($C`%s.`,
+            !Is_candle(obj) ? $C`This is not a diving lamp`
+            : $C`Sorry, fire and water don't mix`);
         return;
     }
     /* magic lamps with an spe == 0 (wished for) cannot be lit */
-    if (!Is_candle(obj) && obj.age === 0 || obj.otyp === MAGIC_LAMP && obj.spe === 0) {
+    if (!Is_candle(obj) && obj.age === 0
+        || obj.otyp === MAGIC_LAMP && obj.spe === 0) {
         if (obj.otyp === BRASS_LANTERN) {
             if (!Blind()) {
                 await Your($C`lantern is out of power.`);
@@ -1630,10 +1741,12 @@ async function use_lamp(obj) {   // apply.c:1628
     }
     if (obj.cursed && !rn2(2)) {
         if ((obj.otyp === OIL_LAMP || obj.otyp === MAGIC_LAMP) && !rn2(3)) {
-            await pline_The($C`lamp spills and covers your %s with oil.`, await fingers_or_gloves(TRUE));
+            await pline_The($C`lamp spills and covers your %s with oil.`,
+                await fingers_or_gloves(TRUE));
             await make_glib($c.i32($c.and64(u.uprops[GLIB].intrinsic, TIMEOUT)) + d(2, 10) | 0);
         } else if (!Blind()) {
-            await pline($C`%s for a moment, then %s.`, await Tobjnam(obj, $C`flicker`), await otense(obj, $C`die`));
+            await pline($C`%s for a moment, then %s.`, await Tobjnam(obj, $C`flicker`),
+                await otense(obj, $C`die`));
         } else {
             await pline($C`%s`, c_common_strings.c_nothing_seems_to_happen);
         }
@@ -1644,8 +1757,10 @@ async function use_lamp(obj) {   // apply.c:1628
             await pline($C`%s%s is now on.`, await Shk_Your(new $c.Ptr(buf, 0), obj), lamp);
         } else {
             /* candle(s) */
-            await pline($C`%s flame%s %s%s`, s_suffix(await Yname2(obj)), plur(obj.quan), await otense(obj, $C`burn`), Blind() ? $C`.` : $C` brightly!`);
-            if (obj.unpaid && await costly_spot(u.ux, u.uy) && obj.age === $c.mul64(20, objects[obj.otyp].oc_cost)) {
+            await pline($C`%s flame%s %s%s`, s_suffix(await Yname2(obj)), plur(obj.quan),
+                await otense(obj, $C`burn`), Blind() ? $C`.` : $C` brightly!`);
+            if (obj.unpaid && await costly_spot(u.ux, u.uy)
+                && obj.age === $c.mul64(20, objects[obj.otyp].oc_cost)) {
                 const ithem = obj.quan > 1 ? $C`them` : $C`it`;
                 const shkp = await shop_keeper(in_rooms(u.ux, u.uy, SHOPBASE).get(0));
                 await verbalize($C`You burn %s, you bought %s!`, ithem, ithem);
@@ -1689,9 +1804,11 @@ async function light_cocktail(optr) {   // apply.c:1703
     if (split1off) {
         obj = await splitobj(obj, 1);
     }
-    await You($C`light %spotion.%s`, await shk_your(new $c.Ptr(buf, 0), obj), Blind() ? $C`` : $C`  It gives off a dim light.`);
+    await You($C`light %spotion.%s`, await shk_your(new $c.Ptr(buf, 0), obj),
+        Blind() ? $C`` : $C`  It gives off a dim light.`);
     if (obj.unpaid && await costly_spot(u.ux, u.uy)) {
-        const shkp = await shop_keeper(in_rooms(u.ux, u.uy, SHOPBASE).get(0));
+        const shkp = await shop_keeper(in_rooms(u.ux, u.uy,
+            SHOPBASE).get(0));
         /* Normally, we shouldn't both partially and fully charge
          * for an item, but (Yendorian Fuel) Taxes are inevitable...
          */
@@ -1704,7 +1821,8 @@ async function light_cocktail(optr) {   // apply.c:1703
     if (split1off) {
         await obj_extract_self(obj);   /* free from inv */
         obj.nomerge = 1;
-        obj = await hold_another_object(obj, $C`You drop %s!`, await doname(obj), null);
+        obj = await hold_another_object(obj, $C`You drop %s!`, await doname(obj),
+            null);
         if (obj) {
             obj.nomerge = 0;
         }
@@ -1721,7 +1839,9 @@ function rub_ok(obj) {   // apply.c:1770
     if (!obj) {
         return GETOBJ.EXCLUDE;
     }
-    if (obj.otyp === OIL_LAMP || obj.otyp === MAGIC_LAMP || obj.otyp === BRASS_LANTERN || is_graystone(obj) || obj.otyp === LUMP_OF_ROYAL_JELLY) {
+    if (obj.otyp === OIL_LAMP || obj.otyp === MAGIC_LAMP
+        || obj.otyp === BRASS_LANTERN || is_graystone(obj)
+        || obj.otyp === LUMP_OF_ROYAL_JELLY) {
         return GETOBJ.SUGGEST;
     }
     return GETOBJ.EXCLUDE;
@@ -1822,7 +1942,9 @@ function check_jump(arg, x, y) {   // apply.c:1862
         /* reject horizontal jump through horizontal open door
            and non-horizontal (ie, vertical) jump through
            non-horizontal (vertical) open door */
-        if ((lev.flags & D.ISOPEN) !== 0 && traj !== jAny && (traj === jDiag || ((traj & jHorz) !== 0 ? 1 : 0) === (lev.horizontal !== 0 ? 1 : 0))) {
+        if ((lev.flags & D.ISOPEN) !== 0 && traj !== jAny
+            && (traj === jDiag
+            || ((traj & jHorz) !== 0 ? 1 : 0) === (lev.horizontal !== 0 ? 1 : 0))) {
             return FALSE;
         }
         /* empty doorways aren't restricted */
@@ -1878,19 +2000,24 @@ async function is_valid_jump_pos(x, y, magic, showmsg) {   // apply.c:1893
         let ax = $c.i16($c.abs(dx));
         let ay = $c.i16($c.abs(dy));
         /* diag: any non-orthogonal destination classified as diagonal */
-        const diag = magic || Passes_walls() || !dx && !dy ? jAny : !dy ? jHorz : !dx ? jVert : jDiag;
+        const diag = magic || Passes_walls() || !dx && !dy ? jAny
+            : !dy ? jHorz : !dx ? jVert : jDiag;
         /* traj: flatten out the trajectory => some diagonals re-classified */
         if (ax >= Math.imul(2, ay)) {
             ay = 0;
         } else if (ay >= Math.imul(2, ax)) {
             ax = 0;
         }
-        traj[0] = magic || Passes_walls() || !ax && !ay ? jAny : !ay ? jHorz : !ax ? jVert : jDiag;
+        traj[0] = magic || Passes_walls() || !ax && !ay ? jAny
+            : !ay ? jHorz : !ax ? jVert : jDiag;
         /* walk_path doesn't process the starting spot;
            this is iffy:  if you're starting on a closed door spot,
            you _can_ jump diagonally from doorway (without needing
            Passes_walls); that's intentional but is it correct? */
-        if (diag === jDiag && IS_DOOR(lev.typ) && (lev.flags & D.ISOPEN) !== 0 && (traj[0] === jDiag || ((traj[0] & jHorz) !== 0 ? 1 : 0) === (lev.horizontal !== 0 ? 1 : 0))) {
+        if (diag === jDiag && IS_DOOR(lev.typ)
+            && (lev.flags & D.ISOPEN) !== 0
+            && (traj[0] === jDiag
+            || ((traj[0] & jHorz) !== 0 ? 1 : 0) === (lev.horizontal !== 0 ? 1 : 0))) {
             if (showmsg) {
                 await You_cant($C`jump diagonally out of a doorway.`);
             }
@@ -1913,7 +2040,9 @@ async function is_valid_jump_pos(x, y, magic, showmsg) {   // apply.c:1893
  * @returns {Promise<number>} boolean
  */
 async function get_valid_jump_position(x, y) {   // apply.c:1959
-    return isok(x, y) && (svl.level.locations[x][y].typ >= DOOR || Passes_walls()) && await is_valid_jump_pos(x, y, gj.jumping_is_magic, FALSE) ? 1 : 0;
+    return isok(x, y)
+        && (svl.level.locations[x][y].typ >= DOOR || Passes_walls())
+        && await is_valid_jump_pos(x, y, gj.jumping_is_magic, FALSE) ? 1 : 0;
 }
 /**
  * @param {number} on_off boolean
@@ -2029,7 +2158,8 @@ export async function jump(magic) {   // apply.c:1988
                 case TT.BEARTRAP:
                     side = rn2(3) ? W.RINGL : W.RINGR;
                     await You($C`rip yourself free of the bear trap!  Ouch!`);
-                    await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(10) + 1 | 0, 2) : rnd(10)), $C`jumping out of a bear trap`, KILLED.BY);
+                    await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(10) + 1 | 0, 2) : rnd(10)), $C`jumping out of a bear trap`,
+                        KILLED.BY);
                     await set_wounded_legs(side, rn1(1000, 500));
                     break;
                 case TT.PIT:
@@ -2045,7 +2175,11 @@ export async function jump(magic) {   // apply.c:1988
                     break;
                 case TT.BURIEDBALL:
                 case TT.INFLOOR:
-                    await You($C`strain your %s, but you're still %s.`, await makeplural(await body_part(LEG)), u.utraptype === TT.INFLOOR ? $C`stuck in the floor` : $C`attached to the buried ball`);
+                    await You($C`strain your %s, but you're still %s.`,
+                        await makeplural(await body_part(LEG)),
+                        u.utraptype === TT.INFLOOR
+                        ? $C`stuck in the floor`
+                        : $C`attached to the buried ball`);
                     await set_wounded_legs(W.RINGL, rn1(10, 11));
                     await set_wounded_legs(W.RINGR, rn1(10, 11));
                     return ECMD.TIME;
@@ -2071,7 +2205,8 @@ export async function jump(magic) {   // apply.c:1988
                 return ECMD.TIME;
             }
             /* jumping in place takes no time and doesn't exercise anything */
-            await You($C`%s.`, Hallucination() ? $C`hop up and down a bit` : $C`decide not to jump after all`);
+            await You($C`%s.`, Hallucination() ? $C`hop up and down a bit`
+                : $C`decide not to jump after all`);
             return ECMD.OK;
         }
         /*
@@ -2146,7 +2281,8 @@ async function use_tinning_kit(obj) {   // apply.c:2177
             await You($C`tin %s without wearing gloves.`, corpse_name);
             kbuf[0] = 0;
         } else {
-            await pline($C`Tinning %s without wearing gloves is a fatal mistake...`, corpse_name);
+            await pline($C`Tinning %s without wearing gloves is a fatal mistake...`,
+                corpse_name);
             $c.sprintf(new $c.Ptr(kbuf, 0), $C`trying to tin %s without gloves`, corpse_name);
         }
         await instapetrify(new $c.Ptr(kbuf, 0));
@@ -2174,7 +2310,8 @@ async function use_tinning_kit(obj) {   // apply.c:2177
         set_tin_variety(can, HOMEMADE_TIN);
         if (carried(corpse)) {
             if (corpse.unpaid) {
-                const shkp = await shop_keeper(in_rooms(u.ux, u.uy, SHOPBASE).get(0));
+                const shkp = await shop_keeper(in_rooms(
+                    u.ux, u.uy, SHOPBASE).get(0));
                 await verbalize(new $c.Ptr(use_tinning_kit$you_buy_it, 0));
             }
             await useup(corpse);
@@ -2185,7 +2322,8 @@ async function use_tinning_kit(obj) {   // apply.c:2177
             }
             await useupf(corpse, 1);
         }
-        await hold_another_object(can, $C`You make, but cannot pick up, %s.`, await doname(can), null);
+        await hold_another_object(can, $C`You make, but cannot pick up, %s.`,
+            await doname(can), null);
     } else {
         await impossible($C`Tinning failed.`);
     }
@@ -2203,14 +2341,17 @@ export async function use_unicorn_horn(optr) {   // apply.c:2259
         switch ($c.div32(rn2(13), 2)) {
             case 0:
                 /* case 6 is half as likely as the others */
-                await make_sick($c.and64(u.uprops[SICK].intrinsic, TIMEOUT) ? $c.add64($c.div64($c.and64(u.uprops[SICK].intrinsic, TIMEOUT), 3), 1) : (rn2(acurr(A.CON)) + 20 | 0), await xname(obj), TRUE, SICK_NONVOMITABLE);
+                await make_sick($c.and64(u.uprops[SICK].intrinsic, TIMEOUT) ? $c.add64($c.div64($c.and64(u.uprops[SICK].intrinsic, TIMEOUT), 3), 1)
+                    : (rn2(acurr(A.CON)) + 20 | 0),
+                    await xname(obj), TRUE, SICK_NONVOMITABLE);
                 break;
             case 1:
                 await make_blinded($c.add64(BlindedTimeout(), lcount), TRUE);
                 break;
             case 2:
                 if (!u.uprops[CONFUSION].intrinsic) {
-                    await You($C`suddenly feel %s.`, Hallucination() ? $C`trippy` : $C`confused`);
+                    await You($C`suddenly feel %s.`,
+                        Hallucination() ? $C`trippy` : $C`confused`);
                 }
                 await make_confused($c.add64($c.and64(u.uprops[CONFUSION].intrinsic, TIMEOUT), lcount), TRUE);
                 break;
@@ -2225,7 +2366,8 @@ export async function use_unicorn_horn(optr) {   // apply.c:2259
                 }
                 break;
             case 5:
-                await make_hallucinated($c.add64($c.and64(u.uprops[HALLUC].intrinsic, TIMEOUT), lcount), TRUE, 0);
+                await make_hallucinated($c.add64($c.and64(u.uprops[HALLUC].intrinsic, TIMEOUT), lcount),
+                    TRUE, 0);
                 break;
             case 6:
                 if (Deaf()) {   /* make_deaf() won't give feedback when already deaf */
@@ -2241,7 +2383,9 @@ export async function use_unicorn_horn(optr) {   // apply.c:2259
     if (u.uprops[SICK].intrinsic && !$c.and64(u.uprops[SICK].intrinsic, ~TIMEOUT) ? $c.and64(u.uprops[SICK].intrinsic, TIMEOUT) : 0) {
         trouble_list[($t2 = trouble_count, trouble_count = $t2 + 1 | 0, $t2)] = SICK;
     }
-    if ((u.uprops[BLINDED].intrinsic && !$c.and64(u.uprops[BLINDED].intrinsic, ~TIMEOUT) ? $c.and64(u.uprops[BLINDED].intrinsic, TIMEOUT) : 0) > u.ucreamed && !(u.uswallow && attacktype_fordmg(u.ustuck.data, AT.ENGL, AD.BLND))) {
+    if ((u.uprops[BLINDED].intrinsic && !$c.and64(u.uprops[BLINDED].intrinsic, ~TIMEOUT) ? $c.and64(u.uprops[BLINDED].intrinsic, TIMEOUT) : 0) > u.ucreamed
+        && !(u.uswallow
+        && attacktype_fordmg(u.ustuck.data, AT.ENGL, AD.BLND))) {
         trouble_list[($t4 = trouble_count, trouble_count = $t4 + 1 | 0, $t4)] = BLINDED;
     }
     if (u.uprops[HALLUC].intrinsic && !$c.and64(u.uprops[HALLUC].intrinsic, ~TIMEOUT) ? $c.and64(u.uprops[HALLUC].intrinsic, TIMEOUT) : 0) {
@@ -2342,7 +2486,8 @@ export async function fig_transform(arg, timeout) {   // apply.c:2398
     }
     if (!okay_spot || !await figurine_location_checks(figurine, cc, TRUE)) {
         /* reset the timer to try again later */
-        await start_timer(rnd(5000), TIMER.OBJECT, FIG_TRANSFORM, obj_to_any(figurine));
+        await start_timer(rnd(5000), TIMER.OBJECT, FIG_TRANSFORM,
+            obj_to_any(figurine));
         return;
     }
     const cansee_spot = cansee(cc.x, cc.y);
@@ -2352,13 +2497,16 @@ export async function fig_transform(arg, timeout) {   // apply.c:2398
         /* [m_monnam() yields accurate mon type, overriding hallucination] */
         $c.sprintf(new $c.Ptr(monnambuf, 0), $C`%s`, await an(await m_monnam(mtmp)));
         and_vanish[0] = 0;
-        if (mtmp.minvis && !See_invisible() || mtmp.data.mlet === S.MIMIC && M_AP_TYPE(mtmp) !== M_AP.NOTHING) {
+        if (mtmp.minvis && !See_invisible()
+            || mtmp.data.mlet === S.MIMIC
+            && M_AP_TYPE(mtmp) !== M_AP.NOTHING) {
             suppress_see = TRUE;
         }
         if (mtmp.mundetected) {
             if (hides_under(mtmp.data) && mshelter) {
                 $c.sprintf(new $c.Ptr(and_vanish, 0), $C` and %s under %s`, locomotion(mtmp.data, $C`crawl`), await doname(mshelter));
-            } else if (mtmp.data.mlet === S.MIMIC || mtmp.data.mlet === S.EEL) {
+            } else if (mtmp.data.mlet === S.MIMIC
+                || mtmp.data.mlet === S.EEL) {
                 suppress_see = TRUE;
             } else {
                 $c.strcpy(new $c.Ptr(and_vanish, 0), $C` and vanish`);
@@ -2367,9 +2515,11 @@ export async function fig_transform(arg, timeout) {   // apply.c:2398
         switch (figurine.where) {
             case OBJ.INVENT:
                 if (Blind() || suppress_see) {
-                    await You_feel($C`%s %s from your pack!`, c_common_strings.c_something, locomotion(mtmp.data, $C`drop`));
+                    await You_feel($C`%s %s from your pack!`, c_common_strings.c_something,
+                        locomotion(mtmp.data, $C`drop`));
                 } else {
-                    await You_see($C`%s %s out of your pack%s!`, new $c.Ptr(monnambuf, 0), locomotion(mtmp.data, $C`drop`), new $c.Ptr(and_vanish, 0));
+                    await You_see($C`%s %s out of your pack%s!`, new $c.Ptr(monnambuf, 0),
+                        locomotion(mtmp.data, $C`drop`), new $c.Ptr(and_vanish, 0));
                 }
                 break;
             case OBJ.FLOOR:
@@ -2378,7 +2528,8 @@ export async function fig_transform(arg, timeout) {   // apply.c:2398
                     if (suppress_see) {
                         await pline($C`%s suddenly vanishes!`, await an(await xname(figurine)));
                     } else {
-                        await You_see($C`a figurine transform into %s%s!`, new $c.Ptr(monnambuf, 0), new $c.Ptr(and_vanish, 0));
+                        await You_see($C`a figurine transform into %s%s!`, new $c.Ptr(monnambuf, 0),
+                            new $c.Ptr(and_vanish, 0));
                     }
                     redraw = TRUE;   /* update figurine's map location */
                 }
@@ -2387,18 +2538,22 @@ export async function fig_transform(arg, timeout) {   // apply.c:2398
                 if (cansee_spot && !silent && !suppress_see) {
                     const mon = figurine.v.v_ocarry;
                     /* figurine carrying monster might be invisible */
-                    if (canseemon(figurine.v.v_ocarry) && (!mon.wormno || cansee(mon.mx, mon.my))) {
+                    if (canseemon(figurine.v.v_ocarry)
+                        && (!mon.wormno || cansee(mon.mx, mon.my))) {
                         $c.sprintf(new $c.Ptr(carriedby, 0), $C`%s pack`, s_suffix(await a_monnam(mon)));
                     } else if (is_pool(mon.mx, mon.my)) {
                         $c.strcpy(new $c.Ptr(carriedby, 0), $C`empty water`);
                     } else {
                         $c.strcpy(new $c.Ptr(carriedby, 0), $C`thin air`);
                     }
-                    await You_see($C`%s %s out of %s%s!`, new $c.Ptr(monnambuf, 0), locomotion(mtmp.data, $C`drop`), new $c.Ptr(carriedby, 0), new $c.Ptr(and_vanish, 0));
+                    await You_see($C`%s %s out of %s%s!`, new $c.Ptr(monnambuf, 0),
+                        locomotion(mtmp.data, $C`drop`), new $c.Ptr(carriedby, 0),
+                        new $c.Ptr(and_vanish, 0));
                 }
                 break;
             default:
-                await impossible($C`figurine came to life where? (%d)`, figurine.where);
+                await impossible($C`figurine came to life where? (%d)`,
+                    figurine.where);
                 break;
         }
     }
@@ -2434,13 +2589,16 @@ async function figurine_location_checks(obj, cc, quietly) {   // apply.c:2511
         }
         return FALSE;
     }
-    if (svl.level.locations[x][y].typ < POOL && !(passes_walls($c.relem(mons, obj.corpsenm)) && may_passwall(x, y))) {
+    if (svl.level.locations[x][y].typ < POOL
+        && !(passes_walls($c.relem(mons, obj.corpsenm)) && may_passwall(x, y))) {
         if (!quietly) {
-            await You($C`cannot place a figurine in %s!`, svl.level.locations[x][y].typ === TREE || svl.level.flags.arboreal && svl.level.locations[x][y].typ === STONE ? $C`a tree` : $C`solid rock`);
+            await You($C`cannot place a figurine in %s!`,
+                svl.level.locations[x][y].typ === TREE || svl.level.flags.arboreal && svl.level.locations[x][y].typ === STONE ? $C`a tree` : $C`solid rock`);
         }
         return FALSE;
     }
-    if (sobj_at(BOULDER, x, y) && !passes_walls($c.relem(mons, obj.corpsenm)) && !throws_rocks($c.relem(mons, obj.corpsenm))) {
+    if (sobj_at(BOULDER, x, y) && !passes_walls($c.relem(mons, obj.corpsenm))
+        && !throws_rocks($c.relem(mons, obj.corpsenm))) {
         if (!quietly) {
             await You($C`cannot fit the figurine on the boulder.`);
         }
@@ -2473,7 +2631,14 @@ async function use_figurine(optr) {   // apply.c:2544
     if (!await figurine_location_checks(obj, cc, FALSE)) {
         return ECMD.TIME;
     }
-    await You($C`%s and it %stransforms.`, u.dx || u.dy ? $C`set the figurine beside you` : Is_airlevel(u.uz) || Is_waterlevel(u.uz) || is_pool(cc.x, cc.y) ? $C`release the figurine` : u.dz < 0 ? $C`toss the figurine into the air` : $C`set the figurine on the ground`, Blind() ? $C`supposedly ` : $C``);
+    await You($C`%s and it %stransforms.`,
+        u.dx || u.dy ? $C`set the figurine beside you`
+        : Is_airlevel(u.uz) || Is_waterlevel(u.uz)
+        || is_pool(cc.x, cc.y)
+        ? $C`release the figurine`
+        : u.dz < 0 ? $C`toss the figurine into the air`
+        : $C`set the figurine on the ground`,
+        Blind() ? $C`supposedly ` : $C``);
     await make_familiar(obj, cc.x, cc.y, FALSE);
     await stop_timer(FIG_TRANSFORM, obj_to_any(obj));
     await useup(obj);
@@ -2510,14 +2675,16 @@ async function grease_ok(obj) {   // apply.c:2585
  */
 async function use_grease(obj) {   // apply.c:2604
     if (Glib()) {
-        await pline($C`%s from your %s.`, await Tobjnam(obj, $C`slip`), await fingers_or_gloves(FALSE));
+        await pline($C`%s from your %s.`, await Tobjnam(obj, $C`slip`),
+            await fingers_or_gloves(FALSE));
         await dropx(obj);
         return ECMD.TIME;
     }
     if (obj.spe > 0) {
         if ((obj.cursed || Fumbling()) && !rn2(2)) {
             await consume_obj_charge(obj, TRUE);
-            await pline($C`%s from your %s.`, await Tobjnam(obj, $C`slip`), await fingers_or_gloves(FALSE));
+            await pline($C`%s from your %s.`, await Tobjnam(obj, $C`slip`),
+                await fingers_or_gloves(FALSE));
             await dropx(obj);
             return ECMD.TIME;
         }
@@ -2535,7 +2702,8 @@ async function use_grease(obj) {   // apply.c:2604
             otmp.greased = 1;
             if (obj.cursed && !nohands(gy.youmonst.data)) {
                 await make_glib(oldglib + rn1(6, 10) | 0);   /* + 10..15 */
-                await pline($C`Some of the grease gets all over your %s.`, await fingers_or_gloves(TRUE));
+                await pline($C`Some of the grease gets all over your %s.`,
+                    await fingers_or_gloves(TRUE));
             }
         } else {
             await make_glib(oldglib + rn1(11, 5) | 0);   /* + 5..15 */
@@ -2567,7 +2735,8 @@ function touchstone_ok(obj) {   // apply.c:2658
         return GETOBJ.SUGGEST;
     }
     /* don't suggest identified gems */
-    if (obj.oclass === GEM_CLASS && !(obj.dknown && objects[obj.otyp].oc_name_known)) {
+    if (obj.oclass === GEM_CLASS
+        && !(obj.dknown && objects[obj.otyp].oc_name_known)) {
         return GETOBJ.SUGGEST;
     }
     return GETOBJ.DOWNPLAY;
@@ -2583,24 +2752,29 @@ async function use_stone(tstone) {   // apply.c:2680
     if (!Blind()) {
         await observe_object(tstone);
     }
-    const known = tstone.otyp === TOUCHSTONE && tstone.dknown && objects[TOUCHSTONE].oc_name_known ? 1 : 0;
+    const known = tstone.otyp === TOUCHSTONE && tstone.dknown
+        && objects[TOUCHSTONE].oc_name_known ? 1 : 0;
     $c.sprintf(new $c.Ptr(stonebuf, 0), $C`rub on the stone%s`, tstone.quan === 1 ? $C`` : $C`s`);
     /* when the touchstone is fully known, don't bother listing extra
        junk as likely candidates for rubbing */
-    if ((obj = await getobj(new $c.Ptr(stonebuf, 0), known ? touchstone_ok : any_obj_ok, GETOBJ_PROMPT)) === null) {
+    if ((obj = await getobj(new $c.Ptr(stonebuf, 0), known ? touchstone_ok : any_obj_ok,
+        GETOBJ_PROMPT)) === null) {
         return ECMD.CANCEL;
     }
     if (obj === tstone && obj.quan === 1) {
         await You_cant($C`rub %s on itself.`, await the(await xname(obj)));
         return ECMD.OK;
     }
-    if (tstone.otyp === TOUCHSTONE && tstone.cursed && obj.oclass === GEM_CLASS && !is_graystone(obj) && !obj_resists(obj, 80, 100)) {
+    if (tstone.otyp === TOUCHSTONE && tstone.cursed
+        && obj.oclass === GEM_CLASS && !is_graystone(obj)
+        && !obj_resists(obj, 80, 100)) {
         if (Blind()) {
             await You_feel($C`something shatter.`);
         } else if (Hallucination()) {
             await pline($C`Oh, wow, look at the pretty shards.`);
         } else {
-            await pline($C`A sharp crack shatters %s%s.`, obj.quan > 1 ? $C`one of ` : $C``, await the(await xname(obj)));
+            await pline($C`A sharp crack shatters %s%s.`,
+                obj.quan > 1 ? $C`one of ` : $C``, await the(await xname(obj)));
         }
         await useup(obj);
         return ECMD.TIME;
@@ -2616,7 +2790,9 @@ async function use_stone(tstone) {   // apply.c:2680
     let streak_color = null;
     let oclass = obj.oclass;
     /* prevent non-gemstone rings from being treated like gems */
-    if (oclass === RING_CLASS && objects[obj.otyp].oc_material !== GEMSTONE && objects[obj.otyp].oc_material !== MINERAL) {
+    if (oclass === RING_CLASS
+        && objects[obj.otyp].oc_material !== GEMSTONE
+        && objects[obj.otyp].oc_material !== MINERAL) {
         oclass = RANDOM_CLASS;   /* something that's neither gem nor ring */
     }
     switch (oclass) {
@@ -2625,7 +2801,10 @@ async function use_stone(tstone) {   // apply.c:2680
             /* these have class-specific handling below */
             if (tstone.otyp !== TOUCHSTONE) {
                 do_scratch = TRUE;
-            } else if (obj.oclass === GEM_CLASS && (tstone.blessed || !tstone.cursed && (Role_if(PM.ARCHEOLOGIST) || Race_if(PM.GNOME)))) {
+            } else if (obj.oclass === GEM_CLASS
+                && (tstone.blessed
+                || !tstone.cursed && (Role_if(PM.ARCHEOLOGIST)
+                || Race_if(PM.GNOME)))) {
                 await makeknown(TOUCHSTONE);
                 await makeknown(obj.otyp);
                 await prinv(null, obj, 0);
@@ -2680,7 +2859,9 @@ async function use_stone(tstone) {   // apply.c:2680
     }
     $c.sprintf(new $c.Ptr(stonebuf, 0), $C`stone%s`, tstone.quan === 1 ? $C`` : $C`s`);
     if (do_scratch) {
-        await You($C`make %s%sscratch marks on the %s.`, streak_color ? streak_color : $C``, streak_color ? $C` ` : $C``, new $c.Ptr(stonebuf, 0));
+        await You($C`make %s%sscratch marks on the %s.`,
+            streak_color ? streak_color : $C``,
+            streak_color ? $C` ` : $C``, new $c.Ptr(stonebuf, 0));
     } else if (streak_color) {
         await You_see($C`%s streaks on the %s.`, streak_color, new $c.Ptr(stonebuf, 0));
     } else {
@@ -2719,10 +2900,15 @@ async function use_trap(otmp) {   // apply.c:2821
     } else if (On_stairs(u.ux, u.uy)) {
         const stway = stairway_at(u.ux, u.uy);
         what = stway.isladder ? $C`on the ladder` : $C`on the stairs`;
-    } else if (IS_FURNITURE(levtyp) || IS_OBSTRUCTED(levtyp) || closed_door(u.ux, u.uy) || t_at(u.ux, u.uy)) {
+    } else if (IS_FURNITURE(levtyp) || IS_OBSTRUCTED(levtyp)
+        || closed_door(u.ux, u.uy) || t_at(u.ux, u.uy)) {
         what = $C`here`;
     } else if (Is_airlevel(u.uz) || Is_waterlevel(u.uz)) {
-        what = levtyp === AIR ? $C`in midair` : levtyp === CLOUD ? $C`in a cloud` : $C`in this place`;   /* Air/Water Plane catch-all */
+        what = levtyp === AIR
+            ? $C`in midair`
+            : levtyp === CLOUD
+            ? $C`in a cloud`
+            : $C`in this place`;   /* Air/Water Plane catch-all */
     }
     if (what) {
         await You_cant($C`set a trap %s!`, what);
@@ -2731,7 +2917,8 @@ async function use_trap(otmp) {   // apply.c:2821
     }
     const ttyp = otmp.otyp === LAND_MINE ? LANDMINE : BEAR_TRAP;
     if (otmp === gt.trapinfo.tobj && (gt.trapinfo.tx === u.ux && gt.trapinfo.ty === u.uy)) {
-        await You($C`resume setting %s%s.`, await shk_your(new $c.Ptr(buf, 0), otmp), trapname(ttyp, FALSE));
+        await You($C`resume setting %s%s.`, await shk_your(new $c.Ptr(buf, 0), otmp),
+            trapname(ttyp, FALSE));
         set_occupation(set_trap, occutext, 0);
         return;
     }
@@ -2807,8 +2994,10 @@ async function set_trap() {   // apply.c:2916
         if (!gt.trapinfo.force_bungle) {
             await You($C`finish arming %s.`, await the(trapname(ttyp, FALSE)));
         }
-        if ((otmp.cursed || Fumbling()) && rnl(10) > 5 || gt.trapinfo.force_bungle) {
-            await dotrap(ttmp, gt.trapinfo.force_bungle ? FORCEBUNGLE : 0);
+        if ((otmp.cursed || Fumbling()) && rnl(10) > 5
+            || gt.trapinfo.force_bungle) {
+            await dotrap(ttmp,
+                gt.trapinfo.force_bungle ? FORCEBUNGLE : 0);
         }
     } else {
         /* this shouldn't happen */
@@ -2881,7 +3070,8 @@ export async function use_whip(obj) {   // apply.c:2955
                 await There($C`is too much resistance to flick your bullwhip.`);
             } else if ($goto !== "whipattack" && u.dz < 0) {
                 await You($C`flick a bug off of the %s.`, ceiling(u.ux, u.uy));
-            } else if ($goto !== "whipattack" && (!u.dz && (svl.level.locations[rx][ry].typ === WATER || svl.level.locations[rx][ry].typ === LAVAWALL))) {
+            } else if ($goto !== "whipattack" && (!u.dz && (svl.level.locations[rx][ry].typ === WATER
+                || svl.level.locations[rx][ry].typ === LAVAWALL))) {
                 await You($C`cause a small splash.`);
                 if (svl.level.locations[rx][ry].typ === LAVAWALL) {
                     await fire_damage($G.uwep, FALSE, $c.i16(rx), $c.i16(ry));
@@ -2894,7 +3084,9 @@ export async function use_whip(obj) {   // apply.c:2955
                     await kick_steed();
                     return ECMD.TIME;
                 }
-                if (is_pool_or_lava(u.ux, u.uy) || svl.level.locations[rx][ry].typ === WATER || svl.level.locations[rx][ry].typ === LAVAWALL) {
+                if (is_pool_or_lava(u.ux, u.uy)
+                    || svl.level.locations[rx][ry].typ === WATER
+                    || svl.level.locations[rx][ry].typ === LAVAWALL) {
                     await You($C`cause a small splash.`);
                     if (is_lava(u.ux, u.uy)) {
                         await fire_damage($G.uwep, FALSE, u.ux, u.uy);
@@ -2907,13 +3099,17 @@ export async function use_whip(obj) {   // apply.c:2955
                        allow snagging by whip too. */
                     otmp = svl.level.objects[u.ux][u.uy];
                     /* warhorse */
-                    if (otmp && otmp.otyp === CORPSE && (otmp.corpsenm === PM.HORSE || otmp.corpsenm === little_to_big(PM.HORSE) || otmp.corpsenm === big_to_little(PM.HORSE))) {
+                    if (otmp && otmp.otyp === CORPSE
+                        && (otmp.corpsenm === PM.HORSE
+                        || otmp.corpsenm === little_to_big(PM.HORSE)
+                        || otmp.corpsenm === big_to_little(PM.HORSE))) {
                         /* pony */
                         await pline($C`Why beat a dead horse?`);
                         return ECMD.TIME;
                     }
                     if (otmp && proficient) {
-                        await You($C`wrap your bullwhip around %s on the %s.`, await an(await singular(otmp, xname)), surface(u.ux, u.uy));
+                        await You($C`wrap your bullwhip around %s on the %s.`,
+                            await an(await singular(otmp, xname)), surface(u.ux, u.uy));
                         if (rnl(6) || await pickup_object(otmp, 1, TRUE) < 1) {
                             await pline1(msg_slipsfree);
                         }
@@ -2951,7 +3147,9 @@ export async function use_whip(obj) {   // apply.c:2955
                  * if you're confused (and thus off the mark)
                  *    - you only end up hitting.
                  */
-                wrapped_what = sobj_at(BOULDER, $c.i16(rx), $c.i16(ry)) ? $C`a boulder` : svl.level.locations[rx][ry].typ >= STAIRS && svl.level.locations[rx][ry].typ <= ALTAR ? c_common_strings.c_something : null;
+                wrapped_what = sobj_at(BOULDER, $c.i16(rx), $c.i16(ry)) ? $C`a boulder`
+                    : svl.level.locations[rx][ry].typ >= STAIRS && svl.level.locations[rx][ry].typ <= ALTAR
+                    ? c_common_strings.c_something : null;
                 if (mtmp) {
                     /* if a big monster is known to be present, target it in
                        preference to boulder or furniture; if any small or medium
@@ -2997,7 +3195,9 @@ export async function use_whip(obj) {   // apply.c:2955
                        blind or formerly hidden monster is also invisible) */
                     spotitnow = canspotmon(mtmp);
                     if (spotitnow || !(svl.level.locations[rx][ry].glyph === GLYPH_INVISIBLE)) {
-                        await pline($C`%s is there that you %s.`, !spotitnow ? $C`A monster` : await Amonnam(mtmp), !Blind() ? $C`couldn't see` : $C`hadn't noticed`);
+                        await pline($C`%s is there that you %s.`,
+                            !spotitnow ? $C`A monster` : await Amonnam(mtmp),
+                            !Blind() ? $C`couldn't see` : $C`hadn't noticed`);
                         if (!spotitnow) {
                             await map_invisible($c.i16(rx), $c.i16(ry));
                         } else {
@@ -3022,7 +3222,9 @@ export async function use_whip(obj) {   // apply.c:2955
                     }
                     await You($C`wrap your bullwhip around %s.`, await yname(otmp));
                     if (gotit && mwelded(otmp)) {
-                        await pline($C`%s welded to %s %s%c`, otmp.quan === 1 ? $C`It is` : $C`They are`, genders[pronoun_gender(mtmp, PRONOUN.HALLU)].his, mon_hand, !otmp.bknown ? 33 : 46);
+                        await pline($C`%s welded to %s %s%c`,
+                            otmp.quan === 1 ? $C`It is` : $C`They are`, genders[pronoun_gender(mtmp, PRONOUN.HALLU)].his,
+                            mon_hand, !otmp.bknown ? 33 : 46);
                         await set_bknown(otmp, 1);
                         gotit = FALSE;   /* can't pull it free */
                     }
@@ -3033,7 +3235,8 @@ export async function use_whip(obj) {   // apply.c:2955
                         switch (rn2(proficient + 1 | 0)) {
                             case 2:
                                 /* to floor near you */
-                                await You($C`yank %s to the %s!`, await yname(otmp), surface(u.ux, u.uy));
+                                await You($C`yank %s to the %s!`, await yname(otmp),
+                                    surface(u.ux, u.uy));
                                 await place_object(otmp, u.ux, u.uy);
                                 await stackobj(otmp);
                                 break;
@@ -3044,7 +3247,11 @@ export async function use_whip(obj) {   // apply.c:2955
                                 /* 0 */
                                 /* right into your inventory */
                                 await You($C`snatch %s!`, await yname(otmp));
-                                if (otmp.otyp === CORPSE && touch_petrifies($c.relem(mons, otmp.corpsenm)) && !$G.uarmg && !Stone_resistance() && !(poly_when_stoned(gy.youmonst.data) && await polymon(PM.STONE_GOLEM))) {
+                                if (otmp.otyp === CORPSE
+                                    && touch_petrifies($c.relem(mons, otmp.corpsenm)) && !$G.uarmg
+                                    && !Stone_resistance()
+                                    && !(poly_when_stoned(gy.youmonst.data)
+                                    && await polymon(PM.STONE_GOLEM))) {
                                     $c.strcpy(new $c.Ptr(kbuf, 0), otmp.quan === 1 ? await an(new $c.Ptr(onambuf, 0)) : new $c.Ptr(onambuf, 0));
                                     await pline($C`Snatching %s is a fatal mistake.`, new $c.Ptr(kbuf, 0));
                                     /* corpse probably has a rot timer but is now
@@ -3056,11 +3263,13 @@ export async function use_whip(obj) {   // apply.c:2955
                                     /* life-saved; free the corpse again */
                                     await obj_extract_self(otmp);
                                 }
-                                await hold_another_object(otmp, $C`You drop %s!`, await doname(otmp), null);
+                                await hold_another_object(otmp, $C`You drop %s!`,
+                                    await doname(otmp), null);
                                 break;
                             default:
                                 /* to floor beneath mon */
-                                await You($C`yank %s from %s %s!`, await the(new $c.Ptr(onambuf, 0)), s_suffix(await mon_nam(mtmp)), mon_hand);
+                                await You($C`yank %s from %s %s!`, await the(new $c.Ptr(onambuf, 0)),
+                                    s_suffix(await mon_nam(mtmp)), mon_hand);
                                 await obj_no_longer_held(otmp);
                                 await place_object(otmp, mtmp.mx, mtmp.my);
                                 await stackobj(otmp);
@@ -3072,7 +3281,8 @@ export async function use_whip(obj) {   // apply.c:2955
                 } else {
                     /* mtmp isn't wielding a weapon; attack it */
                     do_snap = TRUE;
-                    if (M_AP_TYPE(mtmp) && !Protection_from_shape_changers() && !sensemon(mtmp)) {
+                    if (M_AP_TYPE(mtmp) && !Protection_from_shape_changers()
+                        && !sensemon(mtmp)) {
                         await stumble_onto_mimic(mtmp);
                         do_snap = FALSE;
                     } else {
@@ -3118,10 +3328,14 @@ function find_poleable_mon(pos) {   // apply.c:3284
                 continue;
             }
             const glyph = glyph_at(x, y);
-            if (!impaired && glyph_is_monster(glyph) && (mtmp = svl.level.monsters[x][y]) !== null && (mtmp.mtame || mtmp.mpeaceful && flags.confirm)) {
+            if (!impaired
+                && glyph_is_monster(glyph)
+                && (mtmp = svl.level.monsters[x][y]) !== null
+                && (mtmp.mtame || mtmp.mpeaceful && flags.confirm)) {
                 continue;
             }
-            if (glyph_is_poleable(glyph) && (!glyph_is_statue(glyph) || impaired)) {
+            if (glyph_is_poleable(glyph)
+                && (!glyph_is_statue(glyph) || impaired)) {
                 if (mpos.x) {
                     return FALSE;   /* more than one candidate location */
                 }
@@ -3142,7 +3356,10 @@ function find_poleable_mon(pos) {   // apply.c:3284
  */
 function get_valid_polearm_position(x, y) {   // apply.c:3321
     const glyph = glyph_at(x, y);
-    return isok(x, y) && distu(x, y) >= gp.polearm_range_min && distu(x, y) <= gp.polearm_range_max && (cansee(x, y) || couldsee(x, y) && glyph_is_poleable(glyph)) ? 1 : 0;
+    return isok(x, y) && distu(x, y) >= gp.polearm_range_min
+        && distu(x, y) <= gp.polearm_range_max
+        && (cansee(x, y) || couldsee(x, y)
+        && glyph_is_poleable(glyph)) ? 1 : 0;
 }
 /**
  * @param {number} on_off boolean
@@ -3214,7 +3431,8 @@ export function could_pole_mon() {   // apply.c:3391
     cc.x = u.ux;
     cc.y = u.uy;
     if (!find_poleable_mon(cc)) {
-        if (hitm && !DEADMONSTER(hitm) && sensemon(hitm) && dist2(hitm.mx, hitm.my, u.ux, u.uy) <= max_range[0] && dist2(hitm.mx, hitm.my, u.ux, u.uy) >= min_range[0]) {
+        if (hitm && !DEADMONSTER(hitm) && sensemon(hitm)
+            && dist2(hitm.mx, hitm.my, u.ux, u.uy) <= max_range[0] && dist2(hitm.mx, hitm.my, u.ux, u.uy) >= min_range[0]) {
             return TRUE;
         }
     } else {
@@ -3228,7 +3446,8 @@ export function could_pole_mon() {   // apply.c:3391
  * @returns {number} boolean
  */
 function snickersnee_used_dist_attk(obj) {   // apply.c:3416
-    if (obj && obj === $G.uwep && u_wield_art(ART.SNICKERSNEE) && svc.context.snickersnee_turn === svm.moves) {
+    if (obj && obj === $G.uwep && u_wield_art(ART.SNICKERSNEE)
+        && svc.context.snickersnee_turn === svm.moves) {
         return TRUE;
     }
     return FALSE;
@@ -3267,12 +3486,15 @@ export async function use_pole(obj, autohit) {   // apply.c:3426
     }
     cc.x = u.ux;
     cc.y = u.uy;
-    if (!find_poleable_mon(cc) && hitm && !DEADMONSTER(hitm) && sensemon(hitm) && dist2(hitm.mx, hitm.my, u.ux, u.uy) <= max_range[0] && dist2(hitm.mx, hitm.my, u.ux, u.uy) >= min_range[0]) {
+    if (!find_poleable_mon(cc) && hitm
+        && !DEADMONSTER(hitm) && sensemon(hitm)
+        && dist2(hitm.mx, hitm.my, u.ux, u.uy) <= max_range[0] && dist2(hitm.mx, hitm.my, u.ux, u.uy) >= min_range[0]) {
         cc.x = hitm.mx;
         cc.y = hitm.my;
     }
     if (!autohit) {
-        await getpos_sethilite(display_polearm_positions, get_valid_polearm_position);
+        await getpos_sethilite(display_polearm_positions,
+            get_valid_polearm_position);
         if (await getpos(cc, TRUE, $C`the spot to hit`) < 0) {   /* ESC; uses turn iff polearm became wielded */
             return res | ECMD.CANCEL;
         }
@@ -3327,10 +3549,12 @@ export async function use_pole(obj, autohit) {   // apply.c:3426
             }
         }
         await thitmonst(mtmp, $G.uwep);
-    } else if (glyph_is_statue(glyph) && sobj_at(STATUE, gb.bhitpos.x, gb.bhitpos.y)) {
+    } else if (glyph_is_statue(glyph)
+        && sobj_at(STATUE, gb.bhitpos.x, gb.bhitpos.y)) {
         /* might be hallucinatory */
         const t = t_at(gb.bhitpos.x, gb.bhitpos.y);
-        if (t && t.ttyp === STATUE_TRAP && await activate_statue_trap(t, t.tx, t.ty, FALSE)) {
+        if (t && t.ttyp === STATUE_TRAP
+            && await activate_statue_trap(t, t.tx, t.ty, FALSE)) {
             /* feedback has been give by animate_statue() */
         } else {
             /* Since statues look like monsters now, we say something
@@ -3344,13 +3568,21 @@ export async function use_pole(obj, autohit) {   // apply.c:3426
     } else {
         /* no monster here and no statue seen or remembered here */
         await unmap_invisible(gb.bhitpos.x, gb.bhitpos.y);
-        if (glyph_to_obj(glyph) === BOULDER && sobj_at(BOULDER, gb.bhitpos.x, gb.bhitpos.y)) {
+        if (glyph_to_obj(glyph) === BOULDER
+            && sobj_at(BOULDER, gb.bhitpos.x, gb.bhitpos.y)) {
             await pline(new $c.Ptr(thump, 0), $C`boulder`);
             await wake_nearto(gb.bhitpos.x, gb.bhitpos.y, 25);
-        } else if (!accessible(gb.bhitpos.x, gb.bhitpos.y) || svl.level.locations[gb.bhitpos.x][gb.bhitpos.y].typ >= STAIRS && svl.level.locations[gb.bhitpos.x][gb.bhitpos.y].typ <= ALTAR) {
+        } else if (!accessible(gb.bhitpos.x, gb.bhitpos.y)
+            || svl.level.locations[gb.bhitpos.x][gb.bhitpos.y].typ >= STAIRS && svl.level.locations[gb.bhitpos.x][gb.bhitpos.y].typ <= ALTAR) {
             /* similar to 'F'orcefight with a melee weapon; we know that
                the spot can be seen or we wouldn't have gotten this far */
-            await You($C`uselessly attack %s.`, svl.level.locations[gb.bhitpos.x][gb.bhitpos.y].typ === STONE || svl.level.locations[gb.bhitpos.x][gb.bhitpos.y].typ === SCORR ? $C`stone` : glyph_is_cmap(glyph) ? await the(defsyms[glyph_to_cmap(glyph)].explanation) : $C`an unknown obstacle`);
+            await You($C`uselessly attack %s.`,
+                svl.level.locations[gb.bhitpos.x][gb.bhitpos.y].typ === STONE
+                || svl.level.locations[gb.bhitpos.x][gb.bhitpos.y].typ === SCORR
+                ? $C`stone`
+                : glyph_is_cmap(glyph)
+                ? await the(defsyms[glyph_to_cmap(glyph)].explanation)
+                : $C`an unknown obstacle`);
         } else {
             await You($C`miss; there is no one there to hit.`);
         }
@@ -3373,17 +3605,21 @@ async function use_cream_pie(obj) {   // apply.c:3568
     if (Hallucination()) {
         await You($C`give yourself a facial.`);
     } else {
-        await You($C`immerse your %s in %s%s.`, await body_part(FACE), several ? $C`one of ` : $C``, several ? await makeplural(await the(await xname(obj))) : await the(await xname(obj)));
+        await You($C`immerse your %s in %s%s.`, await body_part(FACE),
+            several ? $C`one of ` : $C``,
+            several ? await makeplural(await the(await xname(obj))) : await the(await xname(obj)));
     }
     if (await can_blnd(null, gy.youmonst, AT.WEAP, obj)) {
         const blindinc = rnd(25);
         u.ucreamed = u.ucreamed + (blindinc >>> 0) >>> 0;
         await make_blinded($c.add64(BlindedTimeout(), blindinc), FALSE);
         if (!Blind() || Blind() && wasblind) {
-            await pline($C`There's %ssticky goop all over your %s.`, wascreamed ? $C`more ` : $C``, await body_part(FACE));
+            await pline($C`There's %ssticky goop all over your %s.`,
+                wascreamed ? $C`more ` : $C``, await body_part(FACE));
         } else {
             /* Blind  && !wasblind */
-            await You_cant($C`see through all the sticky goop on your %s.`, await body_part(FACE));
+            await You_cant($C`see through all the sticky goop on your %s.`,
+                await body_part(FACE));
         }
     }
     await setnotworn(obj);
@@ -3460,7 +3696,8 @@ async function use_royal_jelly(optr) {   // apply.c:3616
                 eobj.spe = 2;
             }
         }
-        if (eobj.timed && !was_timed || eobj.spe === 2 || eobj.corpsenm !== oldcorpsenm) {
+        if (eobj.timed && !was_timed || eobj.spe === 2
+            || eobj.corpsenm !== oldcorpsenm) {
             await pline($C`The %s %s briefly.`, await xname(eobj), await otense(eobj, $C`quiver`));
         } else {
             await pline($C`%s`, c_common_strings.c_nothing_seems_to_happen);
@@ -3571,15 +3808,19 @@ async function use_grapple(obj) {   // apply.c:3729
         await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
         any.a_int = any.a_int + 1 | 0;
         $c.sprintf(new $c.Ptr(buf, 0), $C`an object on the %s`, surface(cc.x, cc.y));
-        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE,
+            clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
         any.a_int = any.a_int + 1 | 0;
-        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, $C`a monster`, MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE,
+            clr, $C`a monster`, MENU.ITEMFLAGS_NONE);
         any.a_int = any.a_int + 1 | 0;
         $c.sprintf(new $c.Ptr(buf, 0), $C`the %s`, surface(cc.x, cc.y));
-        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr,
+            new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
         await end_menu()(tmpwin, $C`Aim for what?`);
         tohit = rn2(4);
-        if (await select_menu(tmpwin, PICK.ONE, new $c.Ptr(selected, 0)) > 0 && rn2(u.weapon_skills[typ].skill > P.SKILLED ? 20 : 2)) {
+        if (await select_menu(tmpwin, PICK.ONE, new $c.Ptr(selected, 0)) > 0
+            && rn2(u.weapon_skills[typ].skill > P.SKILLED ? 20 : 2)) {
             tohit = $c.radd(selected[0], 0).item.a_int - 1 | 0;
         }
         $c.free(selected[0]);
@@ -3614,7 +3855,8 @@ async function use_grapple(obj) {   // apply.c:3729
             }
             gn.notonhead = gb.bhitpos.x !== mtmp.mx || gb.bhitpos.y !== mtmp.my ? 1 : 0;
             save_confirm = flags.confirm;
-            if (verysmall(mtmp.data) && !rn2(4) && await enexto(cc, u.ux, u.uy, null)) {
+            if (verysmall(mtmp.data) && !rn2(4)
+                && await enexto(cc, u.ux, u.uy, null)) {
                 flags.confirm = FALSE;
                 await attack_checks(mtmp, $G.uwep);
                 flags.confirm = save_confirm;
@@ -3623,7 +3865,8 @@ async function use_grapple(obj) {   // apply.c:3729
                 mtmp.mundetected = 0;
                 await rloc_to(mtmp, cc.x, cc.y);
                 return ECMD.TIME;
-            } else if (!bigmonst(mtmp.data) && !strongmonst(mtmp.data) || rn2(4)) {
+            } else if (!bigmonst(mtmp.data) && !strongmonst(mtmp.data)
+                || rn2(4)) {
                 flags.confirm = FALSE;
                 await attack_checks(mtmp, $G.uwep);
                 flags.confirm = save_confirm;
@@ -3646,7 +3889,8 @@ async function use_grapple(obj) {   // apply.c:3729
             /* Yourself (oops!) */
             if (u.weapon_skills[typ].skill <= P.BASIC) {
                 await You($C`hook yourself!`);
-                await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32((rn2(10) + 10 | 0) + 1 | 0, 2) : rn2(10) + 10 | 0), $C`a grappling hook`, KILLED.BY);
+                await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32((rn2(10) + 10 | 0) + 1 | 0, 2) : rn2(10) + 10 | 0), $C`a grappling hook`,
+                    KILLED.BY);
                 return ECMD.TIME;
             }
             break;
@@ -3698,7 +3942,8 @@ async function do_break_wand(obj) {   // apply.c:3909
     let i = 0, x = 0, y = 0, mon = null, confirm = new Int8Array(128), buf = new Int8Array(256), $t1, $t2, $t3;
     let shop_damage = FALSE;
     let fillmsg = FALSE;
-    const is_fragile = await objdescr_is(obj, $C`balsa`) || await objdescr_is(obj, $C`glass`) ? 1 : 0;
+    const is_fragile = await objdescr_is(obj, $C`balsa`)
+        || await objdescr_is(obj, $C`glass`) ? 1 : 0;
     if (nohands(gy.youmonst.data)) {
         await You_cant($C`break %s without hands!`, await yname(obj));
         return ECMD.OK;
@@ -3709,10 +3954,14 @@ async function do_break_wand(obj) {   // apply.c:3909
         await You($C`don't have the strength to break %s!`, await yname(obj));
         return ECMD.OK;
     }
-    if (!await paranoid_query(ParanoidBreakwand(), await safe_qbuf(new $c.Ptr(confirm, 0), $C`Are you really sure you want to break `, $C`?`, obj, yname, ysimple_name, $C`the wand`))) {
+    if (!await paranoid_query(ParanoidBreakwand(),
+        await safe_qbuf(new $c.Ptr(confirm, 0),
+        $C`Are you really sure you want to break `,
+        $C`?`, obj, yname, ysimple_name, $C`the wand`))) {
         return ECMD.OK;
     }
-    await pline($C`Raising %s high above your %s, you %s it in two!`, await yname(obj), await body_part(HEAD), is_fragile ? $C`snap` : $C`break`);
+    await pline($C`Raising %s high above your %s, you %s it in two!`, await yname(obj),
+        await body_part(HEAD), is_fragile ? $C`snap` : $C`break`);
     /* [ALI] Do this first so that wand is removed from bill. Otherwise,
      * the freeinv() below also hides it from setpaid() which causes problems.
      */
@@ -3795,7 +4044,8 @@ async function do_break_wand(obj) {   // apply.c:3909
     /* [TODO?  This really ought to prevent the explosion from being
        fatal so that we never leave a bones file where none of the
        surrounding targets (or underlying objects) got affected yet.] */
-    await explode(obj.ox, obj.oy, -obj.otyp | 0, rnd(dmg), WAND_CLASS, EXPL.MAGICAL);
+    await explode(obj.ox, obj.oy, -obj.otyp | 0, rnd(dmg), WAND_CLASS,
+        EXPL.MAGICAL);
     /* prepare for potential feedback from polymorph... */
     zapsetup();
     /* this makes it hit us last, so that we can see the action first */
@@ -3827,10 +4077,16 @@ async function do_break_wand(obj) {   // apply.c:3909
                 const typ = fillholetyp(x, y, FALSE);
                 if (typ !== ROOM) {
                     svl.level.locations[x][y].typ = typ, svl.level.locations[x][y].flags = 0;
-                    await liquid_flow(x, y, typ, t_at(x, y), fillmsg ? null : $C`Some holes are quickly filled with %s!`);
+                    await liquid_flow(x, y, typ, t_at(x, y),
+                        fillmsg
+                        ? null
+                        : $C`Some holes are quickly filled with %s!`);
                     fillmsg = TRUE;
                 } else {
-                    await digactualhole(x, y, null, rn2(obj.spe) < 3 || !Can_dig_down(u.uz) && !svl.level.locations[x][y].candig ? PIT : HOLE);
+                    await digactualhole(x, y, null,
+                        rn2(obj.spe) < 3
+                        || !Can_dig_down(u.uz)
+                        && !svl.level.locations[x][y].candig ? PIT : HOLE);
                 }
             }
             await fill_pit(x, y);
@@ -3915,7 +4171,8 @@ function apply_ok(obj) {   // apply.c:4151
     }
     /* all tools, all wands (breaking), all spellbooks (flipping through -
        including blank/novel/Book of the Dead) */
-    if (obj.oclass === TOOL_CLASS || obj.oclass === WAND_CLASS || obj.oclass === SPBOOK_CLASS) {
+    if (obj.oclass === TOOL_CLASS || obj.oclass === WAND_CLASS
+        || obj.oclass === SPBOOK_CLASS) {
         return GETOBJ.SUGGEST;
     }
     /* applying coins to flip them is a minor easter egg, so do not suggest
@@ -3924,7 +4181,9 @@ function apply_ok(obj) {   // apply.c:4151
         return GETOBJ.DOWNPLAY;
     }
     /* certain weapons */
-    if (obj.oclass === WEAPON_CLASS && (is_pick(obj) || is_axe(obj) || is_pole(obj) || obj.otyp === BULLWHIP)) {
+    if (obj.oclass === WEAPON_CLASS
+        && (is_pick(obj) || is_axe(obj) || is_pole(obj)
+        || obj.otyp === BULLWHIP)) {
         return GETOBJ.SUGGEST;
     }
     if (obj.oclass === POTION_CLASS) {
@@ -3939,7 +4198,8 @@ function apply_ok(obj) {   // apply.c:4151
         }
     }
     /* certain foods */
-    if (obj.otyp === CREAM_PIE || obj.otyp === EUCALYPTUS_LEAF || obj.otyp === LUMP_OF_ROYAL_JELLY) {
+    if (obj.otyp === CREAM_PIE || obj.otyp === EUCALYPTUS_LEAF
+        || obj.otyp === LUMP_OF_ROYAL_JELLY) {
         return GETOBJ.SUGGEST;
     }
     if (obj.otyp === BANANA && Hallucination()) {
@@ -3951,7 +4211,9 @@ function apply_ok(obj) {   // apply.c:4151
         if (!obj.dknown) {
             return GETOBJ.SUGGEST;
         }
-        if (obj.otyp !== TOUCHSTONE && (objects[TOUCHSTONE].oc_name_known || objects[obj.otyp].oc_name_known)) {
+        if (obj.otyp !== TOUCHSTONE
+            && (objects[TOUCHSTONE].oc_name_known
+            || objects[obj.otyp].oc_name_known)) {
             return GETOBJ.EXCLUDE_SELECTABLE;
         }
         return GETOBJ.SUGGEST;
@@ -4003,7 +4265,10 @@ export async function doapply() {   // apply.c:4214
             } else if (!$G.ublindf) {
                 await Blindf_on(obj[0]);
             } else {
-                await You($C`are already %s.`, $G.ublindf.otyp === TOWEL ? $C`covered by a towel` : $G.ublindf.otyp === BLINDFOLD ? $C`wearing a blindfold` : $C`wearing lenses`);
+                await You($C`are already %s.`,
+                    $G.ublindf.otyp === TOWEL ? $C`covered by a towel`
+                    : $G.ublindf.otyp === BLINDFOLD ? $C`wearing a blindfold`
+                    : $C`wearing lenses`);
             }
             break;
         case CREAM_PIE:
@@ -4243,16 +4508,22 @@ async function flip_through_book(obj) {   // apply.c:4473
         if (!Deaf()) {
             if (!Hallucination()) {
             }
-            await You_hear($C`the pages make an unpleasant %s sound.`, Hallucination() ? $C`chuckling` : $C`rustling`);
+            await You_hear($C`the pages make an unpleasant %s sound.`,
+                Hallucination() ? $C`chuckling`
+                : $C`rustling`);
         } else if (!Blind()) {
             await You_see($C`the pages glow faintly %s.`, hcolor(c_color_names.c_red));
         } else {
             await You_feel($C`the pages tremble.`);
         }
     } else if (Blind()) {
-        await pline($C`The pages feel %s.`, Hallucination() ? $C`freshly picked` : $C`rough and dry`);
+        await pline($C`The pages feel %s.`,
+            Hallucination() ? $C`freshly picked`
+            : $C`rough and dry`);
     } else if (obj.otyp === SPE_BLANK_PAPER) {
-        await pline($C`This spellbook %s.`, Hallucination() ? $C`doesn't have much of a plot` : $C`has nothing written in it`);
+        await pline($C`This spellbook %s.`,
+            Hallucination() ? $C`doesn't have much of a plot`
+            : $C`has nothing written in it`);
         await makeknown(obj.otyp);
     } else if (Hallucination()) {
         await You($C`enjoy the animated initials.`);
@@ -4260,7 +4531,9 @@ async function flip_through_book(obj) {   // apply.c:4473
         await pline($C`This looks like it might be interesting to read.`);
     } else {
         const findx = obj.usecount < MAX_SPELL_STUDY ? obj.usecount : MAX_SPELL_STUDY;
-        await pline($C`The%s ink in this spellbook is %s.`, objects[obj.otyp].oc_magic ? $C` magical` : $C``, flip_through_book$fadeness[findx]);
+        await pline($C`The%s ink in this spellbook is %s.`,
+            objects[obj.otyp].oc_magic ? $C` magical` : $C``,
+            flip_through_book$fadeness[findx]);
     }
     return ECMD.TIME;
 }
@@ -4275,7 +4548,8 @@ async function flip_coin(obj) {   // apply.c:4527
     if (Underwater()) {
         await pline($C`It tumbles away.`);
         lose_coin = TRUE;
-    } else if (Glib() || Fumbling() || ACURR(A.DEX) < 10 && !rn2(acurr(A.DEX))) {
+    } else if (Glib() || Fumbling()
+        || ACURR(A.DEX) < 10 && !rn2(acurr(A.DEX))) {
         await pline($C`It slips between your %s.`, await fingers_or_gloves(FALSE));
         lose_coin = TRUE;
     }
@@ -4288,7 +4562,8 @@ async function flip_coin(obj) {   // apply.c:4527
     }
     if (Hallucination()) {
         /* edge case */
-        await pline(rn2(100) ? $C`Wow, a double header!` : $C`The coin miraculously lands on its edge!`);
+        await pline(rn2(100) ? $C`Wow, a double header!`
+            : $C`The coin miraculously lands on its edge!`);
     } else {
         await pline($C`It comes up %s.`, rn2(2) ? $C`heads` : $C`tails`);
     }

@@ -112,7 +112,8 @@ export async function formatkiller(buf, siz, how, incl_helpless) {   // topten.c
     buf.set(0, 0);
     if (incl_helpless && gm.multi < 0) {
         /* X <= siz: 'sizeof "string"' includes 1 for '\0' terminator */
-        if (gm.multi_reason && $c.addu64($c.strlen(gm.multi_reason), 9) <= siz) {
+        if (gm.multi_reason
+            && $c.addu64($c.strlen(gm.multi_reason), 9) <= siz) {
             $c.sprintf(buf, $C`, while %s`, gm.multi_reason);
         } else if (17 <= siz) {
             /* either gm.multi_reason wasn't specified or wouldn't fit */
@@ -172,7 +173,10 @@ async function readentry(rfile, tt) {   // topten.c:220
     let inbuf = new Int8Array(129), s1 = new Int8Array(129), s2 = new Int8Array(129), s3 = new Int8Array(129), s4 = new Int8Array(129), s5 = new Int8Array(129), s6 = new Int8Array(129), i = 0, $t1;
     /* Version_ Pts DgnLevs_ Hp___ Died__Born id */
     /* note: input below must read the record's terminating newline */
-    if ($c.fscanf(rfile, new $c.Ptr(readentry$fmt, 0), new $c.FieldRef(tt, "ver_major", "i32"), new $c.FieldRef(tt, "ver_minor", "i32"), new $c.FieldRef(tt, "patchlevel", "i32"), new $c.FieldRef(tt, "points", "i64"), new $c.FieldRef(tt, "deathdnum", "i32"), new $c.FieldRef(tt, "deathlev", "i32"), new $c.FieldRef(tt, "maxlvl", "i32"), new $c.FieldRef(tt, "hp", "i32"), new $c.FieldRef(tt, "maxhp", "i32"), new $c.FieldRef(tt, "deaths", "i32"), new $c.FieldRef(tt, "deathdate", "i64"), new $c.FieldRef(tt, "birthdate", "i64"), new $c.FieldRef(tt, "uid", "i32")) !== TTFIELDS) {
+    if ($c.fscanf(rfile, new $c.Ptr(readentry$fmt, 0), new $c.FieldRef(tt, "ver_major", "i32"), new $c.FieldRef(tt, "ver_minor", "i32"), new $c.FieldRef(tt, "patchlevel", "i32"),
+        new $c.FieldRef(tt, "points", "i64"), new $c.FieldRef(tt, "deathdnum", "i32"), new $c.FieldRef(tt, "deathlev", "i32"), new $c.FieldRef(tt, "maxlvl", "i32"),
+        new $c.FieldRef(tt, "hp", "i32"), new $c.FieldRef(tt, "maxhp", "i32"), new $c.FieldRef(tt, "deaths", "i32"), new $c.FieldRef(tt, "deathdate", "i64"),
+        new $c.FieldRef(tt, "birthdate", "i64"), new $c.FieldRef(tt, "uid", "i32")) !== TTFIELDS) {
         tt.points = 0;
         discardexcess(rfile);
     } else {
@@ -231,13 +235,18 @@ function writeentry(rfile, tt) {   // topten.c:301
     /* role,gender */
     /* role,race,gndr,algn */
     /* NO_SCAN_BRACK */
-    $c.fprintf(rfile, new $c.Ptr(writeentry$fmt0, 0), tt.ver_major, tt.ver_minor, tt.patchlevel, tt.points, tt.deathdnum, tt.deathlev, tt.maxlvl, tt.hp, tt.maxhp, tt.deaths, tt.deathdate, tt.birthdate, tt.uid);
+    $c.fprintf(rfile, new $c.Ptr(writeentry$fmt0, 0), tt.ver_major, tt.ver_minor, tt.patchlevel,
+        tt.points, tt.deathdnum, tt.deathlev, tt.maxlvl,
+        tt.hp, tt.maxhp, tt.deaths, tt.deathdate,
+        tt.birthdate, tt.uid);
     if (tt.ver_major < 3 || tt.ver_major === 3 && tt.ver_minor < 3) {
         $c.fprintf(rfile, new $c.Ptr(writeentry$fmt32, 0), tt.plrole[0], tt.plgend[0]);
     } else {
-        $c.fprintf(rfile, new $c.Ptr(writeentry$fmt33, 0), new $c.Ptr(tt.plrole, 0), new $c.Ptr(tt.plrace, 0), new $c.Ptr(tt.plgend, 0), new $c.Ptr(tt.plalign, 0));
+        $c.fprintf(rfile, new $c.Ptr(writeentry$fmt33, 0), new $c.Ptr(tt.plrole, 0), new $c.Ptr(tt.plrace, 0), new $c.Ptr(tt.plgend, 0),
+            new $c.Ptr(tt.plalign, 0));
     }
-    $c.fprintf(rfile, new $c.Ptr(writeentry$fmtX, 0), onlyspace(new $c.Ptr(tt.name, 0)) ? $C`_` : new $c.Ptr(tt.name, 0), new $c.Ptr(tt.death, 0));
+    $c.fprintf(rfile, new $c.Ptr(writeentry$fmtX, 0), onlyspace(new $c.Ptr(tt.name, 0)) ? $C`_` : new $c.Ptr(tt.name, 0),
+        new $c.Ptr(tt.death, 0));
 }
 /* as tab is never used in eg. svp.plname or death, no need to mangle those. */
 /**
@@ -258,17 +267,30 @@ async function writexlentry(rfile, tt, how) {   // topten.c:340
     /* make a copy of death reason that doesn't include ", while helpless" */
     await formatkiller(new $c.Ptr(tmpbuf, 0), 101, how, FALSE);
     /* (already includes separator) */
-    $c.fprintf(rfile, $C`%s%cname=%s%cdeath=%s`, new $c.Ptr(buf, 0), 9, new $c.Ptr(svp.plname, 0), 9, new $c.Ptr(tmpbuf, 0));
+    $c.fprintf(rfile, $C`%s%cname=%s%cdeath=%s`,
+        new $c.Ptr(buf, 0),
+        9, new $c.Ptr(svp.plname, 0), 9, new $c.Ptr(tmpbuf, 0));
     if (gm.multi < 0) {
-        $c.fprintf(rfile, $C`%cwhile=%s`, 9, gm.multi_reason ? gm.multi_reason : $C`helpless`);
+        $c.fprintf(rfile, $C`%cwhile=%s`, 9,
+            gm.multi_reason ? gm.multi_reason : $C`helpless`);
     }
-    $c.fprintf(rfile, $C`%cconduct=0x%lx%cturns=%ld%cachieve=0x%lx`, 9, await encodeconduct(), 9, svm.moves, 9, encodeachieve(FALSE));
-    $c.fprintf(rfile, $C`%cachieveX=%s`, 9, encode_extended_achievements(new $c.Ptr(achbuf, 0)));
-    $c.fprintf(rfile, $C`%cconductX=%s`, 9, await encode_extended_conducts(new $c.Ptr(buf, 0)));   /* reuse 'buf[]' */
-    $c.fprintf(rfile, $C`%crealtime=%ld%cstarttime=%ld%cendtime=%ld`, 9, urealtime.realtime, 9, timet_to_seconds($G.ubirthday), 9, timet_to_seconds(urealtime.finish_time));
-    $c.fprintf(rfile, $C`%cgender0=%s%calign0=%s`, 9, genders[flags.initgend].filecode, 9, aligns[1 - u.ualignbase[A.ORIGINAL]].filecode);
+    $c.fprintf(rfile, $C`%cconduct=0x%lx%cturns=%ld%cachieve=0x%lx`, 9,
+        await encodeconduct(), 9, svm.moves, 9,
+        encodeachieve(FALSE));
+    $c.fprintf(rfile, $C`%cachieveX=%s`, 9,
+        encode_extended_achievements(new $c.Ptr(achbuf, 0)));
+    $c.fprintf(rfile, $C`%cconductX=%s`, 9,
+        await encode_extended_conducts(new $c.Ptr(buf, 0)));   /* reuse 'buf[]' */
+    $c.fprintf(rfile, $C`%crealtime=%ld%cstarttime=%ld%cendtime=%ld`, 9,
+        urealtime.realtime, 9,
+        timet_to_seconds($G.ubirthday), 9,
+        timet_to_seconds(urealtime.finish_time));
+    $c.fprintf(rfile, $C`%cgender0=%s%calign0=%s`, 9,
+        genders[flags.initgend].filecode, 9,
+        aligns[1 - u.ualignbase[A.ORIGINAL]].filecode);
     $c.fprintf(rfile, $C`%cflags=0x%lx`, 9, encodexlogflags());
-    $c.fprintf(rfile, $C`%cgold=%ld`, 9, $c.add64(money_cnt(gi.invent), hidden_gold(TRUE)));
+    $c.fprintf(rfile, $C`%cgold=%ld`, 9,
+        $c.add64(money_cnt(gi.invent), hidden_gold(TRUE)));
     $c.fprintf(rfile, $C`%cwish_cnt=%ld`, 9, u.uconduct.wishes);
     $c.fprintf(rfile, $C`%carti_wish_cnt=%ld`, 9, u.uconduct.wisharti);
     $c.fprintf(rfile, $C`%cbones=%ld`, 9, u.uroleplay.numbones);
@@ -661,7 +683,9 @@ export async function topten(how, when) {   // topten.c:628
                 if (t1.points === 0) {
                     break;
                 }
-                if ((sysopt.pers_is_uid ? t1.uid === t0.uid : $c.strncmp(new $c.Ptr(t1.name, 0), new $c.Ptr(t0.name, 0), NAMSZ) === 0) && !$c.strncmp(new $c.Ptr(t1.plrole, 0), new $c.Ptr(t0.plrole, 0), ROLESZ) && (occ_cnt = occ_cnt - 1 | 0) <= 0) {
+                if ((sysopt.pers_is_uid ? t1.uid === t0.uid
+                    : $c.strncmp(new $c.Ptr(t1.name, 0), new $c.Ptr(t0.name, 0), NAMSZ) === 0)
+                    && !$c.strncmp(new $c.Ptr(t1.plrole, 0), new $c.Ptr(t0.plrole, 0), ROLESZ) && (occ_cnt = occ_cnt - 1 | 0) <= 0) {
                     if (rank0 < 0) {
                         rank0 = 0;
                         rank1 = rank;
@@ -727,8 +751,15 @@ export async function topten(how, when) {   // topten.c:628
                 if (skip_scores || program_state.stopprint) {
                     continue;
                 }
-                if (rank <= flags.end_top || rank >= (rank0 - flags.end_around | 0) && rank <= (rank0 + flags.end_around | 0) || flags.end_own && (sysopt.pers_is_uid ? t1.uid === t0.uid : !$c.strncmp(new $c.Ptr(t1.name, 0), new $c.Ptr(t0.name, 0), NAMSZ))) {
-                    if (rank === (rank0 - flags.end_around | 0) && rank0 > ((flags.end_top + flags.end_around | 0) + 1 | 0) && !flags.end_own) {
+                if (rank <= flags.end_top
+                    || rank >= (rank0 - flags.end_around | 0)
+                    && rank <= (rank0 + flags.end_around | 0)
+                    || flags.end_own && (sysopt.pers_is_uid
+                    ? t1.uid === t0.uid
+                    : !$c.strncmp(new $c.Ptr(t1.name, 0), new $c.Ptr(t0.name, 0), NAMSZ))) {
+                    if (rank === (rank0 - flags.end_around | 0)
+                        && rank0 > ((flags.end_top + flags.end_around | 0) + 1 | 0)
+                        && !flags.end_own) {
                         await topten_print($C``);
                     }
                     if (rank !== rank0) {
@@ -973,7 +1004,9 @@ async function outentry(rank, t1, so) {   // topten.c:946
  */
 async function score_wanted(current_ver, rank, t1, playerct, players, uid) {   // topten.c:1112
     let i = 0;
-    if (current_ver && (t1.ver_major !== VERSION.MAJOR || t1.ver_minor !== VERSION.MINOR || t1.patchlevel !== PATCHLEVEL)) {
+    if (current_ver && (t1.ver_major !== VERSION.MAJOR
+        || t1.ver_minor !== VERSION.MINOR
+        || t1.patchlevel !== PATCHLEVEL)) {
         return 0;
     }
     if (sysopt.pers_is_uid && !playerct && t1.uid === uid) {
@@ -1015,14 +1048,21 @@ async function score_wanted(current_ver, rank, t1, playerct, players, uid) {   /
         if (arg.get(0) === 45 && arg.get(1) === 117 && arg.get(2) !== 0) {
             arg = arg.add(2);   /* handle '-uname' */
         }
-        if (arg.get(0) === 45 && $c.strchr($C`pru`, arg.get(1)) && !arg.get(2) && (i + 1 | 0) < playerct) {
+        if (arg.get(0) === 45 && $c.strchr($C`pru`, arg.get(1)) && !arg.get(2)
+            && (i + 1 | 0) < playerct) {
             const nxt = players.get(i + 1 | 0);
             /* handle '-u name' */
-            if (arg.get(1) === 112 && await str2role(nxt) === await str2role(new $c.Ptr(t1.plrole, 0)) || arg.get(1) === 114 && await str2race(nxt) === await str2race(new $c.Ptr(t1.plrace, 0)) || arg.get(1) === 117 && (!$c.strcmp(nxt, $C`all`) || !$c.strncmp(new $c.Ptr(t1.name, 0), nxt, NAMSZ))) {
+            if (arg.get(1) === 112 && await str2role(nxt) === await str2role(new $c.Ptr(t1.plrole, 0))
+                || arg.get(1) === 114 && await str2race(nxt) === await str2race(new $c.Ptr(t1.plrace, 0))
+                || arg.get(1) === 117 && (!$c.strcmp(nxt, $C`all`)
+                || !$c.strncmp(new $c.Ptr(t1.name, 0), nxt, NAMSZ))) {
                 return 1;
             }
             i = i + 1 | 0;
-        } else if (!$c.strcmp(arg, $C`all`) || !$c.strncmp(new $c.Ptr(t1.name, 0), arg, NAMSZ) || arg.get(0) === 45 && arg.get(1) === t1.plrole[0] && !arg.get(2) || digit(arg.get(0)) && rank <= $c.atoi(arg)) {
+        } else if (!$c.strcmp(arg, $C`all`)
+            || !$c.strncmp(new $c.Ptr(t1.name, 0), arg, NAMSZ)
+            || arg.get(0) === 45 && arg.get(1) === t1.plrole[0] && !arg.get(2)
+            || digit(arg.get(0)) && rank <= $c.atoi(arg)) {
             return 1;
         }
     }
@@ -1046,8 +1086,11 @@ export async function prscore(argc, argv) {   // topten.c:1194
     let init_done = FALSE;
     let match_found = FALSE;
     /* expect "-s" or "--scores"; "-s<anything> is accepted */
-    const ln = argc < 2 ? 0 : (p = $c.strchr(argv.get(1), 32)) !== null ? $c.u32($c.pdiff(p, argv.get(1))) : await Strlen_(argv.get(1), $C`prscore`, 1208);
-    if (ln < 2 || $c.strncmp(argv.get(1), $C`-s`, 2) && $c.strcmp(argv.get(1), $C`--scores`)) {
+    const ln = argc < 2 ? 0
+        : (p = $c.strchr(argv.get(1), 32)) !== null ? $c.u32($c.pdiff(p, argv.get(1)))
+        : await Strlen_(argv.get(1), $C`prscore`, 1208);
+    if (ln < 2 || $c.strncmp(argv.get(1), $C`-s`, 2)
+        && $c.strcmp(argv.get(1), $C`--scores`)) {
         await raw_printf($C`prscore: bad arguments (%d)`, argc);
         return;
     }
@@ -1105,7 +1148,8 @@ export async function prscore(argc, argv) {   // topten.c:1194
         if (t1.points === 0) {
             break;
         }
-        if (!match_found && await score_wanted(current_ver, rank, t1, playerct, players, uid)) {
+        if (!match_found
+            && await score_wanted(current_ver, rank, t1, playerct, players, uid)) {
             match_found = TRUE;
         }
         $t1 = await newttentry(), t1.tt_next = $t1;
@@ -1153,7 +1197,8 @@ export async function prscore(argc, argv) {   // topten.c:1194
                 }
                 $c.strcat(new $c.Ptr(pbuf, 0), players.get(i));
                 if (i < (playerct - 1 | 0)) {
-                    if (players.get(i).get(0) === 45 && $c.strchr($C`pr`, players.get(i).get(1)) && players.get(i).get(2) === 0) {
+                    if (players.get(i).get(0) === 45 && $c.strchr($C`pr`, players.get(i).get(1))
+                        && players.get(i).get(2) === 0) {
                         $c.strcat(new $c.Ptr(pbuf, 0), $C` `);
                     } else {
                         $c.strcat(new $c.Ptr(pbuf, 0), $C`:`);
@@ -1166,7 +1211,8 @@ export async function prscore(argc, argv) {   // topten.c:1194
             $c.strcat(new $c.Ptr(pbuf, 0), $C`.`);
         }
         await raw_print()(new $c.Ptr(pbuf, 0));
-        await raw_printf($C`Usage: %s -s [-v] <playertypes> [maxrank] [playernames]`, gh.hname);
+        await raw_printf($C`Usage: %s -s [-v] <playertypes> [maxrank] [playernames]`,
+            gh.hname);
         await raw_printf($C`Player types are: [-p role] [-r race]`);
     }
     free_ttlist(tt_head);

@@ -149,11 +149,14 @@ export function does_block(x, y, lev) {   // vision.c:153
         $t1 = wizard() && explicitdebug($C`seethru`) ? 1 : -1, gs.seethru = $t1;
     }
     /* Features that block . . */
-    if (IS_OBSTRUCTED(lev.typ) || lev.typ === TREE || IS_DOOR(lev.typ) && lev.flags & (D.CLOSED | D.LOCKED | D.TRAPPED)) {
+    if (IS_OBSTRUCTED(lev.typ) || lev.typ === TREE
+        || IS_DOOR(lev.typ)
+        && lev.flags & (D.CLOSED | D.LOCKED | D.TRAPPED)) {
         return 1;
     }
     if (gs.seethru !== 1) {
-        if (lev.typ === CLOUD || IS_WATERWALL(lev.typ) || lev.typ === LAVAWALL || Underwater() && is_moat($c.i16(x), $c.i16(y))) {
+        if (lev.typ === CLOUD || IS_WATERWALL(lev.typ) || lev.typ === LAVAWALL
+            || Underwater() && is_moat($c.i16(x), $c.i16(y))) {
             return 1;
         }
     }   /* gs.seethru */
@@ -164,7 +167,8 @@ export function does_block(x, y, lev) {   // vision.c:153
         }
     }
     /* Mimics mimicking a door or boulder or ... block light. */
-    if ((mon = svl.level.monsters[x][y]) && (!mon.minvis || See_invisible()) && is_lightblocker_mappear(mon)) {
+    if ((mon = svl.level.monsters[x][y]) && (!mon.minvis || See_invisible())
+        && is_lightblocker_mappear(mon)) {
         return 1;
     }
     if (gs.seethru !== 1) {
@@ -479,7 +483,9 @@ export async function vision_recalc(control) {   // vision.c:512
              *        level.
              *      + Monsters can see you even when you're in a pit.
              */
-            await view_from(u.uy, u.ux, next_array[0], next_rmin[0], next_rmax[0], 0, null, null);
+            await view_from(u.uy, u.ux, next_array[0], next_rmin[0], next_rmax[0], 0,
+                null,
+                null);
             /*
              * Our own version of the update loop below.  We know we can't see
              * anything, so we only need to update positions we used to be able
@@ -539,7 +545,9 @@ export async function vision_recalc(control) {   // vision.c:512
                     }
                 }
             } else {
-                await view_from(u.uy, u.ux, next_array[0], next_rmin[0], next_rmax[0], 0, null, null);
+                await view_from(u.uy, u.ux, next_array[0], next_rmin[0], next_rmax[0], 0,
+                    null,
+                    null);
             }
             /*
              * Set the IN_SIGHT bit for xray and night vision.
@@ -658,11 +666,13 @@ export async function vision_recalc(control) {   // vision.c:512
                             if (!(old_row.get(col) & IN_SIGHT) || oldseenv !== lev.seenv) {
                                 await newsym($c.i16(col), $c.i16(row));
                             }
-                        } else if ($goto !== "not_in_sight" && (next_row.get(col) & COULD_SEE && (lev.lit || next_row.get(col) & TEMP_LIT))) {
+                        } else if ($goto !== "not_in_sight" && (next_row.get(col) & COULD_SEE
+                            && (lev.lit || next_row.get(col) & TEMP_LIT))) {
                             /*
                              * We see this position because it is lit.
                              */
-                            if ((IS_DOOR(lev.typ) || lev.typ === SDOOR || IS_WALL(lev.typ)) && !viz_clear[row][col]) {
+                            if ((IS_DOOR(lev.typ) || lev.typ === SDOOR
+                                || IS_WALL(lev.typ)) && !viz_clear[row][col]) {
                                 /*
                                  * Make sure doors, walls, boulders or mimics don't show
                                  * up at the end of dark hallways.  We do this by checking
@@ -672,13 +682,15 @@ export async function vision_recalc(control) {   // vision.c:512
                                 dx = u.ux - col | 0;
                                 dx = (dx < 0 ? -1 : dx ? 1 : 0);
                                 flev = $c.relem(svl.level.locations[col + dx | 0], row + dy | 0);
-                                if (flev.lit || next_array[0].get(row + dy | 0).get(col + dx | 0) & TEMP_LIT) {
+                                if (flev.lit
+                                    || next_array[0].get(row + dy | 0).get(col + dx | 0) & TEMP_LIT) {
                                     next_row.set(col, $c.u8(next_row.get(col) | IN_SIGHT));   /* we see it */
                                     oldseenv = lev.seenv;
                                     lev.seenv = $c.u8(lev.seenv | sv.get(0));
                                     /* Update pos if previously not in sight or new
                                      * angle.*/
-                                    if (!(old_row.get(col) & IN_SIGHT) || oldseenv !== lev.seenv) {
+                                    if (!(old_row.get(col) & IN_SIGHT)
+                                        || oldseenv !== lev.seenv) {
                                         await newsym($c.i16(col), $c.i16(row));
                                     }
                                 } else {
@@ -718,7 +730,8 @@ export async function vision_recalc(control) {   // vision.c:512
                              */
                         } else {
                             $goto = null;   // not_in_sight:
-                            if (old_row.get(col) & IN_SIGHT || next_row.get(col) & COULD_SEE ^ old_row.get(col) & COULD_SEE) {
+                            if (old_row.get(col) & IN_SIGHT
+                                || next_row.get(col) & COULD_SEE ^ old_row.get(col) & COULD_SEE) {
                                 /*
                                  * TEMPORARY?  Sometimes we get here with col==0 and
                                  * newsym()'s impossible() for !isok() is being
@@ -1378,7 +1391,8 @@ async function right_side(row, left, right_mark, limits) {   // vision.c:1666
                  * the mark.  Otherwise don't.  This is a kludge so corners
                  * with an adjacent doorway show up in nethack.
                  */
-                right_edge = is_clear(row - step | 0, right_mark) ? right_mark + 1 | 0 : right_mark;
+                right_edge = is_clear(row - step | 0, right_mark) ? right_mark + 1 | 0
+                    : right_mark;
             }
             if (vis_func) {
                 for (i = left; i <= right_edge; i = i + 1 | 0) {
@@ -1650,7 +1664,8 @@ async function right_side(row, left, right_mark, limits) {   // vision.c:1666
              * start_col.  We *want* to be able to see adjacent vertical
              * walls, so we have to set it back.
              */
-            if (left === right && left === start_col && start_col < COLNO - 1 && !is_clear(row, start_col + 1 | 0)) {
+            if (left === right && left === start_col && start_col < COLNO - 1
+                && !is_clear(row, start_col + 1 | 0)) {
                 right = start_col + 1 | 0;
             }
             if (right > lim_max) {
@@ -1733,7 +1748,8 @@ async function left_side(row, left_mark, right, limits) {   // vision.c:1858
             /* Jump to the far side of a stone wall. */
             if (left_edge < left_mark) {
                 /* Maybe see more (kludge). */
-                left_edge = is_clear(row - step | 0, left_mark) ? left_mark - 1 | 0 : left_mark;
+                left_edge = is_clear(row - step | 0, left_mark) ? left_mark - 1 | 0
+                    : left_mark;
             }
             if (vis_func) {
                 for (i = left_edge; i <= right; i = i + 1 | 0) {
@@ -1969,7 +1985,8 @@ async function left_side(row, left_mark, right, limits) {   // vision.c:1858
         }
         if (left <= right) {
             /* An ugly special case. */
-            if (left === right && right === start_col && start_col > 0 && !is_clear(row, start_col - 1 | 0)) {
+            if (left === right && right === start_col && start_col > 0
+                && !is_clear(row, start_col - 1 | 0)) {
                 left = start_col - 1 | 0;
             }
             if (left < lim_min) {
@@ -2059,8 +2076,13 @@ async function view_from(srow, scol, loc_cs_rows, left_most, right_most, range, 
          * When in stone, you can only see your adjacent squares, unless
          * you are on an array boundary or a stone/clear boundary.
          */
-        left = !scol ? 0 : is_clear(srow, scol - 1) ? left_ptrs[srow][scol - 1] : scol - 1;
-        right = scol === COLNO - 1 ? COLNO - 1 : is_clear(srow, scol + 1) ? right_ptrs[srow][scol + 1] : scol + 1;
+        left = !scol ? 0
+            : is_clear(srow, scol - 1) ? left_ptrs[srow][scol - 1]
+            : scol - 1;
+        right = scol === COLNO - 1
+            ? COLNO - 1
+            : is_clear(srow, scol + 1) ? right_ptrs[srow][scol + 1]
+            : scol + 1;
     }
     if (range) {
         if (range > MAX_RADIUS || range < 1) {
@@ -2143,11 +2165,13 @@ export async function do_clear_area(scol, srow, range, func, arg) {   // vision.
     let x = 0, y = 0, min_x = 0, max_x = 0, max_y = 0;
     /* If not centered on hero, do the hard work of figuring the area */
     if (scol !== u.ux || srow !== u.uy) {
-        await view_from(srow, scol, null, null, null, range, func, arg);
+        await view_from(srow, scol, null, null, null,
+            range, func, arg);
     } else {
         /* vision doesn't pass through water or clouds, detection should
            [this probably ought to be an arg supplied by our caller...] */
-        const override_vision = detecting(func) && (Is_waterlevel(u.uz) || Is_airlevel(u.uz)) ? 1 : 0;
+        const override_vision = detecting(func)
+            && (Is_waterlevel(u.uz) || Is_airlevel(u.uz)) ? 1 : 0;
         if (range > MAX_RADIUS || range < 1) {
             await panic($C`do_clear_area:  illegal range %d`, range);
         }
@@ -2190,7 +2214,9 @@ export function howmonseen(mon) {   // vision.c:2152
     /* normal vision;
        cansee is true for both normal and astral vision,
        but couldsee it not true for astral vision */
-    if ((mon.wormno ? worm_known(mon) : cansee(mon.mx, mon.my) && couldsee(mon.mx, mon.my)) && mon_visible(mon) && !mon.minvis) {
+    if ((mon.wormno ? worm_known(mon) : cansee(mon.mx, mon.my)
+        && couldsee(mon.mx, mon.my))
+        && mon_visible(mon) && !mon.minvis) {
         how_seen = (how_seen | MONSEEN.NORMAL) >>> 0;
     }
     /* see invisible */

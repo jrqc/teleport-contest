@@ -383,7 +383,9 @@ export async function pluslvl(incr) {   // exper.c:307
             $t1 = newuexp(u.ulevel), u.uexp = $t1;
         }
         u.ulevel = u.ulevel + 1 | 0;
-        await pline($C`Welcome %sto experience level %d.`, u.ulevelmax < u.ulevel ? $C`` : $C`back `, u.ulevel);
+        await pline($C`Welcome %sto experience level %d.`,
+            u.ulevelmax < u.ulevel ? $C`` : $C`back `,
+            u.ulevel);
         if (u.ulevelmax < u.ulevel) {
             u.ulevelmax = u.ulevel;
         }
@@ -398,7 +400,8 @@ export async function pluslvl(incr) {   // exper.c:307
            hasn't changed or hero just regained a lost level and the rank
            achievement doesn't get repeated) */
         if (count_achievements() === old_ach_cnt) {
-            await livelog_printf(LL.MINORAC, $C`%sgained experience level %d`, u.ulevel <= u.ulevelpeak ? $C`re` : $C``, u.ulevel);
+            await livelog_printf(LL.MINORAC, $C`%sgained experience level %d`,
+                u.ulevel <= u.ulevelpeak ? $C`re` : $C``, u.ulevel);
         }
         if (u.ulevel > u.ulevelpeak) {
             u.ulevelpeak = u.ulevel;

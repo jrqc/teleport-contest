@@ -182,7 +182,9 @@ export async function revive_nasty(x, y, msg) {   // hack.c:105
     let revived = FALSE;
     for (otmp = svl.level.objects[x][y]; otmp; otmp = otmp2) {
         otmp2 = otmp.v.v_nexthere;
-        if (otmp.otyp === CORPSE && (is_rider($c.relem(mons, otmp.corpsenm)) || otmp.corpsenm === PM.WIZARD_OF_YENDOR)) {
+        if (otmp.otyp === CORPSE
+            && (is_rider($c.relem(mons, otmp.corpsenm))
+            || otmp.corpsenm === PM.WIZARD_OF_YENDOR)) {
             /* move any living monster already at that location */
             if ((mtmp = svl.level.monsters[x][y]) && await enexto(cc, x, y, mtmp.data)) {
                 await rloc_to(mtmp, cc.x, cc.y);
@@ -196,7 +198,8 @@ export async function revive_nasty(x, y, msg) {   // hack.c:105
     /* this location might not be safe, if not, move revived monster */
     if (revived) {
         mtmp = svl.level.monsters[x][y];
-        if (mtmp && !goodpos(x, y, mtmp, 0) && await enexto(cc, x, y, mtmp.data)) {
+        if (mtmp && !goodpos(x, y, mtmp, 0)
+            && await enexto(cc, x, y, mtmp.data)) {
             await rloc_to(mtmp, cc.x, cc.y);
         }
         /* else impossible? */
@@ -222,7 +225,8 @@ function could_move_onto_boulder(sx, sy) {   // hack.c:145
     /* can if a giant, unless doing so allows hero to pass into a
        diagonal squeeze at the same time */
     if (throws_rocks(gy.youmonst.data)) {
-        return !u.dx || !u.dy || !(svl.level.locations[u.ux][sy].typ < POOL && svl.level.locations[sx][u.uy].typ < POOL) ? 1 : 0;
+        return !u.dx || !u.dy || !(svl.level.locations[u.ux][sy].typ < POOL
+            && svl.level.locations[sx][u.uy].typ < POOL) ? 1 : 0;
     }
     /* can if tiny (implies carrying very little else couldn't move at all) */
     if (verysmall(gy.youmonst.data)) {
@@ -252,12 +256,14 @@ async function dopush(sx, sy, rx, ry, otmp, costly) {   // hack.c:166
             gb.bldrpushtime = $c.add64(svm.moves, 1);
             gb.bldrpush_oid = otmp.o_id;
         }
-        const givemesg = svm.moves > $c.add64(gb.bldrpushtime, 2) || svm.moves < gb.bldrpushtime ? 1 : 0;
+        const givemesg = svm.moves > $c.add64(gb.bldrpushtime, 2)
+            || svm.moves < gb.bldrpushtime ? 1 : 0;
         const what = givemesg ? await the(await xname(otmp)) : null;
         if (!u.usteed) {
             const easypush = throws_rocks(gy.youmonst.data);
             if (givemesg) {
-                await pline($C`With %s effort you move %s.`, easypush ? $C`little` : $C`great`, what);
+                await pline($C`With %s effort you move %s.`,
+                    easypush ? $C`little` : $C`great`, what);
             }
             if (!easypush) {
                 await exercise(A.STR, TRUE);
@@ -288,7 +294,9 @@ async function dopush(sx, sy, rx, ry, otmp, costly) {   // hack.c:166
     if (costly && !await costly_spot(rx, ry)) {
         /* pushing from inside shop to its boundary (or free spot) */
         await addtobill(otmp, FALSE, FALSE, FALSE);
-    } else if (!costly && await costly_spot(rx, ry) && otmp.unpaid && (shkp = await shop_keeper(in_rooms(rx, ry, SHOPBASE).get(0))) !== null && await onshopbill(otmp, shkp, TRUE)) {
+    } else if (!costly && await costly_spot(rx, ry) && otmp.unpaid
+        && (shkp = await shop_keeper(in_rooms(rx, ry, SHOPBASE).get(0))) !== null
+        && await onshopbill(otmp, shkp, TRUE)) {
         /* this can happen if hero pushes boulder from farther inside
            shop into shop's free spot (which will add it to the bill),
            then teleports or Passes_walls to doorway (without exiting
@@ -297,7 +305,10 @@ async function dopush(sx, sy, rx, ry, otmp, costly) {   // hack.c:166
            "muttering an incantation" to fracture the boulder while it
            is unpaid at the free spot */
         await subfrombill(otmp, shkp);
-    } else if (otmp.unpaid && (shkp = await find_objowner(otmp, sx, sy)) !== null && !$c.strchr(in_rooms(rx, ry, SHOPBASE), shkp.mextra.eshk.shoproom)) {
+    } else if (otmp.unpaid
+        && (shkp = await find_objowner(otmp, sx, sy)) !== null
+        && !$c.strchr(in_rooms(rx, ry, SHOPBASE),
+        shkp.mextra.eshk.shoproom)) {
         /* once the boulder is fully out of the shop, so that it's
          * impossible to change your mind and push it back in without
          * leaving and triggering Kops, switch it to stolen_value */
@@ -313,7 +324,8 @@ async function dopush(sx, sy, rx, ry, otmp, costly) {   // hack.c:166
 async function cannot_push_msg(otmp, sx, sy) {   // hack.c:247
     const what = await the(await xname(otmp));
     if (u.usteed) {
-        await pline($C`%s tries to move %s, but cannot.`, await YMonnam(u.usteed), what);
+        await pline($C`%s tries to move %s, but cannot.`,
+            await YMonnam(u.usteed), what);
     } else {
         await You($C`try to move %s, but in vain.`, what);
     }
@@ -334,10 +346,16 @@ async function cannot_push(otmp, sx, sy) {   // hack.c:262
            pick up a boulder if you have a free
            slot or into the overflow ('#') slot
            unless already carrying at least one */
-        const canpickup = !Sokoban() && (inv_cnt(FALSE) < invlet_basic || !carrying(BOULDER)) ? 1 : 0;
-        const willpickup = canpickup && (flags.pickup && !svc.context.nopick) && await autopick_testobj(otmp, TRUE) ? 1 : 0;
+        const canpickup = !Sokoban()
+            && (inv_cnt(FALSE) < invlet_basic
+            || !carrying(BOULDER)) ? 1 : 0;
+        const willpickup = canpickup
+            && (flags.pickup && !svc.context.nopick)
+            && await autopick_testobj(otmp, TRUE) ? 1 : 0;
         if (u.usteed && u.weapon_skills[P.RIDING].skill < P.BASIC) {
-            await You($C`aren't skilled enough to %s %s from %s.`, willpickup ? $C`pick up` : $C`push aside`, await the(await xname(otmp)), await y_monnam(u.usteed));
+            await You($C`aren't skilled enough to %s %s from %s.`,
+                willpickup ? $C`pick up` : $C`push aside`,
+                await the(await xname(otmp)), await y_monnam(u.usteed));
         } else {
             /*
              * will pick up:  you easily pick it up
@@ -345,7 +363,12 @@ async function cannot_push(otmp, sx, sy) {   // hack.c:262
              * can't pick up: you maneuver over it (possibly followed
              *     by feedback from failed auto-pickup attempt)
              */
-            await pline($C`However, you %s%s.`, willpickup ? $C`easily pick it up` : $C`maneuver over it`, canpickup && !willpickup ? $C` and could pick it up` : $C``);
+            await pline($C`However, you %s%s.`,
+                willpickup ? $C`easily pick it up`
+                : $C`maneuver over it`,
+                canpickup && !willpickup
+                ? $C` and could pick it up`
+                : $C``);
             /* similar to dropping everything and squeezing onto
                a Sokoban boulder's spot, moving to same breaks the
                Sokoban rules because on next step you could go
@@ -355,7 +378,8 @@ async function cannot_push(otmp, sx, sy) {   // hack.c:262
         return 0;
     }
     if (could_move_onto_boulder(sx, sy)) {
-        await pline($C`However, you can squeeze yourself into a small opening.`);
+        await pline(
+            $C`However, you can squeeze yourself into a small opening.`);
         sokoban_guilt();
         return 0;
     } else {
@@ -368,9 +392,11 @@ async function cannot_push(otmp, sx, sy) {   // hack.c:262
  */
 async function rock_disappear_msg(otmp) {   // hack.c:315
     if (u.usteed) {
-        await pline($C`%s pushes %s and suddenly it disappears!`, await YMonnam(u.usteed), await the(await xname(otmp)));
+        await pline($C`%s pushes %s and suddenly it disappears!`,
+            await YMonnam(u.usteed), await the(await xname(otmp)));
     } else {
-        await You($C`push %s and suddenly it disappears!`, await the(await xname(otmp)));
+        await You($C`push %s and suddenly it disappears!`,
+            await the(await xname(otmp)));
     }
 }
 /**
@@ -442,7 +468,8 @@ async function moverock_core(sx, sy) {   // hack.c:348
                 sokoban_guilt();
                 res = 0;   /* move to <sx,sy> */
             } else if (could_move_onto_boulder(sx, sy)) {
-                await You($C`squeeze yourself %s the boulder.`, Flying() ? $C`over` : $C`against`);
+                await You($C`squeeze yourself %s the boulder.`,
+                    Flying() ? $C`over` : $C`against`);
                 sokoban_guilt();
                 res = 0;   /* move to <sx,sy> */
             } else {
@@ -475,22 +502,29 @@ async function moverock_core(sx, sy) {   // hack.c:348
             await pline($C`You're too small to push that %s.`, await xname(otmp));
             return await cannot_push(otmp, sx, sy);
         }
-        if (isok(rx, ry) && !(svl.level.locations[rx][ry].typ < POOL) && svl.level.locations[rx][ry].typ !== IRONBARS && (!(svl.level.locations[rx][ry].typ === DOOR) || !(u.dx && u.dy) || doorless_door(rx, ry)) && !sobj_at(BOULDER, rx, ry)) {
+        if (isok(rx, ry) && !(svl.level.locations[rx][ry].typ < POOL)
+            && svl.level.locations[rx][ry].typ !== IRONBARS
+            && (!(svl.level.locations[rx][ry].typ === DOOR) || !(u.dx && u.dy)
+            || doorless_door(rx, ry)) && !sobj_at(BOULDER, rx, ry)) {
             const ttmp = t_at(rx, ry);
             const mtmp = svl.level.monsters[rx][ry];
-            const costly = await costly_spot(sx, sy) && await shop_keeper(in_rooms(sx, sy, SHOPBASE).get(0)) ? 1 : 0;
+            const costly = await costly_spot(sx, sy)
+                && await shop_keeper(in_rooms(sx, sy, SHOPBASE).get(0)) ? 1 : 0;
             /* KMH -- Sokoban doesn't let you push boulders diagonally */
             if (Sokoban() && u.dx && u.dy) {
                 if (Blind()) {
                     await feel_location(sx, sy);
                 }
-                await pline($C`%s won't roll diagonally on this %s.`, await The(await xname(otmp)), surface(sx, sy));
+                await pline($C`%s won't roll diagonally on this %s.`,
+                    await The(await xname(otmp)), surface(sx, sy));
                 return await cannot_push(otmp, sx, sy);
             }
-            if (await revive_nasty(rx, ry, $C`You sense movement on the other side.`)) {
+            if (await revive_nasty(rx, ry,
+                $C`You sense movement on the other side.`)) {
                 return -1;
             }
-            if (mtmp && !noncorporeal(mtmp.data) && (!mtmp.mtrapped || !(ttmp && is_pit(ttmp.ttyp)))) {
+            if (mtmp && !noncorporeal(mtmp.data)
+                && (!mtmp.mtrapped || !(ttmp && is_pit(ttmp.ttyp)))) {
                 let deliver_part1 = FALSE;
                 if (Blind()) {
                     await feel_location(sx, sy);
@@ -507,7 +541,11 @@ async function moverock_core(sx, sy) {   // hack.c:348
                 }
                 if (flags.verbose) {
                     $c.strcpy(new $c.Ptr(you_or_steed, 0), u.usteed ? await y_monnam(u.usteed) : $C`you`);
-                    await pline($C`%s%s cannot move %s.`, deliver_part1 ? $C`Perhaps that's why ` : $C``, deliver_part1 ? new $c.Ptr(you_or_steed, 0) : upstart(new $c.Ptr(you_or_steed, 0)), deliver_part1 ? $C`it` : await the(await xname(otmp)));
+                    await pline($C`%s%s cannot move %s.`,
+                        deliver_part1 ? $C`Perhaps that's why ` : $C``,
+                        deliver_part1 ? new $c.Ptr(you_or_steed, 0)
+                        : upstart(new $c.Ptr(you_or_steed, 0)),
+                        deliver_part1 ? $C`it` : await the(await xname(otmp)));
                 }
                 return await cannot_push(otmp, sx, sy);
             }
@@ -538,7 +576,11 @@ async function moverock_core(sx, sy) {   // hack.c:348
                             /* use an alternate exclamation when feeling
                                the floor/ground/whatever shake (or maybe
                                a weak shockwave if levitating or flying) */
-                            await pline($C`%s!  %s %s land mine.`, !Deaf() || !Blind() ? $C`KAABLAMM!!` : $C`Gadzooks`, await Tobjnam(otmp, $C`trigger`), ttmp.madeby_u ? $C`your` : $C`a`);
+                            await pline($C`%s!  %s %s land mine.`,
+                                !Deaf() || !Blind() ? $C`KAABLAMM!!`
+                                : $C`Gadzooks`,
+                                await Tobjnam(otmp, $C`trigger`),
+                                ttmp.madeby_u ? $C`your` : $C`a`);
                             await blow_up_landmine(ttmp);
                             /* if the boulder remains, it should fill the pit */
                             await fill_pit(u.ux, u.uy);
@@ -567,9 +609,17 @@ async function moverock_core(sx, sy) {   // hack.c:348
                     case HOLE:
                     case TRAPDOOR:
                         if (Blind()) {
-                            await pline($C`Kerplunk!  You no longer feel %s.`, await the(await xname(otmp)));
+                            await pline($C`Kerplunk!  You no longer feel %s.`,
+                                await the(await xname(otmp)));
                         } else {
-                            await pline($C`%s%s and %s a %s in the %s!`, await Tobjnam(otmp, ttmp.ttyp === TRAPDOOR ? $C`trigger` : $C`fall`), ttmp.ttyp === TRAPDOOR ? $C`` : $C` into`, await otense(otmp, $C`plug`), ttmp.ttyp === TRAPDOOR ? $C`trap door` : $C`hole`, surface(rx, ry));
+                            await pline($C`%s%s and %s a %s in the %s!`,
+                                await Tobjnam(otmp, ttmp.ttyp === TRAPDOOR
+                                ? $C`trigger`
+                                : $C`fall`),
+                                ttmp.ttyp === TRAPDOOR ? $C`` : $C` into`,
+                                await otense(otmp, $C`plug`),
+                                ttmp.ttyp === TRAPDOOR ? $C`trap door` : $C`hole`,
+                                surface(rx, ry));
                         }
                         await deltrap(ttmp);
                         await useupf(otmp, 1);
@@ -624,7 +674,8 @@ async function moverock_core(sx, sy) {   // hack.c:348
                                     break;
                                 }
                             }
-                            await pline($C`%s away from you!`, await Tobjnam(otmp, $C`suddenly roll`));
+                            await pline($C`%s away from you!`,
+                                await Tobjnam(otmp, $C`suddenly roll`));
                             await feeltrap(ttmp);
                             await launch_obj(BOULDER, sx, sy, $c.i16(tox), $c.i16(toy), ROLL | LAUNCH.KNOWN);
                             return sobj_at(BOULDER, sx, sy) ? -1 : 0;
@@ -673,16 +724,27 @@ export async function still_chewing(x, y) {   // hack.c:647
         $c.memset(svc.context.digging, 0, 32);
     }
     /* may_dig() checks W_NONDIGGABLE but doesn't handle iron bars */
-    if (!boulder && (IS_OBSTRUCTED(lev.typ) && !may_dig(x, y) || lev.typ === IRONBARS && lev.flags & W.NONDIGGABLE)) {
-        await You($C`hurt your teeth on the %s.`, lev.typ === IRONBARS ? $C`bars` : IS_TREE(lev.typ) ? $C`tree` : $C`hard stone`);
+    if (!boulder
+        && (IS_OBSTRUCTED(lev.typ) && !may_dig(x, y)
+        || lev.typ === IRONBARS && lev.flags & W.NONDIGGABLE)) {
+        await You($C`hurt your teeth on the %s.`,
+            lev.typ === IRONBARS
+            ? $C`bars`
+            : IS_TREE(lev.typ)
+            ? $C`tree`
+            : $C`hard stone`);
         nomul(0);
         return 1;
-    } else if (lev.typ === IRONBARS && metallivorous(gy.youmonst.data) && u.uhunger > 1500) {
+    } else if (lev.typ === IRONBARS
+        && metallivorous(gy.youmonst.data) && u.uhunger > 1500) {
         /* finishing eating via 'morehungry()' doesn't handle choking */
         await You($C`are too full to eat the bars.`);
         nomul(0);
         return 1;
-    } else if (!svc.context.digging.chew || svc.context.digging.pos.x !== x || svc.context.digging.pos.y !== y || !on_level(svc.context.digging.level, u.uz)) {
+    } else if (!svc.context.digging.chew
+        || svc.context.digging.pos.x !== x
+        || svc.context.digging.pos.y !== y
+        || !on_level(svc.context.digging.level, u.uz)) {
         svc.context.digging.down = FALSE;
         svc.context.digging.chew = TRUE;
         svc.context.digging.warned = FALSE;
@@ -691,12 +753,34 @@ export async function still_chewing(x, y) {   // hack.c:647
         assign_level(svc.context.digging.level, u.uz);
         /* solid rock takes more work & time to dig through */
         svc.context.digging.effort = (IS_OBSTRUCTED(lev.typ) && !IS_TREE(lev.typ) ? 30 : 60) + u.udaminc;
-        await You($C`start chewing %s %s.`, boulder || IS_TREE(lev.typ) || lev.typ === IRONBARS ? $C`on a` : $C`a hole in the`, boulder ? $C`boulder` : IS_TREE(lev.typ) ? $C`tree` : IS_OBSTRUCTED(lev.typ) ? $C`rock` : lev.typ === IRONBARS ? $C`bar` : $C`door`);
+        await You($C`start chewing %s %s.`,
+            boulder || IS_TREE(lev.typ) || lev.typ === IRONBARS
+            ? $C`on a`
+            : $C`a hole in the`,
+            boulder
+            ? $C`boulder`
+            : IS_TREE(lev.typ)
+            ? $C`tree`
+            : IS_OBSTRUCTED(lev.typ)
+            ? $C`rock`
+            : lev.typ === IRONBARS
+            ? $C`bar`
+            : $C`door`);
         await watch_dig(null, x, y, FALSE);
         return 1;
     } else if ((svc.context.digging.effort = svc.context.digging.effort + (30 + u.udaminc) | 0) <= 100) {
         if (flags.verbose) {
-            await You($C`%s chewing on the %s.`, svc.context.digging.chew ? $C`continue` : $C`begin`, boulder ? $C`boulder` : IS_TREE(lev.typ) ? $C`tree` : IS_OBSTRUCTED(lev.typ) ? $C`rock` : lev.typ === IRONBARS ? $C`bars` : $C`door`);
+            await You($C`%s chewing on the %s.`,
+                svc.context.digging.chew ? $C`continue` : $C`begin`,
+                boulder
+                ? $C`boulder`
+                : IS_TREE(lev.typ)
+                ? $C`tree`
+                : IS_OBSTRUCTED(lev.typ)
+                ? $C`rock`
+                : lev.typ === IRONBARS
+                ? $C`bars`
+                : $C`door`);
         }
         svc.context.digging.chew = TRUE;
         await watch_dig(null, x, y, FALSE);
@@ -704,7 +788,13 @@ export async function still_chewing(x, y) {   // hack.c:647
     }
     /* Okay, you've chewed through something */
     if (!($t1 = u.uconduct.food, u.uconduct.food = $c.add64($t1, 1), $t1)) {
-        await livelog_printf(LL.CONDUCT, $C`ate for the first time, by chewing through %s`, boulder ? $C`a boulder` : IS_TREE(lev.typ) ? $C`a tree` : IS_OBSTRUCTED(lev.typ) ? $C`rock` : lev.typ === IRONBARS ? $C`iron bars` : $C`a door`);
+        await livelog_printf(LL.CONDUCT,
+            $C`ate for the first time, by chewing through %s`,
+            boulder ? $C`a boulder`
+            : IS_TREE(lev.typ) ? $C`a tree`
+            : IS_OBSTRUCTED(lev.typ) ? $C`rock`
+            : lev.typ === IRONBARS ? $C`iron bars`
+            : $C`a door`);
     }
     $t2 = rnd(20), u.uhunger = u.uhunger + $t2 | 0;
     if (boulder) {
@@ -717,7 +807,8 @@ export async function still_chewing(x, y) {   // hack.c:647
          *
          *  [perhaps use does_block() below (from vision.c)]
          */
-        if (IS_OBSTRUCTED(lev.typ) || closed_door(x, y) || sobj_at(BOULDER, x, y)) {
+        if (IS_OBSTRUCTED(lev.typ) || closed_door(x, y)
+            || sobj_at(BOULDER, x, y)) {
             block_point(x, y);   /* delobj will unblock the point */
             /* reset dig state */
             $c.memset(svc.context.digging, 0, 32);
@@ -752,7 +843,9 @@ export async function still_chewing(x, y) {   // hack.c:647
                updates hunger state and requests status update if changed */
             await morehungry(-nut | 0);
         }
-        digtxt = u_at(x, y) ? $C`devour the iron bars.` : $C`eat through the bars.`;
+        digtxt = u_at(x, y)
+            ? $C`devour the iron bars.`
+            : $C`eat through the bars.`;
         await dissolve_bars(x, y);
     } else if (lev.typ === SDOOR) {
         if (lev.flags & D.TRAPPED) {
@@ -817,9 +910,11 @@ async function dosinkfall() {   // hack.c:836
     let lev_boots = $G.uarmf && $G.uarmf.otyp === LEVITATION_BOOTS ? 1 : 0;
     const innate_lev = $c.and64(u.uprops[LEVITATION].intrinsic, FROMOUTSIDE | FROMFORM) !== 0 ? 1 : 0;
     const blockd_lev = u.uprops[LEVITATION].blocked === I_SPECIAL ? 1 : 0;
-    const ufall = !innate_lev && !blockd_lev && !(HFlying() || EFlying()) ? 1 : 0;   /* BFlying */
+    const ufall = !innate_lev && !blockd_lev
+        && !(HFlying() || EFlying()) ? 1 : 0;   /* BFlying */
     if (!ufall) {
-        await You(innate_lev || blockd_lev ? $C`wobble unsteadily for a moment.` : $C`gain control of your flight.`);
+        await You(innate_lev || blockd_lev ? $C`wobble unsteadily for a moment.`
+            : $C`gain control of your flight.`);
     } else {
         const save_ELev = u.uprops[LEVITATION].extrinsic;
         const save_HLev = u.uprops[LEVITATION].intrinsic;
@@ -836,7 +931,8 @@ async function dosinkfall() {   // hack.c:836
         for (obj = svl.level.objects[u.ux][u.uy]; obj; obj = obj.v.v_nexthere) {
             if (obj.oclass === WEAPON_CLASS || is_weptool(obj)) {
                 await You($C`fell on %s.`, await doname(obj));
-                await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(3) + 1 | 0, 2) : rnd(3)), new $c.Ptr(dosinkfall$fell_on_sink, 0), NO_KILLER_PREFIX);
+                await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(3) + 1 | 0, 2) : rnd(3)), new $c.Ptr(dosinkfall$fell_on_sink, 0),
+                    NO_KILLER_PREFIX);
                 await exercise(A.CON, FALSE);
             }
         }
@@ -892,7 +988,8 @@ async function dosinkfall() {   // hack.c:836
  */
 export function may_dig(x, y) {   // hack.c:923
     const lev = $c.relem(svl.level.locations[x], y);
-    return !((IS_STWALL(lev.typ) || IS_TREE(lev.typ)) && lev.flags & W.NONDIGGABLE) ? 1 : 0;
+    return !((IS_STWALL(lev.typ) || IS_TREE(lev.typ))
+        && lev.flags & W.NONDIGGABLE) ? 1 : 0;
 }
 /**
  * @param {number} x coordxy
@@ -900,7 +997,8 @@ export function may_dig(x, y) {   // hack.c:923
  * @returns {number} boolean
  */
 export function may_passwall(x, y) {   // hack.c:932
-    return !(svl.level.locations[x][y].typ <= DBWALL && svl.level.locations[x][y].flags & W.NONPASSWALL) ? 1 : 0;
+    return !(svl.level.locations[x][y].typ <= DBWALL
+        && svl.level.locations[x][y].flags & W.NONPASSWALL) ? 1 : 0;
 }
 /**
  * @param {$T.permonst | null} mdat struct permonst *
@@ -909,7 +1007,11 @@ export function may_passwall(x, y) {   // hack.c:932
  * @returns {number} boolean
  */
 export function bad_rock(mdat, x, y) {   // hack.c:939
-    return Sokoban() && sobj_at(BOULDER, x, y) || svl.level.locations[x][y].typ < POOL && (!tunnels(mdat) || needspick(mdat) || !may_dig(x, y)) && !(passes_walls(mdat) && may_passwall(x, y)) ? 1 : 0;
+    return Sokoban() && sobj_at(BOULDER, x, y)
+        || svl.level.locations[x][y].typ < POOL
+        && (!tunnels(mdat) || needspick(mdat)
+        || !may_dig(x, y))
+        && !(passes_walls(mdat) && may_passwall(x, y)) ? 1 : 0;
 }
 /* caller has already decided that it's a tight diagonal; check whether a
    monster--who might be the hero--can fit through, and if not then return
@@ -925,11 +1027,14 @@ export function cant_squeeze_thru(mon) {   // hack.c:953
         return 0;
     }
     /* too big? */
-    if (bigmonst(ptr) && !(amorphous(ptr) || is_whirly(ptr) || noncorporeal(ptr) || slithy(ptr) || can_fog(mon))) {
+    if (bigmonst(ptr)
+        && !(amorphous(ptr) || is_whirly(ptr) || noncorporeal(ptr)
+        || slithy(ptr) || can_fog(mon))) {
         return 1;
     }
     /* lugging too much junk? */
-    const amt = mon === gy.youmonst ? inv_weight() + weight_cap() | 0 : curr_mon_load(mon);
+    const amt = mon === gy.youmonst ? inv_weight() + weight_cap() | 0
+        : curr_mon_load(mon);
     if (amt > WT.TOOMUCH_DIAGONAL) {
         return 2;
     }
@@ -946,7 +1051,8 @@ export function cant_squeeze_thru(mon) {   // hack.c:953
  * @returns {number} boolean
  */
 export function invocation_pos(x, y) {   // hack.c:982
-    return Invocation_lev(u.uz) && x === svi.inv_pos.x && y === svi.inv_pos.y ? 1 : 0;
+    return Invocation_lev(u.uz)
+        && x === svi.inv_pos.x && y === svi.inv_pos.y ? 1 : 0;
 }
 /* return TRUE if (ux+dx,uy+dy) is an OK place to move;
    mode is one of DO_MOVE, TEST_MOVE, TEST_TRAV, or TEST_TRAP */
@@ -987,7 +1093,11 @@ export async function test_move(ux, uy, dx, dy, mode) {   // hack.c:991
             }
             return FALSE;
         } else if (tmpr.typ === IRONBARS) {
-            if (mode === DO_MOVE && (dmgtype(gy.youmonst.data, AD.RUST) || dmgtype(gy.youmonst.data, AD.CORR) || metallivorous(gy.youmonst.data)) && await still_chewing(x, y)) {
+            if (mode === DO_MOVE
+                && (dmgtype(gy.youmonst.data, AD.RUST)
+                || dmgtype(gy.youmonst.data, AD.CORR)
+                || metallivorous(gy.youmonst.data))
+                && await still_chewing(x, y)) {
                 return FALSE;
             }
             if (!(Passes_walls() || passes_bars(gy.youmonst.data))) {
@@ -996,12 +1106,14 @@ export async function test_move(ux, uy, dx, dy, mode) {   // hack.c:991
                 }
                 return FALSE;
             }
-        } else if (tunnels(gy.youmonst.data) && !needspick(gy.youmonst.data)) {
+        } else if (tunnels(gy.youmonst.data)
+            && !needspick(gy.youmonst.data)) {
             /* Eat the rock. */
             if (mode === DO_MOVE && await still_chewing(x, y)) {
                 return FALSE;
             }
-        } else if (flags.autodig && !svc.context.run && !svc.context.nopick && $G.uwep && is_pick($G.uwep)) {
+        } else if (flags.autodig && !svc.context.run && !svc.context.nopick
+            && $G.uwep && is_pick($G.uwep)) {
             /* MRKR: Automatic digging when wielding the appropriate tool */
             if (mode === DO_MOVE) {
                 await use_pick_axe2($G.uwep);
@@ -1011,12 +1123,14 @@ export async function test_move(ux, uy, dx, dy, mode) {   // hack.c:991
             if (mode === DO_MOVE) {
                 if (is_db_wall(x, y)) {
                     await pline($C`That drawbridge is up!`);
-                } else if (Passes_walls() && !may_passwall(x, y) && In_sokoban(u.uz)) {
+                } else if (Passes_walls() && !may_passwall(x, y)
+                    && In_sokoban(u.uz)) {
                     /* soko restriction stays even after puzzle is solved */
                     await pline_The($C`Sokoban walls resist your ability.`);
                 } else if (flags.mention_walls) {
                     glyph = await back_to_glyph(x, y);
-                    sym = glyph_is_cmap(glyph) ? glyph_to_cmap(glyph) : -1;
+                    sym = glyph_is_cmap(glyph) ? glyph_to_cmap(glyph)
+                        : -1;
                     if (sym === S.stone) {
                         $c.strcpy(new $c.Ptr(buf, 0), $C`solid stone`);
                     } else if (sym >= 0) {
@@ -1048,7 +1162,8 @@ export async function test_move(ux, uy, dx, dy, mode) {   // hack.c:991
                             await pline($C`There is an obstacle there.`);
                         }
                         return FALSE;
-                    } else if (tunnels(gy.youmonst.data) && !needspick(gy.youmonst.data)) {
+                    } else if (tunnels(gy.youmonst.data)
+                        && !needspick(gy.youmonst.data)) {
                         /* Eat the door. */
                         if (mode === DO_MOVE && await still_chewing(x, y)) {
                             return FALSE;
@@ -1058,23 +1173,27 @@ export async function test_move(ux, uy, dx, dy, mode) {   // hack.c:991
                             if (amorphous(gy.youmonst.data)) {
                                 await You($C`try to ooze under the door, but can't squeeze your possessions through.`);
                             }
-                            if (flags.autoopen && !svc.context.run && !u.uprops[CONFUSION].intrinsic && !u.uprops[STUNNED].intrinsic && !Fumbling()) {
+                            if (flags.autoopen && !svc.context.run
+                                && !u.uprops[CONFUSION].intrinsic && !u.uprops[STUNNED].intrinsic && !Fumbling()) {
                                 tmp = await doopen_indir(x, y);
                                 /* if 'autounlock' includes Kick, we might have a
                                    kick at the door queued up after doopen_indir() */
                                 cq = cmdq_peek(CQ_CANNED);
                                 /* door hasn't been opened, but fake it so that
                                    canned kick will be executed as next command */
-                                if (tmp === ECMD.OK && cq && cq.typ === CMDQ.EXTCMD && $c.peq(cq.ec_entry, ext_func_tab_from_func(dokick))) {
+                                if (tmp === ECMD.OK && cq && cq.typ === CMDQ.EXTCMD
+                                    && $c.peq(cq.ec_entry, ext_func_tab_from_func(dokick))) {
                                     svc.context.door_opened = TRUE;
                                 } else {
                                     $t1 = !closed_door(x, y) ? 1 : 0, svc.context.door_opened = $t1;
                                 }
                                 svc.context.move = ux !== u.ux || uy !== u.uy ? 1 : 0;
                             } else if (x === ux || y === uy) {
-                                if (Blind() || u.uprops[STUNNED].intrinsic || ACURR(A.DEX) < 10 || Fumbling()) {
+                                if (Blind() || u.uprops[STUNNED].intrinsic || ACURR(A.DEX) < 10
+                                    || Fumbling()) {
                                     if (u.usteed) {
-                                        await You_cant($C`lead %s through that closed door.`, await y_monnam(u.usteed));
+                                        await You_cant($C`lead %s through that closed door.`,
+                                            await y_monnam(u.usteed));
                                     } else {
                                         await pline($C`Ouch!  You bump into a door.`);
                                         await exercise(A.DEX, FALSE);
@@ -1099,7 +1218,8 @@ export async function test_move(ux, uy, dx, dy, mode) {   // hack.c:991
                     }
                 } else {
                     $goto = null;   // testdiag:
-                    if (dx && dy && !Passes_walls() && (!doorless_door(x, y) || await block_door(x, y))) {
+                    if (dx && dy && !Passes_walls()
+                        && (!doorless_door(x, y) || await block_door(x, y))) {
                         /* Diagonal moves into a door are not allowed. */
                         if (mode === DO_MOVE) {
                             if (Blind()) {
@@ -1116,7 +1236,8 @@ export async function test_move(ux, uy, dx, dy, mode) {   // hack.c:991
             break;
         }
     }
-    if (dx && dy && bad_rock(gy.youmonst.data, ux, y) && bad_rock(gy.youmonst.data, x, uy)) {
+    if (dx && dy && bad_rock(gy.youmonst.data, ux, y)
+        && bad_rock(gy.youmonst.data, x, uy)) {
         /* Move at a diagonal. */
         switch (cant_squeeze_thru(gy.youmonst)) {
             case 3:
@@ -1160,7 +1281,12 @@ export async function test_move(ux, uy, dx, dy, mode) {   // hack.c:991
            get here) unless flying or levitating or have known
            water-walking for pool or known lava-walking and
            already be on/over lava for lava */
-        if (svl.level.locations[x][y].seenv && is_pool_or_lava(x, y) && (svl.level.locations[x][y].typ === WATER || svl.level.locations[x][y].typ === LAVAWALL || !(Levitation() || Flying() || (is_pool(x, y) ? Known_wwalking() : Known_lwalking() && is_lava(u.ux, u.uy))))) {
+        if (svl.level.locations[x][y].seenv && is_pool_or_lava(x, y)
+            && (svl.level.locations[x][y].typ === WATER
+            || svl.level.locations[x][y].typ === LAVAWALL
+            || !(Levitation() || Flying()
+            || (is_pool(x, y) ? Known_wwalking()
+            : Known_lwalking() && is_lava(u.ux, u.uy))))) {
             return mode === TEST.TRAP ? 1 : 0;
         }
     }
@@ -1169,7 +1295,8 @@ export async function test_move(ux, uy, dx, dy, mode) {   // hack.c:991
     }
     ust = $c.relem(svl.level.locations[ux], uy);
     /* Now see if other things block our way . . */
-    if (dx && dy && !Passes_walls() && IS_DOOR(ust.typ) && (!doorless_door(ux, uy) || await block_entry(x, y))) {
+    if (dx && dy && !Passes_walls() && IS_DOOR(ust.typ)
+        && (!doorless_door(ux, uy) || await block_entry(x, y))) {
         /* Can't move at a diagonal out of a doorway with door. */
         if (mode === DO_MOVE && flags.mention_walls) {
             await You_cant($C`move diagonally out of an intact doorway.`);
@@ -1177,7 +1304,8 @@ export async function test_move(ux, uy, dx, dy, mode) {   // hack.c:991
         return FALSE;
     }
     if (sobj_at(BOULDER, x, y) && (Sokoban() || !Passes_walls())) {
-        if (mode !== TEST.TRAV && svc.context.run >= 2 && !(Blind() || Hallucination()) && !could_move_onto_boulder(x, y)) {
+        if (mode !== TEST.TRAV && svc.context.run >= 2
+            && !(Blind() || Hallucination()) && !could_move_onto_boulder(x, y)) {
             if (mode === DO_MOVE && flags.mention_walls) {
                 await pline_dir(xytodir(dx, dy), $C`A boulder blocks your path.`);
             }
@@ -1185,7 +1313,8 @@ export async function test_move(ux, uy, dx, dy, mode) {   // hack.c:991
         }
         if (mode === DO_MOVE) {
             /* tunneling monsters will chew before pushing */
-            if (tunnels(gy.youmonst.data) && !needspick(gy.youmonst.data) && !Sokoban()) {
+            if (tunnels(gy.youmonst.data) && !needspick(gy.youmonst.data)
+                && !Sokoban()) {
                 if (await still_chewing(x, y)) {
                     return FALSE;
                 }
@@ -1199,7 +1328,13 @@ export async function test_move(ux, uy, dx, dy, mode) {   // hack.c:991
             }
             /* don't pick two boulders in a row, unless there's a way thru */
             if (sobj_at(BOULDER, ux, uy) && !Sokoban()) {
-                if (!Passes_walls() && !could_move_onto_boulder(ux, uy) && !(tunnels(gy.youmonst.data) && !needspick(gy.youmonst.data)) && !carrying(PICK_AXE) && !carrying(DWARVISH_MATTOCK) && !((obj = carrying(WAN_DIGGING)) && !objects[obj.otyp].oc_name_known)) {
+                if (!Passes_walls()
+                    && !could_move_onto_boulder(ux, uy)
+                    && !(tunnels(gy.youmonst.data)
+                    && !needspick(gy.youmonst.data))
+                    && !carrying(PICK_AXE) && !carrying(DWARVISH_MATTOCK)
+                    && !((obj = carrying(WAN_DIGGING))
+                    && !objects[obj.otyp].oc_name_known)) {
                     return FALSE;
                 }
             }
@@ -1230,7 +1365,9 @@ async function findtravelpath(mode) {   // hack.c:1266
     /* was '&& distmin(u.ux, u.uy, u.tx, u.ty) == 1' */
     /* one step away */
     /* handle restricted diagonals */
-    if ((mode === TRAVP_TRAVEL || mode === TRAVP_VALID) && svc.context.travel1 && dist2(u.tx, u.ty, u.ux, u.uy) <= 2 && await crawl_destination(u.tx, u.ty)) {
+    if ((mode === TRAVP_TRAVEL || mode === TRAVP_VALID) && svc.context.travel1
+        && dist2(u.tx, u.ty, u.ux, u.uy) <= 2
+        && await crawl_destination(u.tx, u.ty)) {
         end_running(FALSE);
         if (await test_move(u.ux, u.uy, $c.i16(u.tx - u.ux), $c.i16(u.ty - u.uy), TEST.MOVE)) {
             if (mode === TRAVP_TRAVEL) {
@@ -1317,10 +1454,15 @@ async function findtravelpath(mode) {   // hack.c:1266
                              * example above is never included in it, preventing
                              * the cycle.
                              */
-                            if (!isok(nx, ny) || mode === TRAVP_GUESS && !couldsee(nx, ny)) {
+                            if (!isok(nx, ny)
+                                || mode === TRAVP_GUESS && !couldsee(nx, ny)) {
                                 continue;
                             }
-                            if (!Passes_walls() && !can_ooze(gy.youmonst) && closed_door(x, y) || sobj_at(BOULDER, x, y) && !could_move_onto_boulder(x, y) || await test_move(x, y, $c.i16(nx - x), $c.i16(ny - y), TEST.TRAP)) {
+                            if (!Passes_walls() && !can_ooze(gy.youmonst)
+                                && closed_door(x, y)
+                                || sobj_at(BOULDER, x, y)
+                                && !could_move_onto_boulder(x, y)
+                                || await test_move(x, y, $c.i16(nx - x), $c.i16(ny - y), TEST.TRAP)) {
                                 /* closed doors and boulders usually cause a delay,
                                    so prefer another path; however, giants and tiny
                                    creatures can use m<dir> to move onto a boulder's
@@ -1336,13 +1478,17 @@ async function findtravelpath(mode) {   // hack.c:1266
                                     continue;
                                 }
                             }
-                            if (await test_move(x, y, $c.i16(nx - x), $c.i16(ny - y), TEST.TRAV) && (svl.level.locations[nx][ny].seenv || !Blind() && couldsee(nx, ny))) {
+                            if (await test_move(x, y, $c.i16(nx - x), $c.i16(ny - y), TEST.TRAV)
+                                && (svl.level.locations[nx][ny].seenv
+                                || !Blind() && couldsee(nx, ny))) {
                                 if (nx === ux && ny === uy) {
                                     if (mode === TRAVP_TRAVEL || mode === TRAVP_VALID) {
                                         visited = $c.i8(selection_getpoint(x, y, gt.travelmap));
                                         u.dx = x - ux;
                                         u.dy = y - uy;
-                                        if (mode === TRAVP_TRAVEL && (x === u.tx && y === u.ty || visited)) {
+                                        if (mode === TRAVP_TRAVEL
+                                            && (x === u.tx && y === u.ty
+                                            || visited)) {
                                             nomul(0);
                                             /* reset run so domove run checks work */
                                             svc.context.run = 8;
@@ -1352,7 +1498,8 @@ async function findtravelpath(mode) {   // hack.c:1266
                                                 $t3 = iflags.travelcc.y = 0, iflags.travelcc.x = $t3;
                                             }
                                         }
-                                        selection_setpoint(u.ux, u.uy, gt.travelmap, 1);
+                                        selection_setpoint(u.ux, u.uy,
+                                            gt.travelmap, 1);
                                         return TRUE;
                                     }
                                 } else if (!travel[nx][ny]) {
@@ -1467,7 +1614,8 @@ export async function is_valid_travelpt(x, y) {   // hack.c:1526
     if (u_at(x, y)) {
         return TRUE;
     }
-    if (isok(x, y) && glyph_is_cmap(glyph) && S.stone === glyph_to_cmap(glyph) && !svl.level.locations[x][y].seenv) {
+    if (isok(x, y) && glyph_is_cmap(glyph) && S.stone === glyph_to_cmap(glyph)
+        && !svl.level.locations[x][y].seenv) {
         return FALSE;
     }
     u.tx = x;
@@ -1518,7 +1666,8 @@ async function trapmove(x, y, desttrap) {   // hack.c:1550
                 }
                 break;
             case TT.PIT:
-                if (desttrap && desttrap.tseen && is_pit(desttrap.ttyp)) {
+                if (desttrap && desttrap.tseen
+                    && is_pit(desttrap.ttyp)) {
                     return TRUE;   /* move into adjacent pit */
                 }
                 /* try to escape; position stays same regardless of success */
@@ -1562,9 +1711,11 @@ async function trapmove(x, y, desttrap) {   // hack.c:1550
                     if ((u.utrap & 255) >>> 0 === 0) {
                         u.utrap = 0;
                         if (u.usteed) {
-                            await You($C`lead %s to the edge of the %s.`, steedname, hliquid($C`lava`));
+                            await You($C`lead %s to the edge of the %s.`, steedname,
+                                hliquid($C`lava`));
                         } else {
-                            await You($C`pull yourself to the edge of the %s.`, hliquid($C`lava`));
+                            await You($C`pull yourself to the edge of the %s.`,
+                                hliquid($C`lava`));
                         }
                     }
                 }
@@ -1601,9 +1752,11 @@ async function trapmove(x, y, desttrap) {   // hack.c:1550
                         }
                         if (u.usteed) {
                             if (anchored) {
-                                await Norep($C`You and %s are %s %s.`, steedname, predicament, culprit);
+                                await Norep($C`You and %s are %s %s.`, steedname, predicament,
+                                    culprit);
                             } else {
-                                await Norep($C`%s is %s %s.`, upstart(steedname), predicament, culprit);
+                                await Norep($C`%s is %s %s.`, upstart(steedname), predicament,
+                                    culprit);
                             }
                         } else {
                             await Norep($C`You are %s %s.`, predicament, culprit);
@@ -1612,9 +1765,11 @@ async function trapmove(x, y, desttrap) {   // hack.c:1550
                 } else {
                     $goto = null;   // wriggle_free:
                     if (u.usteed) {
-                        await pline($C`%s finally %s free.`, upstart(steedname), !anchored ? $C`lurches` : $C`wrenches the ball`);
+                        await pline($C`%s finally %s free.`, upstart(steedname),
+                            !anchored ? $C`lurches` : $C`wrenches the ball`);
                     } else {
-                        await You($C`finally %s free.`, !anchored ? $C`wriggle` : $C`wrench the ball`);
+                        await You($C`finally %s free.`,
+                            !anchored ? $C`wriggle` : $C`wrench the ball`);
                     }
                     if (anchored) {
                         await buried_ball_to_punishment();
@@ -1625,7 +1780,8 @@ async function trapmove(x, y, desttrap) {   // hack.c:1550
                 await impossible($C`trapmove: trapped in nothing?`);
                 break;
             default:
-                await impossible($C`trapmove: stuck in unknown trap? (%d)`, u.utraptype | 0);
+                await impossible($C`trapmove: stuck in unknown trap? (%d)`,
+                    u.utraptype | 0);
                 break;
         }
         break;
@@ -1637,7 +1793,10 @@ async function trapmove(x, y, desttrap) {   // hack.c:1550
  */
 export async function u_rooted() {   // hack.c:1694
     if (!gy.youmonst.data.mmove) {
-        await You($C`are rooted %s.`, Levitation() || Is_airlevel(u.uz) || Is_waterlevel(u.uz) ? $C`in place` : $C`to the ground`);
+        await You($C`are rooted %s.`,
+            Levitation() || Is_airlevel(u.uz) || Is_waterlevel(u.uz)
+            ? $C`in place`
+            : $C`to the ground`);
         nomul(0);
         return TRUE;
     }
@@ -1649,11 +1808,22 @@ export async function u_rooted() {   // hack.c:1694
  */
 export async function notice_mon(mtmp) {   // hack.c:1708
     if (a11y.mon_notices && !a11y.mon_notices_blocked) {
-        const spot = canspotmon(mtmp) && !(is_hider(mtmp.data) && (mtmp.mundetected || M_AP_TYPE(mtmp) === M_AP.FURNITURE || M_AP_TYPE(mtmp) === M_AP.OBJECT)) ? 1 : 0;
+        const spot = canspotmon(mtmp)
+            && !(is_hider(mtmp.data)
+            && (mtmp.mundetected
+            || M_AP_TYPE(mtmp) === M_AP.FURNITURE
+            || M_AP_TYPE(mtmp) === M_AP.OBJECT)) ? 1 : 0;
         if (spot && !mtmp.mspotted && !DEADMONSTER(mtmp)) {
             mtmp.mspotted = (TRUE) & 1;
             set_msg_xy(mtmp.mx, mtmp.my);
-            await You($C`%s %s.`, canseemon(mtmp) ? $C`see` : $C`notice`, await x_monnam(mtmp, mtmp.mtame ? ARTICLE.YOUR : !has_mgivenname(mtmp) && !type_is_pname(mtmp.data) ? ARTICLE.A : ARTICLE.NONE, mtmp.mpeaceful && !mtmp.mtame ? $C`peaceful` : null, has_mgivenname(mtmp) ? SUPPRESS.SADDLE : 0, FALSE));
+            await You($C`%s %s.`, canseemon(mtmp) ? $C`see` : $C`notice`,
+                await x_monnam(mtmp,
+                mtmp.mtame ? ARTICLE.YOUR
+                : !has_mgivenname(mtmp)
+                && !type_is_pname(mtmp.data) ? ARTICLE.A
+                : ARTICLE.NONE,
+                mtmp.mpeaceful && !mtmp.mtame ? $C`peaceful` : null,
+                has_mgivenname(mtmp) ? SUPPRESS.SADDLE : 0, FALSE));
         } else if (!spot) {
             mtmp.mspotted = (FALSE) & 1;
         }
@@ -1734,9 +1904,13 @@ export async function impact_disturbs_zombies(obj, violent) {   // hack.c:1787
 export async function disturb_buried_zombies(x, y) {   // hack.c:1798
     let otmp = null, t = 0;
     for (otmp = svl.level.buriedobjlist; otmp; otmp = otmp.nobj) {
-        if (otmp.otyp === CORPSE && otmp.timed && otmp.ox >= x - 1 && otmp.ox <= x + 1 && otmp.oy >= y - 1 && otmp.oy <= y + 1 && (t = peek_timer(ZOMBIFY_MON, obj_to_any(otmp))) > 0) {
+        if (otmp.otyp === CORPSE && otmp.timed
+            && otmp.ox >= x - 1 && otmp.ox <= x + 1
+            && otmp.oy >= y - 1 && otmp.oy <= y + 1
+            && (t = peek_timer(ZOMBIFY_MON, obj_to_any(otmp))) > 0) {
             t = await stop_timer(ZOMBIFY_MON, obj_to_any(otmp));
-            await start_timer(max(1, $c.div64($c.mul64(t, 2), 3)), TIMER.OBJECT, ZOMBIFY_MON, obj_to_any(otmp));
+            await start_timer(max(1, $c.div64($c.mul64(t, 2), 3)), TIMER.OBJECT,
+                ZOMBIFY_MON, obj_to_any(otmp));
         }
     }
 }
@@ -1752,7 +1926,9 @@ export function u_locomotion(def) {   // hack.c:1817
        its is_flyer() and is_floater() tests wouldn't work on hero except
        when hero is polymorphed and not wearing an amulet of flying
        or boots/ring/spell of levitation */
-    return Levitation() ? capitalize ? $C`Float` : $C`float` : Flying() ? capitalize ? $C`Fly` : $C`fly` : locomotion(gy.youmonst.data, def);
+    return Levitation() ? capitalize ? $C`Float` : $C`float`
+        : Flying() ? capitalize ? $C`Fly` : $C`fly`
+        : locomotion(gy.youmonst.data, def);
 }
 /* Return a simplified floor solid/liquid state based on hero's state */
 /**
@@ -1795,7 +1971,8 @@ export async function handle_tip(tip) {   // hack.c:1852
                 await pline($C`(Tip: use the #enhance command to advance them.)`);
                 break;
             case TIP.SWIM:
-                await pline($C`(Tip: use '%s' prefix to step in if you really want to.)`, visctrl(cmd_from_func(do_reqmenu)));
+                await pline($C`(Tip: use '%s' prefix to step in if you really want to.)`,
+                    visctrl(cmd_from_func(do_reqmenu)));
                 break;
             case TIP.UNTRAP_MON:
                 await pline($C`(Tip: perhaps #untrap would help?)`);
@@ -1823,7 +2000,9 @@ async function swim_move_danger(x, y) {   // hack.c:1885
     if (Underwater() && (is_pool(x, y) || IS_WATERWALL(newtyp))) {
         return FALSE;
     }
-    if (newtyp !== u_simple_floortyp(u.ux, u.uy) && !u.uprops[STUNNED].intrinsic && !u.uprops[CONFUSION].intrinsic && svl.level.locations[x][y].seenv && (is_pool(x, y) || is_lava(x, y) || liquid_wall)) {
+    if (newtyp !== u_simple_floortyp(u.ux, u.uy)
+        && !u.uprops[STUNNED].intrinsic && !u.uprops[CONFUSION].intrinsic && svl.level.locations[x][y].seenv
+        && (is_pool(x, y) || is_lava(x, y) || liquid_wall)) {
         /* FIXME: This can be exploited to identify ring of fire resistance
          * if the player is wearing it unidentified and has identified
          * fireproof boots of water walking and is walking over lava. However,
@@ -1831,13 +2010,17 @@ async function swim_move_danger(x, y) {   // hack.c:1885
         /* is_lava(ux,uy): don't move onto/over lava with known
            lava-walking because it isn't completely safe, but do
            continue to move over lava if already doing so */
-        if (is_pool(x, y) && !Known_wwalking() || is_lava(x, y) && !Known_lwalking() && !is_lava(u.ux, u.uy) || liquid_wall) {
+        if (is_pool(x, y) && !Known_wwalking()
+            || is_lava(x, y) && !Known_lwalking() && !is_lava(u.ux, u.uy)
+            || liquid_wall) {
             if (svc.context.nopick) {
                 /* moving with m-prefix */
                 svc.context.tips = $c.oru64(svc.context.tips, 1 << TIP.SWIM);
                 return FALSE;
             } else if (ParanoidSwim() || liquid_wall) {
-                await You($C`avoid %s into the %s.`, ing_suffix(u_locomotion($C`step`)), waterbody_name(x, y));
+                await You($C`avoid %s into the %s.`,
+                    ing_suffix(u_locomotion($C`step`)),
+                    waterbody_name(x, y));
                 await handle_tip(TIP.SWIM);
                 return TRUE;
             }
@@ -1859,8 +2042,11 @@ async function domove_bump_mon(mtmp, glyph) {   // hack.c:1925
      * attack_check(), which still wastes a turn, but prints a
      * different message and makes the player remember the monster.
      */
-    if (svc.context.nopick && !svc.context.travel && (canspotmon(mtmp) || glyph_is_invisible(glyph) || glyph_is_warning(glyph))) {
-        if (M_AP_TYPE(mtmp) && !Protection_from_shape_changers() && !sensemon(mtmp)) {
+    if (svc.context.nopick && !svc.context.travel
+        && (canspotmon(mtmp) || glyph_is_invisible(glyph)
+        || glyph_is_warning(glyph))) {
+        if (M_AP_TYPE(mtmp) && !Protection_from_shape_changers()
+            && !sensemon(mtmp)) {
             await stumble_onto_mimic(mtmp);
         } else if (mtmp.mpeaceful && !Hallucination()) {   /* m_monnam(): "dog" or "Fido", no "invisible dog" or "it" */
             await pline($C`Pardon me, %s.`, await m_monnam(mtmp));
@@ -1892,9 +2078,22 @@ async function domove_attackmon_at(mtmp, x, y, displaceu) {   // hack.c:1955
      * This is different from ceiling hiders, who aren't handled in
      * do_attack().
      */
-    if (svc.context.forcefight || !mtmp.mundetected || sensemon(mtmp) || (hides_under(mtmp.data) || mtmp.data.mlet === S.EEL) && !is_safemon(mtmp)) {
+    if (svc.context.forcefight || !mtmp.mundetected || sensemon(mtmp)
+        || (hides_under(mtmp.data) || mtmp.data.mlet === S.EEL)
+        && !is_safemon(mtmp)) {
         /* target monster might decide to switch places with you... */
-        $t1 = mtmp.data === mons[PM.DISPLACER_BEAST] && !rn2(2) && mtmp.mux === u.ux0 && mtmp.muy === u.uy0 && !helpless(mtmp) && !mtmp.meating && !mtmp.mtrapped && !u.utrap && !u.ustuck && !u.usteed && !(u.dx && u.dy && (NODIAG(u.umonnum) || bad_rock(mtmp.data, x, u.uy0) && bad_rock(mtmp.data, u.ux0, y) || bad_rock(gy.youmonst.data, u.ux0, y) && bad_rock(gy.youmonst.data, x, u.uy0))) && goodpos(u.ux0, u.uy0, mtmp, GP.ALLOW_U) ? 1 : 0, displaceu.set(0, $t1);
+        $t1 = mtmp.data === mons[PM.DISPLACER_BEAST] && !rn2(2)
+            && mtmp.mux === u.ux0 && mtmp.muy === u.uy0
+            && !helpless(mtmp)
+            && !mtmp.meating && !mtmp.mtrapped
+            && !u.utrap && !u.ustuck && !u.usteed
+            && !(u.dx && u.dy
+            && (NODIAG(u.umonnum)
+            || bad_rock(mtmp.data, x, u.uy0)
+            && bad_rock(mtmp.data, u.ux0, y)
+            || bad_rock(gy.youmonst.data, u.ux0, y)
+            && bad_rock(gy.youmonst.data, x, u.uy0)))
+            && goodpos(u.ux0, u.uy0, mtmp, GP.ALLOW_U) ? 1 : 0, displaceu.set(0, $t1);
         /* if not displacing, try to attack; note that it might evade;
            also, we don't attack tame or peaceful when safemon() */
         if (!displaceu.get(0)) {
@@ -1949,12 +2148,15 @@ async function domove_fight_web(x, y) {   // hack.c:2021
         const wtype = uwep_skill_type();
         const wskill_minus_2 = (u.weapon_skills[wtype].skill > P.UNSKILLED ? u.weapon_skills[wtype].skill : P.UNSKILLED) - 2;
         const roll = rn2($G.uwep ? 20 : 45 - Math.imul(5, wskill_minus_2) | 0);
-        if ($G.uwep && (u_wield_art(ART.STING) || $G.uwep.oartifact && attacks(AD.FIRE, $G.uwep))) {
+        if ($G.uwep && (u_wield_art(ART.STING)
+            || $G.uwep.oartifact && attacks(AD.FIRE, $G.uwep))) {
             /* guaranteed success */
-            await pline($C`%s %s through the web!`, await bare_artifactname($G.uwep), u_wield_art(ART.STING) ? $C`cuts` : $C`burns`);
+            await pline($C`%s %s through the web!`, await bare_artifactname($G.uwep),
+                u_wield_art(ART.STING) ? $C`cuts` : $C`burns`);
             /* is_blade() includes daggers (which are classified as PIERCE)
                but doesn't include axes and slashing polearms */
-        } else if ($G.uwep && !is_blade($G.uwep) && (!u.twoweap || !is_blade($G.uswapwep))) {
+        } else if ($G.uwep && !is_blade($G.uwep)
+            && (!u.twoweap || !is_blade($G.uswapwep))) {
             let uwepstr = null;
             let scndstr = null;
             /* when dual wielding, second weapon will only be mentioned
@@ -1962,12 +2164,14 @@ async function domove_fight_web(x, y) {   // hack.c:2021
             $c.strcpy(new $c.Ptr(uwepbuf, 0), await weapon_descr($G.uwep));
             $c.strcpy(new $c.Ptr(scndbuf, 0), u.twoweap ? await weapon_descr($G.uswapwep) : $C``);
             const onewep = !new $c.Ptr(scndbuf, 0).get(0) || !$c.strcmp(new $c.Ptr(uwepbuf, 0), new $c.Ptr(scndbuf, 0)) ? 1 : 0;
-            if (!strncmpi(new $c.Ptr(uwepbuf, 0), $C`armor`, -1) || !strncmpi(new $c.Ptr(uwepbuf, 0), $C`food`, -1) || !strncmpi(new $c.Ptr(uwepbuf, 0), $C`venom`, -1)) {
+            if (!strncmpi(new $c.Ptr(uwepbuf, 0), $C`armor`, -1) || !strncmpi(new $c.Ptr(uwepbuf, 0), $C`food`, -1)
+                || !strncmpi(new $c.Ptr(uwepbuf, 0), $C`venom`, -1)) {
                 /* as-is */
                 /* non-weapon item wielded, of a type where an() would
                    result in weird phrasing; dual wield not possible */
                 uwepstr = new $c.Ptr(uwepbuf, 0);
-            } else if ($G.uwep.quan === 1 && !(u.twoweap && onewep)) {
+            } else if ($G.uwep.quan === 1
+                && !(u.twoweap && onewep)) {
                 /* singular */
                 /* unless secondary is suppressed due to same type */
                 uwepstr = await an(new $c.Ptr(uwepbuf, 0));
@@ -1977,16 +2181,19 @@ async function domove_fight_web(x, y) {   // hack.c:2021
             }
             if (!onewep) {
                 (!($G.uswapwep !== $c.asRec(null, $T.obj, 112)) ? 1 : 0) ? $c.__assert_rtn($C`domove_fight_web`, $C`hack.c`, 2065, $C`uswapwep != NULL`) : 0;
-                scndstr = $G.uswapwep.quan === 1 ? await an(new $c.Ptr(scndbuf, 0)) : await makeplural(new $c.Ptr(scndbuf, 0));
+                scndstr = $G.uswapwep.quan === 1 ? await an(new $c.Ptr(scndbuf, 0))
+                    : await makeplural(new $c.Ptr(scndbuf, 0));
             }
-            await You_cant($C`cut a web with %s%s%s!`, uwepstr, !onewep ? $C` or ` : $C``, !onewep ? scndstr : $C``);
+            await You_cant($C`cut a web with %s%s%s!`, uwepstr,
+                !onewep ? $C` or ` : $C``, !onewep ? scndstr : $C``);
             return TRUE;
             /* weapon is ok; check whether hit is successful */
         } else if (roll > (acurrstr() - 2 + ($G.uwep ? $G.uwep.spe + wskill_minus_2 | 0 : 0) | 0)) {
             /* 1..19 */
             /* for weaponless, 'roll' was adjusted above */
             /* TODO: add failures, maybe make an occupation? */
-            await You($C`%s ineffectually at some of the strands.`, $G.uwep ? $C`hack` : $C`thrash`);
+            await You($C`%s ineffectually at some of the strands.`,
+                $G.uwep ? $C`hack` : $C`thrash`);
             return TRUE;
             /* hit has succeeded */
         } else {
@@ -2025,18 +2232,24 @@ async function domove_swap_with_pet(mtmp, x, y) {   // hack.c:2098
     if (!trap) {
         mtmp.mtrapped = 0;
     }
-    if (mtmp.mtrapped && is_pit(trap.ttyp) && sobj_at(BOULDER, trap.tx, trap.ty)) {
+    if (mtmp.mtrapped && is_pit(trap.ttyp)
+        && sobj_at(BOULDER, trap.tx, trap.ty)) {
         /* can't swap places with pet pinned in a pit by a boulder */
         didnt_move = TRUE;
     } else if (u.ux0 !== x && u.uy0 !== y && NODIAG($c.rdiff(mtmp.data, mons[0]))) {
         /* can't swap places when pet can't move to your spot */
         await You($C`stop.  %s can't move diagonally.`, await YMonnam(mtmp));
         didnt_move = TRUE;
-    } else if (u_with_boulder && !(verysmall(mtmp.data) && (!mtmp.minvent || curr_mon_load(mtmp) <= 600))) {
+    } else if (u_with_boulder
+        && !(verysmall(mtmp.data)
+        && (!mtmp.minvent || curr_mon_load(mtmp) <= 600))) {
         /* can't swap places when pet won't fit there with the boulder */
-        await You($C`stop.  %s won't fit into the same spot that you're at.`, await YMonnam(mtmp));
+        await You($C`stop.  %s won't fit into the same spot that you're at.`,
+            await YMonnam(mtmp));
         didnt_move = TRUE;
-    } else if (u.ux0 !== x && u.uy0 !== y && bad_rock(mtmp.data, x, u.uy0) && bad_rock(mtmp.data, u.ux0, y) && (bigmonst(mtmp.data) || curr_mon_load(mtmp) > 600)) {
+    } else if (u.ux0 !== x && u.uy0 !== y && bad_rock(mtmp.data, x, u.uy0)
+        && bad_rock(mtmp.data, u.ux0, y)
+        && (bigmonst(mtmp.data) || curr_mon_load(mtmp) > 600)) {
         /* can't swap places when pet won't fit thru the opening */
         await You($C`stop.  %s won't fit through.`, await YMonnam(mtmp));
         didnt_move = TRUE;
@@ -2052,7 +2265,10 @@ async function domove_swap_with_pet(mtmp, x, y) {   // hack.c:2098
         await You($C`stop.  %s can't move out of %s%s.`, await YMonnam(mtmp), which, what);
         await handle_tip(TIP.UNTRAP_MON);
         didnt_move = TRUE;
-    } else if (mtmp.mpeaceful && (!goodpos(u.ux0, u.uy0, mtmp, 0) || t_at(u.ux0, u.uy0) !== $c.asRec(null, $T.trap, 32) || mundisplaceable(mtmp))) {
+    } else if (mtmp.mpeaceful
+        && (!goodpos(u.ux0, u.uy0, mtmp, 0)
+        || t_at(u.ux0, u.uy0) !== $c.asRec(null, $T.trap, 32)
+        || mundisplaceable(mtmp))) {
         /* displacing peaceful into unsafe or trapped space, or trying to
            displace quest leader, Oracle, shk, priest, or vault guard */
         await You($C`stop.  %s doesn't want to swap places.`, await YMonnam(mtmp));
@@ -2063,9 +2279,17 @@ async function domove_swap_with_pet(mtmp, x, y) {   // hack.c:2098
         await place_monster(mtmp, u.ux0, u.uy0);
         await newsym(x, y);
         await newsym(u.ux0, u.uy0);
-        await You($C`%s %s.`, mtmp.mpeaceful ? $C`swap places with` : $C`frighten`, await x_monnam(mtmp, mtmp.mtame ? ARTICLE.YOUR : !has_mgivenname(mtmp) && !type_is_pname(mtmp.data) ? ARTICLE.THE : ARTICLE.NONE, mtmp.mpeaceful && !mtmp.mtame ? $C`peaceful` : null, has_mgivenname(mtmp) ? SUPPRESS.SADDLE : 0, FALSE));
+        await You($C`%s %s.`, mtmp.mpeaceful ? $C`swap places with` : $C`frighten`,
+            await x_monnam(mtmp,
+            mtmp.mtame ? ARTICLE.YOUR
+            : !has_mgivenname(mtmp)
+            && !type_is_pname(mtmp.data) ? ARTICLE.THE
+            : ARTICLE.NONE,
+            mtmp.mpeaceful && !mtmp.mtame ? $C`peaceful` : null,
+            has_mgivenname(mtmp) ? SUPPRESS.SADDLE : 0, FALSE));
         /* check for displacing it into pools and traps */
-        switch (await minliquid(mtmp) ? Trap.Killed_Mon : await mintrap(mtmp, NO_TRAP_FLAGS)) {
+        switch (await minliquid(mtmp) ? Trap.Killed_Mon
+            : await mintrap(mtmp, NO_TRAP_FLAGS)) {
             case Trap.Effect_Finished:
                 break;
             case Trap.Caught_Mon:
@@ -2131,10 +2355,13 @@ async function domove_fight_empty(x, y) {   // hack.c:2229
      * because m_at() might find a vault guard there */
     /* specifying 'F' with no monster wastes a turn */
     /* remembered an 'I' && didn't use a move command */
-    if (svc.context.forcefight || glyph_is_invisible(glyph) && !m_at(x, y) && !svc.context.nopick) {
+    if (svc.context.forcefight
+        || glyph_is_invisible(glyph) && !m_at(x, y)
+        && !svc.context.nopick) {
         boulder = null;
         explo = Upolyd() && attacktype(gy.youmonst.data, AT.EXPL) ? 1 : 0;
-        solid = off_edge || (!accessible(x, y) || svl.level.locations[x][y].typ >= STAIRS && svl.level.locations[x][y].typ <= ALTAR) ? 1 : 0;
+        solid = off_edge || (!accessible(x, y)
+            || svl.level.locations[x][y].typ >= STAIRS && svl.level.locations[x][y].typ <= ALTAR) ? 1 : 0;
         futile$: {
             if (off_edge) {
                 /* treat as if solid rock, even on planes' levels */
@@ -2146,14 +2373,17 @@ async function domove_fight_empty(x, y) {   // hack.c:2229
                 /* if a statue is displayed at the target location,
                    player is attempting to attack it [and boulder
                    handling below is suitable for handling that] */
-                if (glyph_is_statue(glyph) || Hallucination() && glyph_is_monster(glyph)) {
+                if (glyph_is_statue(glyph)
+                    || Hallucination() && glyph_is_monster(glyph)) {
                     boulder = sobj_at(STATUE, x, y);
                 }
                 /* force fight at boulder/statue or wall/door while wielding
                    pick:  start digging to break the boulder or wall */
                 /* can we dig? */
                 /* should we dig? */
-                if (svc.context.forcefight && $G.uwep && dig_typ($G.uwep, x, y) && !glyph_is_invisible(glyph) && !glyph_is_monster(glyph)) {
+                if (svc.context.forcefight
+                    && $G.uwep && dig_typ($G.uwep, x, y)
+                    && !glyph_is_invisible(glyph) && !glyph_is_monster(glyph)) {
                     await use_pick_axe2($G.uwep);
                     return TRUE;
                 }
@@ -2180,7 +2410,8 @@ async function domove_fight_empty(x, y) {   // hack.c:2229
                    5.0: used to say "solid rock" for STONE, but that made it be
                    different from unmapped walls outside of rooms (and was wrong
                    on arboreal levels) */
-                if (svl.level.locations[x][y].seenv || svl.level.locations[x][y].typ <= DBWALL || svl.level.locations[x][y].typ === SDOOR || svl.level.locations[x][y].typ === SCORR) {
+                if (svl.level.locations[x][y].seenv || svl.level.locations[x][y].typ <= DBWALL
+                    || svl.level.locations[x][y].typ === SDOOR || svl.level.locations[x][y].typ === SCORR) {
                     glyph = await back_to_glyph(x, y);
                     $c.strcpy(new $c.Ptr(buf, 0), await the(defsyms[glyph_to_cmap(glyph)].explanation));
                 } else {
@@ -2193,7 +2424,9 @@ async function domove_fight_empty(x, y) {   // hack.c:2229
                 $c.strcpy(new $c.Ptr(buf, 0), $C`thin air`);
             }
         }
-        await You($C`%s%s %s.`, !(boulder || solid) ? $C`` : !explo ? $C`harmlessly ` : $C`futilely `, explo ? $C`explode at` : $C`attack`, new $c.Ptr(buf, 0));
+        await You($C`%s%s %s.`,
+            !(boulder || solid) ? $C`` : !explo ? $C`harmlessly ` : $C`futilely `,
+            explo ? $C`explode at` : $C`attack`, new $c.Ptr(buf, 0));
         nomul(0);
         if (explo) {
             attk = attacktype_fordmg(gy.youmonst.data, AT.EXPL, AD.ANY);
@@ -2250,7 +2483,8 @@ async function water_turbulence(x, y) {   // hack.c:2365
         x.set(0, $c.i16(u.ux + u.dx | 0));
         y.set(0, $c.i16(u.uy + u.dy | 0));
         /* are we trying to move out of water while carrying too much? */
-        if (isok(x.get(0), y.get(0)) && !is_pool(x.get(0), y.get(0)) && !Is_waterlevel(u.uz) && (wtcap = near_capacity()) > wtmod) {
+        if (isok(x.get(0), y.get(0)) && !is_pool(x.get(0), y.get(0)) && !Is_waterlevel(u.uz)
+            && (wtcap = near_capacity()) > wtmod) {
             /* when escaping from drowning you need to be unencumbered
                in order to crawl out of water, but when not drowning,
                doing so while encumbered is feasible; if in an aquatic
@@ -2270,7 +2504,10 @@ async function slippery_ice_fumbling() {   // hack.c:2396
     let recharged = !Levitation() && is_ice(u.ux, u.uy) ? 1 : 0;
     const iceskater = u.usteed ? u.usteed : gy.youmonst;
     if (recharged) {
-        if ($G.uarmf && await objdescr_is($G.uarmf, $C`snow boots`) || await resists_cold(iceskater) || Flying() || is_floater(iceskater.data) || is_clinger(iceskater.data) || is_whirly(iceskater.data)) {
+        if ($G.uarmf && await objdescr_is($G.uarmf, $C`snow boots`)
+            || await resists_cold(iceskater) || Flying()
+            || is_floater(iceskater.data) || is_clinger(iceskater.data)
+            || is_whirly(iceskater.data)) {
             recharged = FALSE;
         } else if (!rn2(u.uprops[COLD_RES].intrinsic || u.uprops[COLD_RES].extrinsic ? 3 : 2)) {
             u.uprops[FUMBLING].intrinsic = $c.or64(u.uprops[FUMBLING].intrinsic, FROMOUTSIDE);
@@ -2320,10 +2557,12 @@ async function avoid_moving_on_trap(x, y, msg) {   // hack.c:2444
     let trap = null;
     /* the vibrating square is implemented as a trap but treated as if
        it were a type of terrain */
-    if ((trap = t_at(x, y)) && trap.tseen && trap.ttyp !== VIBRATING_SQUARE) {
+    if ((trap = t_at(x, y)) && trap.tseen
+        && trap.ttyp !== VIBRATING_SQUARE) {
         if (msg && flags.mention_walls) {
             set_msg_xy(x, y);
-            await You($C`stop in front of %s.`, await an(trapname(trap.ttyp, FALSE)));
+            await You($C`stop in front of %s.`,
+                await an(trapname(trap.ttyp, FALSE)));
         }
         return TRUE;
     }
@@ -2341,14 +2580,19 @@ async function avoid_moving_on_liquid(x, y, msg) {   // hack.c:2463
     /* or you are using shift-dir running and the transition isn't
        dangerous... */
     /* and you know you won't fall in */
-    if ((svl.level.locations[x][y].typ === svl.level.locations[u.ux][u.uy].typ || svc.context.run < 2 && (!is_lava(x, y) || in_air) || svc.context.travel) && (in_air || Known_lwalking() || is_pool(x, y) && Known_wwalking()) && !(svl.level.locations[x][y].typ === WATER || svl.level.locations[x][y].typ === LAVAWALL)) {
+    if ((svl.level.locations[x][y].typ === svl.level.locations[u.ux][u.uy].typ
+        || svc.context.run < 2 && (!is_lava(x, y) || in_air)
+        || svc.context.travel)
+        && (in_air || Known_lwalking() || is_pool(x, y) && Known_wwalking())
+        && !(svl.level.locations[x][y].typ === WATER || svl.level.locations[x][y].typ === LAVAWALL)) {
         /* XXX: should send 'is_clinger(gy.youmonst.data)' here once clinging
            polyforms are allowed to move over water */
         return FALSE;   /* liquid is safe to traverse */
     } else if (is_pool_or_lava(x, y) && svl.level.locations[x][y].seenv) {
         if (msg && flags.mention_walls) {
             set_msg_xy(x, y);
-            await You($C`stop at the edge of the %s.`, hliquid(is_pool(x, y) ? $C`water` : $C`lava`));
+            await You($C`stop at the edge of the %s.`,
+                hliquid(is_pool(x, y) ? $C`water` : $C`lava`));
         }
         return TRUE;
     }
@@ -2366,7 +2610,8 @@ async function avoid_running_into_trap_or_liquid(x, y) {   // hack.c:2495
     if (!svc.context.run) {
         return FALSE;
     }
-    if (await avoid_moving_on_trap(x, y, would_stop) || Blind() && await avoid_moving_on_liquid(x, y, would_stop)) {
+    if (await avoid_moving_on_trap(x, y, would_stop)
+        || Blind() && await avoid_moving_on_liquid(x, y, would_stop)) {
         nomul(0);
         if (would_stop) {
             svc.context.move = 0;
@@ -2400,7 +2645,12 @@ async function avoid_trap_andor_region(x, y) {   // hack.c:2515
     /* check whether attempted move will be viable */
     /* we don't override confirmation for poison resistance since the
        region also hinders hero's vision even if/when no damage is done */
-    if (ParanoidTrap() && !Blind() && !u.uprops[STUNNED].intrinsic && !u.uprops[CONFUSION].intrinsic && !Hallucination() && (!svc.context.nopick || svc.context.run) && (newreg = visible_region_at(x, y)) !== null && ((oldreg = visible_region_at(u.ux, u.uy)) === null || reg_damg(newreg) > 0 && reg_damg(oldreg) === 0) && await test_move(u.ux, u.uy, $c.i16(u.dx), $c.i16(u.dy), TEST.MOVE)) {
+    if (ParanoidTrap() && !Blind() && !u.uprops[STUNNED].intrinsic && !u.uprops[CONFUSION].intrinsic && !Hallucination()
+        && (!svc.context.nopick || svc.context.run)
+        && (newreg = visible_region_at(x, y)) !== null
+        && ((oldreg = visible_region_at(u.ux, u.uy)) === null
+        || reg_damg(newreg) > 0 && reg_damg(oldreg) === 0)
+        && await test_move(u.ux, u.uy, $c.i16(u.dx), $c.i16(u.dy), TEST.MOVE)) {
         nh_snprintf($C`avoid_trap_andor_region`, 2544, new $c.Ptr(qbuf, 0), 128, $C`%s into that %s cloud?`, u_locomotion($C`step`), reg_damg(newreg) > 0 ? $C`poison gas` : $C`vapor`);
         if (!await paranoid_query(ParanoidConfirm(), upstart(new $c.Ptr(qbuf, 0)))) {
             nomul(0);
@@ -2415,7 +2665,12 @@ async function avoid_trap_andor_region(x, y) {   // hack.c:2515
     /* override confirmation if the trap is harmless to the hero */
     /* Hallucination: all traps still show as ^, but the
        hero can't tell what they are, so treat as dangerous */
-    if (ParanoidTrap() && !u.uprops[STUNNED].intrinsic && !u.uprops[CONFUSION].intrinsic && (!svc.context.nopick || svc.context.run) && (trap = t_at(x, y)) !== null && trap.tseen && await test_move(u.ux, u.uy, $c.i16(u.dx), $c.i16(u.dy), TEST.MOVE) && (await immune_to_trap(gy.youmonst, trap.ttyp) !== TRAP.CLEARLY_IMMUNE || Hallucination())) {
+    if (ParanoidTrap() && !u.uprops[STUNNED].intrinsic && !u.uprops[CONFUSION].intrinsic
+        && (!svc.context.nopick || svc.context.run)
+        && (trap = t_at(x, y)) !== null && trap.tseen
+        && await test_move(u.ux, u.uy, $c.i16(u.dx), $c.i16(u.dy), TEST.MOVE)
+        && (await immune_to_trap(gy.youmonst, trap.ttyp) !== TRAP.CLEARLY_IMMUNE
+        || Hallucination())) {
         const traptype = Hallucination() ? rnd(TRAPNUM - 1) : trap.ttyp;
         const into = into_vs_onto(traptype);
         nh_snprintf($C`avoid_trap_andor_region`, 2570, new $c.Ptr(qbuf, 0), 128, $C`Really %s %s that %s?`, u_locomotion($C`step`), into ? $C`into` : $C`onto`, defsyms[(S.arrow_trap + traptype | 0) - 1 | 0].explanation);
@@ -2456,7 +2711,8 @@ async function move_out_of_bounds(x, y) {   // hack.c:2586
                     dy = 0;
                 }
             }
-            await You($C`have already gone as far %s as possible.`, directionname(xytodir(dx, dy)));
+            await You($C`have already gone as far %s as possible.`,
+                directionname(xytodir(dx, dy)));
         }
         nomul(0);
         svc.context.move = 0;
@@ -2470,7 +2726,11 @@ async function move_out_of_bounds(x, y) {   // hack.c:2586
  */
 async function carrying_too_much() {   // hack.c:2616
     let wtcap = 0;
-    if (((wtcap = near_capacity()) >= OVERLOADED || wtcap > SLT_ENCUMBER && (Upolyd() ? u.mh < 5 && u.mh !== u.mhmax : u.uhp < 10 && u.uhp !== u.uhpmax)) && !Is_airlevel(u.uz)) {
+    if (((wtcap = near_capacity()) >= OVERLOADED
+        || wtcap > SLT_ENCUMBER
+        && (Upolyd() ? u.mh < 5 && u.mh !== u.mhmax
+        : u.uhp < 10 && u.uhp !== u.uhpmax))
+        && !Is_airlevel(u.uz)) {
         if (wtcap < OVERLOADED) {
             await You($C`don't have enough stamina to move.`);
             await exercise(A.CON, FALSE);
@@ -2611,7 +2871,11 @@ async function domove_core() {   // hack.c:2712
             /* Don't attack if you're running, and can see it */
             /* It's fine to displace pets, though */
             /* We should never get here if forcefight */
-            if (svc.context.run && (!Blind() && mon_visible(mtmp) && (M_AP_TYPE(mtmp) !== M_AP.FURNITURE && M_AP_TYPE(mtmp) !== M_AP.OBJECT || Protection_from_shape_changers()) || sensemon(mtmp))) {
+            if (svc.context.run && (!Blind() && mon_visible(mtmp)
+                && (M_AP_TYPE(mtmp) !== M_AP.FURNITURE
+                && M_AP_TYPE(mtmp) !== M_AP.OBJECT
+                || Protection_from_shape_changers())
+                || sensemon(mtmp))) {
                 nomul(0);
                 svc.context.move = 0;
                 return;
@@ -2694,7 +2958,8 @@ async function domove_core() {   // hack.c:2712
     }   /* !dislacedu */
     /* Move ball and chain.  */
     if (Punished()) {
-        if (!await drag_ball(x[0], y[0], new $c.Ptr(bc_control, 0), new $c.Ptr(ballx, 0), new $c.Ptr(bally, 0), new $c.Ptr(chainx, 0), new $c.Ptr(chainy, 0), new $c.Ptr(cause_delay, 0), TRUE)) {
+        if (!await drag_ball(x[0], y[0], new $c.Ptr(bc_control, 0), new $c.Ptr(ballx, 0), new $c.Ptr(bally, 0), new $c.Ptr(chainx, 0), new $c.Ptr(chainy, 0),
+            new $c.Ptr(cause_delay, 0), TRUE)) {
             return;
         }
     }
@@ -2716,14 +2981,17 @@ async function domove_core() {   // hack.c:2712
     }
     if (mtmp) {
         if (displaceu[0]) {
-            const noticed_it = canspotmon(mtmp) || glyph_is_invisible(glyph) || glyph_is_warning(glyph) ? 1 : 0;
+            const noticed_it = canspotmon(mtmp)
+                || glyph_is_invisible(glyph)
+                || glyph_is_warning(glyph) ? 1 : 0;
             svl.level.monsters[u.ux][u.uy] = null;
             await place_monster(mtmp, u.ux0, u.uy0);
             await newsym(u.ux, u.uy);
             await newsym(u.ux0, u.uy0);
             /* monst still knows where hero is */
             mtmp.mux = u.ux, mtmp.muy = u.uy;
-            await pline($C`%s swaps places with you...`, !noticed_it ? c_common_strings.c_Something : await YMonnam(mtmp));
+            await pline($C`%s swaps places with you...`,
+                !noticed_it ? c_common_strings.c_Something : await YMonnam(mtmp));
             if (!canspotmon(mtmp)) {
                 await map_invisible(u.ux0, u.uy0);
             }
@@ -2744,7 +3012,8 @@ async function domove_core() {   // hack.c:2712
              * Ceiling-hiding pets are skipped by this section of code, to
              * be caught by the normal falling-monster code.
              */
-        } else if (is_safemon(mtmp) && !(is_hider(mtmp.data) && mtmp.mundetected)) {
+        } else if (is_safemon(mtmp)
+            && !(is_hider(mtmp.data) && mtmp.mundetected)) {
             if (!await domove_swap_with_pet(mtmp, x[0], y[0])) {
                 u.ux = u.ux0, u.uy = u.uy0;   /* didn't move after all */
                 /* could skip this since we're about to call u_on_newpos() */
@@ -2761,16 +3030,19 @@ async function domove_core() {   // hack.c:2712
     reset_occupations();
     if (svc.context.run) {
         if (svc.context.run < 8) {
-            if (IS_DOOR(tmpr.typ) || IS_OBSTRUCTED(tmpr.typ) || IS_FURNITURE(tmpr.typ)) {
+            if (IS_DOOR(tmpr.typ) || IS_OBSTRUCTED(tmpr.typ)
+                || IS_FURNITURE(tmpr.typ)) {
                 nomul(0);
             }
         }
     }
     /* your tread on the ground may disturb the slumber of nearby zombies */
-    if (!Levitation() && !Flying() && !Stealth() && gy.youmonst.data.cwt >= 400) {
+    if (!Levitation() && !Flying() && !Stealth()
+        && gy.youmonst.data.cwt >= 400) {
         await disturb_buried_zombies(u.ux, u.uy);
     }
-    if (hides_under(gy.youmonst.data) || gy.youmonst.data.mlet === S.EEL || u.dx || u.dy) {
+    if (hides_under(gy.youmonst.data) || gy.youmonst.data.mlet === S.EEL
+        || u.dx || u.dy) {
         await hideunder(gy.youmonst);
     }
     /*
@@ -2778,7 +3050,8 @@ async function domove_core() {   // hack.c:2712
      * imitating something that doesn't move.  We could extend this
      * to non-moving monsters...
      */
-    if ((u.dx || u.dy) && (U_AP_TYPE() === M_AP.OBJECT || U_AP_TYPE() === M_AP.FURNITURE)) {
+    if ((u.dx || u.dy) && (U_AP_TYPE() === M_AP.OBJECT
+        || U_AP_TYPE() === M_AP.FURNITURE)) {
         gy.youmonst.m_ap_type = M_AP.NOTHING;
     }
     await check_leash(u.ux0, u.uy0);
@@ -2846,7 +3119,8 @@ async function maybe_smudge_engr(x1, y1, x2, y2) {   // hack.c:3020
         if ((ep = engr_at(x1, y1)) && ep.engr_type !== HEADSTONE) {
             await wipe_engr_at(x1, y1, $c.i16(rnd(5)), FALSE);
         }
-        if ((x2 !== x1 || y2 !== y1) && (ep = engr_at(x2, y2)) && ep.engr_type !== HEADSTONE) {
+        if ((x2 !== x1 || y2 !== y1)
+            && (ep = engr_at(x2, y2)) && ep.engr_type !== HEADSTONE) {
             await wipe_engr_at(x2, y2, $c.i16(rnd(5)), FALSE);
         }
     }
@@ -2899,7 +3173,8 @@ export async function invocation_message() {   // hack.c:3064
         await You_feel($C`a strange vibration %s.`, new $c.Ptr(buf, 0));
         u.uevent.uvibrated = 1;
         if (otmp && otmp.spe === 7 && otmp.lamplit) {
-            await pline($C`%s %s!`, await The(await xname(otmp)), Blind() ? $C`throbs palpably` : $C`glows with a strange light`);
+            await pline($C`%s %s!`, await The(await xname(otmp)),
+                Blind() ? $C`throbs palpably` : $C`glows with a strange light`);
         }
     }
 }
@@ -2984,7 +3259,9 @@ export function classify_terrain() {   // hack.c:3090
  */
 export async function switch_terrain() {   // hack.c:3178
     const lev = $c.relem(svl.level.locations[u.ux], u.uy);
-    const blocklev = IS_OBSTRUCTED(lev.typ) || closed_door(u.ux, u.uy) || IS_WATERWALL(lev.typ) || lev.typ === LAVAWALL ? 1 : 0;
+    const blocklev = IS_OBSTRUCTED(lev.typ) || closed_door(u.ux, u.uy)
+        || IS_WATERWALL(lev.typ)
+        || lev.typ === LAVAWALL ? 1 : 0;
     const was_levitating = !!Levitation() ? 1 : 0;
     const was_flying = !!Flying() ? 1 : 0;
     if (blocklev) {
@@ -3109,7 +3386,9 @@ export async function pooleffects(newspot) {   // hack.c:3233
             if (await lava_effects()) {
                 return TRUE;
             }
-        } else if ((!Wwalking() || is_waterwall(u.ux, u.uy)) && (newspot || !u.uinwater || !(Swimming() || Amphibious() || Breathless()))) {
+        } else if ((!Wwalking() || is_waterwall(u.ux, u.uy))
+            && (newspot || !u.uinwater
+            || !(Swimming() || Amphibious() || Breathless()))) {
             if (await drown()) {
                 return TRUE;
             }
@@ -3130,7 +3409,9 @@ export async function spoteffects(pick) {   // hack.c:3312
        damage that triggers rehumanize() which calls spoteffects()...] */
     /* except when reason is transformed terrain (ice -> water) */
     /* or transformed trap (land mine -> pit) */
-    if (spoteffects$inspoteffects && (spoteffects$spotloc.x === u.ux && spoteffects$spotloc.y === u.uy) && spoteffects$spotterrain === svl.level.locations[u.ux][u.uy].typ && (!spoteffects$spottrap || !trap || trap.ttyp === spoteffects$spottraptyp)) {
+    if (spoteffects$inspoteffects && (spoteffects$spotloc.x === u.ux && spoteffects$spotloc.y === u.uy)
+        && spoteffects$spotterrain === svl.level.locations[u.ux][u.uy].typ
+        && (!spoteffects$spottrap || !trap || trap.ttyp === spoteffects$spottraptyp)) {
         return;
     }
     /* when float_down() puts hero into lava and she teleports out,
@@ -3144,7 +3425,8 @@ export async function spoteffects(pick) {   // hack.c:3312
     /* moving onto different terrain might cause Lev or Fly to toggle;
       level change sets <ux0,uy0> to <ux,uy>, so this spotterrain
       check always fails then, but it also sets iflags.terrain_typ */
-    if (spoteffects$spotterrain !== svl.level.locations[u.ux0][u.uy0].typ || iflags.terrain_typ === MAX_TYPE) {
+    if (spoteffects$spotterrain !== svl.level.locations[u.ux0][u.uy0].typ
+        || iflags.terrain_typ === MAX_TYPE) {
         await switch_terrain();
     }
     spotdone$: {
@@ -3161,7 +3443,8 @@ export async function spoteffects(pick) {   // hack.c:3312
                turn, allowing it to do so could give the perception
                that a trap here is being triggered twice, so adjust
                the timeout to prevent that */
-            if (trap && $c.and64(u.uprops[LEVITATION].intrinsic, TIMEOUT) === 1 && !(ELevitation() || $c.and64(u.uprops[LEVITATION].intrinsic, ~(I_SPECIAL | TIMEOUT)))) {
+            if (trap && $c.and64(u.uprops[LEVITATION].intrinsic, TIMEOUT) === 1
+                && !(ELevitation() || $c.and64(u.uprops[LEVITATION].intrinsic, ~(I_SPECIAL | TIMEOUT)))) {
                 if (rn2(2)) {
                     /* defer timeout */
                     incr_itimeout(new $c.FieldRef(u.uprops[LEVITATION], "intrinsic", "i64"), 1);
@@ -3207,22 +3490,28 @@ export async function spoteffects(pick) {   // hack.c:3312
         if (Warning() && is_ice(u.ux, u.uy)) {
             time_left = spot_time_left(u.ux, u.uy, MELT_ICE_AWAY);
             if (time_left && time_left < 15) {
-                await pline($C`%s`, spoteffects$icewarnings[time_left < 5 ? 2 : time_left < 10 ? 1 : 0]);
+                await pline($C`%s`, spoteffects$icewarnings[time_left < 5 ? 2
+                    : time_left < 10 ? 1
+                    : 0]);
             }
         }
         if ((mtmp = svl.level.monsters[u.ux][u.uy]) !== null && !u.uswallow) {
             $t1 = mtmp.msleeping = 0, mtmp.mundetected = ($t1) & 1;
             switch (mtmp.data.mlet) {
                 case S.PIERCER:
-                    await pline($C`%s suddenly drops from the %s!`, await Amonnam(mtmp), ceiling(u.ux, u.uy));
+                    await pline($C`%s suddenly drops from the %s!`, await Amonnam(mtmp),
+                        ceiling(u.ux, u.uy));
                     if (mtmp.mtame) {
                         /* jumps to greet you, not attack */
                     } else if (hard_helmet($G.uarmh)) {
-                        await pline($C`Its blow glances off your %s.`, helm_simple_name($G.uarmh));
+                        await pline($C`Its blow glances off your %s.`,
+                            helm_simple_name($G.uarmh));
                     } else if (u.uac + 3 <= rnd(20)) {
-                        await You($C`are almost hit by %s!`, await x_monnam(mtmp, ARTICLE.A, $C`falling`, 0, TRUE));
+                        await You($C`are almost hit by %s!`,
+                            await x_monnam(mtmp, ARTICLE.A, $C`falling`, 0, TRUE));
                     } else {
-                        await You($C`are hit by %s!`, await x_monnam(mtmp, ARTICLE.A, $C`falling`, 0, TRUE));
+                        await You($C`are hit by %s!`,
+                            await x_monnam(mtmp, ARTICLE.A, $C`falling`, 0, TRUE));
                         dmg = d(4, 6);
                         if (Half_physical_damage()) {
                             dmg = $c.div32(dmg + 1 | 0, 2);
@@ -3233,9 +3522,11 @@ export async function spoteffects(pick) {   // hack.c:3312
                 default:
                     /* monster surprises you. */
                     if (mtmp.mtame) {
-                        await pline($C`%s jumps near you from the %s.`, await Amonnam(mtmp), ceiling(u.ux, u.uy));
+                        await pline($C`%s jumps near you from the %s.`, await Amonnam(mtmp),
+                            ceiling(u.ux, u.uy));
                     } else if (mtmp.mpeaceful) {
-                        await You($C`surprise %s!`, Blind() && !sensemon(mtmp) ? c_common_strings.c_something : await a_monnam(mtmp));
+                        await You($C`surprise %s!`,
+                            Blind() && !sensemon(mtmp) ? c_common_strings.c_something : await a_monnam(mtmp));
                         mtmp.mpeaceful = 0;
                     } else {
                         await pline($C`%s attacks you by surprise!`, await Amonnam(mtmp));
@@ -3263,7 +3554,8 @@ function monstinroom(mdat, roomno) {   // hack.c:3466
         if (DEADMONSTER(mtmp)) {
             continue;
         }
-        if (mtmp.data === mdat && $c.strchr(in_rooms(mtmp.mx, mtmp.my, 0), roomno + ROOMOFFSET | 0)) {
+        if (mtmp.data === mdat
+            && $c.strchr(in_rooms(mtmp.mx, mtmp.my, 0), roomno + ROOMOFFSET | 0)) {
             return mtmp;
         }
     }
@@ -3335,21 +3627,24 @@ export function in_rooms(x, y, typewanted) {   // hack.c:3498
     for (x = $c.i16(min_x); x <= max_x; x = $c.i16(x + step | 0)) {
         const lev = $c.relem(svl.level.locations[x], min_y);
         y = 0;
-        if ((rno = $c.radd(lev, y).roomno) >= ROOMOFFSET && !$c.strchr(ptr, rno) && (!typewanted || (typefound = svr.rooms[rno - ROOMOFFSET].rtype) === typewanted || typewanted === SHOPBASE && typefound > SHOPBASE)) {
+        if ((rno = $c.radd(lev, y).roomno) >= ROOMOFFSET && !$c.strchr(ptr, rno)
+            && (!typewanted || (typefound = svr.rooms[rno - ROOMOFFSET].rtype) === typewanted || typewanted === SHOPBASE && typefound > SHOPBASE)) {
             (ptr = ptr.add(-1)).set(0, rno);
         }
         y = $c.i16(y + step | 0);
         if (y > max_y_offset) {
             continue;
         }
-        if ((rno = $c.radd(lev, y).roomno) >= ROOMOFFSET && !$c.strchr(ptr, rno) && (!typewanted || (typefound = svr.rooms[rno - ROOMOFFSET].rtype) === typewanted || typewanted === SHOPBASE && typefound > SHOPBASE)) {
+        if ((rno = $c.radd(lev, y).roomno) >= ROOMOFFSET && !$c.strchr(ptr, rno)
+            && (!typewanted || (typefound = svr.rooms[rno - ROOMOFFSET].rtype) === typewanted || typewanted === SHOPBASE && typefound > SHOPBASE)) {
             (ptr = ptr.add(-1)).set(0, rno);
         }
         y = $c.i16(y + step | 0);
         if (y > max_y_offset) {
             continue;
         }
-        if ((rno = $c.radd(lev, y).roomno) >= ROOMOFFSET && !$c.strchr(ptr, rno) && (!typewanted || (typefound = svr.rooms[rno - ROOMOFFSET].rtype) === typewanted || typewanted === SHOPBASE && typefound > SHOPBASE)) {
+        if ((rno = $c.radd(lev, y).roomno) >= ROOMOFFSET && !$c.strchr(ptr, rno)
+            && (!typewanted || (typefound = svr.rooms[rno - ROOMOFFSET].rtype) === typewanted || typewanted === SHOPBASE && typefound > SHOPBASE)) {
             (ptr = ptr.add(-1)).set(0, rno);
         }
     }
@@ -3441,7 +3736,8 @@ export async function check_special_room(newlev) {   // hack.c:3626
      * TODO: change the minetn variants which don't include any town
      * boundary to have such.
      */
-    if (svl.level.flags.has_town && !svc.context.achieveo.minetn_reached && In_mines(u.uz) && in_town(u.ux, u.uy)) {
+    if (svl.level.flags.has_town && !svc.context.achieveo.minetn_reached
+        && In_mines(u.uz) && in_town(u.ux, u.uy)) {
         await record_achievement(ACH.TOWN);
         svc.context.achieveo.minetn_reached = TRUE;
     }
@@ -3465,11 +3761,13 @@ export async function check_special_room(newlev) {   // hack.c:3626
                 await pline($C`Welcome to David's treasure zoo!`);
                 break;
             case SWAMP:
-                await pline($C`It %s rather %s down here.`, Blind() ? $C`feels` : $C`looks`, Blind() ? $C`humid` : $C`muddy`);
+                await pline($C`It %s rather %s down here.`, Blind() ? $C`feels` : $C`looks`,
+                    Blind() ? $C`humid` : $C`muddy`);
                 break;
             case COURT:
                 /* the throne room in Sam quest home level lacks a throne */
-                await You($C`enter an opulent%s room!`, !furniture_present(THRONE, roomno) ? $C`` : $C` throne`);
+                await You($C`enter an opulent%s room!`,
+                    !furniture_present(THRONE, roomno) ? $C`` : $C` throne`);
                 break;
             case LEPREHALL:
                 await You($C`enter a leprechaun hall!`);
@@ -3492,7 +3790,10 @@ export async function check_special_room(newlev) {   // hack.c:3626
                 await You($C`enter an anthole!`);
                 break;
             case BARRACKS:
-                if (monstinroom(mons[PM.SOLDIER], roomno) || monstinroom(mons[PM.SERGEANT], roomno) || monstinroom(mons[PM.LIEUTENANT], roomno) || monstinroom(mons[PM.CAPTAIN], roomno)) {
+                if (monstinroom(mons[PM.SOLDIER], roomno)
+                    || monstinroom(mons[PM.SERGEANT], roomno)
+                    || monstinroom(mons[PM.LIEUTENANT], roomno)
+                    || monstinroom(mons[PM.CAPTAIN], roomno)) {
                     await You($C`enter a military barracks!`);
                 } else {
                     await You($C`enter an abandoned barracks.`);
@@ -3505,7 +3806,8 @@ export async function check_special_room(newlev) {   // hack.c:3626
                         if (!oracle.mpeaceful) {
                             await verbalize($C`You're in Delphi, %s.`, new $c.Ptr(svp.plname, 0));
                         } else {
-                            await verbalize($C`%s, %s, welcome to Delphi!`, Hello(null), new $c.Ptr(svp.plname, 0));
+                            await verbalize($C`%s, %s, welcome to Delphi!`,
+                                Hello(null), new $c.Ptr(svp.plname, 0));
                         }
                     } else {
                         msg_given = FALSE;
@@ -3556,7 +3858,8 @@ export async function check_special_room(newlev) {   // hack.c:3626
                     if (DEADMONSTER(mtmp)) {
                         continue;
                     }
-                    if (!isok(mtmp.mx, mtmp.my) || roomno !== svl.level.locations[mtmp.mx][mtmp.my].roomno) {
+                    if (!isok(mtmp.mx, mtmp.my)
+                        || roomno !== svl.level.locations[mtmp.mx][mtmp.my].roomno) {
                         continue;
                     }
                     if (!Stealth() && !rn2(3)) {
@@ -3585,7 +3888,8 @@ async function pickup_checks() {   // hack.c:3788
                 await You($C`pick up %s tongue.`, s_suffix(await mon_nam(u.ustuck)));
                 await pline($C`But it's kind of slimy, so you drop it.`);
             } else {
-                await You($C`don't %s anything in here to pick up.`, Blind() ? $C`feel` : $C`see`);
+                await You($C`don't %s anything in here to pick up.`,
+                    Blind() ? $C`feel` : $C`see`);
             }
             return 1;
         } else {
@@ -3593,8 +3897,10 @@ async function pickup_checks() {   // hack.c:3788
         }
     }
     if (is_pool(u.ux, u.uy)) {
-        if (Wwalking() || is_floater(gy.youmonst.data) || is_clinger(gy.youmonst.data) || Flying() && !Breathless()) {
-            await You($C`cannot dive into the %s to pick things up.`, hliquid($C`water`));
+        if (Wwalking() || is_floater(gy.youmonst.data)
+            || is_clinger(gy.youmonst.data) || Flying() && !Breathless()) {
+            await You($C`cannot dive into the %s to pick things up.`,
+                hliquid($C`water`));
             return 0;
         } else if (!Underwater()) {
             await You_cant($C`even see the bottom, let alone pick up %s.`, c_common_strings.c_something);
@@ -3602,7 +3908,8 @@ async function pickup_checks() {   // hack.c:3788
         }
     }
     if (is_lava(u.ux, u.uy)) {
-        if (Wwalking() || is_floater(gy.youmonst.data) || is_clinger(gy.youmonst.data) || Flying() && !Breathless()) {
+        if (Wwalking() || is_floater(gy.youmonst.data)
+            || is_clinger(gy.youmonst.data) || Flying() && !Breathless()) {
             await You_cant($C`reach the bottom to pick things up.`);
             return 0;
         } else if (!likes_lava(gy.youmonst.data)) {
@@ -3668,7 +3975,8 @@ export async function dopickup() {   // hack.c:3876
         return ret ? ECMD.TIME : ECMD.OK;
     } else if (ret === -2) {
         tmpcount[0] = -count | 0;
-        return await loot_mon(u.ustuck, new $c.Ptr(tmpcount, 0), null) ? ECMD.TIME : ECMD.OK;
+        return await loot_mon(u.ustuck, new $c.Ptr(tmpcount, 0), null) ? ECMD.TIME
+            : ECMD.OK;
     }   /* else ret == -1 */
     return await pickup(-count | 0) ? ECMD.TIME : ECMD.OK;
 }
@@ -3717,12 +4025,17 @@ export async function lookaround() {   // hack.c:3898
                                 continue L3;
                             }
                             /* can we see a monster there? */
-                            if ((mtmp = svl.level.monsters[x][y]) !== null && M_AP_TYPE(mtmp) !== M_AP.FURNITURE && M_AP_TYPE(mtmp) !== M_AP.OBJECT && mon_visible(mtmp)) {
+                            if ((mtmp = svl.level.monsters[x][y]) !== null
+                                && M_AP_TYPE(mtmp) !== M_AP.FURNITURE
+                                && M_AP_TYPE(mtmp) !== M_AP.OBJECT
+                                && mon_visible(mtmp)) {
                                 /* running movement and not a hostile monster */
                                 /* OR it blocks our move direction and we're not traveling */
-                                if (svc.context.run !== 1 && !is_safemon(mtmp) || infront && !svc.context.travel) {
+                                if (svc.context.run !== 1 && !is_safemon(mtmp)
+                                    || infront && !svc.context.travel) {
                                     if (flags.mention_walls) {
-                                        await pline_xy(x, y, $C`%s blocks your path.`, upstart(await a_monnam(mtmp)));
+                                        await pline_xy(x, y, $C`%s blocks your path.`,
+                                            upstart(await a_monnam(mtmp)));
                                     }
                                     $goto = "stop"; continue D2;
                                 }
@@ -3736,7 +4049,8 @@ export async function lookaround() {   // hack.c:3898
                                 continue L3;
                             }
                             /* stop for traps, sometimes */
-                            if (await avoid_moving_on_trap(x, y, infront && svc.context.run > 1 ? 1 : 0)) {
+                            if (await avoid_moving_on_trap(x, y,
+                                infront && svc.context.run > 1 ? 1 : 0)) {
                                 if (svc.context.run === 1) {
                                     $goto = "bcorr"; continue D2;   /* if you must */
                                 }
@@ -3746,7 +4060,8 @@ export async function lookaround() {   // hack.c:3898
                             }
                         case "bcorr":
                             /* more uninteresting terrain */
-                            if ($goto !== "bcorr" && (svl.level.locations[x][y].typ < POOL || svl.level.locations[x][y].typ === ROOM || (svl.level.locations[x][y].typ === AIR || svl.level.locations[x][y].typ === CLOUD) || svl.level.locations[x][y].typ === ICE)) {
+                            if ($goto !== "bcorr" && (svl.level.locations[x][y].typ < POOL || svl.level.locations[x][y].typ === ROOM
+                                || (svl.level.locations[x][y].typ === AIR || svl.level.locations[x][y].typ === CLOUD) || svl.level.locations[x][y].typ === ICE)) {
                                 continue L3;
                             } else if ($goto !== "bcorr" && (closed_door(x, y) || mtmp && is_door_mappear(mtmp))) {
                                 /* a closed door? */
@@ -3768,7 +4083,8 @@ export async function lookaround() {   // hack.c:3898
                                 $goto = null;   // bcorr:
                                 if (svl.level.locations[u.ux][u.uy].typ !== ROOM) {
                                     /* running or traveling */
-                                    if (svc.context.run === 1 || svc.context.run === 3 || svc.context.run === 8) {
+                                    if (svc.context.run === 1 || svc.context.run === 3
+                                        || svc.context.run === 8) {
                                         /* distance from x,y to location we're moving to */
                                         i = $c.i16(dist2(x, y, $c.i16(u.ux + u.dx | 0), $c.i16(u.uy + u.dy | 0)));
                                         /* ignore if not on or directly adjacent to it */
@@ -3809,7 +4125,8 @@ export async function lookaround() {   // hack.c:3898
                                 if (mtmp) {
                                     continue L3;   /* d */
                                 }
-                                if (x === (u.ux - u.dx | 0) && y !== (u.uy + u.dy | 0) || y === (u.uy - u.dy | 0) && x !== (u.ux + u.dx | 0)) {
+                                if (x === (u.ux - u.dx | 0) && y !== (u.uy + u.dy | 0)
+                                    || y === (u.uy - u.dy | 0) && x !== (u.ux + u.dx | 0)) {
                                     continue L3;
                                 }
                             }
@@ -3828,7 +4145,9 @@ export async function lookaround() {   // hack.c:3898
                 }
                 $goto = "stop"; continue D1;
             }
-            if ((svc.context.run === 1 || svc.context.run === 3 || svc.context.run === 8) && !noturn && !m0 && i0 && (corrct === 1 || corrct === 2 && i0 === 1)) {
+            if ((svc.context.run === 1 || svc.context.run === 3 || svc.context.run === 8)
+                && !noturn && !m0 && i0
+                && (corrct === 1 || corrct === 2 && i0 === 1)) {
                 /* make sure that we do not turn too far */
                 if (i0 === 2) {
                     if (u.dx === y0 - u.uy && u.dy === u.ux - x0) {
@@ -3843,7 +4162,8 @@ export async function lookaround() {   // hack.c:3898
                         i = 1;   /* half turn right */
                     }
                 } else {
-                    if (x0 - u.ux === y0 - u.uy && !u.dy || x0 - u.ux !== y0 - u.uy && u.dy) {
+                    if (x0 - u.ux === y0 - u.uy && !u.dy
+                        || x0 - u.ux !== y0 - u.uy && u.dy) {
                         i = 1;   /* half turn right */
                     } else {
                         i = -1;   /* half turn left */
@@ -3906,7 +4226,9 @@ export async function crawl_destination(x, y) {   // hack.c:4079
         return FALSE;
     }
     /* finally, are we trying to squeeze through a too-narrow gap? */
-    return !(bad_rock(gy.youmonst.data, u.ux, y) && bad_rock(gy.youmonst.data, x, u.uy) && cant_squeeze_thru(gy.youmonst)) ? 1 : 0;
+    return !(bad_rock(gy.youmonst.data, u.ux, y)
+        && bad_rock(gy.youmonst.data, x, u.uy)
+        && cant_squeeze_thru(gy.youmonst)) ? 1 : 0;
 }
 /* something like lookaround, but we are not running */
 /* react only to monsters that might hit us */
@@ -3921,7 +4243,14 @@ export function monster_nearby() {   // hack.c:4106
             if (!isok(x, y) || u_at(x, y)) {
                 continue;
             }
-            if ((mtmp = svl.level.monsters[x][y]) !== null && M_AP_TYPE(mtmp) !== M_AP.FURNITURE && M_AP_TYPE(mtmp) !== M_AP.OBJECT && (Hallucination() || !mtmp.mpeaceful && !noattacks(mtmp.data)) && (!is_hider(mtmp.data) || !mtmp.mundetected) && !helpless(mtmp) && !onscary(u.ux, u.uy, mtmp) && canspotmon(mtmp)) {
+            if ((mtmp = svl.level.monsters[x][y]) !== null
+                && M_AP_TYPE(mtmp) !== M_AP.FURNITURE
+                && M_AP_TYPE(mtmp) !== M_AP.OBJECT
+                && (Hallucination()
+                || !mtmp.mpeaceful && !noattacks(mtmp.data))
+                && (!is_hider(mtmp.data) || !mtmp.mundetected)
+                && !helpless(mtmp)
+                && !onscary(u.ux, u.uy, mtmp) && canspotmon(mtmp)) {
                 return 1;
             }
         }
@@ -4000,7 +4329,8 @@ export async function unmul(msg_override) {   // hack.c:4177
            if life-saved while poly'd and Unchanging (explore or wizard mode
            declining to die since can't be both Unchanging and Lifesaved) */
         if (Upolyd() && !strncmpi(gn.nomovemsg, $C`You survived that `, 18)) {
-            await You($C`are %s.`, await an(pmname($c.relem(mons, u.umonnum), Ugender())));   /* (ignore Hallu) */
+            await You($C`are %s.`,
+                await an(pmname($c.relem(mons, u.umonnum), Ugender())));   /* (ignore Hallu) */
         }
     }
     gn.nomovemsg = null;
@@ -4024,7 +4354,8 @@ async function maybe_wail() {   // hack.c:4211
     }
     gw.wailmsg = svm.moves;
     if (Role_if(PM.WIZARD) || Race_if(PM.ELF) || Role_if(PM.VALKYRIE)) {
-        const who = Role_if(PM.WIZARD) || Role_if(PM.VALKYRIE) ? gu.urole.name.m : $C`Elf`;
+        const who = Role_if(PM.WIZARD) || Role_if(PM.VALKYRIE) ? gu.urole.name.m
+            : $C`Elf`;
         if (u.uhp === 1) {
             await pline($C`%s is about to die.`, who);
         } else {
@@ -4033,10 +4364,13 @@ async function maybe_wail() {   // hack.c:4211
                     powercnt = powercnt + 1 | 0;
                 }
             }
-            await pline(powercnt >= 4 ? $C`%s, all your powers will be lost...` : $C`%s, your life force is running out.`, who);
+            await pline(powercnt >= 4 ? $C`%s, all your powers will be lost...`
+                : $C`%s, your life force is running out.`,
+                who);
         }
     } else {
-        await You_hear(u.uhp === 1 ? $C`the wailing of the Banshee...` : $C`the howling of the CwnAnnwn...`);
+        await You_hear(u.uhp === 1 ? $C`the wailing of the Banshee...`
+            : $C`the howling of the CwnAnnwn...`);
     }
 }
 /* show a message how much damage you received */
@@ -4114,12 +4448,15 @@ export function weight_cap() {   // hack.c:4295
             carrcap = MAX_CARR_CAP;
         } else if (!gy.youmonst.data.cwt) {
             carrcap = $c.div64($c.mul64(carrcap, gy.youmonst.data.msize), MZ.MEDIUM);
-        } else if (!strongmonst(gy.youmonst.data) || strongmonst(gy.youmonst.data) && gy.youmonst.data.cwt > WT.HUMAN) {
+        } else if (!strongmonst(gy.youmonst.data)
+            || strongmonst(gy.youmonst.data)
+            && gy.youmonst.data.cwt > WT.HUMAN) {
             carrcap = $c.div64($c.mul64(carrcap, gy.youmonst.data.cwt), WT.HUMAN);
         }
     }
     /* pugh@cornell */
-    if (Levitation() || Is_airlevel(u.uz) || u.usteed && strongmonst(u.usteed.data)) {
+    if (Levitation() || Is_airlevel(u.uz)
+        || u.usteed && strongmonst(u.usteed.data)) {
         carrcap = MAX_CARR_CAP;
     } else {
         if (carrcap > MAX_CARR_CAP) {
@@ -4235,7 +4572,8 @@ export async function dump_weights() {   // hack.c:4421
         }
     }
     for (i = 0; i < ocount; i = i + 1 | 0) {
-        const oc_name = i === SLIME_MOLD ? $C`slime mold` : obj_descr[i].oc_name;
+        const oc_name = i === SLIME_MOLD ? $C`slime mold`
+            : obj_descr[i].oc_name;
         const wt = objects[i].oc_weight | 0;
         if (wt && oc_name) {
             $c.radd(weightlist, cnt).idx = i;
@@ -4253,7 +4591,9 @@ export async function dump_weights() {   // hack.c:4421
     await raw_printf($C`int all_weights[] = {`);
     for (i = 0; i < cnt; i = i + 1 | 0) {
         if ($c.radd(weightlist, i).nm) {
-            await raw_printf($C`    %7u%s /* %*s */`, $c.radd(weightlist, i).wt, i === (cnt - 1 | 0) ? $C` ` : $C`,`, -nmwidth | 0, $c.radd(weightlist, i).nm.add(7));
+            await raw_printf($C`    %7u%s /* %*s */`, $c.radd(weightlist, i).wt,
+                i === (cnt - 1 | 0) ? $C` ` : $C`,`, -nmwidth | 0,
+                $c.radd(weightlist, i).nm.add(7));
             $c.free($c.radd(weightlist, i).nm), $c.radd(weightlist, i).nm = null;
         }
     }
@@ -4319,7 +4659,8 @@ export async function spot_checks(x, y, old_typ) {   // hack.c:4525
             db_ice_now = (svl.level.locations[x][y].flags & DB.UNDER) === DB.ICE ? 1 : 0;
         case ICE:
             /*FALLTHRU*/
-            if (new_typ !== old_typ || old_typ === DRAWBRIDGE_UP && !db_ice_now) {
+            if (new_typ !== old_typ
+                || old_typ === DRAWBRIDGE_UP && !db_ice_now) {
                 /* make sure there's no MELT_ICE_AWAY timer */
                 if (spot_time_left(x, y, MELT_ICE_AWAY)) {
                     await spot_stop_timers(x, y, MELT_ICE_AWAY);

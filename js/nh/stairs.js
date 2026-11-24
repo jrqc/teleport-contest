@@ -60,7 +60,8 @@ export function stairway_at(x, y) {   // stairs.c:40
 export function stairway_find(fromdlev) {   // stairs.c:50
     let tmp = gs.stairs;
     while (tmp) {
-        if (tmp.tolev.dnum === fromdlev.dnum && tmp.tolev.dlevel === fromdlev.dlevel) {
+        if (tmp.tolev.dnum === fromdlev.dnum
+            && tmp.tolev.dlevel === fromdlev.dlevel) {
             break;   /* return */
         }
         tmp = tmp.next;
@@ -75,7 +76,9 @@ export function stairway_find(fromdlev) {   // stairs.c:50
 export function stairway_find_from(fromdlev, isladder) {   // stairs.c:64
     let tmp = gs.stairs;
     while (tmp) {
-        if (tmp.tolev.dnum === fromdlev.dnum && tmp.tolev.dlevel === fromdlev.dlevel && tmp.isladder === isladder) {
+        if (tmp.tolev.dnum === fromdlev.dnum
+            && tmp.tolev.dlevel === fromdlev.dlevel
+            && tmp.isladder === isladder) {
             break;   /* return */
         }
         tmp = tmp.next;
@@ -221,7 +224,8 @@ export function stairs_description(sway, outbuf, stcase) {   // stairs.c:187
         /* ordinary stairs or branch stairs to not-yet-visited branch */
         $c.sprintf(outbuf, $C`%s %s`, stairs, updown);
         if (sway.u_traversed) {
-            const specialdepth = tolev.dnum === svd.dungeon_topology.d_quest_dnum || single_level_branch(tolev) ? 1 : 0;   /* knox */
+            const specialdepth = tolev.dnum === svd.dungeon_topology.d_quest_dnum
+                || single_level_branch(tolev) ? 1 : 0;   /* knox */
             const to_dlev = specialdepth ? dunlev(tolev) : depth(tolev);
             $c.sprintf(eos(outbuf), $C` to level %d`, to_dlev);
         }

@@ -248,7 +248,8 @@ function mkobj_erosions(otmp) {   // mkobj.c:196
         if (!rn2(100)) {
             otmp.oerodeproof = 1;
         } else {
-            if (!rn2(80) && (is_flammable(otmp) || is_rustprone(otmp) || is_crackable(otmp))) {
+            if (!rn2(80) && (is_flammable(otmp) || is_rustprone(otmp)
+                || is_crackable(otmp))) {
                 do {
                     otmp.oeroded = (otmp.oeroded + 1 >>> 0) & 3;
                 } while (otmp.oeroded < 3 && !rn2(9));
@@ -319,7 +320,10 @@ export async function mksobj_migr_to_species(otyp, mflags2, init, artif) {   // 
 export async function mkobj(oclass, artif) {   // mkobj.c:270
     let tprob = 0, i = 0;
     if (oclass === RANDOM_CLASS) {
-        let iprobs = Is_rogue_level(u.uz) ? rogueprobs[0] : Inhell() ? hellprobs[0] : mkobjprobs[0];
+        let iprobs = Is_rogue_level(u.uz)
+            ? rogueprobs[0]
+            : Inhell() ? hellprobs[0]
+            : mkobjprobs[0];
         for (tprob = rnd(100); (tprob = tprob - iprobs.iprob | 0) > 0; iprobs = $c.radd(iprobs, 1)) {
             continue;
         }
@@ -503,7 +507,8 @@ export async function splitobj(obj, num) {   // mkobj.c:457
     let $t1, $t2, $t3;
     /* can't split containers */
     if (obj.cobj || num <= 0 || obj.quan <= num) {
-        await panic($C`splitobj [cobj=%s num=%ld quan=%ld]`, obj.cobj ? $C`non-empty container` : $C`(null)`, num, obj.quan);
+        await panic($C`splitobj [cobj=%s num=%ld quan=%ld]`,
+            obj.cobj ? $C`non-empty container` : $C`(null)`, num, obj.quan);
     }
     const otmp = await newobj();
     otmp.$copyFrom(obj);   /* copies whole structure */
@@ -793,7 +798,8 @@ export async function bill_dummy_object(otmp) {   // mkobj.c:712
         await alter_cost(dummy, $c.neg64(cost));
     }
     /* no_charge is only valid for some locations */
-    otmp.no_charge = (otmp.where === OBJ.FLOOR || otmp.where === OBJ.CONTAINED ? 1 : 0) & 1;
+    otmp.no_charge = (otmp.where === OBJ.FLOOR
+        || otmp.where === OBJ.CONTAINED ? 1 : 0) & 1;
     otmp.unpaid = 0;
     return;
 }
@@ -854,7 +860,9 @@ export async function costly_alteration(obj, alter_type) {   // mkobj.c:752
             }
             if (shkp[0]) {
             }
-            await verbalize($C`You %s %s %s, you pay for %s!`, alteration_verbs[alter_type], those, await simpleonames(obj), them);
+            await verbalize($C`You %s %s %s, you pay for %s!`,
+                alteration_verbs[alter_type], those, await simpleonames(obj),
+                them);
             await bill_dummy_object(obj);
             break;
         case OBJ.FLOOR:
@@ -864,7 +872,8 @@ export async function costly_alteration(obj, alter_type) {   // mkobj.c:752
             if (await costly_spot(u.ux, u.uy) && objroom === new $c.Ptr(u.ushops, 0).get(0)) {
                 if (shkp[0]) {
                 }
-                await verbalize($C`You %s %s, you pay for %s!`, alteration_verbs[alter_type], those, them);
+                await verbalize($C`You %s %s, you pay for %s!`,
+                    alteration_verbs[alter_type], those, them);
                 await bill_dummy_object(obj);
             } else {
                 await stolen_value(obj, ox[0], oy[0], FALSE, FALSE);
@@ -882,7 +891,9 @@ export function clear_dknown(obj) {   // mkobj.c:835
     /* note: this is an unobserving not an observing, so don't call
        observe_object even if dknown is being set to 1 */
     $t1 = $c.strchr(new $c.Ptr(dknowns, 0), obj.oclass) ? 0 : 1, obj.dknown = ($t1) & 1;
-    if (obj.otyp >= ELVEN_SHIELD && obj.otyp <= ORCISH_SHIELD || obj.otyp === SHIELD_OF_REFLECTION || objects[obj.otyp].oc_merge) {
+    if (obj.otyp >= ELVEN_SHIELD && obj.otyp <= ORCISH_SHIELD
+        || obj.otyp === SHIELD_OF_REFLECTION
+        || objects[obj.otyp].oc_merge) {
         obj.dknown = 0;
     }
     /* globs always have dknown flag set (to maximize merging) but for new
@@ -947,7 +958,8 @@ async function mksobj_init(obj, artif) {   // mkobj.c:869
                     tryct = 50;
                     do {
                         $t5 = undead_to_corpse(await rndmonnum()), otmp.corpsenm = $t5;
-                    } while (svm.mvitals[otmp.corpsenm].mvflags & G_NOCORPSE && (tryct = tryct - 1 | 0) > 0);
+                    } while (svm.mvitals[otmp.corpsenm].mvflags & G_NOCORPSE
+                        && (tryct = tryct - 1 | 0) > 0);
                     if (tryct === 0) {
                         /* perhaps rndmonnum() only wants to make G_NOCORPSE
                            monsters on this svl.level; create an adventurer's
@@ -976,7 +988,8 @@ async function mksobj_init(obj, artif) {   // mkobj.c:869
                     } else {
                         for (tryct = 200; tryct > 0; tryct = tryct - 1 | 0) {
                             mndx = undead_to_corpse(await rndmonnum());
-                            if (mons[mndx].cnutrit && !(svm.mvitals[mndx].mvflags & G_NOCORPSE)) {
+                            if (mons[mndx].cnutrit
+                                && !(svm.mvitals[mndx].mvflags & G_NOCORPSE)) {
                                 otmp.corpsenm = mndx;
                                 set_tin_variety(otmp, RANDOM_TIN);
                                 break;
@@ -1014,7 +1027,8 @@ async function mksobj_init(obj, artif) {   // mkobj.c:869
                 otmp.corpsenm = PM.GRAY_OOZE + (otmp.otyp - GLOB_OF_GRAY_OOZE);
                 await start_glob_timeout(otmp, 0);
             } else {
-                if (otmp.otyp !== CORPSE && otmp.otyp !== MEAT_RING && otmp.otyp !== KELP_FROND && !rn2(6)) {
+                if (otmp.otyp !== CORPSE && otmp.otyp !== MEAT_RING
+                    && otmp.otyp !== KELP_FROND && !rn2(6)) {
                     otmp.quan = 2;
                 }
             }
@@ -1107,7 +1121,9 @@ async function mksobj_init(obj, artif) {   // mkobj.c:869
             if (otmp.otyp === AMULET_OF_YENDOR) {
                 svc.context.made_amulet = TRUE;
             }
-            if (rn2(10) && (otmp.otyp === AMULET_OF_STRANGULATION || otmp.otyp === AMULET_OF_CHANGE || otmp.otyp === AMULET_OF_RESTFUL_SLEEP)) {
+            if (rn2(10) && (otmp.otyp === AMULET_OF_STRANGULATION
+                || otmp.otyp === AMULET_OF_CHANGE
+                || otmp.otyp === AMULET_OF_RESTFUL_SLEEP)) {
                 await curse(otmp);
             } else {
                 await blessorcurse(otmp, 10);
@@ -1129,7 +1145,11 @@ async function mksobj_init(obj, artif) {   // mkobj.c:869
             await blessorcurse(otmp, 17);
             break;
         case ARMOR_CLASS:
-            if (rn2(10) && (otmp.otyp === FUMBLE_BOOTS || otmp.otyp === LEVITATION_BOOTS || otmp.otyp === HELM_OF_OPPOSITE_ALIGNMENT || otmp.otyp === GAUNTLETS_OF_FUMBLING || !rn2(11))) {
+            if (rn2(10)
+                && (otmp.otyp === FUMBLE_BOOTS
+                || otmp.otyp === LEVITATION_BOOTS
+                || otmp.otyp === HELM_OF_OPPOSITE_ALIGNMENT
+                || otmp.otyp === GAUNTLETS_OF_FUMBLING || !rn2(11))) {
                 await curse(otmp);
                 $t21 = $c.i8(-rne(3) | 0), otmp.spe = $t21;
             } else if (!rn2(10)) {
@@ -1144,7 +1164,8 @@ async function mksobj_init(obj, artif) {   // mkobj.c:869
                 obj.set(0, otmp);
             }
             /* simulate lacquered armor for samurai */
-            if (Role_if(PM.SAMURAI) && otmp.otyp === SPLINT_MAIL && (svm.moves <= 1 || In_quest(u.uz))) {
+            if (Role_if(PM.SAMURAI) && otmp.otyp === SPLINT_MAIL
+                && (svm.moves <= 1 || In_quest(u.uz))) {
                 /* optimizer bitfield bug */
                 $t24 = otmp.rknown = 1, otmp.oerodeproof = ($t24) & 1;
             }
@@ -1180,7 +1201,10 @@ async function mksobj_init(obj, artif) {   // mkobj.c:869
                 if (otmp.spe < 0 && rn2(5)) {
                     await curse(otmp);
                 }
-            } else if (rn2(10) && (otmp.otyp === RIN_TELEPORTATION || otmp.otyp === RIN_POLYMORPH || otmp.otyp === RIN_AGGRAVATE_MONSTER || otmp.otyp === RIN_HUNGER || !rn2(9))) {
+            } else if (rn2(10) && (otmp.otyp === RIN_TELEPORTATION
+                || otmp.otyp === RIN_POLYMORPH
+                || otmp.otyp === RIN_AGGRAVATE_MONSTER
+                || otmp.otyp === RIN_HUNGER || !rn2(9))) {
                 await curse(otmp);
             }
             break;
@@ -1188,9 +1212,11 @@ async function mksobj_init(obj, artif) {   // mkobj.c:869
             if (otmp.otyp === STATUE) {
                 /* possibly overridden by mkcorpstat() */
                 $t30 = await rndmonnum(), otmp.corpsenm = $t30;
-                if (!verysmall($c.relem(mons, otmp.corpsenm)) && rn2($c.div32(await level_difficulty(), 2) + 10 | 0) > 10) {
+                if (!verysmall($c.relem(mons, otmp.corpsenm))
+                    && rn2($c.div32(await level_difficulty(), 2) + 10 | 0) > 10) {
                     /* caller will update owt */
-                    await add_to_container(otmp, await mkobj(SPBOOK_no_NOVEL, FALSE));
+                    await add_to_container(otmp,
+                        await mkobj(SPBOOK_no_NOVEL, FALSE));
                 }
             }
             /* boulder init'd below in the 'regardless of !init' code */
@@ -1201,7 +1227,8 @@ async function mksobj_init(obj, artif) {   // mkobj.c:869
             /* 3.6.3: this used to be impossible() followed by return 0
                but most callers aren't prepared to deal with Null result
                and cluttering them up to do so is pointless */
-            await panic($C`mksobj tried to make type %d, class %d.`, otmp.otyp, objects[otmp.otyp].oc_class);
+            await panic($C`mksobj tried to make type %d, class %d.`,
+                otmp.otyp, objects[otmp.otyp].oc_class);
     }
     /*NOTREACHED*/
     mkobj_erosions(otmp);
@@ -1235,7 +1262,9 @@ export async function mksobj(otyp, init, artif) {   // mkobj.c:1179
         await mksobj_init(new $c.Ptr(otmp, 0), artif);
     }
     /* some things must get done (corpsenm, timers) even if init = 0 */
-    switch (otmp[0].oclass === POTION_CLASS && otmp[0].otyp !== POT_OIL ? POT_WATER : otmp[0].otyp) {
+    switch (otmp[0].oclass === POTION_CLASS && otmp[0].otyp !== POT_OIL
+        ? POT_WATER
+        : otmp[0].otyp) {
         case CORPSE:
             if (otmp[0].corpsenm === NON_PM) {
                 $t2 = undead_to_corpse(await rndmonnum()), otmp[0].corpsenm = $t2;
@@ -1251,7 +1280,10 @@ export async function mksobj(otyp, init, artif) {   // mkobj.c:1179
             }
             if (otmp[0].corpsenm !== NON_PM) {
                 const ptr = $c.relem(mons, otmp[0].corpsenm);
-                $t4 = is_neuter(ptr) ? CORPSTAT.NEUTER : is_female(ptr) ? CORPSTAT.FEMALE : is_male(ptr) ? CORPSTAT.MALE : rn2(2) ? CORPSTAT.FEMALE : CORPSTAT.MALE, otmp[0].spe = $t4;
+                $t4 = is_neuter(ptr) ? CORPSTAT.NEUTER
+                    : is_female(ptr) ? CORPSTAT.FEMALE
+                    : is_male(ptr) ? CORPSTAT.MALE
+                    : rn2(2) ? CORPSTAT.FEMALE : CORPSTAT.MALE, otmp[0].spe = $t4;
             }
         case EGG:
             /*FALLTHRU*/
@@ -1369,7 +1401,8 @@ export async function set_corpsenm(obj, id) {   // mkobj.c:1318
        in case they are defined with different mons[].cnutrit values */
     /* when oeaten is non-zero, index old_id can't be NON_PM
        and divisor mons[old_id].cnutrit can't be zero */
-    if (obj.otyp === CORPSE && obj.oeaten !== 0 && mons[old_id].cnutrit !== mons[id].cnutrit) {
+    if (obj.otyp === CORPSE && obj.oeaten !== 0
+        && mons[old_id].cnutrit !== mons[id].cnutrit) {
         /* oeaten and cnutrit are unsigned; theoretically that could
            be 16 bits and the calculation might overflow, so force long */
         obj.oeaten = $c.u32($c.div64($c.mul64(obj.oeaten, mons[id].cnutrit), mons[old_id].cnutrit));
@@ -1381,7 +1414,8 @@ export async function set_corpsenm(obj, id) {   // mkobj.c:1318
             $t1 = await weight(obj) >>> 0, obj.owt = $t1;
             break;
         case FIGURINE:
-            if (obj.corpsenm !== NON_PM && !dead_species(obj.corpsenm, TRUE) && (carried(obj) || mcarried(obj))) {
+            if (obj.corpsenm !== NON_PM && !dead_species(obj.corpsenm, TRUE)
+                && (carried(obj) || mcarried(obj))) {
                 await attach_fig_transform_timeout(obj);
             }
             $t2 = await weight(obj) >>> 0, obj.owt = $t2;
@@ -1457,7 +1491,8 @@ export async function start_corpse_timeout(body) {   // mkobj.c:1389
                 break;
             }
         }
-    } else if (gz.zombify && zombie_form($c.relem(mons, body.corpsenm)) !== NON_PM && !body.oeroded2) {
+    } else if (gz.zombify && zombie_form($c.relem(mons, body.corpsenm)) !== NON_PM
+        && !body.oeroded2) {
         action = ZOMBIFY_MON;
         when = rn1(15, 5);   /* 5..19 */
     }
@@ -1504,7 +1539,8 @@ export async function start_glob_timeout(obj, when) {   // mkobj.c:1473
     /* glob */
     /* when to shrink; if 0L, use random value close to 25 */
     if (!obj.globby) {
-        await impossible($C`start_glob_timeout for non-glob [%d: %s]?`, obj.otyp, await simpleonames(obj));
+        await impossible($C`start_glob_timeout for non-glob [%d: %s]?`,
+            obj.otyp, await simpleonames(obj));
         return;   /* skip timer creation */
     }
     /* sanity precaution */
@@ -1545,7 +1581,8 @@ export async function shrink_glob(arg, expire_time) {   // mkobj.c:1500
     let topcontnr = null;
     let old_top_owt = 0;
     if (!obj.globby) {
-        await impossible($C`shrink_glob for non-glob [%d: %s]?`, obj.otyp, await simpleonames(obj));
+        await impossible($C`shrink_glob for non-glob [%d: %s]?`,
+            obj.otyp, await simpleonames(obj));
         return;   /* old timer is gone, don't start a new one */
     }
     /* note: if check_glob() complains about a problem, the " obj " here
@@ -1592,7 +1629,9 @@ export async function shrink_glob(arg, expire_time) {   // mkobj.c:1500
      * to avoid messing up the context.victual data (if/when eaten by a
      * monster, timer won't have a chance to run before meal is finished).
      */
-    if (eating_glob(obj) || globloc === BURIED_UNDER_ICE || globloc === SET_ON_ICE && $c.rem64(svm.moves, 3) === 1) {
+    if (eating_glob(obj)
+        || globloc === BURIED_UNDER_ICE
+        || globloc === SET_ON_ICE && $c.rem64(svm.moves, 3) === 1) {
         /* schedule next shrink attempt; for the being eaten case, the
            glob and its timer might be deleted before this kicks in */
         await start_glob_timeout(obj, 0);
@@ -1630,7 +1669,8 @@ export async function shrink_glob(arg, expire_time) {   // mkobj.c:1500
         if (shrink || gone) {
             /* globs always have quantity 1 so we don't need otense()
                because the verb always references a singular item */
-            await pline($C`%s %s.`, new $c.Ptr(globnambuf, 0), gone ? $C`dissolves completely` : $C`shrinks`);
+            await pline($C`%s %s.`, new $c.Ptr(globnambuf, 0),
+                gone ? $C`dissolves completely` : $C`shrinks`);
         }
         updinv = TRUE;
     } else if (contnr) {
@@ -1653,12 +1693,15 @@ export async function shrink_glob(arg, expire_time) {   // mkobj.c:1500
                for a non-cursed bag of holding the total weight might not
                change because only a fraction of glob's weight is counted;
                however, always say the bag is lighter for the 'gone' case */
-            if (gone || shrink && topcontnr.owt !== old_top_owt || near_capacity() !== go.oldcap) {
+            if (gone || shrink && topcontnr.owt !== old_top_owt
+                || near_capacity() !== go.oldcap) {
                 /* containers also always have quantity 1 */
                 /* TODO?  maybe also skip "slightly" if description
                    is changing (from "very large" to "large",
                    "large" to "medium", or "medium to "small") */
-                await pline($C`%s %s%s lighter.`, await Yname2(topcontnr), topcontnr.owt !== old_top_owt ? $C`becomes` : $C`seems`, !gone ? $C` slightly` : $C``);
+                await pline($C`%s %s%s lighter.`, await Yname2(topcontnr),
+                    topcontnr.owt !== old_top_owt ? $C`becomes` : $C`seems`,
+                    !gone ? $C` slightly` : $C``);
             }
             updinv = TRUE;
         }
@@ -1667,7 +1710,9 @@ export async function shrink_glob(arg, expire_time) {   // mkobj.c:1500
         ox[0] = 0;
         oy[0] = 0;
         /* check location for visibility before destroying obj */
-        const seeit = obj.where === OBJ.FLOOR && get_obj_location(obj, new $c.Ptr(ox, 0), new $c.Ptr(oy, 0), 0) && cansee(ox[0], oy[0]) ? 1 : 0;
+        const seeit = obj.where === OBJ.FLOOR
+            && get_obj_location(obj, new $c.Ptr(ox, 0), new $c.Ptr(oy, 0), 0)
+            && cansee(ox[0], oy[0]) ? 1 : 0;
         /* weight has been reduced to 0 so destroy the glob */
         await shrinking_glob_gone(obj);
         if (seeit) {
@@ -1750,7 +1795,9 @@ export async function maybe_adjust_light(obj, old_range) {   // mkobj.c:1704
                    when changing intensity, using "less brightly" is
                    straightforward for dimming, but we need "brighter"
                    rather than "more brightly" for brightening; ugh */
-                await pline($C`%s %s %s%s.`, new $c.Ptr(buf, 0), await otense(obj, $C`shine`), $c.abs(delta) > 1 ? $C`much ` : $C``, delta > 0 ? $C`brighter` : $C`less brightly`);
+                await pline($C`%s %s %s%s.`, new $c.Ptr(buf, 0), await otense(obj, $C`shine`),
+                    $c.abs(delta) > 1 ? $C`much ` : $C``,
+                    delta > 0 ? $C`brighter` : $C`less brightly`);
             }
         }
     }
@@ -1838,7 +1885,8 @@ export async function curse(otmp) {   // mkobj.c:1783
     } else if (otmp.otyp === BAG_OF_HOLDING) {
         $t1 = await weight(otmp) >>> 0, otmp.owt = $t1;
     } else if (otmp.otyp === FIGURINE) {
-        if (otmp.corpsenm !== NON_PM && !dead_species(otmp.corpsenm, TRUE) && (carried(otmp) || mcarried(otmp))) {
+        if (otmp.corpsenm !== NON_PM && !dead_species(otmp.corpsenm, TRUE)
+            && (carried(otmp) || mcarried(otmp))) {
             await attach_fig_transform_timeout(otmp);
         }
     } else if (otmp.oclass === SPBOOK_CLASS) {
@@ -1935,7 +1983,8 @@ export async function weight(obj) {   // mkobj.c:1888
     let contents = null;
     let wt = objects[obj.otyp].oc_weight | 0;   /* weight of 1 'otyp' */
     if (obj.quan < 1) {
-        await impossible($C`Calculating weight of %ld %s?`, obj.quan, await simpleonames(obj));
+        await impossible($C`Calculating weight of %ld %s?`,
+            obj.quan, await simpleonames(obj));
         return 0;
     }
     /* glob absorption means that merging globs combines their weight
@@ -1990,7 +2039,9 @@ export async function weight(obj) {   // mkobj.c:1888
          *  weight equations.
          */
         if (obj.otyp === BAG_OF_HOLDING) {
-            cwt = obj.cursed ? Math.imul(cwt, 2) : obj.blessed ? $c.div32(cwt + 3 | 0, 4) : $c.div32(cwt + 1 | 0, 2);   /* uncursed */
+            cwt = obj.cursed ? Math.imul(cwt, 2)
+                : obj.blessed ? $c.div32(cwt + 3 | 0, 4)
+                : $c.div32(cwt + 1 | 0, 2);   /* uncursed */
         }
         return wt + cwt | 0;
     }
@@ -2151,7 +2202,9 @@ export async function mkcorpstat(objtype, mtmp, ptr, x, y, corpstatflags) {   //
         const old_corpsenm = otmp.corpsenm;
         otmp.corpsenm = ptr.pmidx;
         $t1 = await weight(otmp) >>> 0, otmp.owt = $t1;
-        if (otmp.otyp === CORPSE && (gz.zombify || special_corpse(old_corpsenm) || special_corpse(otmp.corpsenm))) {
+        if (otmp.otyp === CORPSE
+            && (gz.zombify || special_corpse(old_corpsenm)
+            || special_corpse(otmp.corpsenm))) {
             await obj_stop_timers(otmp);
             await start_corpse_timeout(otmp);
         }
@@ -2309,7 +2362,8 @@ export async function mk_tt_object(objtype, x, y) {   // mkobj.c:2227
  */
 export async function mk_named_object(objtype, ptr, x, y, nm) {   // mkobj.c:2253
     /* CORPSE or STATUE */
-    const corpstatflags = objtype !== STATUE ? CORPSTAT.INIT : CORPSTAT.NONE;
+    const corpstatflags = objtype !== STATUE ? CORPSTAT.INIT
+        : CORPSTAT.NONE;
     let otmp = await mkcorpstat(objtype, null, ptr, x, y, corpstatflags);
     if (nm) {
         otmp = await oname(otmp, nm, ONAME_NO_FLAGS);
@@ -2341,7 +2395,9 @@ export function is_flammable(otmp) {   // mkobj.c:2270
  */
 export function is_rottable(otmp) {   // mkobj.c:2289
     const otyp = otmp.otyp;
-    return objects[otyp].oc_material <= WOOD && objects[otyp].oc_material !== LIQUID || objects[otyp].oc_material === DRAGON_HIDE ? 1 : 0;
+    return objects[otyp].oc_material <= WOOD
+        && objects[otyp].oc_material !== LIQUID
+        || objects[otyp].oc_material === DRAGON_HIDE ? 1 : 0;
 }
 /*
  * These routines maintain the single-linked lists headed in level.objects[][]
@@ -2357,8 +2413,10 @@ export function is_rottable(otmp) {   // mkobj.c:2289
 export async function place_object(otmp, x, y) {   // mkobj.c:2305
     if (!isok(x, y)) {
         /* validate location */
-        const func = x < 0 || y < 0 || x > COLNO - 1 || y > ROWNO - 1 ? panic : impossible;
-        await func($C`place_object: "%s" [%d] off map <%d,%d>`, await safe_typename(otmp.otyp), otmp.where, x, y);
+        const func = x < 0 || y < 0 || x > COLNO - 1 || y > ROWNO - 1 ? panic
+            : impossible;
+        await func($C`place_object: "%s" [%d] off map <%d,%d>`,
+            await safe_typename(otmp.otyp), otmp.where, x, y);
         /* we'll only get to here if we've issued a warning (and fuzzer
            is not running since it escalates impossible to panic), so
            x,y has failed isok() but is within array bounds for the map;
@@ -2366,7 +2424,8 @@ export async function place_object(otmp, x, y) {   // mkobj.c:2305
            but we let the game keep going */
     }
     if (otmp.where !== OBJ.FREE) {
-        await panic($C`place_object: obj "%s" [%d] not free`, await safe_typename(otmp.otyp), otmp.where);
+        await panic($C`place_object: obj "%s" [%d] not free`,
+            await safe_typename(otmp.otyp), otmp.where);
     }
     (!(x >= 0 && x < COLNO && y >= 0 && y < ROWNO) ? 1 : 0) ? $c.__assert_rtn($C`place_object`, $C`mkobj.c`, 2327, $C`x >= 0 && x < COLNO && y >= 0 && y < ROWNO`) : 0;
     let otmp2 = svl.level.objects[x][y];
@@ -2396,7 +2455,8 @@ export async function place_object(otmp, x, y) {   // mkobj.c:2305
     otmp.oy = y;
     otmp.where = OBJ.FLOOR;
     /* if placed outside of shop, no_charge is no longer applicable */
-    if (otmp.no_charge && !await costly_spot(x, y) && !costly_adjacent(await find_objowner(otmp, x, y), x, y)) {
+    if (otmp.no_charge && !await costly_spot(x, y)
+        && !costly_adjacent(await find_objowner(otmp, x, y), x, y)) {
         otmp.no_charge = 0;
     }
     /* add to floor chain */
@@ -2535,7 +2595,8 @@ async function obj_timer_checks(otmp, x, y, force) {   // mkobj.c:2440
             otmp.age = $c.sub64(svm.moves, $c.mul64(age, ROT_ICE_ADJUSTMENT));
         }
         /* Check for corpses coming off ice */
-    } else if (force < 0 || otmp.otyp === CORPSE && otmp.recharged && !((on_floor || buried) && is_ice(x, y))) {
+    } else if (force < 0 || otmp.otyp === CORPSE && otmp.recharged
+        && !((on_floor || buried) && is_ice(x, y))) {
         tleft = await stop_timer(action, obj_to_any(otmp));
         if (tleft === 0) {
             action = REVIVE_MON;
@@ -2782,7 +2843,8 @@ export async function add_to_migration(obj) {   // mkobj.c:2698
         await panic($C`add_to_migration: obj where=%d, not free`, obj.where);
     }
     if (obj.unpaid) {   /* caller should have changed unpaid item to stolen */
-        await impossible($C`unpaid object migrating to another level? [%s]`, await simpleonames(obj));
+        await impossible($C`unpaid object migrating to another level? [%s]`,
+            await simpleonames(obj));
     }
     obj.no_charge = 0;   /* was only relevant while inside a shop */
     /* lock picking context becomes stale if it's for this object */
@@ -2837,7 +2899,8 @@ export async function dealloc_obj(obj) {   // mkobj.c:2745
         await impossible($C`dealloc_obj: obj already deleted (type=%d)`, obj.otyp);
         return;
     } else if (obj.where !== OBJ.FREE && obj.where !== OBJ.LUAFREE) {
-        await panic($C`dealloc_obj: obj not free (type=%d, where=%d)`, obj.otyp, obj.where);
+        await panic($C`dealloc_obj: obj not free (type=%d, where=%d)`,
+            obj.otyp, obj.where);
     }
     if (obj.nobj) {
         await panic($C`dealloc_obj with nobj`);
@@ -2877,7 +2940,8 @@ export async function dealloc_obj(obj) {   // mkobj.c:2745
     }
     /* if obj came from the most recent splitobj(), it's no longer eligible
        for unsplitobj(); perform inline clear_splitobjs() */
-    if (obj.o_id === svc.context.objsplit.parent_oid || obj.o_id === svc.context.objsplit.child_oid) {
+    if (obj.o_id === svc.context.objsplit.parent_oid
+        || obj.o_id === svc.context.objsplit.child_oid) {
         $t1 = svc.context.objsplit.child_oid = 0, svc.context.objsplit.parent_oid = $t1;
     }
     if (obj.lua_ref_cnt) {
@@ -2981,7 +3045,16 @@ export async function hornoplenty(horn, tipping, targetbox) {   // mkobj.c:2847
            being included in its formatted name during next message */
         iflags.suppress_price = iflags.suppress_price + 1 | 0;
         if (!tipping) {
-            obj = await hold_another_object(obj, u.uswallow ? $C`Oops!  %s out of your reach!` : Is_airlevel(u.uz) || Is_waterlevel(u.uz) || svl.level.locations[u.ux][u.uy].typ < IRONBARS || svl.level.locations[u.ux][u.uy].typ >= ICE ? $C`Oops!  %s away from you!` : $C`Oops!  %s to the floor!`, await The(await aobjnam(obj, $C`slip`)), null);
+            obj = await hold_another_object(obj,
+                u.uswallow
+                ? $C`Oops!  %s out of your reach!`
+                : Is_airlevel(u.uz)
+                || Is_waterlevel(u.uz)
+                || svl.level.locations[u.ux][u.uy].typ < IRONBARS
+                || svl.level.locations[u.ux][u.uy].typ >= ICE
+                ? $C`Oops!  %s away from you!`
+                : $C`Oops!  %s to the floor!`,
+                await The(await aobjnam(obj, $C`slip`)), null);
             nhUse(obj);
         } else if (targetbox) {
             await add_to_container(targetbox, obj);
@@ -3001,7 +3074,8 @@ export async function hornoplenty(horn, tipping, targetbox) {   // mkobj.c:2847
                 if (svl.level.locations[u.ux][u.uy].typ === ALTAR) {
                     await doaltarobj(obj);   /* does its own drop message */
                 } else {
-                    await pline($C`%s %s to the %s.`, await Doname2(obj), await otense(obj, $C`drop`), surface(u.ux, u.uy));
+                    await pline($C`%s %s to the %s.`, await Doname2(obj),
+                        await otense(obj, $C`drop`), surface(u.ux, u.uy));
                 }
                 await dropy(obj);
             }
@@ -3029,19 +3103,23 @@ export async function obj_sanity_check() {   // mkobj.c:2949
             let prevo = null;
             for (obj = otop; obj; prevo = obj, obj = prevo.v.v_nexthere) {
                 /* <ox,oy> should match <x,y>; <0,*> should always be empty */
-                if (obj.where !== OBJ.FLOOR || x === 0 || obj.ox !== x || obj.oy !== y) {
+                if (obj.where !== OBJ.FLOOR || x === 0
+                    || obj.ox !== x || obj.oy !== y) {
                     $c.sprintf(new $c.Ptr(at_fmt, 0), $C`%%s obj@<%d,%d> %%s %%s: %%s@<%d,%d>`, x, y, obj.ox, obj.oy);
-                    await insane_object(obj, new $c.Ptr(at_fmt, 0), $C`location sanity`, null);
+                    await insane_object(obj, new $c.Ptr(at_fmt, 0), $C`location sanity`,
+                        null);
                     /* when one or more boulders are present, they should always
                        be at the top of their pile; also never in water or lava */
                 } else if (obj.otyp === BOULDER) {
                     if (prevo && prevo.otyp !== BOULDER) {
                         $c.sprintf(new $c.Ptr(at_fmt, 0), $C`%%s boulder@<%d,%d> %%s %%s: not on top`, x, y);
-                        await insane_object(obj, new $c.Ptr(at_fmt, 0), $C`boulder sanity`, null);
+                        await insane_object(obj, new $c.Ptr(at_fmt, 0), $C`boulder sanity`,
+                            null);
                     }
                     if (is_pool_or_lava(x, y)) {
                         $c.sprintf(new $c.Ptr(at_fmt, 0), $C`%%s boulder@<%d,%d> %%s %%s: on/in %s`, x, y, is_pool(x, y) ? $C`water` : $C`lava`);
-                        await insane_object(obj, new $c.Ptr(at_fmt, 0), $C`boulder sanity`, null);
+                        await insane_object(obj, new $c.Ptr(at_fmt, 0), $C`boulder sanity`,
+                            null);
                     }
                 }
             }
@@ -3063,20 +3141,24 @@ export async function obj_sanity_check() {   // mkobj.c:2949
     /* objects temporarily freed from invent/floor lists;
        they should have arrived somewhere by the time we get called */
     if (gt.thrownobj) {
-        await insane_object(gt.thrownobj, new $c.Ptr(ofmt3, 0), $C`thrownobj sanity`, null);
+        await insane_object(gt.thrownobj, new $c.Ptr(ofmt3, 0), $C`thrownobj sanity`,
+            null);
     }
     if (gk.kickedobj) {
-        await insane_object(gk.kickedobj, new $c.Ptr(ofmt3, 0), $C`kickedobj sanity`, null);
+        await insane_object(gk.kickedobj, new $c.Ptr(ofmt3, 0), $C`kickedobj sanity`,
+            null);
     }
     /* returning_missile temporarily remembers thrownobj and should be
        Null in between moves */
     if (iflags.returning_missile) {
-        await insane_object(gk.kickedobj, new $c.Ptr(ofmt3, 0), $C`returning_missile sanity`, null);
+        await insane_object(gk.kickedobj, new $c.Ptr(ofmt3, 0), $C`returning_missile sanity`,
+            null);
     }
     /* gc.current_wand isn't removed from invent while in use, but should
        be Null between moves when we're called */
     if (gc.current_wand) {
-        await insane_object(gc.current_wand, new $c.Ptr(ofmt3, 0), $C`current_wand sanity`, null);
+        await insane_object(gc.current_wand, new $c.Ptr(ofmt3, 0), $C`current_wand sanity`,
+            null);
     }
 }
 /* sanity check for objects on specified list (fobj, &c) */
@@ -3099,7 +3181,8 @@ async function objlist_sanity(objlist, wheretype, mesg) {   // mkobj.c:3032
         }
         if (Has_contents(obj)) {
             if (wheretype === OBJ.ONBILL) {   /* containers on shop bill should always be empty */
-                await insane_object(obj, $C`%s obj contains something! %s %s: %s`, mesg, null);
+                await insane_object(obj, $C`%s obj contains something! %s %s: %s`,
+                    mesg, null);
             }
             await check_contained(obj, mesg);
         }
@@ -3150,7 +3233,8 @@ async function objlist_sanity(objlist, wheretype, mesg) {   // mkobj.c:3032
                    obj->leashmon does, so obj->leashmon and consequently 'mtmp'
                    might be inaccurate for any leash found on migrating_objs */
             } else if (obj.where !== OBJ.MIGRATING) {
-                const mtmp2 = obj.where === OBJ.MINVENT ? obj.v.v_ocarry : null;
+                const mtmp2 = obj.where === OBJ.MINVENT
+                    ? obj.v.v_ocarry : null;
                 if (mtmp) {
                     /* found monst leashed by non-invent leash */
                     $c.sprintf(new $c.Ptr(buf, 0), $C`leashmon:%u %s leashed by %s leash,`, obj.corpsenm >>> 0, mon_pmname(mtmp), where_name(obj));
@@ -3167,7 +3251,8 @@ async function objlist_sanity(objlist, wheretype, mesg) {   // mkobj.c:3032
         }
         /* temporary flags that might have been set but which should
            be clear by the time this sanity check is taking place */
-        if (obj.in_use || obj.bypass || obj.nomerge || obj.otyp === BOULDER && obj.corpsenm) {
+        if (obj.in_use || obj.bypass || obj.nomerge
+            || obj.otyp === BOULDER && obj.corpsenm) {
             await insane_obj_bits(obj, null);
         }
     }
@@ -3212,7 +3297,10 @@ async function shop_obj_sanity(obj, mesg) {   // mkobj.c:3134
            for objects moved from such spots into the shop proper by
            repair of shop walls or items buried while on boundary */
         /* when on bill, obj==otop */
-        if (otop.where !== OBJ.INVENT && obj.where !== OBJ.ONBILL && (otop.where !== OBJ.FLOOR && obj.where !== OBJ.BURIED || !(costly || costlytoo))) {
+        if (otop.where !== OBJ.INVENT
+            && obj.where !== OBJ.ONBILL
+            && (otop.where !== OBJ.FLOOR && obj.where !== OBJ.BURIED
+            || !(costly || costlytoo))) {
             why = $C`%s unpaid obj not carried! %s %s: %s`;
         } else if (!costly && !costlytoo) {
             why = $C`%s unpaid obj not inside tended shop! %s %s: %s`;
@@ -3225,7 +3313,9 @@ async function shop_obj_sanity(obj, mesg) {   // mkobj.c:3134
         /* no_charge is only applicable for floor objects in shops, for
            objects inside floor containers in shops, and for objects buried
            beneath the shop floor or carried by a monster (usually pet) */
-        if (otop.where !== OBJ.FLOOR && otop.where !== OBJ.BURIED && otop.where !== OBJ.MINVENT) {
+        if (otop.where !== OBJ.FLOOR
+            && otop.where !== OBJ.BURIED
+            && otop.where !== OBJ.MINVENT) {
             why = $C`%s no_charge obj not on floor! %s %s: %s`;
         } else if (!costly && !costlytoo) {
             why = $C`%s no_charge obj not inside tended shop! %s %s: %s`;
@@ -3236,7 +3326,8 @@ async function shop_obj_sanity(obj, mesg) {   // mkobj.c:3134
         }
     }
     if (why) {
-        await insane_object(obj, why, mesg, mcarried(otop) ? otop.v.v_ocarry : null);
+        await insane_object(obj, why, mesg,
+            mcarried(otop) ? otop.v.v_ocarry : null);
     }
     return;
 }
@@ -3275,7 +3366,8 @@ async function mon_obj_sanity(monlist, mesg) {   // mkobj.c:3204
             if (obj.unpaid || obj.no_charge) {
                 await shop_obj_sanity(obj, mesg);
             }
-            if (obj.in_use || obj.bypass || obj.nomerge || obj.otyp === BOULDER && obj.corpsenm) {
+            if (obj.in_use || obj.bypass || obj.nomerge
+                || obj.otyp === BOULDER && obj.corpsenm) {
                 await insane_obj_bits(obj, mon);
             }
             if (obj === mwep) {
@@ -3287,7 +3379,9 @@ async function mon_obj_sanity(monlist, mesg) {   // mkobj.c:3204
                it here avoids making an extra pass through mon's minvent;
                if the full pass through that list hasn't reset mwep to Null,
                then mwep isn't in that list where it should be */
-            await impossible($C`monst (%s: %u) wielding %s (%u) not in %s inventory`, pmname(mon.data, Mgender(mon)), mon.m_id, await safe_typename(mwep.otyp), mwep.o_id, genders[pronoun_gender(mon, PRONOUN.HALLU)].his);
+            await impossible($C`monst (%s: %u) wielding %s (%u) not in %s inventory`,
+                pmname(mon.data, Mgender(mon)), mon.m_id,
+                await safe_typename(mwep.otyp), mwep.o_id, genders[pronoun_gender(mon, PRONOUN.HALLU)].his);
         }
     }
 }
@@ -3362,9 +3456,11 @@ async function insane_object(obj, fmt, mesg, mon) {   // mkobj.c:3314
         if (mon) {
             monnm = await x_monnam(mon, ARTICLE.A, null, EXACT_NAME, TRUE);
         }
-        await impossible(new $c.Ptr(altfmt, 0), mesg, fmt_ptr(obj), where_name(obj), objnm, fmt_ptr(mon), monnm);
+        await impossible(new $c.Ptr(altfmt, 0), mesg, fmt_ptr(obj), where_name(obj),
+            objnm, fmt_ptr(mon), monnm);
     } else {
-        await impossible(fmt, mesg, fmt_ptr(obj), where_name(obj), objnm);
+        await impossible(fmt, mesg, fmt_ptr(obj), where_name(obj),
+            objnm);
     }
 }
 /* initialize a dummy obj with just enough info to allow some of the tests in
@@ -3384,7 +3480,9 @@ export function init_dummyobj(obj, otyp, oquan) {   // mkobj.c:3347
         /* obj->dknown = 0; */
         /* suppress known except for amulets (needed for fakes & real AoY) */
         /* default is "on" for types which don't use it */
-        obj.known = (obj.oclass === AMULET_CLASS ? obj.known : !objects[otyp].oc_uses_known ? 1 : 0) & 1;
+        obj.known = (obj.oclass === AMULET_CLASS
+            ? obj.known
+            : !objects[otyp].oc_uses_known ? 1 : 0) & 1;
         obj.quan = oquan ? oquan : 1;
         obj.corpsenm = NON_PM;   /* suppress statue and figurine details */
         if (obj.otyp === LEASH) {
@@ -3425,7 +3523,10 @@ async function check_contained(container, mesg) {   // mkobj.c:3374
         if (obj.where !== OBJ.CONTAINED) {
             await insane_object(obj, $C`%s obj %s %s: %s`, mesg, null);
         } else if (obj.v.v_ocontainer !== container) {
-            await impossible($C`%s obj %s in container %s, not %s`, mesg, fmt_ptr(obj), fmt_ptr(obj.v.v_ocontainer), fmt_ptr(container));
+            await impossible($C`%s obj %s in container %s, not %s`, mesg,
+                fmt_ptr(obj),
+                fmt_ptr(obj.v.v_ocontainer),
+                fmt_ptr(container));
         }
         if (obj.globby) {
             await check_glob(obj, mesg);
@@ -3460,10 +3561,12 @@ async function check_glob(obj, mesg) {   // mkobj.c:3420
      */
     /* a partially eaten glob could have any non-zero weight but an
        intact one should weigh an exact multiple of base weight (20) */
-    if (obj.quan !== 1 || obj.owt === 0 || obj.otyp < LOWEST_GLOB || obj.otyp > HIGHEST_GLOB) {
+    if (obj.quan !== 1 || obj.owt === 0
+        || obj.otyp < LOWEST_GLOB || obj.otyp > HIGHEST_GLOB) {
         $c.sprintf(new $c.Ptr(globbuf, 0), $C` glob %d,quan=%ld,owt=%u `, obj.otyp, obj.quan, obj.owt);
         mesg = strsubst($c.strcpy(new $c.Ptr(mesgbuf, 0), mesg), $C` obj `, new $c.Ptr(globbuf, 0));
-        await insane_object(obj, new $c.Ptr(ofmt0, 0), mesg, obj.where === OBJ.MINVENT ? obj.v.v_ocarry : null);
+        await insane_object(obj, new $c.Ptr(ofmt0, 0), mesg,
+            obj.where === OBJ.MINVENT ? obj.v.v_ocarry : null);
     }
 }
 /* check an object in hero's or monster's inventory which has worn mask set */
@@ -3496,7 +3599,9 @@ async function sanity_check_worn(obj) {   // mkobj.c:3447
             n = 0, owornmask = 18446744073709551615n;   /* force insane_object("bogus") below */
         }
     }
-    if (n === 2 && carried(obj) && obj === $G.uball && $c.andu64(owornmask, W.BALL) !== 0 && $c.andu64(owornmask, W_WEAPONS) !== 0) {
+    if (n === 2 && carried(obj)
+        && obj === $G.uball && $c.andu64(owornmask, W.BALL) !== 0
+        && $c.andu64(owornmask, W_WEAPONS) !== 0) {
         /* chained ball can be wielded/alt-wielded/quivered; if so,
           pretend it's not chained in order to check the weapon pointer
           (we've already verified the ball pointer by successfully passing
@@ -3509,7 +3614,8 @@ async function sanity_check_worn(obj) {   // mkobj.c:3447
         $c.sprintf(new $c.Ptr(maskbuf, 0), $C`worn mask (multiple) 0x%08lx`, obj.owornmask);
         await insane_object(obj, new $c.Ptr(ofmt0, 0), new $c.Ptr(maskbuf, 0), null);
     }
-    if ($c.andu64(owornmask, $c.notu64(allmask)) !== 0 || carried(obj) && $c.andu64(owornmask, W.SADDLE) !== 0) {
+    if ($c.andu64(owornmask, $c.notu64(allmask)) !== 0
+        || carried(obj) && $c.andu64(owornmask, W.SADDLE) !== 0) {
         /* non-wearable bit(s) set */
         $c.sprintf(new $c.Ptr(maskbuf, 0), $C`worn mask (bogus)) 0x%08lx`, obj.owornmask);
         await insane_object(obj, new $c.Ptr(ofmt0, 0), new $c.Ptr(maskbuf, 0), null);
@@ -3608,7 +3714,8 @@ async function sanity_check_worn(obj) {   // mkobj.c:3447
             await insane_object(obj, new $c.Ptr(ofmt0, 0), new $c.Ptr(maskbuf, 0), null);
         }
     }
-    if (n === 1 && (carried(obj) || $c.andu64(owornmask, W.BALL | W.CHAIN) !== 0 || mcarried(obj))) {
+    if (n === 1 && (carried(obj) || $c.andu64(owornmask, W.BALL | W.CHAIN) !== 0
+        || mcarried(obj))) {
         /* check for items worn in invalid slots; practically anything can
            be wielded/alt-wielded/quivered, so tests on those are limited */
         what = null;
@@ -3624,8 +3731,10 @@ async function sanity_check_worn(obj) {   // mkobj.c:3447
         } else if ($c.andu64(owornmask, W_WEAPONS)) {
             /* monsters don't maintain alternate weapon or quiver */
             if (mcarried(obj) && $c.andu64(owornmask, W.SWAPWEP | W.QUIVER) !== 0) {
-                what = $c.andu64(owornmask, W.SWAPWEP) !== 0 ? $C`monst alt weapon?` : $C`monst quiver?`;
-            } else if (obj.oclass === COIN_CLASS && $c.andu64(owornmask, W.WEP | W.SWAPWEP) !== 0) {
+                what = $c.andu64(owornmask, W.SWAPWEP) !== 0 ? $C`monst alt weapon?`
+                    : $C`monst quiver?`;
+            } else if (obj.oclass === COIN_CLASS
+                && $c.andu64(owornmask, W.WEP | W.SWAPWEP) !== 0) {
                 /* hero can quiver gold but not wield it (hence not alt-wield
                    it either); also catches monster wielding gold */
                 what = $c.andu64(owornmask, W.WEP) !== 0 ? $C`weapon` : $C`alt weapon`;
@@ -3639,7 +3748,8 @@ async function sanity_check_worn(obj) {   // mkobj.c:3447
                 what = $C`ring`;
             }
         } else if ($c.andu64(owornmask, W.TOOL)) {
-            if (obj.otyp !== BLINDFOLD && obj.otyp !== TOWEL && obj.otyp !== LENSES) {
+            if (obj.otyp !== BLINDFOLD && obj.otyp !== TOWEL
+                && obj.otyp !== LENSES) {
                 what = $C`blindfold`;
             }
         } else if ($c.andu64(owornmask, W.BALL)) {
@@ -3822,7 +3932,9 @@ export async function obj_meld(obj1, obj2) {   // mkobj.c:3768
              *  [Also, what about when one of the globs is on the shore
              *  and we drop the other into adjacent pool or vice versa?]
              */
-            if (!(otmp2.where === OBJ.FLOOR && otmp1.where === OBJ.FREE) && (otmp1.owt > otmp2.owt || otmp1.owt === otmp2.owt && rn2(2))) {
+            if (!(otmp2.where === OBJ.FLOOR && otmp1.where === OBJ.FREE)
+                && (otmp1.owt > otmp2.owt
+                || otmp1.owt === otmp2.owt && rn2(2))) {
                 if (otmp2.where === OBJ.FLOOR) {
                     ox = otmp2.ox, oy = otmp2.oy;
                 }
@@ -3857,7 +3969,8 @@ export async function obj_meld(obj1, obj2) {   // mkobj.c:3768
  * @returns {Promise<void>}
  */
 export async function pudding_merge_message(otmp, otmp2) {   // mkobj.c:3818
-    const visible = cansee(otmp.ox, otmp.oy) || cansee(otmp2.ox, otmp2.oy) ? 1 : 0;
+    const visible = cansee(otmp.ox, otmp.oy)
+        || cansee(otmp2.ox, otmp2.oy) ? 1 : 0;
     const onfloor = otmp.where === OBJ.FLOOR || otmp2.where === OBJ.FLOOR ? 1 : 0;
     const inpack = carried(otmp) || carried(otmp2) ? 1 : 0;
     /* the player will know something happened inside his own inventory */
@@ -3872,8 +3985,12 @@ export async function pudding_merge_message(otmp, otmp2) {   // mkobj.c:3818
              * they'll be out of our view (minvent or container)
              * so don't actually show anything */
         } else if (onfloor || inpack) {
-            const adj = (otmp.ox !== u.ux || otmp.oy !== u.uy) && (otmp2.ox !== u.ux || otmp2.oy !== u.uy) ? 1 : 0;
-            await pline($C`The %s%s coalesce%s.`, onfloor && adj ? $C`adjacent ` : $C``, await makeplural(await obj_typename(otmp.otyp)), inpack ? $C` inside your pack` : $C``);
+            const adj = (otmp.ox !== u.ux || otmp.oy !== u.uy)
+                && (otmp2.ox !== u.ux || otmp2.oy !== u.uy) ? 1 : 0;
+            await pline($C`The %s%s coalesce%s.`,
+                onfloor && adj ? $C`adjacent ` : $C``,
+                await makeplural(await obj_typename(otmp.otyp)),
+                inpack ? $C` inside your pack` : $C``);
         }
     } else {
         await You_hear($C`a faint sloshing sound.`);

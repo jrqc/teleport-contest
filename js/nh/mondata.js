@@ -144,7 +144,8 @@ export function noattacks(ptr) {   // mondata.c:61
  */
 export function poly_when_stoned(ptr) {   // mondata.c:80
     /* non-stone golems turn into stone golems unless latter is genocided */
-    return is_golem(ptr) && ptr !== mons[PM.STONE_GOLEM] && !(svm.mvitals[PM.STONE_GOLEM].mvflags & G_GENOD) ? 1 : 0;
+    return is_golem(ptr) && ptr !== mons[PM.STONE_GOLEM]
+        && !(svm.mvitals[PM.STONE_GOLEM].mvflags & G_GENOD) ? 1 : 0;
     /* allow G_EXTINCT */
 }
 /* is 'mon' (possibly youmonst) protected against damage type 'adtype' via
@@ -222,7 +223,8 @@ export async function Resists_Elem(mon, propindx) {   // mondata.c:129
             /* 8 */
             damgtype = propindx + 1 | 0;   /* valid for propindx 1..8, damgtype 2..9 */
             rsstmask = 1 << (propindx - 1 | 0);   /* valid for propindx 1..8 */
-            u_resist = u.uprops[propindx].intrinsic || u.uprops[propindx].extrinsic ? 1 : 0;
+            u_resist = u.uprops[propindx].intrinsic
+                || u.uprops[propindx].extrinsic ? 1 : 0;
             break;
         case ANTIMAGIC:
             /* accept these, but we expect callers to use their routines directly */
@@ -247,7 +249,8 @@ export async function Resists_Elem(mon, propindx) {   // mondata.c:129
     o = is_you ? gi.invent : mon.minvent;
     let slotmask = W_ARMOR | W_ACCESSORY;
     /* assumes monsters don't wield non-weapons */
-    if (!is_you || $G.uwep && ($G.uwep.oclass === WEAPON_CLASS || is_weptool($G.uwep))) {
+    if (!is_you
+        || $G.uwep && ($G.uwep.oclass === WEAPON_CLASS || is_weptool($G.uwep))) {
         slotmask = $c.or64(slotmask, W.WEP);
     }
     if (is_you && u.twoweap) {
@@ -257,7 +260,12 @@ export async function Resists_Elem(mon, propindx) {   // mondata.c:129
         /* worn apron confers a pair of resistances but
            objects[ALCHEMY_SMOCK].oc_oprop can only represent one;
            we check both so won't need to know which one that is */
-        if ($c.and64(o.owornmask, slotmask) !== 0 && objects[o.otyp].oc_oprop === propindx || $c.and64(o.owornmask, W.ARMC) === W.ARMC && o.otyp === ALCHEMY_SMOCK && (propindx === POISON_RES || propindx === ACID_RES) || o.oartifact && defends_when_carried(damgtype, o)) {
+        if ($c.and64(o.owornmask, slotmask) !== 0
+            && objects[o.otyp].oc_oprop === propindx
+            || $c.and64(o.owornmask, W.ARMC) === W.ARMC
+            && o.otyp === ALCHEMY_SMOCK
+            && (propindx === POISON_RES || propindx === ACID_RES)
+            || o.oartifact && defends_when_carried(damgtype, o)) {
             return TRUE;
         }
     }
@@ -271,7 +279,9 @@ export async function Resists_Elem(mon, propindx) {   // mondata.c:129
 export async function resists_drli(mon) {   // mondata.c:201
     const ptr = mon.data;
     /* is_were() doesn't handle hero in human form */
-    if (is_undead(ptr) || is_demon(ptr) || is_were(ptr) || mon === gy.youmonst && u.ulycn >= LOW_PM || ptr === mons[PM.DEATH] || is_vampshifter(mon)) {
+    if (is_undead(ptr) || is_demon(ptr) || is_were(ptr)
+        || mon === gy.youmonst && u.ulycn >= LOW_PM
+        || ptr === mons[PM.DEATH] || is_vampshifter(mon)) {
         return TRUE;
     }
     return await defended(mon, AD.DRLI);
@@ -285,7 +295,8 @@ export function resists_magm(mon) {   // mondata.c:215
     const ptr = mon.data;
     const is_you = mon === gy.youmonst ? 1 : 0;
     /* as of 3.2.0:  gray dragons, Angels, Oracle, Yeenoghu */
-    if (dmgtype(ptr, AD.MAGM) || ptr === mons[PM.BABY_GRAY_DRAGON] || dmgtype(ptr, AD.RBRE)) {   /* Chromatic Dragon */
+    if (dmgtype(ptr, AD.MAGM) || ptr === mons[PM.BABY_GRAY_DRAGON]
+        || dmgtype(ptr, AD.RBRE)) {   /* Chromatic Dragon */
         return TRUE;
     }
     /* check for magic resistance granted by wielded weapon */
@@ -297,14 +308,17 @@ export function resists_magm(mon) {   // mondata.c:215
     o = is_you ? gi.invent : mon.minvent;
     let slotmask = W_ARMOR | W_ACCESSORY;
     /* assumes monsters don't wield non-weapons */
-    if (!is_you || $G.uwep && ($G.uwep.oclass === WEAPON_CLASS || is_weptool($G.uwep))) {
+    if (!is_you
+        || $G.uwep && ($G.uwep.oclass === WEAPON_CLASS || is_weptool($G.uwep))) {
         slotmask = $c.or64(slotmask, W.WEP);
     }
     if (is_you && u.twoweap) {
         slotmask = $c.or64(slotmask, W.SWAPWEP);
     }
     for (; o; o = o.nobj) {
-        if ($c.and64(o.owornmask, slotmask) !== 0 && objects[o.otyp].oc_oprop === ANTIMAGIC || o.oartifact && defends_when_carried(AD.MAGM, o)) {
+        if ($c.and64(o.owornmask, slotmask) !== 0
+            && objects[o.otyp].oc_oprop === ANTIMAGIC
+            || o.oartifact && defends_when_carried(AD.MAGM, o)) {
             return TRUE;
         }
     }
@@ -320,11 +334,14 @@ export async function resists_blnd(mon) {   // mondata.c:248
     const is_you = mon === gy.youmonst ? 1 : 0;
     /* BUG: temporary sleep sets mfrozen, but since
             paralysis does too, we can't check it */
-    if (is_you ? Blind() || Unaware() : mon.mblinded || !mon.mcansee || !haseyes(ptr) || mon.msleeping) {
+    if (is_you ? Blind() || Unaware()
+        : mon.mblinded || !mon.mcansee || !haseyes(ptr)
+        || mon.msleeping) {
         return TRUE;
     }
     /* yellow light, Archon; !dust vortex, !cobra, !raven */
-    if (dmgtype_fromattack(ptr, AD.BLND, AT.EXPL) || dmgtype_fromattack(ptr, AD.BLND, AT.GAZE)) {
+    if (dmgtype_fromattack(ptr, AD.BLND, AT.EXPL)
+        || dmgtype_fromattack(ptr, AD.BLND, AT.GAZE)) {
         return TRUE;
     }
     /* Sunsword */
@@ -462,7 +479,8 @@ export async function can_blnd(magr, mdef, aatyp, obj) {   // mondata.c:305
     if (check_visor) {
         let o = mdef === gy.youmonst ? gi.invent : mdef.minvent;
         for (; o; o = o.nobj) {
-            if ($c.and64(o.owornmask, W.ARMH) && await objdescr_is(o, $C`visored helmet`)) {
+            if ($c.and64(o.owornmask, W.ARMH)
+                && await objdescr_is(o, $C`visored helmet`)) {
                 return FALSE;
             }
         }
@@ -518,13 +536,16 @@ export function mstrength(ptr) {   // mondata.c:428
             const tmp3 = ptr.mattk[i].adtyp;
             /* {freezing,flaming,shocking} spheres are fairly weak but
                can destroy equipment; {yellow,black} lights can't */
-            n = n + (tmp3 === AD.COLD || tmp3 === AD.FIRE ? 3 : tmp3 === AD.ELEC ? 5 : 0) | 0;
+            n = n + (tmp3 === AD.COLD || tmp3 === AD.FIRE ? 3
+                : tmp3 === AD.ELEC ? 5
+                : 0) | 0;
         }
     }
     /* for each "special" damage type */
     for (i = 0; i < NATTK; i = i + 1 | 0) {
         tmp2 = ptr.mattk[i].adtyp;
-        if (tmp2 === AD.DRLI || tmp2 === AD.STON || tmp2 === AD.DRST || tmp2 === AD.DRDX || tmp2 === AD.DRCO || tmp2 === AD.WERE) {
+        if (tmp2 === AD.DRLI || tmp2 === AD.STON || tmp2 === AD.DRST
+            || tmp2 === AD.DRDX || tmp2 === AD.DRCO || tmp2 === AD.WERE) {
             n = n + 2 | 0;
         } else if ($c.strcmp(ptr.pmnames[NEUTRAL], $C`grid bug`)) {
             n = n + (tmp2 !== AD.PHYS ? 1 : 0) | 0;
@@ -538,7 +559,8 @@ export function mstrength(ptr) {   // mondata.c:428
     }
     /* despite group and poison increments, soldier ants and killer bees are
        underestimated by the formula, so have an artificial +1 difficulty */
-    if (!$c.strcmp(ptr.pmnames[NEUTRAL], $C`killer bee`) || !$c.strcmp(ptr.pmnames[NEUTRAL], $C`soldier ant`)) {
+    if (!$c.strcmp(ptr.pmnames[NEUTRAL], $C`killer bee`) ||
+        !$c.strcmp(ptr.pmnames[NEUTRAL], $C`soldier ant`)) {
         n = n + 2 | 0;   /* +1 after 'tmp += n/2' below */
     }
     /* finally, adjust the monster level  0 <= n <= 24 (approx.) */
@@ -560,7 +582,8 @@ function mstrength_ranged_attk(ptr) {   // mondata.c:501
     let i = 0, j = 0;
     const atk_mask = 1 << AT.BREA | 1 << AT.SPIT | 1 << AT.GAZE;
     for (i = 0; i < NATTK; i = i + 1 | 0) {
-        if ((j = ptr.mattk[i].aatyp) >= AT.WEAP || j < 32 && (atk_mask & 1 << j) !== 0) {
+        if ((j = ptr.mattk[i].aatyp) >= AT.WEAP
+            || j < 32 && (atk_mask & 1 << j) !== 0) {
             return TRUE;
         }
     }
@@ -581,7 +604,9 @@ export function mon_hates_silver(mon) {   // mondata.c:517
  * @returns {number} boolean
  */
 export function hates_silver(ptr) {   // mondata.c:524
-    return is_were(ptr) || ptr.mlet === S.VAMPIRE || is_demon(ptr) || ptr === mons[PM.SHADE] || ptr.mlet === S.IMP && ptr !== mons[PM.TENGU] ? 1 : 0;
+    return is_were(ptr) || ptr.mlet === S.VAMPIRE || is_demon(ptr)
+        || ptr === mons[PM.SHADE]
+        || ptr.mlet === S.IMP && ptr !== mons[PM.TENGU] ? 1 : 0;
 }
 /* True if specific monster is especially affected by blessed objects */
 /**
@@ -615,7 +640,11 @@ export function mon_hates_light(mon) {   // mondata.c:547
 export function passes_bars(mptr) {   // mondata.c:554
     /* rust monsters and some puddings can destroy bars */
     /* rock moles can eat bars */
-    return passes_walls(mptr) || amorphous(mptr) || unsolid(mptr) || is_whirly(mptr) || verysmall(mptr) || dmgtype(mptr, AD.RUST) || dmgtype(mptr, AD.CORR) || metallivorous(mptr) || slithy(mptr) && !bigmonst(mptr) ? 1 : 0;
+    return passes_walls(mptr) || amorphous(mptr) || unsolid(mptr)
+        || is_whirly(mptr) || verysmall(mptr)
+        || dmgtype(mptr, AD.RUST) || dmgtype(mptr, AD.CORR)
+        || metallivorous(mptr)
+        || slithy(mptr) && !bigmonst(mptr) ? 1 : 0;
 }
 /* returns True if monster can blow (whistle, etc) */
 /**
@@ -623,7 +652,9 @@ export function passes_bars(mptr) {   // mondata.c:554
  * @returns {number} boolean
  */
 export function can_blow(mtmp) {   // mondata.c:567
-    if ((is_silent(mtmp.data) || mtmp.data.msound === MS.BUZZ) && (breathless(mtmp.data) || verysmall(mtmp.data) || !has_head(mtmp.data) || mtmp.data.mlet === S.EEL)) {
+    if ((is_silent(mtmp.data) || mtmp.data.msound === MS.BUZZ)
+        && (breathless(mtmp.data) || verysmall(mtmp.data)
+        || !has_head(mtmp.data) || mtmp.data.mlet === S.EEL)) {
         return FALSE;
     }
     if (mtmp === gy.youmonst && Strangled()) {
@@ -637,7 +668,9 @@ export function can_blow(mtmp) {   // mondata.c:567
  * @returns {number} boolean
  */
 export function can_chant(mtmp) {   // mondata.c:580
-    if (mtmp === gy.youmonst && Strangled() || is_silent(mtmp.data) || !has_head(mtmp.data) || mtmp.data.msound === MS.BUZZ || mtmp.data.msound === MS.BURBLE) {
+    if (mtmp === gy.youmonst && Strangled()
+        || is_silent(mtmp.data) || !has_head(mtmp.data)
+        || mtmp.data.msound === MS.BUZZ || mtmp.data.msound === MS.BURBLE) {
         return FALSE;
     }
     return TRUE;
@@ -668,7 +701,9 @@ export async function can_be_strangled(mon) {   // mondata.c:591
         nobrainer = mindless(mon.data);
         /* monsters don't wear amulets of magical breathing,
            so second part doesn't achieve anything useful... */
-        nonbreathing = breathless(mon.data) || (mamul = await which_armor(mon, W.AMUL)) !== null && mamul.otyp === AMULET_OF_MAGICAL_BREATHING ? 1 : 0;
+        nonbreathing = breathless(mon.data)
+            || (mamul = await which_armor(mon, W.AMUL)) !== null
+            && mamul.otyp === AMULET_OF_MAGICAL_BREATHING ? 1 : 0;
     }
     return !nobrainer || !nonbreathing ? 1 : 0;
 }
@@ -689,7 +724,8 @@ export function can_track(ptr) {   // mondata.c:623
  * @returns {number} boolean
  */
 export function sliparm(ptr) {   // mondata.c:632
-    return is_whirly(ptr) || ptr.msize <= MZ.SMALL || noncorporeal(ptr) ? 1 : 0;
+    return is_whirly(ptr) || ptr.msize <= MZ.SMALL
+        || noncorporeal(ptr) ? 1 : 0;
 }
 /* creature will break out of armor */
 /**
@@ -701,7 +737,10 @@ export function breakarm(ptr) {   // mondata.c:640
         return FALSE;
     }
     /* special cases of humanoids that cannot wear suits */
-    return bigmonst(ptr) || ptr.msize > MZ.SMALL && !humanoid(ptr) || ptr === mons[PM.MARILITH] || ptr === mons[PM.WINGED_GARGOYLE] ? 1 : 0;
+    return bigmonst(ptr)
+        || ptr.msize > MZ.SMALL && !humanoid(ptr)
+        || ptr === mons[PM.MARILITH]
+        || ptr === mons[PM.WINGED_GARGOYLE] ? 1 : 0;
 }
 /* creature sticks other creatures it hits */
 /**
@@ -709,7 +748,9 @@ export function breakarm(ptr) {   // mondata.c:640
  * @returns {number} boolean
  */
 export function sticks(ptr) {   // mondata.c:654
-    return dmgtype(ptr, AD.STCK) || dmgtype(ptr, AD.WRAP) && !attacktype(ptr, AT.ENGL) || attacktype(ptr, AT.HUGS) ? 1 : 0;
+    return dmgtype(ptr, AD.STCK)
+        || dmgtype(ptr, AD.WRAP) && !attacktype(ptr, AT.ENGL)
+        || attacktype(ptr, AT.HUGS) ? 1 : 0;
 }
 /* some monster-types can't vomit */
 /**
@@ -719,10 +760,12 @@ export function sticks(ptr) {   // mondata.c:654
 export function cantvomit(ptr) {   // mondata.c:663
     /* rats and mice are incapable of vomiting; likewise with horses;
        which other creatures have the same limitation? */
-    if (ptr.mlet === S.RODENT && ptr !== mons[PM.ROCK_MOLE] && ptr !== mons[PM.WOODCHUCK]) {
+    if (ptr.mlet === S.RODENT && ptr !== mons[PM.ROCK_MOLE]
+        && ptr !== mons[PM.WOODCHUCK]) {
         return TRUE;
     }
-    if (ptr === mons[PM.WARHORSE] || ptr === mons[PM.HORSE] || ptr === mons[PM.PONY]) {
+    if (ptr === mons[PM.WARHORSE] || ptr === mons[PM.HORSE]
+        || ptr === mons[PM.PONY]) {
         return TRUE;
     }
     return FALSE;
@@ -807,11 +850,18 @@ export async function max_passive_dmg(mdef, magr) {   // mondata.c:720
     }
     let dmg = 0;
     for (i = 0; i < NATTK; i = i + 1 | 0) {
-        if (mdef.data.mattk[i].aatyp === AT.NONE || mdef.data.mattk[i].aatyp === AT.BOOM) {
+        if (mdef.data.mattk[i].aatyp === AT.NONE
+            || mdef.data.mattk[i].aatyp === AT.BOOM) {
             const adtyp = mdef.data.mattk[i].adtyp;
-            if (adtyp === AD.FIRE && completelyburns(magr.data) || adtyp === AD.DCAY && completelyrots(magr.data) || adtyp === AD.RUST && completelyrusts(magr.data)) {
+            if (adtyp === AD.FIRE && completelyburns(magr.data)
+                || adtyp === AD.DCAY && completelyrots(magr.data)
+                || adtyp === AD.RUST && completelyrusts(magr.data)) {
                 dmg = magr.mhp;
-            } else if (adtyp === AD.ACID && !await resists_acid(magr) || adtyp === AD.COLD && !await resists_cold(magr) || adtyp === AD.FIRE && !await resists_fire(magr) || adtyp === AD.ELEC && !await resists_elec(magr) || adtyp === AD.PHYS) {
+            } else if (adtyp === AD.ACID && !await resists_acid(magr)
+                || adtyp === AD.COLD && !await resists_cold(magr)
+                || adtyp === AD.FIRE && !await resists_fire(magr)
+                || adtyp === AD.ELEC && !await resists_elec(magr)
+                || adtyp === AD.PHYS) {
                 dmg = mdef.data.mattk[i].damn;
                 if (!dmg) {
                     dmg = mdef.data.mlevel + 1;
@@ -863,8 +913,10 @@ export function same_race(pm1, pm2) {   // mondata.c:771
     if (is_mind_flayer(pm1)) {
         return is_mind_flayer(pm2);
     }
-    if (let1 === S.KOBOLD || pm1 === mons[PM.KOBOLD_ZOMBIE] || pm1 === mons[PM.KOBOLD_MUMMY]) {
-        return let2 === S.KOBOLD || pm2 === mons[PM.KOBOLD_ZOMBIE] || pm2 === mons[PM.KOBOLD_MUMMY] ? 1 : 0;
+    if (let1 === S.KOBOLD || pm1 === mons[PM.KOBOLD_ZOMBIE]
+        || pm1 === mons[PM.KOBOLD_MUMMY]) {
+        return let2 === S.KOBOLD || pm2 === mons[PM.KOBOLD_ZOMBIE]
+            || pm2 === mons[PM.KOBOLD_MUMMY] ? 1 : 0;
     }
     if (let1 === S.OGRE) {
         return let2 === S.OGRE ? 1 : 0;
@@ -946,7 +998,8 @@ export function same_race(pm1, pm2) {   // mondata.c:771
     }
     /* not caught by little/big handling */
     if (pm1 === mons[PM.GARGOYLE] || pm1 === mons[PM.WINGED_GARGOYLE]) {
-        return pm2 === mons[PM.GARGOYLE] || pm2 === mons[PM.WINGED_GARGOYLE] ? 1 : 0;
+        return pm2 === mons[PM.GARGOYLE]
+            || pm2 === mons[PM.WINGED_GARGOYLE] ? 1 : 0;
     }
     if (pm1 === mons[PM.KILLER_BEE] || pm1 === mons[PM.QUEEN_BEE]) {
         return pm2 === mons[PM.KILLER_BEE] || pm2 === mons[PM.QUEEN_BEE] ? 1 : 0;
@@ -1011,7 +1064,8 @@ export async function name_to_monplus(in_str, remainder_p, gender_name_var) {   
     const term = str.add($c.idx(slen));
     if ((s = strstri(str, $C`vortices`)) !== null) {
         $c.strcpy(s.add(4), $C`ex`);
-    } else if (slen > 3 && !strcmpi(term.add(-3), $C`ies`) && (slen < 7 || strcmpi(term.add(-7), $C`zombies`))) {
+    } else if (slen > 3 && !strcmpi(term.add(-3), $C`ies`)
+        && (slen < 7 || strcmpi(term.add(-7), $C`zombies`))) {
         /* be careful with "ies"; "priest", "zombies" */
         $c.strcpy(term.add(-3), $C`y`);
     } else if (slen > 3 && !strcmpi(term.add(-3), $C`ves`)) {
@@ -1024,7 +1078,8 @@ export async function name_to_monplus(in_str, remainder_p, gender_name_var) {   
         for (namep = name_to_monplus$names[0]; namep.name; namep = $c.radd(namep, 1)) {
             len[0] = $c.i32($c.strlen(namep.name));
             /* force full word (which could conceivably be possessive) */
-            if (!strncmpi(str, namep.name, len[0]) && (!str.get(len[0]) || str.get(len[0]) === 32 || str.get(len[0]) === 39)) {
+            if (!strncmpi(str, namep.name, len[0])
+                && (!str.get(len[0]) || str.get(len[0]) === 32 || str.get(len[0]) === 39)) {
                 if (remainder_p) {
                     remainder_p.set(0, in_str.add($c.idx($c.pdiff(str.add(len[0]), new $c.Ptr(buf, 0)))));
                 }
@@ -1041,14 +1096,24 @@ export async function name_to_monplus(in_str, remainder_p, gender_name_var) {   
                 continue;
             }
             const m_i_len = $c.strlen(mons[i].pmnames[mgend]);
-            if (m_i_len > $c.u64(len[0]) && !strncmpi(mons[i].pmnames[mgend], str, $c.i32(m_i_len))) {
+            if (m_i_len > $c.u64(len[0])
+                && !strncmpi(mons[i].pmnames[mgend], str, $c.i32(m_i_len))) {
                 if (m_i_len === slen) {
                     mntmp = i;
                     len[0] = $c.i32(m_i_len);
                     matchgend = mgend;
                     exact_match = TRUE;
                     break;   /* exact match */
-                } else if (slen > m_i_len && (str.get($c.idx(m_i_len)) === 32 || !strcmpi(str.add($c.idx(m_i_len)), $C`s`) || !strncmpi(str.add($c.idx(m_i_len)), $C`s `, 2) || !strcmpi(str.add($c.idx(m_i_len)), $C`'`) || !strncmpi(str.add($c.idx(m_i_len)), $C`' `, 2) || !strcmpi(str.add($c.idx(m_i_len)), $C`'s`) || !strncmpi(str.add($c.idx(m_i_len)), $C`'s `, 3) || !strcmpi(str.add($c.idx(m_i_len)), $C`es`) || !strncmpi(str.add($c.idx(m_i_len)), $C`es `, 3))) {
+                } else if (slen > m_i_len
+                    && (str.get($c.idx(m_i_len)) === 32
+                    || !strcmpi(str.add($c.idx(m_i_len)), $C`s`)
+                    || !strncmpi(str.add($c.idx(m_i_len)), $C`s `, 2)
+                    || !strcmpi(str.add($c.idx(m_i_len)), $C`'`)
+                    || !strncmpi(str.add($c.idx(m_i_len)), $C`' `, 2)
+                    || !strcmpi(str.add($c.idx(m_i_len)), $C`'s`)
+                    || !strncmpi(str.add($c.idx(m_i_len)), $C`'s `, 3)
+                    || !strcmpi(str.add($c.idx(m_i_len)), $C`es`)
+                    || !strncmpi(str.add($c.idx(m_i_len)), $C`es `, 3))) {
                     mntmp = i;
                     len[0] = $c.i32(m_i_len);
                     matchgend = mgend;
@@ -1146,7 +1211,9 @@ export async function name_to_monclass(in_str, mndx_p) {   // mondata.c:1090
         const len = $c.i32($c.strlen(in_str));
         for (i = 1; i < MAXMCLASSES; i = i + 1 | 0) {
             const x = def_monsyms[i].explain;
-            if ((p = strstri(x, in_str)) !== null && ($c.peq(p, x) || p.add(-1).get(0) === 32) && ($c.i32($c.strlen(p)) >= len && (p.get(len) === 0 || p.get(len) === 32))) {
+            if ((p = strstri(x, in_str)) !== null && ($c.peq(p, x) || p.add(-1).get(0) === 32)
+                && ($c.i32($c.strlen(p)) >= len
+                && (p.get(len) === 0 || p.get(len) === 32))) {
                 return i;
             }
         }
@@ -1194,7 +1261,8 @@ export function pronoun_gender(mtmp, pg_flags) {   // mondata.c:1191
     if (is_neuter(mtmp.data)) {
         return 2;
     }
-    return humanoid(mtmp.data) || mtmp.data.geno & G_UNIQ || type_is_pname(mtmp.data) ? mtmp.female : 2;
+    return humanoid(mtmp.data) || mtmp.data.geno & G_UNIQ
+        || type_is_pname(mtmp.data) ? mtmp.female : 2;
 }
 /* used for nearby monsters when you go to another level */
 /**
@@ -1215,7 +1283,8 @@ export function levl_follower(mtmp) {   // mondata.c:1211
     }
     /* stalking types follow, but won't when fleeing unless you hold
        the Amulet */
-    return $c.andu64(mtmp.data.mflags2, M2.STALK) && (!mtmp.mflee || u.uhave.amulet) ? 1 : 0;
+    return $c.andu64(mtmp.data.mflags2, M2.STALK)
+        && (!mtmp.mflee || u.uhave.amulet) ? 1 : 0;
 }
 /**
  * @param {number} montype int
@@ -1299,7 +1368,14 @@ export function raceptr(mtmp) {   // mondata.c:1359
  */
 export function locomotion(ptr, def) {   // mondata.c:1380
     const locoindx = def.get(0) !== highc(def.get(0)) ? 0 : 1;
-    return is_floater(ptr) ? levitate[locoindx] : is_flyer(ptr) && ptr.msize <= MZ.SMALL ? flys[locoindx] : is_flyer(ptr) && ptr.msize > MZ.SMALL ? flyl[locoindx] : slithy(ptr) ? slither[locoindx] : amorphous(ptr) ? ooze[locoindx] : !ptr.mmove ? immobile[locoindx] : nolimbs(ptr) ? crawl[locoindx] : def;
+    return is_floater(ptr) ? levitate[locoindx]
+        : is_flyer(ptr) && ptr.msize <= MZ.SMALL ? flys[locoindx]
+        : is_flyer(ptr) && ptr.msize > MZ.SMALL ? flyl[locoindx]
+        : slithy(ptr) ? slither[locoindx]
+        : amorphous(ptr) ? ooze[locoindx]
+        : !ptr.mmove ? immobile[locoindx]
+        : nolimbs(ptr) ? crawl[locoindx]
+        : def;
 }
 /**
  * @param {$T.permonst | null} ptr const struct permonst *
@@ -1308,7 +1384,14 @@ export function locomotion(ptr, def) {   // mondata.c:1380
  */
 export function stagger(ptr, def) {   // mondata.c:1395
     const locoindx = def.get(0) !== highc(def.get(0)) ? 2 : 3;
-    return is_floater(ptr) ? levitate[locoindx] : is_flyer(ptr) && ptr.msize <= MZ.SMALL ? flys[locoindx] : is_flyer(ptr) && ptr.msize > MZ.SMALL ? flyl[locoindx] : slithy(ptr) ? slither[locoindx] : amorphous(ptr) ? ooze[locoindx] : !ptr.mmove ? immobile[locoindx] : nolimbs(ptr) ? crawl[locoindx] : def;
+    return is_floater(ptr) ? levitate[locoindx]
+        : is_flyer(ptr) && ptr.msize <= MZ.SMALL ? flys[locoindx]
+        : is_flyer(ptr) && ptr.msize > MZ.SMALL ? flyl[locoindx]
+        : slithy(ptr) ? slither[locoindx]
+        : amorphous(ptr) ? ooze[locoindx]
+        : !ptr.mmove ? immobile[locoindx]
+        : nolimbs(ptr) ? crawl[locoindx]
+        : def;
 }
 /* return phrase describing the effect of fire attack on a type of monster */
 /**
@@ -1357,7 +1440,9 @@ export function on_fire(mptr, mattk) {   // mondata.c:1411
  */
 export function msummon_environ(mptr, cloud) {   // mondata.c:1449
     let what = null;
-    const mndx = mptr.mlet === S.ANGEL ? PM.ANGEL : mptr.mlet === S.LIGHT ? PM.YELLOW_LIGHT : mptr.pmidx;
+    const mndx = mptr.mlet === S.ANGEL ? PM.ANGEL
+        : mptr.mlet === S.LIGHT ? PM.YELLOW_LIGHT
+        : mptr.pmidx;
     cloud.set(0, $C`cloud`);   /* default is "cloud of <something>" */
     switch (mndx) {
         case PM.WATER_DEMON:
@@ -1416,7 +1501,13 @@ export function msummon_environ(mptr, cloud) {   // mondata.c:1449
 export function olfaction(mdat) {   // mondata.c:1507
     /* spheres  */
     /* mushrooms and fungi */
-    if (is_golem(mdat) || mdat.mlet === S.EYE || mdat.mlet === S.JELLY || mdat.mlet === S.PUDDING || mdat.mlet === S.BLOB || mdat.mlet === S.VORTEX || mdat.mlet === S.ELEMENTAL || mdat.mlet === S.FUNGUS || mdat.mlet === S.LIGHT) {
+    if (is_golem(mdat)
+        || mdat.mlet === S.EYE
+        || mdat.mlet === S.JELLY || mdat.mlet === S.PUDDING
+        || mdat.mlet === S.BLOB || mdat.mlet === S.VORTEX
+        || mdat.mlet === S.ELEMENTAL
+        || mdat.mlet === S.FUNGUS
+        || mdat.mlet === S.LIGHT) {
         return FALSE;
     }
     return TRUE;
@@ -1577,7 +1668,8 @@ export function mons_see_trap(ttmp) {   // mondata.c:1641
     const ty = ttmp.ty;
     const maxdist = svl.level.locations[tx][ty].lit ? 49 : 2;
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
-        if (is_animal(mtmp.data) || mindless(mtmp.data) || !haseyes(mtmp.data) || !mtmp.mcansee) {
+        if (is_animal(mtmp.data) || mindless(mtmp.data)
+            || !haseyes(mtmp.data) || !mtmp.mcansee) {
             continue;
         }
         if (dist2(mtmp.mx, mtmp.my, tx, ty) > maxdist) {
