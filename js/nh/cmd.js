@@ -1864,7 +1864,7 @@ async function handler_rebind_keys_add(keyfirst) {   // cmd.c:2291
         }
         prevcmd = cmdbind_get(key);
         if (await bind_key(key, new $c.Ptr(cmdstr, 0), TRUE)) {
-            if (prevcmd && !$c.peq(prevcmd.cmd, ec)) {
+            if (prevcmd && prevcmd.cmd !== ec) {
                 await pline($C`Changed key '%s' from "%s" to "%s".`, key2txt(key, new $c.Ptr(buf2, 0)), prevcmd.cmd.ef_txt, new $c.Ptr(cmdstr, 0));
             } else if (!prevcmd) {
                 await pline($C`Bound key '%s' to "%s".`, key2txt(key, new $c.Ptr(buf2, 0)), new $c.Ptr(cmdstr, 0));
@@ -1945,7 +1945,7 @@ export async function handler_change_autocompletions() {   // cmd.c:2449
             }
             $c.sprintf(new $c.Ptr(buf, 0), $C`%s`, ec.ef_txt);
             for (j = 0; j < n; j = j + 1 | 0) {
-                if ($c.peq(ec, $c.relem(extcmdlist, $c.radd(picks[0], j).item.a_int - 1 | 0))) {
+                if (ec === $c.relem(extcmdlist, $c.radd(picks[0], j).item.a_int - 1 | 0)) {
                     await parseautocomplete(new $c.Ptr(buf, 0), TRUE);
                     setit = TRUE;
                     break;
@@ -2218,7 +2218,7 @@ function keylist_func_has_key(extcmd, skip_keys_used) {   // cmd.c:2785
         if (skip_keys_used.get(i)) {
             continue;
         }
-        if ((bind = cmdbind_get($c.u8(i))) !== null && $c.peq(bind.cmd, extcmd)) {
+        if ((bind = cmdbind_get($c.u8(i))) !== null && bind.cmd === extcmd) {
             return TRUE;
         }
     }
@@ -2534,7 +2534,7 @@ export async function cmdname_from_func(fn, outbuf, fullname) {   // cmd.c:3106
                 break;
             }
             for (extcmd = matchcmd; extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
-                if ($c.peq(extcmd, cmdptr)) {
+                if (extcmd === cmdptr) {
                     continue;
                 }
                 if ((extcmd.flags & CMD_NOT_AVAILABLE) >>> 0 !== 0 || (extcmd.flags & WIZMODECMD) >>> 0 !== 0 && !wizard()) {
@@ -2844,7 +2844,7 @@ export async function update_rest_on_space() {   // cmd.c:3483
        when it is Off, <space> will use 'unrestonspace' which will either
        be Null and elicit "Unknown command ' '." or have some non-Null
        command bound in player's RC file */
-    if (bind && !$c.peq(bind.cmd, update_rest_on_space$restonspace)) {
+    if (bind && bind.cmd !== update_rest_on_space$restonspace) {
         update_rest_on_space$unrestonspace = bind.cmd;
     }
     await cmdbind_add(32, flags.rest_on_space ? update_rest_on_space$restonspace : update_rest_on_space$unrestonspace, FALSE);

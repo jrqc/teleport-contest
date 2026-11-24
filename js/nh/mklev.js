@@ -651,13 +651,13 @@ export async function add_door(x, y, aroom) {   // mklev.c:574
     }
     for (i = 0; i < svn.nroom; i = i + 1 | 0) {
         broom = $c.relem(svr.rooms, i);
-        if (!$c.peq(broom, aroom) && broom.doorct && broom.fdoor >= aroom.fdoor) {
+        if (broom !== aroom && broom.doorct && broom.fdoor >= aroom.fdoor) {
             broom.fdoor = broom.fdoor + 1 | 0;
         }
     }
     for (i = 0; i < gn.nsubroom; i = i + 1 | 0) {
         broom = $c.radd(gs.subrooms, i);
-        if (!$c.peq(broom, aroom) && broom.doorct && broom.fdoor >= aroom.fdoor) {
+        if (broom !== aroom && broom.doorct && broom.fdoor >= aroom.fdoor) {
             broom.fdoor = broom.fdoor + 1 | 0;
         }
     }
@@ -1349,7 +1349,7 @@ async function makelevel() {   // mklev.c:1251
            are branch stairs; treat them as if hero had just come down
            them by marking them as having been traversed; most recently
            created stairway is held in 'gs.stairs' */
-        if (u.uz.dnum === 0 && u.uz.dlevel === 1 && !$c.peq(gs.stairs, prevstairs)) {
+        if (u.uz.dnum === 0 && u.uz.dlevel === 1 && gs.stairs !== prevstairs) {
             gs.stairs.u_traversed = TRUE;
         }
         /* some levels have specially generated items in ordinary
@@ -1522,7 +1522,7 @@ export async function level_finalize_topology() {   // mklev.c:1544
         svl.level.flags.graveyard = 1;
     }
     if (!svl.level.flags.is_maze_lev) {
-        for (croom = svr.rooms[0]; !$c.peq(croom, $c.relem(svr.rooms, svn.nroom)); croom = $c.radd(croom, 1)) {
+        for (croom = svr.rooms[0]; croom !== $c.relem(svr.rooms, svn.nroom); croom = $c.radd(croom, 1)) {
             topologize(croom);
         }
     }
@@ -1612,7 +1612,7 @@ async function find_branch_room(mp) {   // mklev.c:1660
         await mazexy(mp);   /* already verifies location */
     } else {
         croom = await generate_stairs_find_room();
-        (!!$c.peq(croom, $c.asRec(null, $T.mkroom, 224)) ? 1 : 0) ? $c.__assert_rtn($C`find_branch_room`, $C`mklev.c`, 1668, $C`croom != NULL`) : 0;   /* Null iff nroom==0 which won't get here */
+        (!(croom !== $c.asRec(null, $T.mkroom, 224)) ? 1 : 0) ? $c.__assert_rtn($C`find_branch_room`, $C`mklev.c`, 1668, $C`croom != NULL`) : 0;   /* Null iff nroom==0 which won't get here */
         if (!somexyspace(croom, mp)) {
             await impossible($C`Can't place branch!`);
         }
@@ -2199,7 +2199,7 @@ async function generate_stairs() {   // mklev.c:2250
     /* generate_stairs_find_room() returns Null if nroom == 0, but that
        should never happen for a rooms+corridors style level */
     if (!Is_botlevel(u.uz)) {
-        if ($c.peq(croom = await generate_stairs_find_room(), $c.asRec(null, $T.mkroom, 224))) {
+        if ((croom = await generate_stairs_find_room()) === $c.asRec(null, $T.mkroom, 224)) {
             await panic(new $c.Ptr(generate_stairs$gen_stairs_panic, 0), svn.nroom);
         }
         if (!somexyspace(croom, pos)) {
@@ -2211,7 +2211,7 @@ async function generate_stairs() {   // mklev.c:2250
     if (u.uz.dlevel !== 1) {
         /* if there is only 1 room and we found it above, this will find
            it again */
-        if ($c.peq(croom = await generate_stairs_find_room(), $c.asRec(null, $T.mkroom, 224))) {
+        if ((croom = await generate_stairs_find_room()) === $c.asRec(null, $T.mkroom, 224)) {
             await panic(new $c.Ptr(generate_stairs$gen_stairs_panic, 0), svn.nroom);
         }
         if (!somexyspace(croom, pos)) {
@@ -2567,7 +2567,7 @@ async function mk_knox_portal(x, y) {   // mklev.c:2624
     let source = null, u_depth = 0;
     const br = await dungeon_branch($C`Fort Ludios`);
     /* dungeon_branch() panics (so never returns) if result would be Null */
-    (!!$c.peq(br, $c.asRec(null, $T.branch, 32)) ? 1 : 0) ? $c.__assert_rtn($C`mk_knox_portal`, $C`mklev.c`, 2632, $C`br != NULL`) : 0;
+    (!(br !== $c.asRec(null, $T.branch, 32)) ? 1 : 0) ? $c.__assert_rtn($C`mk_knox_portal`, $C`mklev.c`, 2632, $C`br != NULL`) : 0;
     if (on_level(svd.dungeon_topology.d_knox_level, br.end1)) {
         source = br.end2;
     } else {

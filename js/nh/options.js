@@ -8106,7 +8106,7 @@ function remove_autopickup_exception(whichape) {   // options.c:9349
     let ape = null;
     let prev = null;
     for (ape = ga.apelist; ape; ) {
-        if ($c.peq(ape, whichape)) {
+        if (ape === whichape) {
             const freeape = ape;
             ape = ape.next;
             if (prev) {

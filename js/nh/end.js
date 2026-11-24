@@ -205,7 +205,7 @@ export async function done_in_by(mtmp, how) {   // end.c:186
     const champtr = ismnum(mtmp.cham) ? $c.relem(mons, mtmp.cham) : mptr;
     const distorted = Hallucination() && canspotmon(mtmp) ? 1 : 0;
     const mimicker = M_AP_TYPE(mtmp) === M_AP.MONSTER ? 1 : 0;
-    const imitator = !$c.peq(mptr, champtr) || mimicker ? 1 : 0;
+    const imitator = mptr !== champtr || mimicker ? 1 : 0;
     await You(how === STONING ? $C`turn to stone...` : $C`die...`);
     await mark_synch()();   /* flush buffered screen output */
     buf[0] = 0;
@@ -1502,7 +1502,7 @@ export async function dealloc_killer(kptr) {   // end.c:1752
         return;
     }
     for (k = svk.killer.next; k !== null; k = k.next) {
-        if ($c.peq(k, kptr)) {
+        if (k === kptr) {
             break;
         }
         prev = k;

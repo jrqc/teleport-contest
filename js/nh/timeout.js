@@ -1898,7 +1898,7 @@ export async function timer_sanity_check() {   // timeout.c:2130
                             break;
                         }
                     }
-                    (!!$c.peq(top, $c.asRec(null, $T.obj, 112)) ? 1 : 0) ? $c.__assert_rtn($C`timer_sanity_check`, $C`timeout.c`, 2156, $C`top != NULL`) : 0;
+                    (!(top !== $c.asRec(null, $T.obj, 112)) ? 1 : 0) ? $c.__assert_rtn($C`timer_sanity_check`, $C`timeout.c`, 2156, $C`top != NULL`) : 0;
                     if (owhere === OBJ.MIGRATING || owhere === OBJ.MINVENT && !mon_is_local(top.v.v_ocarry)) {
                         /* migrating directly or carried by migrating monster */
                         /* not able to validate location so skip checks */
@@ -2065,7 +2065,7 @@ export function peek_timer(type, arg) {   // timeout.c:2324
 export async function obj_move_timers(src, dest) {   // timeout.c:2339
     let count = 0, curr = null;
     for (count = 0, curr = gt.timer_base; curr; curr = curr.next) {
-        if (curr.kind === TIMER.OBJECT && $c.peq(curr.arg.a_obj, src)) {
+        if (curr.kind === TIMER.OBJECT && curr.arg.a_obj === src) {
             curr.arg.a_obj = dest;
             dest.timed = $c.i16(dest.timed + 1);
             count = count + 1 | 0;
@@ -2089,7 +2089,7 @@ export async function obj_split_timers(src, dest) {   // timeout.c:2359
     let next_timer = null;
     for (curr = gt.timer_base; curr; curr = next_timer) {
         next_timer = curr.next;   /* things may be inserted */
-        if (curr.kind === TIMER.OBJECT && $c.peq(curr.arg.a_obj, src)) {
+        if (curr.kind === TIMER.OBJECT && curr.arg.a_obj === src) {
             await start_timer($c.sub64(curr.timeout, svm.moves), TIMER.OBJECT, curr.func_index, obj_to_any(dest));
         }
     }
@@ -2107,7 +2107,7 @@ export async function obj_stop_timers(obj) {   // timeout.c:2377
     let next_timer = null;
     for (prev = null, curr = gt.timer_base; curr; curr = next_timer) {
         next_timer = curr.next;
-        if (curr.kind === TIMER.OBJECT && $c.peq(curr.arg.a_obj, obj)) {
+        if (curr.kind === TIMER.OBJECT && curr.arg.a_obj === obj) {
             if (prev) {
                 prev.next = curr.next;
             } else {
@@ -2321,13 +2321,13 @@ export async function obj_is_local(obj) {   // timeout.c:2560
 function mon_is_local(mon) {   // timeout.c:2584
     let curr = null;
     for (curr = gm.migrating_mons; curr; curr = curr.nmon) {
-        if ($c.peq(curr, mon)) {
+        if (curr === mon) {
             return FALSE;
         }
     }
     /* `gm.mydogs' is used during level changes, never saved and restored */
     for (curr = gm.mydogs; curr; curr = curr.nmon) {
-        if ($c.peq(curr, mon)) {
+        if (curr === mon) {
             return FALSE;
         }
     }

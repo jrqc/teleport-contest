@@ -72,7 +72,7 @@ export function troll_baned(m, o) {
     return m.data.mlet === S.TROLL && o && o.oartifact === ART.TROLLSBANE ? 1 : 0;
 }
 export function engulfing_u(mon) {
-    return u.uswallow && $c.peq(u.ustuck, mon) ? 1 : 0;
+    return u.uswallow && u.ustuck === mon ? 1 : 0;
 }
 export function helpless(mon) {
     return mon.msleeping || !mon.mcanmove ? 1 : 0;

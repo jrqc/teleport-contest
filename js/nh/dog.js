@@ -526,7 +526,7 @@ export async function mon_arrive(mtmp, when) {   // dog.c:420
        special level code for monsters specified in the level, but needed
        here for monsters migrating to a newly created level */
     await restore_cham(mtmp);
-    if ($c.peq(mtmp, u.usteed)) {
+    if (mtmp === u.usteed) {
         return;   /* don't place steed on the map */
     }
     if (when === With_you) {
@@ -874,12 +874,12 @@ export async function keepdogs(pets_only) {   // dog.c:789
         /* eg if level teleport or new trap, steed has no control
            to avoid following */
         /* monster won't follow if it hasn't noticed you yet */
-        if ((monnear(mtmp, u.ux, u.uy) && levl_follower(mtmp) || u.uhave.amulet && mtmp.iswiz) && (!helpless(mtmp) || $c.peq(mtmp, u.usteed)) && !$c.andu64(mtmp.mstrategy, STRAT.WAITFORU)) {
+        if ((monnear(mtmp, u.ux, u.uy) && levl_follower(mtmp) || u.uhave.amulet && mtmp.iswiz) && (!helpless(mtmp) || mtmp === u.usteed) && !$c.andu64(mtmp.mstrategy, STRAT.WAITFORU)) {
             let stay_behind = FALSE;
             if (mtmp.mtrapped) {
                 await mintrap(mtmp, NO_TRAP_FLAGS);   /* try to escape */
             }
-            if ($c.peq(mtmp, u.usteed)) {
+            if (mtmp === u.usteed) {
                 /* make sure steed is eligible to accompany hero */
                 mtmp.mtrapped = 0;   /* escape trap */
                 mtmp.meating = 0;   /* terminate eating */
@@ -900,7 +900,7 @@ export async function keepdogs(pets_only) {   // dog.c:789
                     await pline($C`%s leash suddenly comes loose.`, humanoid(mtmp.data) ? mtmp.female ? $C`Her` : $C`His` : $C`Its`);
                     await m_unleash(mtmp, FALSE);
                 }
-                if ($c.peq(mtmp, u.usteed)) {
+                if (mtmp === u.usteed) {
                     /* can't happen unless someone makes a change
                        which scrambles the stay_behind logic above */
                     await impossible($C`steed left behind?`);
@@ -1214,7 +1214,7 @@ export async function tamedog(mtmp, obj, givemsg) {   // dog.c:1143
     mtmp.mflee = 0;
     mtmp.mfleetim = 0;
     /* make grabber let go now, whether it becomes tame or not */
-    if ($c.peq(mtmp, u.ustuck)) {
+    if (mtmp === u.ustuck) {
         if (u.uswallow) {
             await expels(mtmp, mtmp.data, TRUE);
         } else if (!(Upolyd() && sticks(gy.youmonst.data))) {
@@ -1360,7 +1360,7 @@ export async function wary_dog(mtmp, was_dead) {   // dog.c:1292
         if (mtmp.mleashed) {
             await m_unleash(mtmp, TRUE);
         }
-        if ($c.peq(mtmp, u.usteed)) {
+        if (mtmp === u.usteed) {
             await dismount_steed(DISMOUNT.THROWN);
         }
     } else if (edog) {

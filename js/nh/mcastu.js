@@ -372,7 +372,7 @@ export async function death_inflicted_by(outbuf, deathreason, mtmp) {   // mcast
             realnm = await an(realnm);
         }
         $c.sprintf(eos(outbuf), $C` inflicted by %s%s`, the_unique_pm(mptr) ? $C`the ` : $C``, realnm);
-        if (!$c.peq(champtr, mptr)) {
+        if (champtr !== mptr) {
             $c.sprintf(eos(outbuf), $C` imitating %s`, await an(fakenm));
         }
     }

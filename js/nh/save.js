@@ -800,7 +800,7 @@ async function saveobj(nhfp, otmp) {   // save.c:726
 async function saveobjchn(nhfp, obj_p) {   // save.c:762
     let minusone = Int32Array.of(0);
     let otmp = obj_p.get(0);
-    const is_invent = otmp && $c.peq(otmp, gi.invent) ? 1 : 0;
+    const is_invent = otmp && otmp === gi.invent ? 1 : 0;
     minusone[0] = -1;
     while (otmp) {
         const otmp2 = otmp.nobj;
@@ -817,15 +817,15 @@ async function saveobjchn(nhfp, obj_p) {   // save.c:762
              * Always invalidate the pointer, but ensure that we have
              * the o_id in order to restore the pointer on reload.
              */
-            if ($c.peq(otmp, svc.context.victual.piece)) {
+            if (otmp === svc.context.victual.piece) {
                 svc.context.victual.o_id = otmp.o_id;
                 svc.context.victual.piece = null;
             }
-            if ($c.peq(otmp, svc.context.tin.tin)) {
+            if (otmp === svc.context.tin.tin) {
                 svc.context.tin.o_id = otmp.o_id;
                 svc.context.tin.tin = null;
             }
-            if ($c.peq(otmp, svc.context.spbook.book)) {
+            if (otmp === svc.context.spbook.book) {
                 svc.context.spbook.o_id = otmp.o_id;
                 svc.context.spbook.book = null;
             }
@@ -941,14 +941,14 @@ async function savemonchn(nhfp, mtmp) {   // save.c:884
             await saveobjchn(nhfp, new $c.FieldRef(mtmp, "minvent", "ptr"));
         }
         if (release_data(nhfp)) {
-            if ($c.peq(mtmp, svc.context.polearm.hitmon)) {
+            if (mtmp === svc.context.polearm.hitmon) {
                 svc.context.polearm.m_id = mtmp.m_id;
                 svc.context.polearm.hitmon = null;
             }
-            if ($c.peq(mtmp, u.ustuck)) {
+            if (mtmp === u.ustuck) {
                 u.ustuck_mid = u.ustuck.m_id;
             }
-            if ($c.peq(mtmp, u.usteed)) {
+            if (mtmp === u.usteed) {
                 u.usteed_mid = u.usteed.m_id;
             }
             mtmp.nmon = null;   /* nmon saved into mtmp2 */

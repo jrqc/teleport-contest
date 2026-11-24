@@ -143,7 +143,7 @@ export async function hitmsg(mtmp, mattk) {   // mhitu.c:29
                 verb = $C`hits`;
         }
         /* if a monster hits more than once with similar attack, say so */
-        const again = mtmp.m_id === gh.hitmsg_mid && !$c.peq(gh.hitmsg_prev, $c.asRec(null, $T.attack, 4)) && $c.peq(mattk, $c.radd(gh.hitmsg_prev, 1)) && mattk.aatyp === gh.hitmsg_prev.aatyp ? $C` again` : $C``;
+        const again = mtmp.m_id === gh.hitmsg_mid && gh.hitmsg_prev !== $c.asRec(null, $T.attack, 4) && mattk === $c.radd(gh.hitmsg_prev, 1) && mattk.aatyp === gh.hitmsg_prev.aatyp ? $C` again` : $C``;
         await pline_mon(mtmp, $C`%s %s%s%s`, Monst_name, verb, again, punct);
     }
     gh.hitmsg_mid = mtmp.m_id;
@@ -215,7 +215,7 @@ async function mswings(mtmp, otemp, bash) {   // mhitu.c:130
  */
 export function mpoisons_subj(mtmp, mattk) {   // mhitu.c:145
     if (mattk.aatyp === AT.WEAP) {
-        const mwep = $c.peq(mtmp, gy.youmonst) ? $G.uwep : mtmp.mw;
+        const mwep = mtmp === gy.youmonst ? $G.uwep : mtmp.mw;
         /* "Foo's attack was poisoned." is pretty lame, but at least
            it's better than "sting" when not a stinging attack... */
         return !mwep || !mwep.otrapped ? $C`attack` : $C`weapon`;
@@ -373,8 +373,8 @@ export async function getmattk(magr, mdef, indx, prev_result, alt_attk_buf) {   
     let $t1;
     const mptr = magr.data;
     let attk = $c.relem(mptr.mattk, indx);
-    const weap = $c.peq(magr, gy.youmonst) ? $G.uwep : magr.mw;
-    const udefend = $c.peq(mdef, gy.youmonst) ? 1 : 0;
+    const weap = magr === gy.youmonst ? $G.uwep : magr.mw;
+    const udefend = mdef === gy.youmonst ? 1 : 0;
     /* honor SEDUCE=0 */
     if (!SYSOPT_SEDUCE()) {
         /* if the first attack is for SSEX damage, all six attacks will be
@@ -441,7 +441,7 @@ export async function getmattk(magr, mdef, indx, prev_result, alt_attk_buf) {   
            if weapon is sufficiently interesting; a few unique creatures
            have two weapon attacks where one does physical damage and other
            doesn't--avoid forcing physical damage for those */
-    } else if (indx === 0 && !$c.peq(magr, gy.youmonst) && attk.aatyp === AT.WEAP && attk.adtyp !== AD.PHYS && !(mptr.mattk[1].aatyp === AT.WEAP && mptr.mattk[1].adtyp === AD.PHYS) && (magr.mcan || weap && (weap.otyp === CORPSE && touch_petrifies($c.relem(mons, weap.corpsenm)) || is_art(weap, ART.STORMBRINGER) || is_art(weap, ART.VORPAL_BLADE)))) {
+    } else if (indx === 0 && magr !== gy.youmonst && attk.aatyp === AT.WEAP && attk.adtyp !== AD.PHYS && !(mptr.mattk[1].aatyp === AT.WEAP && mptr.mattk[1].adtyp === AD.PHYS) && (magr.mcan || weap && (weap.otyp === CORPSE && touch_petrifies($c.relem(mons, weap.corpsenm)) || is_art(weap, ART.STORMBRINGER) || is_art(weap, ART.VORPAL_BLADE)))) {
         alt_attk_buf.$copyFrom(attk);
         attk = alt_attk_buf;
         attk.adtyp = AD.PHYS;
@@ -467,7 +467,7 @@ export async function getmattk(magr, mdef, indx, prev_result, alt_attk_buf) {   
         }
     }
     /* elementals on their home plane do double damage */
-    if (!$c.peq(attk, alt_attk_buf) && is_home_elemental(mptr)) {
+    if (attk !== alt_attk_buf && is_home_elemental(mptr)) {
         alt_attk_buf.$copyFrom(attk);
         attk = alt_attk_buf;
         attk.damn = $c.u8(Math.imul(attk.damn, 2));
@@ -501,7 +501,7 @@ function calc_mattacku_vars(mtmp, ranged, range2, foundyou, youseeit) {   // mhi
  */
 export function mtrapped_in_pit(mtmp) {   // mhitu.c:467
     let ttmp = null;
-    if ($c.peq(mtmp, gy.youmonst)) {
+    if (mtmp === gy.youmonst) {
         ttmp = u.utrap && u.utraptype === TT.PIT ? t_at(u.ux, u.uy) : null;
     } else {
         ttmp = mtmp.mtrapped ? t_at(mtmp.mx, mtmp.my) : null;
@@ -552,7 +552,7 @@ export async function mattacku(mtmp) {   // mhitu.c:491
     }
     /* If swallowed, can only be affected by u.ustuck */
     if (u.uswallow) {
-        if (!$c.peq(mtmp, u.ustuck)) {
+        if (mtmp !== u.ustuck) {
             return 0;
         }
         u.ustuck.mux = u.ux;
@@ -563,7 +563,7 @@ export async function mattacku(mtmp) {   // mhitu.c:491
         range2[0] = 0;
         foundyou[0] = 1;
     } else if (u.usteed) {
-        if ($c.peq(mtmp, u.usteed)) {   /* Your steed won't attack you */
+        if (mtmp === u.usteed) {   /* Your steed won't attack you */
             return 0;
         }
         /* Orcs like to steal and eat horses and the like */
@@ -754,7 +754,7 @@ export async function mattacku(mtmp) {   // mhitu.c:491
     if (u.uinvulnerable) {
         /* in the midst of successful prayer */
         /* monsters won't attack you */
-        if ($c.peq(mtmp, u.ustuck)) {
+        if (mtmp === u.ustuck) {
             await pline_mon(mtmp, $C`%s loosens its grip slightly.`, await Monnam(mtmp));
         } else if (!range2[0]) {
             if (youseeit[0] || sensemon(mtmp)) {
@@ -833,7 +833,7 @@ export async function mattacku(mtmp) {   // mhitu.c:491
             case AT.HUGS:
                 /* automatic if prev two attacks succeed */
                 /* Note: if displaced, prev attacks never succeeded */
-                if (!range2[0] && i >= 2 && sum[i - 1 | 0] && sum[i - 2 | 0] || $c.peq(mtmp, u.ustuck)) {
+                if (!range2[0] && i >= 2 && sum[i - 1 | 0] && sum[i - 2 | 0] || mtmp === u.ustuck) {
                     if (!await failed_grab(mtmp, gy.youmonst, mattk)) {
                         $t3 = await hitmu(mtmp, mattk), sum[i] = $t3;
                     }
@@ -1096,7 +1096,7 @@ export function magic_negation(mon) {   // mhitu.c:1089
     let o = null;
     let mc = 0;
     /* high priests have innate protection */
-    const is_you = $c.peq(mon, gy.youmonst) ? 1 : 0;
+    const is_you = mon === gy.youmonst ? 1 : 0;
     let via_amul = FALSE;
     let gotprot = is_you ? u.uprops[PROTECTION].extrinsic !== 0 ? 1 : 0 : mon.data === mons[PM.HIGH_CLERIC] ? 1 : 0;
     for (o = is_you ? gi.invent : mon.minvent; o; o = o.nobj) {
@@ -1379,7 +1379,7 @@ async function gulpmu(mtmp, mattk) {   // mhitu.c:1289
             }
         }
     }
-    if (!$c.peq(mtmp, u.ustuck)) {
+    if (mtmp !== u.ustuck) {
         return M_ATTK.MISS;
     }
     if (Punished()) {
@@ -1881,7 +1881,7 @@ export function could_seduce(magr, mdef, mattk) {   // mhitu.c:1934
     if (is_animal(magr.data)) {
         return 0;
     }
-    if ($c.peq(magr, gy.youmonst)) {
+    if (magr === gy.youmonst) {
         pagr = gy.youmonst.data;
         agrinvis = Invis() !== 0 ? 1 : 0;
         genagr = $c.i16(poly_gender());
@@ -1890,7 +1890,7 @@ export function could_seduce(magr, mdef, mattk) {   // mhitu.c:1934
         agrinvis = magr.minvis;
         genagr = $c.i16(gender(magr));
     }
-    if ($c.peq(mdef, gy.youmonst)) {
+    if (mdef === gy.youmonst) {
         defperc = See_invisible() !== 0 ? 1 : 0;
         gendef = $c.i16(poly_gender());
     } else {
@@ -1982,7 +1982,7 @@ export async function doseduce(mon) {   // mhitu.c:1985
             if ($G.uleft && $G.uright && $G.uleft.otyp === RIN_ADORNMENT && $G.uright.otyp === RIN_ADORNMENT) {
                 break;
             }
-            if ($c.peq(ring, $G.uleft) || $c.peq(ring, $G.uright)) {
+            if (ring === $G.uleft || ring === $G.uright) {
                 continue;
             }
             if ($G.uarmg) {
@@ -2254,7 +2254,7 @@ async function mayberem(mon, seducer, obj, str) {   // mhitu.c:2309
     } else {
         $c.sprintf(new $c.Ptr(hairbuf, 0), $C`let me run my fingers through your %s`, await body_part(HAIR));
         /* obj == uarmh */
-        await verbalize($C`Take off your %s; %s.`, str, $c.peq(obj, $G.uarm) ? $C`let's get a little closer` : $c.peq(obj, $G.uarmc) || $c.peq(obj, $G.uarms) ? $C`it's in the way` : $c.peq(obj, $G.uarmf) ? $C`let me rub your feet` : $c.peq(obj, $G.uarmg) ? $C`they're too clumsy` : $c.peq(obj, $G.uarmu) ? $C`let me massage you` : new $c.Ptr(hairbuf, 0));
+        await verbalize($C`Take off your %s; %s.`, str, obj === $G.uarm ? $C`let's get a little closer` : obj === $G.uarmc || obj === $G.uarms ? $C`it's in the way` : obj === $G.uarmf ? $C`let me rub your feet` : obj === $G.uarmg ? $C`they're too clumsy` : obj === $G.uarmu ? $C`let me massage you` : new $c.Ptr(hairbuf, 0));
     }
     await remove_worn_item(obj, TRUE);
 }

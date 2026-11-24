@@ -234,7 +234,7 @@ export async function mhidden_description(mon, mhid_flags, outbuf) {   // pager.
             incl_article = (mhid_flags & MHID.ARTICLE) >>> 0 !== 0 ? 1 : 0;
             show_altmon = (mhid_flags & MHID.ALTMON) >>> 0 !== 0 ? 1 : 0;
             force_region = (mhid_flags & MHID.REGION) >>> 0 !== 0 ? 1 : 0;
-            isyou = $c.peq(mon, gy.youmonst) ? 1 : 0;
+            isyou = mon === gy.youmonst ? 1 : 0;
             x = isyou ? u.ux : mon.mx;
             y = isyou ? u.uy : mon.my;
             glyph = svl.level.flags.hero_memory && !isyou ? svl.level.locations[x][y].glyph : glyph_at(x, y);
@@ -475,7 +475,7 @@ async function look_at_monster(buf, monbuf, mtmp, x, y) {   // pager.c:422
     const accurate = !Hallucination() ? 1 : 0;
     const name = mtmp.data === mons[PM.COYOTE] && accurate ? await coyotename(mtmp, new $c.Ptr(monnambuf, 0)) : await distant_monnam(mtmp, ARTICLE.NONE, new $c.Ptr(monnambuf, 0));
     $c.sprintf(buf, $C`%s%s%s%s`, mtmp.mx !== x || mtmp.my !== y ? mtmp.isshk && accurate ? $C`tail of ` : $C`tail of a ` : $C``, accurate ? monhealthdescr(mtmp, TRUE, new $c.Ptr(healthbuf, 0)) : $C``, mtmp.mtame && accurate ? $C`tame ` : mtmp.mpeaceful && accurate ? $C`peaceful ` : $C``, name);
-    if ($c.peq(u.ustuck, mtmp)) {
+    if (u.ustuck === mtmp) {
         if (u.uswallow || iflags.save_uswallow) {   /* monster detection */
             $c.strcat(buf, dmgtype_fromattack(mtmp.data, AD.DGST, AT.ENGL) !== null ? $C`, swallowing you` : $C`, engulfing you`);
         } else {

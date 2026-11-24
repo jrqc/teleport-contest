@@ -614,7 +614,7 @@ async function dosinkring(obj) {   // do.c:498
                 ideed = FALSE;
                 for (otmp = svl.level.objects[u.ux][u.uy]; otmp; otmp = otmp2) {
                     otmp2 = otmp.v.v_nexthere;
-                    if (!$c.peq(otmp, $G.uball) && !$c.peq(otmp, $G.uchain) && !obj_resists(otmp, 1, 99)) {
+                    if (otmp !== $G.uball && otmp !== $G.uchain && !obj_resists(otmp, 1, 99)) {
                         if (!Blind()) {
                             await pline($C`Suddenly, %s %s from the sink!`, await doname(otmp), await otense(otmp, $C`vanish`));
                             ideed = TRUE;
@@ -725,7 +725,7 @@ export async function canletgo(obj, word) {   // do.c:665
         }
         return FALSE;
     }
-    if ($c.peq(obj, $G.uwep) && await welded($G.uwep)) {
+    if (obj === $G.uwep && await welded($G.uwep)) {
         /* no weldmsg(), so uwep->bknown might become set silently
            if word is "" */
         if (word.get(0)) {
@@ -781,17 +781,17 @@ async function drop(obj) {   // do.c:714
     if (obj.otyp === CORPSE && await better_not_try_to_drop_that(obj)) {
         return ECMD.FAIL;
     }
-    if ($c.peq(obj, $G.uwep)) {
+    if (obj === $G.uwep) {
         if (await welded($G.uwep)) {
             await weldmsg(obj);
             return ECMD.FAIL;
         }
         await setuwep(null);
     }
-    if ($c.peq(obj, $G.uquiver)) {
+    if (obj === $G.uquiver) {
         await setuqwep(null);
     }
-    if ($c.peq(obj, $G.uswapwep)) {
+    if (obj === $G.uswapwep) {
         await setuswapwep(null);
     }
     if (u.uswallow) {
@@ -871,18 +871,18 @@ export async function dropy(obj) {   // do.c:800
  * @returns {Promise<void>}
  */
 export async function dropz(obj, with_impact) {   // do.c:807
-    if ($c.peq(obj, $G.uwep)) {
+    if (obj === $G.uwep) {
         await setuwep(null);
     }
-    if ($c.peq(obj, $G.uquiver)) {
+    if (obj === $G.uquiver) {
         await setuqwep(null);
     }
-    if ($c.peq(obj, $G.uswapwep)) {
+    if (obj === $G.uswapwep) {
         await setuswapwep(null);
     }
     if (u.uswallow) {
         /* hero has dropped an item while inside an engulfer */
-        if (!$c.peq(obj, $G.uball)) {
+        if (obj !== $G.uball) {
             /* mon doesn't pick up ball */
             /* moving shop item into engulfer's inventory treated as theft */
             if (is_unpaid(obj)) {
@@ -902,7 +902,7 @@ export async function dropz(obj, with_impact) {   // do.c:807
             await container_impact_dmg(obj, u.ux, u.uy);
         }
         await impact_disturbs_zombies(obj, with_impact);
-        if ($c.peq(obj, $G.uball)) {
+        if (obj === $G.uball) {
             await drop_ball(u.ux, u.uy);
         } else if (svl.level.flags.has_shop) {
             await sellobj(obj, u.ux, u.uy);
@@ -1159,7 +1159,7 @@ async function menu_drop(retry) {   // do.c:981
                 for (i = 0; i < n; i = i + 1 | 0) {
                     otmp = $c.radd(pick_list[0], i).item.a_obj;
                     for (otmp2 = gi.invent; otmp2; otmp2 = otmp2.nobj) {
-                        if ($c.peq(otmp2, otmp)) {
+                        if (otmp2 === otmp) {
                             break;
                         }
                     }
@@ -1451,8 +1451,8 @@ badspot(coordxy x, coordxy y)
  */
 export async function u_collide_m(mtmp) {   // do.c:1412
     let cc = new $T.nhcoord();
-    if (!mtmp || $c.peq(mtmp, u.usteed) || !$c.peq(mtmp, svl.level.monsters[u.ux][u.uy])) {
-        await impossible($C`level arrival collision: %s?`, !mtmp ? $C`no monster` : $c.peq(mtmp, u.usteed) ? $C`steed is on map` : $C`monster not co-located`);
+    if (!mtmp || mtmp === u.usteed || mtmp !== svl.level.monsters[u.ux][u.uy]) {
+        await impossible($C`level arrival collision: %s?`, !mtmp ? $C`no monster` : mtmp === u.usteed ? $C`steed is on map` : $C`monster not co-located`);
         return;
     }
     /* There's a monster at your target destination; it might be one
@@ -2130,7 +2130,7 @@ export async function revive_corpse(corpse) {   // do.c:2111
     /* treat buried auto-reviver (troll, Rider?) like a zombie
        so that it can dig itself out of the ground if it revives */
     const is_zomb = mons[montype].mlet === S.ZOMBIE || where === OBJ.BURIED && is_reviver($c.relem(mons, montype)) ? 1 : 0;
-    const is_uwep = $c.peq(corpse, $G.uwep) ? 1 : 0;
+    const is_uwep = corpse === $G.uwep ? 1 : 0;
     const chewed = corpse.oeaten !== 0 ? 1 : 0;
     $c.strcpy(new $c.Ptr(cname, 0), await corpse_xname(corpse, chewed ? $C`bite-covered` : null, CXN.SINGULAR));
     let mcarry = where === OBJ.MINVENT ? corpse.v.v_ocarry : null;

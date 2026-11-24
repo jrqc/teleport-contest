@@ -446,7 +446,7 @@ export async function drinkfountain() {   // fountain.c:243
 export async function dipfountain(obj) {   // fountain.c:394
     let otmp = null, nextobj = null, $t1;
     let er = ER.NOTHING;
-    const is_hands = $c.peq(obj, hands_obj) ? 1 : 0;
+    const is_hands = obj === hands_obj ? 1 : 0;
     if (Levitation()) {
         await floating_above($C`fountain`);
         return;
@@ -485,7 +485,7 @@ export async function dipfountain(obj) {   // fountain.c:394
             await angry_guards(FALSE);
         }
         return;
-    } else if (is_hands || $c.peq(obj, $G.uarmg)) {
+    } else if (is_hands || obj === $G.uarmg) {
         er = await wash_hands();
     } else {
         er = await water_damage(obj, null, TRUE);
@@ -761,7 +761,7 @@ export async function drinksink() {   // fountain.c:595
 export async function dipsink(obj) {   // fountain.c:716
     let try_call = FALSE;
     const not_looted_yet = (svl.level.locations[u.ux][u.uy].flags & S.LRING) === 0 ? 1 : 0;
-    const is_hands = $c.peq(obj, hands_obj) || $G.uarmg && $c.peq(obj, $G.uarmg) ? 1 : 0;
+    const is_hands = obj === hands_obj || $G.uarmg && obj === $G.uarmg ? 1 : 0;
     if (!rn2(not_looted_yet ? 25 : 15)) {
         /* can't rely on using sink for unlimited scroll blanking; however,
            since sink will be converted into a fountain, hero can dip again */

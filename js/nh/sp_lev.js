@@ -1373,7 +1373,7 @@ async function is_ok_location(x, y, humidity) {   // sp_lev.c:1280
         return TRUE;
     }
     if ((humidity & (DRY | SPACELOC)) >>> 0 && SPACE_POS(typ)) {
-        const bould = !$c.peq(sobj_at(BOULDER, x, y), $c.asRec(null, $T.obj, 112)) ? 1 : 0;
+        const bould = sobj_at(BOULDER, x, y) !== $c.asRec(null, $T.obj, 112) ? 1 : 0;
         if (!bould || bould && (humidity & SOLID) >>> 0) {
             return TRUE;
         }
@@ -2183,7 +2183,7 @@ async function create_monster(m, croom) {   // sp_lev.c:1925
                         }
                         if (mndx[0] === NON_PM || is_vampshifter(mtmp) && !validvamp(mtmp, new $c.Ptr(mndx, 0), S.HUMAN)) {
                             await impossible($C`create_monster: invalid %s ("%s")`, mtmp.data.mlet === S.MIMIC ? $C`mimic appearance` : mtmp.data === mons[PM.WIZARD_OF_YENDOR] ? $C`Wizard appearance` : is_vampshifter(mtmp) ? $C`vampire shape` : $C`chameleon shape`, m.appear_as.str);
-                        } else if ($c.peq($c.relem(mons, mndx[0]), mtmp.data)) {
+                        } else if ($c.relem(mons, mndx[0]) === mtmp.data) {
                             /* explicitly forcing a mimic to appear as itself */
                             mtmp.m_ap_type = M_AP.NOTHING;
                             mtmp.mappearance = 0;

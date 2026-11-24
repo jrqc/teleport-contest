@@ -289,23 +289,23 @@ export async function remove_worn_item(obj, unchain_ball) {   // steal.c:213
     const oldinuse = obj.in_use;
     obj.in_use = 1;
     if ($c.and64(obj.owornmask, W_ARMOR)) {
-        if ($c.peq(obj, $G.uskin)) {
+        if (obj === $G.uskin) {
             await impossible($C`Removing embedded scales?`);
             await skinback(TRUE);   /* uarm = uskin; uskin = 0; */
         }
-        if ($c.peq(obj, $G.uarm)) {
+        if (obj === $G.uarm) {
             await Armor_off();
-        } else if ($c.peq(obj, $G.uarmc)) {
+        } else if (obj === $G.uarmc) {
             await Cloak_off();
-        } else if ($c.peq(obj, $G.uarmf)) {
+        } else if (obj === $G.uarmf) {
             await Boots_off();
-        } else if ($c.peq(obj, $G.uarmg)) {
+        } else if (obj === $G.uarmg) {
             await Gloves_off();
-        } else if ($c.peq(obj, $G.uarmh)) {
+        } else if (obj === $G.uarmh) {
             await Helmet_off();
-        } else if ($c.peq(obj, $G.uarms)) {
+        } else if (obj === $G.uarms) {
             await Shield_off();
-        } else if ($c.peq(obj, $G.uarmu)) {
+        } else if (obj === $G.uarmu) {
             await Shirt_off();
         } else {
             /* catchall -- should never happen */
@@ -318,13 +318,13 @@ export async function remove_worn_item(obj, unchain_ball) {   // steal.c:213
     } else if ($c.and64(obj.owornmask, W.TOOL)) {
         await Blindf_off(obj);
     } else if ($c.and64(obj.owornmask, W_WEAPONS)) {
-        if ($c.peq(obj, $G.uwep)) {
+        if (obj === $G.uwep) {
             await uwepgone();
         }
-        if ($c.peq(obj, $G.uswapwep)) {
+        if (obj === $G.uswapwep) {
             await uswapwepgone();
         }
-        if ($c.peq(obj, $G.uquiver)) {
+        if (obj === $G.uquiver) {
             await uqwepgone();
         }
     }
@@ -364,7 +364,7 @@ async function worn_item_removal(mon, obj) {   // steal.c:294
         /* when removing attached iron ball, caller passes 'uchain';
            when formatted, it will be "an iron chain (attached to you)";
            change "an" to "the" rather than to "your" in that situation */
-        strsubst(new $c.Ptr(objbuf, 0), new $c.Ptr(article, 0), $c.peq(obj, $G.uchain) ? $C`the ` : $C`your `);
+        strsubst(new $c.Ptr(objbuf, 0), new $c.Ptr(article, 0), obj === $G.uchain ? $C`the ` : $C`your `);
     }
     /* these ought to be guarded against matching user-supplied name */
     strsubst(new $c.Ptr(objbuf, 0), $C` (being worn)`, $C``);
@@ -433,7 +433,7 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
                    hero becomes unpunished but nymph ends up empty handed */
                 if (Punished() && !monkey_business && rn2(4)) {
                     /* uball is not carried (uchain never is) */
-                    (!(!$c.peq($G.uball, $c.asRec(null, $T.obj, 112)) && $G.uball.where === OBJ.FLOOR) ? 1 : 0) ? $c.__assert_rtn($C`steal`, $C`steal.c`, 381, $C`uball != NULL && uball->where == OBJ_FLOOR`) : 0;
+                    (!($G.uball !== $c.asRec(null, $T.obj, 112) && $G.uball.where === OBJ.FLOOR) ? 1 : 0) ? $c.__assert_rtn($C`steal`, $C`steal.c`, 381, $C`uball != NULL && uball->where == OBJ_FLOOR`) : 0;
                     await worn_item_removal(mtmp, $G.uchain);
                 } else if (u.utrap && u.utraptype === TT.BURIEDBALL && !monkey_business && !rn2(4)) {
                     /* buried ball is not tracked via 'uball' and there is no chain
@@ -462,7 +462,7 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
             $goto = null;   // retry:
             tmp = 0;
             for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
-                if ((!$G.uarm || !$c.peq(otmp, $G.uarmc)) && !$c.peq(otmp, $G.uskin) && otmp.oclass !== COIN_CLASS) {
+                if ((!$G.uarm || otmp !== $G.uarmc) && otmp !== $G.uskin && otmp.oclass !== COIN_CLASS) {
                     tmp = tmp + ($c.and64(otmp.owornmask, W_ARMOR | W_ACCESSORY) ? 5 : 1) | 0;
                 }
             }
@@ -471,7 +471,7 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
             }
             tmp = rn2(tmp);
             for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
-                if ((!$G.uarm || !$c.peq(otmp, $G.uarmc)) && !$c.peq(otmp, $G.uskin) && otmp.oclass !== COIN_CLASS) {
+                if ((!$G.uarm || otmp !== $G.uarmc) && otmp !== $G.uskin && otmp.oclass !== COIN_CLASS) {
                     tmp = tmp - ($c.and64(otmp.owornmask, W_ARMOR | W_ACCESSORY) ? 5 : 1) | 0;
                     if (tmp < 0) {
                         break;
@@ -483,19 +483,19 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
                 return 0;
             }
             /* can't steal ring(s) while wearing gloves */
-            if (($c.peq(otmp, $G.uleft) || $c.peq(otmp, $G.uright)) && $G.uarmg) {
+            if ((otmp === $G.uleft || otmp === $G.uright) && $G.uarmg) {
                 otmp = $G.uarmg;
             }
             /* can't steal gloves while wielding - so steal the wielded item. */
-            if ($c.peq(otmp, $G.uarmg) && $G.uwep) {
+            if (otmp === $G.uarmg && $G.uwep) {
                 otmp = $G.uwep;
-            } else if ($c.peq(otmp, $G.uarm) && $G.uarmc) {
+            } else if (otmp === $G.uarm && $G.uarmc) {
                 /* can't steal armor while wearing cloak - so steal the cloak. */
                 otmp = $G.uarmc;
-            } else if ($c.peq(otmp, $G.uarmu) && $G.uarmc) {
+            } else if (otmp === $G.uarmu && $G.uarmc) {
                 /* can't steal shirt while wearing cloak or suit */
                 otmp = $G.uarmc;
-            } else if ($c.peq(otmp, $G.uarmu) && $G.uarm) {
+            } else if (otmp === $G.uarmu && $G.uarm) {
                 otmp = $G.uarm;
             }
         case "gotobj":
@@ -517,14 +517,14 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
                     case null:
                         /* is the player prevented from voluntarily giving up this item?
                            (ignores loadstones; the !can_carry() check will catch those) */
-                        if ($c.peq(otmp, $G.uball)) {
+                        if (otmp === $G.uball) {
                             ostuck = TRUE;   /* effectively worn; curse is implicit */
-                        } else if ($c.peq(otmp, $G.uquiver) || $c.peq(otmp, $G.uswapwep) && !u.twoweap) {
+                        } else if (otmp === $G.uquiver || otmp === $G.uswapwep && !u.twoweap) {
                             ostuck = FALSE;   /* not really worn; curse doesn't matter */
                         } else {
                             /* nymphs can steal rings from under
                                cursed weapon but animals can't */
-                            ostuck = otmp.cursed && otmp.owornmask || $c.peq(otmp, RING_ON_PRIMARY()) && await welded($G.uwep) || $c.peq(otmp, RING_ON_SECONDARY()) && await welded($G.uwep) && bimanual($G.uwep) ? 1 : 0;
+                            ostuck = otmp.cursed && otmp.owornmask || otmp === RING_ON_PRIMARY() && await welded($G.uwep) || otmp === RING_ON_SECONDARY() && await welded($G.uwep) && bimanual($G.uwep) ? 1 : 0;
                         }
                     case "cant_take":
                         if ($goto === "cant_take" || (ostuck || await can_carry(mtmp, otmp) === 0)) {
@@ -616,7 +616,7 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
             } else if (otmp.owornmask) {
                 /* weapon or ball&chain */
                 item = otmp;
-                if ($c.peq(otmp, $G.uball)) {   /* non-Null uball implies non-Null uchain */
+                if (otmp === $G.uball) {   /* non-Null uball implies non-Null uchain */
                     item = $G.uchain;   /* yields a more accurate 'takes off' message */
                 }
                 await worn_item_removal(mtmp, item);
@@ -673,15 +673,15 @@ export async function mpickobj(mtmp, otmp) {   // steal.c:618
     if (!otmp) {
         await impossible($C`monster (%s) taking or picking up nothing?`, pmname(mtmp.data, Mgender(mtmp)));
         return 1;
-    } else if ($c.peq(otmp, $G.uball) || $c.peq(otmp, $G.uchain)) {
-        await impossible($C`monster (%s) taking or picking up attached %s (%s)?`, pmname(mtmp.data, Mgender(mtmp)), $c.peq(otmp, $G.uchain) ? $C`chain` : $C`ball`, await simpleonames(otmp));
+    } else if (otmp === $G.uball || otmp === $G.uchain) {
+        await impossible($C`monster (%s) taking or picking up attached %s (%s)?`, pmname(mtmp.data, Mgender(mtmp)), otmp === $G.uchain ? $C`chain` : $C`ball`, await simpleonames(otmp));
         return 0;
     }
     /* if monster is acquiring a thrown or kicked object, the throwing
        or kicking code shouldn't continue to track and place it */
-    if ($c.peq(otmp, gt.thrownobj)) {
+    if (otmp === gt.thrownobj) {
         gt.thrownobj = null;
-    } else if ($c.peq(otmp, gk.kickedobj)) {
+    } else if (otmp === gk.kickedobj) {
         gk.kickedobj = null;
     }
     /* an unpaid item can be on the floor; if a monster picks it up, take
@@ -709,7 +709,7 @@ export async function mpickobj(mtmp, otmp) {   // steal.c:618
            it is applied to them; when engulfed (where monster can't be seen
            because vision is disabled), or when held (or poly'd and holding)
            while blind, behave as if the monster can be 'seen' by touch */
-        if (!canseemon(mtmp) && !$c.peq(mtmp, u.ustuck)) {
+        if (!canseemon(mtmp) && mtmp !== u.ustuck) {
             unknow_object(otmp);
         }
         /* if otmp has flags set for how it left hero's inventory, change
@@ -796,20 +796,20 @@ export async function stealamulet(mtmp) {   // steal.c:689
         /* we have something to snatch */
         /* take off outer gear if we're targeting [hypothetical]
            quest artifact suit, shirt, gloves, or rings */
-        if (($c.peq(otmp, $G.uarm) || $c.peq(otmp, $G.uarmu)) && $G.uarmc) {
+        if ((otmp === $G.uarm || otmp === $G.uarmu) && $G.uarmc) {
             await worn_item_removal(mtmp, $G.uarmc);
         }
-        if ($c.peq(otmp, $G.uarmu) && $G.uarm) {
+        if (otmp === $G.uarmu && $G.uarm) {
             await worn_item_removal(mtmp, $G.uarm);
         }
-        if (($c.peq(otmp, $G.uarmg) || ($c.peq(otmp, $G.uright) || $c.peq(otmp, $G.uleft)) && $G.uarmg) && $G.uwep) {
+        if ((otmp === $G.uarmg || (otmp === $G.uright || otmp === $G.uleft) && $G.uarmg) && $G.uwep) {
             /* gloves are about to be unworn; unwield weapon(s) first */
             if (u.twoweap) {   /* remove_worn_item(uswapwep) indirectly */
                 await worn_item_removal(mtmp, $G.uswapwep);   /* clears u.twoweap */
             }
             await worn_item_removal(mtmp, $G.uwep);
         }
-        if (($c.peq(otmp, $G.uright) || $c.peq(otmp, $G.uleft)) && $G.uarmg) {   /* calls Gloves_off() to handle wielded cockatrice corpse */
+        if ((otmp === $G.uright || otmp === $G.uleft) && $G.uarmg) {   /* calls Gloves_off() to handle wielded cockatrice corpse */
             await worn_item_removal(mtmp, $G.uarmg);
         }
         /* finally, steal the target item */
@@ -840,7 +840,7 @@ export async function stealamulet(mtmp) {   // steal.c:689
  */
 export async function maybe_absorb_item(mon, obj, ochance, achance) {   // steal.c:772
     /* percent chance for ordinary item, artifact */
-    if ($c.peq(obj, $G.uball) || $c.peq(obj, $G.uchain) || obj.oclass === ROCK_CLASS || obj_resists(obj, 100 - ochance | 0, 100 - achance | 0) || !await touch_artifact(obj, mon)) {
+    if (obj === $G.uball || obj === $G.uchain || obj.oclass === ROCK_CLASS || obj_resists(obj, 100 - ochance | 0, 100 - achance | 0) || !await touch_artifact(obj, mon)) {
         return;
     }
     if (carried(obj)) {

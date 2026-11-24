@@ -417,7 +417,7 @@ async function e_nam(etmp) {   // dbridge.c:351
  * @returns {Promise<$c.Ptr | null>} const char *
  */
 async function E_phrase(etmp, verb) {   // dbridge.c:361
-    $c.strcpy(new $c.Ptr(E_phrase$wholebuf, 0), $c.peq(etmp.emon, gy.youmonst) ? $C`You` : await Monnam(etmp.emon));
+    $c.strcpy(new $c.Ptr(E_phrase$wholebuf, 0), etmp.emon === gy.youmonst ? $C`You` : await Monnam(etmp.emon));
     if (!verb || !verb.get(0)) {
         return new $c.Ptr(E_phrase$wholebuf, 0);
     }
@@ -521,7 +521,7 @@ async function e_died(etmp, xkill_flags, how) {   // dbridge.c:402
         etmp.edata = null;
         /* dead long worm handling */
         for (entitycnt = 0; entitycnt < ENTITIES; entitycnt = entitycnt + 1 | 0) {
-            if (!$c.peq(etmp, $c.relem(go.occupants, entitycnt)) && $c.peq(etmp.emon, go.occupants[entitycnt].emon)) {
+            if (etmp !== $c.relem(go.occupants, entitycnt) && etmp.emon === go.occupants[entitycnt].emon) {
                 go.occupants[entitycnt].edata = null;
             }
         }
@@ -767,7 +767,7 @@ async function do_entity(etmp) {   // dbridge.c:554
                     iflags.last_msg = save_plnmsg$9;
                 }
             } while (0);
-            while (await e_at(newx[0], newy[0]) !== null && !$c.peq(await e_at(newx[0], newy[0]), etmp)) {
+            while (await e_at(newx[0], newy[0]) !== null && await e_at(newx[0], newy[0]) !== etmp) {
                 await do_entity(other);
             }
             do {
@@ -777,7 +777,7 @@ async function do_entity(etmp) {   // dbridge.c:554
                     iflags.last_msg = save_plnmsg$10;
                 }
             } while (0);
-            if (!$c.peq(await e_at(oldx, oldy), etmp)) {
+            if (await e_at(oldx, oldy) !== etmp) {
                 do {
                     if (debugcore($C`dbridge.c`, TRUE)) {
                         const save_plnmsg$11 = iflags.last_msg;
@@ -1159,10 +1159,10 @@ export async function destroy_drawbridge(x, y) {   // dbridge.c:888
     }
 }
 function is_u(etmp) {
-    return $c.peq(etmp.emon, gy.youmonst) ? 1 : 0;
+    return etmp.emon === gy.youmonst ? 1 : 0;
 }
 function e_canseemon(etmp) {
-    return $c.peq(etmp.emon, gy.youmonst) || canseemon(etmp.emon) ? 1 : 0;
+    return etmp.emon === gy.youmonst || canseemon(etmp.emon) ? 1 : 0;
 }
 function mk_message(dest) {
     return (dest & XKILL.NOMSG) !== 0 ? null : $C``;

@@ -215,7 +215,7 @@ async function sanity_check_single_mon(mtmp, chk_geno, msg) {   // mon.c:73
         }
     }
     /* steed should be tame and saddled */
-    if ($c.peq(mtmp, u.usteed)) {
+    if (mtmp === u.usteed) {
         const nt = !mtmp.mtame ? $C`not tame` : null;
         const ns = !m_carrying(mtmp, SADDLE) ? $C`no saddle` : !await which_armor(mtmp, W.SADDLE) ? $C`saddle not worn` : null;
         if (ns || nt) {
@@ -241,10 +241,10 @@ async function sanity_check_single_mon(mtmp, chk_geno, msg) {   // mon.c:73
         if (!isok(mx, my)) {   /* caller will have checked this but not fixed it */
             mx = my = 0;
         }
-        if ($c.peq(mtmp, u.ustuck)) {
+        if (mtmp === u.ustuck) {
             await impossible($C`hiding monster stuck to you (%s)`, msg);
         }
-        if ($c.peq(svl.level.monsters[mx][my], mtmp) && hides_under(mptr) && !OBJ_AT(mx, my)) {
+        if (svl.level.monsters[mx][my] === mtmp && hides_under(mptr) && !OBJ_AT(mx, my)) {
             await impossible($C`mon hiding under nonexistent obj (%s)`, msg);
         }
         if (mptr.mlet === S.EEL && !(is_pool(mx, my) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)))) {
@@ -305,13 +305,13 @@ export async function mon_sanity_check() {   // mon.c:258
         x = mtmp.mx, y = mtmp.my;
         if (!isok(x, y) && !(mtmp.isgd && x === 0 && y === 0)) {
             await impossible($C`mon (%s) claims to be at <%d,%d>?`, fmt_ptr(mtmp), x, y);
-        } else if ($c.peq(mtmp, u.usteed)) {
+        } else if (mtmp === u.usteed) {
             /* steed is in fmon list but not on the map; its
                <mx,my> coordinates should match hero's location */
             if (x !== u.ux || y !== u.uy) {
                 await impossible($C`steed (%s) claims to be at <%d,%d>?`, fmt_ptr(mtmp), x, y);
             }
-        } else if (!$c.peq(svl.level.monsters[x][y], mtmp)) {
+        } else if (svl.level.monsters[x][y] !== mtmp) {
             await impossible($C`mon (%s) at <%d,%d> is not there!`, fmt_ptr(mtmp), x, y);
         } else if (mtmp.wormno) {
             await sanity_check_worm(mtmp);
@@ -325,13 +325,13 @@ export async function mon_sanity_check() {   // mon.c:258
         for (y = 0; y < ROWNO; y = $c.i16(y + 1)) {
             if ((mtmp = svl.level.monsters[x][y]) !== null) {
                 for (m = svl.level.monlist; m; m = m.nmon) {
-                    if ($c.peq(m, mtmp)) {
+                    if (m === mtmp) {
                         break;
                     }
                 }
                 if (!m) {
                     await impossible($C`map mon (%s) at <%d,%d> not in fmon list!`, fmt_ptr(mtmp), x, y);
-                } else if ($c.peq(mtmp, u.usteed)) {
+                } else if (mtmp === u.usteed) {
                     await impossible($C`steed (%s) is on the map at <%d,%d>!`, fmt_ptr(mtmp), x, y);
                 } else if ((mtmp.mx !== x || mtmp.my !== y) && mtmp.data !== mons[PM.LONG_WORM]) {
                     await impossible($C`map mon (%s) at <%d,%d> is found at <%d,%d>?`, fmt_ptr(mtmp), mtmp.mx, mtmp.my, x, y);
@@ -355,7 +355,7 @@ export async function mon_sanity_check() {   // mon.c:258
  * @returns {Promise<number>} int
  */
 export async function m_poisongas_ok(mtmp) {   // mon.c:330
-    const is_you = $c.peq(mtmp, gy.youmonst) ? 1 : 0;
+    const is_you = mtmp === gy.youmonst ? 1 : 0;
     /* Non living, non breathing, immune monsters are not concerned */
     if (nonliving(mtmp.data) || is_vampshifter(mtmp) || breathless(mtmp.data) || immune_poisongas(mtmp.data)) {
         return M_POISONGAS.OK;
@@ -836,7 +836,7 @@ async function minliquid_core(mtmp) {   // mon.c:961
        water location on the Plane of Water, flight and levitating
        are blocked so this (Flying || Levitation) test fails there
        and steed will be subject to water effects, as intended) */
-    if ($c.peq(mtmp, u.usteed) && ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked || Levitation()) && !waterwall) {
+    if (mtmp === u.usteed && ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked || Levitation()) && !waterwall) {
         return 0;
     }
     /* Gremlin multiplying won't go on forever since the hit points
@@ -1007,7 +1007,7 @@ export function mcalcmove(mon, m_moving) {   // mon.c:1126
     } else if (mon.mspeed === MFAST) {
         mmove = $c.div32(Math.imul(4, mmove) + 2 | 0, 3);
     }
-    if ($c.peq(mon, u.usteed) && u.ugallop && svc.context.mv) {
+    if (mon === u.usteed && u.ugallop && svc.context.mv) {
         /* increase movement by a factor of 1.5; also increase variance of
            movement speed (if it's naturally 24, we don't want it to always
            become 36) */
@@ -1254,10 +1254,10 @@ export async function m_consume_obj(mtmp, otmp) {   // mon.c:1392
     if (Has_contents(otmp)) {
         await meatbox(mtmp, otmp);
     }
-    if ($c.peq(otmp, $G.uball)) {
+    if (otmp === $G.uball) {
         await unpunish();
         await delobj(otmp);
-    } else if ($c.peq(otmp, $G.uchain)) {
+    } else if (otmp === $G.uchain) {
         await unpunish();   /* frees uchain */
     } else {
         const vis = canseemon(mtmp);
@@ -1419,7 +1419,7 @@ export async function meatobj(mtmp) {   // mon.c:1533
                and return 3 in that situation (if possible...)] */
             break;
             /* untouchable (or inaccessible) items */
-        } else if (otmp.otyp === CORPSE && touch_petrifies($c.relem(mons, otmp.corpsenm)) && !await resists_ston(mtmp) || otmp.oclass === ROCK_CLASS || $c.peq(otmp, $G.uball) || $c.peq(otmp, $G.uchain) || otmp.otyp === SCR_SCARE_MONSTER) {
+        } else if (otmp.otyp === CORPSE && touch_petrifies($c.relem(mons, otmp.corpsenm)) && !await resists_ston(mtmp) || otmp.oclass === ROCK_CLASS || otmp === $G.uball || otmp === $G.uchain || otmp.otyp === SCR_SCARE_MONSTER) {
             /* don't engulf boulders and statues or ball&chain */
             /* normally mtmp won't have stepped onto scare monster
                scroll, but if it does, don't eat or engulf that
@@ -1467,7 +1467,7 @@ export async function meatobj(mtmp) {   // mon.c:1533
             await m_consume_obj(mtmp, otmp);
             /* in case it polymorphed or died */
             const ptr = mtmp.data;
-            if (!$c.peq(ptr, original_ptr)) {
+            if (ptr !== original_ptr) {
                 return !ptr ? 2 : 1;
             }
         }
@@ -1543,7 +1543,7 @@ export async function meatcorpse(mtmp) {   // mon.c:1656
         await m_consume_obj(mtmp, otmp);
         /* in case it polymorphed or died */
         const ptr = mtmp.data;
-        if (!$c.peq(ptr, original_ptr)) {
+        if (ptr !== original_ptr) {
             return !ptr ? 2 : 1;
         }
         /* Engulf & devour is instant, so don't set meating */
@@ -1853,7 +1853,7 @@ export async function can_carry(mtmp, otmp) {   // mon.c:1990
         }
     }
     /* steeds don't pick up stuff (to avoid shop abuse) */
-    if ($c.peq(mtmp, u.usteed)) {
+    if (mtmp === u.usteed) {
         return 0;
     }
     if (mtmp.isshk) {
@@ -1940,7 +1940,7 @@ export async function mon_allowflags(mtmp) {   // mon.c:2064
     }
     /* restrict engulfer or holder who might try to pass iron bars while
        carrying hero; accept small subset for poly'd hero passes_bars() */
-    if (passes_bars(mtmp.data) && (!$c.peq(mtmp, u.ustuck) || (unsolid(gy.youmonst.data) || verysmall(gy.youmonst.data)))) {
+    if (passes_bars(mtmp.data) && (mtmp !== u.ustuck || (unsolid(gy.youmonst.data) || verysmall(gy.youmonst.data)))) {
         allowflags = $c.or64(allowflags, ALLOW.BARS);
     }
     /* can't do this here; leave it for mfndpos() */
@@ -2323,20 +2323,20 @@ export async function replmon(mtmp, mtmp2) {   // mon.c:2515
     let otmp = null;
     /* transfer the monster's inventory */
     for (otmp = mtmp2.minvent; otmp; otmp = otmp.nobj) {
-        if (otmp.where !== OBJ.MINVENT || !$c.peq(otmp.v.v_ocarry, mtmp)) {
+        if (otmp.where !== OBJ.MINVENT || otmp.v.v_ocarry !== mtmp) {
             await impossible($C`replmon: minvent inconsistency`);
         }
         otmp.v.v_ocarry = mtmp2;
     }
     mtmp.minvent = null;
     /* before relmon(mtmp), because it could clear polearm.hitmon */
-    if ($c.peq(svc.context.polearm.hitmon, mtmp)) {
+    if (svc.context.polearm.hitmon === mtmp) {
         svc.context.polearm.hitmon = mtmp2;
     }
     /* remove the old monster from the map and from `fmon' list */
     await relmon(mtmp, null);
     /* finish adding its replacement */
-    if (!$c.peq(mtmp, u.usteed)) {   /* don't place steed onto the map */
+    if (mtmp !== u.usteed) {   /* don't place steed onto the map */
         await place_monster(mtmp2, mtmp2.mx, mtmp2.my);
     }
     if (mtmp2.wormno) {   /* update level.monsters[wseg->wx][wseg->wy] */
@@ -2350,10 +2350,10 @@ export async function replmon(mtmp, mtmp2) {   // mon.c:2515
     }
     mtmp2.nmon = svl.level.monlist;
     svl.level.monlist = mtmp2;
-    if ($c.peq(u.ustuck, mtmp)) {
+    if (u.ustuck === mtmp) {
         await set_ustuck(mtmp2);
     }
-    if ($c.peq(u.usteed, mtmp)) {
+    if (u.usteed === mtmp) {
         u.usteed = mtmp2;
     }
     if (mtmp2.isshk) {
@@ -2378,11 +2378,11 @@ export async function relmon(mon, monst_list) {   // mon.c:2561
     /* take 'mon' off the map */
     await mon_leaving_level(mon);
     /* remove 'mon' from the 'fmon' list */
-    if ($c.peq(mon, svl.level.monlist)) {
+    if (mon === svl.level.monlist) {
         svl.level.monlist = svl.level.monlist.nmon;
     } else {
         for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
-            if ($c.peq(mtmp.nmon, mon)) {
+            if (mtmp.nmon === mon) {
                 mtmp.nmon = mon.nmon;
                 break;
             }
@@ -2523,12 +2523,12 @@ export async function dealloc_monst(mon) {   // mon.c:2676
 async function mon_leaving_level(mon) {   // mon.c:2696
     const mx = mon.mx;
     const my = mon.my;
-    const onmap = isok(mx, my) && $c.peq(svl.level.monsters[mx][my], mon) ? 1 : 0;
+    const onmap = isok(mx, my) && svl.level.monsters[mx][my] === mon ? 1 : 0;
     /* to prevent an infinite relobj-flooreffects-hmon-killed loop */
     mon.mtrapped = 0;
     await unstuck(mon);   /* mon is not swallowing or holding you nor held by you */
     /* vault guard might be at <0,0> */
-    if (onmap || $c.peq(mon, svl.level.monsters[0][0])) {
+    if (onmap || mon === svl.level.monsters[0][0]) {
         if (mon.wormno) {
             await remove_worm(mon);
         } else {
@@ -2550,7 +2550,7 @@ async function mon_leaving_level(mon) {   // mon.c:2696
         await newsym(mx, my);
     }
     /* if mon is a remembered target, forget it since it isn't here anymore */
-    if ($c.peq(mon, svc.context.polearm.hitmon)) {
+    if (mon === svc.context.polearm.hitmon) {
         svc.context.polearm.hitmon = null;
     }
 }
@@ -2626,7 +2626,7 @@ async function m_detach(mtmp, mptr, due_to_death) {   // mon.c:2734
         iflags.purge_monsters = iflags.purge_monsters + 1 | 0;
     }
     /* hero is thrown from his steed when it dies or gets genocided */
-    if ($c.peq(mtmp, u.usteed)) {
+    if (mtmp === u.usteed) {
         await dismount_steed(DISMOUNT.GENERIC);
     }
     return;
@@ -2743,7 +2743,7 @@ async function vamprises(mtmp) {   // mon.c:2890
         mtmp.mhp = mtmp.mhpmax;
         /* mtmp==u.ustuck can happen if previously a fog cloud or if
            poly'd hero is hugging a vampire bat */
-        if ($c.peq(mtmp, u.ustuck)) {
+        if (mtmp === u.ustuck) {
             if (u.uswallow) {
                 await expels(mtmp, mtmp.data, FALSE);
             } else {
@@ -2753,7 +2753,7 @@ async function vamprises(mtmp) {   // mon.c:2890
         if (!await newcham(mtmp, $c.relem(mons, mndx), NO_NC_FLAGS)) {
             return !DEADMONSTER(mtmp) ? 1 : 0;
         }
-        mtmp.cham = $c.i16($c.peq(mtmp.data, $c.relem(mons, mndx)) ? NON_PM : mndx);
+        mtmp.cham = $c.i16(mtmp.data === $c.relem(mons, mndx) ? NON_PM : mndx);
         if (canspotmon(mtmp)) {
             /* 3.6.0 used a_monnam(mtmp); that was weird if mtmp was
                named: "Dracula suddenly transforms and rises as Dracula";
@@ -2873,7 +2873,7 @@ async function logdeadmon(mtmp, mndx) {   // mon.c:2997
  * @returns {Promise<void>}
  */
 async function anger_quest_guardians(mtmp) {   // mon.c:3072
-    if ($c.peq(mtmp.data, $c.relem(mons, gu.urole.guardnum))) {
+    if (mtmp.data === $c.relem(mons, gu.urole.guardnum)) {
         await setmangry(mtmp, TRUE);
     }
 }
@@ -3005,7 +3005,7 @@ export async function corpse_chance(mon, magr, was_swallowed) {   // mon.c:3181
             if (was_swallowed && magr) {
                 /* mdef is a gas spore (AT_BOOM) that is exploding inside an
                    engulfer; suppress usual explosion since it's contained */
-                if ($c.peq(magr, gy.youmonst)) {
+                if (magr === gy.youmonst) {
                     await There($C`is an explosion in your %s!`, await body_part(STOMACH));
                     $c.sprintf(new $c.Ptr(svk.killer.name, 0), $C`%s explosion`, s_suffix(pmname(mdat, Mgender(mon))));
                     await losehp(Maybe_Half_Phys(tmp), new $c.Ptr(svk.killer.name, 0), KILLED.BY_AN);
@@ -3232,7 +3232,7 @@ export async function set_ustuck(mtmp) {   // mon.c:3421
  */
 export async function unstuck(mtmp) {   // mon.c:3438
     let $t1;
-    if ($c.peq(u.ustuck, mtmp)) {
+    if (u.ustuck === mtmp) {
         const ptr = mtmp.data;
         const swallowed = u.uswallow;
         /* do this first so that docrt()'s botl update is accurate;
@@ -3313,7 +3313,7 @@ export async function xkilled(mtmp, xkill_flags) {   // mon.c:3477
     }
     /* don't give to mon if missile is going to be destroyed */
     /* don't give to mon if missile is going to return to hero */
-    if (wasinside && gt.thrownobj && !$c.peq(gt.thrownobj, $G.uball) && gt.thrownobj.oclass !== POTION_CLASS && !$c.peq(gt.thrownobj, $c.asRec(iflags.returning_missile, $T.obj, 112))) {
+    if (wasinside && gt.thrownobj && gt.thrownobj !== $G.uball && gt.thrownobj.oclass !== POTION_CLASS && gt.thrownobj !== $c.asRec(iflags.returning_missile, $T.obj, 112)) {
         /* thrown object has killed hero's engulfer; add it to mon's
            inventory now so that it will be placed with mon's other
            stuff prior to lookhere/autopickup when hero is expelled
@@ -3548,7 +3548,7 @@ export async function vamp_stone(mtmp) {   // mon.c:3766
                 await display_nhwindow()($G.WIN_MESSAGE, FALSE);
             }
             await newcham(mtmp, $c.relem(mons, mndx), NO_NC_FLAGS);
-            if ($c.peq(mtmp.data, $c.relem(mons, mndx))) {
+            if (mtmp.data === $c.relem(mons, mndx)) {
                 mtmp.cham = NON_PM;
             } else {
                 mtmp.cham = $c.i16(mndx);
@@ -3615,7 +3615,7 @@ function ok_to_obliterate(mtmp) {   // mon.c:3864
      * Add checks for monsters that should not be obliterated
      * here (return FALSE).
      */
-    if (mtmp.data === mons[PM.WIZARD_OF_YENDOR] || is_rider(mtmp.data) || has_emin(mtmp) || has_epri(mtmp) || has_eshk(mtmp) || $c.peq(mtmp, u.ustuck) || $c.peq(mtmp, u.usteed)) {
+    if (mtmp.data === mons[PM.WIZARD_OF_YENDOR] || is_rider(mtmp.data) || has_emin(mtmp) || has_epri(mtmp) || has_eshk(mtmp) || mtmp === u.ustuck || mtmp === u.usteed) {
         return FALSE;
     }
     return TRUE;
@@ -3643,7 +3643,7 @@ export async function elemental_clog(mon) {   // mon.c:3878
          * m5 a pet.
          */
         for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
-            if (DEADMONSTER(mtmp) || $c.peq(mtmp, mon)) {
+            if (DEADMONSTER(mtmp) || mtmp === mon) {
                 continue;
             }
             if (mtmp.mx === 0 && mtmp.my === 0) {
@@ -3706,7 +3706,7 @@ export async function elemental_clog(mon) {   // mon.c:3878
  */
 export async function mnexto(mtmp, rlocflags) {   // mon.c:3955
     let mm = new $T.nhcoord(), savemm = new $T.nhcoord();
-    if ($c.peq(mtmp, u.usteed)) {
+    if (mtmp === u.usteed) {
         /* Keep your steed in sync with you instead */
         mtmp.mx = u.ux;
         mtmp.my = u.uy;
@@ -3800,7 +3800,7 @@ export async function mnearto(mtmp, x, y, move_other, rlocflags) {   // mon.c:40
     /* make sure mtmp gets to x, y! so move m_at(x, y) */
     let othermon = null;
     let res = 1;
-    if (mtmp.mx === x && mtmp.my === y && $c.peq(svl.level.monsters[x][y], mtmp)) {
+    if (mtmp.mx === x && mtmp.my === y && svl.level.monsters[x][y] === mtmp) {
         return res;
     }
     if (move_other && (othermon = svl.level.monsters[x][y]) !== null) {
@@ -3903,7 +3903,7 @@ async function qst_guardians_respond() {   // mon.c:4135
         if (DEADMONSTER(mon)) {
             continue;
         }
-        if ($c.peq(mon.data, q_guardian) && mon.mpeaceful) {
+        if (mon.data === q_guardian && mon.mpeaceful) {
             mon.mpeaceful = 0;
             if (canseemon(mon)) {
                 got_mad = got_mad + 1 | 0;
@@ -3930,7 +3930,7 @@ async function peacefuls_respond(mtmp) {   // mon.c:4163
         if (DEADMONSTER(mon)) {
             continue;
         }
-        if ($c.peq(mon, mtmp)) {   /* the mpeaceful test catches this since mtmp */
+        if (mon === mtmp) {   /* the mpeaceful test catches this since mtmp */
             continue;   /* is no longer peaceful, but be explicit...  */
         }
         if (!mindless(mon.data) && mon.mpeaceful && couldsee(mon.mx, mon.my) && !mon.msleeping && mon.mcansee && ((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(mon.data.mflags1, M1.SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(mon.my).get(mon.mx) & COULD_SEE) !== 0)) {
@@ -3958,14 +3958,14 @@ async function peacefuls_respond(mtmp) {   // mon.c:4163
                        surprise, but they won't become angry here;
                        quest leader will only get angry if hero attacks
                        own quest guardians */
-                    if (mon.isshk || mon.ispriest || $c.peq(mon.data, $c.relem(mons, await quest_info(MS.LEADER))) && !$c.peq(mtmp.data, $c.relem(mons, gu.urole.guardnum))) {
+                    if (mon.isshk || mon.ispriest || mon.data === $c.relem(mons, await quest_info(MS.LEADER)) && mtmp.data !== $c.relem(mons, gu.urole.guardnum)) {
                         if (exclaimed) {
                             await pline_mon(mon, $C`%s%s`, new $c.Ptr(buf, 0), $C` then shrugs.`);
                         }
                         continue;
                     }
                     /* don't have quest guardians turn to flee */
-                    if (mon.data.mlevel < rn2(10) && !$c.peq(mon.data, $c.relem(mons, gu.urole.guardnum))) {
+                    if (mon.data.mlevel < rn2(10) && mon.data !== $c.relem(mons, gu.urole.guardnum)) {
                         alreadyfleeing = mon.mflee || mon.mfleetim ? 1 : 0;
                         await monflee(mon, rn2(50) + 25 | 0, TRUE, !exclaimed ? 1 : 0);
                         if (exclaimed) {
@@ -4068,7 +4068,7 @@ export async function setmangry(mtmp, via_attack) {   // mon.c:4265
         await growl(mtmp);
     }
     /* attacking your own quest leader will anger his or her guardians */
-    if ($c.peq(mtmp.data, $c.relem(mons, await quest_info(MS.LEADER)))) {
+    if (mtmp.data === $c.relem(mons, await quest_info(MS.LEADER))) {
         await qst_guardians_respond();
     }
     /* make other peaceful monsters react */
@@ -4369,7 +4369,7 @@ export async function get_iter_mons_xy(bfunc, x, y) {   // mon.c:4562
  * @returns {Promise<number>} int
  */
 export async function healmon(mtmp, amt, overheal) {   // mon.c:4596
-    if ($c.peq(mtmp, gy.youmonst)) {
+    if (mtmp === gy.youmonst) {
         const oldhp = Upolyd() ? u.mh : u.uhp;
         await healup(amt, 0, 0, 0);
         return (Upolyd() ? u.mh : u.uhp) - oldhp | 0;
@@ -4445,7 +4445,7 @@ async function restrap(mtmp) {   // mon.c:4662
     /* can't hide while trapped except in pits */
     /* can't hide on ceiling if there isn't one */
     /* won't hide when adjacent to hero */
-    if (mtmp.mcan || M_AP_TYPE(mtmp) || cansee(mtmp.mx, mtmp.my) || rn2(3) || $c.peq(mtmp, u.ustuck) || mtmp.mtrapped && (t = t_at(mtmp.mx, mtmp.my)) !== null && !is_pit(t.ttyp) || ceiling_hider(mtmp.data) && !has_ceiling(u.uz) || sensemon(mtmp) && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2) {
+    if (mtmp.mcan || M_AP_TYPE(mtmp) || cansee(mtmp.mx, mtmp.my) || rn2(3) || mtmp === u.ustuck || mtmp.mtrapped && (t = t_at(mtmp.mx, mtmp.my)) !== null && !is_pit(t.ttyp) || ceiling_hider(mtmp.data) && !has_ceiling(u.uz) || sensemon(mtmp) && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2) {
         return FALSE;
     }
     if (mtmp.data.mlet === S.MIMIC) {
@@ -4503,10 +4503,10 @@ export async function hideunder(mtmp) {   // mon.c:4726
     let locomo = null;
     const seeit = gi.in_mklev ? 0 : canseemon(mtmp);
     let undetected = FALSE;
-    const is_u = $c.peq(mtmp, gy.youmonst) ? 1 : 0;
+    const is_u = mtmp === gy.youmonst ? 1 : 0;
     const x = is_u ? u.ux : mtmp.mx;
     const y = is_u ? u.uy : mtmp.my;
-    if ($c.peq(mtmp, u.ustuck)) {
+    if (mtmp === u.ustuck) {
         /* undetected==FALSE; can't hide if holding you or held by you */
     } else if ((is_u ? u.utrap : mtmp.mtrapped) || (t = t_at(x, y)) !== null && !is_pit(t.ttyp)) {
         /* undetected==FALSE; can't hide while trapped or on/in/under
@@ -4672,7 +4672,7 @@ export async function decide_to_shapeshift(mon) {   // mon.c:4872
                 const mndx = pickvampshape(mon);
                 if (ismnum(mndx)) {
                     ptr = $c.relem(mons, mndx);
-                    dochng = !$c.peq(ptr, mon.data) ? 1 : 0;
+                    dochng = ptr !== mon.data ? 1 : 0;
                 }
             }
             if (dochng && amorphous(mon.data) && closed_door(mon.mx, mon.my)) {
@@ -4734,7 +4734,7 @@ function pickvampshape(mon) {   // mon.c:4941
     /* return to base form if chosen poly target has been genocided
        or randomly if already in an alternate form (to prevent always
        switching back and forth between bat and fog) */
-    if ((svm.mvitals[mndx].mvflags & G_GENOD) !== 0 || !$c.peq(mon.data, $c.relem(mons, mon.cham)) && !rn2(4)) {
+    if ((svm.mvitals[mndx].mvflags & G_GENOD) !== 0 || mon.data !== $c.relem(mons, mon.cham) && !rn2(4)) {
         return mon.cham;
     }
     return mndx;
@@ -5018,7 +5018,7 @@ function accept_newcham_form(mon, mndx) {   // mon.c:5229
     }
     /* shapeshifters are rejected by polyok() but allow a shapeshifter
        to take on its 'natural' form */
-    if (is_shapeshifter(mdat) && ismnum(mon.cham) && $c.peq(mdat, $c.relem(mons, mon.cham))) {
+    if (is_shapeshifter(mdat) && ismnum(mon.cham) && mdat === $c.relem(mons, mon.cham)) {
         return mdat;
     }
     /* polyok() rules out M2_PNAME, M2_WERE, and all humans except Kops */
@@ -5111,7 +5111,7 @@ export async function newcham(mtmp, mdat, ncflags) {   // mon.c:5278
     } else if (svm.mvitals[mdat.pmidx].mvflags & G_GENOD) {
         return 0;   /* passed in mdat is genocided */
     }
-    if ($c.peq(mdat, olddata)) {
+    if (mdat === olddata) {
         return 0;   /* still the same monster */
     }
     mgender_from_permonst(mtmp, mdat);
@@ -5182,7 +5182,7 @@ export async function newcham(mtmp, mdat, ncflags) {   // mon.c:5278
     if (mtmp.mundetected) {
         await hideunder(mtmp);
     }
-    if ($c.peq(u.ustuck, mtmp)) {
+    if (u.ustuck === mtmp) {
         if (u.uswallow) {
             if (!attacktype(mdat, AT.ENGL)) {
                 /* Does mdat care? */
@@ -5276,7 +5276,7 @@ export async function newcham(mtmp, mdat, ncflags) {   // mon.c:5278
             }
         }
     }
-    if ($c.peq(mtmp, u.usteed)) {
+    if (mtmp === u.usteed) {
         await poly_steed(mtmp, olddata);
     }
     /* old form might not have been affected by Elbereth but perhaps the

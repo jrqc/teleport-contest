@@ -416,7 +416,7 @@ async function disturb(mtmp) {   // monmove.c:327
  * @returns {Promise<void>}
  */
 async function release_hero(mon) {   // monmove.c:362
-    if ($c.peq(mon, u.ustuck)) {
+    if (mon === u.ustuck) {
         if (u.uswallow) {
             await expels(mon, mon.data, TRUE);
         } else if (!sticks(gy.youmonst.data)) {
@@ -436,7 +436,7 @@ export function find_pmmonst(pm) {   // monmove.c:375
             if (DEADMONSTER(mtmp)) {
                 continue;
             }
-            if ($c.peq(mtmp.data, $c.relem(mons, pm))) {
+            if (mtmp.data === $c.relem(mons, pm)) {
                 break;
             }
         }
@@ -522,7 +522,7 @@ export async function monflee(mtmp, fleetime, first, fleemsg) {   // monmove.c:4
     if (DEADMONSTER(mtmp)) {
         return;
     }
-    if ($c.peq(mtmp, u.ustuck)) {
+    if (mtmp === u.ustuck) {
         await release_hero(mtmp);   /* expels/unstuck */
     }
     if (!first || !mtmp.mflee) {
@@ -668,7 +668,7 @@ async function mind_blast(mtmp) {   // monmove.c:583
         if (mindless(m2.data)) {
             continue;
         }
-        if ($c.peq(m2, mtmp)) {
+        if (m2 === mtmp) {
             continue;
         }
         if (telepathic(m2.data) && (rn2(2) || m2.mblinded) || !rn2(10)) {
@@ -691,7 +691,7 @@ async function mind_blast(mtmp) {   // monmove.c:583
  * @returns {Promise<void>}
  */
 export async function m_everyturn_effect(mtmp) {   // monmove.c:650
-    const is_u = $c.peq(mtmp, gy.youmonst) ? TRUE : FALSE;
+    const is_u = mtmp === gy.youmonst ? TRUE : FALSE;
     const x = is_u ? u.ux : mtmp.mx;
     const y = is_u ? u.uy : mtmp.my;
     if (mtmp.data === mons[PM.FOG_CLOUD]) {
@@ -714,7 +714,7 @@ export async function m_everyturn_effect(mtmp) {   // monmove.c:650
  * @returns {Promise<void>}
  */
 export async function m_postmove_effect(mtmp) {   // monmove.c:672
-    const is_u = $c.peq(mtmp, gy.youmonst) ? TRUE : FALSE;
+    const is_u = mtmp === gy.youmonst ? TRUE : FALSE;
     const x = is_u ? u.ux0 : mtmp.mx;
     const y = is_u ? u.uy0 : mtmp.my;
     /* Hezrous create clouds of stench. This does not cost a move. */
@@ -796,7 +796,7 @@ export async function dochug(mtmp) {   // monmove.c:690
     }
     /* Cease conflict-induced swallow/grab if conflict has ended. Releasing
        the hero in this way uses up the monster's turn. */
-    if ($c.peq(mtmp, u.ustuck) && mtmp.mpeaceful && !mtmp.mconf && !Conflict()) {
+    if (mtmp === u.ustuck && mtmp.mpeaceful && !mtmp.mconf && !Conflict()) {
         await release_hero(mtmp);
         return 0;
     }
@@ -950,7 +950,7 @@ export async function dochug(mtmp) {   // monmove.c:690
             case MMOVE.MOVED:
                 /* monster moved */
                 /* if confused grabber has wandered off, let go */
-                if ($c.peq(mtmp, u.ustuck) && !(dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2)) {
+                if (mtmp === u.ustuck && !(dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2)) {
                     await unstuck(mtmp);
                 }
                 if (grounded(mdat)) {
@@ -1013,7 +1013,7 @@ export async function dochug(mtmp) {   // monmove.c:690
  */
 export async function mon_would_take_item(mtmp, otmp) {   // monmove.c:999
     const pctload = $c.div32(Math.imul(curr_mon_load(mtmp), 100), max_mon_load(mtmp));
-    if ($c.peq(otmp, $G.uball) || $c.peq(otmp, $G.uchain)) {
+    if (otmp === $G.uball || otmp === $G.uchain) {
         return FALSE;
     }
     if (mtmp.mtame && otmp.cursed) {
@@ -1067,7 +1067,7 @@ export async function mon_would_consume_item(mtmp, otmp) {   // monmove.c:1036
  * @returns {Promise<number>} boolean
  */
 export async function itsstuck(mtmp) {   // monmove.c:1053
-    if (sticks(gy.youmonst.data) && $c.peq(mtmp, u.ustuck) && !u.uswallow) {
+    if (sticks(gy.youmonst.data) && mtmp === u.ustuck && !u.uswallow) {
         await pline_mon(mtmp, $C`%s cannot escape from you!`, await Monnam(mtmp));
         return TRUE;
     }
@@ -1757,7 +1757,7 @@ export async function m_move(mtmp, after) {   // monmove.c:1715
              */
             /* 5.0: this used to use 'dist2() < 2' which meant that intended
                attack was disallowed if they were adjacent diagonally */
-            if (intruder && !$c.peq(intruder, mtmp) && dist2(mtmp.mx, mtmp.my, tx, ty) <= 2) {
+            if (intruder && intruder !== mtmp && dist2(mtmp.mx, mtmp.my, tx, ty) <= 2) {
                 gb.bhitpos.x = tx, gb.bhitpos.y = ty;
                 gn.notonhead = intruder.mx !== tx || intruder.my !== ty ? 1 : 0;
                 covetousattack = await mattackm(mtmp, intruder);
@@ -1804,7 +1804,7 @@ export async function m_move(mtmp, after) {   // monmove.c:1715
             return await postmov(mtmp, ptr, omx, omy, MMOVE.MOVED, seenflgs, can_tunnel, can_unlock, can_open);
         }
     }
-    if (u.uswallow && !mtmp.mflee && !$c.peq(u.ustuck, mtmp)) {
+    if (u.uswallow && !mtmp.mflee && u.ustuck !== mtmp) {
         return MMOVE.MOVED;
     }
     omx = mtmp.mx;
@@ -2130,7 +2130,7 @@ export function set_apparxy(mtmp) {   // monmove.c:2198
      */
     /* pet knows your smell; grabber still has hold of you; monsters which
        know where you are don't suddenly forget, if you haven't moved away */
-    if (mtmp.mtame || $c.peq(mtmp, u.ustuck) || u_at(mx, my)) {
+    if (mtmp.mtame || mtmp === u.ustuck || u_at(mx, my)) {
         mtmp.mux = u.ux;
         mtmp.muy = u.uy;
         return;
@@ -2230,7 +2230,7 @@ export function undesirable_disp(mtmp, x, y) {   // monmove.c:2277
  */
 function stuff_prevents_passage(mtmp) {   // monmove.c:2319
     let chain = null, obj = null;
-    if ($c.peq(mtmp, gy.youmonst)) {
+    if (mtmp === gy.youmonst) {
         chain = gi.invent;
     } else {
         chain = mtmp.minvent;
@@ -2281,7 +2281,7 @@ export function can_fog(mtmp) {   // monmove.c:2365
  */
 async function vamp_shift(mon, ptr, domsg) {   // monmove.c:2377
     let reslt = 0;
-    if ($c.peq(mon.data, ptr)) {
+    if (mon.data === ptr) {
         /* already right shape */
         reslt = 1;
     } else if (is_vampshifter(mon)) {

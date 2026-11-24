@@ -82,7 +82,7 @@ async function explosionmask(m, adtyp, olet) {   // explode.c:26
     /* damage type */
     /* object class (only matters for AD_DISN) */
     let res = EXPL_NONE;
-    if ($c.peq(m, gy.youmonst)) {
+    if (m === gy.youmonst) {
         switch (adtyp) {
             case AD.PHYS:
                 /* leave 'res' with EXPL_NONE */
@@ -600,7 +600,7 @@ export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:
                     /* if grabber is reaching into hero's spot and
                        hero's spot is within explosion radius, grabber
                        gets hit by double damage */
-                    if (grabbed && $c.peq(mtmp, u.ustuck) && dist2(x, y, u.ux, u.uy) <= 2) {
+                    if (grabbed && mtmp === u.ustuck && dist2(x, y, u.ux, u.uy) <= 2) {
                         mdam = Math.imul(mdam, 2);
                     }
                     /* being resistant to opposite type of damage makes
@@ -618,7 +618,7 @@ export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:
                     const xkflg = adtyp === AD.FIRE && completelyburns(mtmp.data) ? XKILL.NOCORPSE : 0;
                     if (!svc.context.mon_moving) {
                         await xkilled(mtmp, XKILL.GIVEMSG | xkflg);
-                    } else if (mdef && $c.peq(mtmp, mdef)) {
+                    } else if (mdef && mtmp === mdef) {
                         /* 'mdef' killed self trying to cure being turned
                          * into slime due to some action by the player.
                          * Hero gets the credit (experience) and most of
@@ -781,8 +781,8 @@ export async function scatter(sx, sy, blastforce, scflags, obj) {   // explode.c
         await credit_report(shkp, 0, TRUE);   /* establish baseline, without msgs */
     }
     while ((otmp = individual_object ? obj : svl.level.objects[sx][sy]) !== null) {
-        if ($c.peq(otmp, $G.uball) || $c.peq(otmp, $G.uchain)) {
-            const waschain = $c.peq(otmp, $G.uchain) ? 1 : 0;
+        if (otmp === $G.uball || otmp === $G.uchain) {
+            const waschain = otmp === $G.uchain ? 1 : 0;
             await pline_The($C`chain shatters!`);
             await unpunish();
             if (waschain) {

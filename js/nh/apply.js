@@ -189,11 +189,11 @@ async function use_camera(obj) {   // apply.c:79
  */
 async function use_towel(obj) {   // apply.c:112
     let old = 0, $t1;
-    const drying_feedback = $c.peq(obj, $G.uwep) ? 1 : 0;
+    const drying_feedback = obj === $G.uwep ? 1 : 0;
     if (!await freehand()) {
         await You($C`have no free %s!`, await body_part(HAND));
         return ECMD.OK;
-    } else if ($c.peq(obj, $G.ublindf)) {
+    } else if (obj === $G.ublindf) {
         await You($C`cannot use it while you're wearing it!`);
         return ECMD.OK;
     } else if (obj.cursed) {
@@ -280,7 +280,7 @@ async function its_dead(rx, ry, resp) {   // apply.c:198
     }
     /* when both corpse and statue are present, pick the uppermost one */
     if (corpse && statue) {
-        if ($c.peq(nxtobj(statue, CORPSE, TRUE), corpse)) {
+        if (nxtobj(statue, CORPSE, TRUE) === corpse) {
             corpse = null;   /* corpse follows statue; ignore it */
         } else {
             statue = null;   /* corpse precedes statue; ignore statue */
@@ -581,7 +581,7 @@ async function magic_whistled(obj) {   // apply.c:518
         /* only tame monsters are affected;
            steed is already at your location, so not affected;
            this avoids trap issues if you're on a trap location */
-        if (!mtmp.mtame || $c.peq(mtmp, u.usteed)) {
+        if (!mtmp.mtame || mtmp === u.usteed) {
             continue;
         }
         if (mtmp.mtrapped) {
@@ -1749,7 +1749,7 @@ export async function dorub() {   // apply.c:1785
             return ECMD.OK;
         }
     }
-    if (!$c.peq(obj[0], $G.uwep)) {
+    if (obj[0] !== $G.uwep) {
         if (await wield_tool(obj[0], $C`rub`)) {
             await cmdq_add_ec(CQ_CANNED, dorub);
             await cmdq_add_key(CQ_CANNED, obj[0].invlet);
@@ -2529,7 +2529,7 @@ async function use_grease(obj) {   // apply.c:2604
         }
         await consume_obj_charge(obj, TRUE);
         const oldglib = $c.i32($c.and64(u.uprops[GLIB].intrinsic, TIMEOUT));
-        if (!$c.peq(otmp, hands_obj)) {
+        if (otmp !== hands_obj) {
             await You($C`cover %s with a thick layer of grease.`, await yname(otmp));
             otmp.greased = 1;
             if (obj.cursed && !nohands(gy.youmonst.data)) {
@@ -2589,7 +2589,7 @@ async function use_stone(tstone) {   // apply.c:2680
     if ((obj = await getobj(new $c.Ptr(stonebuf, 0), known ? touchstone_ok : any_obj_ok, GETOBJ_PROMPT)) === null) {
         return ECMD.CANCEL;
     }
-    if ($c.peq(obj, tstone) && obj.quan === 1) {
+    if (obj === tstone && obj.quan === 1) {
         await You_cant($C`rub %s on itself.`, await the(await xname(obj)));
         return ECMD.OK;
     }
@@ -2729,7 +2729,7 @@ async function use_trap(otmp) {   // apply.c:2821
         return;
     }
     const ttyp = otmp.otyp === LAND_MINE ? LANDMINE : BEAR_TRAP;
-    if ($c.peq(otmp, gt.trapinfo.tobj) && (gt.trapinfo.tx === u.ux && gt.trapinfo.ty === u.uy)) {
+    if (otmp === gt.trapinfo.tobj && (gt.trapinfo.tx === u.ux && gt.trapinfo.ty === u.uy)) {
         await You($C`resume setting %s%s.`, await shk_your(new $c.Ptr(buf, 0), otmp), trapname(ttyp, FALSE));
         set_occupation(set_trap, occutext, 0);
         return;
@@ -2829,7 +2829,7 @@ export async function use_whip(obj) {   // apply.c:2955
             res = ECMD.OK;
             msg_slipsfree = $C`The bullwhip slips free.`;
             msg_snap = $C`Snap!`;
-            if (!$c.peq(obj, $G.uwep)) {
+            if (obj !== $G.uwep) {
                 if (await wield_tool(obj, $C`lash`)) {
                     await cmdq_add_ec(CQ_CANNED, doapply);
                     await cmdq_add_key(CQ_CANNED, obj.invlet);
@@ -3227,7 +3227,7 @@ export function could_pole_mon() {   // apply.c:3391
  * @returns {number} boolean
  */
 function snickersnee_used_dist_attk(obj) {   // apply.c:3416
-    if (obj && $c.peq(obj, $G.uwep) && u_wield_art(ART.SNICKERSNEE) && svc.context.snickersnee_turn === svm.moves) {
+    if (obj && obj === $G.uwep && u_wield_art(ART.SNICKERSNEE) && svc.context.snickersnee_turn === svm.moves) {
         return TRUE;
     }
     return FALSE;
@@ -3250,7 +3250,7 @@ export async function use_pole(obj, autohit) {   // apply.c:3426
         await pline(new $c.Ptr(not_enough_room, 0));
         return ECMD.OK;
     }
-    if (!$c.peq(obj, $G.uwep)) {
+    if (obj !== $G.uwep) {
         if (await wield_tool(obj, $C`swing`)) {
             await cmdq_add_ec(CQ_CANNED, doapply);
             await cmdq_add_key(CQ_CANNED, obj.invlet);
@@ -3318,7 +3318,7 @@ export async function use_pole(obj, autohit) {   // apply.c:3426
         await check_caitiff(mtmp);
         gn.notonhead = gb.bhitpos.x !== mtmp.mx || gb.bhitpos.y !== mtmp.my ? 1 : 0;
         /* Snickersnee allows one free hit from a distance per turn */
-        if ($c.peq(obj, $G.uwep) && u_wield_art(ART.SNICKERSNEE)) {
+        if (obj === $G.uwep && u_wield_art(ART.SNICKERSNEE)) {
             freehit = svm.moves !== svc.context.snickersnee_turn ? 1 : 0;
             svc.context.snickersnee_turn = svm.moves;
             if (freehit && !Deaf()) {
@@ -3529,7 +3529,7 @@ async function use_grapple(obj) {   // apply.c:3729
         await pline(new $c.Ptr(not_enough_room, 0));
         return ECMD.OK;
     }
-    if (!$c.peq(obj, $G.uwep)) {
+    if (obj !== $G.uwep) {
         /* "cast": grappling hook evolved from slash'em's fishing pole */
         if (await wield_tool(obj, $C`cast`)) {
             await cmdq_add_ec(CQ_CANNED, doapply);
@@ -3995,7 +3995,7 @@ export async function doapply() {   // apply.c:4214
     switch (obj[0].otyp) {
         case BLINDFOLD:
         case LENSES:
-            if ($c.peq(obj[0], $G.ublindf)) {
+            if (obj[0] === $G.ublindf) {
                 if (!await cursed(obj[0])) {
                     await Blindf_off(obj[0]);
                 }

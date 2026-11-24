@@ -223,7 +223,7 @@ async function query_classes(oclasses, one_at_a_time, everything, action, objs, 
         ilets[($t4 = iletct, iletct = $t4 + 1 | 0, $t4)] = 32;
         ilets[($t5 = iletct, iletct = $t5 + 1 | 0, $t5)] = 97;
         ilets[($t6 = iletct, iletct = $t6 + 1 | 0, $t6)] = 65;
-        ilets[($t7 = iletct, iletct = $t7 + 1 | 0, $t7)] = $c.peq(objs, gi.invent) ? 105 : 58;
+        ilets[($t7 = iletct, iletct = $t7 + 1 | 0, $t7)] = objs === gi.invent ? 105 : 58;
     }
     if (itemcount[0] && menu_on_demand) {
         ilets[($t8 = iletct, iletct = $t8 + 1 | 0, $t8)] = 109;
@@ -494,7 +494,7 @@ async function check_here(picked_some) {   // pickup.c:430
     }
     /* count the objects here */
     for (obj = svl.level.objects[u.ux][u.uy]; obj; obj = obj.v.v_nexthere) {
-        if (!$c.peq(obj, $G.uchain)) {
+        if (obj !== $G.uchain) {
             ct = ct + 1 | 0;
         }
     }
@@ -515,7 +515,7 @@ async function check_here(picked_some) {   // pickup.c:430
  * @returns {number} boolean
  */
 function n_or_more(obj) {   // pickup.c:460
-    if ($c.peq(obj, $G.uchain)) {
+    if (obj === $G.uchain) {
         return FALSE;
     }
     return obj.quan >= gv.val_for_n_or_more ? 1 : 0;
@@ -568,7 +568,7 @@ export function add_valid_menu_class(c) {   // pickup.c:475
  * @returns {number} boolean
  */
 function all_but_uchain(obj) {   // pickup.c:509
-    return !$c.peq(obj, $G.uchain) ? 1 : 0;
+    return obj !== $G.uchain ? 1 : 0;
 }
 /* query_objlist callback: return TRUE */
 /*ARGUSED*/
@@ -1094,7 +1094,7 @@ export async function query_objlist(qstr, olist_p, qflags, pick_list, how, allow
     }
     /* can't depend upon 'engulfer' because that's used to indicate whether
        hero should be shown as an extra, fake item */
-    const engulfer_minvent = olist[0] && olist[0].where === OBJ.MINVENT && (u.uswallow && $c.peq(u.ustuck, olist[0].v.v_ocarry)) ? 1 : 0;
+    const engulfer_minvent = olist[0] && olist[0].where === OBJ.MINVENT && (u.uswallow && u.ustuck === olist[0].v.v_ocarry) ? 1 : 0;
     if (engulfer_minvent && n === 1 && olist[0].owornmask !== 0) {
         qflags = qflags & ~AUTOSELECT_SINGLE;
     }
@@ -1185,7 +1185,7 @@ export async function query_objlist(qstr, olist_p, qflags, pick_list, how, allow
            if fake_hero_object was picked, discard that choice */
         for (i = k = 0, mi = pick_list.get(0); i < n; i = i + 1 | 0, mi = $c.radd(mi, 1)) {
             curr = mi.item.a_obj;
-            if ($c.peq(curr, fake_hero_object)) {
+            if (curr === fake_hero_object) {
                 /* this isn't actually possible; fake item representing
                    hero is only included for look here (':'), not pickup,
                    and that's PICK_NONE so we can't get here from there */
@@ -1438,7 +1438,7 @@ export async function query_category(qstr, olist, qflags, pick_list, how) {   //
         await end_menu()(win, qstr);
         n = await select_menu(win, how, pick_list);
         if (n > 0) {
-            (!!$c.peq(pick_list.get(0), $c.asRec(null, $T.mi, 24)) ? 1 : 0) ? $c.__assert_rtn($C`query_category`, $C`pickup.c`, 1451, $C`*pick_list != NULL`) : 0;
+            (!(pick_list.get(0) !== $c.asRec(null, $T.mi, 24)) ? 1 : 0) ? $c.__assert_rtn($C`query_category`, $C`pickup.c`, 1451, $C`*pick_list != NULL`) : 0;
         }
         /* handle ParanoidAutoAll by confirming 'A' choice if present */
         if (n > 0 && verify_All) {
@@ -1539,7 +1539,7 @@ async function delta_cwt(container, obj) {   // pickup.c:1544
     const owt = nwt = container.owt | 0;
     /* find the object so that we can remove it */
     for (prev = new $c.FieldRef(container, "cobj", "ptr"); prev.get(0); prev = new $c.FieldRef(prev.get(0), "nobj", "ptr")) {
-        if ($c.peq(prev.get(0), obj)) {
+        if (prev.get(0) === obj) {
             break;
         }
     }
@@ -1793,10 +1793,10 @@ export async function pickup_object(obj, count$in, telekinesis) {   // pickup.c:
     if (!Blind()) {
         await observe_object(obj);
     }
-    if ($c.peq(obj, $G.uchain)) {
+    if (obj === $G.uchain) {
         /* do not pick up attached chain */
         return 0;
-    } else if (obj.where === OBJ.MINVENT && obj.owornmask !== 0 && (u.uswallow && $c.peq(u.ustuck, obj.v.v_ocarry))) {
+    } else if (obj.where === OBJ.MINVENT && obj.owornmask !== 0 && (u.uswallow && u.ustuck === obj.v.v_ocarry)) {
         await You_cant($C`pick %s up.`, await ysimple_name(obj));
         return 0;
     } else if (obj.oartifact && !await touch_artifact(obj, gy.youmonst)) {
@@ -1849,7 +1849,7 @@ export async function pickup_object(obj, count$in, telekinesis) {   // pickup.c:
         obj = await splitobj(obj, count[0]);
     }
     obj = await pick_obj(obj);
-    if ($G.uwep && $c.peq($G.uwep, obj)) {
+    if ($G.uwep && $G.uwep === obj) {
         gm.mrg_to_wielded = TRUE;
     }
     await pickup_prinv(obj, count[0], $C`lifting`);
@@ -1875,7 +1875,7 @@ export async function pick_obj(otmp) {   // pickup.c:1897
     /* otmp is either on the floor or in an engulfer's inventory; for the
        latter, its <ox,oy> probably won't be set */
     get_obj_location(otmp, new $c.Ptr(ox, 0), new $c.Ptr(oy, 0), 0);
-    let robshop = !u.uswallow && !$c.peq(otmp, $G.uball) && await costly_spot(ox[0], oy[0]) ? 1 : 0;
+    let robshop = !u.uswallow && otmp !== $G.uball && await costly_spot(ox[0], oy[0]) ? 1 : 0;
     await obj_extract_self(otmp);
     if (fromfloor) {
         await newsym(ox[0], oy[0]);
@@ -2085,7 +2085,7 @@ async function do_loot_cont(cobjp, cindex, ccount) {   // pickup.c:2088
                 /* attempting to untrap or unlock might trigger a trap
                    which destroys 'cobj'; inform caller if that happens */
                 for (otmp = svl.level.objects[ox][oy]; otmp; otmp = otmp.v.v_nexthere) {
-                    if ($c.peq(otmp, cobj)) {
+                    if (otmp === cobj) {
                         break;
                     }
                 }
@@ -2386,7 +2386,7 @@ export async function loot_mon(mtmp, passed_info, prev_loot) {   // pickup.c:243
      *  *passed_info is set to TRUE if a loot query was given.
      *  *prev_loot is set to TRUE if something was actually acquired in here.
      */
-    if (mtmp && !$c.peq(mtmp, u.usteed) && (otmp = await which_armor(mtmp, W.SADDLE))) {
+    if (mtmp && mtmp !== u.usteed && (otmp = await which_armor(mtmp, W.SADDLE))) {
         if (passed_info) {
             passed_info.set(0, 1);
         }
@@ -2510,10 +2510,10 @@ async function in_container(obj) {   // pickup.c:2558
     if (!gc.current_container) {
         await impossible($C`<in> no gc.current_container?`);
         return 0;
-    } else if ($c.peq(obj, $G.uball) || $c.peq(obj, $G.uchain)) {
+    } else if (obj === $G.uball || obj === $G.uchain) {
         await You($C`must be kidding.`);
         return 0;
-    } else if ($c.peq(obj, gc.current_container)) {
+    } else if (obj === gc.current_container) {
         await pline($C`That would be an interesting topological exercise.`);
         return 0;
     } else if ($c.and64(obj.owornmask, W_ARMOR | W_ACCESSORY)) {
@@ -2533,7 +2533,7 @@ async function in_container(obj) {   // pickup.c:2558
     } else if (obj.otyp === LEASH && obj.corpsenm !== 0) {
         await pline($C`%s attached to your pet.`, await Tobjnam(obj, $C`are`));
         return 0;
-    } else if ($c.peq(obj, $G.uwep)) {
+    } else if (obj === $G.uwep) {
         if (await welded(obj)) {
             await weldmsg(obj);
             return 0;
@@ -2546,9 +2546,9 @@ async function in_container(obj) {   // pickup.c:2558
         if ($G.uwep) {
             return 0;   /* unwielded, died, rewielded */
         }
-    } else if ($c.peq(obj, $G.uswapwep)) {
+    } else if (obj === $G.uswapwep) {
         await setuswapwep(null);
-    } else if ($c.peq(obj, $G.uquiver)) {
+    } else if (obj === $G.uquiver) {
         await setuqwep(null);
     }
     if (await fatal_corpse_mistake(obj, FALSE)) {
@@ -2654,7 +2654,7 @@ async function in_container(obj) {   // pickup.c:2558
  * @returns {number} int
  */
 export function ck_bag(obj) {   // pickup.c:2720
-    return gc.current_container && !$c.peq(obj, gc.current_container) ? 1 : 0;
+    return gc.current_container && obj !== gc.current_container ? 1 : 0;
 }
 /* Returns: -1 to stop, 1 item was removed, 0 item was not removed. */
 /**
@@ -2941,7 +2941,7 @@ export async function use_container(objp, held, more_containers) {   // pickup.c
     }
     /* might put something in if carrying anything other than just the
        container itself (invent is not the container or has a next object) */
-    inokay = gi.invent !== null && (!$c.peq(gi.invent, gc.current_container) || gi.invent.nobj) ? 1 : 0;
+    inokay = gi.invent !== null && (gi.invent !== gc.current_container || gi.invent.nobj) ? 1 : 0;
     /* might take something out if container isn't empty */
     outokay = Has_contents(gc.current_container);
     if (!outokay) {   /* preformat the empty-container message */
@@ -3056,7 +3056,7 @@ export async function use_container(objp, held, more_containers) {   // pickup.c
             }
             /* recalculate 'inokay' in case something was just taken out and
                inventory is no longer empty or no longer just the container */
-            inokay = gi.invent && (!$c.peq(gi.invent, gc.current_container) || gi.invent.nobj) ? 1 : 0;
+            inokay = gi.invent && (gi.invent !== gc.current_container || gi.invent.nobj) ? 1 : 0;
         }
         if ((loot_in || stash_one) && !inokay) {
             await You($C`don't have anything%s to %s.`, gi.invent ? $C` else` : $C``, stash_one ? $C`stash` : $C`put in`);
@@ -3274,7 +3274,7 @@ async function menu_loot(retry, put_in) {   // pickup.c:3265
                         /* otmp caused current_container to explode;
                            both are now gone */
                         otmp = null;   /* and break loop */
-                    } else if (otmp && !$c.peq(otmp, $c.radd(pick_list[0], i).item.a_obj)) {
+                    } else if (otmp && otmp !== $c.radd(pick_list[0], i).item.a_obj) {
                         /* split occurred, merge again */
                         await unsplitobj(otmp);
                     }
@@ -3415,13 +3415,13 @@ async function choose_tip_container_menu() {   // pickup.c:3505
      * n == -1 => cancelled via ESC;
      */
     otmp = n <= 0 ? null : $c.radd(pick_list[0], 0).item.a_obj;
-    if (n > 1 && $c.peq(otmp, dummyobj)) {
+    if (n > 1 && otmp === dummyobj) {
         otmp = $c.radd(pick_list[0], 1).item.a_obj;
     }
     if (pick_list[0]) {
         $c.free(pick_list[0]);
     }
-    if (otmp && !$c.peq(otmp, dummyobj)) {
+    if (otmp && otmp !== dummyobj) {
         await tipcontainer(otmp);
         return ECMD.TIME;
     }
@@ -3527,7 +3527,7 @@ export async function dotip() {   // pickup.c:3562
     /* anything not covered yet */
     if (cobj.oclass === POTION_CLASS) {   /* can't pour potions... */
         await pline_The($C`%s %s securely sealed.`, await xname(cobj), await otense(cobj, $C`are`));
-    } else if ($G.uarmh && $c.peq(cobj, $G.uarmh)) {
+    } else if ($G.uarmh && cobj === $G.uarmh) {
         return await tiphat() ? ECMD.TIME : ECMD.OK;
     } else if (cobj.otyp === STATUE) {
         await pline($C`Nothing interesting happens.`);
@@ -3717,7 +3717,7 @@ async function tipcontainer_gettarget(box, cancelled) {   // pickup.c:3871
     await add_menu_str(win, $C``);
     let n_conts = 0;
     for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
-        if ($c.peq(otmp, box)) {
+        if (otmp === box) {
             continue;
         }
         /* skip non-containers; bag of tricks passes Is_container() test,
@@ -3745,10 +3745,10 @@ async function tipcontainer_gettarget(box, cancelled) {   // pickup.c:3871
         otmp = $c.radd(pick_list[0], 0).item.a_obj;
         /* PICK_ONE with a preselected item might return 2;
            if so, choose the one that wasn't preselected */
-        if (n > 1 && $c.peq(otmp, dummyobj)) {
+        if (n > 1 && otmp === dummyobj) {
             otmp = $c.radd(pick_list[0], 1).item.a_obj;
         }
-        if ($c.peq(otmp, dummyobj)) {
+        if (otmp === dummyobj) {
             otmp = null;
         }
         $c.free(pick_list[0]);

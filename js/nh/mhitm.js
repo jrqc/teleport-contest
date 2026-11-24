@@ -155,7 +155,7 @@ export async function fightm(mtmp) {   // mhitm.c:106
     if (resist_conflict(mtmp)) {
         return 0;
     }
-    if ($c.peq(u.ustuck, mtmp)) {
+    if (u.ustuck === mtmp) {
         /* perhaps we're holding it... */
         if (await itsstuck(mtmp)) {
             return 0;
@@ -164,7 +164,7 @@ export async function fightm(mtmp) {   // mhitm.c:106
     const has_u_swallowed = engulfing_u(mtmp);
     for (mon = svl.level.monlist; mon; mon = nmon) {
         nmon = mon.nmon;
-        if ($c.peq(nmon, mtmp)) {
+        if (nmon === mtmp) {
             nmon = mtmp.nmon;
         }
         /* Be careful to ignore monsters that are already dead, since we
@@ -172,9 +172,9 @@ export async function fightm(mtmp) {   // mhitm.c:106
          * happen if the monster attacked a cockatrice bare-handedly, for
          * instance.
          */
-        if (!$c.peq(mon, mtmp) && !DEADMONSTER(mon)) {
+        if (mon !== mtmp && !DEADMONSTER(mon)) {
             if (monnear(mtmp, mon.mx, mon.my)) {
-                if (!u.uswallow && $c.peq(mtmp, u.ustuck)) {
+                if (!u.uswallow && mtmp === u.ustuck) {
                     if (!rn2(4)) {
                         await set_ustuck(null);
                         await pline($C`%s releases you!`, await Monnam(mtmp));
@@ -227,13 +227,13 @@ export async function fightm(mtmp) {   // mhitm.c:106
 export async function mdisplacem(magr, mdef, quietly) {   // mhitm.c:179
     let pa = null, pd = null, tx = 0, ty = 0, fx = 0, fy = 0, $t1;
     /* sanity checks; could matter if we unexpectedly get a long worm */
-    if (!magr || !mdef || $c.peq(magr, mdef)) {
+    if (!magr || !mdef || magr === mdef) {
         return M_ATTK.MISS;
     }
     pa = magr.data, pd = mdef.data;
     tx = mdef.mx, ty = mdef.my;   /* destination */
     fx = magr.mx, fy = magr.my;   /* current location */
-    if (!$c.peq(svl.level.monsters[fx][fy], magr) || !$c.peq(svl.level.monsters[tx][ty], mdef)) {
+    if (svl.level.monsters[fx][fy] !== magr || svl.level.monsters[tx][ty] !== mdef) {
         return M_ATTK.MISS;
     }
     /* The 1 in 7 failure below matches the chance in do_attack()
@@ -407,7 +407,7 @@ export async function mattackm(magr, mdef) {   // mhitm.c:293
     L1: for (i = 0; i < NATTK; i = i + 1 | 0) {
         res[i] = M_ATTK.MISS;
         /* target might no longer be there */
-        if (i > 0 && (!$c.peq(svl.level.monsters[gb.bhitpos.x][gb.bhitpos.y], mdef) || DEADMONSTER(magr) || DEADMONSTER(mdef))) {
+        if (i > 0 && (svl.level.monsters[gb.bhitpos.x][gb.bhitpos.y] !== mdef || DEADMONSTER(magr) || DEADMONSTER(mdef))) {
             continue;
         }
         const mattk = await getmattk(magr, mdef, i, new $c.Ptr(res, 0), alt_attk);
@@ -546,7 +546,7 @@ export async function mattackm(magr, mdef) {   // mhitm.c:293
                     strike = 0;
                     break;
                 }
-                if (u.usteed && $c.peq(mdef, u.usteed)) {
+                if (u.usteed && mdef === u.usteed) {
                     strike = 0;
                     break;
                 }
@@ -639,16 +639,16 @@ export async function failed_grab(magr, mdef, mattk) {   // mhitm.c:597
        digestion damage: purple worm swallowing */
     if ((unsolid(mdef.data) || gn.notonhead) && (mattk.aatyp === AT.HUGS || mattk.adtyp === AD.WRAP || mattk.adtyp === AD.STCK || mattk.adtyp === AD.DGST)) {
         /* mon-vs-mon */
-        if (gv.vis && canspotmon(mdef) || $c.peq(magr, gy.youmonst) || $c.peq(mdef, gy.youmonst)) {
+        if (gv.vis && canspotmon(mdef) || magr === gy.youmonst || mdef === gy.youmonst) {
             const tailmiss = gn.notonhead;
             const verb = mattk.adtyp === AD.DGST ? $C`gulp` : mattk.adtyp === AD.STCK ? $C`adhere` : $C`grab`;
             /* beware of "Foo's grab passes through Bar's ghost";
                mon_nam(x_monnam) calls s_suffix() for named ghosts and
                s_suffix() uses a single static buffer; make copies of both
                names to overcome that [note: comment predates 'tailmiss'] */
-            $c.strcpy(new $c.Ptr(magrnam, 0), $c.peq(magr, gy.youmonst) ? $C`Your` : s_suffix(await Monnam(magr)));
+            $c.strcpy(new $c.Ptr(magrnam, 0), magr === gy.youmonst ? $C`Your` : s_suffix(await Monnam(magr)));
             if (!tailmiss) {
-                $c.strcpy(new $c.Ptr(mdefnam, 0), $c.peq(mdef, gy.youmonst) ? $C`you` : await mon_nam(mdef));
+                $c.strcpy(new $c.Ptr(mdefnam, 0), mdef === gy.youmonst ? $C`you` : await mon_nam(mdef));
             } else {
                 /* hero poly'd into long worm can't grow tail
                    so no 'youmonst' handling is needed here */
@@ -704,7 +704,7 @@ async function hitmm(magr, mdef, mattk, mwep, dieroll) {   // mhitm.c:644
                     nh_snprintf($C`hitmm`, 689, new $c.Ptr(buf, 0), 256, $C`%s tentacles suck`, s_suffix(new $c.Ptr(magr_name, 0)));
                     break;
                 case AT.HUGS:
-                    if (!$c.peq(magr, u.ustuck)) {
+                    if (magr !== u.ustuck) {
                         nh_snprintf($C`hitmm`, 693, new $c.Ptr(buf, 0), 256, $C`%s squeezes`, new $c.Ptr(magr_name, 0));
                         break;
                     }
@@ -725,7 +725,7 @@ async function hitmm(magr, mdef, mattk, mwep, dieroll) {   // mhitm.c:644
                    and we might be calling it twice for this message */
                 $c.strcpy(new $c.Ptr(magr_name, 0), s_suffix(new $c.Ptr(magr_name, 0)));
                 if (!noncorporeal(mdef.data) && !amorphous(mdef.data)) {
-                    if (!$c.peq(mdef, magr)) {
+                    if (mdef !== magr) {
                         mdef_name = s_suffix(mdef_name);
                     } else {
                         strsubst(mdef_name, $C`himself`, $C`his own`);
@@ -818,8 +818,8 @@ async function gazemm(magr, mdef, mattk) {   // mhitm.c:736
  * @returns {number} boolean
  */
 export function engulf_target(magr, mdef) {   // mhitm.c:807
-    const uatk = $c.peq(magr, gy.youmonst) ? 1 : 0;
-    const udef = $c.peq(mdef, gy.youmonst) ? 1 : 0;
+    const uatk = magr === gy.youmonst ? 1 : 0;
+    const udef = mdef === gy.youmonst ? 1 : 0;
     /* can't swallow something that's too big */
     if (mdef.data.msize >= MZ.HUGE || magr.data.msize < mdef.data.msize && !is_whirly(magr.data)) {
         return FALSE;
@@ -833,15 +833,15 @@ export function engulf_target(magr, mdef) {   // mhitm.c:807
        might not be able to place attacker and defender both back on map;
        when defender is the hero, a sanity_check complaint about placing
        the hero on top of a monster can occur */
-    const dx = $c.peq(mdef, gy.youmonst) ? u.ux : mdef.mx;
-    const dy = $c.peq(mdef, gy.youmonst) ? u.uy : mdef.my;
+    const dx = mdef === gy.youmonst ? u.ux : mdef.mx;
+    const dy = mdef === gy.youmonst ? u.uy : mdef.my;
     let lev = $c.relem(svl.level.locations[dx], dy);
     /* not passes_bars(); engulfer isn't squeezing through */
     if (!(udef ? Passes_walls() : passes_walls(mdef.data)) && (IS_OBSTRUCTED(lev.typ) || closed_door($c.i16(dx), $c.i16(dy)) || IS_TREE(lev.typ) || lev.typ === IRONBARS && !is_whirly(magr.data))) {
         return FALSE;
     }
-    const ax = $c.peq(magr, gy.youmonst) ? u.ux : magr.mx;
-    const ay = $c.peq(magr, gy.youmonst) ? u.uy : magr.my;
+    const ax = magr === gy.youmonst ? u.ux : magr.mx;
+    const ay = magr === gy.youmonst ? u.uy : magr.my;
     lev = $c.relem(svl.level.locations[ax], ay);
     if (!(uatk ? Passes_walls() : passes_walls(magr.data)) && (IS_OBSTRUCTED(lev.typ) || closed_door($c.i16(ax), $c.i16(ay)) || IS_TREE(lev.typ) || lev.typ === IRONBARS && !is_whirly(mdef.data))) {
         return FALSE;
@@ -920,13 +920,13 @@ async function gulpmm(magr, mdef, mattk) {   // mhitm.c:849
          *  spot instead of staying.
          */
         if (!goodpos(dx, dy, magr, MM.IGNOREWATER)) {
-            if ($c.peq(svl.level.monsters[dx][dy], magr)) {
+            if (svl.level.monsters[dx][dy] === magr) {
                 remove_monster(dx, dy);
                 await newsym(dx, dy);
             }
             dx = ax, dy = ay;   /* magr's spot at start of the attack */
         }
-        if (!$c.peq(svl.level.monsters[dx][dy], magr)) {
+        if (svl.level.monsters[dx][dy] !== magr) {
             await place_monster(magr, dx, dy);
             await newsym(dx, dy);
         }
@@ -1052,7 +1052,7 @@ async function mdamagem(magr, mdef, mattk, mwep, dieroll) {   // mhitm.c:1016
     }
     mdef.mhp = mdef.mhp - mhm.damage | 0;
     if (mdef.mhp < 1) {
-        if ($c.peq(svl.level.monsters[mdef.mx][mdef.my], magr)) {
+        if (svl.level.monsters[mdef.mx][mdef.my] === magr) {
             /* see gulpmm() */
             svl.level.monsters[mdef.mx][mdef.my] = null;
             mdef.mhp = 1;   /* otherwise place_monster will complain */
@@ -1101,7 +1101,7 @@ async function mdamagem(magr, mdef, mattk, mwep, dieroll) {   // mhitm.c:1016
 export async function mon_poly(magr, mdef, dmg) {   // mhitm.c:1122
     let Before = new Int8Array(256), $t1;
     const oldform = mdef.data;
-    if ($c.peq(mdef, gy.youmonst)) {
+    if (mdef === gy.youmonst) {
         if (Antimagic()) {
             await shieldeff(u.ux, u.uy);
         } else if (Unchanging()) {
@@ -1139,7 +1139,7 @@ export async function mon_poly(magr, mdef, dmg) {   // mhitm.c:1122
             mdef.mhp = mdef.mhp - dmg | 0;
             dmg = 0;
             if (DEADMONSTER(mdef)) {
-                if ($c.peq(magr, gy.youmonst)) {
+                if (magr === gy.youmonst) {
                     await xkilled(mdef, XKILL.GIVEMSG | XKILL.NOCORPSE);
                 } else {
                     await monkilled(mdef, $C``, AD.RBRE);
@@ -1152,13 +1152,13 @@ export async function mon_poly(magr, mdef, dmg) {   // mhitm.c:1122
                 const verbosely = flags.verbose || !was_seen ? 1 : 0;
                 if (canspotmon(mdef)) {
                     await pline($C`%s%s%s turns into %s.`, new $c.Ptr(Before, 0), verbosely ? new $c.Ptr(mon_poly$freaky, 0) : $C``, verbosely ? $C` and` : $C``, await x_monnam(mdef, ARTICLE.A, null, SUPPRESS_NAME | SUPPRESS.IT | SUPPRESS.INVISIBLE, FALSE));
-                } else if (was_seen || $c.peq(magr, gy.youmonst)) {
+                } else if (was_seen || magr === gy.youmonst) {
                     await pline($C`%s%s%s.`, new $c.Ptr(Before, 0), new $c.Ptr(mon_poly$freaky, 0), !was_seen ? $C`` : $C` and disappears`);
                 }
             }
             dmg = 0;
             if (can_teleport(magr.data)) {
-                if ($c.peq(magr, gy.youmonst)) {
+                if (magr === gy.youmonst) {
                     await tele();
                 } else if (!await tele_restrict(magr)) {
                     await rloc(magr, RLOC.MSG);
@@ -1172,7 +1172,7 @@ export async function mon_poly(magr, mdef, dmg) {   // mhitm.c:1122
     }
     /* when a transformation has happened, can't attack again for poly
        effect during next turn or two; not enforced for poly'd hero */
-    if (!$c.peq(mdef.data, oldform) && !$c.peq(magr, gy.youmonst)) {
+    if (mdef.data !== oldform && magr !== gy.youmonst) {
         $t1 = rnd(2), magr.mspec_used = magr.mspec_used + $t1 | 0;
     }
     return dmg;
@@ -1225,7 +1225,7 @@ export async function sleep_monst(mon, amt, how) {   // mhitm.c:1223
  * @returns {Promise<void>}
  */
 export async function slept_monst(mon) {   // mhitm.c:1250
-    if (helpless(mon) && $c.peq(mon, u.ustuck) && !sticks(gy.youmonst.data) && !u.uswallow) {
+    if (helpless(mon) && mon === u.ustuck && !sticks(gy.youmonst.data) && !u.uswallow) {
         await pline_mon(mon, $C`%s grip relaxes.`, s_suffix(await Monnam(mon)));
         await unstuck(mon);
     }

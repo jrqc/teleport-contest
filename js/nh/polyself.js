@@ -1304,7 +1304,7 @@ async function dropp(obj) {   // polyself.c:1123
      * inventory for it instead of trusting obj->where.
      */
     for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
-        if ($c.peq(otmp, obj)) {
+        if (otmp === obj) {
             await dropx(obj);
             /* Note that otmp->nobj is pointing at fobj now,
              * as a result of:
@@ -2012,7 +2012,7 @@ export async function dopoly() {   // polyself.c:1877
     const savedat = gy.youmonst.data;
     if (is_vampire(gy.youmonst.data) || is_vampshifter(gy.youmonst)) {
         await polyself(POLY.MONSTER);
-        if (!$c.peq(savedat, gy.youmonst.data)) {
+        if (savedat !== gy.youmonst.data) {
             await You($C`transform into %s.`, await an(pmname(gy.youmonst.data, Ugender())));
             await newsym(u.ux, u.uy);
         }

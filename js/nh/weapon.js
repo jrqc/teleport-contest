@@ -427,7 +427,7 @@ export async function special_dmgval(magr, mdef, armask, silverhit_p) {   // wea
             silverhit = $c.or64(silverhit, armask);
         }
         /* when no gloves we check for silver rings (blessed rings ignored) */
-    } else if ((left_ring || right_ring) && $c.peq(magr, gy.youmonst)) {
+    } else if ((left_ring || right_ring) && magr === gy.youmonst) {
         if (left_ring && $G.uleft) {
             if (objects[$G.uleft.otyp].oc_material === SILVER && mon_hates_silver(mdef)) {
                 bonus = bonus + rnd(20) | 0;
@@ -564,7 +564,7 @@ export async function select_rwep(mtmp) {   // weapon.c:533
              * All monsters can wield the remaining weapons.
              */
             if ((strongmonst(mtmp.data) && $c.and64(mtmp.misc_worn_check, W.ARMS) === 0 || !objects[pwep[i]].oc_big) && (objects[pwep[i]].oc_material !== SILVER || !mon_hates_silver(mtmp))) {
-                if ((otmp = await oselect(mtmp, pwep[i])) !== null && ($c.peq(otmp, mwep) || !mweponly)) {
+                if ((otmp = await oselect(mtmp, pwep[i])) !== null && (otmp === mwep || !mweponly)) {
                     gp.propellor = otmp;   /* force the monster to wield it */
                     return otmp;
                 }
@@ -579,7 +579,7 @@ export async function select_rwep(mtmp) {   // weapon.c:533
         const arw = $c.relem(arwep, i);
         if (!mindless(mtmp.data) && !is_animal(mtmp.data) && !mweponly && dist2(mtmp.mx, mtmp.my, mtmp.mux, mtmp.muy) <= arw.range && couldsee(mtmp.mx, mtmp.my)) {
             if (($c.and64(mtmp.misc_worn_check, W.ARMS) === 0 || !objects[arw.otyp].oc_big) && (objects[arw.otyp].oc_material !== SILVER || !mon_hates_silver(mtmp))) {
-                if ((otmp = await oselect(mtmp, arw.otyp)) !== null && ($c.peq(otmp, mwep) || !mweponly)) {
+                if ((otmp = await oselect(mtmp, arw.otyp)) !== null && (otmp === mwep || !mweponly)) {
                     gp.propellor = otmp;   /* force the monster to wield it */
                     return otmp;
                 }
@@ -625,7 +625,7 @@ export async function select_rwep(mtmp) {   // weapon.c:533
                 case P.CROSSBOW:
                     $t7 = await oselect(mtmp, CROSSBOW), gp.propellor = $t7;
             }
-            if ((otmp = mtmp.mw) && mwelded(otmp) && !$c.peq(otmp, gp.propellor) && mtmp.weapon_check === NO_WEAPON_WANTED) {
+            if ((otmp = mtmp.mw) && mwelded(otmp) && otmp !== gp.propellor && mtmp.weapon_check === NO_WEAPON_WANTED) {
                 gp.propellor = null;
             }
         }
@@ -640,7 +640,7 @@ export async function select_rwep(mtmp) {   // weapon.c:533
              */
             if (rwep[i] !== LOADSTONE) {
                 /* Don't throw a cursed weapon-in-hand or an artifact */
-                if ((otmp = await oselect(mtmp, rwep[i])) && !otmp.oartifact && !($c.peq(otmp, mtmp.mw) && mwelded(otmp))) {
+                if ((otmp = await oselect(mtmp, rwep[i])) && !otmp.oartifact && !(otmp === mtmp.mw && mwelded(otmp))) {
                     return otmp;
                 }
             } else {
@@ -729,7 +729,7 @@ export async function possibly_unwield(mon, polyspot) {   // weapon.c:747
         return;
     }
     for (obj = mon.minvent; obj; obj = obj.nobj) {
-        if ($c.peq(obj, mw_tmp)) {
+        if (obj === mw_tmp) {
             break;
         }
     }
@@ -832,7 +832,7 @@ export async function mon_wield_item(mon) {   // weapon.c:801
             await impossible($C`weapon_check %d for %s?`, mon.weapon_check, await mon_nam(mon));
             return 0;
     }
-    if (obj && !$c.peq(obj, hands_obj)) {
+    if (obj && obj !== hands_obj) {
         const mw_tmp = mon.mw;
         if (mw_tmp && mw_tmp.otyp === obj.otyp) {
             /* already wielding it */
@@ -997,7 +997,7 @@ async function finish_towel_change(obj, newspe) {   // weapon.c:1020
     obj.spe = $c.i8(newspe > 0 ? newspe : 0);
     /* if hero is wielding this towel, don't give "you begin bashing with
        your [wet] towel" message if it's wet, do give one if it's dry */
-    if ($c.peq(obj, $G.uwep)) {
+    if (obj === $G.uwep) {
         gu.unweapon = !is_wet_towel(obj) ? 1 : 0;
     }
     /* description might change: "towel" vs "moist towel" vs "wet towel" */
@@ -1489,7 +1489,7 @@ export async function weapon_hit_bonus(weapon) {   // weapon.c:1545
     const wep_type = weapon_type(weapon);
     /* use two weapon skill only if attacking with one of the wielded weapons
      */
-    const type = u.twoweap && ($c.peq(weapon, $G.uwep) || $c.peq(weapon, $G.uswapwep)) ? P.TWO_WEAPON_COMBAT : wep_type;
+    const type = u.twoweap && (weapon === $G.uwep || weapon === $G.uswapwep) ? P.TWO_WEAPON_COMBAT : wep_type;
     if (type === P.NONE) {
         bonus = 0;
     } else if (type <= P_LAST_WEAPON) {
@@ -1583,7 +1583,7 @@ export async function weapon_dam_bonus(weapon) {   // weapon.c:1644
     const wep_type = weapon_type(weapon);
     /* use two weapon skill only if attacking with one of the wielded weapons
      */
-    const type = u.twoweap && ($c.peq(weapon, $G.uwep) || $c.peq(weapon, $G.uswapwep)) ? P.TWO_WEAPON_COMBAT : wep_type;
+    const type = u.twoweap && (weapon === $G.uwep || weapon === $G.uswapwep) ? P.TWO_WEAPON_COMBAT : wep_type;
     if (type === P.NONE) {
         bonus = 0;
     } else if (type <= P_LAST_WEAPON) {
@@ -1750,7 +1750,7 @@ export async function setmnotwielded(mon, obj) {   // weapon.c:1814
             await pline($C`%s in %s %s %s shining.`, await The(await xname(obj)), s_suffix(await mon_nam(mon)), await mbodypart(mon, HAND), await otense(obj, $C`stop`));
         }
     }
-    if ($c.peq(mon.mw, obj)) {
+    if (mon.mw === obj) {
         MON_NOWEP(mon);
     }
     obj.owornmask = $c.and64(obj.owornmask, ~W.WEP);

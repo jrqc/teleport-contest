@@ -257,7 +257,7 @@ function nameshk(shk, nlp) {   // shknam.c:487
             }
             /* is name already in use on this level? */
             for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
-                if (DEADMONSTER(mtmp) || $c.peq(mtmp, shk) || !mtmp.isshk) {
+                if (DEADMONSTER(mtmp) || mtmp === shk || !mtmp.isshk) {
                     continue;
                 }
                 (!(mtmp.mextra && mtmp.mextra.eshk) ? 1 : 0) ? $c.__assert_rtn($C`nameshk`, $C`shknam.c`, 542, $C`has_eshk(mtmp)`) : 0;

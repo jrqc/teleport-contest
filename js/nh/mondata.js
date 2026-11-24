@@ -69,7 +69,7 @@ const crawl = $c.nulls(4);
  */
 export function set_mon_data(mon, ptr) {   // mondata.c:13
     const old_speed = mon.data ? mon.data.mmove : 0;
-    const movement_p = $c.peq(mon, gy.youmonst) ? new $c.FieldRef(u, "umovement", "i16") : new $c.FieldRef(mon, "movement", "i16");
+    const movement_p = mon === gy.youmonst ? new $c.FieldRef(u, "umovement", "i16") : new $c.FieldRef(mon, "movement", "i16");
     mon.data = ptr;
     mon.mnum = $c.i16(ptr.pmidx);
     if (movement_p.get(0)) {
@@ -156,7 +156,7 @@ export function poly_when_stoned(ptr) {   // mondata.c:80
  */
 export async function defended(mon, adtyp) {   // mondata.c:91
     let otemp = new $T.obj();
-    const is_you = $c.peq(mon, gy.youmonst) ? 1 : 0;
+    const is_you = mon === gy.youmonst ? 1 : 0;
     /* is 'mon' wielding an artifact that protects against 'adtyp'? */
     let o = is_you ? $G.uwep : mon.mw;
     if (o && o.oartifact && defends(adtyp, o)) {
@@ -193,7 +193,7 @@ export async function defended(mon, adtyp) {   // mondata.c:91
  * @returns {Promise<number>} boolean
  */
 export async function Resists_Elem(mon, propindx) {   // mondata.c:129
-    const is_you = $c.peq(mon, gy.youmonst) ? 1 : 0;
+    const is_you = mon === gy.youmonst ? 1 : 0;
     let u_resist = 0;
     let damgtype = 0;
     let rsstmask = 0;
@@ -271,7 +271,7 @@ export async function Resists_Elem(mon, propindx) {   // mondata.c:129
 export async function resists_drli(mon) {   // mondata.c:201
     const ptr = mon.data;
     /* is_were() doesn't handle hero in human form */
-    if (is_undead(ptr) || is_demon(ptr) || is_were(ptr) || $c.peq(mon, gy.youmonst) && u.ulycn >= LOW_PM || ptr === mons[PM.DEATH] || is_vampshifter(mon)) {
+    if (is_undead(ptr) || is_demon(ptr) || is_were(ptr) || mon === gy.youmonst && u.ulycn >= LOW_PM || ptr === mons[PM.DEATH] || is_vampshifter(mon)) {
         return TRUE;
     }
     return await defended(mon, AD.DRLI);
@@ -283,7 +283,7 @@ export async function resists_drli(mon) {   // mondata.c:201
  */
 export function resists_magm(mon) {   // mondata.c:215
     const ptr = mon.data;
-    const is_you = $c.peq(mon, gy.youmonst) ? 1 : 0;
+    const is_you = mon === gy.youmonst ? 1 : 0;
     /* as of 3.2.0:  gray dragons, Angels, Oracle, Yeenoghu */
     if (dmgtype(ptr, AD.MAGM) || ptr === mons[PM.BABY_GRAY_DRAGON] || dmgtype(ptr, AD.RBRE)) {   /* Chromatic Dragon */
         return TRUE;
@@ -317,7 +317,7 @@ export function resists_magm(mon) {   // mondata.c:215
  */
 export async function resists_blnd(mon) {   // mondata.c:248
     const ptr = mon.data;
-    const is_you = $c.peq(mon, gy.youmonst) ? 1 : 0;
+    const is_you = mon === gy.youmonst ? 1 : 0;
     /* BUG: temporary sleep sets mfrozen, but since
             paralysis does too, we can't check it */
     if (is_you ? Blind() || Unaware() : mon.mblinded || !mon.mcansee || !haseyes(ptr) || mon.msleeping) {
@@ -346,7 +346,7 @@ export async function resists_blnd(mon) {   // mondata.c:248
  * @returns {number} boolean
  */
 export function resists_blnd_by_arti(mon) {   // mondata.c:278
-    const is_you = $c.peq(mon, gy.youmonst) ? 1 : 0;
+    const is_you = mon === gy.youmonst ? 1 : 0;
     let o = is_you ? $G.uwep : mon.mw;
     if (o && o.oartifact && defends(AD.BLND, o)) {
         return TRUE;
@@ -378,7 +378,7 @@ export function resists_blnd_by_arti(mon) {   // mondata.c:278
 export async function can_blnd(magr, mdef, aatyp, obj) {   // mondata.c:305
     /* NULL == no specific aggressor */
     /* aatyp == AT_WEAP, AT_SPIT */
-    const is_you = $c.peq(mdef, gy.youmonst) ? 1 : 0;
+    const is_you = mdef === gy.youmonst ? 1 : 0;
     let check_visor = FALSE;
     /* no eyes protect against all attacks for now */
     if (!haseyes(mdef.data)) {
@@ -426,7 +426,7 @@ export async function can_blnd(magr, mdef, aatyp, obj) {   // mondata.c:305
             } else {
                 return FALSE;   /* other objects cannot cause blindness yet */
             }
-            if ($c.peq(magr, gy.youmonst) && u.uswallow) {
+            if (magr === gy.youmonst && u.uswallow) {
                 return FALSE;   /* can't affect eyes while inside monster */
             }
             break;
@@ -443,7 +443,7 @@ export async function can_blnd(magr, mdef, aatyp, obj) {   // mondata.c:305
             if (is_you && $G.ublindf) {
                 return FALSE;
             }
-            if ($c.peq(magr, gy.youmonst) && u.uswallow) {
+            if (magr === gy.youmonst && u.uswallow) {
                 return FALSE;   /* can't affect eyes while inside monster */
             }
             check_visor = TRUE;
@@ -460,7 +460,7 @@ export async function can_blnd(magr, mdef, aatyp, obj) {   // mondata.c:305
     }
     /* check if wearing a visor (only checked if visor might help) */
     if (check_visor) {
-        let o = $c.peq(mdef, gy.youmonst) ? gi.invent : mdef.minvent;
+        let o = mdef === gy.youmonst ? gi.invent : mdef.minvent;
         for (; o; o = o.nobj) {
             if ($c.and64(o.owornmask, W.ARMH) && await objdescr_is(o, $C`visored helmet`)) {
                 return FALSE;
@@ -626,7 +626,7 @@ export function can_blow(mtmp) {   // mondata.c:567
     if ((is_silent(mtmp.data) || mtmp.data.msound === MS.BUZZ) && (breathless(mtmp.data) || verysmall(mtmp.data) || !has_head(mtmp.data) || mtmp.data.mlet === S.EEL)) {
         return FALSE;
     }
-    if ($c.peq(mtmp, gy.youmonst) && Strangled()) {
+    if (mtmp === gy.youmonst && Strangled()) {
         return FALSE;
     }
     return TRUE;
@@ -637,7 +637,7 @@ export function can_blow(mtmp) {   // mondata.c:567
  * @returns {number} boolean
  */
 export function can_chant(mtmp) {   // mondata.c:580
-    if ($c.peq(mtmp, gy.youmonst) && Strangled() || is_silent(mtmp.data) || !has_head(mtmp.data) || mtmp.data.msound === MS.BUZZ || mtmp.data.msound === MS.BURBLE) {
+    if (mtmp === gy.youmonst && Strangled() || is_silent(mtmp.data) || !has_head(mtmp.data) || mtmp.data.msound === MS.BUZZ || mtmp.data.msound === MS.BURBLE) {
         return FALSE;
     }
     return TRUE;
@@ -659,7 +659,7 @@ export async function can_be_strangled(mon) {   // mondata.c:591
     if (!has_head(mon.data)) {
         return FALSE;
     }
-    if ($c.peq(mon, gy.youmonst)) {
+    if (mon === gy.youmonst) {
         /* hero can't be mindless but poly'ing into mindless form can
            confer strangulation protection */
         nobrainer = mindless(gy.youmonst.data);
@@ -834,7 +834,7 @@ export function same_race(pm1, pm2) {   // mondata.c:771
     let prv = 0, nxt = 0;
     const let1 = pm1.mlet;
     const let2 = pm2.mlet;
-    if ($c.peq(pm1, pm2)) {
+    if (pm1 === pm2) {
         return TRUE;   /* exact match */
     }
     /* player races have their own predicates */
@@ -1202,7 +1202,7 @@ export function pronoun_gender(mtmp, pg_flags) {   // mondata.c:1191
  * @returns {number} boolean
  */
 export function levl_follower(mtmp) {   // mondata.c:1211
-    if ($c.peq(mtmp, u.usteed)) {
+    if (mtmp === u.usteed) {
         return TRUE;
     }
     /* Wizard with Amulet won't bother trying to follow across levels */
@@ -1287,7 +1287,7 @@ export function big_little_match(montyp1, montyp2) {   // mondata.c:1331
  * @returns {$T.permonst | null} const struct permonst *
  */
 export function raceptr(mtmp) {   // mondata.c:1359
-    if ($c.peq(mtmp, gy.youmonst) && !Upolyd()) {
+    if (mtmp === gy.youmonst && !Upolyd()) {
         return $c.relem(mons, gu.urace.mnum);
     }
     return mtmp.data;

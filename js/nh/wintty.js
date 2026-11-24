@@ -697,7 +697,7 @@ async function erase_menu_or_text(window, cw, clear) {   // wintty.c:990
 function free_window_info(cw, free_data) {   // wintty.c:1011
     let i = 0, temp = null, $t1, $t2, $t3, $t4;
     if (cw.data) {
-        if ($G.WIN_MESSAGE !== WIN_ERR && $c.peq(cw, wins[$G.WIN_MESSAGE]) && cw.rows > cw.maxrow) {
+        if ($G.WIN_MESSAGE !== WIN_ERR && cw === wins[$G.WIN_MESSAGE] && cw.rows > cw.maxrow) {
             cw.maxrow = cw.rows;   /* topl data */
         }
         for (i = 0; i < cw.maxrow; i = i + 1 | 0) {
@@ -935,7 +935,7 @@ async function set_item_state(window, lineno, item) {   // wintty.c:1204
  */
 async function set_all_on_page(window, page_start, page_end) {   // wintty.c:1228
     let curr = null, n = 0;
-    for (n = 0, curr = page_start; !$c.peq(curr, page_end); n = n + 1 | 0, curr = curr.next) {
+    for (n = 0, curr = page_start; curr !== page_end; n = n + 1 | 0, curr = curr.next) {
         /* not selectable */
         /* already selected */
         if (!curr.identifier.a_void || curr.selected || !menuitem_invert_test(1, curr.itemflags, 0)) {
@@ -954,7 +954,7 @@ async function set_all_on_page(window, page_start, page_end) {   // wintty.c:122
  */
 async function unset_all_on_page(window, page_start, page_end) {   // wintty.c:1248
     let curr = null, n = 0;
-    for (n = 0, curr = page_start; !$c.peq(curr, page_end); n = n + 1 | 0, curr = curr.next) {
+    for (n = 0, curr = page_start; curr !== page_end; n = n + 1 | 0, curr = curr.next) {
         /* skip if not selectable */
         /* skip if already de-selected */
         if (!curr.identifier.a_void || !curr.selected || !menuitem_invert_test(2, curr.itemflags, 1)) {
@@ -978,7 +978,7 @@ async function invert_all_on_page(window, page_start, page_end, acc, count) {   
     let curr = null, n = 0;
     /* group accelerator, 0 => all */
     /* pending count; -1L for non-group toggling */
-    for (n = 0, curr = page_start; !$c.peq(curr, page_end); n = n + 1 | 0, curr = curr.next) {
+    for (n = 0, curr = page_start; curr !== page_end; n = n + 1 | 0, curr = curr.next) {
         /* not selectable */
         /* skip if not group 'acc' */
         /* inverting all rather than a group; skip if flagged */
@@ -1015,9 +1015,9 @@ async function invert_all(window, page_start, page_end, acc, count) {   // wintt
     await invert_all_on_page(window, page_start, page_end, acc, count);
     /* invert the rest (no screen updating for them) */
     for (on_curr_page = 0, curr = cw.mlist; curr; curr = curr.next) {
-        if ($c.peq(curr, page_start)) {
+        if (curr === page_start) {
             on_curr_page = 1;
-        } else if ($c.peq(curr, page_end)) {
+        } else if (curr === page_end) {
             on_curr_page = 0;
         }
         /* skip if on current page (already handled above) or not
@@ -1148,7 +1148,7 @@ async function process_menu_window(window, cw) {   // wintty.c:1359
                 /* collect accelerators */
                 page_start = cw.plist.get(curr_page);
                 page_end = cw.plist.get(curr_page + 1 | 0);
-                for (page_lines = 0, curr = page_start; !$c.peq(curr, page_end); page_lines = page_lines + 1 | 0, curr = curr.next) {
+                for (page_lines = 0, curr = page_start; curr !== page_end; page_lines = page_lines + 1 | 0, curr = curr.next) {
                     color = NO_COLOR;
                     if (curr.selector) {
                         ($t3 = rp, rp = $t3.add(1), $t3).set(0, curr.selector);
@@ -1450,9 +1450,9 @@ async function process_menu_window(window, cw) {   // wintty.c:1359
                             if (on_curr_page) {
                                 lineno = lineno + 1 | 0;
                             }
-                            if ($c.peq(curr, page_start)) {
+                            if (curr === page_start) {
                                 on_curr_page = 1;
-                            } else if ($c.peq(curr, page_end)) {
+                            } else if (curr === page_end) {
                                 on_curr_page = 0;
                             }
                             if (curr.identifier.a_void && pmatchi(new $c.Ptr(searchbuf, 0), curr.str)) {
@@ -1485,7 +1485,7 @@ async function process_menu_window(window, cw) {   // wintty.c:1359
                         break;
                     }
                     /* find, toggle, and possibly update */
-                    for (n = 0, curr = page_start; !$c.peq(curr, page_end); n = n + 1 | 0, curr = curr.next) {
+                    for (n = 0, curr = page_start; curr !== page_end; n = n + 1 | 0, curr = curr.next) {
                         if ($G.morc === curr.selector) {
                             await toggle_menu_curr(window, curr, n, 1, counting, count);
                             if (cw.how === PICK.ONE) {

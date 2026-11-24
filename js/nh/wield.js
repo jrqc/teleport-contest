@@ -79,24 +79,24 @@ const can_no_longer_twoweap = new Int8Array(40);
 export async function setuwep(obj) {   // wield.c:100
     let $t1;
     const olduwep = $G.uwep;
-    if ($c.peq(obj, $G.uwep)) {
+    if (obj === $G.uwep) {
         return;   /* necessary to not set gu.unweapon */
     }
     await setworn(obj, W.WEP);
     /* handle Ogresmasher before Sunsword; even though they can't be happening
        at the same time, botl flag update should come before pline message */
-    if ($c.peq($G.uwep, obj) && ($G.uwep && $G.uwep.oartifact === ART.OGRESMASHER || olduwep && olduwep.oartifact === ART.OGRESMASHER)) {
+    if ($G.uwep === obj && ($G.uwep && $G.uwep.oartifact === ART.OGRESMASHER || olduwep && olduwep.oartifact === ART.OGRESMASHER)) {
         disp.botl = TRUE;   /* gaining or losing Con bonus */
     }
     /* This message isn't printed in the caller because it happens
      * *whenever* Sunsword is unwielded, from whatever cause. */
-    if ($c.peq($G.uwep, obj) && artifact_light(olduwep) && olduwep.lamplit) {
+    if ($G.uwep === obj && artifact_light(olduwep) && olduwep.lamplit) {
         await end_burn(olduwep, FALSE);
         if (!Blind()) {
             await pline($C`%s shining.`, await Tobjnam(olduwep, $C`stop`));
         }
     }
-    if ($c.peq($G.uwep, obj) && (u_wield_art(ART.OGRESMASHER) || is_art(olduwep, ART.OGRESMASHER))) {
+    if ($G.uwep === obj && (u_wield_art(ART.OGRESMASHER) || is_art(olduwep, ART.OGRESMASHER))) {
         disp.botl = TRUE;
     }
     /* Note: Explicitly wielding a pick-axe will not give a "bashing"
@@ -256,7 +256,7 @@ function ready_ok(obj) {   // wield.c:294
         return $G.uquiver ? GETOBJ.SUGGEST : GETOBJ.DOWNPLAY;
     }
     /* downplay when wielded, unless more than one */
-    if ($c.peq(obj, $G.uwep) || $c.peq(obj, $G.uswapwep) && u.twoweap) {
+    if (obj === $G.uwep || obj === $G.uswapwep && u.twoweap) {
         return obj.quan === 1 ? GETOBJ.DOWNPLAY : GETOBJ.SUGGEST;
     }
     if (is_ammo(obj)) {
@@ -326,7 +326,7 @@ export async function dowield() {   // wield.c:355
             if ($goto !== "already_wielded" && !(wep = await getobj($C`wield`, wield_ok, GETOBJ_PROMPT | GETOBJ.ALLOWCNT))) {
                 /* Cancelled */
                 return ECMD.CANCEL;
-            } else if ($goto === "already_wielded" || $c.peq(wep, $G.uwep)) {
+            } else if ($goto === "already_wielded" || wep === $G.uwep) {
                 $goto = null;   // already_wielded:
                 await You($C`are already wielding that!`);
                 if (is_weptool(wep) || is_wet_towel(wep)) {
@@ -356,11 +356,11 @@ export async function dowield() {   // wield.c:355
                 $goto = "wielding"; continue D1;
             }
             /* Handle no object, or object in other slot */
-            if ($c.peq(wep, hands_obj)) {
+            if (wep === hands_obj) {
                 wep = null;
-            } else if ($c.peq(wep, $G.uswapwep)) {
+            } else if (wep === $G.uswapwep) {
                 return await doswapweapon();
-            } else if ($c.peq(wep, $G.uquiver)) {
+            } else if (wep === $G.uquiver) {
                 /* offer to split stack if multiple are quivered */
                 if ($G.uquiver.quan > 1 && inv_cnt(FALSE) < invlet_basic && await splittable($G.uquiver)) {
                     $c.sprintf(new $c.Ptr(qbuf, 0), $C`You have %ld %s readied.  Wield one?`, $G.uquiver.quan, await simpleonames($G.uquiver));
@@ -397,7 +397,7 @@ export async function dowield() {   // wield.c:355
             /* Set your new primary weapon */
             oldwep = $G.uwep;
             result = await ready_weapon(wep);
-            if (flags.pushweapon && oldwep && !$c.peq($G.uwep, oldwep)) {
+            if (flags.pushweapon && oldwep && $G.uwep !== oldwep) {
                 await setuswapwep(oldwep);
             }
             await untwoweapon();
@@ -429,7 +429,7 @@ export async function doswapweapon() {   // wield.c:461
     /* Set your new primary weapon */
     result = await ready_weapon(oldswap);
     /* Set your new secondary weapon */
-    if ($c.peq($G.uwep, oldwep)) {
+    if ($G.uwep === oldwep) {
         /* Wield failed for some reason */
         await setuswapwep(oldswap);
     } else {
@@ -482,7 +482,7 @@ export async function doquiver_core(verb) {   // wield.c:512
             if ($goto !== "already_quivered" && !newquiver) {
                 /* Cancelled */
                 return ECMD.CANCEL;
-            } else if ($goto !== "already_quivered" && $c.peq(newquiver, hands_obj)) {
+            } else if ($goto !== "already_quivered" && newquiver === hands_obj) {
                 /* no object */
                 /* Explicitly nothing */
                 if ($G.uquiver) {
@@ -507,14 +507,14 @@ export async function doquiver_core(verb) {   // wield.c:512
                     return ECMD.OK;
                 }
                 await finish_splitting(newquiver);
-            } else if ($goto === "already_quivered" || $c.peq(newquiver, $G.uquiver)) {
+            } else if ($goto === "already_quivered" || newquiver === $G.uquiver) {
                 $goto = null;   // already_quivered:
                 await pline($C`That ammunition is already readied!`);
                 return ECMD.OK;
             } else if ($c.and64(newquiver.owornmask, W_ARMOR | W_ACCESSORY | W.SADDLE)) {
                 await You($C`cannot %s that!`, verb);
                 return ECMD.OK;
-            } else if ($c.peq(newquiver, $G.uwep)) {
+            } else if (newquiver === $G.uwep) {
                 weld_res = !$G.uwep.bknown ? 1 : 0;
                 if (await welded($G.uwep)) {
                     await weldmsg($G.uwep);
@@ -550,7 +550,7 @@ export async function doquiver_core(verb) {   // wield.c:512
                 await setuwep(null);
                 await untwoweapon();
                 was_uwep = TRUE;
-            } else if ($c.peq(newquiver, $G.uswapwep)) {
+            } else if (newquiver === $G.uswapwep) {
                 if ($G.uswapwep.quan > 1 && inv_cnt(FALSE) < invlet_basic && await splittable($G.uswapwep)) {
                     $c.sprintf(new $c.Ptr(qbuf, 0), $C`%s %ld %s.  Ready %ld of them?`, u.twoweap ? $C`You are dual wielding` : $C`Your alternate weapon is`, $G.uswapwep.quan, await simpleonames($G.uswapwep), $c.sub64($G.uswapwep.quan, 1));
                     switch (await ynq(new $c.Ptr(qbuf, 0))) {
@@ -619,7 +619,7 @@ export async function doquiver_core(verb) {   // wield.c:512
  */
 export async function wield_tool(obj, verb) {   // wield.c:683
     /* "rub",&c */
-    if ($G.uwep && $c.peq(obj, $G.uwep)) {
+    if ($G.uwep && obj === $G.uwep) {
         return TRUE;   /* nothing to do if already wielding it */
     }
     if (!verb) {
@@ -655,13 +655,13 @@ export async function wield_tool(obj, verb) {   // wield.c:683
         await You($C`cannot %s a two-handed %s while wearing a shield.`, verb, obj.oclass === WEAPON_CLASS ? $C`weapon` : $C`tool`);
         return FALSE;
     }
-    if ($c.peq($G.uquiver, obj)) {
+    if ($G.uquiver === obj) {
         await setuqwep(null);
     }
-    if ($c.peq($G.uswapwep, obj)) {
+    if ($G.uswapwep === obj) {
         await doswapweapon();
         /* doswapweapon might fail */
-        if ($c.peq($G.uswapwep, obj)) {
+        if ($G.uswapwep === obj) {
             return FALSE;
         }
     } else {
@@ -673,11 +673,11 @@ export async function wield_tool(obj, verb) {   // wield.c:683
             await You($C`now wield %s.`, await doname(obj));
             await setuwep(obj);
         }
-        if (flags.pushweapon && oldwep && !$c.peq($G.uwep, oldwep)) {
+        if (flags.pushweapon && oldwep && $G.uwep !== oldwep) {
             await setuswapwep(oldwep);
         }
     }
-    if ($G.uwep && !$c.peq($G.uwep, obj)) {
+    if ($G.uwep && $G.uwep !== obj) {
         return FALSE;   /* rewielded old object after dying */
     }
     /* applying weapon or tool that gets wielded ends two-weapon combat */
@@ -709,7 +709,7 @@ export async function can_twoweapon() {   // wield.c:761
         await Your($C`%s%s %s empty.`, $G.uwep ? $C`left ` : $G.uswapwep ? $C`right ` : $C``, hand_s, await vtense(hand_s, $C`are`));
     } else if (!TWOWEAPOK($G.uwep) || !TWOWEAPOK($G.uswapwep)) {
         otmp = !TWOWEAPOK($G.uwep) ? $G.uwep : $G.uswapwep;
-        await pline($C`%s %s suitable %s weapon%s.`, await Yname2(otmp), is_plural(otmp) ? $C`aren't` : $C`isn't a`, $c.peq(otmp, $G.uwep) ? $C`primary` : $C`secondary`, plur(otmp.quan));
+        await pline($C`%s %s suitable %s weapon%s.`, await Yname2(otmp), is_plural(otmp) ? $C`aren't` : $C`isn't a`, otmp === $G.uwep ? $C`primary` : $C`secondary`, plur(otmp.quan));
     } else if (bimanual($G.uwep) || bimanual($G.uswapwep)) {
         otmp = bimanual($G.uwep) ? $G.uwep : $G.uswapwep;
         await pline($C`%s isn't one-handed.`, await Yname2(otmp));
@@ -973,7 +973,7 @@ export async function chwepon(otmp, amount) {   // wield.c:918
  * @returns {Promise<number>} int
  */
 export async function welded(obj) {   // wield.c:1051
-    if (obj && $c.peq(obj, $G.uwep) && will_weld(obj)) {
+    if (obj && obj === $G.uwep && will_weld(obj)) {
         await set_bknown(obj, 1);
         return 1;
     }

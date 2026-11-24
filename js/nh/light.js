@@ -114,7 +114,7 @@ export async function del_light_source(type, id) {   // light.c:99
         if (curr.type !== type) {
             continue;
         }
-        if ($c.peq(curr.id.a_obj, curr.flags & LSF_NEEDS_FIXUP ? tmp_id.a_obj : id.a_obj)) {
+        if (curr.id.a_obj === (curr.flags & LSF_NEEDS_FIXUP ? tmp_id.a_obj : id.a_obj)) {
             break;
         }
     }
@@ -132,7 +132,7 @@ export async function del_light_source(type, id) {   // light.c:99
 async function delete_ls(ls) {   // light.c:142
     let curr = null, prev = null;
     for (prev = null, curr = gl.light_base; curr; prev = curr, curr = curr.next) {
-        if ($c.peq(curr, ls)) {
+        if (curr === ls) {
             if (prev) {
                 prev.next = curr.next;
             } else {
@@ -142,7 +142,7 @@ async function delete_ls(ls) {   // light.c:142
         }
     }
     if (curr) {
-        (!$c.peq(curr, ls) ? 1 : 0) ? $c.__assert_rtn($C`delete_ls`, $C`light.c`, 157, $C`curr == ls`) : 0;
+        (!(curr === ls) ? 1 : 0) ? $c.__assert_rtn($C`delete_ls`, $C`light.c`, 157, $C`curr == ls`) : 0;
         $c.memset(ls, 0, 32);
         $c.free(ls);
         gv.vision_full_recalc = 1;
@@ -261,7 +261,7 @@ export async function show_transient_light(obj, x, y) {   // light.c:257
         ls = await new_light_core(x, y, 0, LS_OBJECT, cameraflash);
         /* pacify static analysis; 'ls' is never Null for
            new_light_core(,,0,LS_OBJECT,&zeroany) */
-        (!!$c.peq(ls, $c.asRec(null, $T.ls_t, 32)) ? 1 : 0) ? $c.__assert_rtn($C`show_transient_light`, $C`light.c`, 275, $C`ls != NULL`) : 0;
+        (!(ls !== $c.asRec(null, $T.ls_t, 32)) ? 1 : 0) ? $c.__assert_rtn($C`show_transient_light`, $C`light.c`, 275, $C`ls != NULL`) : 0;
     } else {
         /* thrown or kicked object which is emitting light; validate its
            light source to obtain its radius (for monster sightings) */
@@ -269,11 +269,11 @@ export async function show_transient_light(obj, x, y) {   // light.c:257
             if (ls.type !== LS_OBJECT) {
                 continue;
             }
-            if ($c.peq(ls.id.a_obj, obj)) {
+            if (ls.id.a_obj === obj) {
                 break;
             }
         }
-        (!!$c.peq(obj, $c.asRec(null, $T.obj, 112)) ? 1 : 0) ? $c.__assert_rtn($C`show_transient_light`, $C`light.c`, 285, $C`obj != NULL`) : 0;   /* necessary condition to get into this 'else' */
+        (!(obj !== $c.asRec(null, $T.obj, 112)) ? 1 : 0) ? $c.__assert_rtn($C`show_transient_light`, $C`light.c`, 285, $C`obj != NULL`) : 0;   /* necessary condition to get into this 'else' */
         if (!ls || obj.where !== OBJ.FREE) {
             await impossible($C`transient light %s %s %s not %s?`, obj.lamplit ? $C`lit` : $C`unlit`, await simpleonames(obj), await otense(obj, $C`are`), !ls ? $C`a light source` : $C`free`);
             return;
@@ -399,26 +399,26 @@ export function find_mid(nid, fmflags) {   // light.c:376
  */
 function whereis_mon(mon, fmflags) {   // light.c:398
     let mtmp = null;
-    if ((fmflags & FM.YOU) >>> 0 && $c.peq(mon, gy.youmonst)) {
+    if ((fmflags & FM.YOU) >>> 0 && mon === gy.youmonst) {
         return FM.YOU;
     }
     if ((fmflags & FM.FMON) >>> 0) {
         for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
-            if ($c.peq(mtmp, mon)) {
+            if (mtmp === mon) {
                 return FM.FMON;
             }
         }
     }
     if ((fmflags & FM.MIGRATE) >>> 0) {
         for (mtmp = gm.migrating_mons; mtmp; mtmp = mtmp.nmon) {
-            if ($c.peq(mtmp, mon)) {
+            if (mtmp === mon) {
                 return FM.MIGRATE;
             }
         }
     }
     if ((fmflags & FM.MYDOGS) >>> 0) {
         for (mtmp = gm.mydogs; mtmp; mtmp = mtmp.nmon) {
-            if ($c.peq(mtmp, mon)) {
+            if (mtmp === mon) {
                 return FM.MYDOGS;
             }
         }
@@ -616,13 +616,13 @@ export async function light_sources_sanity_check() {   // light.c:606
         if (ls.type === LS_OBJECT) {
             const otmp = ls.id.a_obj;
             auint = otmp.o_id;
-            if (!$c.peq(find_oid(auint), otmp)) {
+            if (find_oid(auint) !== otmp) {
                 await panic($C`insane light source: can't find obj #%u!`, auint);
             }
         } else if (ls.type === LS_MONSTER) {
             const mtmp = ls.id.a_monst;
             auint = mtmp.m_id;
-            if (!$c.peq(find_mid(auint, FM_EVERYWHERE), mtmp)) {
+            if (find_mid(auint, FM_EVERYWHERE) !== mtmp) {
                 await panic($C`insane light source: can't find mon #%u!`, auint);
             }
         } else {
@@ -648,7 +648,7 @@ async function write_ls(nhfp, ls) {   // light.c:634
                 const otmp = ls.id.a_obj;
                 ls.id.$copyFrom(cg.zeroany);
                 ls.id.a_uint = otmp.o_id;
-                if (!$c.peq(find_oid(ls.id.a_uint), otmp)) {
+                if (find_oid(ls.id.a_uint) !== otmp) {
                     await impossible($C`write_ls: can't find obj #%u!`, ls.id.a_uint);
                     ls.flags = $c.i16(ls.flags | LSF_IS_PROBLEMATIC);
                 }
@@ -672,7 +672,7 @@ async function write_ls(nhfp, ls) {   // light.c:634
                 if ((monloc = whereis_mon(mtmp, FM_EVERYWHERE)) !== 0) {
                     ls.id.$copyFrom(cg.zeroany);
                     ls.id.a_uint = mtmp.m_id;
-                    if (!$c.peq(find_mid(ls.id.a_uint, monloc), mtmp)) {
+                    if (find_mid(ls.id.a_uint, monloc) !== mtmp) {
                         await impossible($C`write_ls: can't find mon%s #%u!`, DEADMONSTER(mtmp) ? $C` because it's dead` : $C``, ls.id.a_uint);
                         ls.flags = $c.i16(ls.flags | LSF_IS_PROBLEMATIC);
                     }
@@ -702,7 +702,7 @@ async function write_ls(nhfp, ls) {   // light.c:634
 export function obj_move_light_source(src, dest) {   // light.c:706
     let ls = null;
     for (ls = gl.light_base; ls; ls = ls.next) {
-        if (ls.type === LS_OBJECT && $c.peq(ls.id.a_obj, src)) {
+        if (ls.type === LS_OBJECT && ls.id.a_obj === src) {
             ls.id.a_obj = dest;
         }
     }
@@ -781,7 +781,7 @@ export function obj_is_burning(obj) {   // light.c:771
 export async function obj_split_light_source(src, dest) {   // light.c:779
     let ls = null, $t1, $t2;
     for (ls = gl.light_base; ls; ls = ls.next) {
-        if (ls.type === LS_OBJECT && $c.peq(ls.id.a_obj, src)) {
+        if (ls.type === LS_OBJECT && ls.id.a_obj === src) {
             /*
              * Insert the new source at beginning of list.  This will
              * never interfere us walking down the list - we are already
@@ -812,11 +812,11 @@ export async function obj_split_light_source(src, dest) {   // light.c:779
 export async function obj_merge_light_sources(src, dest) {   // light.c:808
     let ls = null, $t1;
     /* src == dest implies adding to candelabrum */
-    if (!$c.peq(src, dest)) {
+    if (src !== dest) {
         await end_burn(src, TRUE);   /* extinguish candles */
     }
     for (ls = gl.light_base; ls; ls = ls.next) {
-        if (ls.type === LS_OBJECT && $c.peq(ls.id.a_obj, dest)) {
+        if (ls.type === LS_OBJECT && ls.id.a_obj === dest) {
             $t1 = $c.i16(candle_light_range(dest)), ls.range = $t1;
             gv.vision_full_recalc = 1;   /* in case range changed */
             break;
@@ -832,7 +832,7 @@ export async function obj_merge_light_sources(src, dest) {   // light.c:808
 export async function obj_adjust_light_radius(obj, new_radius) {   // light.c:826
     let ls = null;
     for (ls = gl.light_base; ls; ls = ls.next) {
-        if (ls.type === LS_OBJECT && $c.peq(ls.id.a_obj, obj)) {
+        if (ls.type === LS_OBJECT && ls.id.a_obj === obj) {
             if (new_radius !== ls.range) {
                 gv.vision_full_recalc = 1;
             }
@@ -904,7 +904,7 @@ export function arti_light_radius(obj) {   // light.c:881
        have minimum radiance (hero as light source will use light radius
        based on monster form); otherwise, worn gold DSM gives off more
        light than other light sources */
-    if ($c.peq(obj, $G.uskin)) {
+    if (obj === $G.uskin) {
         res = 1;
     } else if (obj.otyp === GOLD_DRAGON_SCALE_MAIL) {   /* DSM but not scales */
         res = res + 1 | 0;
@@ -949,7 +949,7 @@ export async function wiz_light_sources() {   // light.c:935
         await putstr()(win, 0, $C`location range flags  type    id`);
         await putstr()(win, 0, $C`-------- ----- ------ ----  -------`);
         for (ls = gl.light_base; ls; ls = ls.next) {
-            $c.sprintf(new $c.Ptr(buf, 0), $C`  %2d,%2d   %2d   0x%04x  %s  %s`, ls.x, ls.y, ls.range, ls.flags, ls.type === LS_OBJECT ? $C`obj` : ls.type === LS_MONSTER ? ls.id.a_monst.mx > 0 ? $C`mon` : $c.peq(ls.id.a_monst, gy.youmonst) ? $C`you` : $C`<m>` : $C`???`, fmt_ptr(ls.id.a_void));
+            $c.sprintf(new $c.Ptr(buf, 0), $C`  %2d,%2d   %2d   0x%04x  %s  %s`, ls.x, ls.y, ls.range, ls.flags, ls.type === LS_OBJECT ? $C`obj` : ls.type === LS_MONSTER ? ls.id.a_monst.mx > 0 ? $C`mon` : ls.id.a_monst === gy.youmonst ? $C`you` : $C`<m>` : $C`???`, fmt_ptr(ls.id.a_void));
             /* migrating monster */
             await putstr()(win, 0, new $c.Ptr(buf, 0));
         }

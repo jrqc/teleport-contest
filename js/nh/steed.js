@@ -860,7 +860,7 @@ export async function poly_steed(steed, oldshape) {   // steed.c:852
         await dismount_steed(DISMOUNT.FELL);
     } else {
         $c.strcpy(new $c.Ptr(buf, 0), await x_monnam(steed, ARTICLE.YOUR, null, SUPPRESS.SADDLE, FALSE));
-        if (!$c.peq(oldshape, steed.data)) {
+        if (oldshape !== steed.data) {
             strsubst(new $c.Ptr(buf, 0), $C`your `, $C`your new `);
         }
         await You($C`adjust yourself in the saddle on %s.`, new $c.Ptr(buf, 0));
@@ -907,15 +907,15 @@ export async function place_monster(mon, x, y) {   // steed.c:898
         x = y = 0;
     }
     /* special case is for convoluted vault guard handling */
-    if ($c.peq(mon, u.usteed) && !gi.in_steed_dismounting || DEADMONSTER(mon) && !(mon.isgd && x === 0 && y === 0)) {
+    if (mon === u.usteed && !gi.in_steed_dismounting || DEADMONSTER(mon) && !(mon.isgd && x === 0 && y === 0)) {
         describe_level(new $c.Ptr(buf, 0), 0);
-        await impossible($C`placing %s onto map, mstate:%lx, on %s?`, $c.peq(mon, u.usteed) ? $C`steed` : $C`defunct monster`, mon.mstate, new $c.Ptr(buf, 0));
+        await impossible($C`placing %s onto map, mstate:%lx, on %s?`, mon === u.usteed ? $C`steed` : $C`defunct monster`, mon.mstate, new $c.Ptr(buf, 0));
         return;
     }
     if ((othermon = svl.level.monsters[x][y]) !== null) {
         describe_level(new $c.Ptr(buf, 0), 0);
         const monnm = minimal_monnam(mon, FALSE);
-        const othnm = !$c.peq(mon, othermon) ? minimal_monnam(othermon, TRUE) : $C`itself`;
+        const othnm = mon !== othermon ? minimal_monnam(othermon, TRUE) : $C`itself`;
         await impossible($C`placing %s over %s at <%d,%d>, mstates:%lx %lx on %s?`, monnm, othnm, x, y, othermon.mstate, mon.mstate, new $c.Ptr(buf, 0));
     }
     mon.mx = x, mon.my = y;

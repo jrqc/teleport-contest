@@ -175,11 +175,11 @@ export async function setnotworn(obj) {   // worn.c:150
     if (!obj) {
         return;
     }
-    if (u.twoweap && ($c.peq(obj, $G.uwep) || $c.peq(obj, $G.uswapwep))) {
+    if (u.twoweap && (obj === $G.uwep || obj === $G.uswapwep)) {
         set_twoweap(FALSE);   /* u.twoweap = FALSE */
     }
     for (wp = worn[0]; wp.w_mask; wp = $c.radd(wp, 1)) {
-        if ($c.peq(obj, wp.w_obj.get(0))) {
+        if (obj === wp.w_obj.get(0)) {
             /* in case wearing or removal is in progress or removal
                is pending (via 'A' command for multiple items) */
             cancel_doff(obj, wp.w_mask);
@@ -390,7 +390,7 @@ export async function check_wornmask_slots() {   // worn.c:355
             /* slot pointer (uarm, uwep, &c) is populated; check that object
                is in inventory and has the relevant owornmask bit set */
             for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
-                if ($c.peq(otmp, o)) {
+                if (otmp === o) {
                     break;
                 }
             }
@@ -413,7 +413,7 @@ export async function check_wornmask_slots() {   // worn.c:355
             /* embedded scales owornmask is W_ARM|I_SPECIAL so would
                give a false complaint about item other than uarm having
                W_ARM bit set if we didn't screen it out here */
-            if (!$c.peq(otmp, o) && $c.and64(otmp.owornmask, m) !== 0 && (m !== W.ARM || !$c.peq(otmp, $G.uskin) || $c.and64(otmp.owornmask, I_SPECIAL) === 0)) {
+            if (otmp !== o && $c.and64(otmp.owornmask, m) !== 0 && (m !== W.ARM || otmp !== $G.uskin || $c.and64(otmp.owornmask, I_SPECIAL) === 0)) {
                 $c.sprintf(new $c.Ptr(whybuf, 0), $C`%s [0x%08lx] has %s mask 0x%08lx bit set`, await simpleonames(otmp), otmp.owornmask, wp.w_what, m);
                 await impossible($C`Worn-slot insanity: %s.`, new $c.Ptr(whybuf, 0));
             }
@@ -629,7 +629,7 @@ export async function update_mon_extrinsics(mon, obj, on, silently) {   // worn.
                          */
                         mask = res_to_mr(which);
                         for (otmp = mon.minvent; otmp; otmp = otmp.nobj) {
-                            if ($c.peq(otmp, obj) || !otmp.owornmask) {
+                            if (otmp === obj || !otmp.owornmask) {
                                 continue;
                             }
                             if (objects[otmp.otyp].oc_oprop === which) {
@@ -669,7 +669,7 @@ export async function update_mon_extrinsics(mon, obj, on, silently) {   // worn.
         default:
             break;
     }
-    if (!on && $c.peq(mon, u.usteed) && obj.otyp === SADDLE) {
+    if (!on && mon === u.usteed && obj.otyp === SADDLE) {
         await dismount_steed(DISMOUNT.FELL);
     }
     /* if couldn't see it but now can, or vice versa, update display */
@@ -883,7 +883,7 @@ async function m_dowear_type(mon, flag, creation, racialexception) {   // worn.c
             best = obj;
         }
     }
-    if (!best || $c.peq(best, old)) {
+    if (!best || best === old) {
         return;
     }
     /* same auto-cursing behavior as for hero */
@@ -985,7 +985,7 @@ async function m_dowear_type(mon, flag, creation, racialexception) {   // worn.c
  */
 export async function which_armor(mon, flag) {   // worn.c:1006
     let obj = null;
-    if ($c.peq(mon, gy.youmonst)) {
+    if (mon === gy.youmonst) {
         switch (flag) {
             case W.ARM:
                 return $G.uarm;
@@ -1145,7 +1145,7 @@ export function nxt_unbypassed_loot(lootarray, listhead) {   // worn.c:1159
     let o = null, obj = null;
     while ((obj = lootarray.obj) !== null) {
         for (o = listhead; o; o = o.nobj) {
-            if ($c.peq(o, obj)) {
+            if (o === obj) {
                 break;
             }
         }
@@ -1172,7 +1172,7 @@ export async function mon_break_armor(mon, polyspot) {   // worn.c:1177
     const ppronoun = genders[pronoun_gender(mon, PRONOUN.HALLU)].his;
     if (breakarm(mdat)) {
         if ((otmp = await which_armor(mon, W.ARM)) !== null) {
-            if (Is_dragon_scales(otmp) && $c.peq(mdat, Dragon_scales_to_pm(otmp)) || Is_dragon_mail(otmp) && $c.peq(mdat, Dragon_mail_to_pm(otmp))) {
+            if (Is_dragon_scales(otmp) && mdat === Dragon_scales_to_pm(otmp) || Is_dragon_mail(otmp) && mdat === Dragon_mail_to_pm(otmp)) {
                 /* no message here;
                    "the dragon merges with his scaly armor" is odd
                    and the monster's previous form is already gone */
@@ -1289,11 +1289,11 @@ export async function mon_break_armor(mon, polyspot) {   // worn.c:1177
                 await pline_mon(mon, $C`%s saddle falls off.`, s_suffix(await Monnam(mon)));
             }
         }
-        if ($c.peq(mon, u.usteed)) {
+        if (mon === u.usteed) {
             noride = TRUE;
         }
     }
-    if (noride || $c.peq(mon, u.usteed) && !can_ride(mon)) {
+    if (noride || mon === u.usteed && !can_ride(mon)) {
         await You($C`can no longer ride %s.`, await mon_nam(mon));
         if (touch_petrifies(u.usteed.data) && !Stone_resistance() && rnl(3)) {
             await You($C`touch %s.`, await mon_nam(u.usteed));
@@ -1338,7 +1338,7 @@ export function racial_exception(mon, obj) {   // worn.c:1360
     const ptr = raceptr(mon);
     /* Acceptable Exceptions: */
     /* Allow hobbits to wear elven armor - LoTR */
-    if ($c.peq(ptr, mons[PM.HOBBIT]) && is_elven_armor(obj)) {
+    if (ptr === mons[PM.HOBBIT] && is_elven_armor(obj)) {
         return 1;
     }
     /* Unacceptable Exceptions: */

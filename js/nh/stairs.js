@@ -162,7 +162,7 @@ export async function u_on_dnstairs() {   // stairs.c:137
  * @returns {number} boolean
  */
 export function On_stairs(x, y) {   // stairs.c:148
-    return !$c.peq(stairway_at(x, y), $c.asRec(null, $T.stairway, 24)) ? 1 : 0;
+    return stairway_at(x, y) !== $c.asRec(null, $T.stairway, 24) ? 1 : 0;
 }
 /**
  * @param {number} x coordxy

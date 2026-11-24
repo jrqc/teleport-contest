@@ -403,7 +403,7 @@ export async function insert_branch(new_branch, extract_first) {   // dungeon.c:
     let curr = null, prev = null, curr_val = 0;
     if (extract_first) {
         for (prev = null, curr = svb.branches; curr; prev = curr, curr = curr.next) {
-            if ($c.peq(curr, new_branch)) {
+            if (curr === new_branch) {
                 break;
             }
         }
@@ -983,7 +983,7 @@ async function fixup_level_locations() {   // dungeon.c:1122
                  * levels of the quest dungeon occur.
                  */
                 $c.sprintf(new $c.Ptr(x.proto, 0), $C`%s%s`, gu.urole.filecode, lev_map.lev_name.add(1));
-            } else if ($c.peq(lev_map.lev_spec, svd.dungeon_topology.d_knox_level)) {
+            } else if (lev_map.lev_spec === svd.dungeon_topology.d_knox_level) {
                 /*
                  * Kludge to allow floating Knox entrance.  We
                  * specify a floating entrance by the fact that its
@@ -2246,7 +2246,7 @@ export async function recbranch_mapseen(source, dest) {   // dungeon.c:2446
         return;
     }
     if ((mptr = find_mapseen(source)) !== null) {
-        if (mptr.br && !$c.peq(br, mptr.br)) {
+        if (mptr.br && br !== mptr.br) {
             await impossible($C`Two branches on the same level?`);
         }
         mptr.br = br;
@@ -2437,7 +2437,7 @@ export function rm_mapseen(ledger_num) {   // dungeon.c:2665
         $c.free(mptr.custom), mptr.custom = $c.asArr(null, Int8Array);
     }
     let bpnext = mptr.final_resting_place;
-    while (!$c.peq(bp = bpnext, $c.asRec(null, $T.cemetery, 184))) {
+    while ((bp = bpnext) !== $c.asRec(null, $T.cemetery, 184)) {
         bpnext = bp.next;
         $c.free(bp);
     }
@@ -2456,7 +2456,7 @@ export function rm_mapseen(ledger_num) {   // dungeon.c:2665
 async function save_mapseen(nhfp, mptr) {   // dungeon.c:2695
     let curr = null, i = 0, brindx = Int32Array.of(0);
     for (brindx[0] = 0, curr = svb.branches; curr; curr = curr.next, brindx[0] = brindx[0] + 1 | 0) {
-        if ($c.peq(curr, mptr.br)) {
+        if (curr === mptr.br) {
             break;
         }
     }

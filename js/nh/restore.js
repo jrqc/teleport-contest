@@ -1331,7 +1331,7 @@ export function lookup_id_mapping(gid, nidp) {   // restore.c:1484
     if (gn.n_ids_mapped) {
         for (curr = gi.id_map; curr; curr = curr.next) {
             /* first bucket might not be totally full */
-            if ($c.peq(curr, gi.id_map)) {
+            if (curr === gi.id_map) {
                 i = $c.rem32(gn.n_ids_mapped, N_PER_BUCKET);
                 if (i === 0) {
                     i = N_PER_BUCKET;

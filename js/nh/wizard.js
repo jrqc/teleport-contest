@@ -197,7 +197,7 @@ function mon_has_arti(mtmp, otyp) {   // wizard.c:165
 function other_mon_has_arti(mtmp, otyp) {   // wizard.c:184
     let mtmp2 = null;
     for (mtmp2 = svl.level.monlist; mtmp2; mtmp2 = mtmp2.nmon) {   /* no need for !DEADMONSTER check here since they have no inventory */
-        if (!$c.peq(mtmp2, mtmp)) {
+        if (mtmp2 !== mtmp) {
             if (mon_has_arti(mtmp2, otyp)) {
                 return mtmp2;
             }
@@ -400,7 +400,7 @@ export async function tactics(mtmp) {   // wizard.c:369
         case STRAT.HEAL:
             /* hide and recover */
             mx = mtmp.mx, my = mtmp.my;
-            if (u.uswallow && $c.peq(u.ustuck, mtmp)) {
+            if (u.uswallow && u.ustuck === mtmp) {
                 await expels(mtmp, mtmp.data, TRUE);
             }
             /* if wounded, hole up on or near the stairs (to block them) */

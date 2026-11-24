@@ -1042,7 +1042,7 @@ async function status_enlightenment(mode, final) {   // insight.c:940
         }
     }
     if (u.uswallow) {
-        (!!$c.peq(u.ustuck, $c.asRec(null, $T.monst, 192)) ? 1 : 0) ? $c.__assert_rtn($C`status_enlightenment`, $C`insight.c`, 1108, $C`u.ustuck != NULL`) : 0;   /* implied by u.uswallow */
+        (!(u.ustuck !== $c.asRec(null, $T.monst, 192)) ? 1 : 0) ? $c.__assert_rtn($C`status_enlightenment`, $C`insight.c`, 1108, $C`u.ustuck != NULL`) : 0;   /* implied by u.uswallow */
         nh_snprintf($C`status_enlightenment`, 1111, new $c.Ptr(buf, 0), 256, $C`%s by %s`, dmgtype_fromattack(u.ustuck.data, AD.DGST, AT.ENGL) !== null ? $C`swallowed` : $C`engulfed`, new $c.Ptr(heldmon, 0));
         if (dmgtype(u.ustuck.data, AD.DGST)) {
             /* if final, death via digestion can be deduced by u.uswallow
@@ -3056,7 +3056,7 @@ export async function mstatusline(mtmp) {   // insight.c:3275
     }
     /* don't reveal the innate form (chameleon, vampire, &c),
        just expose the fact that this current form isn't it */
-    if (ismnum(mtmp.cham) && !$c.peq(mtmp.data, $c.relem(mons, mtmp.cham))) {
+    if (ismnum(mtmp.cham) && mtmp.data !== $c.relem(mons, mtmp.cham)) {
         $c.strcat(new $c.Ptr(info, 0), $C`, shapechanger`);
     }
     /* pets eating mimic corpses mimic while eating, so this comes first */
@@ -3102,7 +3102,7 @@ export async function mstatusline(mtmp) {   // insight.c:3275
     if (mtmp.minvis) {
         $c.strcat(new $c.Ptr(info, 0), $C`, invisible`);
     }
-    if ($c.peq(mtmp, u.ustuck)) {
+    if (mtmp === u.ustuck) {
         const pm = u.ustuck.data;
         /* being swallowed/engulfed takes priority over sticks(youmonst);
            this used to have that backwards and checked sticks() first */
@@ -3115,7 +3115,7 @@ export async function mstatusline(mtmp) {   // insight.c:3275
         /* !u.uswallow; if both youmonst and ustuck are holders,
            youmonst wins */
     }
-    if ($c.peq(mtmp, u.usteed)) {
+    if (mtmp === u.usteed) {
         $c.strcat(new $c.Ptr(info, 0), $C`, carrying you`);
         if (Wounded_legs()) {
             /* EWounded_legs is used to track left/right/both rather than

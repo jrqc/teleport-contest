@@ -801,7 +801,7 @@ async function doengrave_sfx_item(de) {   // engrave.c:742
             }
             break;
         case TOOL_CLASS:
-            if ($c.peq(de.otmp, $G.ublindf)) {
+            if (de.otmp === $G.ublindf) {
                 await pline($C`That is a bit difficult to engrave with, don't you think?`);
                 de.ret = ECMD.FAIL;
                 return FALSE;
@@ -933,7 +933,7 @@ export async function doengrave() {   // engrave.c:956
             de.ret = ECMD.CANCEL;
             break doengr_exit$;
         }
-        if ($c.peq(de.otmp, hands_obj)) {
+        if (de.otmp === hands_obj) {
             $c.strcat($c.strcpy(new $c.Ptr(de.fbuf, 0), $C`your `), await body_part(FINGERTIP));
             de.writer = new $c.Ptr(de.fbuf, 0);
         } else {
@@ -942,7 +942,7 @@ export async function doengrave() {   // engrave.c:956
         /* There's no reason you should be able to write with a wand
          * while both your hands are tied up.
          */
-        if (!await freehand() && !$c.peq(de.otmp, $G.uwep) && !de.otmp.owornmask) {
+        if (!await freehand() && de.otmp !== $G.uwep && !de.otmp.owornmask) {
             await You($C`have no free %s to write with!`, await body_part(HAND));
             break doengr_exit$;
         }
@@ -968,7 +968,7 @@ export async function doengrave() {   // engrave.c:956
             break doengr_exit$;
         }
         if (svl.level.locations[u.ux][u.uy].typ === GRAVE) {
-            if ($c.peq(de.otmp, hands_obj)) {
+            if (de.otmp === hands_obj) {
                 /* using only finger */
                 await You($C`would only make a small smudge on the %s.`, surface(u.ux, u.uy));
                 break doengr_exit$;
@@ -1096,7 +1096,7 @@ export async function doengrave() {   // engrave.c:956
         de.adding = de.oep && !de.eow ? 1 : 0;
         doengrave_ctx_verb(de);
         /* Tell adventurer what is going on */
-        if (!$c.peq(de.otmp, hands_obj)) {
+        if (de.otmp !== hands_obj) {
             /* since doname() yields "N items" when quantity is more than
                one, match that by using "1 of" rather than "one of" when
                informing the player that the stack will be split */
@@ -1204,12 +1204,12 @@ async function engrave() {   // engrave.c:1267
     }
     /* Stylus might have been taken out of inventory and destroyed somehow.
      * Not safe to dereference stylus until after this. */
-    if ($c.peq(svc.context.engraving.stylus, hands_obj)) {
+    if (svc.context.engraving.stylus === hands_obj) {
         /* bare finger */
         stylus = null;
     } else {
         for (stylus = gi.invent; stylus; stylus = stylus.nobj) {
-            if ($c.peq(stylus, svc.context.engraving.stylus)) {
+            if (stylus === svc.context.engraving.stylus) {
                 break;
             }
         }
@@ -1522,11 +1522,11 @@ export function engr_stats(hdrfmt, hdrbuf, count, size) {   // engrave.c:1626
  */
 export async function del_engr(ep) {   // engrave.c:1645
     let ept = null;
-    if ($c.peq(ep, $G.head_engr)) {
+    if (ep === $G.head_engr) {
         $G.head_engr = ep.nxt_engr;
     } else {
         for (ept = $G.head_engr; ept; ept = ept.nxt_engr) {
-            if ($c.peq(ept.nxt_engr, ep)) {
+            if (ept.nxt_engr === ep) {
                 ept.nxt_engr = ep.nxt_engr;
                 break;
             }

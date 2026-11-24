@@ -217,14 +217,14 @@ async function restfakecorr(grd) {   // vault.c:144
 async function parkguard(grd) {   // vault.c:155
     /* either guard is dead or will now be treated as if so;
        monster traversal loops should skip it */
-    if ($c.peq(grd, svc.context.polearm.hitmon)) {
+    if (grd === svc.context.polearm.hitmon) {
         svc.context.polearm.hitmon = null;
     }
     if (grd.mx) {
         svl.level.monsters[grd.mx][grd.my] = null;
         await newsym(grd.mx, grd.my);
     }
-    if (!$c.peq(svl.level.monsters[0][0], grd)) {
+    if (svl.level.monsters[0][0] !== grd) {
         await place_monster(grd, 0, 0);
     }
     /* [grd->mx,my just got set to 0,0 by place_monster(), so this
@@ -700,7 +700,7 @@ async function wallify_vault(grd) {   // vault.c:646
                 continue;
             }
             if ((!(svl.level.locations[x][y].typ && svl.level.locations[x][y].typ <= DBWALL) || g_at(x, y) || sobj_at(ROCK, x, y) || sobj_at(BOULDER, x, y)) && !in_fcorridor(grd, x, y)) {
-                if ((mon = svl.level.monsters[x][y]) !== null && !$c.peq(mon, grd)) {
+                if ((mon = svl.level.monsters[x][y]) !== null && mon !== grd) {
                     if (mon.mtame) {
                         await yelp(mon);
                     }
@@ -773,7 +773,7 @@ async function wallify_vault(grd) {   // vault.c:646
  */
 async function gd_mv_monaway(grd, nx, ny) {   // vault.c:734
     const mtmp = svl.level.monsters[nx][ny];
-    if (mtmp && !$c.peq(mtmp, grd)) {
+    if (mtmp && mtmp !== grd) {
         if (!Deaf()) {
             await verbalize($C`Out of my way, scum!`);
         }

@@ -1415,7 +1415,7 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
             case ARMOR_CLASS:
                 if ($c.and64(obj.owornmask, W_ARMOR)) {
                     do {
-                        $c.strncat(bp_eos[0].add(-0), $c.peq(obj, $G.uskin) ? $C` (embedded in your skin)` : doffing(obj) ? $C` (being doffed)` : donning(obj) ? $C` (being donned)` : $C` (being worn)`, $c.addu64(bpspaceleft, 0));
+                        $c.strncat(bp_eos[0].add(-0), obj === $G.uskin ? $C` (embedded in your skin)` : doffing(obj) ? $C` (being doffed)` : donning(obj) ? $C` (being donned)` : $C` (being worn)`, $c.addu64(bpspaceleft, 0));
                         bp_eos[0] = eos(bp), bpspaceleft = $c.u64($c.pdiff(bp_end, bp_eos[0]));
                     } while (0);
                     /* in case of perm_invent update while Wear/Takeoff
@@ -1430,7 +1430,7 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
                         /* just appended "(something)",
                          * replace paren, changing that
                          * to be "(something; slippery)" */
-                        if ($c.peq(obj, $G.uarmg) && Glib()) {
+                        if (obj === $G.uarmg && Glib()) {
                             do {
                                 $c.strncat(bp_eos[0].add(-1), $C`; slippery)`, $c.addu64(bpspaceleft, 1));
                                 bp_eos[0] = eos(bp), bpspaceleft = $c.u64($c.pdiff(bp_end, bp_eos[0]));
@@ -1625,7 +1625,7 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
         } while (0);
     }
     if ($c.and64(obj.owornmask, W.WEP) && !gm.mrg_to_wielded) {
-        twoweap_primary = $c.peq(obj, $G.uwep) && u.twoweap ? 1 : 0;
+        twoweap_primary = obj === $G.uwep && u.twoweap ? 1 : 0;
         tethered = obj.otyp === AKLYS ? 1 : 0;
         /* use alternate phrasing for non-weapons and for wielded ammo
            (arrows, bolts), or missiles (darts, shuriken, boomerangs)
@@ -1657,7 +1657,7 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
             /* we just added a parenthesized phrase, but the right paren
                might be absent if the appended string got truncated */
             if (!Blind() && bpspaceleft && bp_eos[0].get(-1) === 41) {
-                if (gw.warn_obj_cnt && $c.peq(obj, $G.uwep) && $c.and64(u.uprops[WARN_OF_MON].extrinsic, W.WEP) !== 0) {   /* we know bp[] ends with ')'; overwrite that */
+                if (gw.warn_obj_cnt && obj === $G.uwep && $c.and64(u.uprops[WARN_OF_MON].extrinsic, W.WEP) !== 0) {   /* we know bp[] ends with ')'; overwrite that */
                     do {
                         nh_snprintf($C`doname_base`, 1605, bp_eos[0].add(-1), $c.addu64(bpspaceleft, 1), $C`, %s %s)`, glow_verb(gw.warn_obj_cnt, TRUE), glow_color(obj.oartifact));
                         bp_eos[0] = eos(bp), bpspaceleft = $c.u64($c.pdiff(bp_end, bp_eos[0]));

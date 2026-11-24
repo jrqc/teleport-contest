@@ -384,7 +384,7 @@ export async function mplayer_talk(mtmp) {   // mplayer.c:356
     if (mtmp.mpeaceful) {
         return;   /* will drop to humanoid talk */
     }
-    await verbalize($C`Talk? -- %s`, $c.peq(mtmp.data, $c.relem(mons, gu.urole.mnum)) ? mplayer_talk$same_class_msg[rn2(3)] : mplayer_talk$other_class_msg[rn2(3)]);
+    await verbalize($C`Talk? -- %s`, mtmp.data === $c.relem(mons, gu.urole.mnum) ? mplayer_talk$same_class_msg[rn2(3)] : mplayer_talk$other_class_msg[rn2(3)]);
 }
 
 export function $init() {

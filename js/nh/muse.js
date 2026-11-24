@@ -484,7 +484,7 @@ function m_next2m(mtmp) {   // muse.c:420
             if (!isok(x, y)) {
                 continue;
             }
-            if ((m2 = svl.level.monsters[x][y]) && !$c.peq(m2, mtmp)) {
+            if ((m2 = svl.level.monsters[x][y]) && m2 !== mtmp) {
                 return TRUE;
             }
         }
@@ -502,7 +502,7 @@ export async function find_defensive(mtmp, tryescape) {   // muse.c:441
     let obj = null, t = null, fraction = 0, x = 0, y = 0, stuck = 0, immobile = 0, stway = null, liztin = null, xx = 0, yy = 0, i = 0, locs = $c.matrix(Int16Array, [10, 2]), ignore_boulders = 0, diag_ok = 0, $t1, $t2;
     x = mtmp.mx;
     y = mtmp.my;
-    stuck = $c.peq(mtmp, u.ustuck) ? 1 : 0;
+    stuck = mtmp === u.ustuck ? 1 : 0;
     immobile = mtmp.data.mmove === 0 ? 1 : 0;
     gm.m.defensive = null;
     gm.m.has_defense = 0;
@@ -1447,7 +1447,7 @@ function mon_has_friends(mtmp) {   // muse.c:1371
         for (dy = -1; dy <= 1; dy = $c.i16(dy + 1)) {
             const x = $c.i16(mtmp.mx + dx);
             const y = $c.i16(mtmp.my + dy);
-            if (isok(x, y) && (mon2 = svl.level.monsters[x][y]) !== null && !$c.peq(mon2, mtmp) && !mon2.mtame && !mon2.mpeaceful) {
+            if (isok(x, y) && (mon2 = svl.level.monsters[x][y]) !== null && mon2 !== mtmp && !mon2.mtame && !mon2.mpeaceful) {
                 return TRUE;
             }
         }
@@ -1661,7 +1661,7 @@ async function mbhitm(mtmp, otmp) {   // muse.c:1597
     let tmp = 0;
     let reveal_invis = FALSE;
     let learnit = FALSE;
-    const hits_you = $c.peq(mtmp, gy.youmonst) ? 1 : 0;
+    const hits_you = mtmp === gy.youmonst ? 1 : 0;
     if (!hits_you && otmp.otyp !== WAN_UNDEAD_TURNING) {
         mtmp.msleeping = 0;
         if (mtmp.m_ap_type) {
@@ -2097,7 +2097,7 @@ export async function find_misc(mtmp) {   // muse.c:2095
     const y = mtmp.my;
     let pmidx = NON_PM;
     const immobile = mdat.mmove === 0 ? 1 : 0;
-    const stuck = $c.peq(mtmp, u.ustuck) ? 1 : 0;
+    const stuck = mtmp === u.ustuck ? 1 : 0;
     gm.m.misc = null;
     gm.m.has_misc = 0;
     if (is_animal(mdat) || mindless(mdat)) {
@@ -2171,7 +2171,7 @@ export async function find_misc(mtmp) {   // muse.c:2095
         /* hero's location must be known and adjacent */
         /* don't bother if it can't work (this doesn't
            prevent cursed weapons from being targeted) */
-        if (obj.otyp === BULLWHIP && !mtmp.mpeaceful && $G.uwep && !rn2(5) && $c.peq(obj, mtmp.mw) && (mtmp.mux === u.ux && mtmp.muy === u.uy) && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2 && !u.uswallow && (await canletgo($G.uwep, $C``) || u.twoweap && await canletgo($G.uswapwep, $C``))) {
+        if (obj.otyp === BULLWHIP && !mtmp.mpeaceful && $G.uwep && !rn2(5) && obj === mtmp.mw && (mtmp.mux === u.ux && mtmp.muy === u.uy) && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2 && !u.uswallow && (await canletgo($G.uwep, $C``) || u.twoweap && await canletgo($G.uswapwep, $C``))) {
             gm.m.misc = obj;
             gm.m.has_misc = MUSE_BULLWHIP;
         }
@@ -2314,7 +2314,7 @@ async function mloot_container(mon, container, vismon) {   // muse.c:2264
                 break;
             }
         }
-        (!!$c.peq(xobj, $c.asRec(null, $T.obj, 112)) ? 1 : 0) ? $c.__assert_rtn($C`mloot_container`, $C`muse.c`, 2324, $C`xobj != NULL`) : 0;
+        (!(xobj !== $c.asRec(null, $T.obj, 112)) ? 1 : 0) ? $c.__assert_rtn($C`mloot_container`, $C`muse.c`, 2324, $C`xobj != NULL`) : 0;
         container.cknown = 0;
         /* hero no longer knows container's contents
          * even if [attempted] removal is observed */
@@ -3002,7 +3002,7 @@ function mcould_eat_tin(mon) {   // muse.c:3001
        have to be wielded, and knife can be used instead of dagger */
     for (obj = mon.minvent; obj; obj = obj.nobj) {
         /* if stuck with a cursed weapon, don't check rest of inventory */
-        if (welded_wep && !$c.peq(obj, mwep)) {
+        if (welded_wep && obj !== mwep) {
             continue;
         }
         if (obj.otyp === TIN_OPENER || obj.oclass === WEAPON_CLASS && (objects[obj.otyp].oc_subtyp === P.DAGGER || objects[obj.otyp].oc_subtyp === P.KNIFE)) {

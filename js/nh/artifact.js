@@ -573,7 +573,7 @@ export async function artifact_origin(arti, aflags) {   // artifact.c:478
  */
 export function spec_ability(otmp, abil) {   // artifact.c:516
     const arti = get_artifact(otmp);
-    return !$c.peq(arti, artilist[ART.NONARTIFACT]) && $c.andu64(arti.spfx, abil) !== 0 ? 1 : 0;
+    return arti !== artilist[ART.NONARTIFACT] && $c.andu64(arti.spfx, abil) !== 0 ? 1 : 0;
 }
 /* used so that callers don't need to known about SPFX_ codes */
 /**
@@ -594,7 +594,7 @@ export function confers_luck(obj) {   // artifact.c:526
  */
 export function arti_reflects(obj) {   // artifact.c:537
     const arti = get_artifact(obj);
-    if (!$c.peq(arti, artilist[ART.NONARTIFACT])) {
+    if (arti !== artilist[ART.NONARTIFACT]) {
         /* while being worn */
         if ($c.and64(obj.owornmask, ~W.ART) && $c.andu64(arti.spfx, SPFX.REFLECT)) {
             return TRUE;
@@ -619,7 +619,7 @@ export function shade_glare(obj) {   // artifact.c:555
     }
     /* non-silver artifacts with bonus against undead also are effective */
     const arti = get_artifact(obj);
-    if (!$c.peq(arti, artilist[ART.NONARTIFACT]) && $c.andu64(arti.spfx, SPFX.DFLAG2) && arti.mtype === M2.UNDEAD) {
+    if (arti !== artilist[ART.NONARTIFACT] && $c.andu64(arti.spfx, SPFX.DFLAG2) && arti.mtype === M2.UNDEAD) {
         return TRUE;
     }
     /* [if there was anything with special bonus against noncorporeals,
@@ -686,7 +686,7 @@ export function restrict_name(otmp, name) {   // artifact.c:575
  */
 export function attacks(adtyp, otmp) {   // artifact.c:626
     let weap = null;
-    if (!$c.peq(weap = get_artifact(otmp), artilist[ART.NONARTIFACT])) {
+    if ((weap = get_artifact(otmp)) !== artilist[ART.NONARTIFACT]) {
         return weap.attk.adtyp === adtyp ? 1 : 0;
     }
     return FALSE;
@@ -701,7 +701,7 @@ export function defends(adtyp, otmp) {   // artifact.c:636
     if (!otmp) {
         return FALSE;
     }
-    if (!$c.peq(weap = get_artifact(otmp), artilist[ART.NONARTIFACT])) {
+    if ((weap = get_artifact(otmp)) !== artilist[ART.NONARTIFACT]) {
         return weap.defn.adtyp === adtyp ? 1 : 0;
     }
     if (Is_dragon_armor(otmp)) {
@@ -762,7 +762,7 @@ export function defends(adtyp, otmp) {   // artifact.c:636
  */
 export function defends_when_carried(adtyp, otmp) {   // artifact.c:687
     let weap = null;
-    if (!$c.peq(weap = get_artifact(otmp), artilist[ART.NONARTIFACT])) {
+    if ((weap = get_artifact(otmp)) !== artilist[ART.NONARTIFACT]) {
         return weap.cary.adtyp === adtyp ? 1 : 0;
     }
     return FALSE;
@@ -778,7 +778,7 @@ export function protects(otmp, being_worn) {   // artifact.c:698
         return TRUE;
     }
     const arti = get_artifact(otmp);
-    if ($c.peq(arti, artilist[ART.NONARTIFACT])) {
+    if (arti === artilist[ART.NONARTIFACT]) {
         return FALSE;
     }
     return $c.andu64(arti.cspfx, SPFX.PROTECT) !== 0 || being_worn && $c.andu64(arti.spfx, SPFX.PROTECT) !== 0 ? 1 : 0;
@@ -797,7 +797,7 @@ export async function set_artifact_intrinsic(otmp, on, wp_mask) {   // artifact.
     let art = null, obj = null, $t1, $t2;
     let mask = null;
     const oart = get_artifact(otmp);
-    if ($c.peq(oart, artilist[ART.NONARTIFACT])) {
+    if (oart === artilist[ART.NONARTIFACT]) {
         return;
     }
     /* effects from the defn field */
@@ -821,9 +821,9 @@ export async function set_artifact_intrinsic(otmp, on, wp_mask) {   // artifact.
         /* find out if some other artifact also confers this intrinsic;
            if so, leave the mask alone */
         for (obj = gi.invent; obj; obj = obj.nobj) {
-            if (!$c.peq(obj, otmp) && obj.oartifact) {
+            if (obj !== otmp && obj.oartifact) {
                 art = get_artifact(obj);
-                if (!$c.peq(art, artilist[ART.NONARTIFACT]) && art.cary.adtyp === dtyp) {
+                if (art !== artilist[ART.NONARTIFACT] && art.cary.adtyp === dtyp) {
                     mask = null;
                     break;
                 }
@@ -842,9 +842,9 @@ export async function set_artifact_intrinsic(otmp, on, wp_mask) {   // artifact.
     if (spfx && wp_mask === W.ART && !on) {
         /* don't change any spfx also conferred by other artifacts */
         for (obj = gi.invent; obj; obj = obj.nobj) {
-            if (!$c.peq(obj, otmp) && obj.oartifact) {
+            if (obj !== otmp && obj.oartifact) {
                 art = get_artifact(obj);
-                if (!$c.peq(art, artilist[ART.NONARTIFACT])) {
+                if (art !== artilist[ART.NONARTIFACT]) {
                     spfx = $c.i64($c.andu64($c.u64(spfx), $c.notu64(art.cspfx)));
                 }
             }
@@ -988,10 +988,10 @@ export async function touch_artifact(obj, mon) {   // artifact.c:908
     let badclass = 0, badalign = 0, tmp = 0, buf = new Int8Array(256);
     const oart = get_artifact(obj);
     touch_blasted = FALSE;
-    if ($c.peq(oart, artilist[ART.NONARTIFACT])) {
+    if (oart === artilist[ART.NONARTIFACT]) {
         return 1;
     }
-    const yours = $c.peq(mon, gy.youmonst) ? 1 : 0;
+    const yours = mon === gy.youmonst ? 1 : 0;
     /* all quest artifacts are self-willed; if this ever changes, `badclass'
        will have to be extended to explicitly include quest artifacts */
     const self_willed = $c.andu64(oart.spfx, SPFX.INTEL) !== 0 ? 1 : 0;
@@ -999,7 +999,7 @@ export async function touch_artifact(obj, mon) {   // artifact.c:908
         badclass = self_willed && (oart.role !== NON_PM && !Role_if(oart.role) || oart.race !== NON_PM && !Race_if(oart.race)) ? 1 : 0;
         badalign = $c.andu64(oart.spfx, SPFX.RESTR) !== 0 && oart.alignment !== A.NONE && (oart.alignment !== u.ualign.type || u.ualign.record < 0) ? 1 : 0;
     } else if (!is_covetous(mon.data) && !is_mplayer(mon.data)) {
-        badclass = self_willed && oart.role !== NON_PM && !$c.peq(oart, artilist[ART.EXCALIBUR]) ? 1 : 0;
+        badclass = self_willed && oart.role !== NON_PM && oart !== artilist[ART.EXCALIBUR] ? 1 : 0;
         badalign = $c.andu64(oart.spfx, SPFX.RESTR) && oart.alignment !== A.NONE && oart.alignment !== mon_aligntyp(mon) ? 1 : 0;
     } else {
         /* an M3_WANTSxxx monster or a fake player */
@@ -1049,7 +1049,7 @@ export async function touch_artifact(obj, mon) {   // artifact.c:908
  */
 export function arti_immune(obj, dtyp) {   // artifact.c:979
     const weap = get_artifact(obj);
-    if ($c.peq(weap, artilist[ART.NONARTIFACT])) {
+    if (weap === artilist[ART.NONARTIFACT]) {
         return FALSE;
     }
     if (dtyp === AD.PHYS) {
@@ -1064,7 +1064,7 @@ export function arti_immune(obj, dtyp) {   // artifact.c:979
  */
 async function bane_applies(oart, mon) {   // artifact.c:993
     let atmp = new $T.artifact();
-    if (!$c.peq(oart, artilist[ART.NONARTIFACT]) && $c.andu64(oart.spfx, SPFX.DBONUS) !== 0) {
+    if (oart !== artilist[ART.NONARTIFACT] && $c.andu64(oart.spfx, SPFX.DBONUS) !== 0) {
         atmp.$copyFrom(oart);
         atmp.spfx = $c.andu64(atmp.spfx, SPFX.DBONUS);   /* clear other spfx fields */
         if (await spec_applies(atmp, mon)) {
@@ -1083,10 +1083,10 @@ async function spec_applies(weap, mtmp) {   // artifact.c:1009
     if (!$c.andu64(weap.spfx, SPFX.DBONUS | SPFX.ATTK)) {
         return weap.attk.adtyp === AD.PHYS ? 1 : 0;
     }
-    const yours = $c.peq(mtmp, gy.youmonst) ? 1 : 0;
+    const yours = mtmp === gy.youmonst ? 1 : 0;
     const ptr = mtmp.data;
     if ($c.andu64(weap.spfx, SPFX.DMONS)) {
-        return $c.peq(ptr, $c.relem(mons, $c.i32(weap.mtype))) ? 1 : 0;
+        return ptr === $c.relem(mons, $c.i32(weap.mtype)) ? 1 : 0;
     } else if ($c.andu64(weap.spfx, SPFX.DCLAS)) {
         return weap.mtype === $c.u64(ptr.mlet) ? 1 : 0;
     } else if ($c.andu64(weap.spfx, SPFX.DFLAG1)) {
@@ -1129,7 +1129,7 @@ async function spec_applies(weap, mtmp) {   // artifact.c:1009
  */
 export function spec_m2(otmp) {   // artifact.c:1065
     const artifact = get_artifact(otmp);
-    if (!$c.peq(artifact, artilist[ART.NONARTIFACT])) {
+    if (artifact !== artilist[ART.NONARTIFACT]) {
         return $c.i64(artifact.mtype);
     }
     return 0;
@@ -1144,7 +1144,7 @@ export async function spec_abon(otmp, mon) {   // artifact.c:1076
     const weap = get_artifact(otmp);
     /* no need for an extra check for `NO_ATTK' because this will
        always return 0 for any artifact which has that attribute */
-    if (!$c.peq(weap, artilist[ART.NONARTIFACT]) && weap.attk.damn && await spec_applies(weap, mon)) {
+    if (weap !== artilist[ART.NONARTIFACT] && weap.attk.damn && await spec_applies(weap, mon)) {
         return rnd(weap.attk.damn);
     }
     return 0;
@@ -1160,7 +1160,7 @@ export async function spec_dbon(otmp, mon, tmp) {   // artifact.c:1091
     let $t1;
     const weap = get_artifact(otmp);
     /* check for `NO_ATTK' */
-    if ($c.peq(weap, artilist[ART.NONARTIFACT]) || weap.attk.adtyp === AD.PHYS && weap.attk.damn === 0 && weap.attk.damd === 0) {
+    if (weap === artilist[ART.NONARTIFACT] || weap.attk.adtyp === AD.PHYS && weap.attk.damn === 0 && weap.attk.damd === 0) {
         gs.spec_dbon_applies = FALSE;
     } else if (is_art(otmp, ART.GRIMTOOTH)) {
         /* Grimtooth has SPFX settings to warn against elves but we want its
@@ -1281,8 +1281,8 @@ async function Mb_hit(magr, mdef, mb, dmgptr, dieroll, vis, hittee) {   // artif
     /* d20 that has already scored a hit */
     /* whether the action can be seen */
     /* target's name: "you" or mon_nam(mdef) */
-    const youattack = $c.peq(magr, gy.youmonst) ? 1 : 0;
-    const youdefend = $c.peq(mdef, gy.youmonst) ? 1 : 0;
+    const youattack = magr === gy.youmonst ? 1 : 0;
+    const youdefend = mdef === gy.youmonst ? 1 : 0;
     let resisted = FALSE;
     let scare_dieroll = 4;
     let result = FALSE;   /* no message given yet */
@@ -1345,7 +1345,7 @@ async function Mb_hit(magr, mdef, mb, dmgptr, dieroll, vis, hittee) {   // artif
             } else {
                 do_stun = FALSE;
                 if (youdefend) {
-                    if (!$c.peq(gy.youmonst.data, old_mdat)) {
+                    if (gy.youmonst.data !== old_mdat) {
                         dmgptr.set(0, 0);   /* rehumanized, so no more damage */
                     }
                     if (u.uenmax > 0) {
@@ -1359,7 +1359,7 @@ async function Mb_hit(magr, mdef, mb, dmgptr, dieroll, vis, hittee) {   // artif
                 } else {
                     /* canceled shapeshifter/vamp may have changed forms, so
                        update its name if necessary */
-                    if (!$c.peq(mdef.data, old_mdat)) {
+                    if (mdef.data !== old_mdat) {
                         $c.strcpy(hittee, await mon_nam(mdef));
                     }
                     if (mdef.data === mons[PM.CLAY_GOLEM]) {
@@ -1385,7 +1385,7 @@ async function Mb_hit(magr, mdef, mb, dmgptr, dieroll, vis, hittee) {   // artif
                     nomul(-3);
                     gm.multi_reason = $C`being scared stiff`;
                     gn.nomovemsg = $C``;
-                    if (magr && $c.peq(magr, u.ustuck) && sticks(gy.youmonst.data)) {
+                    if (magr && magr === u.ustuck && sticks(gy.youmonst.data)) {
                         await set_ustuck(null);
                         await You($C`release %s!`, await mon_nam(magr));
                     }
@@ -1481,8 +1481,8 @@ export async function artifact_hit(magr, mdef, otmp, dmgptr, dieroll) {   // art
     /* artifact weapon */
     /* output */
     /* needed for Magicbane and vorpal blades */
-    const youattack = $c.peq(magr, gy.youmonst) ? 1 : 0;
-    const youdefend = $c.peq(mdef, gy.youmonst) ? 1 : 0;
+    const youattack = magr === gy.youmonst ? 1 : 0;
+    const youdefend = mdef === gy.youmonst ? 1 : 0;
     const vis = !youattack && magr && cansee(magr.mx, magr.my) || !youdefend && cansee(mdef.mx, mdef.my) || youattack && engulfing_u(mdef) && !Blind() ? 1 : 0;
     $c.strcpy(new $c.Ptr(hittee, 0), youdefend ? new $c.Ptr(artifact_hit$you, 0) : await mon_nam(mdef));
     /* The following takes care of most of the damage, but not all--
@@ -1495,7 +1495,7 @@ export async function artifact_hit(magr, mdef, otmp, dmgptr, dieroll) {   // art
         return FALSE;
     }
     /* feel the effect even if not seen */
-    const realizes_damage = youdefend || vis || youattack && $c.peq(mdef, u.ustuck) ? 1 : 0;
+    const realizes_damage = youdefend || vis || youattack && mdef === u.ustuck ? 1 : 0;
     /* the four basic attacks: fire, cold, shock and missiles */
     if (attacks(AD.FIRE, otmp)) {
         if (realizes_damage) {
@@ -2129,7 +2129,7 @@ async function arti_invoke(obj$in) {   // artifact.c:2131
         return ECMD.OK;
     }
     const oart = get_artifact(obj[0]);
-    if ($c.peq(oart, artilist[ART.NONARTIFACT]) || !oart.inv_prop) {
+    if (oart === artilist[ART.NONARTIFACT] || !oart.inv_prop) {
         if (obj[0].otyp === CRYSTAL_BALL) {
             await use_crystal_ball(new $c.Ptr(obj, 0));
         } else {
@@ -2253,7 +2253,7 @@ export function finesse_ahriman(obj) {   // artifact.c:2236
     let oart = null, save_Lev = new $T.prop();
     /* if we aren't levitating or this isn't an artifact which confers
        levitation via #invoke then freeinv() won't toggle levitation */
-    if (!Levitation() || $c.peq(oart = get_artifact(obj), artilist[ART.NONARTIFACT]) || oart.inv_prop !== LEVITATION || !$c.and64(u.uprops[LEVITATION].extrinsic, W.ARTI)) {
+    if (!Levitation() || (oart = get_artifact(obj)) === artilist[ART.NONARTIFACT] || oart.inv_prop !== LEVITATION || !$c.and64(u.uprops[LEVITATION].extrinsic, W.ARTI)) {
         return FALSE;
     }
     /* arti_invoke(off) -> float_down() clears I_SPECIAL|TIMEOUT & W_ARTI;
@@ -2290,7 +2290,7 @@ export async function arti_speak(obj) {   // artifact.c:2279
     let buf = new Int8Array(256);
     const oart = get_artifact(obj);
     /* Is this a speaking artifact? */
-    if ($c.peq(oart, artilist[ART.NONARTIFACT]) || !$c.andu64(oart.spfx, SPFX.SPEAK)) {
+    if (oart === artilist[ART.NONARTIFACT] || !$c.andu64(oart.spfx, SPFX.SPEAK)) {
         return ECMD.OK;   /* nothing happened */
     }
     let line = await getrumor(bcsign(obj), new $c.Ptr(buf, 0), TRUE);
@@ -2308,7 +2308,7 @@ export async function arti_speak(obj) {   // artifact.c:2279
  */
 export function artifact_has_invprop(otmp, inv_prop) {   // artifact.c:2299
     const arti = get_artifact(otmp);
-    return !$c.peq(arti, artilist[ART.NONARTIFACT]) && arti.inv_prop === inv_prop ? 1 : 0;
+    return arti !== artilist[ART.NONARTIFACT] && arti.inv_prop === inv_prop ? 1 : 0;
 }
 /* Return the price sold to the hero of a given artifact or unique item */
 /**
@@ -2386,7 +2386,7 @@ export function what_gives(abil) {   // artifact.c:2376
     for (obj = gi.invent; obj; obj = obj.nobj) {
         if (obj.oartifact && (!$c.peq(abil, new $c.FieldRef(u.uprops[WARN_OF_MON], "extrinsic", "i64")) || svc.context.warntype.obj)) {
             const art = get_artifact(obj);
-            if (!$c.peq(art, artilist[ART.NONARTIFACT])) {
+            if (art !== artilist[ART.NONARTIFACT]) {
                 if (dtyp) {
                     /* carried */
                     /* defends while worn */
@@ -2404,7 +2404,7 @@ export function what_gives(abil) {   // artifact.c:2376
                         return obj;
                     }
                 }
-                if ($c.peq(obj, $G.uwep) && $c.peq(abil, new $c.FieldRef(u.uprops[BLND_RES], "extrinsic", "i64")) && $c.and64(abil.get(0), W.WEP) !== 0) {
+                if (obj === $G.uwep && $c.peq(abil, new $c.FieldRef(u.uprops[BLND_RES], "extrinsic", "i64")) && $c.and64(abil.get(0), W.WEP) !== 0) {
                     return obj;   /* Sunsword */
                 }
             }
@@ -2545,7 +2545,7 @@ export async function retouch_object(objp, loseit) {   // artifact.c:2508
     if (obj.owornmask) {
         await remove_worn_item(obj, FALSE);
         for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
-            if ($c.peq(otmp, obj)) {
+            if (otmp === obj) {
                 break;
             }
         }
@@ -2753,7 +2753,7 @@ export async function mkot_trap_warn() {   // artifact.c:2753
 export function is_magic_key(mon, obj) {   // artifact.c:2775
     /* if null, non-rogue is assumed */
     if (is_art(obj, ART.MASTER_KEY_OF_THIEVERY)) {
-        if ($c.peq(mon, gy.youmonst) ? gu.urole.mnum === PM.ROGUE : mon && mon.data === mons[PM.ROGUE]) {
+        if (mon === gy.youmonst ? gu.urole.mnum === PM.ROGUE : mon && mon.data === mons[PM.ROGUE]) {
             return !obj.cursed ? 1 : 0;   /* a rogue; non-cursed suffices for magic */
         }
         /* not a rogue; key must be blessed to behave as a magic one */
@@ -2773,7 +2773,7 @@ export function has_magic_key(mon) {   // artifact.c:2790
     if (!mon) {
         mon = gy.youmonst;
     }
-    for (o = $c.peq(mon, gy.youmonst) ? gi.invent : mon.minvent; o; o = nxtobj(o, key, FALSE)) {
+    for (o = mon === gy.youmonst ? gi.invent : mon.minvent; o; o = nxtobj(o, key, FALSE)) {
         if (is_magic_key(mon, o)) {
             return o;
         }

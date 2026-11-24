@@ -174,7 +174,7 @@ async function itemactions_pushkeys(otmp, act) {   // iactions.c:140
         case IA.NONE:
             break;
         case IA.UNWIELD:
-            await cmdq_add_ec(CQ_CANNED, $c.peq(otmp, $G.uwep) ? dowield : $c.peq(otmp, $G.uswapwep) ? remarm_swapwep : $c.peq(otmp, $G.uquiver) ? dowieldquiver : donull);   /* can't happen */
+            await cmdq_add_ec(CQ_CANNED, otmp === $G.uwep ? dowield : otmp === $G.uswapwep ? remarm_swapwep : otmp === $G.uquiver ? dowieldquiver : donull);   /* can't happen */
             await cmdq_add_key(CQ_CANNED, HANDS_SYM);
             break;
         case IA.APPLY_OBJ:
@@ -311,9 +311,9 @@ export async function itemactions(otmp) {   // iactions.c:278
     await start_menu()(win, MENU.BEHAVE_STANDARD);
     /* -: unwield; picking current weapon offers an opportunity for 'w-'
        to wield bare/gloved hands; likewise for 'Q-' with quivered item(s) */
-    if ($c.peq(otmp, $G.uwep) || $c.peq(otmp, $G.uswapwep) || $c.peq(otmp, $G.uquiver)) {
-        const verb = $c.peq(otmp, $G.uquiver) ? $C`Quiver` : $C`Wield`;
-        const action = $c.peq(otmp, $G.uquiver) ? $C`un-ready` : $C`un-wield`;
+    if (otmp === $G.uwep || otmp === $G.uswapwep || otmp === $G.uquiver) {
+        const verb = otmp === $G.uquiver ? $C`Quiver` : $C`Wield`;
+        const action = otmp === $G.uquiver ? $C`un-ready` : $C`un-wield`;
         const which = is_plural(otmp) ? $C`these` : $C`this`;
         const what = otmp.oclass === WEAPON_CLASS || is_weptool(otmp) ? $C`weapon` : $C`item`;
         /*
@@ -437,12 +437,12 @@ export async function itemactions(otmp) {   // iactions.c:278
         await ia_addmenu(win, IA.ENGRAVE_OBJ, 69, new $c.Ptr(buf, 0));
     }
     /* f: fire quivered ammo */
-    if ($c.peq(otmp, $G.uquiver)) {
+    if (otmp === $G.uquiver) {
         const shoot = ammo_and_launcher(otmp, $G.uwep);
         /* FIXME: see the multi-shot FIXME about "one of" for 't: throw' */
         $c.sprintf(new $c.Ptr(buf, 0), $C`%s %s`, shoot ? $C`Shoot` : $C`Throw`, otmp.quan > 1 ? $C`one of these` : $C`this`);
         if (shoot) {
-            (!!$c.peq($G.uwep, $c.asRec(null, $T.obj, 112)) ? 1 : 0) ? $c.__assert_rtn($C`itemactions`, $C`iactions.c`, 456, $C`uwep != NULL`) : 0;
+            (!($G.uwep !== $c.asRec(null, $T.obj, 112)) ? 1 : 0) ? $c.__assert_rtn($C`itemactions`, $C`iactions.c`, 456, $C`uwep != NULL`) : 0;
             $c.sprintf(eos(new $c.Ptr(buf, 0)), $C` with your wielded %s`, await simpleonames($G.uwep));
         }
         await ia_addmenu(win, IA.FIRE_OBJ, 102, new $c.Ptr(buf, 0));
@@ -508,7 +508,7 @@ export async function itemactions(otmp) {   // iactions.c:278
         await ia_addmenu(win, IA.QUAFF_OBJ, 113, new $c.Ptr(buf, 0));
     }
     /* Q: quiver throwable item */
-    if ((otmp.oclass === GEM_CLASS || otmp.oclass === WEAPON_CLASS) && !$c.peq(otmp, $G.uquiver)) {
+    if ((otmp.oclass === GEM_CLASS || otmp.oclass === WEAPON_CLASS) && otmp !== $G.uquiver) {
         $c.sprintf(new $c.Ptr(buf, 0), $C`Quiver this %s for easy %s with 'f'ire`, otmp.quan > 1 ? $C`stack` : $C`item`, (otmp.oclass === WEAPON_CLASS || otmp.oclass === GEM_CLASS) && objects[otmp.otyp].oc_subtyp >= -P.CROSSBOW && objects[otmp.otyp].oc_subtyp <= -P.BOW && ($G.uwep && objects[otmp.otyp].oc_subtyp === (-objects[$G.uwep.otyp].oc_subtyp | 0)) ? $C`shooting` : $C`throwing`);
         await ia_addmenu(win, IA.QUIVER_OBJ, 81, new $c.Ptr(buf, 0));
     }
@@ -539,7 +539,7 @@ export async function itemactions(otmp) {   // iactions.c:278
          *  volley count and that could randomly yield 1 here and 2..N
          *  while throwing or vice versa.
          */
-        $c.sprintf(new $c.Ptr(buf, 0), $C`%s %s%s`, shoot$2 ? $C`Shoot` : $C`Throw`, otmp.quan === 1 ? $C`this item` : otmp.otyp === GOLD_PIECE ? $C`them` : $C`one of these`, $c.peq(otmp, $G.uquiver) && (otmp.otyp !== GOLD_PIECE || otmp.quan === 1) ? $C` (same as 'f')` : $C``);
+        $c.sprintf(new $c.Ptr(buf, 0), $C`%s %s%s`, shoot$2 ? $C`Shoot` : $C`Throw`, otmp.quan === 1 ? $C`this item` : otmp.otyp === GOLD_PIECE ? $C`them` : $C`one of these`, otmp === $G.uquiver && (otmp.otyp !== GOLD_PIECE || otmp.quan === 1) ? $C` (same as 'f')` : $C``);
         /* if otmp is quivered, we've already listed
            'f - shoot|throw this item' as a choice;
            if 't' is duplicating that, say so ('t' and 'f'
@@ -561,7 +561,7 @@ export async function itemactions(otmp) {   // iactions.c:278
     }
     /* w: wield, hold in hands, works on everything but with different
        advice text; not mentioned for things that are already wielded */
-    if ($c.peq(otmp, $G.uwep) || cantwield(gy.youmonst.data)) {
+    if (otmp === $G.uwep || cantwield(gy.youmonst.data)) {
         /* either already wielded or can't wield anything; skip 'w' */
     } else if (otmp.oclass === WEAPON_CLASS || is_weptool(otmp) || is_wet_towel(otmp) || otmp.otyp === HEAVY_IRON_BALL) {
         $c.sprintf(new $c.Ptr(buf, 0), $C`Wield this %s as your weapon`, otmp.quan > 1 ? $C`stack` : $C`item`);
@@ -597,11 +597,11 @@ export async function itemactions(otmp) {   // iactions.c:278
         }
     }
     /* x: Swap main and readied weapon */
-    if ($c.peq(otmp, $G.uwep) && $G.uswapwep) {
+    if (otmp === $G.uwep && $G.uswapwep) {
         await ia_addmenu(win, IA.SWAPWEAPON, 120, $C`Swap this with your alternate weapon`);
-    } else if ($c.peq(otmp, $G.uwep)) {
+    } else if (otmp === $G.uwep) {
         await ia_addmenu(win, IA.SWAPWEAPON, 120, $C`Ready this as an alternate weapon`);
-    } else if ($c.peq(otmp, $G.uswapwep)) {
+    } else if (otmp === $G.uswapwep) {
         await ia_addmenu(win, IA.SWAPWEAPON, 120, $C`Swap this with your main weapon`);
     }
     /* this is based on TWOWEAPOK() in wield.c; we don't call can_two_weapon()
@@ -611,7 +611,7 @@ export async function itemactions(otmp) {   // iactions.c:278
     /* X: Toggle two-weapon mode on or off */
     /* if already two-weaponing, no special checks needed to toggle off */
     /* but if not, try to filter most "you can't do that" here */
-    if (($c.peq(otmp, $G.uwep) || $c.peq(otmp, $G.uswapwep)) && (u.twoweap || could_twoweap(gy.youmonst.data) && !$G.uarms && $G.uwep && MAYBETWOWEAPON($G.uwep) && $G.uswapwep && MAYBETWOWEAPON($G.uswapwep))) {
+    if ((otmp === $G.uwep || otmp === $G.uswapwep) && (u.twoweap || could_twoweap(gy.youmonst.data) && !$G.uarms && $G.uwep && MAYBETWOWEAPON($G.uwep) && $G.uswapwep && MAYBETWOWEAPON($G.uswapwep))) {
         $c.sprintf(new $c.Ptr(buf, 0), $C`Toggle two-weapon combat %s`, u.twoweap ? $C`off` : $C`on`);
         await ia_addmenu(win, IA.TWOWEAPON, 88, new $c.Ptr(buf, 0));
     }

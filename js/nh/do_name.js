@@ -452,11 +452,11 @@ export async function oname(obj, name, oflgs) {   // do_name.c:372
     }
     if (obj.oartifact) {
         /* can't dual-wield with artifact as secondary weapon */
-        if ($c.peq(obj, $G.uswapwep)) {
+        if (obj === $G.uswapwep) {
             await untwoweapon();
         }
         /* activate warning if you've just named your weapon "Sting" */
-        if ($c.peq(obj, $G.uwep)) {
+        if (obj === $G.uwep) {
             await set_artifact_intrinsic(obj, TRUE, W.WEP);
         }
         /* if obj is owned by a shop, increase your bill */
@@ -849,7 +849,7 @@ export async function x_monnam(mtmp, article, adjective, suppress, called) {   /
     const buf = nextmbuf();
     const mdat = mtmp.data;
     const mappear_as_mon = M_AP_TYPE(mtmp) === M_AP.MONSTER ? 1 : 0;
-    if ($c.peq(mtmp, gy.youmonst)) {
+    if (mtmp === gy.youmonst) {
         return $c.strcpy(buf, $C`you`);   /* ignore article, "invisible", &c */
     }
     if (program_state.gameover) {
@@ -858,7 +858,7 @@ export async function x_monnam(mtmp, article, adjective, suppress, called) {   /
     if (article === ARTICLE.YOUR && !mtmp.mtame) {
         article = ARTICLE.THE;
     }
-    if (u.uswallow && $c.peq(mtmp, u.ustuck)) {
+    if (u.uswallow && mtmp === u.ustuck) {
         /*
          * This monster has become important, for the moment anyway.
          * As the hero's consumer, it is worthy of ARTICLE_THE.
@@ -870,7 +870,7 @@ export async function x_monnam(mtmp, article, adjective, suppress, called) {   /
     }
     const do_hallu = Hallucination() && !(suppress & SUPPRESS.HALLUCINATION) ? 1 : 0;
     const do_invis = mtmp.minvis && !(suppress & SUPPRESS.INVISIBLE) ? 1 : 0;
-    const do_it = !canspotmon(mtmp) && article !== ARTICLE.YOUR && !program_state.gameover && !$c.peq(mtmp, u.usteed) && !engulfing_u(mtmp) && !(suppress & SUPPRESS.IT) ? 1 : 0;
+    const do_it = !canspotmon(mtmp) && article !== ARTICLE.YOUR && !program_state.gameover && mtmp !== u.usteed && !engulfing_u(mtmp) && !(suppress & SUPPRESS.IT) ? 1 : 0;
     const do_saddle = !(suppress & SUPPRESS.SADDLE) ? 1 : 0;
     const do_mappear = mappear_as_mon && !(suppress & SUPPRESS.MAPPEARANCE) ? 1 : 0;
     const do_exact = (suppress & EXACT_NAME) === EXACT_NAME ? 1 : 0;
@@ -1110,7 +1110,7 @@ export async function m_monnam(mtmp) {   // do_name.c:1110
 export async function y_monnam(mtmp) {   // do_name.c:1117
     const prefix = mtmp.mtame ? ARTICLE.YOUR : ARTICLE.THE;
     /* "saddled" is redundant when mounted */
-    const suppression_flag = has_mgivenname(mtmp) || $c.peq(mtmp, u.usteed) ? SUPPRESS.SADDLE : 0;
+    const suppression_flag = has_mgivenname(mtmp) || mtmp === u.usteed ? SUPPRESS.SADDLE : 0;
     return await x_monnam(mtmp, prefix, null, suppression_flag, FALSE);
 }
 /* y_monnam() for start of sentence */
@@ -1182,7 +1182,7 @@ export async function distant_monnam(mon, article, outbuf) {   // do_name.c:1170
  */
 export async function mon_nam_too(mon, other_mon) {   // do_name.c:1191
     let outbuf = null;
-    if (!$c.peq(mon, other_mon)) {
+    if (mon !== other_mon) {
         outbuf = await mon_nam(mon);
     } else {
         outbuf = nextmbuf();
@@ -1259,7 +1259,7 @@ export function minimal_monnam(mon, ckloc) {   // do_name.c:1254
         $c.sprintf(outbuf, $C`[Invalid mon->data %s < %s]`, fmt_ptr(mon.data), fmt_ptr(mons[0]));
     } else if ($c.pcmp(ptr, mons[NUMMONS]) >= 0) {
         $c.sprintf(outbuf, $C`[Invalid mon->data %s >= %s]`, fmt_ptr(mon.data), fmt_ptr(mons[NUMMONS]));
-    } else if (ckloc && ptr === mons[PM.LONG_WORM] && mon.mx && !$c.peq(svl.level.monsters[mon.mx][mon.my], mon)) {
+    } else if (ckloc && ptr === mons[PM.LONG_WORM] && mon.mx && svl.level.monsters[mon.mx][mon.my] !== mon) {
         $c.sprintf(outbuf, $C`%s <%d,%d>`, pmname(mons[PM.LONG_WORM_TAIL], Mgender(mon)), mon.mx, mon.my);
     } else {
         $c.sprintf(outbuf, $C`%s%s <%d,%d>`, mon.mtame ? $C`tame ` : mon.mpeaceful ? $C`peaceful ` : $C``, mon_pmname(mon), mon.mx, mon.my);
@@ -1275,7 +1275,7 @@ export function minimal_monnam(mon, ckloc) {   // do_name.c:1254
  */
 export function Mgender(mtmp) {   // do_name.c:1289
     let mgender = MALE;
-    if ($c.peq(mtmp, gy.youmonst)) {
+    if (mtmp === gy.youmonst) {
         if (Upolyd() ? u.mfemale : flags.female) {
             mgender = FEMALE;
         }

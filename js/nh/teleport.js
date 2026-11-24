@@ -194,7 +194,7 @@ export function goodpos(x, y, mtmp, gpflags) {   // teleport.c:86
      * oh well.
      */
     if (!allow_u) {
-        if (u_at(x, y) && !$c.peq(mtmp, gy.youmonst) && (!$c.peq(mtmp, u.ustuck) || !u.uswallow) && (!u.usteed || !$c.peq(mtmp, u.usteed))) {
+        if (u_at(x, y) && mtmp !== gy.youmonst && (mtmp !== u.ustuck || !u.uswallow) && (!u.usteed || mtmp !== u.usteed)) {
             return FALSE;
         }
     }
@@ -213,13 +213,13 @@ export function goodpos(x, y, mtmp, gpflags) {   // teleport.c:86
          * != x || mtmp->my != y, we'd miss the case where we're called
          * to place the worm segment and the worm's head is at x,y.
          */
-        if (mtmp2 && (!$c.peq(mtmp2, mtmp) || mtmp.wormno)) {
+        if (mtmp2 && (mtmp2 !== mtmp || mtmp.wormno)) {
             return FALSE;
         }
         mdat = mtmp.data;
         if (is_pool(x, y) && !ignorewater) {
             /* [what about Breathless?] */
-            if ($c.peq(mtmp, gy.youmonst)) {
+            if (mtmp === gy.youmonst) {
                 /* water on the Plane of Water has no surface
                    so there's no way to be on or above that */
                 return u.uprops[SWIMMING].intrinsic || u.uprops[SWIMMING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.SWIM) !== 0 || (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.AMPHIBIOUS) !== 0) || !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && !is_waterwall(x, y) && (Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked || (u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) ? 1 : 0;
@@ -233,7 +233,7 @@ export function goodpos(x, y, mtmp, gpflags) {   // teleport.c:86
                that due the effect of the heat causing it to dry out */
             if (mdat === mons[PM.FLOATING_EYE]) {
                 return FALSE;
-            } else if ($c.peq(mtmp, gy.youmonst)) {
+            } else if (mtmp === gy.youmonst) {
                 return Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked || Fire_resistance() && ((u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) && $G.uarmf && $G.uarmf.oerodeproof || Upolyd() && likes_lava(gy.youmonst.data) ? 1 : 0;
             } else {
                 return m_in_air(mtmp) || likes_lava(mdat) ? 1 : 0;
@@ -819,7 +819,7 @@ async function vault_tele() {   // teleport.c:773
  */
 export async function teleport_pet(mtmp, force_it) {   // teleport.c:786
     let otmp = null, $goto = null;
-    if ($c.peq(mtmp, u.usteed)) {
+    if (mtmp === u.usteed) {
         return FALSE;
     }
     if (mtmp.mleashed) {
@@ -1631,7 +1631,7 @@ async function rloc_to_core(mtmp, x, y, rlocflags) {   // teleport.c:1645
     let appearmsg = $c.andu64(mtmp.mstrategy, 2147483648) !== 0 ? 1 : 0;
     const domsg = !gi.in_mklev && (vanishmsg || appearmsg) && !preventmsg ? 1 : 0;
     let telemsg = FALSE;
-    if (x === mtmp.mx && y === mtmp.my && $c.peq(svl.level.monsters[x][y], mtmp)) {
+    if (x === mtmp.mx && y === mtmp.my && svl.level.monsters[x][y] === mtmp) {
         return;   /* that was easy */
     }
     if (oldx) {
@@ -1661,7 +1661,7 @@ async function rloc_to_core(mtmp, x, y, rlocflags) {   // teleport.c:1645
     if (mtmp.wormno) {   /* now put down tail */
         await place_worm_tail_randomly(mtmp, x, y);
     }
-    if ($c.peq(u.ustuck, mtmp)) {
+    if (u.ustuck === mtmp) {
         if (u.uswallow) {
             await u_on_newpos(mtmp.mx, mtmp.my);
             await check_special_room(FALSE);
@@ -1673,14 +1673,14 @@ async function rloc_to_core(mtmp, x, y, rlocflags) {   // teleport.c:1645
     await maybe_unhide_at(x, y);
     await newsym(x, y);   /* update new location */
     set_apparxy(mtmp);   /* orient monster */
-    if (domsg && (canspotmon(mtmp) || appearmsg || $c.peq(mtmp, u.ustuck))) {
+    if (domsg && (canspotmon(mtmp) || appearmsg || mtmp === u.ustuck)) {
         const du = distu(x, y);
         /* next2u() */
         const next = du <= 2 ? $C` next to you` : null;
         const nearu = du <= BOLT_LIM * BOLT_LIM ? $C` close by` : null;
         set_msg_xy(x, y);
         mtmp.mstrategy = $c.andu64(mtmp.mstrategy, 18446744071562067967n);   /* one chance only */
-        if ($c.peq(mtmp, u.ustuck) && !(u.ux0 === u.ux && u.uy0 === u.uy)) {
+        if (mtmp === u.ustuck && !(u.ux0 === u.ux && u.uy0 === u.uy)) {
             await You($C`and %s teleport together.`, await mon_nam(mtmp));
         } else if (telemsg && (couldsee(x, y) || sensemon(mtmp))) {
             await pline($C`%s vanishes and reappears%s.`, await Monnam(mtmp), next ? next : nearu ? nearu : (olddu = distu(oldx, oldy)) === du ? $C`` : du < olddu ? $C` closer to you` : $C` farther away`);
@@ -1770,7 +1770,7 @@ export async function rloc(mtmp, rlocflags) {   // teleport.c:1799
     let cc = new $T.nhcoord(), backupcc = new $T.nhcoord(), candy = $c.recArray($T.nhcoord, 1659), cc_flags = 0, x = 0, y = 0, trycount = 0, i = 0, j = 0, candycount = 0, stway = null, $t1;
     /* mtmp->mx==0 implies migrating monster arrival */
     /* room for entire map */
-    if ($c.peq(mtmp, u.usteed)) {
+    if (mtmp === u.usteed) {
         await tele();
         return TRUE;
     }
@@ -1973,7 +1973,7 @@ export async function mtele_trap(mtmp, trap, in_sight) {   // teleport.c:1962
 export async function mlevel_tele_trap(mtmp, trap, force_it, in_sight) {   // teleport.c:2006
     let tolevel = new $T.d_level();
     const tt = trap ? trap.ttyp : NO_TRAP;
-    if ($c.peq(mtmp, u.ustuck)) {   /* probably a vortex */
+    if (mtmp === u.ustuck) {   /* probably a vortex */
         return Trap.Effect_Finished;   /* temporary? kludge */
     }
     if (await teleport_pet(mtmp, force_it)) {

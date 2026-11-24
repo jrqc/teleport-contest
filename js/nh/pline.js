@@ -156,7 +156,7 @@ export async function pline_xy(x, y, line, ...$va) {   // pline.c:126
  */
 export async function pline_mon(mtmp, line, ...$va) {   // pline.c:138
     let the_args = null;
-    if ($c.peq(mtmp, gy.youmonst)) {
+    if (mtmp === gy.youmonst) {
         set_msg_xy(0, 0);
     } else {
         set_msg_xy(mtmp.mx, mtmp.my);

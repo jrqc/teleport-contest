@@ -297,7 +297,7 @@ export async function doread() {   // read.c:330
             return ECMD.OK;
         }
         /* can't read shirt worn under suit (under cloak is ok though) */
-        if ((otyp === T_SHIRT || otyp === HAWAIIAN_SHIRT) && $G.uarm && $c.peq(scroll, $G.uarmu)) {
+        if ((otyp === T_SHIRT || otyp === HAWAIIAN_SHIRT) && $G.uarm && scroll === $G.uarmu) {
             await pline($C`%s shirt is obscured by %s%s.`, scroll.unpaid ? $C`That` : $C`Your`, await shk_your(new $c.Ptr(buf, 0), $G.uarm), suit_simple_name($G.uarm));
             return ECMD.OK;
         }
@@ -647,7 +647,7 @@ export async function recharge(obj, curse_bless) {   // read.c:729
             } else if ($goto !== "not_chargable" && (obj.oclass === RING_CLASS && objects[obj.otyp].oc_charged)) {
                 /* charging does not affect ring's curse/bless status */
                 s = is_blessed ? rnd(3) : is_cursed ? -rnd(2) | 0 : 1;
-                is_on = $c.peq(obj, $G.uleft) || $c.peq(obj, $G.uright) ? 1 : 0;
+                is_on = obj === $G.uleft || obj === $G.uright ? 1 : 0;
                 /* destruction depends on current state, not adjustment */
                 if (obj.spe > rn2(7) || obj.spe <= -5) {
                     await pline($C`%s momentarily, then %s!`, await Yobjnam2(obj, $C`pulsate`), await otense(obj, $C`explode`));
@@ -658,7 +658,7 @@ export async function recharge(obj, curse_bless) {   // read.c:729
                     await useup(obj), obj = null;
                     await losehp(Maybe_Half_Phys(s), $C`exploding ring`, KILLED.BY_AN);
                 } else {
-                    mask = is_on ? $c.peq(obj, $G.uleft) ? W.RINGL : W.RINGR : 0;
+                    mask = is_on ? obj === $G.uleft ? W.RINGL : W.RINGR : 0;
                     await pline($C`%s spins %sclockwise for a moment.`, await Yname2(obj), s < 0 ? $C`counter` : $C``);
                     if (s < 0) {
                         await costly_alteration(obj, COST.DECHNT);
@@ -891,7 +891,7 @@ async function forget(howmuch) {   // read.c:1020
     await drain_weapon_skill(rnd(howmuch ? 5 : 3));
     /* forget having seen monsts (affects recognizing unseen ones by sound) */
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
-        if (!$c.peq(mtmp, u.usteed) && !$c.peq(mtmp, u.ustuck)) {
+        if (mtmp !== u.usteed && mtmp !== u.ustuck) {
             mtmp.meverseen = 0;
         }
     }
@@ -1369,7 +1369,7 @@ async function seffect_remove_curse(sobjp) {   // read.c:1489
             }
             /* hide current scroll from itself so that perm_invent won't
                show known blessed scroll losing bknown when confused */
-            if ($c.peq(obj, sobj) && obj.quan === 1) {
+            if (obj === sobj && obj.quan === 1) {
                 continue;
             }
             let wornmask = $c.and64(obj.owornmask, ~(W.BALL | W.ART | W.ARTI));
@@ -1377,11 +1377,11 @@ async function seffect_remove_curse(sobjp) {   // read.c:1489
                 /* handle a couple of special cases; we don't
                    allow auxiliary weapon slots to be used to
                    artificially increase number of worn items */
-                if ($c.peq(obj, $G.uswapwep)) {
+                if (obj === $G.uswapwep) {
                     if (!u.twoweap) {
                         wornmask = 0;
                     }
-                } else if ($c.peq(obj, $G.uquiver)) {
+                } else if (obj === $G.uquiver) {
                     if (obj.oclass === WEAPON_CLASS) {
                         /* mergeable weapon test covers ammo,
                            missiles, spears, daggers & knives */
@@ -2723,7 +2723,7 @@ export async function do_genocide(how) {   // read.c:2826
                 continue;
             }
             /* KMH -- Unchanging prevents rehumanization */
-            if (Unchanging() && $c.peq(ptr, gy.youmonst.data)) {
+            if (Unchanging() && ptr === gy.youmonst.data) {
                 killplayer = killplayer + 1 | 0;
             }
             break;
@@ -2772,13 +2772,13 @@ export async function do_genocide(how) {   // read.c:2826
             }
             /* Polymorphed characters will die as soon as they're rehumanized.
                KMH -- Unchanging prevents rehumanization. */
-            if (Upolyd() && !$c.peq(ptr, gy.youmonst.data)) {
+            if (Upolyd() && ptr !== gy.youmonst.data) {
                 await delayed_killer(POLYMORPH, svk.killer.format, new $c.Ptr(svk.killer.name, 0));
                 await You_feel($C`%s inside.`, udeadinside());
             } else {
                 await done(GENOCIDED);
             }
-        } else if ($c.peq(ptr, gy.youmonst.data)) {
+        } else if (ptr === gy.youmonst.data) {
             await rehumanize();
         }
         await kill_genocided_monsters();

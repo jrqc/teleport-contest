@@ -808,7 +808,7 @@ export function assigninvlet(otmp) {   // invent.c:694
         inuse[i] = FALSE;
     }
     for (obj = gi.invent; obj; obj = obj.nobj) {
-        if (!$c.peq(obj, otmp)) {
+        if (obj !== otmp) {
             i = obj.invlet;
             if (97 <= i && i <= 122) {
                 inuse[i - 97 | 0] = TRUE;
@@ -884,7 +884,7 @@ export async function merge_choice(objlist, obj) {   // invent.c:775
        have when carried are different from what they are now; prevent
        that from eliciting an incorrect result from mergable() */
     const save_nocharge = obj.no_charge;
-    if ($c.peq(objlist, gi.invent) && obj.where === OBJ.FLOOR && (shkp = await shop_keeper(inside_shop(obj.ox, obj.oy))) !== null) {
+    if (objlist === gi.invent && obj.where === OBJ.FLOOR && (shkp = await shop_keeper(inside_shop(obj.ox, obj.oy))) !== null) {
         if (obj.no_charge) {
             obj.no_charge = 0;
         } else if (inhishop(shkp)) {
@@ -1184,7 +1184,7 @@ async function addinv_core0(obj$in, other_obj, update_perm_invent) {   // invent
            placing at end; for thrown-and-return weapon with !fixinv setting */
         if (other_obj) {
             for (otmp[0] = gi.invent; otmp[0]; otmp[0] = otmp[0].nobj) {
-                if ($c.peq(otmp[0].nobj, other_obj)) {
+                if (otmp[0].nobj === other_obj) {
                     obj[0].nobj = other_obj;
                     otmp[0].nobj = obj[0];
                     obj[0].where = OBJ.INVENT;
@@ -1500,7 +1500,7 @@ export async function freeinv_core(obj) {   // invent.c:1356
     } else if (obj.otyp === FIGURINE && obj.timed) {
         await stop_timer(FIG_TRANSFORM, obj_to_any(obj));
     }
-    if ($c.peq(obj, svc.context.tin.tin)) {
+    if (obj === svc.context.tin.tin) {
         svc.context.tin.tin = null;
         svc.context.tin.o_id = 0;
     }
@@ -1525,12 +1525,12 @@ export async function freeinv(obj) {   // invent.c:1403
 export async function delallobj(x, y) {   // invent.c:1413
     let otmp = null, otmp2 = null;
     for (otmp = svl.level.objects[x][y]; otmp; otmp = otmp2) {
-        if ($c.peq(otmp, $G.uball)) {
+        if (otmp === $G.uball) {
             await unpunish();
         }
         /* after unpunish(), or might get deallocated chain */
         otmp2 = otmp.v.v_nexthere;
-        if ($c.peq(otmp, $G.uchain)) {
+        if (otmp === $G.uchain) {
             continue;
         }
         await delobj(otmp);
@@ -1703,7 +1703,7 @@ export function o_on(id, objchn) {   // invent.c:1587
 export function obj_here(obj, x, y) {   // invent.c:1602
     let otmp = null;
     for (otmp = svl.level.objects[x][y]; otmp; otmp = otmp.v.v_nexthere) {
-        if ($c.peq(obj, otmp)) {
+        if (obj === otmp) {
             return TRUE;
         }
     }
@@ -1767,7 +1767,7 @@ function compactify(buf) {   // invent.c:1627
  * @returns {Promise<number>} boolean
  */
 export async function splittable(obj) {   // invent.c:1664
-    return !(obj.otyp === LOADSTONE && obj.cursed || $c.peq(obj, $G.uwep) && await welded($G.uwep)) ? 1 : 0;
+    return !(obj.otyp === LOADSTONE && obj.cursed || obj === $G.uwep && await welded($G.uwep)) ? 1 : 0;
 }
 /* match the prompt for either 'T' or 'R' command */
 /**
@@ -2488,7 +2488,7 @@ export async function askchain(objchn, olets, allflag, fn, ckfn, mx, word) {   /
             take_out = !$c.strcmp(word, $C`take out`) ? 1 : 0;
             put_in = !$c.strcmp(word, $C`put in`) ? 1 : 0;
             nodot = !$c.strcmp(word, $C`nodot`) || !$c.strcmp(word, $C`drop`) || ident || takeoff || take_out || put_in ? 1 : 0;
-            ininv = $c.peq(objchn.get(0), gi.invent) ? 1 : 0;
+            ininv = objchn.get(0) === gi.invent ? 1 : 0;
             bycat = menu_class_present(117) || menu_class_present(66) || menu_class_present(85) || menu_class_present(67) || menu_class_present(88) || menu_class_present(80) ? 1 : 0;
             /* someday maybe we'll sort by 'olets' too (temporarily replace
                flags.packorder and pass SORTLOOT_PACK), but not yet... */
@@ -2587,7 +2587,7 @@ export async function askchain(objchn, olets, allflag, fn, ckfn, mx, word) {   /
                                 /* otmp caused magic bag to explode;
                                    both are now gone */
                                 otmp = null;   /* and return */
-                            } else if (otmp && !$c.peq(otmp, otmpo)) {
+                            } else if (otmp && otmp !== otmpo) {
                                 /* split occurred, merge again */
                                 await unsplitobj(otmp);
                             }
@@ -2980,7 +2980,7 @@ export async function xprname(obj, txt, let_, dot, cost, quan) {   // invent.c:2
     /* if non-0, print this quantity, not obj->quan */
     /* plenty of room for count and hallucinatory currency */
     /* signed int for %*s formatting */
-    const use_invlet = flags.invlet_constant && !$c.peq(obj, $c.asRec(null, $T.obj, 112)) && let_ !== 62 && let_ !== 45 ? 1 : 0;
+    const use_invlet = flags.invlet_constant && obj !== $c.asRec(null, $T.obj, 112) && let_ !== 62 && let_ !== 45 ? 1 : 0;
     let savequan = 0;
     if (quan && obj) {
         savequan = obj.quan;
@@ -2994,7 +2994,7 @@ export async function xprname(obj, txt, let_, dot, cost, quan) {   // invent.c:2
      */
     let fmt = $C`%c - %.*s%s`;
     if (!txt) {
-        (!!$c.peq(obj, $c.asRec(null, $T.obj, 112)) ? 1 : 0) ? $c.__assert_rtn($C`xprname`, $C`invent.c`, 2923, $C`obj != NULL`) : 0;
+        (!(obj !== $c.asRec(null, $T.obj, 112)) ? 1 : 0) ? $c.__assert_rtn($C`xprname`, $C`invent.c`, 2923, $C`obj != NULL`) : 0;
         txt = await doname(obj);
     }
     let txtlen = $c.i32($c.strlen(txt));
@@ -3099,7 +3099,7 @@ function find_unpaid(list, last_found) {   // invent.c:3021
         if (list.unpaid) {
             if (last_found.get(0)) {
                 /* still looking for previous unpaid object */
-                if ($c.peq(list, last_found.get(0))) {
+                if (list === last_found.get(0)) {
                     last_found.set(0, null);
                 }
             } else {
@@ -3268,12 +3268,12 @@ async function display_pickinv(lets, xtra_choice, query, allowxtra, want_reply, 
     /* inuse_only: if we inserted bare hands as a fake weapon, remove them;
        although the fake object will no longer be in invent, sortedinvent
        will still contain a pointer to it */
-    if ($c.peq(gi.invent, inuse_fakeobj)) {
+    if (gi.invent === inuse_fakeobj) {
         gi.invent = inuse_fakeobj.nobj;
         inuse_fakeobj.nobj = null;
         /* if inuse_fakeobj is the only thing present in sortedinvent, get
            rid of it in order to produce "not using any items" */
-        if ($c.peq($c.radd(sortedinvent[0], 0).obj, inuse_fakeobj) && !$c.radd(sortedinvent[0], 1).obj) {
+        if ($c.radd(sortedinvent[0], 0).obj === inuse_fakeobj && !$c.radd(sortedinvent[0], 1).obj) {
             $c.radd(sortedinvent[0], 0).obj = null;
         }
     }
@@ -3352,7 +3352,7 @@ async function display_pickinv(lets, xtra_choice, query, allowxtra, want_reply, 
                 } else {
                     any.a_char = ilet;
                 }
-                if ($c.peq(otmp, inuse_fakeobj)) {
+                if (otmp === inuse_fakeobj) {
                     /* fake item to format as "bare|gloved hands" */
                     /* like doname() below, makeplural() returns an obuf[] */
                     formattedobj = await makeplural(await body_part(HAND));
@@ -3426,7 +3426,7 @@ async function display_pickinv(lets, xtra_choice, query, allowxtra, want_reply, 
             ret = 0;
             for (i = 0; i < n; i = i + 1 | 0) {
                 otmp = $c.radd(selected[0], i).item.a_obj;
-                if ($c.peq(otmp, wizid_fakeobj)) {
+                if (otmp === wizid_fakeobj) {
                     await identify_pack(0, FALSE);
                     /* identify_pack() performs update_inventory() */
                     all_id = TRUE;
@@ -4366,7 +4366,7 @@ export async function stackobj(obj$in) {   // invent.c:4366
     const obj = [obj$in];
     let otmp = [null];
     for (otmp[0] = svl.level.objects[obj[0].ox][obj[0].oy]; otmp[0]; otmp[0] = otmp[0].v.v_nexthere) {
-        if (!$c.peq(otmp[0], obj[0]) && await merged(new $c.Ptr(obj, 0), new $c.Ptr(otmp, 0))) {
+        if (otmp[0] !== obj[0] && await merged(new $c.Ptr(obj, 0), new $c.Ptr(otmp, 0))) {
             break;
         }
     }
@@ -4385,7 +4385,7 @@ export async function mergable(otmp, obj) {   // invent.c:4379
     let otmpnamelth = 0;
     /* fail if already the same object, if different types, if either is
        explicitly marked to prevent merge, or if not mergable in general */
-    if ($c.peq(obj, otmp) || obj.otyp !== otmp.otyp || obj.nomerge || otmp.nomerge || !objects[obj.otyp].oc_merge) {
+    if (obj === otmp || obj.otyp !== otmp.otyp || obj.nomerge || otmp.nomerge || !objects[obj.otyp].oc_merge) {
         return FALSE;
     }
     /* coins of the same kind will always merge */
@@ -4685,7 +4685,7 @@ function tool_being_used(obj) {   // invent.c:4698
         return FALSE;
     }
     /* [don't actually need to check uwep here; caller catches it] */
-    return $c.peq(obj, $G.uwep) || obj.lamplit || obj.otyp === LEASH && obj.corpsenm ? 1 : 0;
+    return obj === $G.uwep || obj.lamplit || obj.otyp === LEASH && obj.corpsenm ? 1 : 0;
 }
 /* the #seetools command */
 /**
@@ -5036,7 +5036,7 @@ async function doorganize_core(obj$in) {   // invent.c:5068
     /* figure out whether user gave a split count to getobj() */
     splitting[0] = bumped = null;
     for (otmp[0] = gi.invent; otmp[0]; otmp[0] = otmp[0].nobj) {
-        if ($c.peq(otmp[0].nobj, obj[0])) {
+        if (otmp[0].nobj === obj[0]) {
             /* knowledge of splitobj() operation */
             if (otmp[0].invlet === obj[0].invlet) {
                 splitting[0] = otmp[0];
@@ -5061,7 +5061,7 @@ async function doorganize_core(obj$in) {   // invent.c:5068
     /* blank out all the letters currently in use in the inventory
        except those that will be merged with the selected object */
     for (otmp[0] = gi.invent; otmp[0]; otmp[0] = otmp[0].nobj) {
-        if (!$c.peq(otmp[0], obj[0]) && !await mergable(otmp[0], obj[0])) {
+        if (otmp[0] !== obj[0] && !await mergable(otmp[0], obj[0])) {
             let_ = otmp[0].invlet;
             if (let_ >= 97 && let_ <= 122) {
                 lets[GOLD_OFFSET + let_ - 97] = 32;

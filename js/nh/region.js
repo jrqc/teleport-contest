@@ -341,7 +341,7 @@ export async function add_region(reg) {   // region.c:284
 export async function remove_region(reg) {   // region.c:344
     let i = 0, x = 0, y = 0, pass = 0;
     for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
-        if ($c.peq(gr.regions.get(i), reg)) {
+        if (gr.regions.get(i) === reg) {
             break;
         }
     }

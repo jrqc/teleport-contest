@@ -410,7 +410,7 @@ export async function gold_detect(sobj) {   // detect.c:335
                 continue;
             }
             if (findgold(mtmp.minvent) || mtmp.data.pmidx === PM.GOLD_GOLEM) {
-                if ($c.peq(mtmp, u.usteed)) {
+                if (mtmp === u.usteed) {
                     steedgold = TRUE;
                 } else {
                     gk.known = TRUE;
@@ -419,7 +419,7 @@ export async function gold_detect(sobj) {   // detect.c:335
             } else {
                 for (obj = mtmp.minvent; obj; obj = obj.nobj) {
                     if (sobj.blessed && o_material(obj, GOLD) || o_in(obj, COIN_CLASS)) {
-                        if ($c.peq(mtmp, u.usteed)) {
+                        if (mtmp === u.usteed) {
                             steedgold = TRUE;
                         } else {
                             gk.known = TRUE;
@@ -470,13 +470,13 @@ export async function gold_detect(sobj) {   // detect.c:335
     /* Discover gold locations. */
     for (obj = svl.level.objlist; obj; obj = obj.nobj) {
         if (sobj.blessed && (temp = o_material(obj, GOLD)) !== null) {
-            if (!$c.peq(temp, obj)) {
+            if (temp !== obj) {
                 temp.ox = obj.ox;
                 temp.oy = obj.oy;
             }
             await map_object(temp, 1);
         } else if ((temp = o_in(obj, COIN_CLASS)) !== null) {
-            if (!$c.peq(temp, obj)) {
+            if (temp !== obj) {
                 temp.ox = obj.ox;
                 temp.oy = obj.oy;
             }
@@ -608,7 +608,7 @@ export async function food_detect(sobj) {   // detect.c:479
         unconstrain_map();
         for (obj = svl.level.objlist; obj; obj = obj.nobj) {
             if ((temp = o_in(obj, oclass)) !== null) {
-                if (!$c.peq(temp, obj)) {
+                if (temp !== obj) {
                     temp.ox = obj.ox;
                     temp.oy = obj.oy;
                 }
@@ -759,7 +759,7 @@ export async function object_detect(detector, class_) {   // detect.c:603
     for (obj = svl.level.buriedobjlist; obj; obj = obj.nobj) {
         if (!class_ || (otmp = o_in(obj, $c.i8(class_))) !== null) {
             if (class_) {
-                if (!$c.peq(otmp, obj)) {
+                if (otmp !== obj) {
                     otmp.ox = obj.ox;
                     otmp.oy = obj.oy;
                 }
@@ -782,7 +782,7 @@ export async function object_detect(detector, class_) {   // detect.c:603
             for (obj = svl.level.objects[x][y]; obj; obj = obj.v.v_nexthere) {
                 if (!class_ && !boulder || (otmp = o_in(obj, $c.i8(class_))) !== null || (otmp = o_in(obj, $c.i8(boulder))) !== null) {
                     if (class_ || boulder) {
-                        if (!$c.peq(otmp, obj)) {
+                        if (otmp !== obj) {
                             otmp.ox = obj.ox;
                             otmp.oy = obj.oy;
                         }

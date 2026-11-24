@@ -1706,7 +1706,7 @@ async function shrinking_glob_gone(obj) {   // mkobj.c:1673
             obj.owornmask = 0;
         } else if (owhere === OBJ.MINVENT) {
             /* monsters don't wield globs so this isn't strictly needed */
-            if (obj.owornmask && $c.peq(obj, obj.v.v_ocarry.mw)) {
+            if (obj.owornmask && obj === obj.v.v_ocarry.mw) {
                 await setmnotwielded(obj.v.v_ocarry, obj);   /* clears owornmask */
             }
         }
@@ -1823,12 +1823,12 @@ export async function curse(otmp) {   // mkobj.c:1783
     otmp.blessed = 0;
     otmp.cursed = 1;
     /* welded two-handed weapon interferes with some armor removal */
-    if ($c.peq(otmp, $G.uwep) && bimanual($G.uwep)) {
+    if (otmp === $G.uwep && bimanual($G.uwep)) {
         reset_remarm();
     }
     /* rules at top of wield.c state that twoweapon cannot be done
        with cursed alternate weapon */
-    if ($c.peq(otmp, $G.uswapwep) && u.twoweap) {
+    if (otmp === $G.uswapwep && u.twoweap) {
         await drop_uswapwep();
     }
     /* some cursed items need immediate updating */
@@ -2665,7 +2665,7 @@ export async function extract_nobj(obj, head_ptr) {   // mkobj.c:2596
     let prev = null;
     let curr = head_ptr.get(0);
     for (prev = null; curr; prev = curr, curr = curr.nobj) {
-        if ($c.peq(curr, obj)) {
+        if (curr === obj) {
             if (prev) {
                 prev.nobj = curr.nobj;
             } else {
@@ -2695,7 +2695,7 @@ export async function extract_nexthere(obj, head_ptr) {   // mkobj.c:2623
     let prev = null;
     let curr = head_ptr.get(0);
     for (prev = null; curr; prev = curr, curr = curr.v.v_nexthere) {
-        if ($c.peq(curr, obj)) {
+        if (curr === obj) {
             if (prev) {
                 prev.v.v_nexthere = curr.v.v_nexthere;
             } else {
@@ -2844,7 +2844,7 @@ export async function dealloc_obj(obj) {   // mkobj.c:2745
     if (obj.cobj) {
         await panic($C`dealloc_obj with cobj`);
     }
-    if ($c.peq(obj, hands_obj)) {
+    if (obj === hands_obj) {
         await impossible($C`dealloc_obj with hands_obj`);
         return;
     }
@@ -2864,13 +2864,13 @@ export async function dealloc_obj(obj) {   // mkobj.c:2745
         await del_light_source(LS_OBJECT, obj_to_any(obj));
         obj.lamplit = 0;
     }
-    if ($c.peq(obj, gt.thrownobj)) {
+    if (obj === gt.thrownobj) {
         gt.thrownobj = null;
     }
-    if ($c.peq(obj, gk.kickedobj)) {
+    if (obj === gk.kickedobj) {
         gk.kickedobj = null;
     }
-    if ($c.peq(obj, svc.context.tin.tin)) {
+    if (obj === svc.context.tin.tin) {
         svc.context.tin.tin = null;
         svc.context.tin.o_id = 0;
     }
@@ -3122,7 +3122,7 @@ async function objlist_sanity(objlist, wheretype, mesg) {   // mkobj.c:3032
                     bc_ok = TRUE;
                 default:
                     /*FALLTHRU*/
-                    if (!$c.peq(obj, $G.uchain) && !$c.peq(obj, $G.uball) || !bc_ok) {
+                    if (obj !== $G.uchain && obj !== $G.uball || !bc_ok) {
                         /* discovered an object not in inventory which
                            erroneously has worn mask set */
                         $c.sprintf(new $c.Ptr(maskbuf, 0), $C`worn mask 0x%08lx`, obj.owornmask);
@@ -3256,7 +3256,7 @@ async function mon_obj_sanity(monlist, mesg) {   // mkobj.c:3204
             if (!mcarried(mwep)) {
                 await insane_object(mwep, new $c.Ptr(mfmt1, 0), mesg, mon);
             }
-            if (!$c.peq(mwep.v.v_ocarry, mon)) {
+            if (mwep.v.v_ocarry !== mon) {
                 await insane_object(mwep, new $c.Ptr(mfmt2, 0), mesg, mon);
             }
         }
@@ -3264,7 +3264,7 @@ async function mon_obj_sanity(monlist, mesg) {   // mkobj.c:3204
             if (obj.where !== OBJ.MINVENT) {
                 await insane_object(obj, new $c.Ptr(mfmt1, 0), mesg, mon);
             }
-            if (!$c.peq(obj.v.v_ocarry, mon)) {
+            if (obj.v.v_ocarry !== mon) {
                 await insane_object(obj, new $c.Ptr(mfmt2, 0), mesg, mon);
             }
             if (obj.globby) {
@@ -3277,7 +3277,7 @@ async function mon_obj_sanity(monlist, mesg) {   // mkobj.c:3204
             if (obj.in_use || obj.bypass || obj.nomerge || obj.otyp === BOULDER && obj.corpsenm) {
                 await insane_obj_bits(obj, mon);
             }
-            if ($c.peq(obj, mwep)) {
+            if (obj === mwep) {
                 mwep = null;
             }
         }
@@ -3418,12 +3418,12 @@ async function check_contained(container, mesg) {   // mkobj.c:3374
     }
     for (obj = container.cobj; obj; obj = obj.nobj) {
         /* catch direct cycle to avoid unbounded recursion */
-        if ($c.peq(obj, container)) {
+        if (obj === container) {
             await panic($C`failed sanity check: container holds itself`);
         }
         if (obj.where !== OBJ.CONTAINED) {
             await insane_object(obj, $C`%s obj %s %s: %s`, mesg, null);
-        } else if (!$c.peq(obj.v.v_ocontainer, container)) {
+        } else if (obj.v.v_ocontainer !== container) {
             await impossible($C`%s obj %s in container %s, not %s`, mesg, fmt_ptr(obj), fmt_ptr(obj.v.v_ocontainer), fmt_ptr(container));
         }
         if (obj.globby) {
@@ -3433,7 +3433,7 @@ async function check_contained(container, mesg) {   // mkobj.c:3374
             /* catch most likely indirect cycle; we won't notice if
                parent is present when something comes before it, or
                notice more deeply embedded cycles (grandparent, &c) */
-            if ($c.peq(obj.cobj, container)) {
+            if (obj.cobj === container) {
                 await panic($C`failed sanity check: container holds its parent`);
             }
             /* change "contained... sanity" to "nested contained... sanity"
@@ -3485,7 +3485,7 @@ async function sanity_check_worn(obj) {   // mkobj.c:3447
         }
         allmask = $c.oru64(allmask, sanity_check_worn$wearbits[i]);
     }
-    if ($c.peq(obj, $G.uskin)) {
+    if (obj === $G.uskin) {
         /* embedded dragon scales have an extra bit set;
            make sure it's set, then suppress it */
         embedded = TRUE;
@@ -3495,7 +3495,7 @@ async function sanity_check_worn(obj) {   // mkobj.c:3447
             n = 0, owornmask = 18446744073709551615n;   /* force insane_object("bogus") below */
         }
     }
-    if (n === 2 && carried(obj) && $c.peq(obj, $G.uball) && $c.andu64(owornmask, W.BALL) !== 0 && $c.andu64(owornmask, W_WEAPONS) !== 0) {
+    if (n === 2 && carried(obj) && obj === $G.uball && $c.andu64(owornmask, W.BALL) !== 0 && $c.andu64(owornmask, W_WEAPONS) !== 0) {
         /* chained ball can be wielded/alt-wielded/quivered; if so,
           pretend it's not chained in order to check the weapon pointer
           (we've already verified the ball pointer by successfully passing
@@ -3519,83 +3519,83 @@ async function sanity_check_worn(obj) {   // mkobj.c:3447
            with owornmask of W_foo is the object pointed to by ufoo */
         switch (owornmask) {
             case W.ARM:
-                if (!$c.peq(obj, embedded ? $G.uskin : $G.uarm)) {
+                if (obj !== (embedded ? $G.uskin : $G.uarm)) {
                     what = embedded ? $C`skin` : $C`suit`;
                 }
                 break;
             case W.ARMC:
-                if (!$c.peq(obj, $G.uarmc)) {
+                if (obj !== $G.uarmc) {
                     what = $C`cloak`;
                 }
                 break;
             case W.ARMH:
-                if (!$c.peq(obj, $G.uarmh)) {
+                if (obj !== $G.uarmh) {
                     what = $C`helm`;
                 }
                 break;
             case W.ARMS:
-                if (!$c.peq(obj, $G.uarms)) {
+                if (obj !== $G.uarms) {
                     what = $C`shield`;
                 }
                 break;
             case W.ARMG:
-                if (!$c.peq(obj, $G.uarmg)) {
+                if (obj !== $G.uarmg) {
                     what = $C`gloves`;
                 }
                 break;
             case W.ARMF:
-                if (!$c.peq(obj, $G.uarmf)) {
+                if (obj !== $G.uarmf) {
                     what = $C`boots`;
                 }
                 break;
             case W.ARMU:
-                if (!$c.peq(obj, $G.uarmu)) {
+                if (obj !== $G.uarmu) {
                     what = $C`shirt`;
                 }
                 break;
             case W.WEP:
-                if (!$c.peq(obj, $G.uwep)) {
+                if (obj !== $G.uwep) {
                     what = $C`primary weapon`;
                 }
                 break;
             case W.QUIVER:
-                if (!$c.peq(obj, $G.uquiver)) {
+                if (obj !== $G.uquiver) {
                     what = $C`quiver`;
                 }
                 break;
             case W.SWAPWEP:
-                if (!$c.peq(obj, $G.uswapwep)) {
+                if (obj !== $G.uswapwep) {
                     what = u.twoweap ? $C`secondary weapon` : $C`alternate weapon`;
                 }
                 break;
             case W.AMUL:
-                if (!$c.peq(obj, $G.uamul)) {
+                if (obj !== $G.uamul) {
                     what = $C`amulet`;
                 }
                 break;
             case W.RINGL:
-                if (!$c.peq(obj, $G.uleft)) {
+                if (obj !== $G.uleft) {
                     what = $C`left ring`;
                 }
                 break;
             case W.RINGR:
-                if (!$c.peq(obj, $G.uright)) {
+                if (obj !== $G.uright) {
                     what = $C`right ring`;
                 }
                 break;
             case W.TOOL:
-                if (!$c.peq(obj, $G.ublindf)) {
+                if (obj !== $G.ublindf) {
                     what = $C`blindfold`;
                 }
                 break;
             case W.BALL:
                 /* case W_SADDLE: */
-                if (!$c.peq(obj, $G.uball)) {
+                if (obj !== $G.uball) {
                     what = $C`ball`;
                 }
                 break;
             case W.CHAIN:
-                if (!$c.peq(obj, $G.uchain)) {
+                if (obj !== $G.uchain) {
                     what = $C`chain`;
                 }
                 break;
@@ -3702,7 +3702,7 @@ export async function obj_nexto_xy(obj, x, y, recurs) {   // mkobj.c:3661
     let otmp = sobj_at(otyp, x, y);
     while (otmp) {
         /* don't be clever and find ourselves */
-        if (!$c.peq(otmp, obj) && await mergable(otmp, obj)) {
+        if (otmp !== obj && await mergable(otmp, obj)) {
             return otmp;
         }
         otmp = nxtobj(otmp, otyp, TRUE);
@@ -3742,7 +3742,7 @@ export async function obj_absorb(obj1, obj2) {   // mkobj.c:3702
     if (obj1 && obj2) {
         const otmp1 = obj1.get(0);
         const otmp2 = obj2.get(0);
-        if (otmp1 && otmp2 && !$c.peq(otmp1, otmp2)) {
+        if (otmp1 && otmp2 && otmp1 !== otmp2) {
             await globby_bill_fixup(otmp1, otmp2);
             if (otmp1.bknown !== otmp2.bknown) {
                 $t1 = otmp2.bknown = 0, otmp1.bknown = ($t1) & 1;
@@ -3809,7 +3809,7 @@ export async function obj_meld(obj1, obj2) {   // mkobj.c:3768
     if (obj1 && obj2) {
         const otmp1 = obj1.get(0);
         const otmp2 = obj2.get(0);
-        if (otmp1 && otmp2 && !$c.peq(otmp1, otmp2)) {
+        if (otmp1 && otmp2 && otmp1 !== otmp2) {
             let ox = oy = 0;
             /*
              * FIXME?

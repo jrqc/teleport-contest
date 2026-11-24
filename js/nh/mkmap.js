@@ -420,7 +420,7 @@ function remove_room(roomno) {   // mkmap.c:412
     let x = 0, y = 0;
     const croom = $c.relem(svr.rooms, roomno);
     const maxroom = $c.relem(svr.rooms, svn.nroom = svn.nroom - 1 | 0);
-    if (!$c.peq(croom, maxroom)) {
+    if (croom !== maxroom) {
         /* since the order in the array only matters for making corridors,
          * copy the last room over the one being removed on the assumption
          * that corridors have already been dug. */

@@ -158,7 +158,7 @@ async function kickdmg(mon, clumsy) {   // dokick.c:34
     if (dmg > 0) {
         mon.mhp = mon.mhp - dmg | 0;
     }
-    if (!DEADMONSTER(mon) && (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || gy.youmonst.data === mons[PM.SASQUATCH] || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) && !bigmonst(mon.data) && !rn2(3) && mon.mcanmove && !$c.peq(mon, u.ustuck) && !mon.mtrapped) {
+    if (!DEADMONSTER(mon) && (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || gy.youmonst.data === mons[PM.SASQUATCH] || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) && !bigmonst(mon.data) && !rn2(3) && mon.mcanmove && mon !== u.ustuck && !mon.mtrapped) {
         /* see if the monster has a place to move into */
         const mdx = mon.mx + u.dx | 0;
         const mdy = mon.my + u.dy | 0;
@@ -464,7 +464,7 @@ export async function container_impact_dmg(obj, x, y) {   // dokick.c:412
     const costly = (shkp = await shop_keeper(in_rooms(x, y, SHOPBASE).get(0))) && await costly_spot(x, y) ? 1 : 0;
     const insider = new $c.Ptr(u.ushops, 0).get(0) && inside_shop(u.ux, u.uy) && in_rooms(x, y, SHOPBASE).get(0) === new $c.Ptr(u.ushops, 0).get(0) ? 1 : 0;
     /* if dropped or thrown, shop ownership flags are set on this obj */
-    const frominv = !$c.peq(obj, gk.kickedobj) ? 1 : 0;
+    const frominv = obj !== gk.kickedobj ? 1 : 0;
     for (otmp = obj.cobj; otmp; otmp = otmp2) {
         let result = null;
         otmp2 = otmp.nobj;
@@ -547,7 +547,7 @@ async function really_kick_object(x, y) {   // dokick.c:508
     let shkp = null;
     let slide = FALSE;
     /* gk.kickedobj should always be set due to conditions of call */
-    if (!gk.kickedobj || gk.kickedobj.otyp === BOULDER || $c.peq(gk.kickedobj, $G.uball) || $c.peq(gk.kickedobj, $G.uchain)) {
+    if (!gk.kickedobj || gk.kickedobj.otyp === BOULDER || gk.kickedobj === $G.uball || gk.kickedobj === $G.uchain) {
         return 0;
     }
     if ((trap = t_at(x, y)) !== null) {
@@ -742,7 +742,7 @@ async function really_kick_object(x, y) {   // dokick.c:508
         return 1;   /* object broken */
     }
     if (mon) {
-        if (mon.isshk && gk.kickedobj.where === OBJ.MINVENT && $c.peq(gk.kickedobj.v.v_ocarry, mon)) {
+        if (mon.isshk && gk.kickedobj.where === OBJ.MINVENT && gk.kickedobj.v.v_ocarry === mon) {
             return 1;   /* alert shk caught it */
         }
         gn.notonhead = mon.mx !== gb.bhitpos.x || mon.my !== gb.bhitpos.y ? 1 : 0;
@@ -798,7 +798,7 @@ function kickstr(buf, kickobjnam) {   // dokick.c:794
     let what = null;
     if (kickobjnam.get(0)) {
         what = kickobjnam;
-    } else if ($c.peq(gm.maploc, gn.nowhere)) {
+    } else if (gm.maploc === gn.nowhere) {
         what = $C`nothing`;
     } else if (IS_DOOR(gm.maploc.typ)) {
         what = $C`a door`;
@@ -1535,12 +1535,12 @@ export async function impact_drop(missile, x, y, dlev) {   // dokick.c:1511
     let oct = dct = 0;
     for (obj = svl.level.objects[x][y]; obj; obj = obj2) {
         obj2 = obj.v.v_nexthere;
-        if ($c.peq(obj, missile)) {
+        if (obj === missile) {
             continue;
         }
         /* number of objects in the pile */
         oct = $c.add64(oct, obj.quan);
-        if ($c.peq(obj, $G.uball) || $c.peq(obj, $G.uchain)) {
+        if (obj === $G.uball || obj === $G.uchain) {
             continue;
         }
         /* boulders can fall too, but rarely & never due to rocks */
@@ -1629,14 +1629,14 @@ export async function ship_object(otmp, x, y, shop_floor_obj) {   // dokick.c:16
     }
     /* objects other than attached iron ball always fall down ladder,
        but have a chance of staying otherwise */
-    const nodrop = $c.peq(otmp, $G.uball) || $c.peq(otmp, $G.uchain) || toloc !== MIGR.LADDER_UP && rn2(3) ? 1 : 0;
+    const nodrop = otmp === $G.uball || otmp === $G.uchain || toloc !== MIGR.LADDER_UP && rn2(3) ? 1 : 0;
     const container = Has_contents(otmp);
     const unpaid = is_unpaid(otmp);
     if (OBJ_AT(x, y)) {
         for (obj = svl.level.objects[x][y]; obj; obj = obj.v.v_nexthere) {
-            if ($c.peq(obj, $G.uchain)) {
+            if (obj === $G.uchain) {
                 chainthere = TRUE;
-            } else if (!$c.peq(obj, otmp)) {
+            } else if (obj !== otmp) {
                 n = $c.add64(n, obj.quan);
             }
         }

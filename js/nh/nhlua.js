@@ -1683,7 +1683,7 @@ async function nhl_gamestate(L) {   // nhlua.c:1876
         while (gi.invent) {
             await useupall(gi.invent);
         }
-        while (!$c.peq(otmp = gg.gmst_invent, $c.asRec(null, $T.obj, 112))) {
+        while ((otmp = gg.gmst_invent) !== $c.asRec(null, $T.obj, 112)) {
             wornmask = otmp.owornmask;
             otmp.owornmask = 0;
             await extract_nobj(otmp, new $c.FieldRef(gg, "gmst_invent", "ptr"));
@@ -1714,7 +1714,7 @@ async function nhl_gamestate(L) {   // nhlua.c:1876
     } else if (!reststate && !gg.gmst_stored) {
         /* store game state */
         gg.gmst_moves = svm.moves;
-        while (!$c.peq(otmp = gi.invent, $c.asRec(null, $T.obj, 112))) {
+        while ((otmp = gi.invent) !== $c.asRec(null, $T.obj, 112)) {
             wornmask = otmp.owornmask;
             await setnotworn(otmp);
             await freeinv(otmp);

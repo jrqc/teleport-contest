@@ -578,7 +578,7 @@ export function maybe_gasp(mon) {   // sounds.c:546
     let msound = mptr.msound;
     let dogasp = FALSE;
     /* other roles' guardians and cross-aligned priests don't gasp */
-    if (msound === MS.GUARDIAN && !$c.peq(mptr, $c.relem(mons, gu.urole.guardnum)) || msound === MS.PRIEST && !p_coaligned(mon)) {
+    if (msound === MS.GUARDIAN && mptr !== $c.relem(mons, gu.urole.guardnum) || msound === MS.PRIEST && !p_coaligned(mon)) {
         msound = MS.SILENT;
     } else if (msound === MS.CUSS && has_emin(mon) && (p_coaligned(mon) ? !mon.mextra.emin.renegade : mon.mextra.emin.renegade)) {
         /* co-aligned angels do gasp */
@@ -749,7 +749,7 @@ export async function domonnoise(mtmp) {   // sounds.c:679
     /* leader might be poly'd; if he can still speak, give leader speech */
     if (mtmp.m_id === svq.quest_status.leader_m_id && msound > MS.ANIMAL) {
         msound = MS.LEADER;
-    } else if (msound === MS.GUARDIAN && !$c.peq(ptr, $c.relem(mons, gu.urole.guardnum))) {
+    } else if (msound === MS.GUARDIAN && ptr !== $c.relem(mons, gu.urole.guardnum)) {
         /* make sure it's your role's quest guardian; adjust if not */
         msound = mons[genus(ptr.pmidx, 1)].msound;
     } else if (mtmp.isshk) {

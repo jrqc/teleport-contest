@@ -237,7 +237,7 @@ async function md_rush(md, tx, ty) {   // mail.c:288
      * It is possible that the monster at (fx,fy) is not the md when:
      * the md rushed the hero and failed, and is now starting back.
      */
-    if ($c.peq(svl.level.monsters[fx][fy], md)) {
+    if (svl.level.monsters[fx][fy] === md) {
         remove_monster(fx, fy);   /* pick up from orig position */
         await newsym($c.i16(fx), $c.i16(fy));
     }

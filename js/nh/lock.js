@@ -92,7 +92,7 @@ export function picking_lock(x, y) {   // lock.c:17
  * @returns {number} boolean
  */
 export function picking_at(x, y) {   // lock.c:30
-    return go.occupation === picklock && $c.peq(gx.xlock.door, $c.relem(svl.level.locations[x], y)) ? 1 : 0;
+    return go.occupation === picklock && gx.xlock.door === $c.relem(svl.level.locations[x], y) ? 1 : 0;
 }
 /* produce an occupation string appropriate for the current activity */
 /**
@@ -130,7 +130,7 @@ async function picklock() {   // lock.c:68
         }
     } else {
         /* door */
-        if (!$c.peq(gx.xlock.door, $c.relem(svl.level.locations[u.ux + u.dx | 0], u.uy + u.dy | 0))) {
+        if (gx.xlock.door !== $c.relem(svl.level.locations[u.ux + u.dx | 0], u.uy + u.dy | 0)) {
             return gx.xlock.usedtime = 0;   /* you moved */
         }
         switch (gx.xlock.door.flags) {
@@ -332,7 +332,7 @@ export function maybe_reset_pick(container) {   // lock.c:269
      * carried container will still be.  There might not be any context,
      * in which case redundantly clearing it is harmless.
      */
-    if (container ? $c.peq(container, gx.xlock.box) : !gx.xlock.box || !carried(gx.xlock.box)) {
+    if (container ? container === gx.xlock.box : !gx.xlock.box || !carried(gx.xlock.box)) {
         reset_pick();
     }
 }
@@ -425,7 +425,7 @@ export async function pick_lock(pick, rx, ry, container) {   // lock.c:358
     /* coordinates of door/container, for autounlock:
      * doesn't prompt for direction if these are set */
     /* container, for autounlock */
-    const autounlock = rx !== 0 || !$c.peq(container, $c.asRec(null, $T.obj, 112)) ? 1 : 0;
+    const autounlock = rx !== 0 || container !== $c.asRec(null, $T.obj, 112) ? 1 : 0;
     /* 'pick' might be Null [called by do_loot_cont() for AUTOUNLOCK_UNTRAP] */
     if (!pick) {
         dummypick.$copyFrom(cg.zeroobj);
@@ -461,7 +461,7 @@ export async function pick_lock(pick, rx, ry, container) {   // lock.c:358
         await You_cant($C`%sunlock %s.`, picktyp === CREDIT_CARD ? $C`` : $C`lock or `, await mon_nam(u.ustuck));
         return PICKLOCK_DID_NOTHING;
     }
-    if (!$c.peq(pick, dummypick) && picktyp !== SKELETON_KEY && picktyp !== LOCK_PICK && picktyp !== CREDIT_CARD) {
+    if (pick !== dummypick && picktyp !== SKELETON_KEY && picktyp !== LOCK_PICK && picktyp !== CREDIT_CARD) {
         await impossible($C`picking lock with object %d?`, picktyp);
         return PICKLOCK_DID_NOTHING;
     }
@@ -491,7 +491,7 @@ export async function pick_lock(pick, rx, ry, container) {   // lock.c:358
         for (otmp = svl.level.objects[cc.x][cc.y]; otmp; otmp = otmp.v.v_nexthere) {
             /* autounlock on boxes: only the one that was just discovered to
                be locked; don't include any other boxes which might be here */
-            if (autounlock && !$c.peq(otmp, container)) {
+            if (autounlock && otmp !== container) {
                 continue;
             }
             if (Is_box(otmp)) {
@@ -519,7 +519,7 @@ export async function pick_lock(pick, rx, ry, container) {   // lock.c:358
                     return PICKLOCK_DID_SOMETHING;   /* even if no trap found */
                 } else if (autounlock && (flags.autounlock & AUTOUNLOCK.APPLY_KEY) >>> 0 !== 0) {
                     c = 113;
-                    if (!$c.peq(pick, dummypick)) {
+                    if (pick !== dummypick) {
                         $c.sprintf(new $c.Ptr(qbuf, 0), $C`Unlock it with %s?`, await yname(pick));
                         c = await ynq(new $c.Ptr(qbuf, 0));
                     }
@@ -1089,7 +1089,7 @@ export async function boxlock(obj, otmp) {   // lock.c:1056
         case SPE_POLYMORPH:
             /* maybe start unlocking chest, get interrupted, then zap it;
                we must avoid any attempt to resume unlocking it */
-            if ($c.peq(gx.xlock.box, obj)) {
+            if (gx.xlock.box === obj) {
                 reset_pick();
             }
             break;

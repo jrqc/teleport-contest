@@ -374,7 +374,7 @@ export async function wiz_kill() {   // wizcmds.c:243
                isn't; note that if it triggers other kills, those might
                be referred to as "it" */
             const tame = !!mtmp.mtame ? 1 : 0;
-            const seen = canspotmon(mtmp) || u.uswallow && $c.peq(mtmp, u.ustuck) ? 1 : 0;
+            const seen = canspotmon(mtmp) || u.uswallow && mtmp === u.ustuck ? 1 : 0;
             const flgs = SUPPRESS.IT | SUPPRESS.HALLUCINATION | (tame && has_mgivenname(mtmp) ? SUPPRESS.SADDLE : 0);
             const articl = tame ? ARTICLE.YOUR : seen ? ARTICLE.THE : ARTICLE.A;
             const adjs = tame ? !seen ? $C`poor, unseen` : $C`poor` : !seen ? $C`unseen` : null;
@@ -1442,7 +1442,7 @@ async function you_sanity_check() {   // wizcmds.c:1402
     }
     if ((mtmp = svl.level.monsters[u.ux][u.uy]) !== null) {
         /* u.usteed isn't on the map */
-        if (!$c.peq(u.ustuck, mtmp)) {
+        if (u.ustuck !== mtmp) {
             await impossible($C`sanity_check: you over monster`);
         }
     }

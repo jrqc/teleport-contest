@@ -63,13 +63,13 @@ export async function ballrelease(showmsg) {   // ball.c:23
         if (showmsg) {
             await pline($C`Startled, you drop the iron ball.`);
         }
-        if ($c.peq($G.uwep, $G.uball)) {
+        if ($G.uwep === $G.uball) {
             await setuwep(null);
         }
-        if ($c.peq($G.uswapwep, $G.uball)) {
+        if ($G.uswapwep === $G.uball) {
             await setuswapwep(null);
         }
-        if ($c.peq($G.uquiver, $G.uball)) {
+        if ($G.uquiver === $G.uball) {
             await setuqwep(null);
         }
         /* [this used to test 'if (uwep != uball)' but that always passes
@@ -86,7 +86,7 @@ export async function ballfall() {   // ball.c:43
     if (!$G.uball || $G.uball && carried($G.uball) && await welded($G.uball)) {
         return;
     }
-    const gets_hit = ($G.uball.ox !== u.ux || $G.uball.oy !== u.uy) && ($c.peq($G.uwep, $G.uball) ? FALSE : $c.i8(rn2(5))) ? 1 : 0;
+    const gets_hit = ($G.uball.ox !== u.ux || $G.uball.oy !== u.uy) && ($G.uwep === $G.uball ? FALSE : $c.i8(rn2(5))) ? 1 : 0;
     await ballrelease(TRUE);
     if (gets_hit) {
         let dmg = rn2(7) + 25 | 0;
@@ -285,10 +285,10 @@ async function bc_order() {   // ball.c:354
         return BCPOS_DIFFER;
     }
     for (obj = svl.level.objects[$G.uball.ox][$G.uball.oy]; obj; obj = obj.v.v_nexthere) {
-        if ($c.peq(obj, $G.uchain)) {
+        if (obj === $G.uchain) {
             return BCPOS_CHAIN;
         }
-        if ($c.peq(obj, $G.uball)) {
+        if (obj === $G.uball) {
             return BCPOS_BALL;
         }
     }
@@ -879,7 +879,7 @@ async function litter() {   // ball.c:965
     const capacity = weight_cap();
     for (otmp = gi.invent; otmp; otmp = nextobj) {
         nextobj = otmp.nobj;
-        if (!$c.peq(otmp, $G.uball) && rnd(capacity) <= (otmp.owt | 0)) {
+        if (otmp !== $G.uball && rnd(capacity) <= (otmp.owt | 0)) {
             if (await canletgo(otmp, $C``)) {
                 await You($C`drop %s and %s %s down the stairs with you.`, await yname(otmp), otmp.quan === 1 ? $C`it` : $C`they`, await otense(otmp, $C`fall`));
                 await setnotworn(otmp);
@@ -902,7 +902,7 @@ export async function drag_down() {   // ball.c:986
      *     not wielding any weapon), or
      *  c) (perhaps) it falls forward out of his non-weapon hand
      */
-    const forward = carried($G.uball) && ($c.peq($G.uwep, $G.uball) || !$G.uwep || !rn2(3)) ? 1 : 0;
+    const forward = carried($G.uball) && ($G.uwep === $G.uball || !$G.uwep || !rn2(3)) ? 1 : 0;
     if (carried($G.uball) && !await welded($G.uball)) {
         await You($C`lose your grip on the iron ball.`);
     }

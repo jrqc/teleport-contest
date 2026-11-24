@@ -419,7 +419,7 @@ async function moverock_core(sx, sy) {   // hack.c:348
            this one.  Probably not worth bothering with... */
         firstboulder = FALSE;
         /* make sure that this boulder is visible as the top object */
-        if (!$c.peq(otmp, svl.level.objects[sx][sy])) {
+        if (otmp !== svl.level.objects[sx][sy]) {
             await movobj(otmp, sx, sy);
         }
         const rx = $c.i16(u.ux + Math.imul(2, u.dx) | 0);   /* boulder destination position */
@@ -640,7 +640,7 @@ async function moverock_core(sx, sy) {   // hack.c:348
              * Re-link at top of fobj chain so that pile order is preserved
              * when level is restored.
              */
-            if (!$c.peq(otmp, svl.level.objlist)) {
+            if (otmp !== svl.level.objlist) {
                 await remove_object(otmp);
                 await place_object(otmp, otmp.ox, otmp.oy);
             }
@@ -921,7 +921,7 @@ export function bad_rock(mdat, x, y) {   // hack.c:939
  */
 export function cant_squeeze_thru(mon) {   // hack.c:953
     const ptr = mon.data;
-    if ($c.peq(mon, gy.youmonst) ? Passes_walls() : passes_walls(ptr)) {
+    if (mon === gy.youmonst ? Passes_walls() : passes_walls(ptr)) {
         return 0;
     }
     /* too big? */
@@ -929,12 +929,12 @@ export function cant_squeeze_thru(mon) {   // hack.c:953
         return 1;
     }
     /* lugging too much junk? */
-    const amt = $c.peq(mon, gy.youmonst) ? inv_weight() + weight_cap() | 0 : curr_mon_load(mon);
+    const amt = mon === gy.youmonst ? inv_weight() + weight_cap() | 0 : curr_mon_load(mon);
     if (amt > WT.TOOMUCH_DIAGONAL) {
         return 2;
     }
     /* Sokoban restriction applies to hero only */
-    if ($c.peq(mon, gy.youmonst) && Sokoban()) {
+    if (mon === gy.youmonst && Sokoban()) {
         return 3;
     }
     /* can squeeze through */
@@ -1976,7 +1976,7 @@ async function domove_fight_web(x, y) {   // hack.c:2021
                 uwepstr = await makeplural(new $c.Ptr(uwepbuf, 0));
             }
             if (!onewep) {
-                (!!$c.peq($G.uswapwep, $c.asRec(null, $T.obj, 112)) ? 1 : 0) ? $c.__assert_rtn($C`domove_fight_web`, $C`hack.c`, 2065, $C`uswapwep != NULL`) : 0;
+                (!($G.uswapwep !== $c.asRec(null, $T.obj, 112)) ? 1 : 0) ? $c.__assert_rtn($C`domove_fight_web`, $C`hack.c`, 2065, $C`uswapwep != NULL`) : 0;
                 scndstr = $G.uswapwep.quan === 1 ? await an(new $c.Ptr(scndbuf, 0)) : await makeplural(new $c.Ptr(scndbuf, 0));
             }
             await You_cant($C`cut a web with %s%s%s!`, uwepstr, !onewep ? $C` or ` : $C``, !onewep ? scndstr : $C``);
@@ -2042,7 +2042,7 @@ async function domove_swap_with_pet(mtmp, x, y) {   // hack.c:2098
         didnt_move = TRUE;
     } else if (mtmp.mpeaceful && mtmp.mtrapped) {
         /* all mtame are also mpeaceful, so this affects pets too */
-        (!!$c.peq(trap, $c.asRec(null, $T.trap, 32)) ? 1 : 0) ? $c.__assert_rtn($C`domove_swap_with_pet`, $C`hack.c`, 2143, $C`trap != NULL`) : 0;   /* implied by mtrapped */
+        (!(trap !== $c.asRec(null, $T.trap, 32)) ? 1 : 0) ? $c.__assert_rtn($C`domove_swap_with_pet`, $C`hack.c`, 2143, $C`trap != NULL`) : 0;   /* implied by mtrapped */
         const what = trapname(trap.ttyp, FALSE);
         let which = $C`that `;
         if (!trap.tseen) {
@@ -2052,7 +2052,7 @@ async function domove_swap_with_pet(mtmp, x, y) {   // hack.c:2098
         await You($C`stop.  %s can't move out of %s%s.`, await YMonnam(mtmp), which, what);
         await handle_tip(TIP.UNTRAP_MON);
         didnt_move = TRUE;
-    } else if (mtmp.mpeaceful && (!goodpos(u.ux0, u.uy0, mtmp, 0) || !$c.peq(t_at(u.ux0, u.uy0), $c.asRec(null, $T.trap, 32)) || mundisplaceable(mtmp))) {
+    } else if (mtmp.mpeaceful && (!goodpos(u.ux0, u.uy0, mtmp, 0) || t_at(u.ux0, u.uy0) !== $c.asRec(null, $T.trap, 32) || mundisplaceable(mtmp))) {
         /* displacing peaceful into unsafe or trapped space, or trying to
            displace quest leader, Oracle, shk, priest, or vault guard */
         await You($C`stop.  %s doesn't want to swap places.`, await YMonnam(mtmp));
@@ -3263,7 +3263,7 @@ function monstinroom(mdat, roomno) {   // hack.c:3466
         if (DEADMONSTER(mtmp)) {
             continue;
         }
-        if ($c.peq(mtmp.data, mdat) && $c.strchr(in_rooms(mtmp.mx, mtmp.my, 0), roomno + ROOMOFFSET | 0)) {
+        if (mtmp.data === mdat && $c.strchr(in_rooms(mtmp.mx, mtmp.my, 0), roomno + ROOMOFFSET | 0)) {
             return mtmp;
         }
     }

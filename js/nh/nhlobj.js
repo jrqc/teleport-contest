@@ -135,7 +135,7 @@ async function l_obj_add_to_container(L) {   // nhlobj.c:114
     await obj_extract_self(lo.obj);
     const otmp = await add_to_container(lobox.obj, lo.obj);
     /* was lo->obj merged? */
-    if (!$c.peq(otmp, lo.obj)) {
+    if (otmp !== lo.obj) {
         lo.obj = otmp;
         lo.obj.lua_ref_cnt = lo.obj.lua_ref_cnt + (refs >>> 0) >>> 0;
     }
@@ -156,7 +156,7 @@ export async function nhl_obj_u_giveobj(L) {   // nhlobj.c:142
     const refs = lo.obj.lua_ref_cnt | 0;
     await obj_extract_self(lo.obj);
     const otmp = await addinv(lo.obj);
-    if (!$c.peq(otmp, lo.obj)) {
+    if (otmp !== lo.obj) {
         lo.obj.lua_ref_cnt = lo.obj.lua_ref_cnt + (refs >>> 0) >>> 0;
         lo.obj = otmp;
     }
@@ -339,7 +339,7 @@ async function l_obj_new_readobjnam(L) {   // nhlobj.c:350
     if (argc === 1 && lua_type(L, 1) === LUA.TSTRING) {
         $c.sprintf(new $c.Ptr(buf, 0), $C`%s`, await luaL_checklstring(L, 1, null));
         await lua_settop(L, -2);
-        if ($c.peq(otmp = await readobjnam(new $c.Ptr(buf, 0), null), hands_obj)) {
+        if ((otmp = await readobjnam(new $c.Ptr(buf, 0), null)) === hands_obj) {
             otmp = null;
         }
         await l_obj_push(L, otmp);

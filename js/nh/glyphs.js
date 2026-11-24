@@ -512,7 +512,7 @@ export async function add_custom_nhcolor_entry(customization_name, glyphidx, nhc
     newdetails.content.urep.glyphidx = glyphidx;
     newdetails.content.ccolor.nhcolor = nhcolor;
     newdetails.next = null;
-    if ($c.peq(gdc.details, $c.asRec(null, $T.customization_detail, 32))) {
+    if (gdc.details === $c.asRec(null, $T.customization_detail, 32)) {
         gdc.details = newdetails;
     } else {
         gdc.details_end.next = newdetails;
@@ -616,7 +616,7 @@ async function shuffle_customizations() {   // glyphs.c:646
                 tmp_customcolor[i] = $c.radd(obj_glyphs, idx).customcolor;
                 tmp_color256idx[i] = $c.radd(obj_glyphs, idx).color256idx;
                 tmp_u[i] = $c.radd(obj_glyphs, idx).u;
-                if (!$c.peq($c.radd(obj_glyphs, idx).u, $c.asRec(null, $T.unicode_representation, 16)) || $c.radd(obj_glyphs, idx).customcolor !== 0) {
+                if ($c.radd(obj_glyphs, idx).u !== $c.asRec(null, $T.unicode_representation, 16) || $c.radd(obj_glyphs, idx).customcolor !== 0) {
                     duplicate[idx] = i;
                     $c.radd(obj_glyphs, idx).u = null;
                     $c.radd(obj_glyphs, idx).customcolor = 0;
@@ -626,7 +626,7 @@ async function shuffle_customizations() {   // glyphs.c:646
         }
         for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
             /* Some glyphmaps may not have been transferred */
-            if (!$c.peq($c.radd(obj_glyphs, i).u, $c.asRec(null, $T.unicode_representation, 16))) {
+            if ($c.radd(obj_glyphs, i).u !== $c.asRec(null, $T.unicode_representation, 16)) {
                 $c.free($c.radd(obj_glyphs, i).u.utf8str);
                 $c.free($c.radd(obj_glyphs, i).u);
             }

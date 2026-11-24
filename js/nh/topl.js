@@ -738,7 +738,7 @@ export async function tty_putmsghistory(msg, restoring_msghist) {   // topl.c:68
         $c.strcpy(new $c.Ptr(gt.toplines, 0), msg);
         await dumplogmsg(new $c.Ptr(gt.toplines, 0));
     } else if (snapshot_mesgs) {
-        !!($c.peq($G.ttyDisplay, $c.asRec(null, $T.DisplayDesc, 60)) || $G.ttyDisplay.toplin !== TOPLINE.NEED_MORE) || (await nhassert_failed($C`ttyDisplay == NULL || ttyDisplay->toplin != TOPLINE_NEED_MORE`, $C`../win/tty/topl.c`, 720), 0);
+        !!($G.ttyDisplay === $c.asRec(null, $T.DisplayDesc, 60) || $G.ttyDisplay.toplin !== TOPLINE.NEED_MORE) || (await nhassert_failed($C`ttyDisplay == NULL || ttyDisplay->toplin != TOPLINE_NEED_MORE`, $C`../win/tty/topl.c`, 720), 0);
         /* done putting arbitrary messages in; put the snapshot ones back */
         for (idx = 0; snapshot_mesgs.get(idx); idx = idx + 1 | 0) {
             await remember_topl();

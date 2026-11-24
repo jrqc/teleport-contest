@@ -245,7 +245,7 @@ function pick_room(strict) {   // mkroom.c:220
     let sroom = null, $t1;
     let i = svn.nroom;
     for (sroom = $c.relem(svr.rooms, rn2(svn.nroom)); $t1 = i, i = $t1 - 1 | 0, $t1; sroom = $c.radd(sroom, 1)) {
-        if ($c.peq(sroom, $c.relem(svr.rooms, svn.nroom))) {
+        if (sroom === $c.relem(svr.rooms, svn.nroom)) {
             sroom = svr.rooms[0];
         }
         if (sroom.hx < 0) {

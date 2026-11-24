@@ -939,7 +939,7 @@ export async function check_panic_save() {   // files.c:1312
     const cfn = $c.asArr(await alloc(ln + 1 >>> 0), Int8Array);
     $c.strcpy(cfn, savef);
     $c.strcat(cfn, $C`.Z`);
-    if (!$c.peq(cf = $c.fopen(cfn, $C`r`), $c.asRec(null, $T.__sFILE, 152))) {
+    if ((cf = $c.fopen(cfn, $C`r`)) !== $c.asRec(null, $T.__sFILE, 152)) {
         $c.fclose(cf);
         result = 1;
     }
@@ -947,7 +947,7 @@ export async function check_panic_save() {   // files.c:1312
     /* COMPRESS_EXTENSION */
     if (!result) {
         /* maybe it has already been manually uncompressed */
-        if (!$c.peq(cf = $c.fopen(savef, $C`r`), $c.asRec(null, $T.__sFILE, 152))) {
+        if ((cf = $c.fopen(savef, $C`r`)) !== $c.asRec(null, $T.__sFILE, 152)) {
             $c.fclose(cf);
             result = 1;
         }
@@ -1389,7 +1389,7 @@ async function fopen_wizkit_file() {   // files.c:2465
  * @returns {Promise<void>}
  */
 async function wizkit_addinv(obj) {   // files.c:2537
-    if (!obj || $c.peq(obj, hands_obj)) {
+    if (!obj || obj === hands_obj) {
         return;
     }
     /* subset of starting inventory pre-ID */
@@ -1419,7 +1419,7 @@ export async function proc_wizkit_line(buf) {   // files.c:2562
     }
     const otmp = await readobjnam(buf, null);
     if (otmp) {
-        if (!$c.peq(otmp, hands_obj)) {
+        if (otmp !== hands_obj) {
             await wish_history_add(buf);
             await wizkit_addinv(otmp);
         }

@@ -257,7 +257,7 @@ async function confused_book(spellbook) {   // spell.c:189
         await useup(spellbook);
         gone = TRUE;
     } else {
-        await You($C`find yourself reading the %s line over and over again.`, $c.peq(spellbook, svc.context.spbook.book) ? $C`next` : $C`first`);
+        await You($C`find yourself reading the %s line over and over again.`, spellbook === svc.context.spbook.book ? $C`next` : $C`first`);
     }
     return gone;
 }
@@ -398,7 +398,7 @@ async function deadbook(book2) {   // spell.c:231
  * @returns {Promise<void>}
  */
 export async function book_cursed(book) {   // spell.c:343
-    if (book.cursed && gm.multi >= 0 && go.occupation === learn && $c.peq(svc.context.spbook.book, book)) {
+    if (book.cursed && gm.multi >= 0 && go.occupation === learn && svc.context.spbook.book === book) {
         await pline($C`%s shut!`, await Tobjnam(book, $C`slam`));
         await set_bknown(book, 1);
         await stop_occupation();
@@ -525,7 +525,7 @@ export async function study_book(spellbook) {   // spell.c:468
     if (!confused && !Sleep_resistance() && await objdescr_is(spellbook, $C`dull`)) {
         let dullbook = rnd(25) - ACURR(A.WIS) | 0;
         /* adjust chance if hero stayed awake, got interrupted, retries */
-        if (svc.context.spbook.delay && $c.peq(spellbook, svc.context.spbook.book)) {
+        if (svc.context.spbook.delay && spellbook === svc.context.spbook.book) {
             dullbook = dullbook - rnd(objects[booktype].oc_oc2) | 0;
         }
         if (dullbook > 0) {
@@ -541,7 +541,7 @@ export async function study_book(spellbook) {   // spell.c:468
     }
     /* handle the sequence: start reading, get interrupted, have
        svc.context.spbook.book become erased somehow, resume reading it */
-    if (svc.context.spbook.delay && !confused && $c.peq(spellbook, svc.context.spbook.book) && booktype !== SPE_BLANK_PAPER) {
+    if (svc.context.spbook.delay && !confused && spellbook === svc.context.spbook.book && booktype !== SPE_BLANK_PAPER) {
         await You($C`continue your efforts to %s.`, booktype === SPE_NOVEL ? $C`read the novel` : $C`memorize the spell`);
     } else {
         /* KMH -- Simplified this code */
@@ -669,7 +669,7 @@ export async function study_book(spellbook) {   // spell.c:468
  * @param {$T.obj | null} obj struct obj *
  */
 export function book_disappears(obj) {   // spell.c:646
-    if ($c.peq(obj, svc.context.spbook.book)) {
+    if (obj === svc.context.spbook.book) {
         svc.context.spbook.book = null;
         svc.context.spbook.o_id = 0;
     }
@@ -682,7 +682,7 @@ export function book_disappears(obj) {   // spell.c:646
  * @param {$T.obj | null} new_obj struct obj *
  */
 export function book_substitution(old_obj, new_obj) {   // spell.c:658
-    if ($c.peq(old_obj, svc.context.spbook.book)) {
+    if (old_obj === svc.context.spbook.book) {
         svc.context.spbook.book = new_obj;
         if (svc.context.spbook.book) {
             svc.context.spbook.o_id = svc.context.spbook.book.o_id;

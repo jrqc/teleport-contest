@@ -296,9 +296,9 @@ export function dig_check(madeby, x, y) {   // dig.c:207
         } else {
             return DIGCHECK.FAIL_ONSTAIRS;
         }
-    } else if (svl.level.locations[x][y].typ === THRONE && !$c.peq(madeby, null)) {
+    } else if (svl.level.locations[x][y].typ === THRONE && madeby !== null) {
         return DIGCHECK.FAIL_THRONE;
-    } else if (svl.level.locations[x][y].typ === ALTAR && (!$c.peq(madeby, null) || (altarmask_at(x, y) & AM.SANCTUM) !== 0)) {
+    } else if (svl.level.locations[x][y].typ === ALTAR && (madeby !== null || (altarmask_at(x, y) & AM.SANCTUM) !== 0)) {
         return DIGCHECK.FAIL_ALTAR;
     } else if ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) {
         return DIGCHECK.FAIL_AIRLEVEL;
@@ -320,7 +320,7 @@ export function dig_check(madeby, x, y) {   // dig.c:207
         }
     } else if (sobj_at(BOULDER, x, y)) {
         return DIGCHECK.FAIL_BOULDER;
-    } else if ($c.peq(madeby, null) && (ttmp || is_pool_or_lava(x, y))) {
+    } else if (madeby === null && (ttmp || is_pool_or_lava(x, y))) {
         /* the block against existing traps is mainly to
            prevent broken wands from turning holes into pits */
         /* digging by player handles pools separately */
@@ -336,7 +336,7 @@ export function dig_check(madeby, x, y) {   // dig.c:207
  * @returns {Promise<void>}
  */
 export async function digcheck_fail_message(digresult, madeby, x, y) {   // dig.c:255
-    const verb = $c.peq(madeby, BY_YOU()) && $G.uwep && is_axe($G.uwep) ? $C`chop` : $C`dig in`;
+    const verb = madeby === BY_YOU() && $G.uwep && is_axe($G.uwep) ? $C`chop` : $C`dig in`;
     if (digresult < DIGCHECK.FAILED) {
         return;
     }
@@ -707,8 +707,8 @@ export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
     const lev = $c.relem(svl.level.locations[x], y);
     const mtmp = svl.level.monsters[x][y];   /* may be madeby */
     /* BY_OBJECT means the hero broke a wand, so blame her for it */
-    const madeby_u = $c.peq(madeby, BY_YOU()) ? 1 : 0;
-    const madeby_obj = $c.peq(madeby, null) ? 1 : 0;
+    const madeby_u = madeby === BY_YOU() ? 1 : 0;
+    const madeby_obj = madeby === null ? 1 : 0;
     const heros_fault = madeby_u || madeby_obj ? 1 : 0;
     const at_u = u_at(x, y);
     let wont_fall = Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked ? 1 : 0;
@@ -804,7 +804,7 @@ export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
             } else {
                 await reset_utrap(TRUE);
             }
-            if (!$c.peq(oldobjs, newobjs)) {   /* something unearthed */
+            if (oldobjs !== newobjs) {   /* something unearthed */
                 await pickup(1);   /* detects pit */
             }
         } else if (mtmp) {
@@ -812,7 +812,7 @@ export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
                 if (canseemon(mtmp)) {
                     await pline($C`%s %s over the pit.`, await Monnam(mtmp), is_flyer(mtmp.data) ? $C`flies` : $C`floats`);
                 }
-            } else if (!$c.peq(mtmp, madeby)) {
+            } else if (mtmp !== madeby) {
                 await mintrap(mtmp, NO_TRAP_FLAGS);
             }
         }
@@ -838,7 +838,7 @@ export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
                 if (newobjs) {
                     await impact_drop(null, x, y, 0);
                 }
-                if (!$c.peq(oldobjs, newobjs)) {
+                if (oldobjs !== newobjs) {
                     await pickup(1);
                 }
                 if (shopdoor && heros_fault) {
@@ -873,7 +873,7 @@ export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
                 if (!(!($c.andu64(mtmp.data.mflags1, M1.FLY) !== 0) && !(mtmp.data.mlet === S.EYE || mtmp.data.mlet === S.LIGHT) && (!($c.andu64(mtmp.data.mflags1, M1.CLING) !== 0) || !has_ceiling(u.uz))) || mtmp.wormno && count_wsegs(mtmp) > 5 || mtmp.data.msize >= MZ.HUGE) {
                     return;
                 }
-                if ($c.peq(mtmp, u.ustuck)) {   /* probably a vortex */
+                if (mtmp === u.ustuck) {   /* probably a vortex */
                     return;   /* temporary? kludge */
                 }
                 if (await teleport_pet(mtmp, FALSE)) {
@@ -1130,7 +1130,7 @@ export async function use_pick_axe(obj) {   // dig.c:1092
     let dirsyms = new Int8Array(12), qbuf = new Int8Array(256), dir = 0, $t1;
     const res = ECMD.OK;
     /* Check tool */
-    if (!$c.peq(obj, $G.uwep)) {
+    if (obj !== $G.uwep) {
         if (await wield_tool(obj, $C`swing`)) {
             /* we're now wielding it. next turn, apply to dig. */
             await cmdq_add_ec(CQ_CANNED, doapply);
@@ -1945,7 +1945,7 @@ export async function bury_an_obj(otmp, dealloced) {   // dig.c:1984
     if (dealloced) {
         dealloced.set(0, FALSE);
     }
-    if ($c.peq(otmp, $G.uball)) {
+    if (otmp === $G.uball) {
         await unpunish();
         set_utrap((rn2(50) + 20 | 0) >>> 0, TT.BURIEDBALL);
         await pline_The($C`iron ball gets buried!`);
@@ -1960,7 +1960,7 @@ export async function bury_an_obj(otmp, dealloced) {   // dig.c:1984
      * the real reason there (direct accessibility when carried) is
      * completely different.
      */
-    if ($c.peq(otmp, $G.uchain) || obj_resists(otmp, 0, 0)) {
+    if (otmp === $G.uchain || obj_resists(otmp, 0, 0)) {
         return otmp2;
     }
     if (otmp.otyp === LEASH && otmp.corpsenm !== 0) {
@@ -2049,7 +2049,7 @@ export async function unearth_objs(x, y) {   // dig.c:2086
     for (otmp = svl.level.buriedobjlist; otmp; otmp = otmp2) {
         otmp2 = otmp.nobj;
         if (otmp.ox === x && otmp.oy === y) {
-            if (bball && $c.peq(otmp, bball) && u.utrap && u.utraptype === TT.BURIEDBALL) {
+            if (bball && otmp === bball && u.utrap && u.utraptype === TT.BURIEDBALL) {
                 await buried_ball_to_punishment();
             } else {
                 await obj_extract_self(otmp);
@@ -2113,14 +2113,14 @@ export async function rot_corpse(arg, timeout) {   // dig.c:2146
     } else if (in_invent) {
         if (flags.verbose) {
             const cname = await corpse_xname(obj, null, CXN.NO_PFX);
-            await Your($C`%s%s %s away%c`, $c.peq(obj, $G.uwep) ? $C`wielded ` : $C``, cname, await otense(obj, $C`rot`), $c.peq(obj, $G.uwep) ? 33 : 46);
+            await Your($C`%s%s %s away%c`, obj === $G.uwep ? $C`wielded ` : $C``, cname, await otense(obj, $C`rot`), obj === $G.uwep ? 33 : 46);
         }
         if (obj.owornmask) {
             await remove_worn_item(obj, TRUE);
             await stop_occupation();
         }
     } else if (obj.where === OBJ.MINVENT) {
-        if (obj.owornmask && $c.peq(obj, obj.v.v_ocarry.mw)) {
+        if (obj.owornmask && obj === obj.v.v_ocarry.mw) {
             await setmnotwielded(obj.v.v_ocarry, obj);   /* clears owornmask */
         }
     } else if (obj.where === OBJ.MIGRATING) {

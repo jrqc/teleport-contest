@@ -221,7 +221,7 @@ export async function awaken_soldiers(bugler) {   // music.c:162
     let mtmp = null, distm = 0, $t1;
     /* monster that played instrument */
     /* distance of affected non-soldier monsters to bugler */
-    const distance = Math.imul($c.peq(bugler, gy.youmonst) ? u.ulevel : bugler.data.mlevel, 30);
+    const distance = Math.imul(bugler === gy.youmonst ? u.ulevel : bugler.data.mlevel, 30);
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
         if (DEADMONSTER(mtmp)) {
             continue;
@@ -238,7 +238,7 @@ export async function awaken_soldiers(bugler) {   // music.c:162
             } else if (!Deaf()) {
                 await Norep($C`%s the rattle of battle gear being readied.`, $C`You hear`);   /* Deaf-aware */
             }
-        } else if ((distm = $c.peq(bugler, gy.youmonst) ? dist2(mtmp.mx, mtmp.my, u.ux, u.uy) : dist2(bugler.mx, bugler.my, mtmp.mx, mtmp.my)) < distance) {
+        } else if ((distm = bugler === gy.youmonst ? dist2(mtmp.mx, mtmp.my, u.ux, u.uy) : dist2(bugler.mx, bugler.my, mtmp.mx, mtmp.my)) < distance) {
             await awaken_scare(mtmp, distm < $c.div32(distance, 3) ? 1 : 0);
         }
     }
@@ -304,7 +304,7 @@ async function do_pit(x, y, tu_pit) {   // music.c:221
         await set_levltyp(x, y, filltype);   /* levl[x][y] = filltype; */
         await liquid_flow(x, y, filltype, chasm, null);
         /* liquid_flow() deletes trap, might kill mtmp */
-        if ($c.peq(chasm = t_at(x, y), $c.asRec(null, $T.trap, 32))) {
+        if ((chasm = t_at(x, y)) === $c.asRec(null, $T.trap, 32)) {
             return;
         }
     }

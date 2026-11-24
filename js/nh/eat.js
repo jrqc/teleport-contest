@@ -436,7 +436,7 @@ async function touchfood(otmp) {   // eat.c:360
  * @returns {Promise<void>}
  */
 export async function food_disappears(obj) {   // eat.c:396
-    if ($c.peq(obj, svc.context.victual.piece)) {
+    if (obj === svc.context.victual.piece) {
         svc.context.victual.$copyFrom(zero_victual);   /* victual.piece = 0, .o_id = 0 */
     }
     if (obj.timed) {
@@ -451,11 +451,11 @@ export async function food_disappears(obj) {   // eat.c:396
  * @param {$T.obj | null} new_obj struct obj *
  */
 export function food_substitution(old_obj, new_obj) {   // eat.c:409
-    if ($c.peq(old_obj, svc.context.victual.piece)) {
+    if (old_obj === svc.context.victual.piece) {
         svc.context.victual.piece = new_obj;
         svc.context.victual.o_id = new_obj.o_id;
     }
-    if ($c.peq(old_obj, svc.context.tin.tin)) {
+    if (old_obj === svc.context.tin.tin) {
         svc.context.tin.tin = new_obj;
         svc.context.tin.o_id = new_obj.o_id;
     }
@@ -636,17 +636,17 @@ export async function eat_brains(magr, mdef, visflag, dmg_p) {   // eat.c:603
     const xtra_dmg = rnd(10);
     /* previous tentacle attack might have triggered fatal passive
        counterattack [callers ought to be updated to avoid this situation] */
-    if (!$c.peq(magr, gy.youmonst) && DEADMONSTER(magr)) {
+    if (magr !== gy.youmonst && DEADMONSTER(magr)) {
         return M_ATTK.AGR_DIED;
     }
     if (noncorporeal(pd)) {
         if (visflag) {
-            await pline($C`%s brain is unharmed.`, $c.peq(mdef, gy.youmonst) ? $C`Your` : s_suffix(await Monnam(mdef)));
+            await pline($C`%s brain is unharmed.`, mdef === gy.youmonst ? $C`Your` : s_suffix(await Monnam(mdef)));
         }
         return M_ATTK.MISS;   /* side-effects can't occur */
-    } else if ($c.peq(magr, gy.youmonst)) {
+    } else if (magr === gy.youmonst) {
         await You($C`eat %s brain!`, s_suffix(await mon_nam(mdef)));
-    } else if ($c.peq(mdef, gy.youmonst)) {
+    } else if (mdef === gy.youmonst) {
         await Your($C`brain is eaten!`);
     } else {
         /* monster against monster */
@@ -658,7 +658,7 @@ export async function eat_brains(magr, mdef, visflag, dmg_p) {   // eat.c:603
         /* mind flayer has attempted to eat the brains of a petrification
            inducing critter (most likely Medusa; attacking a cockatrice via
            tentacle-touch should have been caught before reaching this far) */
-        if ($c.peq(magr, gy.youmonst)) {
+        if (magr === gy.youmonst) {
             if (!Stone_resistance() && !Stoned()) {
                 await make_stoned(5, null, KILLED.BY_AN, pmname(pd, Mgender(mdef)));
             }
@@ -680,7 +680,7 @@ export async function eat_brains(magr, mdef, visflag, dmg_p) {   // eat.c:603
             }
         }
     }
-    if ($c.peq(magr, gy.youmonst)) {
+    if (magr === gy.youmonst) {
         /*
          * player mind flayer is eating something's brain
          */
@@ -714,7 +714,7 @@ export async function eat_brains(magr, mdef, visflag, dmg_p) {   // eat.c:603
         /* targeting another mind flayer or your own underlying species
            is cannibalism */
         await maybe_cannibal(pd.pmidx, TRUE);
-    } else if ($c.peq(mdef, gy.youmonst)) {
+    } else if (mdef === gy.youmonst) {
         /*
          * monster mind flayer is eating hero's brain
          */
@@ -2275,7 +2275,7 @@ async function start_eating(otmp, already_partly_eaten) {   // eat.c:2022
  * @returns {number} boolean
  */
 export function eating_glob(glob) {   // eat.c:2078
-    return go.occupation === eatfood && $c.peq(glob, svc.context.victual.piece) ? 1 : 0;
+    return go.occupation === eatfood && glob === svc.context.victual.piece ? 1 : 0;
 }
 /* scare nearby monster when hero eats garlic */
 /**
@@ -2461,7 +2461,7 @@ async function eataccessory(otmp) {   // eat.c:2265
     /* Note: rings are not so common that this is unbalancing. */
     /* (How often do you even _find_ 3 rings of polymorph in a game?) */
     const oldprop = u.uprops[objects[typ].oc_oprop].intrinsic;
-    if ($c.peq(otmp, $G.uleft) || $c.peq(otmp, $G.uright)) {
+    if (otmp === $G.uleft || otmp === $G.uright) {
         await Ring_gone(otmp);
         if (u.uhp <= 0) {
             return;   /* died from sink fall */
@@ -2652,19 +2652,19 @@ async function eatspecial() {   // eat.c:2414
         await pline($C`Yabba-dabba delicious!`);
         await exercise(A.CON, TRUE);
     }
-    if ($c.peq(otmp, $G.uwep) && otmp.quan === 1) {
+    if (otmp === $G.uwep && otmp.quan === 1) {
         await uwepgone();
     }
-    if ($c.peq(otmp, $G.uquiver) && otmp.quan === 1) {
+    if (otmp === $G.uquiver && otmp.quan === 1) {
         await uqwepgone();
     }
-    if ($c.peq(otmp, $G.uswapwep) && otmp.quan === 1) {
+    if (otmp === $G.uswapwep && otmp.quan === 1) {
         await uswapwepgone();
     }
-    if ($c.peq(otmp, $G.uball)) {
+    if (otmp === $G.uball) {
         await unpunish();
     }
-    if ($c.peq(otmp, $G.uchain)) {
+    if (otmp === $G.uchain) {
         await unpunish();   /* but no useup() */
     } else if (carried(otmp)) {
         await useup(otmp);
@@ -2968,7 +2968,7 @@ export async function doeat() {   // eat.c:2817
         }
     }
     /* from floorfood(), &hands_obj means iron bars at current spot */
-    if ($c.peq(otmp[0], hands_obj)) {
+    if (otmp[0] === hands_obj) {
         /* hero in metallivore form is eating [diggable] iron bars
            at current location so skip the other assorted checks;
            operates as if digging rather than via the eat occupation */
@@ -3041,7 +3041,7 @@ export async function doeat() {   // eat.c:2817
     if (otmp[0].oclass !== FOOD_CLASS) {
         return await doeat_nonfood(otmp[0]);
     }
-    if ($c.peq(otmp[0], svc.context.victual.piece)) {
+    if (otmp[0] === svc.context.victual.piece) {
         const one_bite_left = (svc.context.victual.usedtime + 1 | 0) >= svc.context.victual.reqtime ? 1 : 0;
         /* If they weren't able to choke, they don't suddenly become able to
          * choke just because they were interrupted.  On the other hand, if
@@ -3209,7 +3209,7 @@ export async function use_tin_opener(obj) {   // eat.c:3098
         await You($C`have no tin to open.`);
         return ECMD.OK;
     }
-    if (!$c.peq(obj, $G.uwep)) {
+    if (obj !== $G.uwep) {
         if (obj.cursed && obj.bknown) {
             if (await yn_function(await safe_qbuf(new $c.Ptr(qbuf, 0), $C`Really wield `, $C`?`, obj, doname, thesimpleoname, $C`that`), new $c.Ptr(ynqchars, 0), 113, TRUE) !== 121) {
                 return ECMD.OK;
@@ -3914,7 +3914,7 @@ export async function consume_oeaten(obj, amt) {   // eat.c:3808
     /* mustn't let partly-eaten drop all the way to 0 or the item would
        become restored to untouched; set to no bites left */
     if (obj.oeaten === 0) {
-        if ($c.peq(obj, svc.context.victual.piece)) {   /* always true unless wishing */
+        if (obj === svc.context.victual.piece) {   /* always true unless wishing */
             svc.context.victual.reqtime = svc.context.victual.usedtime;
         }
         obj.oeaten = 1;   /* smallest possible positive value */
@@ -3951,7 +3951,7 @@ export async function cant_finish_meal(corpse) {   // eat.c:3893
      * left for another bite.  revive() needs continued access to the
      * corpse and will delete it when done.
      */
-    if (go.occupation === eatfood && $c.peq(svc.context.victual.piece, corpse)) {
+    if (go.occupation === eatfood && svc.context.victual.piece === corpse) {
         /* normally performed by done_eating() */
         svc.context.victual.$copyFrom(zero_victual);   /* victual.piece = 0, .o_id = 0 */
         if (!corpse.oeaten) {

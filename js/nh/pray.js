@@ -436,14 +436,14 @@ async function fix_curse_trouble(otmp, what) {   // pray.c:349
         await impossible($C`fix_curse_trouble: nothing to uncurse.`);
         return;
     }
-    if ($c.peq(otmp, $G.uarmg) && Glib()) {
+    if (otmp === $G.uarmg && Glib()) {
         await make_glib(0);
         await Your($C`%s are no longer slippery.`, gloves_simple_name($G.uarmg));
         if (!otmp.cursed) {
             return;
         }
     }
-    if (!Blind() || $c.peq(otmp, $G.ublindf) && Blindfolded_only()) {
+    if (!Blind() || otmp === $G.ublindf && Blindfolded_only()) {
         await pline($C`%s %s.`, what ? what : await Yobjnam2(otmp, $C`softly glow`), hcolor(c_color_names.c_amber));
         iflags.last_msg = PLNMSG.OBJ_GLOWS;
         otmp.bknown = (!Hallucination() ? 1 : 0) & 1;   /* ok to skip set_bknown() */
@@ -528,11 +528,11 @@ async function fix_worst_trouble(trouble) {   // pray.c:373
             disp.botl = TRUE;
             if (Fixed_abil()) {
                 if ((otmp = await stuck_ring($G.uleft, RIN_SUSTAIN_ABILITY)) !== null) {
-                    if ($c.peq(otmp, $G.uleft)) {
+                    if (otmp === $G.uleft) {
                         what = new $c.Ptr(fix_worst_trouble$leftglow, 0);
                     }
                 } else if ((otmp = await stuck_ring($G.uright, RIN_SUSTAIN_ABILITY)) !== null) {
-                    if ($c.peq(otmp, $G.uright)) {
+                    if (otmp === $G.uright) {
                         what = new $c.Ptr(fix_worst_trouble$rightglow, 0);
                     }
                 }
@@ -564,11 +564,11 @@ async function fix_worst_trouble(trouble) {   // pray.c:373
             if ($G.uarmf && $G.uarmf.otyp === LEVITATION_BOOTS && $G.uarmf.cursed) {
                 otmp = $G.uarmf;
             } else if ((otmp = await stuck_ring($G.uleft, RIN_LEVITATION)) !== null) {
-                if ($c.peq(otmp, $G.uleft)) {
+                if (otmp === $G.uleft) {
                     what = new $c.Ptr(fix_worst_trouble$leftglow, 0);
                 }
             } else if ((otmp = await stuck_ring($G.uright, RIN_LEVITATION)) !== null) {
-                if ($c.peq(otmp, $G.uright)) {
+                if (otmp === $G.uright) {
                     what = new $c.Ptr(fix_worst_trouble$rightglow, 0);
                 }
             }
@@ -621,9 +621,9 @@ async function fix_worst_trouble(trouble) {   // pray.c:373
             break;
         case TROUBLE_CURSED_ITEMS:
             otmp = await worst_cursed_item();
-            if ($c.peq(otmp, $G.uright)) {
+            if (otmp === $G.uright) {
                 what = new $c.Ptr(fix_worst_trouble$rightglow, 0);
-            } else if ($c.peq(otmp, $G.uleft)) {
+            } else if (otmp === $G.uleft) {
                 what = new $c.Ptr(fix_worst_trouble$leftglow, 0);
             }
             await fix_curse_trouble(otmp, what);
@@ -1314,7 +1314,7 @@ async function pleased(g_align) {   // pray.c:1071
                     for (otmp = gi.invent; otmp; otmp = nextobj) {
                         nextobj = otmp.nobj;
                         /* [see worst_cursed_item()] */
-                        if (otmp.cursed && (!$c.peq(otmp, $G.uarmh) || $G.uarmh.otyp !== HELM_OF_OPPOSITE_ALIGNMENT)) {
+                        if (otmp.cursed && (otmp !== $G.uarmh || $G.uarmh.otyp !== HELM_OF_OPPOSITE_ALIGNMENT)) {
                             if (!Blind()) {
                                 await pline($C`%s %s.`, await Yobjnam2(otmp, $C`softly glow`), hcolor(c_color_names.c_amber));
                                 iflags.last_msg = PLNMSG.OBJ_GLOWS;
@@ -1544,7 +1544,7 @@ export async function desecrate_altar(highaltar, altaralign) {   // pray.c:1501
  */
 async function offer_real_amulet(otmp, altaralign) {   // pray.c:1529
     /* The final Test.  Did you win? */
-    if ($c.peq($G.uamul, otmp)) {
+    if ($G.uamul === otmp) {
         await Amulet_off();
     }
     if (carried(otmp)) {
@@ -2156,9 +2156,9 @@ async function pray_revive() {   // pray.c:2177
         return FALSE;
     }
     if (otmp.otyp === CORPSE) {
-        return !$c.peq(await revive(otmp, TRUE), $c.asRec(null, $T.monst, 192)) ? 1 : 0;
+        return await revive(otmp, TRUE) !== $c.asRec(null, $T.monst, 192) ? 1 : 0;
     } else {
-        return !$c.peq(await animate_statue(otmp, u.ux, u.uy, ANIMATE.SPELL, null), $c.asRec(null, $T.monst, 192)) ? 1 : 0;
+        return await animate_statue(otmp, u.ux, u.uy, ANIMATE.SPELL, null) !== $c.asRec(null, $T.monst, 192) ? 1 : 0;
     }
 }
 /* #pray command */

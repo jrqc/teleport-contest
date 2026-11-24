@@ -182,7 +182,7 @@ async function throw_obj(obj, shotlimit) {   // dothrow.c:87
          * If the gold is in quiver, throw one coin at a time,
          * possibly using a sling.
          */
-        if (obj.oclass === COIN_CLASS && !$c.peq(obj, $G.uquiver)) {
+        if (obj.oclass === COIN_CLASS && obj !== $G.uquiver) {
             /* throw_gold will unsplit the stack itself if necessary and may have
                freed the object, so don't route through unsplit_stack here */
             return await throw_gold(obj);   /* check */
@@ -191,7 +191,7 @@ async function throw_obj(obj, shotlimit) {   // dothrow.c:87
             res = ECMD.OK;
             break unsplit_stack$;
         }
-        if (is_art(obj, ART.MJOLLNIR) && !$c.peq(obj, $G.uwep)) {
+        if (is_art(obj, ART.MJOLLNIR) && obj !== $G.uwep) {
             await pline($C`%s must be wielded before it can be thrown.`, await The(await xname(obj)));
             res = ECMD.OK;
             break unsplit_stack$;
@@ -310,7 +310,7 @@ async function throw_obj(obj, shotlimit) {   // dothrow.c:87
         gm.m_shot.n = multishot;
         for (gm.m_shot.i = 1; gm.m_shot.i <= gm.m_shot.n; gm.m_shot.i = gm.m_shot.i + 1 | 0) {
             twoweap = u.twoweap;
-            (!!$c.peq(obj, $c.asRec(null, $T.obj, 112)) ? 1 : 0) ? $c.__assert_rtn($C`throw_obj`, $C`dothrow.c`, 256, $C`obj != NULL`) : 0;   /* m_shot.i <= m_shot.n guarantees this */
+            (!(obj !== $c.asRec(null, $T.obj, 112)) ? 1 : 0) ? $c.__assert_rtn($C`throw_obj`, $C`dothrow.c`, 256, $C`obj != NULL`) : 0;   /* m_shot.i <= m_shot.n guarantees this */
             /* split this object off from its slot if necessary */
             if (obj.quan > 1) {
                 otmp = await splitobj(obj, 1);
@@ -338,7 +338,7 @@ async function throw_obj(obj, shotlimit) {   // dothrow.c:87
      * been split from there (possibly triggering a panic in addinv),
      * and freeinv+addinv potentially has other side-effects.
      */
-    if (obj && !$c.peq(obj, $G.uquiver) && (obj.o_id === save_osplit.parent_oid || obj.o_id === save_osplit.child_oid)) {
+    if (obj && obj !== $G.uquiver && (obj.o_id === save_osplit.parent_oid || obj.o_id === save_osplit.child_oid)) {
         /* futureproofing: objsplit will have been affected if partial stack
            was thrown; objects will have been split off stack to throw. */
         svc.context.objsplit.$copyFrom(save_osplit);
@@ -384,7 +384,7 @@ async function throw_ok(obj) {   // dothrow.c:317
     if (($c.and64(obj.owornmask, W.WEP) !== 0 && (obj.otyp === AKLYS || obj.oartifact === ART.MJOLLNIR && gu.urole.mnum === PM.VALKYRIE) || obj.otyp === BOOMERANG) && (obj.oartifact !== ART.MJOLLNIR || ACURR(A.STR) >= 125)) {
         return GETOBJ.SUGGEST;
     }
-    if (obj.quan === 1 && ($c.peq(obj, $G.uwep) || $c.peq(obj, $G.uswapwep) && u.twoweap)) {
+    if (obj.quan === 1 && (obj === $G.uwep || obj === $G.uswapwep && u.twoweap)) {
         return GETOBJ.DOWNPLAY;
     }
     if (obj.oclass === COIN_CLASS) {
@@ -995,7 +995,7 @@ export function will_hurtle(mon, x, y) {   // dothrow.c:977
         return FALSE;
     }
     /* redundant when called by mhurtle() but needed for mhitm_knockback() */
-    if (mon.data.msize >= MZ.HUGE || $c.peq(mon, u.ustuck) || mon.mtrapped) {
+    if (mon.data.msize >= MZ.HUGE || mon === u.ustuck || mon.mtrapped) {
         return FALSE;
     }
     /*
@@ -1017,7 +1017,7 @@ async function mhurtle_step(arg, x, y) {   // dothrow.c:992
         return FALSE;
     }
     if (will_hurtle(mon, x, y) && await m_in_out_region(mon, x, y)) {
-        if (!$c.peq(mon, u.usteed)) {
+        if (mon !== u.usteed) {
             svl.level.monsters[mon.mx][mon.my] = null;
             await newsym(mon.mx, mon.my);
             await place_monster(mon, x, y);
@@ -1041,7 +1041,7 @@ async function mhurtle_step(arg, x, y) {   // dothrow.c:992
         }
         return TRUE;
     }
-    if ((mtmp = svl.level.monsters[x][y]) !== null && !$c.peq(mtmp, mon)) {
+    if ((mtmp = svl.level.monsters[x][y]) !== null && mtmp !== mon) {
         if (canseemon(mon) || canseemon(mtmp)) {
             await pline($C`%s bumps into %s.`, await Monnam(mon), await a_monnam(mtmp));
         }
@@ -1149,7 +1149,7 @@ export async function mhurtle(mon, dx, dy, range) {   // dothrow.c:1130
     /* Is the monster stuck or too heavy to push?
      * (very large monsters have too much inertia, even floaters and flyers)
      */
-    if (mon.data.msize >= MZ.HUGE || $c.peq(mon, u.ustuck) || mon.mtrapped) {
+    if (mon.data.msize >= MZ.HUGE || mon === u.ustuck || mon.mtrapped) {
         if (canseemon(mon)) {
             await pline($C`%s doesn't budge!`, await Monnam(mon));
         }
@@ -1495,7 +1495,7 @@ function throwit_return(clear_thrownobj) {   // dothrow.c:1460
  * @returns {Promise<void>}
  */
 async function swallowit(obj) {   // dothrow.c:1468
-    if (!$c.peq(obj, $G.uball)) {
+    if (obj !== $G.uball) {
         await mpickobj(u.ustuck, obj);   /* clears 'gt.thrownobj' */
         throwit_return(FALSE);
     } else {
@@ -1513,7 +1513,7 @@ async function swallowit(obj) {   // dothrow.c:1468
  */
 export async function throwit_mon_hit(obj, mon) {   // dothrow.c:1482
     if (mon) {
-        if (mon.isshk && obj.where === OBJ.MINVENT && $c.peq(obj.v.v_ocarry, mon)) {
+        if (mon.isshk && obj.where === OBJ.MINVENT && obj.v.v_ocarry === mon) {
             return TRUE;
         }
         await snuff_candle(obj);
@@ -1585,7 +1585,7 @@ export async function throwit(obj$in, wep_mask, twoweap, oldslot) {   // dothrow
     /* NOTE:  No early returns after this point or returning_missile
        will be left with a stale pointer. */
     if (u.uswallow) {
-        if ($c.peq(obj[0], $G.uball)) {
+        if (obj[0] === $G.uball) {
             $t4 = $G.uchain.ox = u.ux, $G.uball.ox = $t4;
             $t5 = $G.uchain.oy = u.uy, $G.uball.oy = $t5;
         }
@@ -1618,7 +1618,7 @@ export async function throwit(obj$in, wep_mask, twoweap, oldslot) {   // dothrow
         }
         mon = await boomhit(obj[0], u.dx, u.dy);
         iflags.returning_missile = null;   /* has returned or isn't going to */
-        if ($c.peq(mon, gy.youmonst)) {
+        if (mon === gy.youmonst) {
             /* the thing was caught */
             await exercise(A.DEX, TRUE);
             obj[0] = await return_throw_to_inv(obj[0], wep_mask, twoweap, oldslot);
@@ -1639,7 +1639,7 @@ export async function throwit(obj$in, wep_mask, twoweap, oldslot) {   // dothrow
         } else {
             range = urange - ($c.divu32(obj[0].owt, 40) | 0) | 0;
         }
-        if ($c.peq(obj[0], $G.uball)) {
+        if (obj[0] === $G.uball) {
             if (u.ustuck) {
                 range = 1;
             } else if (range >= 5) {
@@ -1681,7 +1681,7 @@ export async function throwit(obj$in, wep_mask, twoweap, oldslot) {   // dothrow
             /* range of a tethered_weapon is limited by the
                length of the attached cord [implicit aspect of item] */
             range = range < isqrt(arw.range) ? range : isqrt(arw.range);
-        } else if ($c.peq(obj[0], $G.uball) && u.utrap && u.utraptype === TT.INFLOOR) {
+        } else if (obj[0] === $G.uball && u.utrap && u.utraptype === TT.INFLOOR) {
             range = 1;
         }
         if (Underwater()) {
@@ -1834,11 +1834,11 @@ export async function throwit(obj$in, wep_mask, twoweap, oldslot) {   // dothrow
         }
         /* charge for items thrown out of shop;
            shk takes possession for items thrown into one */
-        if ((new $c.Ptr(u.ushops, 0).get(0) || obj[0].unpaid) && !$c.peq(obj[0], $G.uball)) {
+        if ((new $c.Ptr(u.ushops, 0).get(0) || obj[0].unpaid) && obj[0] !== $G.uball) {
             await check_shop_obj(obj[0], gb.bhitpos.x, gb.bhitpos.y, FALSE);
         }
         await stackobj(obj[0]);
-        if ($c.peq(obj[0], $G.uball)) {
+        if (obj[0] === $G.uball) {
             await drop_ball(gb.bhitpos.x, gb.bhitpos.y);
         }
         if (cansee(gb.bhitpos.x, gb.bhitpos.y)) {
@@ -1936,7 +1936,7 @@ export async function omon_adj(mon, obj, mon_notices) {   // dothrow.c:1913
     /* some objects are more likely to hit than others */
     switch (obj.otyp) {
         case HEAVY_IRON_BALL:
-            if (!$c.peq(obj, $G.uball)) {
+            if (obj !== $G.uball) {
                 tmp = tmp + 2 | 0;
             }
             break;
@@ -2017,7 +2017,7 @@ export async function thitmonst(mon, obj) {   // dothrow.c:2011
     /* distance modifier */
     const otyp = obj.otyp;
     const guaranteed_hit = engulfing_u(mon);
-    const hmode = $c.peq(obj, $G.uwep) ? HMON.APPLIED : $c.peq(obj, gk.kickedobj) ? HMON.KICKED : HMON.THROWN;
+    const hmode = obj === $G.uwep ? HMON.APPLIED : obj === gk.kickedobj ? HMON.KICKED : HMON.THROWN;
     /* Differences from melee weapons:
      *
      * Dex still gives a bonus, but strength does not.
@@ -2166,7 +2166,7 @@ export async function thitmonst(mon, obj) {   // dothrow.c:2011
                 tmp = tmp + 4 | 0;
             } else if (throwing_weapon(obj)) {   /* meant to be thrown */
                 tmp = tmp + 2 | 0;
-            } else if ($c.peq(obj, gt.thrownobj)) {   /* not meant to be thrown */
+            } else if (obj === gt.thrownobj) {   /* not meant to be thrown */
                 tmp = tmp - 2 | 0;
             }
             /* we know we're dealing with a weapon or weptool handled
@@ -2223,7 +2223,7 @@ export async function thitmonst(mon, obj) {   // dothrow.c:2011
             await exercise(A.DEX, TRUE);
             if (!await hmon(mon, obj, hmode, dieroll)) {
                 /* mon killed */
-                if (was_swallowed && !u.uswallow && $c.peq(obj, $G.uball)) {
+                if (was_swallowed && !u.uswallow && obj === $G.uball) {
                     return 1;   /* already did placebc() */
                 }
             }

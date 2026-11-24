@@ -780,7 +780,7 @@ async function peffect_water(otmp) {   // potion.c:717
             await exercise(A.CON, FALSE);
             if (ismnum(u.ulycn)) {
                 await Your($C`affinity to %s disappears!`, await makeplural(mons[u.ulycn].pmnames[NEUTRAL]));
-                if ($c.peq(gy.youmonst.data, $c.relem(mons, u.ulycn))) {
+                if (gy.youmonst.data === $c.relem(mons, u.ulycn)) {
                     await you_unwere(FALSE);
                 }
                 await set_ulycn(NON_PM);   /* cure lycanthropy */
@@ -1702,7 +1702,7 @@ export async function impact_arti_light(obj, worsen, seeit) {   // potion.c:1595
 export async function potionhit(mon, obj, how) {   // potion.c:1625
     let botlnam = null, isyou = 0, distance = 0, tx = 0, ty = 0, saddle = null, hit_saddle = 0, your_fault = 0, mnam = null, buf = new Int8Array(256), dmg = 0, mnam$2 = null, buf$2 = new Int8Array(256), saddle_glows = new Int8Array(256), affected = 0, useeit = 0, angermon = 0, cureblind = 0, sawit = 0, cursed_potion = 0, btmp = 0, shkp = null, $goto = null, $t1, $t2, $t3;
     botlnam = bottlename();
-    isyou = $c.peq(mon, gy.youmonst) ? 1 : 0;
+    isyou = mon === gy.youmonst ? 1 : 0;
     saddle = null;
     hit_saddle = FALSE;
     your_fault = how <= POTHIT.HERO_THROW ? 1 : 0;
@@ -2161,7 +2161,7 @@ export async function potionbreathe(obj) {   // potion.c:1932
             } else if (ismnum(u.ulycn)) {
                 /* vapor from [un]holy water will trigger
                    transformation but won't cure lycanthropy */
-                if (obj.blessed && $c.peq(gy.youmonst.data, $c.relem(mons, u.ulycn))) {
+                if (obj.blessed && gy.youmonst.data === $c.relem(mons, u.ulycn)) {
                     await you_unwere(FALSE);
                 } else if (obj.cursed && !Upolyd()) {
                     await you_were();
@@ -2360,7 +2360,7 @@ export async function dodip() {   // potion.c:2267
     if (await inaccessible_equipment(obj, $C`dip`, FALSE)) {
         return ECMD.OK;
     }
-    const is_hands = $c.peq(obj, hands_obj) ? 1 : 0;
+    const is_hands = obj === hands_obj ? 1 : 0;
     const shortestname = is_hands || is_plural(obj) || pair_of(obj) ? $C`them` : $C`it`;
     drink_ok_extra = 0;
     /*
@@ -2415,7 +2415,7 @@ export async function dodip() {   // potion.c:2267
                     await floating_above(pooltype);
                 } else if (u.usteed && !is_swimmer(u.usteed.data) && u.weapon_skills[P.RIDING].skill < P.BASIC) {
                     await rider_cant_reach();   /* not skilled enough to reach */
-                } else if (is_hands || $c.peq(obj, $G.uarmg)) {
+                } else if (is_hands || obj === $G.uarmg) {
                     if (!is_hands) {
                         obj.pickup_prev = 0;
                     }
@@ -2519,18 +2519,18 @@ async function dip_potion_explosion(obj, dmg) {   // potion.c:2417
  */
 async function potion_dip(obj, potion) {   // potion.c:2442
     let singlepotion = null, qbuf = new Int8Array(128), mixture = 0, useeit = 0, obj_glows = null, save_otyp = 0, amt = 0, magic = 0, otmp = null, buf = new Int8Array(256), wisx = 0, oldbuf = new Int8Array(256), newbuf = new Int8Array(256), old_otyp = 0, old_dknown = 0, more_than_one = 0, fakeobj = new $T.obj(), $t1, $t2, $t3, $t4;
-    if ($c.peq(potion, obj) && potion.quan === 1) {
+    if (potion === obj && potion.quan === 1) {
         await pline($C`That is a potion bottle, not a Klein bottle!`);
         return ECMD.OK;
     }
-    if ($c.peq(obj, hands_obj)) {
+    if (obj === hands_obj) {
         await You($C`can't fit your %s into the mouth of the bottle!`, await body_part(HAND));
         return ECMD.OK;
     }
     obj.pickup_prev = 0;   /* no longer 'recently picked up' */
     potion.in_use = (TRUE) & 1;   /* assume it will be used up */
     if (potion.otyp === POT_WATER) {
-        useeit = !Blind() || $c.peq(obj, $G.ublindf) && Blindfolded_only() ? 1 : 0;
+        useeit = !Blind() || obj === $G.ublindf && Blindfolded_only() ? 1 : 0;
         obj_glows = await Yobjnam2(obj, $C`glow`);
         if (await H2Opotion_dip(potion, obj, useeit, obj_glows)) {
             await poof(potion);
@@ -2912,9 +2912,9 @@ export async function split_mon(mon, mtmp) {   // potion.c:2873
     /* optional attacker whose heat triggered it */
     reason[0] = 0;
     if (mtmp) {
-        $c.sprintf(new $c.Ptr(reason, 0), $C` from %s heat`, $c.peq(mtmp, gy.youmonst) ? c_common_strings.c_the_your[1] : s_suffix(await mon_nam(mtmp)));
+        $c.sprintf(new $c.Ptr(reason, 0), $C` from %s heat`, mtmp === gy.youmonst ? c_common_strings.c_the_your[1] : s_suffix(await mon_nam(mtmp)));
     }
-    if ($c.peq(mon, gy.youmonst)) {
+    if (mon === gy.youmonst) {
         if (u.mh > u.mhmax) {   /* sanity precaution */
             u.mh = u.mhmax;
         }

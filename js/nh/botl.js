@@ -1754,7 +1754,7 @@ export async function exp_percent_changing() {   // botl.c:2090
             a.$copyFrom(cg.zeroany);
             a.a_int = u.ulevel;
             const rule = get_hilite(gn.now_or_before_idx, BL.XP, a, 0, pc, new $c.Ptr(color_dummy, 0));
-            if (!$c.peq(rule, curr.hilite_rule)) {
+            if (rule !== curr.hilite_rule) {
                 return TRUE;   /* caller should set 'disp.botl' to True */
             }
         }
@@ -3647,14 +3647,14 @@ function status_hilite_remove(id) {   // botl.c:4305
         const fld = hlstr.fld;
         let hlprev = null;
         for (hl = gb.blstats[0][fld].thresholds; hl; hl = hl.next) {
-            if ($c.peq(hlstr.hl, hl)) {
+            if (hlstr.hl === hl) {
                 if (hlprev) {
                     hlprev.next = hl.next;
                 } else {
                     gb.blstats[0][fld].thresholds = hl.next;
                     gb.blstats[1][fld].thresholds = gb.blstats[0][fld].thresholds;
                 }
-                if ($c.peq(gb.blstats[0][fld].hilite_rule, hl)) {
+                if (gb.blstats[0][fld].hilite_rule === hl) {
                     $t1 = gb.blstats[1][fld].hilite_rule = null, gb.blstats[0][fld].hilite_rule = $t1;
                     $t2 = gb.blstats[1][fld].time = 0, gb.blstats[0][fld].time = $t2;
                 }

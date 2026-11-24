@@ -186,7 +186,7 @@ async function toss_wsegs(curr, display_update) {   // worm.c:146
  */
 async function shrink_worm(wnum) {   // worm.c:175
     /* worm number */
-    if ($c.peq(wtails[wnum], wheads[wnum])) {
+    if (wtails[wnum] === wheads[wnum]) {
         return;   /* no tail */
     }
     const seg = wtails[wnum];
@@ -369,7 +369,7 @@ export async function wormhitu(worm) {   // worm.c:344
      *  Head has already had a chance to attack, so the dummy tail segment
      *  sharing its location should be skipped.
      */
-    for (seg = wtails[wnum]; !$c.peq(seg, wheads[wnum]); seg = seg.nseg) {
+    for (seg = wtails[wnum]; seg !== wheads[wnum]; seg = seg.nseg) {
         if (dist2(seg.wx, seg.wy, u.ux, u.uy) < 3) {
             if (await mattacku(worm)) {
                 return 1;   /* your passive ability killed the worm */
@@ -421,7 +421,7 @@ export async function cutworm(worm, x, y, cuttier) {   // worm.c:373
         }
     }
     /* If this is the tail segment, then the worm just loses it. */
-    if ($c.peq(curr, wtails[wnum])) {
+    if (curr === wtails[wnum]) {
         await shrink_worm(wnum);
         return;
     }
@@ -500,7 +500,7 @@ export async function cutworm(worm, x, y, cuttier) {   // worm.c:373
  */
 export async function see_wsegs(worm) {   // worm.c:487
     let curr = wtails[worm.wormno];
-    while (!$c.peq(curr, wheads[worm.wormno])) {
+    while (curr !== wheads[worm.wormno]) {
         await newsym(curr.wx, curr.wy);
         curr = curr.nseg;
     }
@@ -518,7 +518,7 @@ export async function see_wsegs(worm) {   // worm.c:487
 export async function detect_wsegs(worm, use_detection_glyph) {   // worm.c:503
     let curr = wtails[worm.wormno];
     const what_tail = u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : PM.LONG_WORM_TAIL;
-    while (!$c.peq(curr, wheads[worm.wormno])) {
+    while (curr !== wheads[worm.wormno]) {
         const num = use_detection_glyph ? detected_monnum_to_glyph(what_tail, worm.female ? FEMALE : MALE) : worm.mtame ? petnum_to_glyph(what_tail, worm.female ? FEMALE : MALE) : monnum_to_glyph(what_tail, worm.female ? FEMALE : MALE);
         await show_glyph(curr.wx, curr.wy, num);
         curr = curr.nseg;
@@ -621,11 +621,11 @@ export async function rest_worm(nhfp) {   // worm.c:577
  */
 export async function place_wsegs(worm, oldworm) {   // worm.c:615
     let curr = wtails[worm.wormno];
-    while (!$c.peq(curr, wheads[worm.wormno])) {
+    while (curr !== wheads[worm.wormno]) {
         const x = curr.wx;
         const y = curr.wy;
         const mtmp = svl.level.monsters[x][y];
-        if (oldworm && $c.peq(mtmp, oldworm)) {
+        if (oldworm && mtmp === oldworm) {
             remove_monster(x, y);
         } else if (mtmp) {
             await impossible($C`placing worm seg <%d,%d> over another mon`, x, y);
@@ -667,11 +667,11 @@ export async function sanity_check_worm(worm) {   // worm.c:639
         return;
     }
     let curr = wtails[wnum];
-    while (!$c.peq(curr, wheads[wnum])) {
+    while (curr !== wheads[wnum]) {
         x = curr.wx, y = curr.wy;
         if (!isok($c.i16(x), $c.i16(y))) {
             await impossible($C`worm seg not isok <%d,%d>`, x, y);
-        } else if (!$c.peq(svl.level.monsters[x][y], worm)) {
+        } else if (svl.level.monsters[x][y] !== worm) {
             await impossible($C`mon (%s) at seg location is not worm (%s)`, fmt_ptr(svl.level.monsters[x][y]), fmt_ptr(worm));
         }
         curr = curr.nseg;
@@ -733,13 +733,13 @@ export async function place_worm_tail_randomly(worm, x, y) {   // worm.c:738
         await impossible($C`place_worm_tail_randomly: wormno is set without a tail!`);
         return;
     }
-    if ($c.peq(wtails[wnum], wheads[wnum])) {
+    if (wtails[wnum] === wheads[wnum]) {
         /* single segment, co-located with worm;
            should either have same coordinates or have seg->wx==0
            to indicate that it is not currently on the map */
         if (curr.wx && (curr.wx !== worm.mx || curr.wy !== worm.my)) {
             await impossible($C`place_worm_tail_randomly: tail segment at <%d,%d>, worm at <%d,%d>`, curr.wx, curr.wy, worm.mx, worm.my);
-            if ($c.peq(svl.level.monsters[curr.wx][curr.wy], worm)) {
+            if (svl.level.monsters[curr.wx][curr.wy] === worm) {
                 svl.level.monsters[curr.wx][curr.wy] = null;
             }
         }
@@ -893,7 +893,7 @@ export async function worm_cross(x1, y1, x2, y2) {   // worm.c:898
     }
     /* is the same monster at <x1,y2> and at <x2,y1>? */
     const worm = svl.level.monsters[x1][y2];
-    if (!worm || !$c.peq(svl.level.monsters[x2][y1], worm)) {
+    if (!worm || svl.level.monsters[x2][y1] !== worm) {
         return FALSE;
     }
     /* same monster is at both adjacent spots, so must be a worm; we need
@@ -925,7 +925,7 @@ export async function worm_cross(x1, y1, x2, y2) {   // worm.c:898
 export function wseg_at(worm, x, y) {   // worm.c:946
     let curr = null, i = 0, n = 0;
     let res = 0;
-    if (worm && worm.wormno && $c.peq(svl.level.monsters[x][y], worm)) {
+    if (worm && worm.wormno && svl.level.monsters[x][y] === worm) {
         const wx = $c.i16(x);
         const wy = $c.i16(y);
         for (i = 0, curr = wtails[worm.wormno]; curr; curr = curr.nseg) {

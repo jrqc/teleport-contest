@@ -486,7 +486,7 @@ export async function bhitm(mtmp, otmp) {   // zap.c:160
                 await that_is_a_mimic(mtmp, MIM.REVEAL);   /*seemimic()*/
             }
             wake = FALSE;   /* don't want immediate counterattack */
-            if ($c.peq(mtmp, u.ustuck)) {
+            if (mtmp === u.ustuck) {
                 /* zapping either holder/holdee or self [zapyourself()] will
                    release hero from holder's grasp or holdee from hero's grasp */
                 await release_hold();
@@ -808,7 +808,7 @@ export function get_obj_location(obj, xp, yp, locflags) {   // zap.c:654
 export function get_mon_location(mon, xp, yp, locflags) {   // zap.c:692
     let $t1;
     /* non-zero means get location even if monster is buried */
-    if ($c.peq(mon, gy.youmonst) || u.usteed && $c.peq(mon, u.usteed)) {
+    if (mon === gy.youmonst || u.usteed && mon === u.usteed) {
         xp.set(0, u.ux);
         yp.set(0, u.uy);
         return TRUE;
@@ -922,7 +922,7 @@ export async function montraits(obj, cc, adjacentok) {   // zap.c:713
         if (mtmp2.isshk) {
             await neweshk(mtmp);
             mtmp.mextra.eshk.$copyFrom(mtmp2.mextra.eshk);
-            if (mtmp2.mextra.eshk.bill_p !== null && !$c.peq(mtmp2.mextra.eshk.bill_p, $c.ptrConst(-1000))) {
+            if (mtmp2.mextra.eshk.bill_p !== null && mtmp2.mextra.eshk.bill_p !== $c.ptrConst(-1000)) {
                 mtmp.mextra.eshk.bill_p = mtmp.mextra.eshk.bill[0];
             }
             mtmp.isshk = 1;
@@ -1153,7 +1153,7 @@ export async function revive(corpse, by_hero) {   // zap.c:884
             await pline($C`A corpse is resuscitated.`);
         }
         /* don't charge for shopkeeper's own corpse if we just revived him */
-        if (shkp && !$c.peq(mtmp, shkp)) {
+        if (shkp && mtmp !== shkp) {
             await stolen_value(corpse, x[0], y[0], shkp.mpeaceful, FALSE);
         }
         /* [we don't give any comparable message about the corpse for
@@ -1253,7 +1253,7 @@ async function revive_egg(obj) {   // zap.c:1143
  */
 export async function unturn_dead(mon) {   // zap.c:1156
     let otmp = null, mtmp2 = null, owner = new Int8Array(256), corpse = new Int8Array(256), $t1;
-    const is_u = $c.peq(mon, gy.youmonst) ? 1 : 0;
+    const is_u = mon === gy.youmonst ? 1 : 0;
     let res = 0;
     const youseeit = $c.i8(is_u ? TRUE : canseemon(mon));
     let otmp2 = is_u ? gi.invent : mon.minvent;
@@ -1286,7 +1286,7 @@ export async function unturn_dead(mon) {   // zap.c:1156
         if ((mtmp2 = await revive(otmp, !svc.context.mon_moving ? 1 : 0)) !== null) {
             res = res + 1 | 0;
             /* might get revived as a zombie rather than corpse's monster */
-            const different_type = !$c.peq(mtmp2.data, $c.relem(mons, corpsenm)) ? 1 : 0;
+            const different_type = mtmp2.data !== $c.relem(mons, corpsenm) ? 1 : 0;
             if (iflags.last_msg === PLNMSG.OBJ_GLOWS) {
                 /* when hero zaps undead turning at self (or breaks
                    non-empty wand), revive() reports "[one of] your <mon>
@@ -1481,7 +1481,7 @@ export async function drain_item(obj, by_you) {   // zap.c:1382
     }
     /* Drain the object and any implied effects */
     obj.spe = $c.i8(obj.spe - 1);
-    const u_ring = $c.peq(obj, $G.uleft) || $c.peq(obj, $G.uright) ? 1 : 0;
+    const u_ring = obj === $G.uleft || obj === $G.uright ? 1 : 0;
     switch (obj.otyp) {
         case RIN_GAIN_STRENGTH:
             if ($c.and64(obj.owornmask, W_RING) && u_ring) {
@@ -1517,14 +1517,14 @@ export async function drain_item(obj, by_you) {   // zap.c:1382
             }
             break;
         case HELM_OF_BRILLIANCE:
-            if ($c.and64(obj.owornmask, W.ARMH) && $c.peq(obj, $G.uarmh)) {
+            if ($c.and64(obj.owornmask, W.ARMH) && obj === $G.uarmh) {
                 u.abon.a[A.INT] = $c.i8(u.abon.a[A.INT] - 1);
                 u.abon.a[A.WIS] = $c.i8(u.abon.a[A.WIS] - 1);
                 disp.botl = TRUE;
             }
             break;
         case GAUNTLETS_OF_DEXTERITY:
-            if ($c.and64(obj.owornmask, W.ARMG) && $c.peq(obj, $G.uarmg)) {
+            if ($c.and64(obj.owornmask, W.ARMG) && obj === $G.uarmg) {
                 u.abon.a[A.DEX] = $c.i8(u.abon.a[A.DEX] - 1);
                 disp.botl = TRUE;
             }
@@ -1598,7 +1598,7 @@ async function polyuse(objhdr, mat, minwt) {   // zap.c:1505
         if (svc.context.bypasses && otmp.bypass) {
             continue;
         }
-        if ($c.peq(otmp, $G.uball) || $c.peq(otmp, $G.uchain)) {
+        if (otmp === $G.uball || otmp === $G.uchain) {
             continue;
         }
         if (obj_resists(otmp, 0, 0)) {
@@ -1760,7 +1760,7 @@ export async function do_osshock(obj) {   // zap.c:1637
  * @returns {number} boolean
  */
 export function obj_unpolyable(obj) {   // zap.c:1678
-    return unpolyable(obj) || $c.peq(obj, $G.uball) || $c.peq(obj, $G.uskin) || obj_resists(obj, 5, 95) ? 1 : 0;
+    return unpolyable(obj) || obj === $G.uball || obj === $G.uskin || obj_resists(obj, 5, 95) ? 1 : 0;
 }
 /*
  * Polymorph the object to the given object ID.  If the ID is STRANGE_OBJECT
@@ -2201,7 +2201,7 @@ export async function bhito(obj, otmp) {   // zap.c:2119
        stone-to-flesh [which aren't good examples since polymorph wands
        aren't affected by polymorph zaps and stone-to-flesh isn't
        available in wand form, but the concept still applies...]) */
-    if ($c.peq(obj, otmp)) {
+    if (obj === otmp) {
         return 0;
     }
     if (obj.bypass) {
@@ -2257,9 +2257,9 @@ export async function bhito(obj, otmp) {   // zap.c:2119
     if (!(obj.where === OBJ.FLOOR || otmp.otyp === SPE_STONE_TO_FLESH)) {
         await impossible($C`bhito: obj is not floor or Stone To Flesh spell`);
     }
-    if ($c.peq(obj, $G.uball)) {
+    if (obj === $G.uball) {
         res = 0;
-    } else if ($c.peq(obj, $G.uchain)) {
+    } else if (obj === $G.uchain) {
         if (otmp.otyp === WAN_OPENING || otmp.otyp === SPE_KNOCK) {
             learn_it = TRUE;
             await unpunish();
@@ -2283,7 +2283,7 @@ export async function bhito(obj, otmp) {   // zap.c:2119
                     await boxlock(obj, otmp);
                 }
                 if (obj_shudders(obj)) {
-                    const cover = $c.peq(obj, svl.level.objects[u.ux][u.uy]) && u.uundetected && hides_under(gy.youmonst.data) ? 1 : 0;
+                    const cover = obj === svl.level.objects[u.ux][u.uy] && u.uundetected && hides_under(gy.youmonst.data) ? 1 : 0;
                     if (cansee(obj.ox, obj.oy)) {
                         learn_it = TRUE;
                     }
@@ -2543,7 +2543,7 @@ export async function bhitpile(obj, fhito, tx, ty, zz) {   // zap.c:2428
         /* assume zapping up or down while hiding under the top item can
            still activate the trap even if it's below (when zapping up)
            or above (when zapping down) */
-        if (!$c.peq(svl.level.objects[tx][ty], topofpile)) {
+        if (svl.level.objects[tx][ty] !== topofpile) {
             first = FALSE;   /* top item was statue which activated */
         }
     }
@@ -3239,7 +3239,7 @@ async function zap_steed(obj) {   // zap.c:3087
 export async function cancel_monst(mdef, obj, youattack, allow_cancel_kill, self_cancel) {   // zap.c:3150
     let otmp = null;
     /* should be extern */
-    const youdefend = $c.peq(mdef, gy.youmonst) ? 1 : 0;
+    const youdefend = mdef === gy.youmonst ? 1 : 0;
     if (youdefend ? !youattack && Antimagic() : await resist(mdef, obj.oclass, 0, NOTELL)) {
         return FALSE;   /* resisted cancellation */
     }
@@ -3628,7 +3628,7 @@ export async function hit(str, mtmp, force) {   // zap.c:3556
     /* zap text or missile name */
     /* target; for missile, might be hero */
     /* usually either "." or "!" via exclam() */
-    const verbosely = $c.peq(mtmp, gy.youmonst) || flags.verbose && (cansee(gb.bhitpos.x, gb.bhitpos.y) || canspotmon(mtmp) || engulfing_u(mtmp)) ? 1 : 0;
+    const verbosely = mtmp === gy.youmonst || flags.verbose && (cansee(gb.bhitpos.x, gb.bhitpos.y) || canspotmon(mtmp) || engulfing_u(mtmp)) ? 1 : 0;
     await pline($C`%s %s %s%s`, await The(str), await vtense(str, $C`hit`), verbosely ? await mon_nam(mtmp) : $C`it`, force);
 }
 /**
@@ -4141,7 +4141,7 @@ export async function bhit(ddx, ddy, range, weapon, fhitm, fhito, pobj) {   // z
                         await pline($C`%s hits %s.`, await The(await distant_name(obj, xname)), await an(await xname(bobj)));
                     }
                     range = 0;
-                } else if ($c.peq(obj, $G.uball)) {
+                } else if (obj === $G.uball) {
                     if (!await test_move($c.i16(x - ddx | 0), $c.i16(y - ddy | 0), $c.i16(ddx), $c.i16(ddy), TEST.MOVE)) {
                         /* nb: it didn't hit anything directly */
                         if (cansee(x, y)) {
@@ -4157,7 +4157,7 @@ export async function bhit(ddx, ddy, range, weapon, fhitm, fhito, pobj) {   // z
             /* thrown/kicked missile has moved away from its starting spot */
             point_blank = FALSE;   /* affects passing through iron bars */
         }
-        if (weapon !== ZAPPED_WAND && weapon !== INVIS_BEAM && !tethered_weapon || was_returning && !$c.peq(was_returning, $c.asRec(iflags.returning_missile, $T.obj, 112))) {
+        if (weapon !== ZAPPED_WAND && weapon !== INVIS_BEAM && !tethered_weapon || was_returning && was_returning !== $c.asRec(iflags.returning_missile, $T.obj, 112)) {
             await tmp_at(DISP_END, 0);
         }
         if (shopdoor) {
@@ -4798,7 +4798,7 @@ async function disintegrate_mon(mon, type, fltxt) {   // zap.c:4723
     /* note: worn amulet of life saving must be preserved in order to operate */
     for (otmp = mon.minvent; otmp; otmp = otmp2) {
         otmp2 = otmp.nobj;
-        if (!(objects[otmp.otyp].oc_oprop === DISINT_RES || obj_resists(otmp, 5, 50) || is_quest_artifact(otmp) || $c.peq(otmp, m_amulet))) {
+        if (!(objects[otmp.otyp].oc_oprop === DISINT_RES || obj_resists(otmp, 5, 50) || is_quest_artifact(otmp) || otmp === m_amulet)) {
             await extract_from_minvent(mon, otmp, TRUE, TRUE);
             await obfree(otmp, null);
         }
@@ -5863,7 +5863,7 @@ export async function item_what(dmgtyp) {   // zap.c:5722
  */
 async function maybe_destroy_item(carrier, obj, dmgtyp) {   // zap.c:5798
     let i = 0, cnt = 0, skip = 0, dindx = 0;
-    const u_carry = $c.peq(carrier, gy.youmonst) ? 1 : 0;
+    const u_carry = carrier === gy.youmonst ? 1 : 0;
     const vis = !u_carry && canseemon(carrier) ? 1 : 0;
     let chargeit = FALSE;
     let xresist = skip = 0;
@@ -5977,7 +5977,7 @@ async function maybe_destroy_item(carrier, obj, dmgtyp) {   // zap.c:5798
                     await setnotworn(obj);
                 }
             }
-            if ($c.peq(obj, gc.current_wand)) {
+            if (obj === gc.current_wand) {
                 gc.current_wand = null;   /* destroyed */
             }
         }
@@ -6026,7 +6026,7 @@ export async function destroy_items(mon, dmgtyp, dmg_in) {   // zap.c:5965
     /* the amount of HP damage the attack dealt */
     /* max amount of item stacks destroyed, based on damage */
     let elig_stacks = 0;   /* number of destroyable objects found so far */
-    const u_carry = $c.peq(mon, gy.youmonst) ? 1 : 0;
+    const u_carry = mon === gy.youmonst ? 1 : 0;
     /* this is a struct obj** because we might destroy the first item in it */
     const objchn = u_carry ? new $c.FieldRef(gi, "invent", "ptr") : new $c.FieldRef(mon, "minvent", "ptr");
     let dmg_out = 0;   /* damage caused by items getting destroyed */
@@ -6355,12 +6355,12 @@ export async function makewish() {   // zap.c:6314
             if (!otmp) {
                 return;   /* for safety; should never happen */
             }
-        } else if ($c.peq(otmp, nothing)) {
+        } else if (otmp === nothing) {
             /* explicitly wished for "nothing", presumably attempting
                to retain wishless conduct */
             await livelog_printf(LL.WISH, $C`declined to make a wish`);
             return;
-        } else if ($c.peq(otmp, hands_obj)) {
+        } else if (otmp === hands_obj) {
             await wish_history_add(new $c.Ptr(bufcpy, 0));
             /* wizard mode terrain wish: skip livelogging, etc */
             return;

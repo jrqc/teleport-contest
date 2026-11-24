@@ -139,7 +139,7 @@ export async function droppables(mon) {   // dogmove.c:28
                 }
                 /* keep mattock in preference to pick unless pick is already
                    wielded or is an artifact and mattock isn't */
-                if (pickaxe && pickaxe.otyp === PICK_AXE && !$c.peq(pickaxe, wep) && (!pickaxe.oartifact || obj.oartifact)) {
+                if (pickaxe && pickaxe.otyp === PICK_AXE && pickaxe !== wep && (!pickaxe.oartifact || obj.oartifact)) {
                     return pickaxe;   /* drop the one we earlier decided to keep */
                 }
             case PICK_AXE:
@@ -190,7 +190,7 @@ export async function droppables(mon) {   // dogmove.c:28
             default:
                 break;
         }
-        if (!obj.owornmask && !$c.peq(obj, wep)) {
+        if (!obj.owornmask && obj !== wep) {
             return obj;
         }
     }
@@ -407,7 +407,7 @@ export async function dog_eat(mtmp, obj, x, y, devour) {   // dogmove.c:218
  * @returns {Promise<void>}
  */
 async function dog_starve(mtmp) {   // dogmove.c:348
-    if (mtmp.mleashed && !$c.peq(mtmp, u.usteed)) {
+    if (mtmp.mleashed && mtmp !== u.usteed) {
         await Your($C`leash goes slack.`);
     } else if (cansee(mtmp.mx, mtmp.my)) {
         await pline_mon(mtmp, $C`%s starves.`, await Monnam(mtmp));
@@ -544,7 +544,7 @@ async function dog_invent(mtmp, edog, udist) {   // dogmove.c:400
 async function dog_goal(mtmp, edog, after, udist, whappr) {   // dogmove.c:483
     let obj = null, appr = 0, min_x = 0, max_x = 0, min_y = 0, max_y = 0, t = null, fardist = Int32Array.of(0), $t1, $t2;
     /* Steeds don't move on their own will */
-    if ($c.peq(mtmp, u.usteed)) {
+    if (mtmp === u.usteed) {
         return -2;
     }
     const omx = mtmp.mx;
@@ -820,7 +820,7 @@ function score_targ(mtmp, mtarg) {   // dogmove.c:738
         }
         /* Is the monster peaceful or tame? */
         /*mtarg->mpeaceful ||*/
-        if (mtarg.mtame || $c.peq(mtarg, gy.youmonst)) {
+        if (mtarg.mtame || mtarg === gy.youmonst) {
             /* Pets will never be targeted */
             score = $c.sub64(score, 3000);
             return score;
@@ -950,7 +950,7 @@ export async function pet_ranged_attk(mtmp, forced) {   // dogmove.c:889
     /* Hungry pets are unlikely to use breath/spit attacks */
     if (mtarg && (!hungry || !rn2(5))) {
         let mstatus = M_ATTK.MISS;
-        if ($c.peq(mtarg, gy.youmonst)) {
+        if (mtarg === gy.youmonst) {
             if (await mattacku(mtmp)) {
                 return MMOVE.DIED;
             }
@@ -973,7 +973,7 @@ export async function pet_ranged_attk(mtmp, forced) {   // dogmove.c:889
              * the targeted beast doesn't have a ranged attack,
              * nothing will happen.
              */
-            if (mstatus & M_ATTK.HIT && !(mstatus & M_ATTK.DEF_DIED) && rn2(4) && !$c.peq(mtarg, gy.youmonst)) {
+            if (mstatus & M_ATTK.HIT && !(mstatus & M_ATTK.DEF_DIED) && rn2(4) && mtarg !== gy.youmonst) {
                 /* Can monster see?  If it can, it can retaliate
                  * even if the pet is invisible, since it'll see
                  * the direction from which the ranged attack came;
@@ -1049,7 +1049,7 @@ export async function dog_move(mtmp, after) {   // dogmove.c:977
     }
     udist = dist2($c.i16(omx), $c.i16(omy), u.ux, u.uy);
     /* Let steeds eat and maybe throw rider during Conflict */
-    if ($c.peq(mtmp, u.usteed)) {
+    if (mtmp === u.usteed) {
         if (Conflict() && !resist_conflict(mtmp)) {
             await dismount_steed(DISMOUNT.THROWN);
             return MMOVE.MOVED;
@@ -1146,7 +1146,7 @@ export async function dog_move(mtmp, after) {   // dogmove.c:977
                 }
                 if (mtmp2.data === mons[PM.FLOATING_EYE] && rn2(10) && mtmp.mcansee && haseyes(mtmp.data) && mtmp2.mcansee && (!mtmp2.minvis || perceives(mtmp.data)) && !await mon_reflects(mtmp, $c.asArr(null, Int8Array)) || mtmp2.data === mons[PM.GELATINOUS_CUBE] && rn2(10) || touch_petrifies(mtmp2.data) && !await resists_ston(mtmp)) {
                     /* only skip this foe if a ranged attack isn't viable */
-                    if (dist2(mtmp.mx, mtmp.my, mtmp2.mx, mtmp2.my) <= 2 || !$c.peq(best_target(mtmp, FALSE), mtmp2)) {
+                    if (dist2(mtmp.mx, mtmp.my, mtmp2.mx, mtmp2.my) <= 2 || best_target(mtmp, FALSE) !== mtmp2) {
                         continue;
                     }
                     ranged_only = TRUE;
@@ -1467,7 +1467,7 @@ export async function quickmimic(mtmp) {   // dogmove.c:1472
        rider taking on an unsuitable shape, but its message works fine
        for this and also avoids inflicting damage during forced dismount;
        do this before changing so that dismount refers to original shape */
-    if ($c.peq(mtmp, u.usteed)) {
+    if (mtmp === u.usteed) {
         await dismount_steed(DISMOUNT.POLY);
     }
     do {

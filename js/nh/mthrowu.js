@@ -374,7 +374,7 @@ export async function ohitmon(mtmp, otmp, range, verbose) {   // mthrowu.c:321
     /* High level monsters will be more likely to hit */
     /* This check applies only if this monster is the target
      * the archer was aiming at. */
-    if (gm.marcher && $c.peq(gm.mtarget, mtmp)) {
+    if (gm.marcher && gm.mtarget === mtmp) {
         if (gm.marcher.m_lev > 5) {
             tmp = tmp + (gm.marcher.m_lev - 5) | 0;
         }
@@ -593,7 +593,7 @@ export async function m_throw(mon, x, y, dx, dy, range, obj) {   // mthrowu.c:57
     let hitu = 0;
     let blindinc = 0;
     const arw = autoreturn_weapon(obj);
-    const tethered_weapon = $c.peq(obj, mon.mw) && arw && arw.tethered !== 0 ? 1 : 0;
+    const tethered_weapon = obj === mon.mw && arw && arw.tethered !== 0 ? 1 : 0;
     let return_flightpath = FALSE;
     gb.bhitpos.x = x;
     gb.bhitpos.y = y;
@@ -610,7 +610,7 @@ export async function m_throw(mon, x, y, dx, dy, range, obj) {   // mthrowu.c:57
          */
         /* not possibly_unwield(), which checks the object's location,
            not its existence */
-        if ($c.peq(mon.mw, obj)) {
+        if (mon.mw === obj) {
             await setmnotwielded(mon, obj);
         }
         await obj_extract_self(obj);
@@ -1015,7 +1015,7 @@ export async function spitmm(mtmp, mattk, mtarg) {   // mthrowu.c:1016
         return M_ATTK.MISS;
     }
     if (m_lined_up(mtarg, mtmp)) {
-        const utarg = $c.peq(mtarg, gy.youmonst) ? 1 : 0;
+        const utarg = mtarg === gy.youmonst ? 1 : 0;
         const tx = utarg ? mtmp.mux : mtarg.mx;
         const ty = utarg ? mtmp.muy : mtarg.my;
         switch (mattk.adtyp) {
@@ -1080,7 +1080,7 @@ function breathwep_name(typ) {   // mthrowu.c:1083
 export async function breamm(mtmp, mattk, mtarg) {   // mthrowu.c:1093
     let $t1, $t2;
     const typ = get_atkdam_type(mattk.adtyp);
-    const utarget = $c.peq(mtarg, gy.youmonst) ? 1 : 0;
+    const utarget = mtarg === gy.youmonst ? 1 : 0;
     if (m_lined_up(mtarg, mtmp)) {
         if (mtmp.mcan) {
             if (!Deaf()) {
@@ -1180,7 +1180,7 @@ export async function thrwmu(mtmp) {   // mthrowu.c:1174
         return;
     }
     if ((otmp[0].oclass === WEAPON_CLASS || otmp[0].oclass === TOOL_CLASS) && (objects[otmp[0].otyp].oc_subtyp === P.POLEARMS || objects[otmp[0].otyp].oc_subtyp === P.LANCE || is_art(otmp[0], ART.SNICKERSNEE))) {
-        if (!$c.peq(otmp[0], mtmp.mw)) {
+        if (otmp[0] !== mtmp.mw) {
             return;   /* polearm, aklys must be wielded */
         }
         /*
@@ -1364,7 +1364,7 @@ export function linedup(ax, ay, bx, by, boulderhandling) {   // mthrowu.c:1330
  * @returns {number} int
  */
 function m_lined_up(mtarg, mtmp) {   // mthrowu.c:1376
-    const utarget = $c.peq(mtarg, gy.youmonst) ? 1 : 0;
+    const utarget = mtarg === gy.youmonst ? 1 : 0;
     const tx = utarget ? mtmp.mux : mtarg.mx;
     const ty = utarget ? mtmp.muy : mtarg.my;
     const ignore_boulders = utarget && (throws_rocks(mtmp.data) || m_carrying(mtmp, WAN_STRIKING)) ? 1 : 0;
@@ -1391,7 +1391,7 @@ export function lined_up(mtmp) {   // mthrowu.c:1398
  */
 export function m_carrying(mtmp, type) {   // mthrowu.c:1405
     let otmp = null;
-    for (otmp = $c.peq(mtmp, gy.youmonst) ? gi.invent : mtmp.minvent; otmp; otmp = otmp.nobj) {
+    for (otmp = mtmp === gy.youmonst ? gi.invent : mtmp.minvent; otmp; otmp = otmp.nobj) {
         if (otmp.otyp === type) {
             break;
         }

@@ -195,7 +195,7 @@ export async function add_custom_urep_entry(customization_name, glyphidx, utf32c
     }
     newdetails.content.urep.u.utf32ch = utf32ch;
     newdetails.next = null;
-    if ($c.peq(gdc.details, $c.asRec(null, $T.customization_detail, 32))) {
+    if (gdc.details === $c.asRec(null, $T.customization_detail, 32)) {
         gdc.details = newdetails;
     } else {
         gdc.details_end.next = newdetails;
