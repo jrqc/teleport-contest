@@ -14,7 +14,7 @@ import { jsTemplate } from '../../transpiler/emit/tu.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const BASE = '104ebaa';            // the last commit whose js/nh uses $c.lit(...)
-const AFTER = process.env.STRTAG_AFTER || '';   // a commit to compare with; '' = the working tree
+const AFTER = process.env.STRTAG_AFTER ?? '67da88f';   // the first $C build; STRTAG_AFTER= (empty) compares the working tree
 
 const bytes = (p) => Array.from(p.buf.subarray(p.off), (b) => b & 0xff);
 const viaTag = (s) => new Function('$C', `return $C${jsTemplate(s)};`)($C);
@@ -22,7 +22,7 @@ const viaTag = (s) => new Function('$C', `return $C${jsTemplate(s)};`)($C);
 test('jsTemplate round-trips byte strings through $C', () => {
     const cases = [''];
     for (let c = 0; c < 256; c++) cases.push(String.fromCharCode(c));
-    const special = ['$', '{', '}', '`', '\\', '\r', '\n', '\0', '0', '7', 'x', 'u', ' '.slice(0, 0)];
+    const special = ['$', '{', '}', '`', '\\', '\r', '\n', '\0', '0', '7', 'x', 'u'];
     for (const a of special) for (const b of special) cases.push(a + b, `a${a}${b}z`);
     cases.push('${x}', '$${', '\\${', '\0' + '12', '\r\n', '`${`}`', 'a\\`b');
     let seed = 12345;
