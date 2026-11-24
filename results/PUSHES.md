@@ -21,3 +21,5 @@ step to revert is the one pushed last before that run.
 | 2026-11-23 19:17 | `38d287c` | Readability P5: wrapper reduction |
 | 2026-11-23 20:03 | `c44d6c4` | Readability: const locals, declared at first assignment |
 | 2026-11-23 20:11 | `4273930` | Handoff note (method/HANDOFF.md), tools/analysis scripts |
+| 2026-11-24 01:30 | `8ded0ff` | Readability: string literals as tagged templates |
+| 2026-11-24 02:29 | `767801b` | Readability (a): === for record-pointer comparisons (one ElemPtr per position); per-move profile |
