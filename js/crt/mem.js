@@ -145,7 +145,18 @@ export function relem(a, i) {
         const row = rowAt(o, a.__oidx + q);
         if (row !== null) return row[r];
     }
-    return new ElemPtr(a, i);
+    return elemAt(a, i);
+}
+// One ElemPtr per (array, index): a position outside an array is one object, like the
+// elements inside it, so record pointers are equal exactly when they are the same object
+// (peq agrees with ===; the emitter writes === where a side is a record pointer).
+const ELEMS = new WeakMap();
+function elemAt(a, i) {
+    let m = ELEMS.get(a);
+    if (m === undefined) { m = new Map(); ELEMS.set(a, m); }
+    let p = m.get(i);
+    if (p === undefined) { p = new ElemPtr(a, i); m.set(i, p); }
+    return p;
 }
 /** Row k of array-of-arrays o, carrying into o's own neighbors; null outside the whole object. */
 function rowAt(o, k) {
@@ -186,7 +197,7 @@ export function radd(p, n) {
     const a = p.__arr;
     if (a === undefined) {
         if (Number(n) !== 1) throw new CTrap('arithmetic on a pointer to a record that is not an array element');
-        return new ElemPtr(soloOf(p), 1);
+        return elemAt(soloOf(p), 1);
     }
     return relem(a, p.__idx + Number(n));
 }
@@ -222,8 +233,8 @@ export function pdiff(p, q) {
 }
 /**
  * Pointer equality for data pointers of any kind (== in C). null equals only null.
- * Element positions compare by (array, index), so a freshly made ElemPtr equals the
- * object at the same place.
+ * Element positions compare by (array, index); a position has one object (relem, elemAt),
+ * so for record pointers this is ===.
  */
 export function peq(a, b) {
     if (a === b) return true;

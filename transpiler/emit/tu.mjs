@@ -2382,6 +2382,21 @@ export class TUEmitter {
     }
     shiftCount(B) { return /^\d+n$/.test(B.c) ? E(B.c.slice(0, -1)) : (/n$/.test(B.c) ? E(`Number(${B.c})`, PREC.call) : B); }
 
+    /**
+     * Whether t is a pointer to a struct (not a union): its values are record objects, one
+     * per position outside an array (js/crt/mem.js elemAt), stale save-file pointers or null,
+     * never a Ptr or FieldRef. Then peq(x, y) is x === y whatever the other side holds: peq
+     * is true for distinct objects only when both are Ptrs, both FieldRefs, or both carry
+     * the same (__arr, __idx), and a position has one object.
+     */
+    recPtr(t) {
+        if (!isPtr(t)) return false;
+        const to = this.S.resolve(t.to);
+        if (to.k !== 'rec' || to.union) return false;
+        let r = null;
+        try { r = this.S.record(to.key); } catch { r = null; }
+        return !!r && !r.union;
+    }
     /** Whether index expression i of array expression arrN folds to a constant inside the array's length. */
     inBounds(arrN, i) {
         const at = this.S.resolve(this.T(arrN));
@@ -2418,7 +2433,7 @@ export class TUEmitter {
             // an element of a record array at a constant index inside it is the array's own
             // object; peq(x, it) is true exactly when x is that object (peq's other cases,
             // pointers into byte buffers, fields or outside an array, never equal it)
-            if (this.canonElem(a) || this.canonElem(b)) return this.boolVal(E(`${par(A, PREC.eq)} ${op === '==' ? '===' : '!=='} ${par(B, PREC.eq + 1)}`, PREC.eq), ctx);
+            if (this.canonElem(a) || this.canonElem(b) || this.recPtr(ta) || this.recPtr(tb)) return this.boolVal(E(`${par(A, PREC.eq)} ${op === '==' ? '===' : '!=='} ${par(B, PREC.eq + 1)}`, PREC.eq), ctx);
             const e = E(`$c.peq(${A.c}, ${B.c})`, PREC.call);
             return this.boolVal(op === '==' ? e : E(`!${par(e, PREC.unary)}`, PREC.unary), ctx);
         }

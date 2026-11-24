@@ -1,7 +1,7 @@
 // Pointer rules of js/crt/mem.js found by fuzzing (tools/fuzz, 2026-11-19).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { radd, rdiff, peq, recArray } from '../../js/crt/mem.js';
+import { radd, rdiff, peq, recArray, relem, Ptr, FieldRef } from '../../js/crt/mem.js';
 import { STALE } from '../../js/crt/serial.js';
 
 class R { constructor() { this.x = 1; } }
@@ -26,4 +26,22 @@ test('a pointer read from a save file is unequal to every live object', () => {
     assert.ok(!peq(arr[0], STALE) && !peq(STALE, arr[0]) && !peq(new R(), STALE));
     assert.ok(peq(STALE, STALE));
     assert.ok(!peq(radd(new R(), 1), STALE));
+});
+
+test('one object per record position: peq of record pointers is === (readability step a)', () => {
+    const a = recArray(R, 3), b = recArray(R, 3), solo = new R();
+    // positions outside the array, made several ways, are one object each
+    assert.equal(relem(a, 3), relem(a, 3));
+    assert.equal(relem(a, -1), relem(a, -1));
+    assert.equal(radd(a[2], 1), relem(a, 3));
+    assert.equal(radd(relem(a, 3), -1), a[2]);
+    assert.equal(radd(solo, 1), radd(solo, 1));
+    assert.notEqual(relem(a, 3), relem(b, 3));
+    // with a record pointer on one side, peq is === whatever the other side is
+    const recs = [a[0], a[2], relem(a, 3), relem(a, -1), relem(b, 3), solo, radd(solo, 1), STALE, null];
+    const others = [...recs, new Ptr(new Int8Array(4), 0), new FieldRef(solo, 'x', 'i32')];
+    recs.forEach((x, i) => others.forEach((y, j) => {
+        assert.equal(peq(x, y), x === y, `peq vs === for recs[${i}] / others[${j}]`);
+        assert.equal(peq(y, x), x === y, `peq vs === for others[${j}] / recs[${i}]`);
+    }));
 });
