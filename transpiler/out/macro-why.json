@@ -1,0 +1,5113 @@
+{
+ "rnd": {
+  "6: name taken": 954
+ },
+ "TRUE": {
+  "8: an object-like constant (P2)": 3766
+ },
+ "FALSE": {
+  "8: an object-like constant (P2)": 3954
+ },
+ "rn2": {
+  "6: name taken": 3290
+ },
+ "NORMAL_SPEED": {
+  "8: an object-like constant (P2)": 20
+ },
+ "nhassert": {
+  "16: a body with effects and an argument that may change": 2,
+  "7: no definition covers the node": 98,
+  "13: an argument not found as AST nodes": 5
+ },
+ "NHW_MESSAGE": {
+  "8: an object-like constant (P2)": 13
+ },
+ "NHW_STATUS": {
+  "8: an object-like constant (P2)": 7
+ },
+ "NHW_MAP": {
+  "8: an object-like constant (P2)": 9
+ },
+ "NHW_MENU": {
+  "8: an object-like constant (P2)": 116
+ },
+ "WIN_ERR": {
+  "8: an object-like constant (P2)": 89
+ },
+ "notice_mon_off": {
+  "7: no definition covers the node": 18
+ },
+ "G_NOCORPSE": {
+  "8: an object-like constant (P2)": 12
+ },
+ "NEWS": {
+  "9: a record or array value": 2
+ },
+ "notice_mon_on": {
+  "7: no definition covers the node": 60
+ },
+ "A_CURRENT": {
+  "8: an object-like constant (P2)": 14
+ },
+ "A_ORIGINAL": {
+  "8: an object-like constant (P2)": 13
+ },
+ "ROLE_GENDMASK": {
+  "8: an object-like constant (P2)": 16
+ },
+ "LL_ACHIEVE": {
+  "8: an object-like constant (P2)": 8
+ },
+ "ForceAlignedLength": {
+  "7: no definition covers the node": 32
+ },
+ "PTRBUFCNT": {
+  "8: an object-like constant (P2)": 1
+ },
+ "COLNO": {
+  "8: an object-like constant (P2)": 73
+ },
+ "ECMD_OK": {
+  "8: an object-like constant (P2)": 441
+ },
+ "ECMD_CANCEL": {
+  "8: an object-like constant (P2)": 68
+ },
+ "pline1": {
+  "13: an argument not found as AST nodes": 55,
+  "7: no definition covers the node": 58,
+  "15: an argument with side effects or calls": 3
+ },
+ "ECMD_TIME": {
+  "8: an object-like constant (P2)": 405
+ },
+ "Glib": {
+  "7: no definition covers the node": 7
+ },
+ "TIMEOUT": {
+  "8: an object-like constant (P2)": 84
+ },
+ "HBlinded": {
+  "7: no definition covers the node": 19
+ },
+ "MZ_TINY": {
+  "8: an object-like constant (P2)": 6
+ },
+ "obj_to_glyph": {
+  "16: a body with effects and an argument that may change": 14,
+  "7: no definition covers the node": 3584,
+  "13: an argument not found as AST nodes": 2
+ },
+ "ARTICLE_A": {
+  "8: an object-like constant (P2)": 24
+ },
+ "RLOC_MSG": {
+  "8: an object-like constant (P2)": 1
+ },
+ "RLOC_NONE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "NO_TRAP_FLAGS": {
+  "8: an object-like constant (P2)": 26
+ },
+ "Snprintf": {
+  "10: an unsafe construct in the body": 202,
+  "7: no definition covers the node": 606
+ },
+ "mhis": {
+  "7: no definition covers the node": 31
+ },
+ "MAXLEASHED": {
+  "8: an object-like constant (P2)": 1
+ },
+ "u_at": {
+  "17: an argument that may trap, evaluated conditionally": 102,
+  "7: no definition covers the node": 204
+ },
+ "glyph_is_invisible": {
+  "13: an argument not found as AST nodes": 14,
+  "7: no definition covers the node": 31,
+  "15: an argument with side effects or calls": 1
+ },
+ "XKILL_NOMSG": {
+  "8: an object-like constant (P2)": 23
+ },
+ "HConfusion": {
+  "7: no definition covers the node": 38
+ },
+ "d": {
+  "6: name taken": 684
+ },
+ "G_GONE": {
+  "8: an object-like constant (P2)": 40
+ },
+ "y_n": {
+  "15: an argument with side effects or calls": 1,
+  "7: no definition covers the node": 1,
+  "20: body text not the one chosen for the macro": 1
+ },
+ "OBJ_MINVENT": {
+  "8: an object-like constant (P2)": 43
+ },
+ "OBJ_INVENT": {
+  "8: an object-like constant (P2)": 49
+ },
+ "OBJ_FLOOR": {
+  "8: an object-like constant (P2)": 76
+ },
+ "D_ISOPEN": {
+  "8: an object-like constant (P2)": 25
+ },
+ "HJumping": {
+  "7: no definition covers the node": 2
+ },
+ "ACCESSIBLE": {
+  "13: an argument not found as AST nodes": 24,
+  "7: no definition covers the node": 12
+ },
+ "ECMD_FAIL": {
+  "8: an object-like constant (P2)": 29
+ },
+ "LEFT_SIDE": {
+  "7: no definition covers the node": 10
+ },
+ "RIGHT_SIDE": {
+  "7: no definition covers the node": 12
+ },
+ "TELEDS_NO_FLAGS": {
+  "8: an object-like constant (P2)": 6
+ },
+ "HOMEMADE_TIN": {
+  "8: an object-like constant (P2)": 7
+ },
+ "Sick": {
+  "7: no definition covers the node": 18
+ },
+ "SICK_NONVOMITABLE": {
+  "8: an object-like constant (P2)": 9
+ },
+ "Confusion": {
+  "7: no definition covers the node": 122
+ },
+ "HStun": {
+  "7: no definition covers the node": 22
+ },
+ "HHallucination": {
+  "7: no definition covers the node": 14
+ },
+ "HDeaf": {
+  "7: no definition covers the node": 19
+ },
+ "TimedTrouble": {
+  "13: an argument not found as AST nodes": 14,
+  "7: no definition covers the node": 63
+ },
+ "prop_trouble": {
+  "18c: the body names a caller local": 7,
+  "7: no definition covers the node": 14
+ },
+ "AT_ENGL": {
+  "8: an object-like constant (P2)": 23
+ },
+ "AD_BLND": {
+  "8: an object-like constant (P2)": 19
+ },
+ "SICK_ALL": {
+  "8: an object-like constant (P2)": 12
+ },
+ "IS_OBSTRUCTED": {
+  "13: an argument not found as AST nodes": 60,
+  "7: no definition covers the node": 30
+ },
+ "IS_TREE": {
+  "13: an argument not found as AST nodes": 8,
+  "7: no definition covers the node": 36
+ },
+ "Stunned": {
+  "7: no definition covers the node": 94
+ },
+ "digests": {
+  "16: a body with effects and an argument that may change": 52,
+  "7: no definition covers the node": 78
+ },
+ "rnl": {
+  "6: name taken": 71
+ },
+ "FORCEBUNGLE": {
+  "8: an object-like constant (P2)": 7
+ },
+ "IS_WATERWALL": {
+  "13: an argument not found as AST nodes": 10,
+  "7: no definition covers the node": 5
+ },
+ "IS_FURNITURE": {
+  "13: an argument not found as AST nodes": 16,
+  "7: no definition covers the node": 48
+ },
+ "TELEDS_ALLOW_DRAG": {
+  "8: an object-like constant (P2)": 6
+ },
+ "min": {
+  "13: an argument not found as AST nodes": 107,
+  "7: no definition covers the node": 298,
+  "15: an argument with side effects or calls": 6,
+  "20: body text not the one chosen for the macro": 2
+ },
+ "is_pole": {
+  "16: a body with effects and an argument that may change": 20,
+  "7: no definition covers the node": 160,
+  "20: body text not the one chosen for the macro": 1
+ },
+ "mdistu": {
+  "7: no definition covers the node": 117
+ },
+ "NO_COLOR": {
+  "8: an object-like constant (P2)": 157
+ },
+ "ATR_NONE": {
+  "8: an object-like constant (P2)": 213
+ },
+ "MENU_ITEMFLAGS_NONE": {
+  "8: an object-like constant (P2)": 169
+ },
+ "PICK_ONE": {
+  "8: an object-like constant (P2)": 76
+ },
+ "IS_AIR": {
+  "13: an argument not found as AST nodes": 10,
+  "7: no definition covers the node": 30
+ },
+ "N_DIRS": {
+  "8: an object-like constant (P2)": 17
+ },
+ "IS_WALL": {
+  "13: an argument not found as AST nodes": 58,
+  "7: no definition covers the node": 116
+ },
+ "IS_DOOR": {
+  "13: an argument not found as AST nodes": 68,
+  "7: no definition covers the node": 34
+ },
+ "Vomiting": {
+  "7: no definition covers the node": 5
+ },
+ "A_NONE": {
+  "8: an object-like constant (P2)": 32
+ },
+ "assert": {
+  "7: no definition covers the node": 222
+ },
+ "ONAME_NO_FLAGS": {
+  "8: an object-like constant (P2)": 12
+ },
+ "ONAME_RANDOM": {
+  "8: an object-like constant (P2)": 4
+ },
+ "NO_ROOM": {
+  "8: an object-like constant (P2)": 6
+ },
+ "OBJ_CONTAINED": {
+  "8: an object-like constant (P2)": 32
+ },
+ "LL_ARTIFACT": {
+  "8: an object-like constant (P2)": 5
+ },
+ "ONAME_KNOW_ARTI": {
+  "8: an object-like constant (P2)": 1
+ },
+ "ONAME_WISH": {
+  "8: an object-like constant (P2)": 2
+ },
+ "ONAME_GIFT": {
+  "8: an object-like constant (P2)": 1
+ },
+ "ONAME_VIA_DIP": {
+  "8: an object-like constant (P2)": 1
+ },
+ "ONAME_VIA_NAMING": {
+  "8: an object-like constant (P2)": 2
+ },
+ "ONAME_LEVEL_DEF": {
+  "8: an object-like constant (P2)": 2
+ },
+ "ONAME_BONES": {
+  "8: an object-like constant (P2)": 2
+ },
+ "AD_MAGM": {
+  "8: an object-like constant (P2)": 21
+ },
+ "AD_HALU": {
+  "8: an object-like constant (P2)": 5
+ },
+ "AD_FIRE": {
+  "8: an object-like constant (P2)": 86
+ },
+ "AD_COLD": {
+  "8: an object-like constant (P2)": 55
+ },
+ "AD_DRST": {
+  "8: an object-like constant (P2)": 18
+ },
+ "AD_DISE": {
+  "8: an object-like constant (P2)": 7
+ },
+ "AD_SLEE": {
+  "8: an object-like constant (P2)": 7
+ },
+ "AD_PLYS": {
+  "8: an object-like constant (P2)": 5
+ },
+ "AD_DISN": {
+  "8: an object-like constant (P2)": 13
+ },
+ "AD_DRLI": {
+  "8: an object-like constant (P2)": 11
+ },
+ "AD_ELEC": {
+  "8: an object-like constant (P2)": 54
+ },
+ "AD_SLOW": {
+  "8: an object-like constant (P2)": 3
+ },
+ "AD_ACID": {
+  "8: an object-like constant (P2)": 30
+ },
+ "AD_STON": {
+  "8: an object-like constant (P2)": 9
+ },
+ "W_ART": {
+  "8: an object-like constant (P2)": 9
+ },
+ "EFire_resistance": {
+  "7: no definition covers the node": 2
+ },
+ "ECold_resistance": {
+  "7: no definition covers the node": 2
+ },
+ "EShock_resistance": {
+  "7: no definition covers the node": 2
+ },
+ "EAntimagic": {
+  "7: no definition covers the node": 2
+ },
+ "EDisint_resistance": {
+  "7: no definition covers the node": 5
+ },
+ "EPoison_resistance": {
+  "7: no definition covers the node": 2
+ },
+ "EDrain_resistance": {
+  "7: no definition covers the node": 4
+ },
+ "SPFX_SEARCH": {
+  "8: an object-like constant (P2)": 1
+ },
+ "ESearching": {
+  "7: no definition covers the node": 3
+ },
+ "SPFX_HALRES": {
+  "8: an object-like constant (P2)": 1
+ },
+ "SPFX_ESP": {
+  "8: an object-like constant (P2)": 1
+ },
+ "ETelepat": {
+  "7: no definition covers the node": 4
+ },
+ "SPFX_STLTH": {
+  "8: an object-like constant (P2)": 1
+ },
+ "EStealth": {
+  "7: no definition covers the node": 4
+ },
+ "SPFX_REGEN": {
+  "8: an object-like constant (P2)": 1
+ },
+ "ERegeneration": {
+  "7: no definition covers the node": 4
+ },
+ "SPFX_TCTRL": {
+  "8: an object-like constant (P2)": 1
+ },
+ "ETeleport_control": {
+  "7: no definition covers the node": 3
+ },
+ "SPFX_WARN": {
+  "8: an object-like constant (P2)": 1
+ },
+ "EWarn_of_mon": {
+  "7: no definition covers the node": 6
+ },
+ "EWarning": {
+  "7: no definition covers the node": 3
+ },
+ "SPFX_EREGEN": {
+  "8: an object-like constant (P2)": 1
+ },
+ "EEnergy_regeneration": {
+  "7: no definition covers the node": 3
+ },
+ "SPFX_HSPDAM": {
+  "8: an object-like constant (P2)": 1
+ },
+ "EHalf_spell_damage": {
+  "7: no definition covers the node": 3
+ },
+ "SPFX_HPHDAM": {
+  "8: an object-like constant (P2)": 1
+ },
+ "EHalf_physical_damage": {
+  "7: no definition covers the node": 3
+ },
+ "SPFX_XRAY": {
+  "8: an object-like constant (P2)": 1
+ },
+ "SPFX_REFLECT": {
+  "8: an object-like constant (P2)": 1
+ },
+ "W_WEP": {
+  "8: an object-like constant (P2)": 36
+ },
+ "EReflecting": {
+  "7: no definition covers the node": 10
+ },
+ "SPFX_PROTECT": {
+  "8: an object-like constant (P2)": 1
+ },
+ "EProtection": {
+  "7: no definition covers the node": 6
+ },
+ "W_ARTI": {
+  "8: an object-like constant (P2)": 10
+ },
+ "EBlnd_resist": {
+  "7: no definition covers the node": 3
+ },
+ "AD_PHYS": {
+  "8: an object-like constant (P2)": 24
+ },
+ "AD_STUN": {
+  "8: an object-like constant (P2)": 9
+ },
+ "AT_MAGC": {
+  "8: an object-like constant (P2)": 20
+ },
+ "NOTELL": {
+  "8: an object-like constant (P2)": 21
+ },
+ "MB_MAX_DIEROLL": {
+  "8: an object-like constant (P2)": 1
+ },
+ "FATAL_DAMAGE_MODIFIER": {
+  "8: an object-like constant (P2)": 6
+ },
+ "ROLL_FROM": {
+  "7: no definition covers the node": 84
+ },
+ "rnz": {
+  "6: name taken": 20
+ },
+ "MAGICENLIGHTENMENT": {
+  "8: an object-like constant (P2)": 8
+ },
+ "ENL_GAMEINPROGRESS": {
+  "8: an object-like constant (P2)": 7
+ },
+ "ELevitation": {
+  "7: no definition covers the node": 15
+ },
+ "HLevitation": {
+  "7: no definition covers the node": 22
+ },
+ "W_ARM": {
+  "8: an object-like constant (P2)": 46
+ },
+ "SIZE": {
+  "18b: not every argument occurrence emits through its parameter": 144,
+  "14: an argument of a non-scalar type": 9
+ },
+ "EHalluc_resistance": {
+  "7: no definition covers the node": 12
+ },
+ "W_SWAPWEP": {
+  "8: an object-like constant (P2)": 16
+ },
+ "IS_ALTAR": {
+  "13: an argument not found as AST nodes": 32,
+  "7: no definition covers the node": 16
+ },
+ "W_QUIVER": {
+  "8: an object-like constant (P2)": 17
+ },
+ "W_BALL": {
+  "8: an object-like constant (P2)": 8
+ },
+ "W_SADDLE": {
+  "8: an object-like constant (P2)": 33
+ },
+ "D_TRAPPED": {
+  "8: an object-like constant (P2)": 33
+ },
+ "KILLED_BY_AN": {
+  "8: an object-like constant (P2)": 32
+ },
+ "G_UNIQ": {
+  "8: an object-like constant (P2)": 31
+ },
+ "KILLED_BY": {
+  "8: an object-like constant (P2)": 42
+ },
+ "max": {
+  "15: an argument with side effects or calls": 10,
+  "7: no definition covers the node": 56,
+  "13: an argument not found as AST nodes": 13,
+  "20: body text not the one chosen for the macro": 2
+ },
+ "LUCKMIN": {
+  "8: an object-like constant (P2)": 1
+ },
+ "LUCKMAX": {
+  "8: an object-like constant (P2)": 2
+ },
+ "debugpline0": {
+  "7: no definition covers the node": 215
+ },
+ "AVAL": {
+  "8: an object-like constant (P2)": 1
+ },
+ "debugpline3": {
+  "7: no definition covers the node": 65
+ },
+ "HClairvoyant": {
+  "7: no definition covers the node": 2
+ },
+ "debugpline1": {
+  "7: no definition covers the node": 310
+ },
+ "debugpline2": {
+  "7: no definition covers the node": 84
+ },
+ "HWarning": {
+  "7: no definition covers the node": 1
+ },
+ "HSee_invisible": {
+  "7: no definition covers the node": 10
+ },
+ "FROMEXPER": {
+  "8: an object-like constant (P2)": 3
+ },
+ "FROMRACE": {
+  "8: an object-like constant (P2)": 5
+ },
+ "FROM_ROLE": {
+  "8: an object-like constant (P2)": 3
+ },
+ "FROM_EXP": {
+  "8: an object-like constant (P2)": 2
+ },
+ "FROM_RACE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "FROMOUTSIDE": {
+  "8: an object-like constant (P2)": 63
+ },
+ "FROM_INTR": {
+  "8: an object-like constant (P2)": 2
+ },
+ "FROMFORM": {
+  "8: an object-like constant (P2)": 2
+ },
+ "FROM_FORM": {
+  "8: an object-like constant (P2)": 3
+ },
+ "FROM_NONE": {
+  "8: an object-like constant (P2)": 4
+ },
+ "FROM_LYCN": {
+  "8: an object-like constant (P2)": 2
+ },
+ "HBlnd_resist": {
+  "7: no definition covers the node": 1
+ },
+ "BUFSZ": {
+  "8: an object-like constant (P2)": 18
+ },
+ "W_ARMC": {
+  "8: an object-like constant (P2)": 29
+ },
+ "W_ARMH": {
+  "8: an object-like constant (P2)": 30
+ },
+ "INTRINSIC": {
+  "8: an object-like constant (P2)": 26
+ },
+ "MAXULEV": {
+  "8: an object-like constant (P2)": 10
+ },
+ "LL_ALIGNMENT": {
+  "8: an object-like constant (P2)": 2
+ },
+ "BCPOS_DIFFER": {
+  "8: an object-like constant (P2)": 6
+ },
+ "BCPOS_CHAIN": {
+  "8: an object-like constant (P2)": 5
+ },
+ "BC_BALL": {
+  "8: an object-like constant (P2)": 8
+ },
+ "BC_CHAIN": {
+  "8: an object-like constant (P2)": 11
+ },
+ "OBJ_FREE": {
+  "8: an object-like constant (P2)": 39
+ },
+ "BCPOS_BALL": {
+  "8: an object-like constant (P2)": 2
+ },
+ "SKIP_TO_DRAG": {
+  "7: no definition covers the node": 48
+ },
+ "CHAIN_IN_MIDDLE": {
+  "16: a body with effects and an argument that may change": 6,
+  "7: no definition covers the node": 24
+ },
+ "W_CHAIN": {
+  "8: an object-like constant (P2)": 6
+ },
+ "ROOMOFFSET": {
+  "8: an object-like constant (P2)": 41
+ },
+ "WINDOWPORT": {
+  "13: an argument not found as AST nodes": 16
+ },
+ "likes_objs": {
+  "16: a body with effects and an argument that may change": 2,
+  "7: no definition covers the node": 14
+ },
+ "NUM_ROLES": {
+  "8: an object-like constant (P2)": 1
+ },
+ "NUM_RACES": {
+  "8: an object-like constant (P2)": 1
+ },
+ "ROWNO": {
+  "8: an object-like constant (P2)": 81
+ },
+ "GLYPH_UNEXPLORED": {
+  "8: an object-like constant (P2)": 15
+ },
+ "WRITING": {
+  "8: an object-like constant (P2)": 8
+ },
+ "SF_UPTODATE": {
+  "8: an object-like constant (P2)": 6
+ },
+ "DEFUNCT_MONSTER": {
+  "8: an object-like constant (P2)": 2
+ },
+ "BOTL_NSIZ": {
+  "8: an object-like constant (P2)": 1
+ },
+ "SICK_VOMITABLE": {
+  "8: an object-like constant (P2)": 9
+ },
+ "MAXCO": {
+  "8: an object-like constant (P2)": 1
+ },
+ "Strlen": {
+  "10: an unsafe construct in the body": 52,
+  "7: no definition covers the node": 156
+ },
+ "test_if_enabled": {
+  "7: no definition covers the node": 42
+ },
+ "Blind": {
+  "7: no definition covers the node": 44
+ },
+ "Deaf": {
+  "7: no definition covers the node": 8
+ },
+ "Flying": {
+  "7: no definition covers the node": 18
+ },
+ "Hallucination": {
+  "7: no definition covers the node": 22
+ },
+ "Levitation": {
+  "7: no definition covers the node": 11
+ },
+ "Slimed": {
+  "7: no definition covers the node": 6
+ },
+ "Stoned": {
+  "7: no definition covers the node": 5
+ },
+ "Strangled": {
+  "7: no definition covers the node": 9
+ },
+ "Wounded_legs": {
+  "7: no definition covers the node": 5
+ },
+ "cond_cache_prepA": {
+  "7: no definition covers the node": 36
+ },
+ "cond_setbit": {
+  "18c: the body names a caller local": 1,
+  "7: no definition covers the node": 1
+ },
+ "qsort": {
+  "14: an argument of a non-scalar type": 15,
+  "7: no definition covers the node": 43
+ },
+ "MENU_ITEMFLAGS_SKIPINVERT": {
+  "8: an object-like constant (P2)": 16
+ },
+ "MENU_ITEMFLAGS_SELECTED": {
+  "8: an object-like constant (P2)": 53
+ },
+ "PICK_ANY": {
+  "8: an object-like constant (P2)": 34
+ },
+ "LARGEST_INT": {
+  "8: an object-like constant (P2)": 6
+ },
+ "LONG_MAX": {
+  "7: no definition covers the node": 3
+ },
+ "BL_TH_CRITICALHP": {
+  "8: an object-like constant (P2)": 5
+ },
+ "BL_TH_UPDOWN": {
+  "8: an object-like constant (P2)": 6
+ },
+ "BL_TH_ALWAYS_HILITE": {
+  "8: an object-like constant (P2)": 7
+ },
+ "BL_TH_VAL_PERCENTAGE": {
+  "8: an object-like constant (P2)": 6
+ },
+ "BL_TH_VAL_ABSOLUTE": {
+  "8: an object-like constant (P2)": 7
+ },
+ "BL_TH_TEXTMATCH": {
+  "8: an object-like constant (P2)": 6
+ },
+ "BL_TH_NONE": {
+  "8: an object-like constant (P2)": 8
+ },
+ "MAX_THRESH": {
+  "8: an object-like constant (P2)": 3
+ },
+ "strcmpi": {
+  "14: an argument of a non-scalar type": 24,
+  "7: no definition covers the node": 22,
+  "15: an argument with side effects or calls": 8,
+  "20: body text not the one chosen for the macro": 23
+ },
+ "MAX_SUBFIELDS": {
+  "8: an object-like constant (P2)": 2
+ },
+ "ATR_BOLD": {
+  "8: an object-like constant (P2)": 7
+ },
+ "ATR_DIM": {
+  "8: an object-like constant (P2)": 5
+ },
+ "ATR_ITALIC": {
+  "8: an object-like constant (P2)": 5
+ },
+ "ATR_ULINE": {
+  "8: an object-like constant (P2)": 6
+ },
+ "ATR_BLINK": {
+  "8: an object-like constant (P2)": 8
+ },
+ "ATR_INVERSE": {
+  "8: an object-like constant (P2)": 12
+ },
+ "CLR_MAX": {
+  "8: an object-like constant (P2)": 15
+ },
+ "BL_TH_CONDITION": {
+  "8: an object-like constant (P2)": 4
+ },
+ "NHW_TEXT": {
+  "8: an object-like constant (P2)": 47
+ },
+ "SYSCONFPREFIX": {
+  "8: an object-like constant (P2)": 2
+ },
+ "WARNCOUNT": {
+  "8: an object-like constant (P2)": 8
+ },
+ "SYSCF_FILE": {
+  "9: a record or array value": 6
+ },
+ "WIZMODECMD": {
+  "8: an object-like constant (P2)": 3
+ },
+ "IFBURIED": {
+  "8: an object-like constant (P2)": 1
+ },
+ "NOFUZZERCMD": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MAX_EXT_CMD": {
+  "8: an object-like constant (P2)": 1
+ },
+ "AT_SPIT": {
+  "8: an object-like constant (P2)": 11
+ },
+ "AT_GAZE": {
+  "8: an object-like constant (P2)": 16
+ },
+ "IS_FOUNTAIN": {
+  "13: an argument not found as AST nodes": 14,
+  "7: no definition covers the node": 7
+ },
+ "TER_MAP": {
+  "8: an object-like constant (P2)": 3
+ },
+ "IS_ROOM": {
+  "13: an argument not found as AST nodes": 20,
+  "7: no definition covers the node": 10
+ },
+ "DOMOVE_WALK": {
+  "8: an object-like constant (P2)": 1
+ },
+ "DOMOVE_RUSH": {
+  "8: an object-like constant (P2)": 1
+ },
+ "DUMMY": {
+  "7: no definition covers the node": 3
+ },
+ "ECM_IGNOREAC": {
+  "8: an object-like constant (P2)": 1
+ },
+ "ECM_EXACTMATCH": {
+  "8: an object-like constant (P2)": 1
+ },
+ "ECM_NO1CHARCMD": {
+  "8: an object-like constant (P2)": 1
+ },
+ "NUM_MOUSE_BUTTONS": {
+  "8: an object-like constant (P2)": 4
+ },
+ "GENERALCMD": {
+  "8: an object-like constant (P2)": 2
+ },
+ "IGNORECMD": {
+  "8: an object-like constant (P2)": 2
+ },
+ "INTERNALCMD": {
+  "8: an object-like constant (P2)": 2
+ },
+ "CMD_M_PREFIX": {
+  "8: an object-like constant (P2)": 1
+ },
+ "CMD_gGF_PREFIX": {
+  "8: an object-like constant (P2)": 1
+ },
+ "CLICK_1": {
+  "8: an object-like constant (P2)": 4
+ },
+ "CLICK_2": {
+  "8: an object-like constant (P2)": 3
+ },
+ "ARTICLE_THE": {
+  "8: an object-like constant (P2)": 27
+ },
+ "SUPPRESS_SADDLE": {
+  "8: an object-like constant (P2)": 16
+ },
+ "hero_glyph": {
+  "7: no definition covers the node": 24
+ },
+ "TEST_MOVE": {
+  "8: an object-like constant (P2)": 11
+ },
+ "IS_SINK": {
+  "13: an argument not found as AST nodes": 18,
+  "7: no definition covers the node": 9
+ },
+ "IS_THRONE": {
+  "13: an argument not found as AST nodes": 14,
+  "7: no definition covers the node": 7
+ },
+ "D_LOCKED": {
+  "8: an object-like constant (P2)": 20
+ },
+ "D_CLOSED": {
+  "8: an object-like constant (P2)": 14
+ },
+ "STANDBY_erase_char": {
+  "8: an object-like constant (P2)": 1
+ },
+ "NR_OF_EOFS": {
+  "8: an object-like constant (P2)": 1
+ },
+ "NH_BASIC_COLOR": {
+  "8: an object-like constant (P2)": 2
+ },
+ "CLR_BLACK": {
+  "8: an object-like constant (P2)": 11
+ },
+ "CLR_WHITE": {
+  "8: an object-like constant (P2)": 7
+ },
+ "INT_MAX": {
+  "7: no definition covers the node": 1
+ },
+ "IndexOk": {
+  "18b: not every argument occurrence emits through its parameter": 9,
+  "7: no definition covers the node": 48,
+  "13: an argument not found as AST nodes": 3
+ },
+ "DB_UNDER": {
+  "8: an object-like constant (P2)": 12
+ },
+ "DB_LAVA": {
+  "8: an object-like constant (P2)": 8
+ },
+ "DB_ICE": {
+  "8: an object-like constant (P2)": 10
+ },
+ "DB_MOAT": {
+  "8: an object-like constant (P2)": 6
+ },
+ "IS_DRAWBRIDGE": {
+  "13: an argument not found as AST nodes": 14,
+  "7: no definition covers the node": 42
+ },
+ "DB_DIR": {
+  "8: an object-like constant (P2)": 10
+ },
+ "DB_WEST": {
+  "8: an object-like constant (P2)": 9
+ },
+ "DB_EAST": {
+  "8: an object-like constant (P2)": 9
+ },
+ "DB_SOUTH": {
+  "8: an object-like constant (P2)": 9
+ },
+ "DB_NORTH": {
+  "8: an object-like constant (P2)": 9
+ },
+ "ENTITIES": {
+  "8: an object-like constant (P2)": 3
+ },
+ "canspotmon": {
+  "16: a body with effects and an argument that may change": 10,
+  "7: no definition covers the node": 20
+ },
+ "mhe": {
+  "7: no definition covers the node": 9
+ },
+ "NO_KILLER_PREFIX": {
+  "8: an object-like constant (P2)": 18
+ },
+ "XKILL_NOCORPSE": {
+  "8: an object-like constant (P2)": 8
+ },
+ "XKILL_GIVEMSG": {
+  "8: an object-like constant (P2)": 9
+ },
+ "remove_monster": {
+  "16: a body with effects and an argument that may change": 21,
+  "7: no definition covers the node": 21
+ },
+ "ICED_MOAT": {
+  "8: an object-like constant (P2)": 5
+ },
+ "MAGICCHECK": {
+  "7: no definition covers the node": 182
+ },
+ "monsym": {
+  "7: no definition covers the node": 13
+ },
+ "detected_mon_to_glyph": {
+  "13: an argument not found as AST nodes": 2,
+  "7: no definition covers the node": 50,
+  "16: a body with effects and an argument that may change": 2
+ },
+ "pet_to_glyph": {
+  "13: an argument not found as AST nodes": 2,
+  "7: no definition covers the node": 50,
+  "16: a body with effects and an argument that may change": 2
+ },
+ "mon_to_glyph": {
+  "13: an argument not found as AST nodes": 6,
+  "7: no definition covers the node": 302,
+  "16: a body with effects and an argument that may change": 18
+ },
+ "glyph_is_trap": {
+  "15: an argument with side effects or calls": 4,
+  "7: no definition covers the node": 16
+ },
+ "ALL_CLASSES": {
+  "8: an object-like constant (P2)": 2
+ },
+ "TER_MON": {
+  "8: an object-like constant (P2)": 10
+ },
+ "glyph_is_object": {
+  "15: an argument with side effects or calls": 1,
+  "7: no definition covers the node": 236,
+  "13: an argument not found as AST nodes": 1
+ },
+ "I_SPECIAL": {
+  "8: an object-like constant (P2)": 24
+ },
+ "EDetect_monsters": {
+  "7: no definition covers the node": 6
+ },
+ "random_object": {
+  "16: a body with effects and an argument that may change": 2,
+  "7: no definition covers the node": 4
+ },
+ "random_monster": {
+  "16: a body with effects and an argument that may change": 4,
+  "7: no definition covers the node": 4
+ },
+ "OTRAP_NONE": {
+  "8: an object-like constant (P2)": 5
+ },
+ "trap_to_glyph": {
+  "7: no definition covers the node": 840
+ },
+ "GLYPH_NOTHING": {
+  "8: an object-like constant (P2)": 4
+ },
+ "OTRAP_HERE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "OTRAP_THERE": {
+  "8: an object-like constant (P2)": 4
+ },
+ "FOUND_FLASH_COUNT": {
+  "8: an object-like constant (P2)": 9
+ },
+ "TER_DETECT": {
+  "8: an object-like constant (P2)": 3
+ },
+ "TER_OBJ": {
+  "8: an object-like constant (P2)": 5
+ },
+ "TER_TRP": {
+  "8: an object-like constant (P2)": 3
+ },
+ "Your1": {
+  "13: an argument not found as AST nodes": 13,
+  "7: no definition covers the node": 13
+ },
+ "SVALL": {
+  "8: an object-like constant (P2)": 10
+ },
+ "IN_SIGHT": {
+  "8: an object-like constant (P2)": 16
+ },
+ "glyph_is_monster": {
+  "15: an argument with side effects or calls": 1,
+  "7: no definition covers the node": 170
+ },
+ "D_NODOOR": {
+  "8: an object-like constant (P2)": 24
+ },
+ "GLYPH_INVISIBLE": {
+  "8: an object-like constant (P2)": 5
+ },
+ "BOLT_LIM": {
+  "8: an object-like constant (P2)": 6
+ },
+ "TER_FULL": {
+  "8: an object-like constant (P2)": 2
+ },
+ "covers_traps": {
+  "7: no definition covers the node": 36
+ },
+ "glyph_is_gascloud": {
+  "18c: the body names a caller local": 2,
+  "7: no definition covers the node": 38
+ },
+ "cmap_to_glyph": {
+  "16: a body with effects and an argument that may change": 5,
+  "7: no definition covers the node": 619,
+  "13: an argument not found as AST nodes": 3,
+  "20: body text not the one chosen for the macro": 6
+ },
+ "COULD_SEE": {
+  "8: an object-like constant (P2)": 7
+ },
+ "AM_SANCTUM": {
+  "8: an object-like constant (P2)": 4
+ },
+ "W_NONDIGGABLE": {
+  "8: an object-like constant (P2)": 24
+ },
+ "FORCETRAP": {
+  "8: an object-like constant (P2)": 22
+ },
+ "SHOP_DOOR_COST": {
+  "8: an object-like constant (P2)": 8
+ },
+ "SET_FOUNTAIN_WARNED": {
+  "7: no definition covers the node": 4
+ },
+ "Amask2align": {
+  "13: an argument not found as AST nodes": 12,
+  "7: no definition covers the node": 159
+ },
+ "SHOP_PIT_COST": {
+  "8: an object-like constant (P2)": 2
+ },
+ "grounded": {
+  "16: a body with effects and an argument that may change": 6,
+  "7: no definition covers the node": 87
+ },
+ "MZ_HUGE": {
+  "8: an object-like constant (P2)": 13
+ },
+ "A_LAWFUL": {
+  "8: an object-like constant (P2)": 25
+ },
+ "D_BROKEN": {
+  "8: an object-like constant (P2)": 23
+ },
+ "rn1": {
+  "15: an argument with side effects or calls": 11,
+  "7: no definition covers the node": 196,
+  "16: a body with effects and an argument that may change": 30,
+  "13: an argument not found as AST nodes": 11,
+  "20: body text not the one chosen for the macro": 6
+ },
+ "STRIDENT": {
+  "8: an object-like constant (P2)": 4
+ },
+ "SHOP_WALL_COST": {
+  "8: an object-like constant (P2)": 2
+ },
+ "OBJ_MIGRATING": {
+  "8: an object-like constant (P2)": 13
+ },
+ "_tp_sensemon": {
+  "13: an argument not found as AST nodes": 2,
+  "7: no definition covers the node": 33
+ },
+ "_sensemon": {
+  "13: an argument not found as AST nodes": 2,
+  "7: no definition covers the node": 85
+ },
+ "_see_with_infrared": {
+  "13: an argument not found as AST nodes": 1,
+  "7: no definition covers the node": 26
+ },
+ "_canseemon": {
+  "13: an argument not found as AST nodes": 1,
+  "7: no definition covers the node": 50
+ },
+ "_is_safemon": {
+  "13: an argument not found as AST nodes": 1,
+  "7: no definition covers the node": 162
+ },
+ "engraving_to_glyph": {
+  "7: no definition covers the node": 168
+ },
+ "random_obj_to_glyph": {
+  "13: an argument not found as AST nodes": 2,
+  "7: no definition covers the node": 21
+ },
+ "_map_location": {
+  "7: no definition covers the node": 390
+ },
+ "sensemon": {
+  "6: name taken": 261
+ },
+ "PHYSICALLY_SEEN": {
+  "8: an object-like constant (P2)": 3
+ },
+ "what_mon": {
+  "16: a body with effects and an argument that may change": 2,
+  "7: no definition covers the node": 48,
+  "13: an argument not found as AST nodes": 1
+ },
+ "DETECTED": {
+  "8: an object-like constant (P2)": 4
+ },
+ "detected_monnum_to_glyph": {
+  "13: an argument not found as AST nodes": 2,
+  "7: no definition covers the node": 9
+ },
+ "monnum_to_glyph": {
+  "13: an argument not found as AST nodes": 2,
+  "7: no definition covers the node": 9,
+  "20: body text not the one chosen for the macro": 2
+ },
+ "mon_warning": {
+  "6: name taken": 110
+ },
+ "tp_sensemon": {
+  "6: name taken": 105
+ },
+ "is_worm_tail": {
+  "18c: the body names a caller local": 10,
+  "7: no definition covers the node": 35
+ },
+ "mon_visible": {
+  "6: name taken": 26
+ },
+ "see_with_infrared": {
+  "6: name taken": 27
+ },
+ "SHIELD_COUNT": {
+  "8: an object-like constant (P2)": 2
+ },
+ "DISP_BEAM": {
+  "8: an object-like constant (P2)": 4
+ },
+ "DISP_ALL": {
+  "8: an object-like constant (P2)": 4
+ },
+ "DISP_TETHER": {
+  "8: an object-like constant (P2)": 3
+ },
+ "DISP_FLASH": {
+  "8: an object-like constant (P2)": 1
+ },
+ "DISP_ALWAYS": {
+  "8: an object-like constant (P2)": 2
+ },
+ "DISP_FREEMEM": {
+  "8: an object-like constant (P2)": 1
+ },
+ "DISP_CHANGE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "DISP_END": {
+  "8: an object-like constant (P2)": 1
+ },
+ "BACKTRACK": {
+  "8: an object-like constant (P2)": 1
+ },
+ "TMP_AT_MAX_GLYPHS": {
+  "8: an object-like constant (P2)": 2
+ },
+ "Glyphinfo_at": {
+  "13: an argument not found as AST nodes": 6,
+  "7: no definition covers the node": 39
+ },
+ "reset_glyph_bbox": {
+  "7: no definition covers the node": 6
+ },
+ "NO_GLYPH": {
+  "8: an object-like constant (P2)": 9
+ },
+ "LA_DOWN": {
+  "8: an object-like constant (P2)": 7
+ },
+ "altar_to_glyph": {
+  "13: an argument not found as AST nodes": 2,
+  "7: no definition covers the node": 24
+ },
+ "DB_FLOOR": {
+  "8: an object-like constant (P2)": 5
+ },
+ "NUM_ZAP": {
+  "8: an object-like constant (P2)": 1
+ },
+ "CLR_YELLOW": {
+  "8: an object-like constant (P2)": 7
+ },
+ "HI_DOMESTIC": {
+  "7: no definition covers the node": 1
+ },
+ "SYM_OFF_M": {
+  "8: an object-like constant (P2)": 17
+ },
+ "CLR_BROWN": {
+  "8: an object-like constant (P2)": 4
+ },
+ "CLR_MAGENTA": {
+  "8: an object-like constant (P2)": 4
+ },
+ "CLR_GRAY": {
+  "8: an object-like constant (P2)": 3
+ },
+ "CLR_GREEN": {
+  "8: an object-like constant (P2)": 5
+ },
+ "CLR_RED": {
+  "8: an object-like constant (P2)": 11
+ },
+ "obj_color": {
+  "7: no definition covers the node": 6
+ },
+ "SYM_OFF_O": {
+  "8: an object-like constant (P2)": 8
+ },
+ "mon_color": {
+  "7: no definition covers the node": 9
+ },
+ "CLR_BRIGHT_BLUE": {
+  "8: an object-like constant (P2)": 5
+ },
+ "SYM_OFF_W": {
+  "8: an object-like constant (P2)": 4
+ },
+ "warn_color": {
+  "7: no definition covers the node": 1
+ },
+ "SYM_OFF_P": {
+  "8: an object-like constant (P2)": 22
+ },
+ "explode_color": {
+  "7: no definition covers the node": 7
+ },
+ "cmap_color": {
+  "7: no definition covers the node": 4
+ },
+ "zap_color": {
+  "7: no definition covers the node": 1
+ },
+ "altar_color": {
+  "7: no definition covers the node": 1
+ },
+ "wall_color": {
+  "7: no definition covers the node": 5
+ },
+ "invis_color": {
+  "7: no definition covers the node": 1
+ },
+ "pet_color": {
+  "7: no definition covers the node": 2
+ },
+ "WM_T_LONG": {
+  "8: an object-like constant (P2)": 2
+ },
+ "WM_T_BL": {
+  "8: an object-like constant (P2)": 2
+ },
+ "WM_T_BR": {
+  "8: an object-like constant (P2)": 2
+ },
+ "more_than_one": {
+  "13: an argument not found as AST nodes": 4,
+  "7: no definition covers the node": 33
+ },
+ "WM_W_TOP": {
+  "7: no definition covers the node": 1
+ },
+ "WM_W_BOTTOM": {
+  "7: no definition covers the node": 1
+ },
+ "WM_W_LEFT": {
+  "8: an object-like constant (P2)": 1
+ },
+ "WM_W_RIGHT": {
+  "8: an object-like constant (P2)": 1
+ },
+ "WM_MASK": {
+  "8: an object-like constant (P2)": 10
+ },
+ "T_u": {
+  "8: an object-like constant (P2)": 1
+ },
+ "T_l": {
+  "8: an object-like constant (P2)": 1
+ },
+ "T_r": {
+  "8: an object-like constant (P2)": 1
+ },
+ "T_d": {
+  "8: an object-like constant (P2)": 1
+ },
+ "T_tlcorn": {
+  "8: an object-like constant (P2)": 3
+ },
+ "T_trcorn": {
+  "8: an object-like constant (P2)": 3
+ },
+ "T_tdwall": {
+  "8: an object-like constant (P2)": 5
+ },
+ "T_hwall": {
+  "8: an object-like constant (P2)": 3
+ },
+ "T_stone": {
+  "8: an object-like constant (P2)": 5
+ },
+ "only": {
+  "13: an argument not found as AST nodes": 22,
+  "7: no definition covers the node": 66
+ },
+ "set_corner": {
+  "7: no definition covers the node": 64
+ },
+ "WM_X_TL": {
+  "8: an object-like constant (P2)": 1
+ },
+ "WM_X_TR": {
+  "8: an object-like constant (P2)": 1
+ },
+ "WM_X_BL": {
+  "8: an object-like constant (P2)": 1
+ },
+ "WM_X_BR": {
+  "8: an object-like constant (P2)": 1
+ },
+ "WM_X_TLBR": {
+  "8: an object-like constant (P2)": 1
+ },
+ "WM_X_BLTR": {
+  "8: an object-like constant (P2)": 1
+ },
+ "C_tl": {
+  "8: an object-like constant (P2)": 1
+ },
+ "C_tr": {
+  "8: an object-like constant (P2)": 1
+ },
+ "C_bl": {
+  "8: an object-like constant (P2)": 1
+ },
+ "C_br": {
+  "8: an object-like constant (P2)": 1
+ },
+ "C_brcorn": {
+  "8: an object-like constant (P2)": 1
+ },
+ "C_crwall": {
+  "8: an object-like constant (P2)": 5
+ },
+ "C_tuwall": {
+  "8: an object-like constant (P2)": 2
+ },
+ "C_blcorn": {
+  "8: an object-like constant (P2)": 1
+ },
+ "C_tlwall": {
+  "8: an object-like constant (P2)": 2
+ },
+ "C_trcorn": {
+  "8: an object-like constant (P2)": 1
+ },
+ "SELL_DELIBERATE": {
+  "8: an object-like constant (P2)": 3
+ },
+ "SELL_NORMAL": {
+  "8: an object-like constant (P2)": 8
+ },
+ "ER_DESTROYED": {
+  "8: an object-like constant (P2)": 9
+ },
+ "LL_CONDUCT": {
+  "8: an object-like constant (P2)": 41
+ },
+ "SET_FOUNTAIN_LOOTED": {
+  "7: no definition covers the node": 8
+ },
+ "NC_SHOW_MSG": {
+  "8: an object-like constant (P2)": 16
+ },
+ "NO_NC_FLAGS": {
+  "8: an object-like constant (P2)": 18
+ },
+ "MENU_TRADITIONAL": {
+  "8: an object-like constant (P2)": 14
+ },
+ "MENU_FULL": {
+  "8: an object-like constant (P2)": 5
+ },
+ "ALL_TYPES_SELECTED": {
+  "8: an object-like constant (P2)": 5
+ },
+ "MENU_COMBINATION": {
+  "8: an object-like constant (P2)": 5
+ },
+ "TOOKPLUNGE": {
+  "8: an object-like constant (P2)": 8
+ },
+ "next2u": {
+  "16: a body with effects and an argument that may change": 5,
+  "7: no definition covers the node": 20,
+  "20: body text not the one chosen for the macro": 1
+ },
+ "FREEING": {
+  "8: an object-like constant (P2)": 9
+ },
+ "dunlev_reached": {
+  "7: no definition covers the node": 6
+ },
+ "LFILE_EXISTS": {
+  "8: an object-like constant (P2)": 4
+ },
+ "LL_DEBUG": {
+  "8: an object-like constant (P2)": 5
+ },
+ "OBJ_BURIED": {
+  "8: an object-like constant (P2)": 17
+ },
+ "G_GENOD": {
+  "8: an object-like constant (P2)": 37
+ },
+ "EWounded_legs": {
+  "7: no definition covers the node": 9
+ },
+ "BOTH_SIDES": {
+  "8: an object-like constant (P2)": 12
+ },
+ "HWounded_legs": {
+  "7: no definition covers the node": 4
+ },
+ "NUMMBUF": {
+  "8: an object-like constant (P2)": 1
+ },
+ "PL_PSIZ": {
+  "8: an object-like constant (P2)": 5
+ },
+ "ONAME_SKIP_INVUPD": {
+  "8: an object-like constant (P2)": 3
+ },
+ "OBJ_DESCR": {
+  "14: an argument of a non-scalar type": 7
+ },
+ "SUPPRESS_HALLUCINATION": {
+  "8: an object-like constant (P2)": 2
+ },
+ "ARTICLE_YOUR": {
+  "8: an object-like constant (P2)": 14
+ },
+ "SUPPRESS_INVISIBLE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "SUPPRESS_IT": {
+  "8: an object-like constant (P2)": 3
+ },
+ "SUPPRESS_MAPPEARANCE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "EXACT_NAME": {
+  "8: an object-like constant (P2)": 6
+ },
+ "SUPPRESS_NAME": {
+  "8: an object-like constant (P2)": 2
+ },
+ "AUGMENT_IT": {
+  "8: an object-like constant (P2)": 4
+ },
+ "ARTICLE_NONE": {
+  "8: an object-like constant (P2)": 15
+ },
+ "has_mgivenname": {
+  "7: no definition covers the node": 9
+ },
+ "CORPSTAT_GENDER": {
+  "8: an object-like constant (P2)": 5
+ },
+ "CORPSTAT_MALE": {
+  "8: an object-like constant (P2)": 12
+ },
+ "CORPSTAT_FEMALE": {
+  "8: an object-like constant (P2)": 12
+ },
+ "CORPSTAT_RANDOM": {
+  "8: an object-like constant (P2)": 4
+ },
+ "BOGUSMONFILE": {
+  "9: a record or array value": 3
+ },
+ "MD_PAD_BOGONS": {
+  "8: an object-like constant (P2)": 1
+ },
+ "G_NOGEN": {
+  "8: an object-like constant (P2)": 4
+ },
+ "NVL_COLOUR_OF_MAGIC": {
+  "8: an object-like constant (P2)": 1
+ },
+ "NVL_SOURCERY": {
+  "8: an object-like constant (P2)": 1
+ },
+ "NVL_MASKERADE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "NVL_AMAZING_MAURICE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "NVL_THUD": {
+  "8: an object-like constant (P2)": 1
+ },
+ "W_TOOL": {
+  "8: an object-like constant (P2)": 4
+ },
+ "HFast": {
+  "7: no definition covers the node": 16
+ },
+ "HFumbling": {
+  "7: no definition covers the node": 18
+ },
+ "BLevitation": {
+  "7: no definition covers the node": 17
+ },
+ "W_ARMF": {
+  "8: an object-like constant (P2)": 25
+ },
+ "EFumbling": {
+  "7: no definition covers the node": 2
+ },
+ "WORN_CLOAK": {
+  "7: no definition covers the node": 5
+ },
+ "EAcid_resistance": {
+  "7: no definition covers the node": 2
+ },
+ "A_NEUTRAL": {
+  "8: an object-like constant (P2)": 15
+ },
+ "A_CHAOTIC": {
+  "8: an object-like constant (P2)": 27
+ },
+ "W_ARMG": {
+  "8: an object-like constant (P2)": 36
+ },
+ "W_ARMS": {
+  "8: an object-like constant (P2)": 31
+ },
+ "W_ARMU": {
+  "8: an object-like constant (P2)": 23
+ },
+ "EFast": {
+  "7: no definition covers the node": 2
+ },
+ "ESick_resistance": {
+  "7: no definition covers the node": 2
+ },
+ "EInfravision": {
+  "7: no definition covers the node": 2
+ },
+ "Free_action": {
+  "7: no definition covers the node": 2
+ },
+ "EStone_resistance": {
+  "7: no definition covers the node": 2
+ },
+ "ESlow_digestion": {
+  "7: no definition covers the node": 2
+ },
+ "W_AMUL": {
+  "8: an object-like constant (P2)": 25
+ },
+ "EMagical_breathing": {
+  "7: no definition covers the node": 2
+ },
+ "HSleepy": {
+  "7: no definition covers the node": 14
+ },
+ "EFlying": {
+  "7: no definition covers the node": 2
+ },
+ "W_RING": {
+  "8: an object-like constant (P2)": 22
+ },
+ "WORN_ARMOR": {
+  "7: no definition covers the node": 4
+ },
+ "WORN_SHIRT": {
+  "7: no definition covers the node": 4
+ },
+ "WORN_BOOTS": {
+  "7: no definition covers the node": 4
+ },
+ "WORN_HELMET": {
+  "7: no definition covers the node": 5
+ },
+ "WORN_GLOVES": {
+  "7: no definition covers the node": 4
+ },
+ "WORN_SHIELD": {
+  "7: no definition covers the node": 4
+ },
+ "WORN_AMUL": {
+  "7: no definition covers the node": 4
+ },
+ "LEFT_RING": {
+  "7: no definition covers the node": 11
+ },
+ "RIGHT_RING": {
+  "7: no definition covers the node": 11
+ },
+ "WORN_BLINDF": {
+  "7: no definition covers the node": 4
+ },
+ "W_ARMOR": {
+  "8: an object-like constant (P2)": 16
+ },
+ "MOREWORN": {
+  "7: no definition covers the node": 22
+ },
+ "cantweararm": {
+  "16: a body with effects and an argument that may change": 4,
+  "7: no definition covers the node": 8
+ },
+ "MZ_SMALL": {
+  "8: an object-like constant (P2)": 15
+ },
+ "has_horns": {
+  "16: a body with effects and an argument that may change": 4,
+  "7: no definition covers the node": 4
+ },
+ "plur": {
+  "15: an argument with side effects or calls": 2,
+  "7: no definition covers the node": 6
+ },
+ "W_WEAPONS": {
+  "8: an object-like constant (P2)": 5
+ },
+ "HProtection": {
+  "7: no definition covers the node": 9
+ },
+ "AC_MAX": {
+  "8: an object-like constant (P2)": 5
+ },
+ "ERODE_BURN": {
+  "8: an object-like constant (P2)": 6
+ },
+ "ERODE_RUST": {
+  "8: an object-like constant (P2)": 9
+ },
+ "ERODE_CRACK": {
+  "8: an object-like constant (P2)": 3
+ },
+ "ERODE_ROT": {
+  "8: an object-like constant (P2)": 5
+ },
+ "ERODE_CORRODE": {
+  "8: an object-like constant (P2)": 19
+ },
+ "ERODE_NONE": {
+  "8: an object-like constant (P2)": 4
+ },
+ "ER_NOTHING": {
+  "8: an object-like constant (P2)": 29
+ },
+ "BLOCKSACCESS": {
+  "18c: the body names a caller local": 8,
+  "7: no definition covers the node": 20
+ },
+ "uhis": {
+  "7: no definition covers the node": 48
+ },
+ "G_EXTINCT": {
+  "8: an object-like constant (P2)": 12
+ },
+ "MAXMONNO": {
+  "8: an object-like constant (P2)": 3
+ },
+ "MM_FEMALE": {
+  "8: an object-like constant (P2)": 7
+ },
+ "MM_MALE": {
+  "8: an object-like constant (P2)": 7
+ },
+ "AT_WEAP": {
+  "8: an object-like constant (P2)": 37
+ },
+ "MIGR_EXACT_XY": {
+  "8: an object-like constant (P2)": 4
+ },
+ "MIGR_APPROX_XY": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MIGR_WITH_HERO": {
+  "8: an object-like constant (P2)": 5
+ },
+ "MIGR_STAIRS_UP": {
+  "8: an object-like constant (P2)": 4
+ },
+ "MIGR_STAIRS_DOWN": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MIGR_LADDER_UP": {
+  "8: an object-like constant (P2)": 4
+ },
+ "MIGR_LADDER_DOWN": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MIGR_SSTAIRS": {
+  "8: an object-like constant (P2)": 4
+ },
+ "MIGR_PORTAL": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MIGR_RANDOM": {
+  "8: an object-like constant (P2)": 4
+ },
+ "M3_WANTSARTI": {
+  "8: an object-like constant (P2)": 4
+ },
+ "MZ_MEDIUM": {
+  "8: an object-like constant (P2)": 4
+ },
+ "MZ_LARGE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MZ_GIGANTIC": {
+  "8: an object-like constant (P2)": 2
+ },
+ "SQSRCHRADIUS": {
+  "8: an object-like constant (P2)": 7
+ },
+ "DDIST": {
+  "18c: the body names a caller local": 4
+ },
+ "FARAWAY": {
+  "8: an object-like constant (P2)": 1
+ },
+ "AT_NONE": {
+  "8: an object-like constant (P2)": 9
+ },
+ "M_ATTK_MISS": {
+  "8: an object-like constant (P2)": 79
+ },
+ "MMOVE_DIED": {
+  "8: an object-like constant (P2)": 27
+ },
+ "M_ATTK_HIT": {
+  "8: an object-like constant (P2)": 60
+ },
+ "M_ATTK_AGR_DIED": {
+  "8: an object-like constant (P2)": 45
+ },
+ "M_ATTK_DEF_DIED": {
+  "8: an object-like constant (P2)": 40
+ },
+ "MMOVE_DONE": {
+  "8: an object-like constant (P2)": 20
+ },
+ "MMOVE_NOTHING": {
+  "8: an object-like constant (P2)": 18
+ },
+ "MMOVE_MOVED": {
+  "8: an object-like constant (P2)": 16
+ },
+ "ALLOW_M": {
+  "8: an object-like constant (P2)": 10
+ },
+ "ALLOW_MDISP": {
+  "8: an object-like constant (P2)": 8
+ },
+ "ALLOW_TRAPS": {
+  "8: an object-like constant (P2)": 4
+ },
+ "MTSZ": {
+  "8: an object-like constant (P2)": 1
+ },
+ "ALLOW_U": {
+  "8: an object-like constant (P2)": 6
+ },
+ "OBJ_NAME": {
+  "14: an argument of a non-scalar type": 12
+ },
+ "P_MARTIAL_ARTS": {
+  "8: an object-like constant (P2)": 1
+ },
+ "AT_KICK": {
+  "8: an object-like constant (P2)": 24
+ },
+ "NATTK": {
+  "8: an object-like constant (P2)": 29
+ },
+ "ZAP_POS": {
+  "13: an argument not found as AST nodes": 20,
+  "7: no definition covers the node": 14,
+  "15: an argument with side effects or calls": 4
+ },
+ "D_WARNED": {
+  "8: an object-like constant (P2)": 4
+ },
+ "TREE_LOOTED": {
+  "8: an object-like constant (P2)": 4
+ },
+ "TREE_SWARM": {
+  "8: an object-like constant (P2)": 4
+ },
+ "S_LPUDDING": {
+  "8: an object-like constant (P2)": 4
+ },
+ "S_LDWASHER": {
+  "8: an object-like constant (P2)": 4
+ },
+ "MM_NOMSG": {
+  "8: an object-like constant (P2)": 4
+ },
+ "MIGR_NOWHERE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MIGR_TO_SPECIES": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MIGR_NOBREAK": {
+  "8: an object-like constant (P2)": 1
+ },
+ "IS_SOFT": {
+  "13: an argument not found as AST nodes": 4,
+  "7: no definition covers the node": 68
+ },
+ "M2_ORC": {
+  "8: an object-like constant (P2)": 1
+ },
+ "LIMIT_TO_RANGE_INT": {
+  "13: an argument not found as AST nodes": 2,
+  "7: no definition covers the node": 7
+ },
+ "EWwalking": {
+  "7: no definition covers the node": 4
+ },
+ "noit_mhim": {
+  "7: no definition covers the node": 7
+ },
+ "HURTLING": {
+  "8: an object-like constant (P2)": 2
+ },
+ "POTHIT_HERO_THROW": {
+  "8: an object-like constant (P2)": 5
+ },
+ "PIERCE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "maybe_polyd": {
+  "17: an argument that may trap, evaluated conditionally": 12,
+  "7: no definition covers the node": 44
+ },
+ "BRK_KNOWN2BREAK": {
+  "8: an object-like constant (P2)": 1
+ },
+ "BRK_KNOWN2NOTBREAK": {
+  "8: an object-like constant (P2)": 1
+ },
+ "explicitdebug": {
+  "13: an argument not found as AST nodes": 2,
+  "7: no definition covers the node": 1
+ },
+ "BR_STAIR": {
+  "8: an object-like constant (P2)": 6
+ },
+ "BR_NO_END1": {
+  "8: an object-like constant (P2)": 7
+ },
+ "BR_NO_END2": {
+  "8: an object-like constant (P2)": 7
+ },
+ "BR_PORTAL": {
+  "8: an object-like constant (P2)": 7
+ },
+ "Sfi_int": {
+  "7: no definition covers the node": 42
+ },
+ "MAXLINFO": {
+  "8: an object-like constant (P2)": 1
+ },
+ "TBR_STAIR": {
+  "8: an object-like constant (P2)": 3
+ },
+ "TBR_NO_UP": {
+  "8: an object-like constant (P2)": 2
+ },
+ "TBR_NO_DOWN": {
+  "8: an object-like constant (P2)": 2
+ },
+ "TBR_PORTAL": {
+  "8: an object-like constant (P2)": 2
+ },
+ "TOWN": {
+  "8: an object-like constant (P2)": 2
+ },
+ "HELLISH": {
+  "8: an object-like constant (P2)": 3
+ },
+ "MAZELIKE": {
+  "8: an object-like constant (P2)": 3
+ },
+ "ROGUELIKE": {
+  "8: an object-like constant (P2)": 3
+ },
+ "D_ALIGN_MASK": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MAXLEVEL": {
+  "8: an object-like constant (P2)": 4
+ },
+ "UNCONNECTED": {
+  "8: an object-like constant (P2)": 2
+ },
+ "LUA_TTABLE": {
+  "8: an object-like constant (P2)": 28
+ },
+ "LUA_TSTRING": {
+  "8: an object-like constant (P2)": 18
+ },
+ "LUA_TNIL": {
+  "8: an object-like constant (P2)": 11
+ },
+ "D_ALIGN_NONE": {
+  "8: an object-like constant (P2)": 3
+ },
+ "debugpline4": {
+  "7: no definition covers the node": 53
+ },
+ "LEV_LIMIT": {
+  "8: an object-like constant (P2)": 1
+ },
+ "BRANCH_LIMIT": {
+  "8: an object-like constant (P2)": 1
+ },
+ "NHL_SB_SAFE": {
+  "8: an object-like constant (P2)": 6
+ },
+ "DUNGEON_FILE": {
+  "9: a record or array value": 1
+ },
+ "MAXDUNGEON": {
+  "8: an object-like constant (P2)": 1
+ },
+ "enfolds": {
+  "16: a body with effects and an argument that may change": 20,
+  "7: no definition covers the node": 30
+ },
+ "within_bounded_area": {
+  "17: an argument that may trap, evaluated conditionally": 42,
+  "7: no definition covers the node": 266,
+  "13: an argument not found as AST nodes": 2
+ },
+ "dlev_in_current_branch": {
+  "14: an argument of a non-scalar type": 2,
+  "7: no definition covers the node": 16
+ },
+ "VISITED": {
+  "8: an object-like constant (P2)": 7
+ },
+ "Is_stronghold": {
+  "16: a body with effects and an argument that may change": 1,
+  "7: no definition covers the node": 9
+ },
+ "Sfi_xint16": {
+  "7: no definition covers the node": 1
+ },
+ "Sfi_unsigned": {
+  "7: no definition covers the node": 12
+ },
+ "OF_INTEREST": {
+  "14: an argument of a non-scalar type": 4,
+  "7: no definition covers the node": 40
+ },
+ "PICK_NONE": {
+  "8: an object-like constant (P2)": 21
+ },
+ "ADDNTOBUF": {
+  "7: no definition covers the node": 12
+ },
+ "ADD2NTOBUF": {
+  "7: no definition covers the node": 6
+ },
+ "PREFIX": {
+  "9: a record or array value": 1,
+  "8: an object-like constant (P2)": 3
+ },
+ "USAGEHELP": {
+  "9: a record or array value": 2
+ },
+ "dump_om": {
+  "7: no definition covers the node": 15
+ },
+ "UNPREFIXED_COUNT": {
+  "8: an object-like constant (P2)": 1
+ },
+ "CXN_SINGULAR": {
+  "8: an object-like constant (P2)": 1
+ },
+ "CXN_PFX_THE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "SELL_DONTSELL": {
+  "8: an object-like constant (P2)": 5
+ },
+ "OBJ_DELETED": {
+  "8: an object-like constant (P2)": 8
+ },
+ "HAggravate_monster": {
+  "7: no definition covers the node": 5
+ },
+ "MR_FIRE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "ifdebugresist": {
+  "7: no definition covers the node": 99
+ },
+ "MR_SLEEP": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MR_COLD": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MR_DISINT": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MR_ELEC": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MR_POISON": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MR_ACID": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MR_STONE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "HFire_resistance": {
+  "7: no definition covers the node": 6
+ },
+ "HSleep_resistance": {
+  "7: no definition covers the node": 5
+ },
+ "HCold_resistance": {
+  "7: no definition covers the node": 5
+ },
+ "HDisint_resistance": {
+  "7: no definition covers the node": 2
+ },
+ "HShock_resistance": {
+  "7: no definition covers the node": 3
+ },
+ "HPoison_resistance": {
+  "7: no definition covers the node": 5
+ },
+ "HTeleportation": {
+  "7: no definition covers the node": 9
+ },
+ "HTeleport_control": {
+  "7: no definition covers the node": 2
+ },
+ "HTelepat": {
+  "7: no definition covers the node": 7
+ },
+ "HAcid_resistance": {
+  "7: no definition covers the node": 1
+ },
+ "HStone_resistance": {
+  "7: no definition covers the node": 1
+ },
+ "HInvis": {
+  "7: no definition covers the node": 11
+ },
+ "HDisplaced": {
+  "7: no definition covers the node": 1
+ },
+ "SPINACH_TIN": {
+  "8: an object-like constant (P2)": 5
+ },
+ "ROTTEN_TIN": {
+  "8: an object-like constant (P2)": 7
+ },
+ "HEALTHY_TIN": {
+  "8: an object-like constant (P2)": 3
+ },
+ "TTSZ": {
+  "7: no definition covers the node": 1
+ },
+ "BY_COOKIE": {
+  "8: an object-like constant (P2)": 6
+ },
+ "ynq": {
+  "15: an argument with side effects or calls": 3,
+  "7: no definition covers the node": 3,
+  "20: body text not the one chosen for the macro": 1
+ },
+ "HRegeneration": {
+  "7: no definition covers the node": 1
+ },
+ "EConflict": {
+  "7: no definition covers the node": 1
+ },
+ "W_RINGR": {
+  "8: an object-like constant (P2)": 8
+ },
+ "AT_BREA": {
+  "8: an object-like constant (P2)": 14
+ },
+ "WIZARD_NAME": {
+  "9: a record or array value": 1
+ },
+ "NUM_DISCLOSURE_OPTIONS": {
+  "8: an object-like constant (P2)": 5
+ },
+ "DISCLOSE_YES_WITHOUT_PROMPT": {
+  "8: an object-like constant (P2)": 2
+ },
+ "DISCLOSE_SPECIAL_WITHOUT_PROMPT": {
+  "8: an object-like constant (P2)": 2
+ },
+ "DISCLOSE_NO_WITHOUT_PROMPT": {
+  "8: an object-like constant (P2)": 2
+ },
+ "DISCLOSE_PROMPT_DEFAULT_YES": {
+  "8: an object-like constant (P2)": 3
+ },
+ "DISCLOSE_PROMPT_DEFAULT_SPECIAL": {
+  "8: an object-like constant (P2)": 2
+ },
+ "ENL_GAMEOVERALIVE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "ENL_GAMEOVERDEAD": {
+  "8: an object-like constant (P2)": 3
+ },
+ "HUnchanging": {
+  "7: no definition covers the node": 1
+ },
+ "LL_LIFESAVE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "LL_DUMP": {
+  "8: an object-like constant (P2)": 1
+ },
+ "IS_GRAVE": {
+  "13: an argument not found as AST nodes": 12,
+  "7: no definition covers the node": 6
+ },
+ "SORTLOOT_LOOT": {
+  "8: an object-like constant (P2)": 3
+ },
+ "SORTLOOT_PACK": {
+  "8: an object-like constant (P2)": 2
+ },
+ "ENGRAVEFILE": {
+  "9: a record or array value": 2
+ },
+ "MD_PAD_RUMORS": {
+  "8: an object-like constant (P2)": 2
+ },
+ "AT_HUGS": {
+  "8: an object-like constant (P2)": 17
+ },
+ "HEADSTONE": {
+  "8: an object-like constant (P2)": 15
+ },
+ "BURN": {
+  "8: an object-like constant (P2)": 12
+ },
+ "DUST": {
+  "8: an object-like constant (P2)": 17
+ },
+ "ENGR_BLOOD": {
+  "8: an object-like constant (P2)": 12
+ },
+ "ENGRAVE": {
+  "8: an object-like constant (P2)": 14
+ },
+ "MARK": {
+  "8: an object-like constant (P2)": 12
+ },
+ "engr_text_space": {
+  "18b: not every argument occurrence emits through its parameter": 8,
+  "7: no definition covers the node": 12
+ },
+ "SURFACE_AT": {
+  "16: a body with effects and an argument that may change": 6,
+  "7: no definition covers the node": 12
+ },
+ "EPITAPHFILE": {
+  "9: a record or array value": 2
+ },
+ "AT_BUTT": {
+  "8: an object-like constant (P2)": 12
+ },
+ "AD_SLIM": {
+  "8: an object-like constant (P2)": 2
+ },
+ "AD_WRAP": {
+  "8: an object-like constant (P2)": 6
+ },
+ "LL_MINORAC": {
+  "8: an object-like constant (P2)": 5
+ },
+ "MON_EXPLODE": {
+  "8: an object-like constant (P2)": 4
+ },
+ "RAY": {
+  "8: an object-like constant (P2)": 2
+ },
+ "BURNING_OIL": {
+  "8: an object-like constant (P2)": 2
+ },
+ "TRAP_EXPLODE": {
+  "8: an object-like constant (P2)": 3
+ },
+ "PHYS_EXPL_TYPE": {
+  "8: an object-like constant (P2)": 3
+ },
+ "ZT_SPELL_O_FIRE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "AD_SPEL": {
+  "8: an object-like constant (P2)": 9
+ },
+ "AD_DREN": {
+  "8: an object-like constant (P2)": 5
+ },
+ "AD_ENCH": {
+  "8: an object-like constant (P2)": 7
+ },
+ "AD_DRDX": {
+  "8: an object-like constant (P2)": 4
+ },
+ "AD_DRCO": {
+  "8: an object-like constant (P2)": 4
+ },
+ "AD_PEST": {
+  "8: an object-like constant (P2)": 4
+ },
+ "AD_SPC2": {
+  "8: an object-like constant (P2)": 1
+ },
+ "XL_DOWN": {
+  "8: an object-like constant (P2)": 6
+ },
+ "XL_RIGHT": {
+  "8: an object-like constant (P2)": 6
+ },
+ "XL_LEFT": {
+  "8: an object-like constant (P2)": 4
+ },
+ "XL_UP": {
+  "8: an object-like constant (P2)": 4
+ },
+ "TROUBLEPREFIX": {
+  "8: an object-like constant (P2)": 3
+ },
+ "COUNTING": {
+  "8: an object-like constant (P2)": 1
+ },
+ "LEVELPREFIX": {
+  "8: an object-like constant (P2)": 7
+ },
+ "NHF_LEVELFILE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "READING": {
+  "8: an object-like constant (P2)": 3
+ },
+ "BONESPREFIX": {
+  "8: an object-like constant (P2)": 8
+ },
+ "NHF_BONESFILE": {
+  "8: an object-like constant (P2)": 8
+ },
+ "SAVE_EXTENSION": {
+  "9: a record or array value": 2
+ },
+ "SAVEPREFIX": {
+  "8: an object-like constant (P2)": 9
+ },
+ "NHF_SAVEFILE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "COMPRESS_EXTENSION": {
+  "9: a record or array value": 3
+ },
+ "RDBMODE": {
+  "9: a record or array value": 3
+ },
+ "SF_DM_IL32LLP64_ON_ILP32LL64": {
+  "8: an object-like constant (P2)": 2
+ },
+ "SF_DM_I32LP64_ON_ILP32LL64": {
+  "8: an object-like constant (P2)": 2
+ },
+ "SF_DM_ILP32LL64_ON_I32LP64": {
+  "8: an object-like constant (P2)": 2
+ },
+ "SF_DM_ILP32LL64_ON_IL32LLP64": {
+  "8: an object-like constant (P2)": 2
+ },
+ "SF_DM_I32LP64_ON_IL32LLP64": {
+  "8: an object-like constant (P2)": 2
+ },
+ "SF_DM_IL32LLP64_ON_I32LP64": {
+  "8: an object-like constant (P2)": 2
+ },
+ "SF_DM_MISMATCH": {
+  "8: an object-like constant (P2)": 2
+ },
+ "SF_OUTDATED": {
+  "8: an object-like constant (P2)": 3
+ },
+ "SF_CRITICAL_BYTE_COUNT_MISMATCH": {
+  "8: an object-like constant (P2)": 2
+ },
+ "HACKDIR": {
+  "9: a record or array value": 3
+ },
+ "HUP": {
+  "7: no definition covers the node": 57
+ },
+ "SYMBOLS": {
+  "9: a record or array value": 6
+ },
+ "HACKPREFIX": {
+  "8: an object-like constant (P2)": 1
+ },
+ "RECORD": {
+  "9: a record or array value": 9
+ },
+ "SCOREPREFIX": {
+  "8: an object-like constant (P2)": 12
+ },
+ "FCMASK": {
+  "8: an object-like constant (P2)": 1
+ },
+ "PANICLOG": {
+  "9: a record or array value": 1
+ },
+ "SYSCONFFILE": {
+  "9: a record or array value": 2
+ },
+ "MAXPASSAGES": {
+  "7: no definition covers the node": 3
+ },
+ "TRIBUTEFILE": {
+  "9: a record or array value": 1
+ },
+ "SECTIONSCOPE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "TITLESCOPE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "PASSAGESCOPE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "LIVELOGFILE": {
+  "9: a record or array value": 4
+ },
+ "uhim": {
+  "7: no definition covers the node": 8
+ },
+ "CLEAR_FOUNTAIN_LOOTED": {
+  "7: no definition covers the node": 2
+ },
+ "ER_GREASED": {
+  "8: an object-like constant (P2)": 3
+ },
+ "S_LRING": {
+  "8: an object-like constant (P2)": 8
+ },
+ "HI_ZAP": {
+  "7: no definition covers the node": 1
+ },
+ "GLOC_SAME_AREA": {
+  "16: a body with effects and an argument that may change": 8,
+  "7: no definition covers the node": 28
+ },
+ "glyph_is_nothing": {
+  "15: an argument with side effects or calls": 1,
+  "7: no definition covers the node": 3
+ },
+ "IS_UNEXPLORED_LOC": {
+  "16: a body with effects and an argument that may change": 8,
+  "7: no definition covers the node": 36
+ },
+ "GPCOORDS_COMFULL": {
+  "8: an object-like constant (P2)": 3
+ },
+ "GPCOORDS_COMPASS": {
+  "8: an object-like constant (P2)": 2
+ },
+ "GPCOORDS_MAP": {
+  "8: an object-like constant (P2)": 6
+ },
+ "GPCOORDS_SCREEN": {
+  "8: an object-like constant (P2)": 2
+ },
+ "glyph_to_obj": {
+  "15: an argument with side effects or calls": 1,
+  "7: no definition covers the node": 171
+ },
+ "IS_STWALL": {
+  "13: an argument not found as AST nodes": 23,
+  "7: no definition covers the node": 12
+ },
+ "W_NONPASSWALL": {
+  "8: an object-like constant (P2)": 5
+ },
+ "DO_MOVE": {
+  "8: an object-like constant (P2)": 22
+ },
+ "AD_RUST": {
+  "8: an object-like constant (P2)": 12
+ },
+ "AD_CORR": {
+  "8: an object-like constant (P2)": 8
+ },
+ "TEST_TRAV": {
+  "8: an object-like constant (P2)": 4
+ },
+ "TEST_TRAP": {
+  "8: an object-like constant (P2)": 5
+ },
+ "TRAVP_TRAVEL": {
+  "8: an object-like constant (P2)": 7
+ },
+ "TRAVP_VALID": {
+  "8: an object-like constant (P2)": 4
+ },
+ "TRAVP_GUESS": {
+  "8: an object-like constant (P2)": 4
+ },
+ "AT_EXPL": {
+  "8: an object-like constant (P2)": 15
+ },
+ "AD_ANY": {
+  "8: an object-like constant (P2)": 6
+ },
+ "on_ice": {
+  "18c: the body names a caller local": 2
+ },
+ "m_next2u": {
+  "16: a body with effects and an argument that may change": 1,
+  "7: no definition covers the node": 4
+ },
+ "BFlying": {
+  "7: no definition covers the node": 7
+ },
+ "FAILEDUNTRAP": {
+  "8: an object-like constant (P2)": 7
+ },
+ "SHARED": {
+  "8: an object-like constant (P2)": 1
+ },
+ "SHARED_PLUS": {
+  "8: an object-like constant (P2)": 1
+ },
+ "goodtype": {
+  "18c: the body names a caller local": 8,
+  "7: no definition covers the node": 72
+ },
+ "IS_SHOP": {
+  "13: an argument not found as AST nodes": 6,
+  "7: no definition covers the node": 3
+ },
+ "W_ACCESSORY": {
+  "8: an object-like constant (P2)": 2
+ },
+ "enl_msg": {
+  "15: an argument with side effects or calls": 11,
+  "7: no definition covers the node": 144,
+  "18c: the body names a caller local": 38,
+  "17: an argument that may trap, evaluated conditionally": 7,
+  "13: an argument not found as AST nodes": 1,
+  "14: an argument of a non-scalar type": 2
+ },
+ "BASICENLIGHTENMENT": {
+  "8: an object-like constant (P2)": 3
+ },
+ "you_are": {
+  "7: no definition covers the node": 267
+ },
+ "you_have_X": {
+  "7: no definition covers the node": 104
+ },
+ "you_have": {
+  "7: no definition covers the node": 85
+ },
+ "Blindfolded": {
+  "7: no definition covers the node": 14
+ },
+ "AD_DGST": {
+  "8: an object-like constant (P2)": 12
+ },
+ "you_can": {
+  "7: no definition covers the node": 52
+ },
+ "HDetect_monsters": {
+  "7: no definition covers the node": 3
+ },
+ "NO_SPELL": {
+  "8: an object-like constant (P2)": 18
+ },
+ "you_have_been": {
+  "7: no definition covers the node": 21
+ },
+ "you_have_never": {
+  "7: no definition covers the node": 15
+ },
+ "USE_RATING": {
+  "7: no definition covers the node": 98
+ },
+ "NOINVSYM": {
+  "8: an object-like constant (P2)": 8
+ },
+ "LOST_THROWN": {
+  "8: an object-like constant (P2)": 5
+ },
+ "LOST_EXPLODING": {
+  "8: an object-like constant (P2)": 4
+ },
+ "HANDS_SYM": {
+  "8: an object-like constant (P2)": 6
+ },
+ "BUC_BLESSED": {
+  "8: an object-like constant (P2)": 5
+ },
+ "BUC_UNCURSED": {
+  "8: an object-like constant (P2)": 6
+ },
+ "BUC_CURSED": {
+  "8: an object-like constant (P2)": 5
+ },
+ "BUC_UNKNOWN": {
+  "8: an object-like constant (P2)": 6
+ },
+ "CONTAINED_SYM": {
+  "8: an object-like constant (P2)": 1
+ },
+ "SORTLOOT_INVLET": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MENU_PARTIAL": {
+  "8: an object-like constant (P2)": 3
+ },
+ "UNPAID_TYPES": {
+  "8: an object-like constant (P2)": 2
+ },
+ "BILLED_TYPES": {
+  "8: an object-like constant (P2)": 2
+ },
+ "JUSTPICKED": {
+  "8: an object-like constant (P2)": 3
+ },
+ "INCLUDE_VENOM": {
+  "8: an object-like constant (P2)": 4
+ },
+ "USE_INVLET": {
+  "8: an object-like constant (P2)": 5
+ },
+ "INVORDER_SORT": {
+  "8: an object-like constant (P2)": 7
+ },
+ "LOOKHERE_PICKED_SOME": {
+  "8: an object-like constant (P2)": 2
+ },
+ "LOOKHERE_SKIP_DFEATURE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MSGTYP_MASK_REP_SHOW": {
+  "8: an object-like constant (P2)": 2
+ },
+ "LOOKHERE_NOFLAGS": {
+  "8: an object-like constant (P2)": 3
+ },
+ "LOST_NONE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "GOLD_INDX": {
+  "8: an object-like constant (P2)": 1
+ },
+ "GOLD_OFFSET": {
+  "8: an object-like constant (P2)": 3
+ },
+ "OVRFLW_INDX": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MINV_ALL": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MINV_PICKMASK": {
+  "8: an object-like constant (P2)": 1
+ },
+ "INCLUDE_HERO": {
+  "8: an object-like constant (P2)": 2
+ },
+ "BY_NEXTHERE": {
+  "8: an object-like constant (P2)": 4
+ },
+ "MAX_RADIUS": {
+  "8: an object-like constant (P2)": 4
+ },
+ "LSF_NEEDS_FIXUP": {
+  "8: an object-like constant (P2)": 4
+ },
+ "LSF_SHOW": {
+  "8: an object-like constant (P2)": 3
+ },
+ "TEMP_LIT": {
+  "8: an object-like constant (P2)": 4
+ },
+ "RANGE_LEVEL": {
+  "8: an object-like constant (P2)": 6
+ },
+ "LSF_IS_PROBLEMATIC": {
+  "8: an object-like constant (P2)": 4
+ },
+ "PICKLOCK_LEARNED_SOMETHING": {
+  "8: an object-like constant (P2)": 16
+ },
+ "PICKLOCK_DID_SOMETHING": {
+  "8: an object-like constant (P2)": 6
+ },
+ "PICKLOCK_DID_NOTHING": {
+  "8: an object-like constant (P2)": 11
+ },
+ "BBlinded": {
+  "7: no definition covers the node": 3
+ },
+ "verbalize1": {
+  "13: an argument not found as AST nodes": 1,
+  "7: no definition covers the node": 2,
+  "15: an argument with side effects or calls": 1
+ },
+ "MSG_OTHER": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MSG_MAIL": {
+  "8: an object-like constant (P2)": 1
+ },
+ "DEF_MAILREADER": {
+  "9: a record or array value": 1
+ },
+ "pm_resistance": {
+  "13: an argument not found as AST nodes": 8,
+  "7: no definition covers the node": 18
+ },
+ "MM_NOGRP": {
+  "8: an object-like constant (P2)": 3
+ },
+ "add_ac": {
+  "7: no definition covers the node": 50
+ },
+ "GP_AVOID_MONPOS": {
+  "8: an object-like constant (P2)": 3
+ },
+ "NO_MINVENT": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MM_NOCOUNTBIRTH": {
+  "8: an object-like constant (P2)": 4
+ },
+ "MM_NOTAIL": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MM_IGNOREWATER": {
+  "8: an object-like constant (P2)": 4
+ },
+ "GP_CHECKSCARY": {
+  "8: an object-like constant (P2)": 3
+ },
+ "MM_ADJACENTOK": {
+  "8: an object-like constant (P2)": 4
+ },
+ "MM_EGD": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MM_EPRI": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MM_ESHK": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MM_EMIN": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MM_EDOG": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MM_ASLEEP": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MM_ANGRY": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MM_MINVIS": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MM_NONAME": {
+  "8: an object-like constant (P2)": 1
+ },
+ "G_SGROUP": {
+  "8: an object-like constant (P2)": 2
+ },
+ "G_LGROUP": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MM_NOWAIT": {
+  "8: an object-like constant (P2)": 1
+ },
+ "M3_WAITFORU": {
+  "8: an object-like constant (P2)": 1
+ },
+ "M3_CLOSE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "STRAT_APPEARMSG": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MM_NOEXCLAM": {
+  "8: an object-like constant (P2)": 2
+ },
+ "G_HELL": {
+  "8: an object-like constant (P2)": 5
+ },
+ "AM_NONE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "AM_LAWFUL": {
+  "8: an object-like constant (P2)": 6
+ },
+ "AM_NEUTRAL": {
+  "8: an object-like constant (P2)": 6
+ },
+ "AM_CHAOTIC": {
+  "8: an object-like constant (P2)": 6
+ },
+ "ALIGNWEIGHT": {
+  "8: an object-like constant (P2)": 1
+ },
+ "G_NOHELL": {
+  "8: an object-like constant (P2)": 5
+ },
+ "G_FREQ": {
+  "8: an object-like constant (P2)": 8
+ },
+ "G_IGNORE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "montoostrong": {
+  "18e: a header macro naming a file-static name": 1,
+  "13: an argument not found as AST nodes": 1
+ },
+ "AD_CLRC": {
+  "8: an object-like constant (P2)": 6
+ },
+ "m_seenres": {
+  "15: an argument with side effects or calls": 12,
+  "7: no definition covers the node": 6
+ },
+ "MCF_INDIRECT": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MCF_HOSTILE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MCF_SIGHT": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MFAST": {
+  "8: an object-like constant (P2)": 10
+ },
+ "BZ_OFS_AD": {
+  "16: a body with effects and an argument that may change": 2,
+  "7: no definition covers the node": 7,
+  "13: an argument not found as AST nodes": 2
+ },
+ "BZ_M_SPELL": {
+  "16: a body with effects and an argument that may change": 2,
+  "7: no definition covers the node": 6,
+  "13: an argument not found as AST nodes": 4
+ },
+ "STOREOPTTEXT": {
+  "16: a body with effects and an argument that may change": 24,
+  "7: no definition covers the node": 117,
+  "18d: the body needs temporaries": 2
+ },
+ "DEFAULT_WINDOW_SYS": {
+  "9: a record or array value": 2
+ },
+ "MAXOPT": {
+  "8: an object-like constant (P2)": 1
+ },
+ "AT_TENT": {
+  "8: an object-like constant (P2)": 12
+ },
+ "AD_DRIN": {
+  "8: an object-like constant (P2)": 8
+ },
+ "AT_CLAW": {
+  "8: an object-like constant (P2)": 24
+ },
+ "AT_BITE": {
+  "8: an object-like constant (P2)": 12
+ },
+ "AT_STNG": {
+  "8: an object-like constant (P2)": 11
+ },
+ "AT_TUCH": {
+  "8: an object-like constant (P2)": 20
+ },
+ "M_ATTK_AGR_DONE": {
+  "8: an object-like constant (P2)": 10
+ },
+ "AD_STCK": {
+  "8: an object-like constant (P2)": 8
+ },
+ "TELL": {
+  "8: an object-like constant (P2)": 5
+ },
+ "AD_RBRE": {
+  "8: an object-like constant (P2)": 7
+ },
+ "AT_BOOM": {
+  "8: an object-like constant (P2)": 10
+ },
+ "AD_SEDU": {
+  "8: an object-like constant (P2)": 9
+ },
+ "AD_SSEX": {
+  "8: an object-like constant (P2)": 10
+ },
+ "AD_FAMN": {
+  "8: an object-like constant (P2)": 2
+ },
+ "AD_POLY": {
+  "8: an object-like constant (P2)": 2
+ },
+ "AC_VALUE": {
+  "16: a body with effects and an argument that may change": 1,
+  "7: no definition covers the node": 7
+ },
+ "AD_CONF": {
+  "8: an object-like constant (P2)": 4
+ },
+ "AD_SITM": {
+  "8: an object-like constant (P2)": 3
+ },
+ "Athome": {
+  "18c: the body names a caller local": 1,
+  "7: no definition covers the node": 6
+ },
+ "LL_UMONST": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MAXNROFROOMS": {
+  "8: an object-like constant (P2)": 3
+ },
+ "MAX_SUBROOMS": {
+  "8: an object-like constant (P2)": 1
+ },
+ "DOORINC": {
+  "8: an object-like constant (P2)": 1
+ },
+ "IS_POOL": {
+  "13: an argument not found as AST nodes": 4,
+  "7: no definition covers the node": 12
+ },
+ "SPBOOK_no_NOVEL": {
+  "8: an object-like constant (P2)": 8
+ },
+ "FILL_NORMAL": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MKTRAP_NOFLAGS": {
+  "8: an object-like constant (P2)": 1
+ },
+ "LUA_GCCOLLECT": {
+  "8: an object-like constant (P2)": 2
+ },
+ "LA_UP": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MKTRAP_NOSPIDERONWEB": {
+  "8: an object-like constant (P2)": 3
+ },
+ "MKTRAP_MAZEFLAG": {
+  "8: an object-like constant (P2)": 4
+ },
+ "MKTRAP_SEEN": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MKTRAP_NOVICTIM": {
+  "8: an object-like constant (P2)": 2
+ },
+ "WIDTH": {
+  "8: an object-like constant (P2)": 8
+ },
+ "HEIGHT": {
+  "8: an object-like constant (P2)": 7
+ },
+ "new_loc": {
+  "7: no definition covers the node": 36
+ },
+ "ICED_POOL": {
+  "8: an object-like constant (P2)": 5
+ },
+ "N_P1_ITER": {
+  "8: an object-like constant (P2)": 1
+ },
+ "N_P2_ITER": {
+  "8: an object-like constant (P2)": 1
+ },
+ "N_P3_ITER": {
+  "8: an object-like constant (P2)": 1
+ },
+ "SET_LIT_NOCHANGE": {
+  "8: an object-like constant (P2)": 3
+ },
+ "SET_LIT_RANDOM": {
+  "8: an object-like constant (P2)": 1
+ },
+ "mz_move": {
+  "7: no definition covers the node": 96
+ },
+ "x_maze_min": {
+  "8: an object-like constant (P2)": 1
+ },
+ "y_maze_min": {
+  "8: an object-like constant (P2)": 1
+ },
+ "INVPOS_X_MARGIN": {
+  "8: an object-like constant (P2)": 1
+ },
+ "INVPOS_Y_MARGIN": {
+  "8: an object-like constant (P2)": 1
+ },
+ "INVPOS_DISTANCE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "SPACE_POS": {
+  "13: an argument not found as AST nodes": 4,
+  "7: no definition covers the node": 2
+ },
+ "MAX_BMASK": {
+  "8: an object-like constant (P2)": 1
+ },
+ "OBJ_LUAFREE": {
+  "8: an object-like constant (P2)": 6
+ },
+ "OBJ_ONBILL": {
+  "8: an object-like constant (P2)": 11
+ },
+ "CONTAINED_TOO": {
+  "8: an object-like constant (P2)": 5
+ },
+ "rne": {
+  "6: name taken": 16
+ },
+ "RANDOM_TIN": {
+  "8: an object-like constant (P2)": 2
+ },
+ "CORPSTAT_NEUTER": {
+  "8: an object-like constant (P2)": 2
+ },
+ "ROT_AGE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "TAINT_AGE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "BURIED_TOO": {
+  "8: an object-like constant (P2)": 4
+ },
+ "CORPSTAT_INIT": {
+  "8: an object-like constant (P2)": 1
+ },
+ "CORPSTAT_NONE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "NOBJ_STATES": {
+  "8: an object-like constant (P2)": 2
+ },
+ "LOWEST_GLOB": {
+  "8: an object-like constant (P2)": 1
+ },
+ "HIGHEST_GLOB": {
+  "8: an object-like constant (P2)": 1
+ },
+ "AM_SHRINE": {
+  "8: an object-like constant (P2)": 5
+ },
+ "ANY_TYPE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "ANY_SHOP": {
+  "8: an object-like constant (P2)": 2
+ },
+ "M_POISONGAS_OK": {
+  "8: an object-like constant (P2)": 8
+ },
+ "M_POISONGAS_MINOR": {
+  "8: an object-like constant (P2)": 1
+ },
+ "M_POISONGAS_BAD": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MSLOW": {
+  "8: an object-like constant (P2)": 5
+ },
+ "mstoning": {
+  "13: an argument not found as AST nodes": 2,
+  "7: no definition covers the node": 80
+ },
+ "ALLOW_SSM": {
+  "8: an object-like constant (P2)": 5
+ },
+ "ALLOW_ROCK": {
+  "8: an object-like constant (P2)": 5
+ },
+ "ALLOW_DIG": {
+  "8: an object-like constant (P2)": 2
+ },
+ "BUSTDOOR": {
+  "8: an object-like constant (P2)": 1
+ },
+ "OPENDOOR": {
+  "8: an object-like constant (P2)": 2
+ },
+ "UNLOCKDOOR": {
+  "8: an object-like constant (P2)": 2
+ },
+ "ALLOW_BARS": {
+  "8: an object-like constant (P2)": 2
+ },
+ "ALLOW_SANCT": {
+  "8: an object-like constant (P2)": 3
+ },
+ "NOTONL": {
+  "8: an object-like constant (P2)": 7
+ },
+ "NOGARLIC": {
+  "8: an object-like constant (P2)": 3
+ },
+ "ALLOW_ALL": {
+  "8: an object-like constant (P2)": 1
+ },
+ "ALLOW_WALL": {
+  "8: an object-like constant (P2)": 2
+ },
+ "ALLOW_TM": {
+  "8: an object-like constant (P2)": 2
+ },
+ "AD_DCAY": {
+  "8: an object-like constant (P2)": 4
+ },
+ "XKILL_NOCONDUCT": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MZ_HUMAN": {
+  "7: no definition covers the node": 3
+ },
+ "CORPSTAT_BURIED": {
+  "8: an object-like constant (P2)": 1
+ },
+ "LL_KILLEDPET": {
+  "8: an object-like constant (P2)": 1
+ },
+ "QBUFSZ": {
+  "8: an object-like constant (P2)": 3
+ },
+ "TRYLIMIT": {
+  "8: an object-like constant (P2)": 1
+ },
+ "NC_VIA_WAND_OR_SPELL": {
+  "8: an object-like constant (P2)": 3
+ },
+ "AD_WERE": {
+  "8: an object-like constant (P2)": 3
+ },
+ "AT_ANY": {
+  "8: an object-like constant (P2)": 2
+ },
+ "flees_light": {
+  "13: an argument not found as AST nodes": 2,
+  "7: no definition covers the node": 64
+ },
+ "MMOVE_NOMOVES": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MON_POLE_DIST": {
+  "8: an object-like constant (P2)": 2
+ },
+ "m_cansee": {
+  "16: a body with effects and an argument that may change": 2
+ },
+ "UnblockDoor": {
+  "7: no definition covers the node": 44
+ },
+ "NO_MM_FLAGS": {
+  "8: an object-like constant (P2)": 2
+ },
+ "POTHIT_OTHER_THROW": {
+  "8: an object-like constant (P2)": 3
+ },
+ "MT_FLIGHTCHECK": {
+  "13: an argument not found as AST nodes": 4,
+  "7: no definition covers the node": 65
+ },
+ "POTHIT_MONST_THROW": {
+  "8: an object-like constant (P2)": 1
+ },
+ "is_poisonable": {
+  "16: a body with effects and an argument that may change": 4,
+  "7: no definition covers the node": 20
+ },
+ "PET_MISSILE_RANGE2": {
+  "8: an object-like constant (P2)": 1
+ },
+ "BRK_BY_HERO": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MUSE_POT_FULL_HEALING": {
+  "8: an object-like constant (P2)": 4
+ },
+ "MUSE_POT_EXTRA_HEALING": {
+  "8: an object-like constant (P2)": 3
+ },
+ "MUSE_POT_HEALING": {
+  "8: an object-like constant (P2)": 3
+ },
+ "MUSE_UNICORN_HORN": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_LIZARD_CORPSE": {
+  "8: an object-like constant (P2)": 3
+ },
+ "MUSE_WAN_UNDEAD_TURNING": {
+  "8: an object-like constant (P2)": 4
+ },
+ "MUSE_DOWNSTAIRS": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_UPSTAIRS": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_SSTAIRS": {
+  "8: an object-like constant (P2)": 3
+ },
+ "MUSE_UP_LADDER": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_DN_LADDER": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_TRAPDOOR": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_TELEPORT_TRAP": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_BUGLE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_WAN_DIGGING": {
+  "8: an object-like constant (P2)": 3
+ },
+ "MUSE_WAN_TELEPORTATION": {
+  "8: an object-like constant (P2)": 4
+ },
+ "MUSE_WAN_TELEPORTATION_SELF": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_SCR_TELEPORTATION": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_WAN_CREATE_MONSTER": {
+  "8: an object-like constant (P2)": 3
+ },
+ "MUSE_SCR_CREATE_MONSTER": {
+  "8: an object-like constant (P2)": 2
+ },
+ "m_flee": {
+  "7: no definition covers the node": 80
+ },
+ "mhim": {
+  "7: no definition covers the node": 3
+ },
+ "AD_HEAL": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_WAN_DEATH": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_WAN_SLEEP": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_WAN_FIRE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_FIRE_HORN": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_WAN_COLD": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_FROST_HORN": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_WAN_LIGHTNING": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_WAN_MAGIC_MISSILE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_WAN_STRIKING": {
+  "8: an object-like constant (P2)": 3
+ },
+ "MUSE_POT_PARALYSIS": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_POT_BLINDNESS": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_POT_CONFUSION": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_POT_SLEEPING": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_POT_ACID": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_SCR_EARTH": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_CAMERA": {
+  "8: an object-like constant (P2)": 2
+ },
+ "BZ_M_WAND": {
+  "16: a body with effects and an argument that may change": 2,
+  "7: no definition covers the node": 4,
+  "13: an argument not found as AST nodes": 2
+ },
+ "MUSE_POLY_TRAP": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_POT_GAIN_LEVEL": {
+  "8: an object-like constant (P2)": 2
+ },
+ "nomore": {
+  "7: no definition covers the node": 24
+ },
+ "MUSE_BULLWHIP": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_WAN_MAKE_INVISIBLE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_POT_INVISIBILITY": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_WAN_SPEED_MONSTER": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_POT_SPEED": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_WAN_POLYMORPH": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_POT_POLYMORPH": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MUSE_BAG": {
+  "8: an object-like constant (P2)": 2
+ },
+ "CLR_BRIGHT_GREEN": {
+  "8: an object-like constant (P2)": 4
+ },
+ "Maybe_Half_Phys": {
+  "16: a body with effects and an argument that may change": 6,
+  "7: no definition covers the node": 68,
+  "13: an argument not found as AST nodes": 2,
+  "17: an argument that may trap, evaluated conditionally": 2,
+  "20: body text not the one chosen for the macro": 20
+ },
+ "PLAY_NORMAL": {
+  "8: an object-like constant (P2)": 2
+ },
+ "PLAY_STUNNED": {
+  "8: an object-like constant (P2)": 3
+ },
+ "PLAY_CONFUSED": {
+  "8: an object-like constant (P2)": 3
+ },
+ "PLAY_HALLU": {
+  "8: an object-like constant (P2)": 4
+ },
+ "lua_istable": {
+  "16: a body with effects and an argument that may change": 2,
+  "7: no definition covers the node": 8
+ },
+ "LUA_TFUNCTION": {
+  "8: an object-like constant (P2)": 9
+ },
+ "lua_pushliteral": {
+  "13: an argument not found as AST nodes": 3
+ },
+ "T_LOOTED": {
+  "8: an object-like constant (P2)": 4
+ },
+ "F_LOOTED": {
+  "8: an object-like constant (P2)": 3
+ },
+ "F_WARNED": {
+  "8: an object-like constant (P2)": 2
+ },
+ "LUA_TBOOLEAN": {
+  "8: an object-like constant (P2)": 3
+ },
+ "LUA_TNUMBER": {
+  "8: an object-like constant (P2)": 9
+ },
+ "lua_pushcfunction": {
+  "14: an argument of a non-scalar type": 3,
+  "7: no definition covers the node": 6
+ },
+ "LUA_GCCOUNT": {
+  "8: an object-like constant (P2)": 1
+ },
+ "LUA_GCCOUNTB": {
+  "8: an object-like constant (P2)": 1
+ },
+ "FITSint": {
+  "10: an unsafe construct in the body": 1,
+  "7: no definition covers the node": 3
+ },
+ "luaL_loadbuffer": {
+  "15: an argument with side effects or calls": 1
+ },
+ "LUA_OK": {
+  "8: an object-like constant (P2)": 1
+ },
+ "LUA_MULTRET": {
+  "8: an object-like constant (P2)": 1
+ },
+ "LUA_VERSION_RELEASE_NUM": {
+  "8: an object-like constant (P2)": 1
+ },
+ "NHL_VERSION_EXPECTED": {
+  "8: an object-like constant (P2)": 1
+ },
+ "LUA_RELEASE": {
+  "7: no definition covers the node": 1
+ },
+ "LUA_VERSION": {
+  "7: no definition covers the node": 1
+ },
+ "LUA_REGISTRYINDEX": {
+  "8: an object-like constant (P2)": 2
+ },
+ "HOOKTBLNAME": {
+  "9: a record or array value": 2
+ },
+ "LUA_TNONE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "NHL_SB_VERSION": {
+  "8: an object-like constant (P2)": 2
+ },
+ "LUA_GNAME": {
+  "9: a record or array value": 1
+ },
+ "DROPIF": {
+  "13: an argument not found as AST nodes": 9,
+  "7: no definition covers the node": 36
+ },
+ "LUA_COLIBNAME": {
+  "9: a record or array value": 1
+ },
+ "LUA_TABLIBNAME": {
+  "9: a record or array value": 1
+ },
+ "LUA_OSLIBNAME": {
+  "9: a record or array value": 1
+ },
+ "LUA_STRLIBNAME": {
+  "9: a record or array value": 1
+ },
+ "LUA_MATHLIBNAME": {
+  "9: a record or array value": 1
+ },
+ "LUA_UTF8LIBNAME": {
+  "9: a record or array value": 1
+ },
+ "LUA_DBLIBNAME": {
+  "9: a record or array value": 1
+ },
+ "LUA_MASKCOUNT": {
+  "8: an object-like constant (P2)": 1
+ },
+ "NHL_SB_STEPSIZE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "LUA_TUSERDATA": {
+  "8: an object-like constant (P2)": 3
+ },
+ "ANY_LOC": {
+  "8: an object-like constant (P2)": 17
+ },
+ "W_ANY": {
+  "7: no definition covers the node": 4,
+  "8: an object-like constant (P2)": 3
+ },
+ "W_RANDOM": {
+  "8: an object-like constant (P2)": 8
+ },
+ "W_NORTH": {
+  "8: an object-like constant (P2)": 10
+ },
+ "W_WEST": {
+  "8: an object-like constant (P2)": 10
+ },
+ "W_EAST": {
+  "8: an object-like constant (P2)": 11
+ },
+ "W_SOUTH": {
+  "8: an object-like constant (P2)": 11
+ },
+ "SEL_GRADIENT_RADIAL": {
+  "8: an object-like constant (P2)": 1
+ },
+ "SEL_GRADIENT_SQUARE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "luaL_newlib": {
+  "18b: not every argument occurrence emits through its parameter": 4,
+  "7: no definition covers the node": 36
+ },
+ "CORPSTAT_HISTORIC": {
+  "8: an object-like constant (P2)": 5
+ },
+ "STEP": {
+  "13: an argument not found as AST nodes": 96,
+  "7: no definition covers the node": 912
+ },
+ "NODIR": {
+  "8: an object-like constant (P2)": 6
+ },
+ "IMMEDIATE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "NUMOBUF": {
+  "8: an object-like constant (P2)": 3
+ },
+ "ConcUpdate": {
+  "7: no definition covers the node": 16
+ },
+ "ConcatF2": {
+  "7: no definition covers the node": 100
+ },
+ "ConcatF1": {
+  "7: no definition covers the node": 140
+ },
+ "Concat": {
+  "7: no definition covers the node": 108
+ },
+ "W_RINGL": {
+  "8: an object-like constant (P2)": 10
+ },
+ "CXN_ARTICLE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "CXN_NOCORPSE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MV_KNOWS_EGG": {
+  "8: an object-like constant (P2)": 2
+ },
+ "BSTRNCMPI": {
+  "16: a body with effects and an argument that may change": 14,
+  "7: no definition covers the node": 24
+ },
+ "BSTRCMPI": {
+  "16: a body with effects and an argument that may change": 72,
+  "7: no definition covers the node": 360
+ },
+ "TIN_UNDEFINED": {
+  "8: an object-like constant (P2)": 1
+ },
+ "TIN_EMPTY": {
+  "8: an object-like constant (P2)": 3
+ },
+ "SPE_LIM": {
+  "8: an object-like constant (P2)": 5
+ },
+ "TIN_SPINACH": {
+  "8: an object-like constant (P2)": 4
+ },
+ "is_damageable": {
+  "16: a body with effects and an argument that may change": 1,
+  "7: no definition covers the node": 30
+ },
+ "ROLE_NONE": {
+  "8: an object-like constant (P2)": 120
+ },
+ "rolestring": {
+  "13: an argument not found as AST nodes": 8,
+  "7: no definition covers the node": 20
+ },
+ "ALIGN_LEFT": {
+  "8: an object-like constant (P2)": 3
+ },
+ "ALIGN_TOP": {
+  "8: an object-like constant (P2)": 4
+ },
+ "ALIGN_RIGHT": {
+  "8: an object-like constant (P2)": 3
+ },
+ "ALIGN_BOTTOM": {
+  "8: an object-like constant (P2)": 4
+ },
+ "AUTOUNLOCK_APPLY_KEY": {
+  "8: an object-like constant (P2)": 1
+ },
+ "PL_FSIZ": {
+  "8: an object-like constant (P2)": 4
+ },
+ "MAP_MODE_TILES": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MAP_MODE_ASCII4x6": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MAP_MODE_ASCII6x8": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MAP_MODE_ASCII8x8": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MAP_MODE_ASCII16x8": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MAP_MODE_ASCII7x12": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MAP_MODE_ASCII8x12": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MAP_MODE_ASCII16x12": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MAP_MODE_ASCII12x16": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MAP_MODE_ASCII10x18": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MAP_MODE_ASCII_FIT_TO_SCREEN": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MAP_MODE_TILES_FIT_TO_SCREEN": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MOUSEFIX1": {
+  "9: a record or array value": 1
+ },
+ "MOUSEFIX2": {
+  "9: a record or array value": 1
+ },
+ "PL_NSIZ": {
+  "8: an object-like constant (P2)": 4
+ },
+ "PARANOID_BONES": {
+  "8: an object-like constant (P2)": 2
+ },
+ "PILE_LIMIT_DFLT": {
+  "8: an object-like constant (P2)": 3
+ },
+ "VIA_DIALOG": {
+  "8: an object-like constant (P2)": 1
+ },
+ "VIA_PROMPTS": {
+  "8: an object-like constant (P2)": 1
+ },
+ "WINTYPELEN": {
+  "8: an object-like constant (P2)": 4
+ },
+ "VI_BRANCH": {
+  "8: an object-like constant (P2)": 2
+ },
+ "VI_NUMBER": {
+  "8: an object-like constant (P2)": 2
+ },
+ "GPCOORDS_NONE": {
+  "8: an object-like constant (P2)": 7
+ },
+ "REASSESS_ONLY": {
+  "7: no definition covers the node": 3
+ },
+ "VI_NAME": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MSGTYP_NOREP": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MSGTYP_NORMAL": {
+  "8: an object-like constant (P2)": 2
+ },
+ "RS_ROLE": {
+  "8: an object-like constant (P2)": 22
+ },
+ "RS_RACE": {
+  "8: an object-like constant (P2)": 16
+ },
+ "RS_GENDER": {
+  "8: an object-like constant (P2)": 15
+ },
+ "RS_ALGNMNT": {
+  "8: an object-like constant (P2)": 14
+ },
+ "RS_filter": {
+  "8: an object-like constant (P2)": 9
+ },
+ "MAX_MENU_MAPPED_CMDS": {
+  "8: an object-like constant (P2)": 1
+ },
+ "ismnum": {
+  "15: an argument with side effects or calls": 4,
+  "7: no definition covers the node": 16
+ },
+ "HELP_IDX": {
+  "8: an object-like constant (P2)": 1
+ },
+ "OPTMENUHELP": {
+  "9: a record or array value": 2
+ },
+ "MENU_SHIFT_RIGHT": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MENU_SHIFT_LEFT": {
+  "8: an object-like constant (P2)": 1
+ },
+ "CONFIG_SLOT": {
+  "8: an object-like constant (P2)": 1
+ },
+ "M_AP_F_DKNOWN": {
+  "8: an object-like constant (P2)": 2
+ },
+ "DATAFILE": {
+  "9: a record or array value": 1
+ },
+ "SYM_OFF_X": {
+  "8: an object-like constant (P2)": 5
+ },
+ "SYM_MAX": {
+  "8: an object-like constant (P2)": 6
+ },
+ "KEYHELP": {
+  "9: a record or array value": 2
+ },
+ "HELP": {
+  "9: a record or array value": 1
+ },
+ "SHELP": {
+  "9: a record or array value": 1
+ },
+ "OPTIONFILE": {
+  "9: a record or array value": 1
+ },
+ "LICENSE": {
+  "9: a record or array value": 1
+ },
+ "DEBUGHELP": {
+  "9: a record or array value": 1
+ },
+ "HISTORY": {
+  "9: a record or array value": 1
+ },
+ "AUTOSELECT_SINGLE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "FEEL_COCKATRICE": {
+  "8: an object-like constant (P2)": 3
+ },
+ "LOST_STOLEN": {
+  "8: an object-like constant (P2)": 1
+ },
+ "LOST_DROPPED": {
+  "8: an object-like constant (P2)": 2
+ },
+ "engulfing_u": {
+  "13: an argument not found as AST nodes": 4,
+  "7: no definition covers the node": 6
+ },
+ "SIGNAL_NOMENU": {
+  "8: an object-like constant (P2)": 1
+ },
+ "SORTLOOT_PETRIFY": {
+  "8: an object-like constant (P2)": 1
+ },
+ "SIGNAL_ESCAPE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "WORN_TYPES": {
+  "8: an object-like constant (P2)": 2
+ },
+ "ALL_TYPES": {
+  "8: an object-like constant (P2)": 2
+ },
+ "CHOOSE_ALL": {
+  "8: an object-like constant (P2)": 1
+ },
+ "ATR_URGENT": {
+  "8: an object-like constant (P2)": 2
+ },
+ "ATR_NOHISTORY": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MSGTYP_NOSHOW": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MSGTYP_STOP": {
+  "8: an object-like constant (P2)": 1
+ },
+ "DEVTEAM_EMAIL": {
+  "9: a record or array value": 1
+ },
+ "PROPSET": {
+  "7: no definition covers the node": 81
+ },
+ "BStealth": {
+  "7: no definition covers the node": 2
+ },
+ "You1": {
+  "13: an argument not found as AST nodes": 7,
+  "7: no definition covers the node": 8,
+  "15: an argument with side effects or calls": 1
+ },
+ "BZ_U_BREATH": {
+  "16: a body with effects and an argument that may change": 2,
+  "7: no definition covers the node": 2
+ },
+ "SHOP_WEB_COST": {
+  "8: an object-like constant (P2)": 1
+ },
+ "HWarn_of_mon": {
+  "7: no definition covers the node": 3
+ },
+ "COST_none": {
+  "8: an object-like constant (P2)": 2
+ },
+ "COST_alter": {
+  "8: an object-like constant (P2)": 3
+ },
+ "EF_GREASE": {
+  "8: an object-like constant (P2)": 9
+ },
+ "TROUBLE_STONED": {
+  "8: an object-like constant (P2)": 2
+ },
+ "TROUBLE_SLIMED": {
+  "8: an object-like constant (P2)": 2
+ },
+ "TROUBLE_STRANGLED": {
+  "8: an object-like constant (P2)": 2
+ },
+ "TROUBLE_LAVA": {
+  "8: an object-like constant (P2)": 2
+ },
+ "TROUBLE_SICK": {
+  "8: an object-like constant (P2)": 2
+ },
+ "TROUBLE_STARVING": {
+  "8: an object-like constant (P2)": 2
+ },
+ "TROUBLE_REGION": {
+  "8: an object-like constant (P2)": 2
+ },
+ "TROUBLE_HIT": {
+  "8: an object-like constant (P2)": 2
+ },
+ "TROUBLE_LYCANTHROPE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "TROUBLE_COLLAPSING": {
+  "8: an object-like constant (P2)": 2
+ },
+ "TROUBLE_STUCK_IN_WALL": {
+  "8: an object-like constant (P2)": 2
+ },
+ "TROUBLE_CURSED_LEVITATION": {
+  "8: an object-like constant (P2)": 2
+ },
+ "TROUBLE_UNUSEABLE_HANDS": {
+  "8: an object-like constant (P2)": 3
+ },
+ "TROUBLE_CURSED_BLINDFOLD": {
+  "8: an object-like constant (P2)": 2
+ },
+ "TROUBLE_PUNISHED": {
+  "8: an object-like constant (P2)": 2
+ },
+ "TROUBLE_FUMBLING": {
+  "8: an object-like constant (P2)": 2
+ },
+ "TROUBLE_CURSED_ITEMS": {
+  "8: an object-like constant (P2)": 2
+ },
+ "TROUBLE_SADDLE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "TROUBLE_BLIND": {
+  "8: an object-like constant (P2)": 3
+ },
+ "TROUBLE_POISONED": {
+  "8: an object-like constant (P2)": 2
+ },
+ "TROUBLE_WOUNDED_LEGS": {
+  "8: an object-like constant (P2)": 2
+ },
+ "TROUBLE_HUNGRY": {
+  "8: an object-like constant (P2)": 2
+ },
+ "TROUBLE_STUNNED": {
+  "8: an object-like constant (P2)": 2
+ },
+ "TROUBLE_CONFUSED": {
+  "8: an object-like constant (P2)": 2
+ },
+ "TROUBLE_HALLUCINATION": {
+  "8: an object-like constant (P2)": 2
+ },
+ "HPasses_walls": {
+  "7: no definition covers the node": 5
+ },
+ "on_altar": {
+  "7: no definition covers the node": 27
+ },
+ "LL_DIVINEGIFT": {
+  "8: an object-like constant (P2)": 3
+ },
+ "P_RESTRICTED": {
+  "15: an argument with side effects or calls": 2,
+  "7: no definition covers the node": 1
+ },
+ "DEVOUT": {
+  "8: an object-like constant (P2)": 2
+ },
+ "HStealth": {
+  "7: no definition covers the node": 4
+ },
+ "PIOUS": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MAXVALUE": {
+  "8: an object-like constant (P2)": 4
+ },
+ "ANIMATE_SPELL": {
+  "8: an object-like constant (P2)": 6
+ },
+ "GDIST": {
+  "18c: the body names a caller local": 6
+ },
+ "ALGN_SINNED": {
+  "8: an object-like constant (P2)": 3
+ },
+ "ALGN_DEVOUT": {
+  "8: an object-like constant (P2)": 1
+ },
+ "Qstat": {
+  "13: an argument not found as AST nodes": 26
+ },
+ "MIN_QUEST_LEVEL": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MIN_QUEST_ALIGN": {
+  "8: an object-like constant (P2)": 4
+ },
+ "QTEXT_FILE": {
+  "9: a record or array value": 7
+ },
+ "ALL_SPELLS": {
+  "8: an object-like constant (P2)": 2
+ },
+ "LL_GENOCIDE": {
+  "8: an object-like constant (P2)": 4
+ },
+ "G_GENO": {
+  "8: an object-like constant (P2)": 3
+ },
+ "PLAYER": {
+  "8: an object-like constant (P2)": 2
+ },
+ "REALLY": {
+  "8: an object-like constant (P2)": 3
+ },
+ "ONTHRONE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "QUAN_LIMIT": {
+  "8: an object-like constant (P2)": 2
+ },
+ "CP_TRYLIM": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MONST_INC": {
+  "8: an object-like constant (P2)": 2
+ },
+ "NO_CALLBACK": {
+  "8: an object-like constant (P2)": 11
+ },
+ "clear_hero_inside": {
+  "16: a body with effects and an argument that may change": 2,
+  "7: no definition covers the node": 2
+ },
+ "set_hero_inside": {
+  "16: a body with effects and an argument that may change": 2,
+  "7: no definition covers the node": 2
+ },
+ "Sfo_long": {
+  "7: no definition covers the node": 7
+ },
+ "Sfi_long": {
+  "7: no definition covers the node": 7
+ },
+ "INSIDE_GAS_CLOUD": {
+  "8: an object-like constant (P2)": 3
+ },
+ "MAX_CLOUD_SIZE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "HMagical_breathing": {
+  "7: no definition covers the node": 5
+ },
+ "HASH_BINFILE_DECL": {
+  "7: no definition covers the node": 1
+ },
+ "HASH_BINFILE": {
+  "7: no definition covers the node": 8
+ },
+ "HASH_FINISH": {
+  "18c: the body names a caller local": 2,
+  "7: no definition covers the node": 2
+ },
+ "MAX_URL": {
+  "8: an object-like constant (P2)": 2
+ },
+ "SWR_ADD": {
+  "7: no definition covers the node": 64
+ },
+ "SWR_ADD_URIcoded": {
+  "7: no definition covers the node": 56
+ },
+ "CRASHREPORT": {
+  "9: a record or array value": 2
+ },
+ "DEVTEAM_URL": {
+  "9: a record or array value": 1
+ },
+ "DUMPLOG_MSG_COUNT": {
+  "8: an object-like constant (P2)": 4
+ },
+ "SIG_MSG": {
+  "9: a record or array value": 1
+ },
+ "SETSIGNAL": {
+  "7: no definition covers the node": 40
+ },
+ "Sfi_ulong": {
+  "7: no definition covers the node": 3
+ },
+ "RANGE_GLOBAL": {
+  "8: an object-like constant (P2)": 6
+ },
+ "Sfi_xint8": {
+  "7: no definition covers the node": 3
+ },
+ "CONVERTING": {
+  "8: an object-like constant (P2)": 4
+ },
+ "UNCONVERTING": {
+  "8: an object-like constant (P2)": 4
+ },
+ "N_PER_BUCKET": {
+  "8: an object-like constant (P2)": 4
+ },
+ "MENU_ITEMFLAGS_SKIPMENUCOLORS": {
+  "8: an object-like constant (P2)": 3
+ },
+ "NAME_LINE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "GOLD_LINE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "DEATH_LINE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "YEAR_LINE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "STONE_LINE_LEN": {
+  "8: an object-like constant (P2)": 4
+ },
+ "IndexOkT": {
+  "18b: not every argument occurrence emits through its parameter": 36,
+  "7: no definition covers the node": 108
+ },
+ "ROLE_RANDOM": {
+  "8: an object-like constant (P2)": 54
+ },
+ "ROLE_RACEMASK": {
+  "8: an object-like constant (P2)": 10
+ },
+ "ROLE_GENDERS": {
+  "8: an object-like constant (P2)": 15
+ },
+ "ROLE_ALIGNS": {
+  "8: an object-like constant (P2)": 15
+ },
+ "ROLE_ALIGNMASK": {
+  "7: no definition covers the node": 20
+ },
+ "PICK_RIGID": {
+  "8: an object-like constant (P2)": 7
+ },
+ "PICK_RANDOM": {
+  "8: an object-like constant (P2)": 12
+ },
+ "ROLE_MALE": {
+  "8: an object-like constant (P2)": 3
+ },
+ "ROLE_FEMALE": {
+  "8: an object-like constant (P2)": 3
+ },
+ "ROLE_NEUTER": {
+  "8: an object-like constant (P2)": 1
+ },
+ "ROLE_CHAOTIC": {
+  "7: no definition covers the node": 1
+ },
+ "ROLE_LAWFUL": {
+  "7: no definition covers the node": 1
+ },
+ "ROLE_NEUTRAL": {
+  "7: no definition covers the node": 1
+ },
+ "NUM_BP": {
+  "8: an object-like constant (P2)": 1
+ },
+ "BP_ALIGN": {
+  "8: an object-like constant (P2)": 4
+ },
+ "BP_GEND": {
+  "8: an object-like constant (P2)": 4
+ },
+ "BP_RACE": {
+  "8: an object-like constant (P2)": 5
+ },
+ "BP_ROLE": {
+  "8: an object-like constant (P2)": 4
+ },
+ "MH_HUMAN": {
+  "7: no definition covers the node": 2
+ },
+ "RS_NAME": {
+  "8: an object-like constant (P2)": 1
+ },
+ "RS_menu_arg": {
+  "13: an argument not found as AST nodes": 17
+ },
+ "RUMORFILE": {
+  "9: a record or array value": 4
+ },
+ "BY_PAPER": {
+  "8: an object-like constant (P2)": 2
+ },
+ "BY_ORACLE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "Sfo_ulong": {
+  "7: no definition covers the node": 3
+ },
+ "ORACLEFILE": {
+  "9: a record or array value": 2
+ },
+ "Sfo_xint8": {
+  "7: no definition covers the node": 3
+ },
+ "Sfo_char": {
+  "15: an argument with side effects or calls": 2,
+  "20: body text not the one chosen for the macro": 3
+ },
+ "Sfo_unsigned": {
+  "13: an argument not found as AST nodes": 1
+ },
+ "free_current_level": {
+  "18c: the body names a caller local": 1
+ },
+ "free_killers": {
+  "18c: the body names a caller local": 1
+ },
+ "free_timers": {
+  "13: an argument not found as AST nodes": 1
+ },
+ "free_light_sources": {
+  "13: an argument not found as AST nodes": 1
+ },
+ "freeobjchn": {
+  "16: a body with effects and an argument that may change": 4,
+  "7: no definition covers the node": 2
+ },
+ "freemonchn": {
+  "16: a body with effects and an argument that may change": 4,
+  "7: no definition covers the node": 2
+ },
+ "free_oracles": {
+  "18c: the body names a caller local": 1
+ },
+ "freefruitchn": {
+  "18c: the body names a caller local": 1
+ },
+ "freenames": {
+  "18c: the body names a caller local": 1
+ },
+ "free_waterlevel": {
+  "18c: the body names a caller local": 1
+ },
+ "discard_gamelog": {
+  "7: no definition covers the node": 1
+ },
+ "SEL_FLOOD": {
+  "7: no definition covers the node": 9
+ },
+ "SEL_FLOOD_CHKDIR": {
+  "7: no definition covers the node": 308
+ },
+ "SF_C": {
+  "7: no definition covers the node": 2201
+ },
+ "SF_A": {
+  "7: no definition covers the node": 1071
+ },
+ "SF_X": {
+  "7: no definition covers the node": 59
+ },
+ "TURN_OFF_LOGGING": {
+  "8: an object-like constant (P2)": 4
+ },
+ "SFCTOOL_BIT": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MAXFD": {
+  "8: an object-like constant (P2)": 2
+ },
+ "BEFORE": {
+  "8: an object-like constant (P2)": 26
+ },
+ "NOW": {
+  "8: an object-like constant (P2)": 76
+ },
+ "noit_mhe": {
+  "7: no definition covers the node": 5
+ },
+ "noit_mhis": {
+  "7: no definition covers the node": 16
+ },
+ "PAY_BUY": {
+  "8: an object-like constant (P2)": 8
+ },
+ "PAY_CANT": {
+  "8: an object-like constant (P2)": 3
+ },
+ "PAY_BROKE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "PAY_SKIP": {
+  "8: an object-like constant (P2)": 4
+ },
+ "BILLSZ": {
+  "8: an object-like constant (P2)": 4
+ },
+ "ynaq": {
+  "15: an argument with side effects or calls": 1,
+  "7: no definition covers the node": 1
+ },
+ "LITTER_INSHOP": {
+  "8: an object-like constant (P2)": 2
+ },
+ "LITTER_UPDATE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "VEGETARIAN_CLASS": {
+  "8: an object-like constant (P2)": 2
+ },
+ "Shock_resistance": {
+  "7: no definition covers the node": 5
+ },
+ "VIASITTING": {
+  "8: an object-like constant (P2)": 6
+ },
+ "You_hear1": {
+  "15: an argument with side effects or calls": 5,
+  "7: no definition covers the node": 5
+ },
+ "MAP_Y_LIM": {
+  "8: an object-like constant (P2)": 1
+ },
+ "TYP_CANNOT_MATCH": {
+  "15: an argument with side effects or calls": 2,
+  "7: no definition covers the node": 8
+ },
+ "inFlipArea": {
+  "17: an argument that may trap, evaluated conditionally": 22,
+  "7: no definition covers the node": 144,
+  "18c: the body names a caller local": 2
+ },
+ "FlipY": {
+  "18c: the body names a caller local": 56,
+  "7: no definition covers the node": 56
+ },
+ "FlipX": {
+  "18c: the body names a caller local": 56,
+  "7: no definition covers the node": 56
+ },
+ "Flip_coord": {
+  "7: no definition covers the node": 350
+ },
+ "IS_DOORJOIN": {
+  "13: an argument not found as AST nodes": 4,
+  "7: no definition covers the node": 28
+ },
+ "SP_COORD_IS_RANDOM": {
+  "8: an object-like constant (P2)": 2
+ },
+ "NO_LOC_WARN": {
+  "8: an object-like constant (P2)": 2
+ },
+ "DRY": {
+  "8: an object-like constant (P2)": 18
+ },
+ "XLIM": {
+  "8: an object-like constant (P2)": 2
+ },
+ "YLIM": {
+  "8: an object-like constant (P2)": 2
+ },
+ "SPLEV_LEFT": {
+  "8: an object-like constant (P2)": 4
+ },
+ "SPLEV_RIGHT": {
+  "8: an object-like constant (P2)": 4
+ },
+ "SPLEV_CENTER": {
+  "8: an object-like constant (P2)": 9
+ },
+ "TOP": {
+  "8: an object-like constant (P2)": 4
+ },
+ "BOTTOM": {
+  "8: an object-like constant (P2)": 4
+ },
+ "WET": {
+  "8: an object-like constant (P2)": 1
+ },
+ "SOLID": {
+  "8: an object-like constant (P2)": 1
+ },
+ "HOT": {
+  "8: an object-like constant (P2)": 1
+ },
+ "Align2amask": {
+  "15: an argument with side effects or calls": 2,
+  "7: no definition covers the node": 17,
+  "20: body text not the one chosen for the macro": 2
+ },
+ "BOOL_RANDOM": {
+  "8: an object-like constant (P2)": 11
+ },
+ "DEFAULT_INVENT": {
+  "8: an object-like constant (P2)": 2
+ },
+ "CUSTOM_INVENT": {
+  "8: an object-like constant (P2)": 2
+ },
+ "SP_OBJ_CONTENT": {
+  "8: an object-like constant (P2)": 3
+ },
+ "SP_OBJ_CONTAINER": {
+  "8: an object-like constant (P2)": 3
+ },
+ "MAX_CONTAINMENT": {
+  "8: an object-like constant (P2)": 2
+ },
+ "FILL_NONE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "Free": {
+  "7: no definition covers the node": 64
+ },
+ "AM_SPLEV_CO": {
+  "8: an object-like constant (P2)": 1
+ },
+ "AM_SPLEV_NONCO": {
+  "8: an object-like constant (P2)": 1
+ },
+ "AM_SPLEV_RANDOM": {
+  "8: an object-like constant (P2)": 1
+ },
+ "SPLEV_H_LEFT": {
+  "8: an object-like constant (P2)": 3
+ },
+ "SPLEV_H_RIGHT": {
+  "8: an object-like constant (P2)": 3
+ },
+ "MAX_NESTED_ROOMS": {
+  "8: an object-like constant (P2)": 2
+ },
+ "D_SECRET": {
+  "8: an object-like constant (P2)": 4
+ },
+ "IS_LAVA": {
+  "13: an argument not found as AST nodes": 2,
+  "7: no definition covers the node": 6
+ },
+ "MAX_SPELL_STUDY": {
+  "8: an object-like constant (P2)": 3
+ },
+ "decrnknow": {
+  "18d: the body needs temporaries": 1
+ },
+ "SPELLMENU_CAST": {
+  "8: an object-like constant (P2)": 1
+ },
+ "CHAIN_LIGHTNING_LIMIT": {
+  "8: an object-like constant (P2)": 1
+ },
+ "CHAIN_LIGHTNING_POS": {
+  "16: a body with effects and an argument that may change": 2,
+  "7: no definition covers the node": 28
+ },
+ "BZ_U_SPELL": {
+  "13: an argument not found as AST nodes": 1
+ },
+ "UNKNOWN_SPELL": {
+  "8: an object-like constant (P2)": 2
+ },
+ "HIDE_SPELL": {
+  "8: an object-like constant (P2)": 4
+ },
+ "REMOVESPELL": {
+  "8: an object-like constant (P2)": 3
+ },
+ "UNHIDESPELL": {
+  "8: an object-like constant (P2)": 3
+ },
+ "ADD_SPELL": {
+  "8: an object-like constant (P2)": 3
+ },
+ "KEEN": {
+  "8: an object-like constant (P2)": 1
+ },
+ "NOOP_SPELL": {
+  "8: an object-like constant (P2)": 5
+ },
+ "SPELLMENU_VIEW": {
+  "8: an object-like constant (P2)": 2
+ },
+ "SPELLMENU_SORT": {
+  "8: an object-like constant (P2)": 1
+ },
+ "SPELLMENU_DUMP": {
+  "8: an object-like constant (P2)": 1
+ },
+ "nhUse": {
+  "15: an argument with side effects or calls": 4,
+  "7: no definition covers the node": 2,
+  "20: body text not the one chosen for the macro": 1
+ },
+ "uarmhbon": {
+  "8: an object-like constant (P2)": 1
+ },
+ "uarmgbon": {
+  "8: an object-like constant (P2)": 1
+ },
+ "uarmfbon": {
+  "8: an object-like constant (P2)": 1
+ },
+ "LL_NONE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "PERS_IS_UID": {
+  "8: an object-like constant (P2)": 1
+ },
+ "GDBPATH": {
+  "9: a record or array value": 1
+ },
+ "GREPPATH": {
+  "9: a record or array value": 1
+ },
+ "Adornment": {
+  "7: no definition covers the node": 2
+ },
+ "MM_IGNORELAVA": {
+  "8: an object-like constant (P2)": 1
+ },
+ "GP_ALLOW_U": {
+  "8: an object-like constant (P2)": 1
+ },
+ "GP_ALLOW_XY": {
+  "8: an object-like constant (P2)": 1
+ },
+ "TELEDS_TELEPORT": {
+  "8: an object-like constant (P2)": 7
+ },
+ "ETeleportation": {
+  "7: no definition covers the node": 4
+ },
+ "HFlying": {
+  "7: no definition covers the node": 2
+ },
+ "MAX_EGG_HATCH_TIME": {
+  "8: an object-like constant (P2)": 1
+ },
+ "TTFIELDS": {
+  "8: an object-like constant (P2)": 1
+ },
+ "XLOG_SEP": {
+  "8: an object-like constant (P2)": 19
+ },
+ "VERSION_MAJOR": {
+  "8: an object-like constant (P2)": 2
+ },
+ "VERSION_MINOR": {
+  "8: an object-like constant (P2)": 2
+ },
+ "PATCHLEVEL": {
+  "8: an object-like constant (P2)": 2
+ },
+ "ROLESZ": {
+  "8: an object-like constant (P2)": 4
+ },
+ "NAMSZ": {
+  "8: an object-like constant (P2)": 1
+ },
+ "LOGFILE": {
+  "9: a record or array value": 3
+ },
+ "XLOGFILE": {
+  "9: a record or array value": 3
+ },
+ "UTSZ": {
+  "8: an object-like constant (P2)": 4
+ },
+ "burn_dmg": {
+  "15: an argument with side effects or calls": 2,
+  "7: no definition covers the node": 4
+ },
+ "EF_VERBOSE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MAX_ERODE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "EF_PAY": {
+  "8: an object-like constant (P2)": 2
+ },
+ "ER_DAMAGED": {
+  "8: an object-like constant (P2)": 8
+ },
+ "EF_DESTROY": {
+  "8: an object-like constant (P2)": 2
+ },
+ "CAN_OVERWRITE_TERRAIN": {
+  "17: an argument that may trap, evaluated conditionally": 2,
+  "7: no definition covers the node": 11
+ },
+ "SHOP_HOLE_COST": {
+  "8: an object-like constant (P2)": 1
+ },
+ "AS_MON_IS_UNIQUE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "AS_NO_MON": {
+  "8: an object-like constant (P2)": 1
+ },
+ "ANIMATE_NORMAL": {
+  "8: an object-like constant (P2)": 3
+ },
+ "ANIMATE_SHATTER": {
+  "8: an object-like constant (P2)": 3
+ },
+ "AS_OK": {
+  "8: an object-like constant (P2)": 1
+ },
+ "RECURSIVETRAP": {
+  "8: an object-like constant (P2)": 2
+ },
+ "NOWEBMSG": {
+  "8: an object-like constant (P2)": 3
+ },
+ "ROLL": {
+  "8: an object-like constant (P2)": 5
+ },
+ "LAUNCH_KNOWN": {
+  "8: an object-like constant (P2)": 2
+ },
+ "LAUNCH_UNSEEN": {
+  "8: an object-like constant (P2)": 1
+ },
+ "EF_NONE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "HWwalking": {
+  "7: no definition covers the node": 1
+ },
+ "RIGHT_HANDED": {
+  "8: an object-like constant (P2)": 1
+ },
+ "LEFT_HANDED": {
+  "8: an object-like constant (P2)": 1
+ },
+ "UNDEF_SPE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "UNDEF_BLESS": {
+  "8: an object-like constant (P2)": 1
+ },
+ "UNDEF_TYP": {
+  "8: an object-like constant (P2)": 1
+ },
+ "POTHIT_HERO_BASH": {
+  "8: an object-like constant (P2)": 1
+ },
+ "useup_eggs": {
+  "7: no definition covers the node": 21
+ },
+ "AD_DETH": {
+  "8: an object-like constant (P2)": 2
+ },
+ "AD_LEGS": {
+  "8: an object-like constant (P2)": 1
+ },
+ "AD_SGLD": {
+  "8: an object-like constant (P2)": 1
+ },
+ "AD_TLPT": {
+  "8: an object-like constant (P2)": 1
+ },
+ "AD_CURS": {
+  "8: an object-like constant (P2)": 1
+ },
+ "AD_SAMU": {
+  "8: an object-like constant (P2)": 1
+ },
+ "VAULT_GUARD_TIME": {
+  "8: an object-like constant (P2)": 1
+ },
+ "GD_EATGOLD": {
+  "8: an object-like constant (P2)": 1
+ },
+ "FCSIZ": {
+  "8: an object-like constant (P2)": 1
+ },
+ "q1_path": {
+  "7: no definition covers the node": 156
+ },
+ "q4_path": {
+  "7: no definition covers the node": 156
+ },
+ "q2_path": {
+  "7: no definition covers the node": 156
+ },
+ "q3_path": {
+  "7: no definition covers the node": 156
+ },
+ "set_cs": {
+  "7: no definition covers the node": 35
+ },
+ "set_min": {
+  "7: no definition covers the node": 40
+ },
+ "set_max": {
+  "7: no definition covers the node": 40
+ },
+ "P_LAST_WEAPON": {
+  "8: an object-like constant (P2)": 4
+ },
+ "P_LAST_SPELL": {
+  "8: an object-like constant (P2)": 2
+ },
+ "Oselect": {
+  "7: no definition covers the node": 42
+ },
+ "P_SKILL_LIMIT": {
+  "8: an object-like constant (P2)": 2
+ },
+ "P_FIRST_SPELL": {
+  "8: an object-like constant (P2)": 1
+ },
+ "practice_needed_to_advance": {
+  "13: an argument not found as AST nodes": 4,
+  "7: no definition covers the node": 8
+ },
+ "is_plural": {
+  "16: a body with effects and an argument that may change": 6,
+  "7: no definition covers the node": 36
+ },
+ "WININIT_UNDO": {
+  "8: an object-like constant (P2)": 1
+ },
+ "WININIT": {
+  "8: an object-like constant (P2)": 2
+ },
+ "BL_MASK_STONE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "BL_MASK_SLIME": {
+  "8: an object-like constant (P2)": 1
+ },
+ "BL_MASK_STRNGL": {
+  "8: an object-like constant (P2)": 1
+ },
+ "BL_MASK_FOODPOIS": {
+  "8: an object-like constant (P2)": 1
+ },
+ "BL_MASK_TERMILL": {
+  "8: an object-like constant (P2)": 1
+ },
+ "BL_MASK_BLIND": {
+  "8: an object-like constant (P2)": 1
+ },
+ "BL_MASK_DEAF": {
+  "8: an object-like constant (P2)": 1
+ },
+ "BL_MASK_STUN": {
+  "8: an object-like constant (P2)": 1
+ },
+ "BL_MASK_CONF": {
+  "8: an object-like constant (P2)": 1
+ },
+ "BL_MASK_HALLU": {
+  "8: an object-like constant (P2)": 1
+ },
+ "BL_MASK_LEV": {
+  "8: an object-like constant (P2)": 1
+ },
+ "BL_MASK_FLY": {
+  "8: an object-like constant (P2)": 1
+ },
+ "BL_MASK_RIDE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "M3_WANTSAMUL": {
+  "8: an object-like constant (P2)": 3
+ },
+ "M3_WANTSBELL": {
+  "8: an object-like constant (P2)": 4
+ },
+ "M3_WANTSCAND": {
+  "8: an object-like constant (P2)": 4
+ },
+ "M3_WANTSBOOK": {
+  "8: an object-like constant (P2)": 4
+ },
+ "M_Wants": {
+  "18c: the body names a caller local": 2
+ },
+ "STRAT_PLAYER": {
+  "8: an object-like constant (P2)": 2
+ },
+ "STRAT_GROUND": {
+  "8: an object-like constant (P2)": 2
+ },
+ "STRAT_MONSTR": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MAXNASTIES": {
+  "8: an object-like constant (P2)": 2
+ },
+ "DEFAULT_TIMEOUT_INCR": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MAX_NUM_WORMS": {
+  "8: an object-like constant (P2)": 6
+ },
+ "MHPMAX": {
+  "8: an object-like constant (P2)": 2
+ },
+ "w_blocks": {
+  "16: a body with effects and an argument that may change": 2,
+  "7: no definition covers the node": 57,
+  "13: an argument not found as AST nodes": 2
+ },
+ "IGNORE_SLOTS": {
+  "8: an object-like constant (P2)": 2
+ },
+ "RACE_EXCEPTION": {
+  "7: no definition covers the node": 1
+ },
+ "ZT_MAGIC_MISSILE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "ZT_FIRE": {
+  "8: an object-like constant (P2)": 7
+ },
+ "ZT_COLD": {
+  "8: an object-like constant (P2)": 5
+ },
+ "ZT_SLEEP": {
+  "8: an object-like constant (P2)": 3
+ },
+ "ZT_DEATH": {
+  "8: an object-like constant (P2)": 5
+ },
+ "ZT_LIGHTNING": {
+  "8: an object-like constant (P2)": 7
+ },
+ "ZT_POISON_GAS": {
+  "8: an object-like constant (P2)": 4
+ },
+ "ZT_ACID": {
+  "8: an object-like constant (P2)": 6
+ },
+ "ZT_WAND": {
+  "13: an argument not found as AST nodes": 2
+ },
+ "ZT_BREATH": {
+  "13: an argument not found as AST nodes": 5
+ },
+ "MAGIC_COOKIE": {
+  "8: an object-like constant (P2)": 4
+ },
+ "oresist_disintegration": {
+  "18c: the body names a caller local": 2,
+  "7: no definition covers the node": 13
+ },
+ "ZT_SPELL": {
+  "13: an argument not found as AST nodes": 1,
+  "20: body text not the one chosen for the macro": 1
+ },
+ "MAX_ICE_TIME": {
+  "8: an object-like constant (P2)": 2
+ },
+ "SHOP_BARS_COST": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MAX_ITEMS_DESTROYED": {
+  "8: an object-like constant (P2)": 3
+ },
+ "DMG_DESTROY_SCALE": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MAX_WISH_HISTORY": {
+  "8: an object-like constant (P2)": 8
+ },
+ "MAXWISHTRY": {
+  "8: an object-like constant (P2)": 2
+ },
+ "LL_WISH": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MAC_PATH_VALUE": {
+  "9: a record or array value": 1
+ },
+ "DEV_RANDOM": {
+  "9: a record or array value": 1
+ },
+ "OSPEED": {
+  "14: an argument of a non-scalar type": 2,
+  "7: no definition covers the node": 1
+ },
+ "ON": {
+  "8: an object-like constant (P2)": 2
+ },
+ "OFF": {
+  "8: an object-like constant (P2)": 2
+ },
+ "IS_7BIT": {
+  "14: an argument of a non-scalar type": 1
+ },
+ "HLOCK": {
+  "9: a record or array value": 9
+ },
+ "LOCKPREFIX": {
+  "8: an object-like constant (P2)": 1
+ },
+ "TOPLINE_NEED_MORE": {
+  "8: an object-like constant (P2)": 14
+ },
+ "WIN_STOP": {
+  "8: an object-like constant (P2)": 6
+ },
+ "TOPLINE_SPECIAL_PROMPT": {
+  "8: an object-like constant (P2)": 5
+ },
+ "TOPLINE_NON_EMPTY": {
+  "8: an object-like constant (P2)": 7
+ },
+ "ECM_NOFLAGS": {
+  "8: an object-like constant (P2)": 1
+ },
+ "Tgetstr": {
+  "13: an argument not found as AST nodes": 62,
+  "7: no definition covers the node": 31
+ },
+ "CLR_BLUE": {
+  "8: an object-like constant (P2)": 5
+ },
+ "CLR_CYAN": {
+  "8: an object-like constant (P2)": 3
+ },
+ "CLR_ORANGE": {
+  "8: an object-like constant (P2)": 3
+ },
+ "CLR_BRIGHT_MAGENTA": {
+  "8: an object-like constant (P2)": 3
+ },
+ "CLR_BRIGHT_CYAN": {
+  "8: an object-like constant (P2)": 3
+ },
+ "WIN_LOCKHISTORY": {
+  "8: an object-like constant (P2)": 2
+ },
+ "WIN_NOSTOP": {
+  "8: an object-like constant (P2)": 2
+ },
+ "TOPLINE_EMPTY": {
+  "8: an object-like constant (P2)": 11
+ },
+ "MAXWIN": {
+  "8: an object-like constant (P2)": 5
+ },
+ "NHW_BASE": {
+  "8: an object-like constant (P2)": 7
+ },
+ "HUPSKIP": {
+  "7: no definition covers the node": 92
+ },
+ "ttywindowpanic": {
+  "10: an unsafe construct in the body": 9,
+  "7: no definition covers the node": 18
+ },
+ "MENU_NEXT_PAGE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MENU_PREVIOUS_PAGE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MENU_FIRST_PAGE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MENU_LAST_PAGE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MENU_SELECT_PAGE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MENU_UNSELECT_PAGE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MENU_INVERT_PAGE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MENU_SELECT_ALL": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MENU_UNSELECT_ALL": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MENU_INVERT_ALL": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MENU_SEARCH": {
+  "8: an object-like constant (P2)": 1
+ },
+ "MENU_EXPLICIT_CHOICE": {
+  "8: an object-like constant (P2)": 1
+ },
+ "WIN_CANCELLED": {
+  "8: an object-like constant (P2)": 7
+ },
+ "NHW_PERMINVENT": {
+  "8: an object-like constant (P2)": 1
+ },
+ "HUPSKIP_RESULT": {
+  "7: no definition covers the node": 11
+ },
+ "Begin_Attr": {
+  "7: no definition covers the node": 96
+ },
+ "End_Attr": {
+  "7: no definition covers the node": 96
+ },
+ "OPTIONS_USED": {
+  "9: a record or array value": 1
+ },
+ "FEATURE_NOTICE_VER": {
+  "13: an argument not found as AST nodes": 1
+ },
+ "COPYRIGHT_BANNER_A": {
+  "9: a record or array value": 1
+ },
+ "COPYRIGHT_BANNER_B": {
+  "9: a record or array value": 1
+ },
+ "COPYRIGHT_BANNER_D": {
+  "9: a record or array value": 1
+ },
+ "extract_field": {
+  "7: no definition covers the node": 30
+ },
+ "VISCTRL_NBUF": {
+  "8: an object-like constant (P2)": 1
+ },
+ "TABSIZ": {
+  "8: an object-like constant (P2)": 2
+ },
+ "MAX_D": {
+  "8: an object-like constant (P2)": 2
+ },
+ "BY_OBJECT": {
+  "20: body text not the one chosen for the macro": 6
+ },
+ "M": {
+  "20: body text not the one chosen for the macro": 1
+ },
+ "display_self": {
+  "20: body text not the one chosen for the macro": 3
+ },
+ "petnum_to_glyph": {
+  "20: body text not the one chosen for the macro": 1
+ },
+ "sign": {
+  "20: body text not the one chosen for the macro": 4
+ },
+ "distu": {
+  "20: body text not the one chosen for the macro": 6
+ },
+ "NODIAG": {
+  "20: body text not the one chosen for the macro": 3
+ },
+ "done_stopprint": {
+  "20: body text not the one chosen for the macro": 20
+ },
+ "makeknown": {
+  "20: body text not the one chosen for the macro": 1
+ },
+ "DIR_CLAMP": {
+  "20: body text not the one chosen for the macro": 2
+ },
+ "BZ_U_WAND": {
+  "20: body text not the one chosen for the macro": 1
+ },
+ "lua_pop": {
+  "20: body text not the one chosen for the macro": 3
+ },
+ "Sfi_char": {
+  "20: body text not the one chosen for the macro": 2
+ },
+ "SP_COORD_PACK": {
+  "20: body text not the one chosen for the macro": 8
+ },
+ "DIR_LEFT": {
+  "20: body text not the one chosen for the macro": 1
+ },
+ "DIR_RIGHT2": {
+  "20: body text not the one chosen for the macro": 1
+ },
+ "SPELL_LEV_PW": {
+  "20: body text not the one chosen for the macro": 1
+ },
+ "bimanual": {
+  "20: body text not the one chosen for the macro": 1
+ }
+}
