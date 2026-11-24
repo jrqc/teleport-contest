@@ -23,3 +23,4 @@ step to revert is the one pushed last before that run.
 | 2026-11-23 20:11 | `4273930` | Handoff note (method/HANDOFF.md), tools/analysis scripts |
 | 2026-11-24 01:30 | `8ded0ff` | Readability: string literals as tagged templates |
 | 2026-11-24 02:29 | `767801b` | Readability (a): === for record-pointer comparisons (one ElemPtr per position); per-move profile |
+| 2026-11-24 03:18 | `6fe9c78` | Readability (b): more macro expansions as calls (Role_if, rn1, strcmpi, max, Is_waterlevel...) |
