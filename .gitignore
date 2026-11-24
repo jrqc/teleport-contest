@@ -12,3 +12,46 @@ transpiler/build/
 
 # macOS Finder metadata
 .DS_Store
+
+# old local run directories never committed (2026-11-19 to 2026-11-23); later runs are committed or listed here
+results/20261119T035041/
+results/20261119T130128/
+results/20261119T132509/
+results/20261119T140601/
+results/20261119T140858/
+results/20261119T141053/
+results/20261119T143547/
+results/20261119T210234/
+results/20261122T224302/
+results/20261122T233218/
+results/20261122T234413/
+results/20261123T005546/
+results/20261123T032221/
+results/20261123T042646/
+results/20261123T044637/
+results/20261123T150245/
+results/20261123T151429/
+results/20261123T160408/
+results/20261123T165640/
+results/20261123T173926/
+results/20261123T182429/
+results/20261123T192232/
+results/fuzz/20261119T144321/
+results/fuzz/20261119T151228/
+results/fuzz/20261119T210246/
+results/fuzz/20261122T224344/
+results/fuzz/20261122T224919/
+results/fuzz/20261122T234432/
+results/fuzz/20261122T234846/
+results/fuzz/20261122T235946/
+results/fuzz/20261123T005621/
+results/fuzz/20261123T010314/
+results/fuzz/20261123T032314/
+results/fuzz/20261123T032930/
+results/fuzz/20261123T044927/
+results/fuzz/20261123T151054/
+results/fuzz/20261123T160413/
+results/fuzz/20261123T165645/
+results/fuzz/20261123T173933/
+results/fuzz/20261123T182437/
+results/fuzz/20261123T192350/

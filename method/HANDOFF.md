@@ -2,7 +2,8 @@
 
 ## Current state
 
-- `main` and `origin/main` are both at `c44d6c4`. No uncommitted work and no WIP branch.
+- `main` and `origin/main` were both at `4273930` (this note; the last code push is
+  `c44d6c4`). No uncommitted work and no WIP branch.
   No background jobs (the fuzz batches, churn benchmarks and score runs are all finished).
 - Local checks at `c44d6c4`:
   - 44/44 sessions, screens 11,405/11,405, RNG 792,838/792,838.
@@ -17,24 +18,22 @@
 
 ## Pushes and the judge
 
-The judge last scored this fork at **2026-11-23 12:35 UTC** (leaderboard `lastScored`),
-on `a17eef9`: 24,531/24,531 points, tied for rank 1 of 6 (transpiled), playability
-5.35 ms/move. CLAUDE.md section 7 has that row.
+(Updated at the start of the next session, 2026-11-23.) The judge last scored this fork at
+**2026-11-23 18:34 UTC** (leaderboard `lastScored`), on `e321f99` (the last push before
+it): 24,531/24,531 points, tied for rank 1 of 6 (transpiled), playability **7.26 ms/move**
+(5.35 on `a17eef9`; startup 3,166 ms, was 2,103). CLAUDE.md section 7 has that row.
 
-Pushed since then, **not yet confirmed by the judge** (it has not scored since 12:35,
-although it normally runs every 2 hours):
+Confirmed by that run: `95b3095` (P4), `7f196ad` (fortify names), `eec068c` (JSDoc),
+`e321f99` (pointer comparisons). Pushed since then, **not yet confirmed by the judge**:
 
 | Pushed (UTC) | Commit | Step |
 |---|---|---|
-| 15:54 | `95b3095` | P4: C comments and license notices |
-| 16:43 | `7f196ad` | Fortify names (`sprintf` instead of `__builtin___sprintf_chk`) |
-| 17:37 | `eec068c` | JSDoc from C signatures |
-| 18:22 | `e321f99` | `===` for pointers to record array elements |
 | 19:17 | `38d287c` | P5 wrapper reduction (value ranges) |
 | 20:03 | `c44d6c4` | `const` locals, declared at first assignment |
+| 20:11 | `4273930` | This note, tools/analysis scripts (no js/ change) |
 
 When the judge scores again, check that the points stay at 24,531, and watch its
-playability figure. It was 5.35 ms/move on `a17eef9`, against a 5 ms target. Local
+playability figure against the 5 ms target. Local
 playability has not risen since then (2.0-2.2), but the judge machine is about 3x slower.
 Add a CLAUDE.md section 7 row only if the score or the scored commit changed.
 
