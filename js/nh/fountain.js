@@ -11,8 +11,7 @@ import { artiname, discover_artifact, exist_artifact } from './artifact.js';
 import { ART } from './artilist.h.js';
 import { acurr, adjattrib, exercise, poison_strdmg } from './attrib.js';
 import { A } from './attrib.h.js';
-import { yn_function } from './cmd.js';
-import { c_common_strings, disp, flags, gi, gu, gy, hands_obj, svl, svm, u, ynchars } from './decl.js';
+import { c_common_strings, disp, flags, gi, gu, gy, hands_obj, svl, svm, u } from './decl.js';
 import { COIN_CLASS, POTION_CLASS, RING_CLASS, S } from './defsym.h.js';
 import { monster_detect } from './detect.js';
 import { glyph_at, newsym } from './display.js';
@@ -29,7 +28,7 @@ import { FALSE, LL, TRUE } from './global.h.js';
 import { glyph_to_cmap } from './glyphs.js';
 import { in_town, losehp, money_cnt } from './hack.js';
 import { ARM, ENL, FACE, HAND, HEAD, KILLED, MAGICENLIGHTENMENT, MM, NO_TRAP_FLAGS, ONAME_KNOW_ARTI, ONAME_VIA_DIP, POLY } from './hack.h.js';
-import { min } from './hack.macros.js';
+import { min, rn1, y_n } from './hack.macros.js';
 import { distmin } from './hacklib.js';
 import { enlightenment } from './insight.js';
 import { delobj, sobj_at, update_inventory, useup } from './invent.js';
@@ -93,7 +92,7 @@ export async function floating_above(what) {   // fountain.c:21
  */
 async function dowatersnakes() {   // fountain.c:38
     let mtmp = null, $t1;
-    let num = rn2(5) + 2 | 0;
+    let num = rn1(5, 2);
     if (!(svm.mvitals[PM.WATER_MOCCASIN].mvflags & G_GONE)) {
         if (!Blind()) {
             await pline($C`An endless stream of %s pours forth!`, Hallucination() ? await makeplural(await rndmonnam(null)) : $C`snakes`);
@@ -254,7 +253,7 @@ export async function dryup(x, y, isyou) {   // fountain.c:201
             return;
         }
         if (isyou && wizard()) {
-            if (await yn_function($C`Dry up fountain?`, new $c.Ptr(ynchars, 0), 110, TRUE) === 110) {
+            if (await y_n($C`Dry up fountain?`) === 110) {
                 return;
             }
         }
@@ -338,7 +337,7 @@ export async function drinkfountain() {   // fountain.c:243
             case 20:
                 /* Foul water */
                 await pline_The($C`water is foul!  You gag and vomit.`);
-                await morehungry(rn2(20) + 11 | 0);
+                await morehungry(rn1(20, 11));
                 await vomit();
                 break;
             case 21:
@@ -349,7 +348,7 @@ export async function drinkfountain() {   // fountain.c:243
                     await losehp(rnd(4), $C`unrefrigerated sip of juice`, KILLED.BY_AN);
                     break;
                 }
-                await poison_strdmg(rn2(4) + 3 | 0, rnd(10), $C`contaminated water`, KILLED.BY);
+                await poison_strdmg(rn1(4, 3), rnd(10), $C`contaminated water`, KILLED.BY);
                 await exercise(A.CON, FALSE);
                 break;
             case 22:
@@ -365,7 +364,7 @@ export async function drinkfountain() {   // fountain.c:243
                     /* Maybe curse some items */
                     let buc_changed = 0;
                     await pline($C`This water's no good!`);
-                    await morehungry(rn2(20) + 11 | 0);
+                    await morehungry(rn1(20, 11));
                     await exercise(A.CON, FALSE);
                     /* this is more severe than rndcurse() */
                     for (obj = gi.invent; obj; obj = nextobj) {

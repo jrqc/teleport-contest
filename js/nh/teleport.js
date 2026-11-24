@@ -12,10 +12,10 @@ import { exercise } from './attrib.js';
 import { A } from './attrib.h.js';
 import { ACURR } from './attrib.macros.js';
 import { drag_ball, move_bc, placebc, unplacebc } from './ball.js';
-import { isok, yn_function } from './cmd.js';
+import { isok } from './cmd.js';
 import { NO_COLOR } from './color.h.js';
 import { is_lava, is_pool, is_waterwall } from './dbridge.js';
-import { a11y, c_common_strings, cg, disp, flags, gc, gi, go, gs, gu, gv, gy, iflags, svd, svk, svl, svm, svn, svu, u, ynchars, ynqchars } from './decl.js';
+import { a11y, c_common_strings, cg, disp, flags, gc, gi, go, gs, gv, gy, iflags, svd, svk, svl, svm, svn, svu, u } from './decl.js';
 import { S } from './defsym.h.js';
 import { buried_ball_to_punishment } from './dig.js';
 import { canseemon, docrt, newsym, nul_glyphinfo, see_monsters, sensemon, shieldeff } from './display.js';
@@ -25,7 +25,7 @@ import { Amonnam, Monnam, mon_nam, noit_mon_nam } from './do_name.js';
 import { migrate_to_level } from './dog.js';
 import { In_W_tower, In_hell, In_mines, In_quest, Is_botlevel, On_W_tower_level, assign_level, depth, dunlevs_in_dungeon, find_hell, get_level, ledger_no, lev_by_name, on_level, print_dungeon, single_level_branch, surface, u_on_newpos } from './dungeon.js';
 import { LR, MIGR } from './dungeon.h.js';
-import { In_endgame, In_sokoban, In_tutorial, Inhell } from './dungeon.macros.js';
+import { In_endgame, In_sokoban, In_tutorial, Inhell, Is_stronghold, Is_waterlevel } from './dungeon.macros.js';
 import { morehungry } from './eat.js';
 import { done } from './end.js';
 import { sengr_at } from './engrave.js';
@@ -35,8 +35,8 @@ import { getpos } from './getpos.js';
 import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
 import { check_capacity, check_special_room, in_rooms, invocation_message, may_passwall, near_capacity, nomul, notice_all_mons, spoteffects, switch_terrain, u_locomotion } from './hack.js';
 import { BOLT_LIM, CC, CC_NO_FLAGS, CC_SKIP_INACCS, DIED, ECMD, FORCETRAP, GP, GP_ALLOW_XY, MM, NO, NO_KILLER_PREFIX, NO_TRAP_FLAGS, RLOC, SLT_ENCUMBER, TELEDS, VIASITTING } from './hack.h.js';
-import { distu, max, min, y_n } from './hack.macros.js';
-import { digit, dist2, distmin, eos } from './hacklib.js';
+import { distu, makeknown, max, min, y_n, ynq } from './hack.macros.js';
+import { digit, distmin, eos } from './hacklib.js';
 import { addinv, prinv, sobj_at } from './invent.js';
 import { is_home_elemental } from './makemon.js';
 import { is_exclusion_zone } from './mkmaze.js';
@@ -46,13 +46,12 @@ import { SHOPBASE, TEMPLE, VAULT } from './mkroom.h.js';
 import { get_iter_mons, hideunder, m_in_air, m_into_limbo, maybe_unhide_at, set_ustuck, unstuck } from './mon.js';
 import { set_mon_data } from './mondata.js';
 import { amorphous, can_teleport, control_teleport, haseyes, is_covetous, is_dlord, is_dprince, is_rider, is_silent, is_swimmer, likes_lava, passes_walls, throws_rocks, unique_corpstat } from './mondata.macros.js';
-import { M1, NEUTRAL } from './monflag.h.js';
+import { NEUTRAL } from './monflag.h.js';
 import { accessible, closed_door, dochugw, mon_track_clear, onscary, set_apparxy } from './monmove.js';
 import { mons } from './monst.js';
 import { M_AP } from './monst.h.js';
 import { DEADMONSTER, engulfing_u, mon_offmap } from './monst.macros.js';
 import { PM } from './monsters.h.js';
-import { discover_object } from './o_init.js';
 import { OBJ } from './obj.h.js';
 import { carried } from './obj.macros.js';
 import { objects } from './objects.js';
@@ -60,7 +59,7 @@ import { AMULET_OF_YENDOR, BOULDER, CORPSE, SCR_SCARE_MONSTER, SPE_TELEPORT_AWAY
 import { You, You_cant, You_feel, Your, impossible, pline, pline_mon, set_msg_xy, verbalize } from './pline.js';
 import { make_blinded, make_confused, make_stunned } from './potion.js';
 import { inhistemple } from './priest.js';
-import { CONFUSION, FLYING, I_SPECIAL, MAGICAL_BREATHING, STUNNED, SWIMMING, TELEPORT, TIMEOUT, WWALKING } from './prop.h.js';
+import { CONFUSION, I_SPECIAL, STUNNED, TELEPORT, TIMEOUT } from './prop.h.js';
 import { learnscroll } from './read.js';
 import { in_out_region, update_monster_region, update_player_regions } from './region.js';
 import { ALTAR, POOL } from './rm.h.js';
@@ -85,8 +84,8 @@ import { ATR, MENU, NHW, PICK } from './wintype.h.js';
 import { mon_has_amulet } from './wizard.js';
 import { place_worm_tail_randomly, remove_worm } from './worm.js';
 import { TT, UTOTYPE } from './you.h.js';
-import { Upolyd, u_at } from './you.macros.js';
-import { Antimagic, Blind, Blinded, Fire_resistance, Hallucination, Levitation, Passes_walls, Punished, Teleport_control, Teleportation } from './youprop.macros.js';
+import { Role_if, Upolyd, m_next2u, u_at } from './you.macros.js';
+import { Amphibious, Antimagic, Blind, Blinded, Fire_resistance, Flying, Hallucination, Levitation, Passes_walls, Punished, Swimming, Teleport_control, Teleportation, Wwalking } from './youprop.macros.js';
 
 const NOOP_SPELL = 0;
 const HIDE_SPELL = 1;
@@ -222,9 +221,9 @@ export function goodpos(x, y, mtmp, gpflags) {   // teleport.c:86
             if (mtmp === gy.youmonst) {
                 /* water on the Plane of Water has no surface
                    so there's no way to be on or above that */
-                return u.uprops[SWIMMING].intrinsic || u.uprops[SWIMMING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.SWIM) !== 0 || (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.AMPHIBIOUS) !== 0) || !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && !is_waterwall(x, y) && (Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked || (u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) ? 1 : 0;
+                return Swimming() || Amphibious() || !Is_waterlevel(u.uz) && !is_waterwall(x, y) && (Levitation() || Flying() || Wwalking()) ? 1 : 0;
             } else {
-                return is_swimmer(mdat) || !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && !is_waterwall(x, y) && m_in_air(mtmp) ? 1 : 0;
+                return is_swimmer(mdat) || !Is_waterlevel(u.uz) && !is_waterwall(x, y) && m_in_air(mtmp) ? 1 : 0;
             }
         } else if (mdat.mlet === S.EEL && rn2(13) && !ignorewater) {
             return FALSE;
@@ -234,7 +233,7 @@ export function goodpos(x, y, mtmp, gpflags) {   // teleport.c:86
             if (mdat === mons[PM.FLOATING_EYE]) {
                 return FALSE;
             } else if (mtmp === gy.youmonst) {
-                return Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked || Fire_resistance() && ((u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) && $G.uarmf && $G.uarmf.oerodeproof || Upolyd() && likes_lava(gy.youmonst.data) ? 1 : 0;
+                return Levitation() || Flying() || Fire_resistance() && Wwalking() && $G.uarmf && $G.uarmf.oerodeproof || Upolyd() && likes_lava(gy.youmonst.data) ? 1 : 0;
             } else {
                 return m_in_air(mtmp) || likes_lava(mdat) ? 1 : 0;
             }
@@ -438,7 +437,7 @@ async function teleok(x, y, trapok) {   // teleport.c:420
             trapok = TRUE;
         } else if (trap.ttyp === VIBRATING_SQUARE) {
             trapok = TRUE;
-        } else if ((is_pit(trap.ttyp) || is_hole(trap.ttyp)) && (Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked)) {
+        } else if ((is_pit(trap.ttyp) || is_hole(trap.ttyp)) && (Levitation() || Flying())) {
             trapok = TRUE;
         }
         if (!trapok) {
@@ -696,11 +695,11 @@ export async function collect_coords(ccc, cx, cy, maxradius, cc_flags, filter) {
         }
         lox = $c.i16(cx - radius | 0), hix = $c.i16(cx + radius | 0);
         loy = $c.i16(cy - radius | 0), hiy = $c.i16(cy + radius | 0);
-        for (y = loy > 0 ? loy : 0; y <= hiy; y = $c.i16(y + 1)) {
+        for (y = max(loy, 0); y <= hiy; y = $c.i16(y + 1)) {
             if (y > ROWNO - 1) {
                 break;   /* done with collection for current radius */
             }
-            for (x = lox > 1 ? lox : 1; x <= hix; x = $c.i16(x + 1)) {
+            for (x = max(lox, 1); x <= hix; x = $c.i16(x + 1)) {
                 /* column 0 is not used */
                 if (x > COLNO - 1) {
                     break;   /* advance to next 'y' */
@@ -874,7 +873,7 @@ export async function tele_to_rnd_pet() {   // teleport.c:814
             }
         }
     }
-    if (pet && !(dist2(pet.mx, pet.my, u.ux, u.uy) <= 2)) {
+    if (pet && !m_next2u(pet)) {
         const tx = $c.i16((pet.mx + rn2(3) | 0) - 1 | 0);
         const ty = $c.i16((pet.my + rn2(3) | 0) - 1 | 0);
         if (isok(tx, ty) && await teleok(tx, ty, FALSE)) {
@@ -912,7 +911,7 @@ export async function scrolltele(scroll) {   // teleport.c:849
         await You_feel($C`disoriented for a moment.`);
         /* don't discover the scroll [at least not yet for wizard override];
            disorientation doesn't reveal that this is a teleport attempt */
-        if (!wizard() || await yn_function($C`Override?`, new $c.Ptr(ynchars, 0), 110, TRUE) !== 121) {
+        if (!wizard() || await y_n($C`Override?`) !== 121) {
             return;
         }
     }
@@ -1062,7 +1061,7 @@ export async function dotele(break_the_rules) {   // teleport.c:1034
     }
     if (trap) {
         if (trap.ttyp === LEVEL_TELEP && trap.tseen) {
-            if (await yn_function($C`There is a level teleporter here. Trigger it?`, new $c.Ptr(ynchars, 0), 110, TRUE) === 121) {
+            if (await y_n($C`There is a level teleporter here. Trigger it?`) === 121) {
                 await level_tele_trap(trap, FORCETRAP);
                 /* deliberate jumping will always take time even if it doesn't
                  * work */
@@ -1074,7 +1073,7 @@ export async function dotele(break_the_rules) {   // teleport.c:1034
             trap_once = trap.once;   /* trap may get deleted, save this */
             if (trap.once) {
                 await pline($C`This is a vault teleport, usable once only.`);
-                if (await yn_function($C`Jump in?`, new $c.Ptr(ynchars, 0), 110, TRUE) === 110) {
+                if (await y_n($C`Jump in?`) === 110) {
                     trap = null;
                 } else {
                     await deltrap(trap);
@@ -1091,7 +1090,7 @@ export async function dotele(break_the_rules) {   // teleport.c:1034
     if (!trap && !break_the_rules) {
         let castit = FALSE;
         let energy = 0;
-        if (!Teleportation() || u.ulevel < (gu.urole.mnum === PM.WIZARD ? 8 : 12) && !can_teleport(gy.youmonst.data)) {
+        if (!Teleportation() || u.ulevel < (Role_if(PM.WIZARD) ? 8 : 12) && !can_teleport(gy.youmonst.data)) {
             /* Try to use teleport away spell. */
             const knownsp = known_spell(SPE_TELEPORT_AWAY);
             /* casting isn't inhibited by being Stunned (...it ought to be) */
@@ -1262,7 +1261,7 @@ export async function level_tele() {   // teleport.c:1165
                     if (trycnt >= 10) {
                         $goto = "random_levtport"; continue D1;
                     }
-                    if (await yn_function($C`Go to Nowhere.  Are you sure?`, new $c.Ptr(ynqchars, 0), 113, TRUE) !== 121) {
+                    if (await ynq($C`Go to Nowhere.  Are you sure?`) !== 121) {
                         return;
                     }
                     await You($C`%s in agony as your body begins to warp...`, is_silent(gy.youmonst.data) ? $C`writhe` : $C`scream`);
@@ -1353,7 +1352,7 @@ export async function level_tele() {   // teleport.c:1165
                     /* arrival in heaven is pending */
                 } else if (Levitation()) {
                     escape_by_flying = $C`float gently down to earth`;
-                } else if ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) {
+                } else if (Flying()) {
                     escape_by_flying = $C`fly down to the ground`;
                 } else {
                     await pline($C`Unfortunately, you don't know how to fly.`);
@@ -1666,7 +1665,7 @@ async function rloc_to_core(mtmp, x, y, rlocflags) {   // teleport.c:1645
             await u_on_newpos(mtmp.mx, mtmp.my);
             await check_special_room(FALSE);
             await docrt();
-        } else if (!(dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2)) {
+        } else if (!m_next2u(mtmp)) {
             await unstuck(mtmp);
         }
     }
@@ -1691,7 +1690,7 @@ async function rloc_to_core(mtmp, x, y, rlocflags) {   // teleport.c:1645
            if spell or q.mechanic attack or artifact #invoke for banish
            then current_wand will be Null */
         if (gc.current_wand && gc.current_wand.otyp === WAN_TELEPORTATION) {
-            await discover_object(WAN_TELEPORTATION, TRUE, TRUE, TRUE);
+            await makeknown(WAN_TELEPORTATION);
         }
     }
     /* shopkeepers will only teleport if you zap them with a wand of
@@ -1979,7 +1978,7 @@ export async function mlevel_tele_trap(mtmp, trap, force_it, in_sight) {   // te
     if (await teleport_pet(mtmp, force_it)) {
         let migrate_typ = MIGR.RANDOM;
         if (is_hole(tt)) {
-            if ((svd.dungeon_topology.d_stronghold_level.dlevel || svd.dungeon_topology.d_stronghold_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_stronghold_level)) {
+            if (Is_stronghold(u.uz)) {
                 assign_level(tolevel, svd.dungeon_topology.d_valley_level);
             } else if (Is_botlevel(u.uz)) {
                 if (in_sight && trap.tseen) {

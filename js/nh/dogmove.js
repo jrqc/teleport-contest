@@ -12,7 +12,7 @@ import { m_unleash } from './apply.js';
 import { A } from './attrib.h.js';
 import { dirtocoord, isok, xytodir } from './cmd.js';
 import { is_lava, is_pool } from './dbridge.js';
-import { c_common_strings, cg, flags, gb, gf, gg, gi, gn, gy, iflags, svd, svl, svm, u } from './decl.js';
+import { c_common_strings, cg, flags, gb, gf, gg, gi, gn, gy, iflags, svl, svm, u } from './decl.js';
 import { BALL_CLASS, CHAIN_CLASS, COIN_CLASS, FOOD_CLASS, ROCK_CLASS, S } from './defsym.h.js';
 import { canseemon, glyph_at, mon_visible, newsym } from './display.js';
 import { GLYPH } from './display.h.js';
@@ -20,7 +20,7 @@ import { canspotmon } from './display.macros.js';
 import { Mgender, Monnam, noit_Monnam, pmname, y_monnam } from './do_name.js';
 import { dogfood } from './dog.js';
 import { defsyms } from './drawing.js';
-import { on_level } from './dungeon.js';
+import { Is_qstart, Is_rogue_level } from './dungeon.macros.js';
 import { eaten_stat } from './eat.js';
 import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
 import { may_dig } from './hack.js';
@@ -635,7 +635,7 @@ async function dog_goal(mtmp, edog, after, udist, whappr) {   // dogmove.c:483
                     for (t = gf.ftrap; t; t = t.ntrap) {
                         if (t.ttyp === MAGIC_PORTAL) {
                             /*t->tseen &&*/
-                            if (dist2(t.tx, t.ty, u.ux, u.uy) <= 2) {
+                            if (distu(t.tx, t.ty) <= 2) {
                                 appr = 1;
                             }
                             break;
@@ -785,7 +785,7 @@ function score_targ(mtmp, mtarg) {   // dogmove.c:738
      */
     /* Give 1 in 3 chance of safe breathing even if pet is confused or
      * if you're on the quest start level */
-    if (!mtmp.mconf || !rn2(3) || (svd.dungeon_topology.d_qstart_level.dlevel || svd.dungeon_topology.d_qstart_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_qstart_level)) {
+    if (!mtmp.mconf || !rn2(3) || Is_qstart(u.uz)) {
         let align1 = A.NONE;
         let align2 = A.NONE;   /* For priests, minions */
         let faith1 = TRUE;
@@ -1396,7 +1396,7 @@ function can_reach_location(mon, mx, my, fx, fy) {   // dogmove.c:1379
                 continue;
             }
             /* tunnelling monsters can't do that on the rogue level */
-            if (svl.level.locations[i][j].typ < POOL && !passes_walls(mon.data) && (!may_dig($c.i16(i), $c.i16(j)) || !tunnels(mon.data) || (svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level))) {
+            if (svl.level.locations[i][j].typ < POOL && !passes_walls(mon.data) && (!may_dig($c.i16(i), $c.i16(j)) || !tunnels(mon.data) || Is_rogue_level(u.uz))) {
                 continue;
             }
             if (svl.level.locations[i][j].typ === DOOR && svl.level.locations[i][j].flags & (D.CLOSED | D.LOCKED)) {

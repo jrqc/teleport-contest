@@ -12,18 +12,18 @@ import { ALIGNLIM } from './align.macros.js';
 import { confers_luck, is_art, retouch_equipment, what_gives } from './artifact.js';
 import { ART } from './artilist.h.js';
 import { A } from './attrib.h.js';
-import { ACURR, ATEMP, ATTRMAX } from './attrib.macros.js';
-import { c_common_strings, disp, flags, gi, gm, gu, gy, iflags, program_state, svc, svd, svk, svm, u } from './decl.js';
+import { ACURR, ATEMP, ATTRMAX, STR18, STR19 } from './attrib.macros.js';
+import { c_common_strings, disp, flags, gi, gm, gu, gy, iflags, program_state, svc, svk, svm, u } from './decl.js';
 import { S } from './defsym.h.js';
 import { see_monsters, shieldeff } from './display.js';
-import { on_level } from './dungeon.js';
+import { Is_astralevel } from './dungeon.macros.js';
 import { done } from './end.js';
 import { debugcore } from './files.js';
 import { wizard } from './flag.macros.js';
 import { BUFSZ, FALSE, LL, MAXULEV, TRUE } from './global.h.js';
 import { losehp, near_capacity } from './hack.js';
 import { DIED, EXT_ENCUMBER, FACE, FAINTED, FAINTING, HUNGRY, HVY_ENCUMBER, KILLED, MOD_ENCUMBER, NOT_HUNGRY, POISONING, SATIATED, WEAK } from './hack.h.js';
-import { max } from './hack.macros.js';
+import { max, min, rn1 } from './hack.macros.js';
 import { copynchars, sgn, strncmpi, strstri } from './hacklib.js';
 import { carrying } from './invent.js';
 import { nhUse } from './lint.macros.js';
@@ -48,7 +48,7 @@ import { d, rn2, rnd } from './rnd.js';
 import { aligns } from './role.js';
 import { add_weapon_skill, lose_weapon_skill } from './weapon.js';
 import { LUCKADD, LUCKMAX, LUCKMIN } from './you.h.js';
-import { Upolyd } from './you.macros.js';
+import { Role_if, Upolyd } from './you.macros.js';
 import { BBlinded, BClairvoyant, BlindedTimeout, Blindfolded_only, EBlinded, Fixed_abil, Fumbling, HRegeneration, HStun, Half_gas_damage, Hallucination, Poison_resistance, Sick, Very_fast, Vomiting, Wounded_legs } from './youprop.macros.js';
 
 const AVAL = 50;
@@ -188,7 +188,7 @@ export async function gainstr(otmp, incr, givemsg) {   // attrib.c:203
     if (!num) {
         if (u.acurr.a[A.STR] < 18) {
             num = rn2(4) ? 1 : rnd(6);
-        } else if (u.acurr.a[A.STR] < 103) {
+        } else if (u.acurr.a[A.STR] < STR18(85)) {
             num = rnd(10);
         } else {
             num = 1;
@@ -216,7 +216,7 @@ export async function losestr(num, knam, k_format) {   // attrib.c:221
     while (ustr < gu.urace.attrmin[A.STR]) {
         ustr = ustr + 1 | 0;
         num = num - 1 | 0;
-        const amt = rn2(4) + 3 | 0;   /* (0..(4-1))+3 => 3..6; used to use flat 6 here */
+        const amt = rn1(4, 3);   /* (0..(4-1))+3 => 3..6; used to use flat 6 here */
         dmg = dmg + amt | 0;
     }
     if (dmg) {
@@ -228,7 +228,7 @@ export async function losestr(num, knam, k_format) {   // attrib.c:221
         await losehp(dmg, knam, k_format);
         if (Upolyd()) {
             /* when still poly'd, reduce you-as-monst maxHP; never below 1 */
-            setuhpmax((u.mhmax - dmg | 0) > 1 ? u.mhmax - dmg | 0 : 1, FALSE);   /* acts as setmhmax() */
+            setuhpmax(max(u.mhmax - dmg | 0, 1), FALSE);   /* acts as setmhmax() */
         } else if (!waspolyd) {
             /* not polymorphed now and didn't rehumanize when taking damage;
                reduce max HP, but not below uhpmin */
@@ -277,7 +277,7 @@ export async function poisontell(typ, exclaim) {   // attrib.c:294
      * Phrasing for other attributes which might have fixed values
      * (dunce cap) is such that we don't need message fixups for them.
      */
-    if (typ === A.STR && ACURR(A.STR) === 125) {
+    if (typ === A.STR && ACURR(A.STR) === STR19(25)) {
         msg_txt = $C`innately weaker`;
     } else if (typ === A.CON && ACURR(A.CON) === 25) {
         msg_txt = $C`sick inside`;
@@ -356,7 +356,7 @@ export async function poisoned(reason, typ, pkiller, fatal, thrown_weapon) {   /
     } else if (i > 5) {
         const cloud = !$c.strcmp(reason, $C`gas cloud`) ? 1 : 0;
         /* HP damage; more likely--but less severe--with missiles */
-        loss = thrown_weapon ? rnd(6) : rn2(10) + 6 | 0;
+        loss = thrown_weapon ? rnd(6) : rn1(10, 6);
         if ((blast || cloud) && Half_gas_damage()) {   /* worn towel */
             loss = $c.div32(loss + 1 | 0, 2);
         }
@@ -517,7 +517,7 @@ async function exerper() {   // attrib.c:521
         switch (hs) {
             case SATIATED:
                 await exercise(A.DEX, FALSE);
-                if (gu.urole.mnum === PM.MONK) {
+                if (Role_if(PM.MONK)) {
                     await exercise(A.WIS, FALSE);
                 }
                 break;
@@ -526,7 +526,7 @@ async function exerper() {   // attrib.c:521
                 break;
             case WEAK:
                 await exercise(A.STR, FALSE);
-                if (gu.urole.mnum === PM.MONK) {   /* fasting */
+                if (Role_if(PM.MONK)) {   /* fasting */
                     await exercise(A.WIS, TRUE);
                 }
                 break;
@@ -681,7 +681,7 @@ export async function exerchk() {   // attrib.c:598
                platform-dependent rounding/truncation for negative vals */
             $t2 = $c.i8(Math.imul($c.div32($c.abs(ax), 2), mod_val)), u.aexe.a[i] = $t2;
         }
-        $t3 = rn2(200) + 800 | 0, svc.context.next_attrib_check = $c.add64(svc.context.next_attrib_check, $t3);
+        $t3 = rn1(200, 800), svc.context.next_attrib_check = $c.add64(svc.context.next_attrib_check, $t3);
         do {
             if (debugcore($C`attrib.c`, TRUE)) {
                 save_plnmsg$6 = iflags.last_msg;
@@ -923,7 +923,7 @@ export function is_innate(propidx) {   // attrib.c:880
     }
     /* knight has intrinsic jumping, but extrinsic is more versatile so
        ignore innateness if equipment is going to claim responsibility */
-    if (propidx === JUMPING && gu.urole.mnum === PM.KNIGHT && !u.uprops[propidx].extrinsic) {
+    if (propidx === JUMPING && Role_if(PM.KNIGHT) && !u.uprops[propidx].extrinsic) {
         return FROM_ROLE;
     }
     if (propidx === BLINDED && !haseyes(gy.youmonst.data) || propidx === BLND_RES && $c.and64(u.uprops[BLND_RES].intrinsic, FROMFORM) !== 0) {
@@ -1160,7 +1160,7 @@ export function newhp() {   // attrib.c:1080
         /* after level 30, throttle hit point gains from extra experience;
            once max reaches 1200, further increments will be just 1 more */
         let lim = $c.i8(5 - $c.div32(u.uhpmax, 300) | 0);
-        lim = lim > 1 ? lim : 1;
+        lim = max(lim, 1);
         if (hp > lim) {
             hp = lim;
         }
@@ -1228,7 +1228,7 @@ export function adjuhploss(loss, olduhp) {   // attrib.c:1182
             loss = loss - (olduhp - u.mh | 0) | 0;
         }
     }
-    return loss > 1 ? loss : 1;
+    return max(loss, 1);
 }
 /* return the current effective value of a specific characteristic
    (the 'a' in 'acurr()' comes from outdated use of "attribute" for the
@@ -1248,13 +1248,13 @@ export function acurr(chridx) {   // attrib.c:1200
            1 <= xx <= 100), and 119..125 for other characteristics' 19..25;
            STR18(x) yields 18 + x (intended for 0 <= x <= 100; not used here);
            STR19(y) yields 100 + y (intended for 19 <= y <= 25) */
-        if (tmp >= 125 || $G.uarmg && $G.uarmg.otyp === GAUNTLETS_OF_POWER) {
-            result = 125;   /* 125 */
+        if (tmp >= STR19(25) || $G.uarmg && $G.uarmg.otyp === GAUNTLETS_OF_POWER) {
+            result = STR19(25);   /* 125 */
         } else {
             /* need non-zero here to avoid 'if(result==0)' below because
                that doesn't deal with Str encoding; the cap of 25 applied
                there would limit Str to 18/07 [18 + 7] */
-            result = tmp > 3 ? tmp : 3;
+            result = max(tmp, 3);
         }
     } else if (chridx === A.CHA) {
         if (tmp < 18 && (gy.youmonst.data.mlet === S.NYMPH || u.umonnum === PM.AMOROUS_DEMON)) {
@@ -1286,9 +1286,9 @@ export function acurrstr() {   // attrib.c:1245
     let result = 0;
     /* 3..125 after massaging by acurr() */
     const str = ACURR(A.STR);   /* 3..25 */
-    if (str <= 18) {   /* <= 18; max(,3) here is redundant */
-        result = str > 3 ? str : 3;   /* 3..18 */
-    } else if (str <= 121) {
+    if (str <= STR18(0)) {   /* <= 18; max(,3) here is redundant */
+        result = max(str, 3);   /* 3..18 */
+    } else if (str <= STR19(21)) {
         /* <= 121 */
         /* this converts
            18/01..18/31 into 19,
@@ -1297,7 +1297,7 @@ export function acurrstr() {   // attrib.c:1245
         result = 19 + $c.div32(str, 50) | 0;   /* map to 19..21 */
     } else {
         /* convert 122..125; min(,125) here is redundant */
-        result = (str < 125 ? str : 125) - 100 | 0;   /* 22..25 */
+        result = min(str, 125) - 100 | 0;   /* 22..25 */
     }
     return $c.i8(result);
 }
@@ -1316,7 +1316,7 @@ export function extremeattr(attrindx) {   // attrib.c:1268
     const curval = ACURR(attrindx);
     /* upper limit for Str is 25 but its value is encoded differently */
     if (attrindx === A.STR) {
-        hilimit = 125;   /* 125 */
+        hilimit = STR19(25);   /* 125 */
         /* lower limit for Str can also be 25 */
         if ($G.uarmg && $G.uarmg.otyp === GAUNTLETS_OF_POWER) {
             lolimit = hilimit;
@@ -1387,9 +1387,9 @@ export async function uchangealign(newalign, reason) {   // attrib.c:1320
         if (reason === A_CG.HELM_ON) {
             adjalign(-7);   /* for abuse -- record will be cleared shortly */
             await Your($C`mind oscillates %s.`, Hallucination() ? $C`wildly` : $C`briefly`);
-            await make_confused(rn2(2) + 3 | 0, FALSE);
-            if ((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level) || rn2(50) >>> 0 < u.ualign.abuse) {
-                await summon_furies((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level) ? 0 : 1);
+            await make_confused(rn1(2, 3), FALSE);
+            if (Is_astralevel(u.uz) || rn2(50) >>> 0 < u.ualign.abuse) {
+                await summon_furies(Is_astralevel(u.uz) ? 0 : 1);
             }
             /* don't livelog taking it back off */
             await livelog_printf(LL.ALIGNMENT, $C`used a helm to turn %s`, aligns[1 - newalign | 0].adj);

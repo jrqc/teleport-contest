@@ -33,9 +33,9 @@ import { AM } from './align.h.js';
 import { acurr, exercise } from './attrib.js';
 import { A } from './attrib.h.js';
 import { ACURR } from './attrib.macros.js';
-import { getdir, isok, yn_function } from './cmd.js';
+import { getdir, isok } from './cmd.js';
 import { close_drawbridge, find_drawbridge, is_drawbridge_wall, open_drawbridge } from './dbridge.js';
-import { c_common_strings, disp, flags, gc, gu, gy, svc, svd, svl, svt, u, ynqchars } from './decl.js';
+import { c_common_strings, disp, flags, gc, gu, gy, svc, svl, svt, u } from './decl.js';
 import { S, TOOL_CLASS } from './defsym.h.js';
 import { cvt_sdoor_to_door } from './detect.js';
 import { fillholetyp, liquid_flow } from './dig.js';
@@ -43,12 +43,12 @@ import { canseemon, newsym } from './display.js';
 import { flooreffects } from './do.js';
 import { Amonnam, Monnam, a_monnam, mon_nam, x_monnam } from './do_name.js';
 import { tamedog } from './dog.js';
-import { In_V_tower, on_level } from './dungeon.js';
-import { In_endgame, In_sokoban } from './dungeon.macros.js';
+import { In_V_tower } from './dungeon.js';
+import { In_endgame, In_sokoban, Is_astralevel, Is_sanctum, Is_stronghold } from './dungeon.macros.js';
 import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
 import { in_rooms, losehp } from './hack.js';
 import { ARTICLE, ECMD, KILLED, NOTELL, NO_KILLER_PREFIX, SUPPRESS, XKILL } from './hack.h.js';
-import { BZ_U_WAND, plur } from './hack.macros.js';
+import { makeknown, max, plur, rn1, ynq } from './hack.macros.js';
 import { dist2, highc, mungspaces } from './hacklib.js';
 import { align_str, record_achievement } from './insight.js';
 import { consume_obj_charge, sobj_at } from './invent.js';
@@ -62,20 +62,18 @@ import { seemimic, wakeup, xkilled } from './mon.js';
 import { AD } from './monattk.h.js';
 import { can_blow } from './mondata.js';
 import { ceiling_hider, humanoid, is_clinger, is_flyer, is_mercenary, mindless, nolimbs, slithy, unique_corpstat } from './mondata.macros.js';
-import { M1 } from './monflag.h.js';
 import { monflee, onscary } from './monmove.js';
 import { mons } from './monst.js';
 import { M_AP, STRAT_WAITMASK } from './monst.h.js';
 import { DEADMONSTER, M_AP_TYPE } from './monst.macros.js';
 import { PM } from './monsters.h.js';
-import { discover_object } from './o_init.js';
 import { objects } from './objects.js';
 import { BOULDER, BUGLE, DRUM_OF_EARTHQUAKE, FIRE_HORN, FROST_HORN, LEATHER_DRUM, MAGIC_FLUTE, MAGIC_HARP, TOOLED_HORN, WOODEN_FLUTE, WOODEN_HARP } from './objects.h.js';
 import { Tobjnam, Yname2, an, the, thesimpleoname, xname, yname } from './objnam.js';
 import { Norep, You, You_cant, You_feel, You_hear, Your, impossible, pline, pline_The } from './pline.js';
 import { incr_itimeout } from './potion.js';
 import { altarmask_at, desecrate_altar } from './pray.js';
-import { CONFUSION, DEAF, FLYING, HALF_PHDAM, STUNNED } from './prop.h.js';
+import { CONFUSION, DEAF, HALF_PHDAM, STUNNED } from './prop.h.js';
 import { ALTAR, CORR, D, DOOR, DRAWBRIDGE_DOWN, DRAWBRIDGE_UP, FOUNTAIN, GRAVE, ROOM, SCORR, SDOOR, SINK, THRONE } from './rm.h.js';
 import { d, rn2, rnd, rnl } from './rnd.js';
 import { genders } from './role.js';
@@ -89,7 +87,7 @@ import { cansee } from './vision.macros.js';
 import { getlin } from './windows.js';
 import { ACH, TT } from './you.h.js';
 import { Upolyd, u_at } from './you.macros.js';
-import { Blind, Deaf, Fumbling, Hallucination, Levitation, Unchanging, Underwater } from './youprop.macros.js';
+import { Blind, Deaf, Flying, Fumbling, Hallucination, Levitation, Unchanging, Underwater } from './youprop.macros.js';
 import { flash_str, resist, ubuzz, zapyourself } from './zap.js';
 
 const PLAY_NORMAL = 0x00;
@@ -348,7 +346,7 @@ async function do_pit(x, y, tu_pit) {   // music.c:221
             await Your($C`chain breaks!`);
             await reset_utrap(TRUE);
         }
-        if (Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked || is_clinger(gy.youmonst.data)) {
+        if (Levitation() || Flying() || is_clinger(gy.youmonst.data)) {
             if (!tu_pit) {
                 /* no pit here previously */
                 await pline($C`A chasm opens up under you!`);
@@ -358,13 +356,13 @@ async function do_pit(x, y, tu_pit) {   // music.c:221
             /* no pit here previously, or you were
                not in it even if there was */
             await You($C`fall into a chasm!`);
-            set_utrap((rn2(6) + 2 | 0) >>> 0, TT.PIT);
-            await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(6) + 1 | 0, 2) : rnd(6), $C`fell into a chasm`, NO_KILLER_PREFIX);
+            set_utrap(rn1(6, 2) >>> 0, TT.PIT);
+            await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(6) + 1 | 0, 2) : rnd(6)), $C`fell into a chasm`, NO_KILLER_PREFIX);
             await selftouch($C`Falling, you`);
         } else if (u.utrap && u.utraptype === TT.PIT) {
             const keepfooting = !(Fumbling() && rn2(5)) && (!rnl(gu.urole.mnum === PM.ARCHEOLOGIST ? 3 : 9) || ACURR(A.DEX) > 7 && rn2(5)) ? 1 : 0;
             await You($C`are jostled around violently!`);
-            set_utrap((rn2(6) + 2 | 0) >>> 0, TT.PIT);
+            set_utrap(rn1(6, 2) >>> 0, TT.PIT);
             await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(keepfooting ? 2 : 4) + 1 | 0, 2) : rnd(keepfooting ? 2 : 4), $C`hurt in a chasm`, NO_KILLER_PREFIX);
             if (keepfooting) {
                 await exercise(A.DEX, TRUE);
@@ -397,8 +395,8 @@ async function do_earthquake(force) {   // music.c:344
     let start_y = u.uy - Math.imul(force, 2) | 0;
     let end_x = u.ux + Math.imul(force, 2) | 0;
     let end_y = u.uy + Math.imul(force, 2) | 0;
-    start_x = start_x > 1 ? start_x : 1;
-    start_y = start_y > 0 ? start_y : 0;
+    start_x = max(start_x, 1);
+    start_y = max(start_y, 0);
     end_x = end_x < COLNO - 1 ? end_x : COLNO - 1;
     end_y = end_y < ROWNO - 1 ? end_y : ROWNO - 1;
     for (x = $c.i16(start_x); x <= end_x; x = $c.i16(x + 1)) {
@@ -522,11 +520,11 @@ async function do_earthquake(force) {   // music.c:344
  * @returns {$c.Ptr | null} const char *
  */
 function generic_lvl_desc() {   // music.c:478
-    if ((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level)) {
+    if (Is_astralevel(u.uz)) {
         return $C`astral plane`;
     } else if (In_endgame(u.uz)) {
         return $C`plane`;
-    } else if ((svd.dungeon_topology.d_sanctum_level.dlevel || svd.dungeon_topology.d_sanctum_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_sanctum_level)) {
+    } else if (Is_sanctum(u.uz)) {
         return $C`sanctum`;
     } else if (In_sokoban(u.uz)) {
         return $C`puzzle`;
@@ -661,10 +659,10 @@ async function do_improvisation(instr) {   // music.c:503
                     await pline($C`A %s blasts out of the horn!`, flash_str(type, FALSE));
                 }
                 gc.current_wand = instr;
-                await ubuzz(BZ_U_WAND(type), rn2(6) + 6 | 0);
+                await ubuzz((0 + type), rn1(6, 6));
                 gc.current_wand = null;
             }
-            await discover_object(instr.otyp, TRUE, TRUE, TRUE);
+            await makeknown(instr.otyp);
             break;
         case TOOLED_HORN:
             /* Awaken or scare monsters */
@@ -722,14 +720,14 @@ async function do_improvisation(instr) {   // music.c:503
             await do_earthquake($c.div32(u.ulevel - 1 | 0, 3) + 1 | 0);
             /* shake up monsters in a much larger radius... */
             await awaken_monsters(ROWNO * COLNO);
-            await discover_object(DRUM_OF_EARTHQUAKE, TRUE, TRUE, TRUE);
+            await makeknown(DRUM_OF_EARTHQUAKE);
             break;
         case LEATHER_DRUM:
             /* Awaken monsters */
             if (!mundane) {
                 if (!Deaf()) {
                     await You($C`beat a %sdeafening row!`, same_old_song[0] ? $C`familiar ` : $C``);
-                    incr_itimeout(new $c.FieldRef(u.uprops[DEAF], "intrinsic", "i64"), rn2(20) + 30 | 0);
+                    incr_itimeout(new $c.FieldRef(u.uprops[DEAF], "intrinsic", "i64"), rn1(20, 30));
                 } else {
                     await You($C`pound on the drum.`);
                 }
@@ -791,7 +789,7 @@ export async function do_play_instrument(instr) {   // music.c:759
     }
     nevermind$: {
         if (instr.otyp !== LEATHER_DRUM && instr.otyp !== DRUM_OF_EARTHQUAKE && !(u.uprops[STUNNED].intrinsic || u.uprops[CONFUSION].intrinsic || Hallucination())) {
-            c = await yn_function($C`Improvise?`, new $c.Ptr(ynqchars, 0), 113, TRUE);
+            c = await ynq($C`Improvise?`);
             if (c === 113) {
                 break nevermind$;
             }
@@ -800,7 +798,7 @@ export async function do_play_instrument(instr) {   // music.c:759
             return await do_improvisation(instr) ? ECMD.TIME : ECMD.OK;
         }
         if (u.uevent.uheard_tune === 2) {
-            c = await yn_function($C`Play the passtune?`, new $c.Ptr(ynqchars, 0), 113, TRUE);
+            c = await ynq($C`Play the passtune?`);
         }
         if (c === 113) {
             break nevermind$;
@@ -824,7 +822,7 @@ export async function do_play_instrument(instr) {   // music.c:759
         /* Check if there was the Stronghold drawbridge near
          * and if the tune conforms to what we're waiting for.
          */
-        if ((svd.dungeon_topology.d_stronghold_level.dlevel || svd.dungeon_topology.d_stronghold_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_stronghold_level)) {
+        if (Is_stronghold(u.uz)) {
             await exercise(A.WIS, TRUE);   /* just for trying */
             if (!$c.strcmp(new $c.Ptr(buf, 0), new $c.Ptr(svt.tune, 0))) {
                 /* Search for the drawbridge */

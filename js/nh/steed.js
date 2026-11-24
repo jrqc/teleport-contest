@@ -13,9 +13,9 @@ import { adjalign, exercise } from './attrib.js';
 import { A } from './attrib.h.js';
 import { ACURR } from './attrib.macros.js';
 import { describe_level } from './botl.js';
-import { directionname, dirtocoord, getdir, isok, xytodir, yn_function } from './cmd.js';
+import { directionname, dirtocoord, getdir, isok, xytodir } from './cmd.js';
 import { is_lava, is_pool } from './dbridge.js';
-import { c_common_strings, disp, gi, gu, gv, gy, iflags, svl, u, ynchars } from './decl.js';
+import { c_common_strings, disp, gi, gu, gv, gy, iflags, svl, u } from './decl.js';
 import { S, TOOL_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { newsym } from './display.js';
 import { canspotmon } from './display.macros.js';
@@ -29,7 +29,7 @@ import { wizard } from './flag.macros.js';
 import { FALSE, TRUE } from './global.h.js';
 import { losehp, near_capacity, test_move, u_locomotion } from './hack.js';
 import { ARTICLE, DIR, DISMOUNT, ECMD, KILLED, LEG, NO_KILLER_PREFIX, NO_TRAP_FLAGS, N_DIRS, RLOC, SLT_ENCUMBER, SUPPRESS, TELEDS, TEST } from './hack.h.js';
-import { DIR_LEFT, DIR_RIGHT, NODIAG, distu, y_n } from './hack.macros.js';
+import { DIR_LEFT, DIR_RIGHT, NODIAG, distu, rn1, y_n } from './hack.macros.js';
 import { highc, strsubst } from './hacklib.js';
 import { freeinv, fully_identify_obj, sobj_at } from './invent.js';
 import { has_mgivenname } from './mextra.macros.js';
@@ -38,7 +38,7 @@ import { killed, monkilled } from './mon.js';
 import { AD } from './monattk.h.js';
 import { poly_when_stoned, pronoun_gender } from './mondata.js';
 import { amorphous, bigmonst, cant_drown, grounded, humanoid, is_floater, is_flyer, is_swimmer, is_whirly, likes_lava, noncorporeal, slithy, throws_rocks, touch_petrifies, unsolid, verysmall } from './mondata.macros.js';
-import { M1, MZ } from './monflag.h.js';
+import { MZ } from './monflag.h.js';
 import { accessible } from './monmove.js';
 import { mons } from './monst.js';
 import { MON, M_AP } from './monst.h.js';
@@ -53,7 +53,7 @@ import { an } from './objnam.js';
 import { encumber_msg, u_handsy } from './pickup.js';
 import { You, You_cant, Your, impossible, pline } from './pline.js';
 import { body_part, polymon, steed_vs_stealth } from './polyself.js';
-import { BOTH_SIDES, CONFUSION, FLYING, HALF_PHDAM, STUNNED, W, WOUNDED_LEGS } from './prop.h.js';
+import { BOTH_SIDES, CONFUSION, HALF_PHDAM, STUNNED, W, WOUNDED_LEGS } from './prop.h.js';
 import { MON_AT, m_at } from './rm.macros.js';
 import { rn2, rnd } from './rnd.js';
 import { genders } from './role.js';
@@ -65,8 +65,8 @@ import { VIBRATING_SQUARE } from './trap.h.js';
 import { use_skill } from './weapon.js';
 import { update_mon_extrinsics, which_armor } from './worn.js';
 import { PRONOUN, TT } from './you.h.js';
-import { Upolyd, u_at } from './you.macros.js';
-import { Blind, Blind_telepat, Fumbling, Glib, Hallucination, Lev_at_will, Levitation, Punished, Stealth, Stone_resistance, Underwater, Wounded_legs } from './youprop.macros.js';
+import { Role_if, Upolyd, u_at } from './you.macros.js';
+import { Blind, Blind_telepat, Flying, Fumbling, Glib, Hallucination, Lev_at_will, Levitation, Punished, Stealth, Stone_resistance, Underwater, Wounded_legs } from './youprop.macros.js';
 
 /* Monsters that might be ridden */
 const steeds = new Int8Array(7);
@@ -141,7 +141,7 @@ export async function use_saddle(otmp) {   // steed.c:36
     if (!mtmp.mtame) {
         chance = chance - 10 * mtmp.m_lev | 0;
     }
-    if (gu.urole.mnum === PM.KNIGHT) {
+    if (Role_if(PM.KNIGHT)) {
         chance = chance + 20 | 0;
     }
     switch (u.weapon_skills[P.RIDING].skill) {
@@ -231,7 +231,7 @@ export async function doride() {   // steed.c:178
     if (u.usteed) {
         await dismount_steed(DISMOUNT.BYCHOICE);
     } else if (await getdir(null) && isok($c.i16(u.ux + u.dx | 0), $c.i16(u.uy + u.dy | 0))) {
-        if (wizard() && await yn_function($C`Force the mount to succeed?`, new $c.Ptr(ynchars, 0), 110, TRUE) === 121) {
+        if (wizard() && await y_n($C`Force the mount to succeed?`) === 121) {
             forcemount = TRUE;
         }
         return await mount_steed(svl.level.monsters[u.ux + u.dx | 0][u.uy + u.dy | 0], forcemount) ? ECMD.TIME : ECMD.OK;
@@ -333,7 +333,7 @@ export async function mount_steed(mtmp, force) {   // steed.c:197
         await You_cant($C`mount %s while %s's trapped in %s.`, await mon_nam(mtmp), genders[pronoun_gender(mtmp, PRONOUN.HALLU)].he, await an(trapname(t.ttyp, FALSE)));
         return FALSE;
     }
-    if (!force && !(gu.urole.mnum === PM.KNIGHT) && !(mtmp.mtame = $c.i8(mtmp.mtame - 1))) {
+    if (!force && !Role_if(PM.KNIGHT) && !(mtmp.mtame = $c.i8(mtmp.mtame - 1))) {
         /* no longer tame */
         await newsym(mtmp.mx, mtmp.my);
         await pline($C`%s resists%s!`, await Monnam(mtmp), mtmp.mleashed ? $C` and its leash comes off` : $C``);
@@ -367,7 +367,7 @@ export async function mount_steed(mtmp, force) {   // steed.c:197
         await You($C`slip while trying to get on %s.`, await mon_nam(mtmp));
         $c.sprintf(new $c.Ptr(buf, 0), $C`slipped while mounting %s`, await x_monnam(mtmp, ARTICLE.A, null, SUPPRESS.IT | SUPPRESS.INVISIBLE | SUPPRESS.HALLUCINATION, TRUE));
         /* "a saddled mumak" or "a saddled pony called Dobbin" */
-        await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32((rn2(5) + 10 | 0) + 1 | 0, 2) : rn2(5) + 10 | 0, new $c.Ptr(buf, 0), NO_KILLER_PREFIX);
+        await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32((rn2(5) + 10 | 0) + 1 | 0, 2) : rn2(5) + 10 | 0), new $c.Ptr(buf, 0), NO_KILLER_PREFIX);
         return FALSE;
     }
     /* Success */
@@ -377,7 +377,7 @@ export async function mount_steed(mtmp, force) {   // steed.c:197
             await pline($C`%s magically floats up!`, await Monnam(mtmp));
         }
         await You($C`mount %s.`, await mon_nam(mtmp));
-        if ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) {
+        if (Flying()) {
             await You($C`and %s take flight together.`, await mon_nam(mtmp));
         }
     }
@@ -464,7 +464,7 @@ export async function kick_steed() {   // steed.c:402
         return;
     }
     await pline($C`%s gallops!`, await Monnam(u.usteed));
-    $t2 = rn2(20) + 30 | 0, u.ugallop = $c.add64(u.ugallop, $t2);
+    $t2 = rn1(20, 30), u.ugallop = $c.add64(u.ugallop, $t2);
     return;
 }
 /*
@@ -602,7 +602,7 @@ export async function dismount_steed(reason) {   // steed.c:576
     u.usteed = null;
     /* affects Fly test; could hypothetically affect Lev;
      * also affects u_locomotion() */
-    const ufly = (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked ? TRUE : FALSE;
+    const ufly = Flying() ? TRUE : FALSE;
     const ulev = Levitation() ? TRUE : FALSE;
     let verb = u_locomotion($C`fall`);   /* only used for _FELL and _KNOCKED */
     u.usteed = mtmp;
@@ -619,8 +619,8 @@ export async function dismount_steed(reason) {   // steed.c:576
                 have_spot = await landing_spot(cc, reason, 1);
             }
             if (!ulev && !ufly) {
-                await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32((rn2(10) + 10 | 0) + 1 | 0, 2) : rn2(10) + 10 | 0, $C`riding accident`, KILLED.BY_AN);
-                await set_wounded_legs(BOTH_SIDES, $c.i32(u.uprops[WOUNDED_LEGS].intrinsic) + (rn2(5) + 5 | 0) | 0);
+                await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32((rn2(10) + 10 | 0) + 1 | 0, 2) : rn2(10) + 10 | 0), $C`riding accident`, KILLED.BY_AN);
+                await set_wounded_legs(BOTH_SIDES, $c.i32(u.uprops[WOUNDED_LEGS].intrinsic) + rn1(5, 5) | 0);
                 repair_leg_damage = FALSE;
             }
             break;

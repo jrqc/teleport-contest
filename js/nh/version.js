@@ -21,7 +21,7 @@ import { get_lua_version } from './nhlua.js';
 import { PATCHLEVEL, VERSION } from './patchlevel.h.js';
 import { pline, raw_printf } from './pline.js';
 import { regex_id } from './posixregex.js';
-import { sfi_char, sfi_uchar, sfi_version_info, sfo_char, sfo_uchar, sfo_version_info } from './sfbase.js';
+import { Sfi_char, Sfi_uchar, Sfi_version_info, Sfo_char, Sfo_uchar, Sfo_version_info } from './savefile.macros.js';
 import { bufoff, bufon } from './sfstruct.js';
 import { port_insert_pastebuf } from './unixmain.js';
 import { create_nhwindow, destroy_nhwindow, display_nhwindow, putstr, raw_print, wait_synch } from './winprocs.macros.js';
@@ -457,7 +457,7 @@ export async function store_version(nhfp) {   // version.c:512
         await bufoff(nhfp.fd);
     }
     await store_critical_bytes(nhfp);
-    await sfo_version_info(nhfp, version_data, $C`version_info`);
+    await Sfo_version_info(nhfp, version_data, $C`version_info`);
     if (nhfp.structlevel) {
         await bufon(nhfp.fd);
     }
@@ -480,11 +480,11 @@ export async function store_critical_bytes(nhfp) {   // version.c:676
     /* int cmc = 0; */
     if (nhfp.mode & WRITING) {
         indicate[0] = nhfp.structlevel ? 104 : nhfp.fnidx === exportascii ? 97 : 63;
-        await sfo_char(nhfp, new $c.Ptr(indicate, 0), $C`indicate-format`, 1);
-        await sfo_char(nhfp, new $c.Ptr(csc_count, 0), $C`count-critical_sizes`, 1);
+        await Sfo_char(nhfp, new $c.Ptr(indicate, 0), $C`indicate-format`, 1);
+        await Sfo_char(nhfp, new $c.Ptr(csc_count, 0), $C`count-critical_sizes`, 1);
         const cnt = csc_count[0];
         for (i = 0; i < cnt; i = i + 1 | 0) {
-            await sfo_uchar(nhfp, new $c.FieldRef(critical_sizes[i], "ucsize", "u8"), $C`critical_sizes`);
+            await Sfo_uchar(nhfp, new $c.FieldRef(critical_sizes[i], "ucsize", "u8"), $C`critical_sizes`);
         }
     }
 }
@@ -516,7 +516,7 @@ export async function uptodate(nhfp, name, utdflags) {   // version.c:713
     idx_1st_mismatch[0] = 0;
     const quietly = $c.andu64(utdflags, UTD.QUIETLY) !== 0 ? 1 : 0;
     const verbose = name ? TRUE : FALSE;
-    await sfi_char(nhfp, new $c.Ptr(indicator, 0), $C`indicate-format`, 1);
+    await Sfi_char(nhfp, new $c.Ptr(indicator, 0), $C`indicate-format`, 1);
     if ((sfstatus = await compare_critical_bytes(nhfp, new $c.Ptr(idx_1st_mismatch, 0), utdflags)) !== SF.UPTODATE) {
         if (sfstatus > 0 && idx_1st_mismatch[0]) {
             if (!quietly) {
@@ -524,7 +524,7 @@ export async function uptodate(nhfp, name, utdflags) {   // version.c:713
             }
         }
     }
-    await sfi_version_info(nhfp, vers_info, $C`version_info`);
+    await Sfi_version_info(nhfp, vers_info, $C`version_info`);
     if (!await check_version(vers_info, name, verbose, utdflags)) {
         if (verbose) {
             if ($c.andu64(utdflags, UTD.WITHOUT_WAITSYNCH_PERFILE) === 0) {
@@ -561,7 +561,7 @@ export async function compare_critical_bytes(nhfp, idx_1st_mismatch, utdflags) {
     const cnt = active_csc_count;
     let dmmismatch = SF.DM_MISMATCH;
     const quietly = $c.andu64(utdflags, UTD.QUIETLY) !== 0 ? 1 : 0;
-    await sfi_char(nhfp, new $c.Ptr(file_csc_count, 0), $C`count-critical_sizes`, 1);
+    await Sfi_char(nhfp, new $c.Ptr(file_csc_count, 0), $C`count-critical_sizes`, 1);
     if (file_csc_count[0] > cnt) {
         if (!quietly) {
             await raw_printf($C`critical byte counts do not match, file:%d, critical_sizes:%d.`, file_csc_count[0], 80);
@@ -569,7 +569,7 @@ export async function compare_critical_bytes(nhfp, idx_1st_mismatch, utdflags) {
         return SF.CRITICAL_BYTE_COUNT_MISMATCH;
     }
     for (i = 0; i < file_csc_count[0]; i = i + 1 | 0) {
-        await sfi_uchar(nhfp, new $c.Ptr(cscbuf, i), $C`critical_sizes`);
+        await Sfi_uchar(nhfp, new $c.Ptr(cscbuf, i), $C`critical_sizes`);
     }
     for (i = 1; i < cnt; i = i + 1 | 0) {
         if (cscbuf[i] !== critical_sizes[i].ucsize) {

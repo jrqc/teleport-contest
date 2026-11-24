@@ -25,12 +25,12 @@ import { $G } from './globals.js';
 import { artifact_light, retouch_equipment } from './artifact.js';
 import { adjabil, exercise, newhp, redist_attr, setuhpmax } from './attrib.js';
 import { A } from './attrib.h.js';
-import { ACURR } from './attrib.macros.js';
+import { ACURR, STR18, STR19 } from './attrib.macros.js';
 import { max_rank_sz, rank_of, status_initialize } from './botl.js';
 import { VIA_WINDOWPORT } from './botl.macros.js';
 import { getdir } from './cmd.js';
 import { is_pool, is_pool_or_lava } from './dbridge.js';
-import { c_common_strings, disp, flags, gi, gm, gn, gs, gu, gv, gw, gy, program_state, svc, svd, svk, svl, svm, svp, u } from './decl.js';
+import { c_common_strings, disp, flags, gi, gm, gn, gs, gu, gv, gw, gy, program_state, svc, svk, svl, svm, svp, u } from './decl.js';
 import { S } from './defsym.h.js';
 import { buried_ball_to_freedom, bury_objs } from './dig.js';
 import { canseemon, newsym, see_monsters, sensemon, set_mimic_blocking } from './display.js';
@@ -38,8 +38,8 @@ import { canletgo, dropx } from './do.js';
 import { Mgender, Monnam, Some_Monnam, hliquid, l_monnam, mon_nam, pmname, y_monnam } from './do_name.js';
 import { Armor_gone, Blindf_off, Boots_off, Cloak_off, Gloves_off, Helmet_off, Shield_off, cancel_don, donning, find_ac } from './do_wear.js';
 import { throwit } from './dothrow.js';
-import { has_ceiling, on_level, surface } from './dungeon.js';
-import { In_endgame } from './dungeon.macros.js';
+import { has_ceiling, surface } from './dungeon.js';
+import { In_endgame, Is_airlevel, Is_waterlevel } from './dungeon.macros.js';
 import { newuhs } from './eat.js';
 import { dealloc_killer, done, find_delayed_killer } from './end.js';
 import { newpw, rndexp } from './exper.js';
@@ -47,7 +47,7 @@ import { wizard } from './flag.macros.js';
 import { FALSE, LL, MAXULEV, TRUE } from './global.h.js';
 import { in_rooms, losehp, monst_to_any, nomul, rounddiv, spoteffects, unmul } from './hack.js';
 import { ARM, BOLT_LIM, DIED, DISMOUNT, ECMD, EYE, FINGER, FINGERTIP, FOOT, GENOCIDED, HAIR, HAND, HANDED, HEAD, KILLED, LEG, NECK, NOSE, NO_KILLER_PREFIX, NO_PART, NO_TRAP_FLAGS, POLY, SHOP, STONING, TOE } from './hack.h.js';
-import { plur, y_n } from './hack.macros.js';
+import { makeknown, plur, rn1, y_n } from './hack.macros.js';
 import { dist2, mungspaces, s_suffix, strstri, strsubst } from './hacklib.js';
 import { youhiding } from './insight.js';
 import { update_inventory, useup } from './invent.js';
@@ -65,7 +65,7 @@ import { mons } from './monst.js';
 import { M_AP } from './monst.h.js';
 import { DEADMONSTER, M_AP_TYPE, U_AP_TYPE, helpless, is_vampshifter, ismnum, resists_fire } from './monst.macros.js';
 import { PM } from './monsters.h.js';
-import { discover_object, observe_object } from './o_init.js';
+import { observe_object } from './o_init.js';
 import { Is_dragon_armor, Is_dragon_scales, WrappingAllowed, is_flimsy, is_sword } from './obj.macros.js';
 import { ACID_VENOM, ALCHEMY_SMOCK, AMULET_OF_STRANGULATION, AMULET_OF_UNCHANGING, BLACK_DRAGON_SCALES, BLACK_DRAGON_SCALE_MAIL, BLINDING_VENOM, BLUE_DRAGON_SCALES, BLUE_DRAGON_SCALE_MAIL, CORPSE, GOLD_DRAGON_SCALES, GOLD_DRAGON_SCALE_MAIL, GRAY_DRAGON_SCALES, GRAY_DRAGON_SCALE_MAIL, GREEN_DRAGON_SCALES, GREEN_DRAGON_SCALE_MAIL, MUMMY_WRAPPING, ORANGE_DRAGON_SCALES, ORANGE_DRAGON_SCALE_MAIL, RED_DRAGON_SCALES, RED_DRAGON_SCALE_MAIL, SILVER_DRAGON_SCALES, SILVER_DRAGON_SCALE_MAIL, STRANGE_OBJECT, WHITE_DRAGON_SCALES, WHITE_DRAGON_SCALE_MAIL, YELLOW_DRAGON_SCALES, YELLOW_DRAGON_SCALE_MAIL } from './objects.h.js';
 import { an, cloak_simple_name, cxname, helm_simple_name, makeplural, otense, simpleonames, the, the_unique_pm, vtense, yname } from './objnam.js';
@@ -93,7 +93,7 @@ import { getlin } from './windows.js';
 import { racial_exception, setworn } from './worn.js';
 import { SICK_ALL, TT } from './you.h.js';
 import { Ugender, Upolyd } from './you.macros.js';
-import { Blind, EFlying, ELevitation, Free_action, HFlying, HLevitation, Hallucination, Invis, Levitation, Passes_walls, Polymorph_control, Protection_from_shape_changers, Punished, See_invisible, Sick, Sick_resistance, Slimed, Stone_resistance, Stoned, Strangled, Unaware, Unchanging, Underwater } from './youprop.macros.js';
+import { Blind, EFlying, ELevitation, Flying, Free_action, HFlying, HLevitation, Hallucination, Invis, Levitation, Passes_walls, Polymorph_control, Protection_from_shape_changers, Punished, See_invisible, Sick, Sick_resistance, Slimed, Stone_resistance, Stoned, Strangled, Swimming, Unaware, Unchanging, Underwater } from './youprop.macros.js';
 import { destroy_items, ubreatheu, ubuzz } from './zap.js';
 
 const polymon$use_thec = new Int8Array(27);   // static in polymon()
@@ -371,7 +371,7 @@ export function float_vs_flight() {   // polyself.c:131
 }
 /* riding blocks stealth unless hero+steed fly */
 export function steed_vs_stealth() {   // polyself.c:158
-    if (u.usteed && !((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) && !Levitation()) {
+    if (u.usteed && !Flying() && !Levitation()) {
         u.uprops[STEALTH].blocked = $c.or64(u.uprops[STEALTH].blocked, FROMOUTSIDE);
     } else {
         u.uprops[STEALTH].blocked = $c.and64(u.uprops[STEALTH].blocked, ~FROMOUTSIDE);
@@ -392,7 +392,7 @@ async function check_strangling(on) {   // polyself.c:168
             u.uprops[STRANGLED].intrinsic = 6;
             disp.botl = TRUE;
             await Your($C`%s %s your %s!`, await simpleonames($G.uamul), was_strangled ? $C`still constricts` : $C`begins constricting`, await body_part(NECK));   /* "throat" */
-            await discover_object(AMULET_OF_STRANGULATION, TRUE, TRUE, TRUE);
+            await makeknown(AMULET_OF_STRANGULATION);
         }
         /* off -- maybe block strangling */
     } else {
@@ -460,7 +460,7 @@ async function polyman(fmt, arg) {   // polyself.c:200
         await untwoweapon();
     }
     if (u.utrap && u.utraptype === TT.PIT) {
-        set_utrap((rn2(6) + 2 | 0) >>> 0, TT.PIT);   /* time to escape resets */
+        set_utrap(rn1(6, 2) >>> 0, TT.PIT);   /* time to escape resets */
     }
     if (was_blind && !Blind()) {
         /* reverting from eyeless */
@@ -537,7 +537,7 @@ async function newman() {   // polyself.c:336
         switch ($goto) {
         case null:
             oldlvl = u.ulevel;
-            newlvl = oldlvl + (rn2(5) + -2 | 0) | 0;   /* new = old + {-2,-1,0,+1,+2} */
+            newlvl = oldlvl + rn1(5, -2) | 0;   /* new = old + {-2,-1,0,+1,+2} */
             if (newlvl > 127 || newlvl < 1) {
                 /* level went below 0? */
                 $goto = "dead"; continue D1;   /* old level is still intact (in case of lifesaving) */
@@ -586,7 +586,7 @@ async function newman() {   // polyself.c:336
                 hpmax = hpmax - u.uhpinc[i] | 0;
             }
             /* hpmax * rn1(4,8) / 10; 0.95*hpmax on average */
-            hpmax = await rounddiv($c.mul64(hpmax, rn2(4) + 8 | 0), 10);
+            hpmax = await rounddiv($c.mul64(hpmax, rn1(4, 8)), 10);
             for (i = 0; (u.ulevel = i) < newlvl; i = i + 1 | 0) {
                 hpmax = hpmax + newhp() | 0;
             }
@@ -603,7 +603,7 @@ async function newman() {   // polyself.c:336
             for (i = 0; i < oldlvl; i = i + 1 | 0) {
                 enmax = enmax - u.ueninc[i] | 0;
             }
-            enmax = await rounddiv($c.mul64(enmax, rn2(4) + 8 | 0), 10);
+            enmax = await rounddiv($c.mul64(enmax, rn1(4, 8)), 10);
             for (i = 0; (u.ulevel = i) < newlvl; i = i + 1 | 0) {
                 enmax = enmax + newpw() | 0;
             }
@@ -613,7 +613,7 @@ async function newman() {   // polyself.c:336
             $t3 = await rounddiv($c.mul64(u.uen, enmax), u.uenmax < 1 ? 1 : u.uenmax), u.uen = $t3;
             u.uenmax = enmax;
             /* [should alignment record be tweaked too?] */
-            $t4 = rn2(500) + 500 | 0, u.uhunger = $t4;
+            $t4 = rn1(500, 500), u.uhunger = $t4;
             if (Sick()) {
                 await make_sick(0, null, FALSE, SICK_ALL);
             }
@@ -895,7 +895,7 @@ export async function polyself(psflags) {   // polyself.c:469
                 tryct = 200;
                 do {
                     /* randomly pick an "ordinary" monster */
-                    mntmp[0] = rn2(SPECIAL_PM - LOW_PM) + LOW_PM;
+                    mntmp[0] = (rn2(SPECIAL_PM - LOW_PM) + LOW_PM);
                     if (polyok($c.relem(mons, mntmp[0])) && !is_placeholder($c.relem(mons, mntmp[0]))) {
                         break;
                     }
@@ -1004,7 +1004,7 @@ export async function polymon(mntmp) {   // polyself.c:735
         mntmp = PM.STONE_GOLEM;
         await make_stoned(0, $C`You turn to stone!`, 0, null);
     }
-    $t2 = rn2(500) + 500 | 0, u.mtimedone = $t2;
+    $t2 = rn1(500, 500), u.mtimedone = $t2;
     u.umonnum = mntmp;
     await set_uasmon();
     /* New stats for monster, to last only as long as polymorphed.
@@ -1082,7 +1082,7 @@ export async function polymon(mntmp) {   // polyself.c:735
         await hideunder(gy.youmonst);
     }
     if (u.utrap && u.utraptype === TT.PIT) {
-        set_utrap((rn2(6) + 2 | 0) >>> 0, TT.PIT);   /* time to escape resets */
+        set_utrap(rn1(6, 2) >>> 0, TT.PIT);   /* time to escape resets */
     }
     if (was_blind && !Blind()) {
         /* previous form was eyeless */
@@ -1146,7 +1146,7 @@ export async function polymon(mntmp) {   // polyself.c:735
     }
     find_ac();
     /* if expelled above, expels() already called spoteffects() */
-    if ((!Levitation() && !u.ustuck && !((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) && is_pool_or_lava(u.ux, u.uy) || Underwater() && !(u.uprops[SWIMMING].intrinsic || u.uprops[SWIMMING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.SWIM) !== 0)) && !was_expelled) {
+    if ((!Levitation() && !u.ustuck && !Flying() && is_pool_or_lava(u.ux, u.uy) || Underwater() && !Swimming()) && !was_expelled) {
         await spoteffects(TRUE);
         /* FIXME? if spoteffects() triggered rehumanize then we should
            return early */
@@ -1278,7 +1278,7 @@ export function uasmon_maxStr() {   // polyself.c:1077
            limited to 18/00 regardless of whether they're strongmonst, but
            the two strongmonst types (monarchs and nobles) have current
            strength set to 18 [by polymon()], the others don't */
-        newMaxStr = R ? R.attrmax[A.STR] : live_H ? 119 : 118;
+        newMaxStr = R ? R.attrmax[A.STR] : live_H ? STR19(19) : STR18(100);
     } else {
         newMaxStr = R ? R.attrmax[A.STR] : 18;   /* 18 is same as STR18(0) */
     }
@@ -1531,7 +1531,7 @@ async function drop_weapon(alone) {   // polyself.c:1305
  * @returns {Promise<void>}
  */
 export async function rehumanize() {   // polyself.c:1367
-    const was_flying = ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked ? 1 : 0) !== 0 ? 1 : 0;
+    const was_flying = Flying() !== 0 ? 1 : 0;
     /* You can't revert back while unchanging */
     if (Unchanging()) {
         if (u.mh < 1) {
@@ -1545,7 +1545,7 @@ export async function rehumanize() {   // polyself.c:1367
         } else if ($G.uamul && $G.uamul.otyp === AMULET_OF_UNCHANGING) {
             await Your($C`%s %s!`, await simpleonames($G.uamul), await otense($G.uamul, $C`fail`));
             await observe_object($G.uamul);
-            await discover_object(AMULET_OF_UNCHANGING, TRUE, TRUE, TRUE);
+            await makeknown(AMULET_OF_UNCHANGING);
         }
     }
     /*
@@ -1569,7 +1569,7 @@ export async function rehumanize() {   // polyself.c:1367
     gv.vision_full_recalc = 1;
     await encumber_msg();
     await update_inventory();
-    if (was_flying && !((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) && u.usteed) {
+    if (was_flying && !Flying() && u.usteed) {
         await You($C`and %s return gently to the %s.`, await mon_nam(u.usteed), surface(u.ux, u.uy));
     }
     await retouch_equipment(2);
@@ -1922,7 +1922,7 @@ export async function dogaze() {   // polyself.c:1642
 export async function dohide() {   // polyself.c:1777
     let otmp = null, kbuf = new Int8Array(256);
     const ismimic = gy.youmonst.data.mlet === S.MIMIC ? 1 : 0;
-    const on_ceiling = is_clinger(gy.youmonst.data) || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked ? 1 : 0;
+    const on_ceiling = is_clinger(gy.youmonst.data) || Flying() ? 1 : 0;
     /* can't hide while being held (or holding) or while trapped
        (except for floor hiders [trapper or mimic] in pits) */
     if (u.ustuck || u.utrap && (u.utraptype !== TT.PIT || on_ceiling)) {
@@ -1982,7 +1982,7 @@ export async function dohide() {   // polyself.c:1777
         return ECMD.OK;
     }
     /* floor hider */
-    if (is_hider(gy.youmonst.data) && !((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) && ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) {
+    if (is_hider(gy.youmonst.data) && !Flying() && (Is_airlevel(u.uz) || Is_waterlevel(u.uz))) {
         await There($C`is nowhere to hide beneath you.`);
         u.uundetected = 0;
         return ECMD.OK;

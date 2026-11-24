@@ -26,8 +26,8 @@ import { schedule_goto } from './do.js';
 import { Mgender, Monnam, free_oname, m_monnam, mon_nam, pmname } from './do_name.js';
 import { keepdogs } from './dog.js';
 import { endmultishot } from './dothrow.js';
-import { In_quest, deepest_lev_reached, depth, dunlev, on_level, show_overview, single_level_branch } from './dungeon.js';
-import { In_endgame, In_tutorial } from './dungeon.macros.js';
+import { In_quest, deepest_lev_reached, depth, dunlev, show_overview, single_level_branch } from './dungeon.js';
+import { In_endgame, In_tutorial, Is_astralevel } from './dungeon.macros.js';
 import { init_uhunger } from './eat.js';
 import { make_grave } from './engrave.js';
 import { clearlocks, debugcore, paniclog, set_error_savefile } from './files.js';
@@ -75,7 +75,7 @@ import { GRAVE } from './rm.h.js';
 import { d, rn2 } from './rnd.js';
 import { Goodbye } from './role.js';
 import { dosave0, freedynamicdata } from './save.js';
-import { sfi_kinfo, sfo_kinfo } from './sfbase.js';
+import { Sfi_kinfo, Sfo_kinfo } from './savefile.macros.js';
 import { finish_paybill, obfree, paybill } from './shk.js';
 import { shkname, shkname_is_pname } from './shknam.js';
 import { soundprocs } from './sounds.js';
@@ -92,7 +92,7 @@ import { clear_nhwindow, create_nhwindow, destroy_nhwindow, display_nhwindow, ex
 import { NHW, WIN_ERR } from './wintype.h.js';
 import { wiz_makemap } from './wizcmds.js';
 import { ACH, SICK_ALL, TT, UTOTYPE } from './you.h.js';
-import { Ugender, Upolyd } from './you.macros.js';
+import { Race_if, Role_if, Ugender, Upolyd } from './you.macros.js';
 import { Blind, Hallucination, Lifesaved } from './youprop.macros.js';
 
 let NH_abort$aborting = 0;   // static in NH_abort()
@@ -321,7 +321,7 @@ export async function done_in_by(mtmp, how) {   // end.c:186
         u.ugrave_arise = gu.urace.mummynum;
     } else if (zombie_maker(mtmp) && gu.urace.zombienum !== NON_PM) {
         u.ugrave_arise = gu.urace.zombienum;
-    } else if (mptr.mlet === S.VAMPIRE && gu.urace.mnum === PM.HUMAN) {
+    } else if (mptr.mlet === S.VAMPIRE && Race_if(PM.HUMAN)) {
         u.ugrave_arise = PM.VAMPIRE;
     } else if (mptr === mons[PM.GHOUL]) {
         u.ugrave_arise = PM.GHOUL;
@@ -596,7 +596,7 @@ async function savelife(how) {   // end.c:705
        again (perhaps due to zap rebound); this text will be appended to
           "killed by <something>, while "
        in high scores entry, if any, and in logfile (but not on tombstone) */
-    gm.multi_reason = gu.urole.mnum === PM.TOURIST ? $C`being toyed with by Fate` : $C`attempting to cheat Death`;
+    gm.multi_reason = Role_if(PM.TOURIST) ? $C`being toyed with by Fate` : $C`attempting to cheat Death`;
     if (u.utrap && u.utraptype === TT.LAVA) {
         await reset_utrap(0);
     }
@@ -645,7 +645,7 @@ function get_valuables(list) {   // end.c:764
             }
         } else if (obj.oclass === GEM_CLASS && obj.otyp <= LAST_GLASS_GEM) {
             /* last+1: combine all glass gems into one slot */
-            i = (obj.otyp < LAST_REAL_GEM + 1 ? obj.otyp : LAST_REAL_GEM + 1) - FIRST_REAL_GEM;
+            i = min(obj.otyp, LAST_REAL_GEM + 1) - FIRST_REAL_GEM;
             if (!gg.gems[i].count) {
                 gg.gems[i].count = obj.quan;
                 gg.gems[i].typ = obj.otyp;
@@ -1200,7 +1200,7 @@ async function really_done(how) {   // end.c:1132
     if (u.uhave.amulet) {
         $c.strcat(new $c.Ptr(svk.killer.name, 0), $C` (with the Amulet)`);
     } else if (how === ESCAPED) {
-        if ((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level)) {   /* offered Amulet to wrong deity */
+        if (Is_astralevel(u.uz)) {   /* offered Amulet to wrong deity */
             $c.strcat(new $c.Ptr(svk.killer.name, 0), $C` (in celestial disgrace)`);
         } else if (carrying(FAKE_AMULET_OF_YENDOR)) {
             $c.strcat(new $c.Ptr(svk.killer.name, 0), $C` (with a fake Amulet)`);
@@ -1293,7 +1293,7 @@ async function really_done(how) {   // end.c:1132
         } else {
             /* more conventional demise */
             let where = new $c.Ptr(svd.dungeons[u.uz.dnum].dname, 0);
-            if ((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level)) {
+            if (Is_astralevel(u.uz)) {
                 where = $C`The Astral Plane`;
             }
             $c.sprintf(new $c.Ptr(pbuf, 0), $C`You %s in %s`, ends[how], where);
@@ -1529,7 +1529,7 @@ export async function save_killers(nhfp) {   // end.c:1774
     let kptr = null;
     if (update_file(nhfp)) {
         for (kptr = svk.killer; kptr; kptr = kptr.next) {
-            await sfo_kinfo(nhfp, kptr, $C`kinfo`);
+            await Sfo_kinfo(nhfp, kptr, $C`kinfo`);
         }
     }
     if (release_data(nhfp)) {
@@ -1548,7 +1548,7 @@ export async function save_killers(nhfp) {   // end.c:1774
 export async function restore_killers(nhfp) {   // end.c:1794
     let kptr = null, $t1;
     for (kptr = svk.killer; kptr !== null; kptr = kptr.next) {
-        await sfi_kinfo(nhfp, kptr, $C`kinfo`);
+        await Sfi_kinfo(nhfp, kptr, $C`kinfo`);
         if (kptr.next) {
             $t1 = $c.asRec(await alloc(272), $T.kinfo, 272), kptr.next = $t1;
         }

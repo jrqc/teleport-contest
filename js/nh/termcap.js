@@ -10,12 +10,13 @@ import { $G } from './globals.js';
 import { alloc, dupstr } from './alloc.js';
 import { HL } from './botl.h.js';
 import { BRIGHT, CLR, NO_COLOR } from './color.h.js';
-import { flags, gc, gs, gt, iflags } from './decl.js';
+import { flags, gc, gt, iflags } from './decl.js';
 import { AE, AS, CO, LI } from './decl.macros.js';
 import { BUFSZ, COLNO, ROWNO } from './global.h.js';
 import { digit, nh_snprintf } from './hacklib.js';
 import { nhStr } from './lint.macros.js';
 import { H_DEC } from './sym.h.js';
+import { SYMHANDLING } from './sym.macros.js';
 import { nh_CD, nh_CM, nh_HE, nh_HI, nh_ND, nh_UE, nh_US } from './tcap.macros.js';
 import { error, tty_utf8graphics_fixup } from './unixtty.js';
 import { erase_tty_screen, setclipped, tty_curs, tty_raw_print, tty_wait_synch } from './wintty.js';
@@ -394,7 +395,7 @@ function tty_decgraphics_termcap_fixup() {   // termcap.c:388
      * Do not select NA ASCII as the primary font since people may
      * reasonably be using the UK character set.
      */
-    if (gs.symset[gc.currentgraphics].handling === H_DEC) {
+    if (SYMHANDLING(H_DEC)) {
         xputs($C`\x1b)0`);   /* "\e)0" load line drawing chars as secondary set */
         /* TI doesn't necessarily do this; explicitly switch to primary
            font in case previous program (either before starting nethack
@@ -456,7 +457,7 @@ export function term_start_screen() {   // termcap.c:511
     /* set up callback in case option is not set yet but toggled later */
     /* set up callback in case option is not set yet but toggled later */
     /* PC9800 */
-    if (gs.symset[gc.currentgraphics].handling === H_DEC) {
+    if (SYMHANDLING(H_DEC)) {
         tty_decgraphics_termcap_fixup();
     }
     /* set up callback in case option is not set yet but toggled later */

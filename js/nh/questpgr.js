@@ -15,9 +15,10 @@ import { panic } from './end.js';
 import { BUFSZ, NHL_SB } from './global.h.js';
 import { copynchars, eos, highc, lowc, s_suffix, strNsubst, strncmpi, strstri } from './hacklib.js';
 import { align_str } from './insight.js';
+import { luaL_checkstring } from './lauxlib.macros.js';
 import { nhUse } from './lint.macros.js';
-import { LUA } from './lua.h.js';
-import { luaL_checklstring, lua_getfield, lua_getglobal, lua_gettable, lua_len, lua_pushinteger, lua_settop, lua_tointegerx, lua_type } from './luabridge.js';
+import { lua_istable, lua_pop, lua_tointeger } from './lua.macros.js';
+import { lua_getfield, lua_getglobal, lua_gettable, lua_len, lua_pushinteger, lua_settop } from './luabridge.js';
 import { mkclass } from './makemon.js';
 import { G_GENOD, M2, MS, NEUTRAL } from './monflag.h.js';
 import { mons } from './monst.js';
@@ -495,14 +496,14 @@ async function com_pager_core(section, msgid, showerror, rawtext) {   // questpg
         }
         await lua_settop(L, 0);
         await lua_getglobal(L, $C`questtext`);
-        if (!(lua_type(L, -1) === LUA.TTABLE)) {
+        if (!lua_istable(L, -1)) {
             if (showerror) {
                 await impossible($C`com_pager: questtext in %s is not a lua table`, $C`quest.lua`);
             }
             break compagerdone$;
         }
         await lua_getfield(L, -1, section);
-        if (!(lua_type(L, -1) === LUA.TTABLE)) {
+        if (!lua_istable(L, -1)) {
             if (showerror) {
                 await impossible($C`com_pager: questtext[%s] in %s is not a lua table`, section, $C`quest.lua`);
             }
@@ -510,13 +511,13 @@ async function com_pager_core(section, msgid, showerror, rawtext) {   // questpg
         }
         tryagain$: for (;;) {
             await lua_getfield(L, -1, fallback_msgid ? fallback_msgid : msgid);
-            if (!(lua_type(L, -1) === LUA.TTABLE)) {
+            if (!lua_istable(L, -1)) {
                 if (!fallback_msgid) {
                     /* Do we have questtxt[msg_fallbacks][<msgid>]? */
                     await lua_getfield(L, -3, $C`msg_fallbacks`);
-                    if (lua_type(L, -1) === LUA.TTABLE) {
+                    if (lua_istable(L, -1)) {
                         fallback_msgid = await get_table_str_opt(L, msgid, null);
-                        await lua_settop(L, -3);
+                        await lua_pop(L, 2);
                         if (fallback_msgid) {
                             continue tryagain$;
                         }
@@ -543,8 +544,8 @@ async function com_pager_core(section, msgid, showerror, rawtext) {   // questpg
         output = com_pager_core$howtoput2i[await get_table_option(L, $C`output`, $C`default`, new $c.Ptr(com_pager_core$howtoput, 0))];
         if (!text) {
             await lua_len(L, -1);
-            nelems = $c.i32(lua_tointegerx(L, -1, null));
-            await lua_settop(L, -2);
+            nelems = $c.i32(lua_tointeger(L, -1));
+            await lua_pop(L, 1);
             if (nelems < 2) {
                 if (showerror) {
                     await impossible($C`com_pager: questtext[%s][%s] in %s is not an array of strings`, section, fallback_msgid ? fallback_msgid : msgid, $C`quest.lua`);
@@ -554,7 +555,7 @@ async function com_pager_core(section, msgid, showerror, rawtext) {   // questpg
             nelems = rn2(nelems) + 1 | 0;
             lua_pushinteger(L, nelems);
             await lua_gettable(L, -2);
-            text = await dupstr(await luaL_checklstring(L, -1, null));
+            text = await dupstr(await luaL_checkstring(L, -1));
         }
         /* switch from by_pline to by_window if line has multiple segments or
            is unreasonably long (the latter ought to checked after formatting

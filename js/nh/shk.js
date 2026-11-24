@@ -20,7 +20,7 @@ import { bot } from './botl.js';
 import { BEFORE, NOW } from './botl.h.js';
 import { isok, yn_function } from './cmd.js';
 import { NO_COLOR } from './color.h.js';
-import { c_common_strings, cg, disp, flags, ga, gb, gc, gf, gi, gk, gm, gr, gs, gt, gu, gv, gy, iflags, program_state, svl, svm, svp, svr, u, ynaqchars } from './decl.js';
+import { c_common_strings, cg, disp, flags, ga, gb, gc, gf, gi, gk, gm, gr, gs, gt, gu, gy, iflags, program_state, svl, svm, svp, svr, u, ynaqchars } from './decl.js';
 import { AMULET_CLASS, ARMOR_CLASS, BALL_CLASS, CHAIN_CLASS, COIN_CLASS, FOOD_CLASS, GEM_CLASS, GOLD_SYM, POTION_CLASS, RING_CLASS, S, SCROLL_CLASS, SPBOOK_CLASS, TOOL_CLASS, WAND_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { holetime } from './dig.js';
 import { canseemon, map_invisible, newsym, nul_glyphinfo, sensemon } from './display.js';
@@ -38,7 +38,7 @@ import { getpos } from './getpos.js';
 import { BUFSZ, COLNO, FALSE, LL, PL, ROWNO, TRUE } from './global.h.js';
 import { check_special_room, in_rooms, inv_cnt, money_cnt } from './hack.js';
 import { ARM, ARTICLE, COST, ECMD, EYE, HAND, HEAD, HUNGRY, MM, NECK, RLOC, SELL, invlet_basic } from './hack.h.js';
-import { distu, nyaq, onlineu, pline1, plur, y_n } from './hack.macros.js';
+import { distu, makeknown, max, nyaq, onlineu, pline1, plur, y_n } from './hack.macros.js';
 import { dist2, eos, highc, nh_snprintf, s_suffix, sgn, strncmpi, upstart } from './hacklib.js';
 import { record_achievement } from './insight.js';
 import { addinv, carrying, count_contents, count_unpaid, currency, freeinv, merge_choice, o_on, sobj_at, update_inventory, xprname } from './invent.js';
@@ -54,13 +54,13 @@ import { CANDLESHOP, NO_ROOM, ROOMOFFSET, SHOPBASE } from './mkroom.h.js';
 import { angry_guards, mnearto, mnexto, mongone, pacify_guards, wake_nearto } from './mon.js';
 import { locomotion, pronoun_gender, resist_conflict } from './mondata.js';
 import { has_head, haseyes, is_demon, is_silent, is_vampire, nolimbs, passes_walls, type_is_pname, unique_corpstat } from './mondata.macros.js';
-import { G_GONE, M1, M2, MS } from './monflag.h.js';
+import { G_GONE, M2, MS } from './monflag.h.js';
 import { closed_door, dochug } from './monmove.js';
 import { mons } from './monst.js';
 import { M_AP } from './monst.h.js';
 import { DEADMONSTER, M_AP_TYPE, helpless, ismnum } from './monst.macros.js';
 import { PM } from './monsters.h.js';
-import { discover_object, observe_object } from './o_init.js';
+import { observe_object } from './o_init.js';
 import { CONTAINED_TOO, OBJ } from './obj.h.js';
 import { Has_contents, Is_candle, Is_container, SchroedingersBox, carried, has_omid, is_pick, newobj } from './obj.macros.js';
 import { GEMSTONE, GLASS } from './objclass.h.js';
@@ -71,7 +71,7 @@ import { LOW_PM } from './permonst.h.js';
 import { Norep, There, You, You_cant, You_feel, You_hear, Your, impossible, livelog_printf, pline, pline_The, verbalize } from './pline.js';
 import { body_part, mbodypart, poly_gender } from './polyself.js';
 import { move_special } from './priest.js';
-import { ACID_RES, COLD_RES, DISINT_RES, FIRE_RES, INVIS, POISON_RES, SHOCK_RES, SLEEP_RES, STONE_RES, TELEPAT, TELEPORT, TELEPORT_CONTROL, W } from './prop.h.js';
+import { ACID_RES, COLD_RES, DISINT_RES, FIRE_RES, POISON_RES, SHOCK_RES, SLEEP_RES, STONE_RES, TELEPAT, TELEPORT, TELEPORT_CONTROL, W } from './prop.h.js';
 import { D, DOOR, POOL, ROOM, SVALL } from './rm.h.js';
 import { IS_DOOR, IS_ROOM, IS_WALL, MON_AT } from './rm.macros.js';
 import { rn2, rnd } from './rnd.js';
@@ -86,15 +86,14 @@ import { deltrap, t_at, trapname } from './trap.js';
 import { BEAR_TRAP, HOLE, LANDMINE, PIT, SPIKED_PIT } from './trap.h.js';
 import { hidden_gold } from './vault.js';
 import { block_point } from './vision.js';
-import { COULD_SEE } from './vision.h.js';
-import { cansee } from './vision.macros.js';
+import { cansee, m_canseeu } from './vision.macros.js';
 import { add_menu, add_menu_heading, select_menu } from './windows.js';
 import { create_nhwindow, destroy_nhwindow, display_nhwindow, end_menu, mark_synch, nh_delay_output, putstr, start_menu, wait_synch } from './winprocs.macros.js';
 import { ANY, ATR, MENU, NHW, PICK } from './wintype.h.js';
 import { choose_stairs } from './wizard.js';
 import { setnotworn } from './worn.js';
 import { ACH, PRONOUN, TT } from './you.h.js';
-import { u_at } from './you.macros.js';
+import { Role_if, m_next2u, u_at } from './you.macros.js';
 import { Blind, Blind_telepat, Conflict, Deaf, Detect_monsters, Displaced, Fast, Invis, Passes_walls, Punished } from './youprop.macros.js';
 import { get_obj_location } from './zap.js';
 
@@ -694,7 +693,7 @@ async function rob_shop(shkp) {   // shk.c:687
     eshkp.robbed = $c.add64(eshkp.robbed, total);
     await You($C`stole %ld %s worth of merchandise.`, total, await currency(total));
     await livelog_printf(LL.ACHIEVE, $C`stole %ld %s worth of merchandise from %s %s`, total, await currency(total), s_suffix(await shkname(shkp)), shtypes[eshkp.shoptype - SHOPBASE | 0].name);
-    if (!(gu.urole.mnum === PM.ROGUE)) {   /* stealing is unlawful */
+    if (!Role_if(PM.ROGUE)) {   /* stealing is unlawful */
         adjalign(-sgn(u.ualign.type) | 0);
     }
     hot_pursuit(shkp);
@@ -836,7 +835,7 @@ export async function u_entered_shop(enterstring) {   // shk.c:751
                 }
                 /* [ALI] Shopkeeper identifies mattock(s) */
                 if (!Blind()) {
-                    await discover_object(DWARVISH_MATTOCK, TRUE, TRUE, TRUE);
+                    await makeknown(DWARVISH_MATTOCK);
                 }
             }
             if (!Deaf() && !muteshk(shkp)) {
@@ -1352,7 +1351,7 @@ export async function make_happy_shk(shkp, silentkops) {   // shk.c:1395
     pacify_shk(shkp, FALSE);
     eshkp.following = 0;
     eshkp.robbed = 0;
-    if (!(gu.urole.mnum === PM.ROGUE)) {
+    if (!Role_if(PM.ROGUE)) {
         adjalign(sgn(u.ualign.type));
     }
     if (!inhishop(shkp)) {
@@ -1675,7 +1674,7 @@ async function menu_pick_pay_items(ibillct, ibill) {   // shk.c:1668
     }
     $c.free(pick_list[0]);
     /* for ESC, return 0 instead of usual -1 */
-    return n > 0 ? n : 0;
+    return max(n, 0);
 }
 /* the #pay command */
 /**
@@ -1696,7 +1695,7 @@ export async function dopay() {   // shk.c:1743
     nxtm = resident = null;
     for (shkp = next_shkp(svl.level.monlist, FALSE); shkp; shkp = next_shkp(shkp.nmon, FALSE)) {
         sk = sk + 1 | 0;
-        if (dist2(shkp.mx, shkp.my, u.ux, u.uy) <= 2) {
+        if (m_next2u(shkp)) {
             /* next to an irate shopkeeper? prioritize that */
             if (nxtm && ANGRY(nxtm)) {
                 continue;
@@ -1738,7 +1737,7 @@ export async function dopay() {   // shk.c:1743
                 }
             }
             (!(shkp !== $c.asRec(null, $T.monst, 192)) ? 1 : 0) ? $c.__assert_rtn($C`dopay`, $C`shk.c`, 1805, $C`shkp != NULL`) : 0;   /* seensk==1 =>  traversal will spot one shk */
-            if (shkp !== resident && !(dist2(shkp.mx, shkp.my, u.ux, u.uy) <= 2)) {
+            if (shkp !== resident && !m_next2u(shkp)) {
                 await pline($C`%s is not near enough to receive your payment.`, await Shknam(shkp));
                 return ECMD.OK;
             }
@@ -1772,7 +1771,7 @@ export async function dopay() {   // shk.c:1743
                 await pline($C`%s is not interested in your payment.`, await Monnam(mtmp));
                 return ECMD.OK;
             }
-            if (mtmp !== resident && !(dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2)) {
+            if (mtmp !== resident && !m_next2u(mtmp)) {
                 await pline($C`%s is too far to receive your payment.`, await Shknam(mtmp));
                 return ECMD.OK;
             }
@@ -2511,7 +2510,7 @@ async function inherits(shkp, numsk, croaked, silently) {   // shk.c:2577
                         if (helpless(shkp)) {
                             $c.strcat(new $c.Ptr(takes, 0), $C`wakes up and `);
                         }
-                        if (!(dist2(shkp.mx, shkp.my, u.ux, u.uy) <= 2)) {
+                        if (!m_next2u(shkp)) {
                             $c.strcat(new $c.Ptr(takes, 0), $C`comes and `);
                         }
                         $c.strcat(new $c.Ptr(takes, 0), $C`takes`);
@@ -2834,7 +2833,7 @@ async function get_cost(obj, shkp) {   // shk.c:2877
     }
     if ($G.uarmh && $G.uarmh.otyp === DUNCE_CAP) {
         multiplier = $c.mul64(multiplier, 4), divisor = $c.mul64(divisor, 3);
-    } else if (gu.urole.mnum === PM.TOURIST && u.ulevel < 15 || $G.uarmu && !$G.uarm && !$G.uarmc) {   /* touristy shirt visible */
+    } else if (Role_if(PM.TOURIST) && u.ulevel < 15 || $G.uarmu && !$G.uarm && !$G.uarmc) {   /* touristy shirt visible */
         multiplier = $c.mul64(multiplier, 4), divisor = $c.mul64(divisor, 3);
     }
     if (ACURR(A.CHA) > 18) {
@@ -3026,7 +3025,7 @@ async function set_cost(obj, shkp) {   // shk.c:3148
     let tmp = $c.mul64(await get_pricing_units(obj), unit_price);
     if ($G.uarmh && $G.uarmh.otyp === DUNCE_CAP) {
         divisor = $c.mul64(divisor, 3);
-    } else if (gu.urole.mnum === PM.TOURIST && u.ulevel < 15 || $G.uarmu && !$G.uarm && !$G.uarmc) {   /* touristy shirt visible */
+    } else if (Role_if(PM.TOURIST) && u.ulevel < 15 || $G.uarmu && !$G.uarm && !$G.uarmc) {   /* touristy shirt visible */
         divisor = $c.mul64(divisor, 3);
     } else {
         divisor = $c.mul64(divisor, 2);
@@ -3288,7 +3287,7 @@ async function shk_names_obj(shkp, obj, fmt, amt, arg) {   // shk.c:3413
      */
     if (!objects[obj.otyp].oc_magic && saleable(shkp, obj) && (obj.oclass === WEAPON_CLASS || obj.oclass === ARMOR_CLASS || obj.oclass === SCROLL_CLASS || obj.oclass === SPBOOK_CLASS || obj.otyp === MIRROR)) {
         was_unknown = $c.i8(was_unknown | (!objects[obj.otyp].oc_name_known ? 1 : 0));
-        await discover_object(obj.otyp, TRUE, TRUE, TRUE);
+        await makeknown(obj.otyp);
     }
     const obj_name = await paydoname(obj);
     /* Use an alternate message when extra information is being provided */
@@ -4085,9 +4084,9 @@ async function corpsenm_price_adj(obj) {   // shk.c:4275
         if (unique_corpstat(ptr)) {
             tmp = $c.add64(tmp, 50);
         }
-        val = 1 > Math.imul(ptr.mlevel - 1, 2) ? 1 : Math.imul(ptr.mlevel - 1, 2);
+        val = max(1, Math.imul(ptr.mlevel - 1, 2));
         if (obj.otyp === CORPSE) {
-            val = $c.add64(val, 1 > $c.div32(ptr.cnutrit, 30) ? 1 : $c.div32(ptr.cnutrit, 30));
+            val = $c.add64(val, max(1, $c.div32(ptr.cnutrit, 30)));
         }
         val = $c.mul64(val, tmp);
     }
@@ -4698,7 +4697,7 @@ export async function shk_move(shkp) {   // shk.c:4880
         gty = u.uy;
     } else if (ANGRY(shkp)) {
         /* Move towards the hero if the shopkeeper can see him. */
-        if (shkp.mcansee && ((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(shkp.data.mflags1, M1.SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(shkp.my).get(shkp.mx) & COULD_SEE) !== 0)) {
+        if (shkp.mcansee && m_canseeu(shkp)) {
             gtx = u.ux;
             gty = u.uy;
         }
@@ -4771,7 +4770,7 @@ export async function shopdig(fall) {   // shk.c:5019
         return;
     }
     if (!inhishop(shkp)) {
-        if (gu.urole.mnum === PM.KNIGHT) {
+        if (Role_if(PM.KNIGHT)) {
             await You_feel($C`like a common thief.`);
             adjalign(-sgn(u.ualign.type) | 0);
         }
@@ -4796,7 +4795,7 @@ export async function shopdig(fall) {   // shk.c:5019
                 }
             }
         }
-        if (gu.urole.mnum === PM.KNIGHT) {
+        if (Role_if(PM.KNIGHT)) {
             await You_feel($C`like a common thief.`);
             adjalign(-sgn(u.ualign.type) | 0);
         }
@@ -4807,10 +4806,10 @@ export async function shopdig(fall) {   // shk.c:5019
              * reasons, it isn't currently.
              */
         }
-        if (!(dist2(shkp.mx, shkp.my, u.ux, u.uy) <= 2)) {
+        if (!m_next2u(shkp)) {
             await mnexto(shkp, RLOC.MSG);
             /* for some reason the shopkeeper can't come next to you */
-            if (!(dist2(shkp.mx, shkp.my, u.ux, u.uy) <= 2)) {
+            if (!m_next2u(shkp)) {
                 if (lang === 2) {
                     await pline($C`%s curses you in anger and frustration!`, await Shknam(shkp));
                 } else if (lang === 1) {
@@ -4922,7 +4921,7 @@ export async function pay_for_damage(dmgstr, cant_mollify) {   // shk.c:5174
                 continue;
             }
             if (tmp_shk === shkp) {
-                const damage_distance = dist2(tmp_dam.place.x, tmp_dam.place.y, u.ux, u.uy) >>> 0;
+                const damage_distance = distu(tmp_dam.place.x, tmp_dam.place.y) >>> 0;
                 if (damage_distance < nearest_damage) {
                     nearest_damage = damage_distance;
                     appear_here = tmp_dam;
@@ -4946,7 +4945,7 @@ export async function pay_for_damage(dmgstr, cant_mollify) {   // shk.c:5174
             shkp = tmp_shk;
             nearest_shk = shk_distance;
             appear_here = tmp_dam;
-            nearest_damage = dist2(tmp_dam.place.x, tmp_dam.place.y, u.ux, u.uy) >>> 0;
+            nearest_damage = distu(tmp_dam.place.x, tmp_dam.place.y) >>> 0;
         }
     }
     if (!cost_of_damage || !shkp) {

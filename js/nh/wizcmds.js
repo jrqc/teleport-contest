@@ -10,7 +10,7 @@ import { alloc } from './alloc.js';
 import { bc_sanity_check } from './ball.js';
 import { cmd_from_func, ecname_from_fn, getdir, levltyp, makemap_prepost, paranoid_query, unavailcmd, yn_function } from './cmd.js';
 import { NO_COLOR } from './color.h.js';
-import { a11y, c_common_strings, cg, disp, flags, gb, gc, gf, gi, gm, gs, gu, gv, gy, iflags, program_state, svc, svd, svk, svl, svm, svn, u, ynchars } from './decl.js';
+import { a11y, c_common_strings, cg, disp, flags, gb, gc, gf, gi, gm, gs, gu, gv, gy, iflags, program_state, svc, svd, svk, svl, svm, svn, u } from './decl.js';
 import { S } from './defsym.h.js';
 import { do_mapping, findit } from './detect.js';
 import { docrt, glyph_at, glyphmap, map_engraving, map_invisible, map_trap, nul_glyphinfo, unmap_invisible } from './display.js';
@@ -22,7 +22,7 @@ import { hurtle, mhurtle } from './dothrow.js';
 import { defsyms } from './drawing.js';
 import { In_W_tower, Invocation_lev, Is_botlevel, Is_special, On_W_tower_level, assign_level, depth, get_level, ledger_no, on_level, overview_stats, print_dungeon } from './dungeon.js';
 import { MIGR } from './dungeon.h.js';
-import { In_endgame, In_sokoban } from './dungeon.macros.js';
+import { In_endgame, In_sokoban, Is_knox, Is_stronghold } from './dungeon.macros.js';
 import { done, panic } from './end.js';
 import { engr_stats, engraving_sanity_check } from './engrave.js';
 import { losexp, pluslvl } from './exper.js';
@@ -30,10 +30,11 @@ import { fuzzer_impossible_continue, fuzzer_impossible_panic } from './flag.h.js
 import { wizard } from './flag.macros.js';
 import { getpos } from './getpos.js';
 import { COLNO, FALSE, MAXULEV, ROWNO, TRUE } from './global.h.js';
+import { C, strcmpi } from './global.macros.js';
 import { fill_glyphid_cache, free_glyphid_cache, glyph_to_cmap, glyphid_cache_status, wizcustom_glyphids } from './glyphs.js';
 import { may_dig, pooleffects } from './hack.js';
 import { ARM, ARTICLE, DIED, ECMD, KILLED, MM, POLY, SUPPRESS, XKILL } from './hack.h.js';
-import { pline1, plur, ynq } from './hack.macros.js';
+import { FEATURE_NOTICE_VER, max, pline1, plur, y_n, ynq } from './hack.macros.js';
 import { dist2, eos, mungspaces, nh_snprintf, strkitten, strncmpi, strsubst, upstart } from './hacklib.js';
 import { check_invent_gold, display_inventory } from './invent.js';
 import { light_sources_sanity_check, light_stats } from './light.js';
@@ -134,7 +135,7 @@ export async function wiz_identify() {   // wizcmds.c:50
            if ^I invokes some other command--what matters is that
            display_pickinv() and xname() see override_ID as nonzero */
         if (!iflags.override_ID) {
-            iflags.override_ID = 9;
+            iflags.override_ID = C(73);
         }
         await display_inventory(null, FALSE);
         iflags.override_ID = 0;
@@ -612,13 +613,13 @@ export async function wiz_panic() {   // wizcmds.c:534
  * @returns {Promise<number>} int
  */
 export async function wiz_fuzzer() {   // wizcmds.c:549
-    if (flags.suppress_alert < 50790400) {
+    if (flags.suppress_alert < FEATURE_NOTICE_VER(3, 7, 0)) {
         await pline($C`The fuzz tester will make NetHack execute random keypresses.`);
         await There($C`is no conventional way out of this mode.`);
     }
     if (await paranoid_query(TRUE, $C`Do you want to start fuzz testing?`)) {
         /* Thoth, take the reins */
-        if (await yn_function($C`Do you want to call panic() after impossible()?`, new $c.Ptr(ynchars, 0), 110, TRUE) === 110) {
+        if (await y_n($C`Do you want to call panic() after impossible()?`) === 110) {
             iflags.debug_fuzzer = fuzzer_impossible_continue;
         } else {
             iflags.debug_fuzzer = fuzzer_impossible_panic;
@@ -645,7 +646,7 @@ export async function wiz_show_seenv() {   // wizcmds.c:576
      * Each seenv description takes up 2 characters, so center
      * the seenv display around the hero.
      */
-    let startx = $c.i16(1 > u.ux - 20 ? 1 : u.ux - 20);
+    let startx = $c.i16(max(1, u.ux - 20));
     const stopx = $c.i16(startx + 40 < COLNO ? startx + 40 : COLNO);
     /* can't have a line exactly 80 chars long */
     if (stopx - startx === 40) {
@@ -875,7 +876,7 @@ export async function wiz_map_levltyp() {   // wizcmds.c:693
             $c.strcat(new $c.Ptr(dsc, 0), $C` sokoban`);
         } else if (u.uz.dnum === svd.dungeon_topology.d_quest_dnum) {
             $c.strcat(new $c.Ptr(dsc, 0), $C` quest`);
-        } else if ((svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level)) {
+        } else if (Is_knox(u.uz)) {
             $c.strcat(new $c.Ptr(dsc, 0), $C` ludios`);
         } else if (u.uz.dnum === 1) {
             $c.strcat(new $c.Ptr(dsc, 0), $C` gehennom`);
@@ -1308,7 +1309,7 @@ function size_monst(mtmp, incl_wsegs) {   // wizcmds.c:1228
 async function mon_chain(win, src, chain, force, total_count, total_size) {   // wizcmds.c:1257
     let buf = new Int8Array(256), size = 0, mon = null;
     /* mon->wormno means something different for migrating_mons and mydogs */
-    const incl_wsegs = !strncmpi(src, $C`fmon`, -1) ? 1 : 0;
+    const incl_wsegs = !strcmpi(src, $C`fmon`) ? 1 : 0;
     let count = size = 0;
     for (mon = chain; mon; mon = mon.nmon) {
         count = $c.add64(count, 1);
@@ -1846,7 +1847,7 @@ export async function wiz_migrate_mons() {   // wizcmds.c:1873
     let inbuf = new Int8Array(256), mtmp = null, tolevel = new $T.d_level(), $t1;
     let use_random_mon = TRUE;
     const mongen_saved = iflags.debug_mongen;
-    if ((svd.dungeon_topology.d_stronghold_level.dlevel || svd.dungeon_topology.d_stronghold_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_stronghold_level)) {
+    if (Is_stronghold(u.uz)) {
         assign_level(tolevel, svd.dungeon_topology.d_valley_level);
     } else if (!Is_botlevel(u.uz)) {
         await get_level(tolevel, depth(u.uz) + 1);

@@ -17,6 +17,7 @@ import { S } from './defsym.h.js';
 import { nul_glyphinfo } from './display.js';
 import { nh_terminate, panic } from './end.js';
 import { FALSE, PL, QBUFSZ, TRUE } from './global.h.js';
+import { strcmpi } from './global.macros.js';
 import { BP, NUM_BP } from './hack.h.js';
 import { eos, findword, highc, lowc, s_suffix, strNsubst, strkitten, strncmpi, strstri, strsubst, trimspaces } from './hacklib.js';
 import { is_female, is_male, is_neuter } from './mondata.macros.js';
@@ -38,6 +39,7 @@ import { RS } from './winprocs.h.js';
 import { RS_menu_arg, askname, create_nhwindow, destroy_nhwindow, end_menu, putstr, start_menu } from './winprocs.macros.js';
 import { ATR, MENU, NHW, PICK, WIN_ERR } from './wintype.h.js';
 import { ROLE_ALIGNS, ROLE_FEMALE, ROLE_GENDERS, ROLE_GENDMASK, ROLE_MALE, ROLE_NEUTER, ROLE_NONE, ROLE_RACEMASK, ROLE_RANDOM } from './you.h.js';
+import { Role_if } from './you.macros.js';
 
 const root_plselection_prompt$err_ret = new Int8Array(13);   // static in root_plselection_prompt()
 const role_selection_prolog$choosing = new Int8Array(14);   // static in role_selection_prolog()
@@ -131,7 +133,7 @@ export async function str2role(str) {   // role.c:747
             return i;
         }
         /* Or the filecode? */
-        if (!strncmpi(str, roles[i].filecode, -1)) {
+        if (!strcmpi(str, roles[i].filecode)) {
             return i;
         }
     }
@@ -202,7 +204,7 @@ export async function str2race(str) {   // role.c:813
             return i;
         }
         /* Or the filecode? */
-        if (!strncmpi(str, races[i].filecode, -1)) {
+        if (!strcmpi(str, races[i].filecode)) {
             return i;
         }
     }
@@ -270,7 +272,7 @@ export async function str2gend(str) {   // role.c:880
             return i;
         }
         /* Or the filecode? */
-        if (!strncmpi(str, genders[i].filecode, -1)) {
+        if (!strcmpi(str, genders[i].filecode)) {
             return i;
         }
     }
@@ -338,7 +340,7 @@ export async function str2align(str) {   // role.c:943
             return i;
         }
         /* Or the filecode? */
-        if (!strncmpi(str, aligns[i].filecode, -1)) {
+        if (!strcmpi(str, aligns[i].filecode)) {
             return i;
         }
     }
@@ -1463,7 +1465,7 @@ export async function role_init() {   // role.c:1980
     }
     /* 0 or 1; no gods are neuter, nor is gender randomized */
     $t8 = !strncmpi(align_gtitle($c.i8(alignmnt)), $C`goddess`, -1) ? 1 : 0, svq.quest_status.godgend = ($t8) & 3;
-    if (gu.urole.mnum === PM.CLERIC) {
+    if (Role_if(PM.CLERIC)) {
         objects[SPE_LIGHT].oc_subtyp = P.CLERIC_SPELL;
     }
     /*

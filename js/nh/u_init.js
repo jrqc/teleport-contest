@@ -21,6 +21,7 @@ import { debugcore } from './files.js';
 import { discover } from './flag.macros.js';
 import { FALSE, TRUE } from './global.h.js';
 import { inv_weight } from './hack.js';
+import { rn1 } from './hack.macros.js';
 import { addinv, useupall } from './invent.js';
 import { nhUse } from './lint.macros.js';
 import { dealloc_obj, mkobj, mksobj, weight } from './mkobj.js';
@@ -40,11 +41,13 @@ import { aligns } from './role.js';
 import { P, P_MARTIAL_ARTS } from './skills.h.js';
 import { initialspell, num_spells, spell_skilltype } from './spell.js';
 import { NO_SPELL } from './spell.h.js';
+import { SPELL_LEV_PW } from './spell.macros.js';
 import { hidden_gold } from './vault.js';
 import { skill_init } from './weapon.js';
 import { set_twoweap, setuqwep, setuswapwep, setuwep } from './wield.js';
 import { setworn } from './worn.js';
 import { LEFT_HANDED, RIGHT_HANDED } from './you.h.js';
+import { Race_if, Role_if } from './you.macros.js';
 
 const UNDEF_TYP = 0;
 const UNDEF_SPE = 127;
@@ -142,16 +145,16 @@ async function knows_class(sym) {   // u_init.c:586
         if (sym === WEAPON_CLASS) {
             odummy.otyp = $c.i16(ct);   /* update 'o' */
             /* arbitrary: only knights and samurai recognize polearms */
-            if (!(gu.urole.mnum === PM.KNIGHT) && !(gu.urole.mnum === PM.SAMURAI) && is_pole(o)) {
+            if (!Role_if(PM.KNIGHT) && !Role_if(PM.SAMURAI) && is_pole(o)) {
                 continue;
             }
             /* rangers know all launchers (bows, &c), ammo (arrows, &c),
                and spears regardless of race/species, but not other weapons */
-            if (gu.urole.mnum === PM.RANGER && (!is_launcher(o) && !is_ammo(o) && !is_spear(o))) {
+            if (Role_if(PM.RANGER) && (!is_launcher(o) && !is_ammo(o) && !is_spear(o))) {
                 continue;
             }
             /* rogues know daggers, regardless of racial variations */
-            if (gu.urole.mnum === PM.ROGUE && objects[o.otyp].oc_subtyp !== P.DAGGER) {
+            if (Role_if(PM.ROGUE) && objects[o.otyp].oc_subtyp !== P.DAGGER) {
                 continue;
             }
         }
@@ -212,7 +215,7 @@ async function u_init_role() {   // u_init.c:637
             await ini_inv(Cave_man[0]);
             break;
         case PM.HEALER:
-            $t1 = rn2(1000) + 1001 | 0, u.umoney0 = $t1;
+            $t1 = rn1(1000, 1001), u.umoney0 = $t1;
             await ini_inv(Healer[0]);
             if (!rn2(25)) {
                 await ini_inv(Lamp[0]);
@@ -345,7 +348,7 @@ async function u_init_race() {   // u_init.c:792
              * Non-warriors get an instrument.  We use a kludge to
              * get only non-magic instruments.
              */
-            if (gu.urole.mnum === PM.CLERIC || gu.urole.mnum === PM.WIZARD) {
+            if (Role_if(PM.CLERIC) || Role_if(PM.WIZARD)) {
                 for (let $i16 = 0; $i16 < 2; $i16++) {
                     Instrument[$i16].$copyFrom(new $T.trobj());
                 }
@@ -390,7 +393,7 @@ async function u_init_race() {   // u_init.c:792
             break;
         case PM.ORC:
             /* compensate for generally inferior equipment */
-            if (!(gu.urole.mnum === PM.WIZARD)) {
+            if (!Role_if(PM.WIZARD)) {
                 await ini_inv(Xtra_food[0]);
             }
             /* Orcs can recognize all orcish objects */
@@ -661,7 +664,7 @@ async function ini_inv_mkobj_filter(oclass, got_level1_spellbook) {   // u_init.
     /* powerful spells are either useless to
        low level players or unbalancing; also
        spells in restricted skill categories */
-    while (otyp === WAN_WISHING || otyp === gn.nocreate || otyp === gn.nocreate2 || otyp === gn.nocreate3 || otyp === gn.nocreate4 || otyp === RIN_LEVITATION || otyp === POT_HALLUCINATION || otyp === POT_ACID || otyp === SCR_AMNESIA || otyp === SCR_FIRE || otyp === SCR_BLANK_PAPER || otyp === SPE_BLANK_PAPER || otyp === RIN_AGGRAVATE_MONSTER || otyp === RIN_HUNGER || otyp === WAN_NOTHING || otyp === RIN_POISON_RESISTANCE && gu.urace.mnum === PM.ORC || otyp === SCR_ENCHANT_WEAPON && gu.urole.mnum === PM.MONK || otyp === SPE_FORCE_BOLT && gu.urole.mnum === PM.WIZARD || obj.oclass === SPBOOK_CLASS && (objects[otyp].oc_oc2 > (got_level1_spellbook ? 3 : 1) || await restricted_spell_discipline(otyp)) || otyp === SPE_NOVEL) {
+    while (otyp === WAN_WISHING || otyp === gn.nocreate || otyp === gn.nocreate2 || otyp === gn.nocreate3 || otyp === gn.nocreate4 || otyp === RIN_LEVITATION || otyp === POT_HALLUCINATION || otyp === POT_ACID || otyp === SCR_AMNESIA || otyp === SCR_FIRE || otyp === SCR_BLANK_PAPER || otyp === SPE_BLANK_PAPER || otyp === RIN_AGGRAVATE_MONSTER || otyp === RIN_HUNGER || otyp === WAN_NOTHING || otyp === RIN_POISON_RESISTANCE && Race_if(PM.ORC) || otyp === SCR_ENCHANT_WEAPON && Role_if(PM.MONK) || otyp === SPE_FORCE_BOLT && Role_if(PM.WIZARD) || obj.oclass === SPBOOK_CLASS && (objects[otyp].oc_oc2 > (got_level1_spellbook ? 3 : 1) || await restricted_spell_discipline(otyp)) || otyp === SPE_NOVEL) {
         await dealloc_obj(obj);
         if ((trycnt = trycnt + 1 | 0) > 1000) {
             /* This lonely pancake's potential will never be realized.
@@ -919,7 +922,7 @@ export async function u_init_skills_discoveries() {   // u_init.c:1395
     }
     /* If we have at least one spell, force starting Pw to be enough,
        so hero can cast the level 1 spell they should have */
-    if (num_spells() && u.uenmax < 5) {
+    if (num_spells() && u.uenmax < SPELL_LEV_PW(1)) {
         $t3 = ($t2 = ($t1 = u.ueninc[u.ulevel] = 5, u.uenpeak = $t1), u.uenmax = $t2), u.uen = $t3;
     }
     find_ac();   /* get initial ac value */

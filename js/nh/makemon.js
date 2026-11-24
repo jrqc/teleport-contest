@@ -20,16 +20,16 @@ import { Amonnam, Mgender, YMonnam, christen_monst, mon_nam, oname, pmname, rndg
 import { newedog, tamedog } from './dog.js';
 import { deliver_obj_to_mon } from './dokick.js';
 import { def_monsyms } from './drawing.js';
-import { In_V_tower, In_hell, In_mines, In_quest, Is_special, depth, level_difficulty, on_level } from './dungeon.js';
-import { In_endgame, In_sokoban, Inhell } from './dungeon.macros.js';
+import { In_V_tower, In_hell, In_mines, In_quest, Is_special, depth, level_difficulty } from './dungeon.js';
+import { In_endgame, In_sokoban, Inhell, Is_airlevel, Is_astralevel, Is_earthlevel, Is_firelevel, Is_knox, Is_rogue_level, Is_stronghold, Is_waterlevel } from './dungeon.macros.js';
 import { monsdump } from './earlyarg.js';
 import { debugcore } from './files.js';
 import { wizard } from './flag.macros.js';
 import { ALIGNWEIGHT, COLNO, FALSE, MAXMONNO, ROWNO, TRUE } from './global.h.js';
 import { in_town, monst_to_any, obj_to_any } from './hack.js';
 import { BOLT_LIM, DF, GP, MHID, MM, MM_NOEXCLAM, NO, NO_NC_FLAGS, ONAME_RANDOM } from './hack.h.js';
-import { distu } from './hack.macros.js';
-import { dist2, nh_snprintf, sgn, upstart } from './hacklib.js';
+import { distu, makeknown, max, rn1 } from './hack.macros.js';
+import { nh_snprintf, sgn, upstart } from './hacklib.js';
 import { consume_obj_charge, update_inventory } from './invent.js';
 import { new_light_source } from './light.js';
 import { nhUse } from './lint.macros.js';
@@ -40,14 +40,13 @@ import { DELPHI, FODDERSHOP, ROOMOFFSET, SHOPBASE, TEMPLE, VAULT, ZOO } from './
 import { can_be_hatched, hideunder, mondied, mongone, newcham, pm_to_cham } from './mon.js';
 import { little_to_big, mon_learns_traps, pronoun_gender, set_mon_data } from './mondata.js';
 import { always_hostile, always_peaceful, amorphous, emits_light, extra_nasty, humanoid, is_armed, is_bat, is_demon, is_domestic, is_dprince, is_dwarf, is_elf, is_female, is_floater, is_flyer, is_giant, is_golem, is_lord, is_male, is_mercenary, is_minion, is_mplayer, is_ndemon, is_neuter, is_placeholder, is_prince, is_rider, is_shapeshifter, is_swimmer, is_unicorn, is_whirly, likes_gold, mindless, noncorporeal, nonliving, race_hostile, race_peaceful, strongmonst, throws_rocks } from './mondata.macros.js';
-import { G_EXTINCT, G_FREQ, G_GENOD, G_GONE, G_HELL, G_IGNORE, G_LGROUP, G_NOCORPSE, G_NOGEN, G_NOHELL, G_SGROUP, G_UNIQ, M2, M3, MR, MS, NEUTRAL } from './monflag.h.js';
+import { G_EXTINCT, G_FREQ, G_GENOD, G_GONE, G_HELL, G_IGNORE, G_LGROUP, G_NOCORPSE, G_NOGEN, G_NOHELL, G_SGROUP, G_UNIQ, M3, MR, MS, NEUTRAL } from './monflag.h.js';
 import { dochugw, mon_track_clear, set_apparxy } from './monmove.js';
 import { mons, monst_globals_init } from './monst.js';
 import { M_AP, M_SEEN, STRAT } from './monst.h.js';
-import { DEADMONSTER, M_AP_TYPE, monmax_difficulty, monmin_difficulty, montoostrong, montooweak, newmonst } from './monst.macros.js';
+import { DEADMONSTER, M_AP_TYPE, is_lminion, monmax_difficulty, monmin_difficulty, montoostrong, montooweak, newmonst } from './monst.macros.js';
 import { PM } from './monsters.h.js';
 import { rnd_defensive_item, rnd_misc_item, rnd_offensive_item } from './muse.js';
-import { discover_object } from './o_init.js';
 import { is_sword, u_wield_art } from './obj.macros.js';
 import { MAXOCLASSES, RANDOM_CLASS } from './objclass.h.js';
 import { objects } from './objects.js';
@@ -56,7 +55,7 @@ import { an, makeplural, rnd_class, vtense } from './objnam.js';
 import { mhidden_description } from './pager.js';
 import { LOW_PM, NON_PM, NUMMONS, SPECIAL_PM } from './permonst.h.js';
 import { Norep, impossible, pline, pline_mon, raw_printf, set_msg_xy } from './pline.js';
-import { mon_aligntyp, newepri } from './priest.js';
+import { newepri } from './priest.js';
 import { W } from './prop.h.js';
 import { qt_montype, quest_info } from './questpgr.js';
 import { create_particular } from './read.js';
@@ -84,7 +83,7 @@ import { raw_print } from './winprocs.macros.js';
 import { count_wsegs, get_wormno, initworm, place_worm_tail_randomly } from './worm.js';
 import { m_dowear, mon_adjust_speed, mon_set_minvis, which_armor } from './worn.js';
 import { PRONOUN } from './you.h.js';
-import { u_at } from './you.macros.js';
+import { Race_if, next2u, u_at } from './you.macros.js';
 import { Blind, Protection_from_shape_changers } from './youprop.macros.js';
 
 let align_shift$oldmoves = 0;   // static in align_shift()
@@ -104,13 +103,13 @@ export function is_home_elemental(ptr) {   // makemon.c:33
     if (ptr.mlet === S.ELEMENTAL) {
         switch (ptr.pmidx) {
             case PM.AIR_ELEMENTAL:
-                return (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) ? 1 : 0;
+                return Is_airlevel(u.uz);
             case PM.FIRE_ELEMENTAL:
-                return (svd.dungeon_topology.d_fire_level.dlevel || svd.dungeon_topology.d_fire_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_fire_level) ? 1 : 0;
+                return Is_firelevel(u.uz);
             case PM.EARTH_ELEMENTAL:
-                return (svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level) ? 1 : 0;
+                return Is_earthlevel(u.uz);
             case PM.WATER_ELEMENTAL:
-                return (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? 1 : 0;
+                return Is_waterlevel(u.uz);
             default:
                 break;
         }
@@ -127,18 +126,18 @@ export function is_home_elemental(ptr) {   // makemon.c:33
 function wrong_elem_type(ptr) {   // makemon.c:56
     if (ptr.mlet === S.ELEMENTAL) {
         return !is_home_elemental(ptr) ? 1 : 0;
-    } else if ((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level)) {
+    } else if (Is_earthlevel(u.uz)) {
         /* no restrictions? */
-    } else if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
+    } else if (Is_waterlevel(u.uz)) {
         /* just monsters that can swim */
         if (!is_swimmer(ptr)) {
             return TRUE;
         }
-    } else if ((svd.dungeon_topology.d_fire_level.dlevel || svd.dungeon_topology.d_fire_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_fire_level)) {
+    } else if (Is_firelevel(u.uz)) {
         if (!((ptr.mresists & MR.FIRE) !== 0)) {
             return TRUE;
         }
-    } else if ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) {
+    } else if (Is_airlevel(u.uz)) {
         if (!(is_flyer(ptr) && ptr.mlet !== S.TRAPPER) && !is_floater(ptr) && !amorphous(ptr) && !noncorporeal(ptr) && !is_whirly(ptr)) {
             return TRUE;
         }
@@ -207,7 +206,7 @@ async function m_initgrp(mtmp, x, y, n, mmflags) {   // makemon.c:79
 async function m_initthrow(mtmp, otyp, oquan) {   // makemon.c:148
     let $t1, $t2;
     const otmp = await mksobj(otyp, TRUE, FALSE);
-    $t1 = rn2(oquan) + 3 | 0, otmp.quan = $t1;
+    $t1 = rn1(oquan, 3), otmp.quan = $t1;
     $t2 = await weight(otmp) >>> 0, otmp.owt = $t2;
     if (otyp === ORCISH_ARROW) {
         otmp.otrapped = (TRUE) & 1;
@@ -222,7 +221,7 @@ async function m_initweap(mtmp) {   // makemon.c:161
     let otmp = null, bias = 0, w2 = 0, $t1, $t2;
     const ptr = mtmp.data;
     const mm = ptr.pmidx;
-    if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level)) {
+    if (Is_rogue_level(u.uz)) {
         return;
     }
     /*
@@ -254,7 +253,7 @@ async function m_initweap(mtmp) {   // makemon.c:161
                                the polearms but use different skills from polearms
                                and aren't appropriates choices for human soldiers */
                             do {
-                                w1 = rn2(BEC_DE_CORBIN - PARTISAN + 1) + PARTISAN | 0;
+                                w1 = rn1(BEC_DE_CORBIN - PARTISAN + 1, PARTISAN);
                             } while (objects[w1].oc_subtyp !== P.POLEARMS);
                             w2 = rn2(2) ? DAGGER : KNIFE;
                         } else {
@@ -326,14 +325,14 @@ async function m_initweap(mtmp) {   // makemon.c:161
                         break;
                 }
                 if (mm === PM.ELVEN_MONARCH) {
-                    if (rn2(3) || gi.in_mklev && ((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level))) {
+                    if (rn2(3) || gi.in_mklev && Is_earthlevel(u.uz)) {
                         await mongets(mtmp, PICK_AXE);
                     }
                     if (!rn2(50)) {
                         await mongets(mtmp, CRYSTAL_BALL);
                     }
                 }
-            } else if (ptr.msound === MS.PRIEST || ptr.mlet === S.HUMAN && gu.urole.mnum === PM.CLERIC && (ptr.msound === MS.LEADER || ptr.msound === MS.NEMESIS)) {
+            } else if (ptr.msound === MS.PRIEST || quest_mon_represents_role(ptr, PM.CLERIC)) {
                 otmp = await mksobj(MACE, FALSE, FALSE);
                 $t1 = $c.i8(rnd(3)), otmp.spe = $t1;
                 if (!rn2(2)) {
@@ -688,7 +687,7 @@ export async function mkmonmoney(mtmp, amount) {   // makemon.c:576
 async function m_initinv(mtmp) {   // makemon.c:589
     let cnt = 0, otmp = null, mac = 0, catcorpse = null, $t1, $t2, $t3, $t4, $t5;
     const ptr = mtmp.data;
-    if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level)) {
+    if (Is_rogue_level(u.uz)) {
         return;
     }
     /*
@@ -821,11 +820,11 @@ async function m_initinv(mtmp) {   // makemon.c:589
                         /*FALLTHRU*/
                         await mongets(mtmp, WAN_STRIKING);
                 }
-            } else if (ptr.msound === MS.PRIEST || ptr.mlet === S.HUMAN && gu.urole.mnum === PM.CLERIC && (ptr.msound === MS.LEADER || ptr.msound === MS.NEMESIS)) {
+            } else if (ptr.msound === MS.PRIEST || quest_mon_represents_role(ptr, PM.CLERIC)) {
                 await mongets(mtmp, rn2(7) ? ROBE : rn2(3) ? CLOAK_OF_PROTECTION : CLOAK_OF_MAGIC_RESISTANCE);
                 await mongets(mtmp, SMALL_SHIELD);
-                await mkmonmoney(mtmp, rn2(10) + 20 | 0);
-            } else if (ptr.mlet === S.HUMAN && gu.urole.mnum === PM.MONK && (ptr.msound === MS.LEADER || ptr.msound === MS.NEMESIS)) {
+                await mkmonmoney(mtmp, rn1(10, 20));
+            } else if (quest_mon_represents_role(ptr, PM.MONK)) {
                 await mongets(mtmp, rn2(11) ? ROBE : CLOAK_OF_MAGIC_RESISTANCE);
             }
             break;
@@ -839,13 +838,13 @@ async function m_initinv(mtmp) {   // makemon.c:589
             break;
         case S.GIANT:
             if (ptr === mons[PM.MINOTAUR]) {
-                if (!rn2(8) || gi.in_mklev && ((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level))) {
+                if (!rn2(8) || gi.in_mklev && Is_earthlevel(u.uz)) {
                     await mongets(mtmp, WAN_DIGGING);
                 }
             } else if (is_giant(ptr)) {
                 for (cnt = rn2($c.div32(mtmp.m_lev, 2)); cnt; cnt = cnt - 1 | 0) {
                     otmp = await mksobj(rnd_class(DILITHIUM_CRYSTAL, LUCKSTONE - 1), FALSE, FALSE);
-                    $t1 = rn2(2) + 3 | 0, otmp.quan = $t1;
+                    $t1 = rn1(2, 3), otmp.quan = $t1;
                     $t2 = await weight(otmp) >>> 0, otmp.owt = $t2;
                     await mpickobj(mtmp, otmp);
                 }
@@ -1390,7 +1389,7 @@ export async function makemon(ptr, x, y, mmflags) {   // makemon.c:1147
         mon_learns_traps(mtmp, PIT);
         mon_learns_traps(mtmp, HOLE);
     }
-    if ((svd.dungeon_topology.d_stronghold_level.dlevel || svd.dungeon_topology.d_stronghold_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_stronghold_level) && !mindless(ptr)) {   /* know about trap doors */
+    if (Is_stronghold(u.uz) && !mindless(ptr)) {   /* know about trap doors */
         mon_learns_traps(mtmp, TRAPDOOR);
     }
     /* quest leader and nemesis both know about all trap types */
@@ -1398,7 +1397,7 @@ export async function makemon(ptr, x, y, mmflags) {   // makemon.c:1147
         mon_learns_traps(mtmp, ALL_TRAPS);
     }
     /* locations where monsters are already experienced with wands */
-    if ((svd.dungeon_topology.d_stronghold_level.dlevel || svd.dungeon_topology.d_stronghold_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_stronghold_level) || (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) || In_endgame(u.uz) || In_hell(u.uz) || In_V_tower(u.uz) || In_quest(u.uz)) {
+    if (Is_stronghold(u.uz) || Is_knox(u.uz) || In_endgame(u.uz) || In_hell(u.uz) || In_V_tower(u.uz) || In_quest(u.uz)) {
         mtmp.mwandexp = (TRUE) & 1;
     }
     await place_monster(mtmp, x, y);
@@ -1444,7 +1443,7 @@ export async function makemon(ptr, x, y, mmflags) {   // makemon.c:1147
             }
             break;
         case S.ORC:
-            if (gu.urace.mnum === PM.ELF) {
+            if (Race_if(PM.ELF)) {
                 mtmp.mpeaceful = (FALSE) & 1;
             }
             break;
@@ -1482,7 +1481,7 @@ export async function makemon(ptr, x, y, mmflags) {   // makemon.c:1147
     } else if (mndx === PM.WIZARD_OF_YENDOR) {
         mtmp.iswiz = (TRUE) & 1;
         svc.context.no_of_wizards = svc.context.no_of_wizards + 1 >>> 0;
-        if (svc.context.no_of_wizards === 1 && ((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level))) {
+        if (svc.context.no_of_wizards === 1 && Is_earthlevel(u.uz)) {
             mitem = SPE_DIG;
         }
     } else if (mndx === PM.GHOST && !$c.and64(mmflags, MM.NONAME)) {
@@ -1538,12 +1537,12 @@ export async function makemon(ptr, x, y, mmflags) {   // makemon.c:1147
     set_malign(mtmp);   /* having finished peaceful changes */
     if (anymon && !$c.and64(mmflags, MM.NOGRP)) {
         if (ptr.geno & G_SGROUP && rn2(2)) {
-            await m_initgrp(mtmp, mtmp.mx, mtmp.my, 3, mmflags);
+            await m_initsgrp(mtmp, mtmp.mx, mtmp.my, mmflags);
         } else if (ptr.geno & G_LGROUP) {
             if (rn2(3)) {
-                await m_initgrp(mtmp, mtmp.mx, mtmp.my, 10, mmflags);
+                await m_initlgrp(mtmp, mtmp.mx, mtmp.my, mmflags);
             } else {
-                await m_initgrp(mtmp, mtmp.mx, mtmp.my, 3, mmflags);
+                await m_initsgrp(mtmp, mtmp.mx, mtmp.my, mmflags);
             }
         }
     }
@@ -1598,7 +1597,7 @@ export async function makemon(ptr, x, y, mmflags) {   // makemon.c:1147
             if (what) {
                 set_msg_xy(mtmp.mx, mtmp.my);
                 /* 'what' might be "gold pieces" so need plural verb */
-                await Norep($C`%s%s %s%s%c`, what, exclaim ? $C` suddenly` : $C``, await vtense(what, $C`appear`), dist2(x, y, u.ux, u.uy) <= 2 ? $C` next to you` : distu(x, y) <= BOLT_LIM * BOLT_LIM ? $C` close by` : $C``, exclaim ? 33 : 46);
+                await Norep($C`%s%s %s%s%c`, what, exclaim ? $C` suddenly` : $C``, await vtense(what, $C`appear`), next2u(x, y) ? $C` next to you` : distu(x, y) <= BOLT_LIM * BOLT_LIM ? $C` close by` : $C``, exclaim ? 33 : 46);
             }
         }
         /* if discernable and a threat, stop fiddling while Rome burns */
@@ -1768,8 +1767,8 @@ export async function rndmonst_adj(minadj, maxadj) {   // makemon.c:1659
     const zlevel = await level_difficulty();
     const minmlev = monmin_difficulty(zlevel) + minadj | 0;
     const maxmlev = monmax_difficulty(zlevel) + maxadj | 0;
-    const upper = (svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? 1 : 0;   /* prefer uppercase only on rogue level */
-    const elemlevel = In_endgame(u.uz) && !((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level)) ? 1 : 0;   /* elmntl plane */
+    const upper = Is_rogue_level(u.uz);   /* prefer uppercase only on rogue level */
+    const elemlevel = In_endgame(u.uz) && !Is_astralevel(u.uz) ? 1 : 0;   /* elmntl plane */
     /* amount processed so far */
     let totalweight = 0;
     let selected_mndx = NON_PM;
@@ -2154,7 +2153,7 @@ export async function grow_up(mtmp, victim) {   // makemon.c:2051
            the limit at the bottom of the next level rather than the top */
         max_increase = rnd(victim.m_lev + 1);
         if ((mtmp.mhpmax + max_increase | 0) > (hp_threshold + 1 | 0)) {
-            max_increase = ((hp_threshold + 1 | 0) - mtmp.mhpmax | 0) > 0 ? (hp_threshold + 1 | 0) - mtmp.mhpmax | 0 : 0;
+            max_increase = max((hp_threshold + 1 | 0) - mtmp.mhpmax | 0, 0);
         }
         cur_increase = max_increase > 1 ? rn2(max_increase) : 0;
     } else {
@@ -2245,7 +2244,7 @@ export async function mongets(mtmp, otyp) {   // makemon.c:2181
             if (otmp.blessed) {
                 await curse(otmp);
             }
-        } else if ($c.andu64(mtmp.data.mflags2, M2.MINION) !== 0 && mon_aligntyp(mtmp) === A.LAWFUL) {
+        } else if (is_lminion(mtmp)) {
             /* lawful minions don't get cursed, bad, or rusting objects */
             otmp.cursed = (FALSE) & 1;
             if (otmp.spe < 0) {
@@ -2406,24 +2405,24 @@ export function set_malign(mtmp) {   // makemon.c:2321
     } else if (always_peaceful(mtmp.data)) {
         const absmal = $c.abs(mal);
         if (mtmp.mpeaceful) {
-            mtmp.malign = $c.i8(Math.imul(-3, 5 > absmal ? 5 : absmal));
+            mtmp.malign = $c.i8(Math.imul(-3, max(5, absmal)));
         } else {
-            mtmp.malign = $c.i8(Math.imul(3, 5 > absmal ? 5 : absmal));   /* renegade */
+            mtmp.malign = $c.i8(Math.imul(3, max(5, absmal)));   /* renegade */
         }
     } else if (always_hostile(mtmp.data)) {
         const absmal$2 = $c.abs(mal);
         if (coaligned) {
             mtmp.malign = 0;
         } else {
-            mtmp.malign = $c.i8(5 > absmal$2 ? 5 : absmal$2);
+            mtmp.malign = $c.i8(max(5, absmal$2));
         }
     } else if (coaligned) {
         const absmal$3 = $c.abs(mal);
         if (mtmp.mpeaceful) {
-            mtmp.malign = $c.i8(Math.imul(-3, 3 > absmal$3 ? 3 : absmal$3));
+            mtmp.malign = $c.i8(Math.imul(-3, max(3, absmal$3)));
         } else {
             /* renegade */
-            mtmp.malign = $c.i8(3 > absmal$3 ? 3 : absmal$3);
+            mtmp.malign = $c.i8(max(3, absmal$3));
         }
     } else {
         /* not coaligned and therefore hostile */
@@ -2487,9 +2486,9 @@ export async function set_mimic_sym(mtmp) {   // makemon.c:2393
                  *  (yes, mimics can end up on this level by various means).
                  */
                 if (mx !== 0 && (svl.level.locations[mx - 1 | 0][my].typ === HWALL || svl.level.locations[mx - 1 | 0][my].typ === TLCORNER || svl.level.locations[mx - 1 | 0][my].typ === TRWALL || svl.level.locations[mx - 1 | 0][my].typ === BLCORNER || svl.level.locations[mx - 1 | 0][my].typ === TDWALL || svl.level.locations[mx - 1 | 0][my].typ === CROSSWALL || svl.level.locations[mx - 1 | 0][my].typ === TUWALL)) {
-                    appear = (svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? S.hwall : S.hcdoor;
+                    appear = Is_rogue_level(u.uz) ? S.hwall : S.hcdoor;
                 } else {
-                    appear = (svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? S.vwall : S.vcdoor;
+                    appear = Is_rogue_level(u.uz) ? S.vwall : S.vcdoor;
                 }
             } else if ($goto !== "assign_sym" && (svl.level.flags.is_maze_lev && !(In_mines(u.uz) && in_town(u.ux, u.uy)) && !In_sokoban(u.uz) && rn2(2))) {
                 ap_type = M_AP.OBJECT;
@@ -2570,7 +2569,7 @@ export async function set_mimic_sym(mtmp) {   // makemon.c:2393
                 mndx = await rndmonnum();
                 nocorpse_ndx = (svm.mvitals[mndx].mvflags & G_NOCORPSE) !== 0 ? 1 : 0;
                 if (appear === CORPSE && nocorpse_ndx) {
-                    mndx = rn2(PM.WIZARD - PM.ARCHEOLOGIST + 1) + PM.ARCHEOLOGIST | 0;
+                    mndx = rn1(PM.WIZARD - PM.ARCHEOLOGIST + 1, PM.ARCHEOLOGIST);
                 } else if (appear === EGG && !can_be_hatched(mndx) || appear === TIN && nocorpse_ndx) {
                     mndx = NON_PM;   /* revert to generic egg or empty tin */
                 }
@@ -2642,7 +2641,7 @@ export async function bagotricks(bag, tipping, seencount) {   // makemon.c:2554
                 seencount.set(0, seencount.get(0) + seecount | 0);
             }
             if (bag.dknown) {
-                await discover_object(BAG_OF_TRICKS, TRUE, TRUE, TRUE);
+                await makeknown(BAG_OF_TRICKS);
                 await update_inventory();   /* for perm_invent */
             }
         } else if (!tipping) {
@@ -2663,6 +2662,15 @@ export async function summon_furies(limit) {   // makemon.c:2605
         await makemon(mons[PM.ERINYS], u.ux, u.uy, MM.ADJACENTOK | MM.NOWAIT);
         i = i + 1 | 0;
     }
+}
+function quest_mon_represents_role(mptr, role_pm) {
+    return mptr.mlet === S.HUMAN && gu.urole.mnum === role_pm && (mptr.msound === MS.LEADER || mptr.msound === MS.NEMESIS) ? 1 : 0;
+}
+async function m_initsgrp(mtmp, x, y, mmf) {
+    await m_initgrp(mtmp, x, y, 3, mmf);
+}
+async function m_initlgrp(mtmp, x, y, mmf) {
+    await m_initgrp(mtmp, x, y, 10, mmf);
 }
 
 export function $init() {

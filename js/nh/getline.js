@@ -11,6 +11,7 @@ import { extcmd_initiator, extcmd_via_menu, extcmds_getentry, extcmds_match, pge
 import { gi, gt, iflags, program_state } from './decl.js';
 import { ECM } from './func_tab.h.js';
 import { BUFSZ, COLNO } from './global.h.js';
+import { C } from './global.macros.js';
 import { OVERRIDE_MSGTYPE, SUPPRESS_HISTORY } from './hack.h.js';
 import { eos, mungspaces, visctrl } from './hacklib.js';
 import { custompline, dumplogmsg, pline } from './pline.js';
@@ -97,7 +98,7 @@ async function hooked_tty_getlin(query, bufp, hook) {   // getline.c:43
             $G.ttyDisplay.intr = $G.ttyDisplay.intr - 1 | 0;
             bufp.set(0, 0);
         }
-        if (c === 16) {
+        if (c === C(112)) {
             /* ctrl-P, doesn't honor rebinding #prevmsg cmd */
             const sav = $G.ttyDisplay.inread;
             $G.ttyDisplay.inread = 0;

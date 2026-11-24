@@ -30,7 +30,7 @@ import { del_engr_at, make_grave } from './engrave.js';
 import { wizard } from './flag.macros.js';
 import { FALSE, TRUE } from './global.h.js';
 import { MM, NO } from './hack.h.js';
-import { max, min } from './hack.macros.js';
+import { max, min, rn1 } from './hack.macros.js';
 import { dist2, distmin } from './hacklib.js';
 import { sobj_at } from './invent.js';
 import { makemon, mkclass, mongets, set_malign } from './makemon.js';
@@ -50,7 +50,8 @@ import { priestini } from './priest.js';
 import { AIR, ALTAR, BLCORNER, BRCORNER, CLOUD, CORR, CROSSWALL, DBWALL, DOOR, DRAWBRIDGE_DOWN, FOUNTAIN, GRAVE, HWALL, ICE, IRONBARS, LADDER, LAVAPOOL, LAVAWALL, POOL, ROOM, SDOOR, SINK, STAIRS, STONE, TDWALL, THRONE, TLCORNER, TLWALL, TRCORNER, TREE, TRWALL, TUWALL, VWALL, WATER } from './rm.h.js';
 import { IS_DOOR, MON_AT, OBJ_AT } from './rm.macros.js';
 import { rn2, rnd } from './rnd.js';
-import { sfi_int, sfi_mkroom, sfo_int, sfo_mkroom } from './sfbase.js';
+import { Sfi_mkroom, Sfo_int, Sfo_mkroom } from './savefile.macros.js';
+import { sfi_int } from './sfbase.js';
 import { shtypes } from './shknam.js';
 import { enexto } from './teleport.js';
 import { t_at } from './trap.js';
@@ -386,7 +387,7 @@ export async function fill_zoo(sroom) {   // mkroom.c:276
                         i = Math.imul(5, await level_difficulty());
                     }
                     goldlim = goldlim - i | 0;
-                    await mkgold(rn2(i) + 10 | 0, $c.i16(sx), $c.i16(sy));
+                    await mkgold(rn1(i, 10), $c.i16(sx), $c.i16(sy));
                     break;
                 case MORGUE:
                     if (!rn2(5)) {
@@ -844,7 +845,7 @@ async function save_room(nhfp, r) {   // mkroom.c:844
      * of writing the whole structure. That is I should not write
      * the gs.subrooms pointers, but who cares ?
      */
-    await sfo_mkroom(nhfp, r, $C`room-mkroom`);
+    await Sfo_mkroom(nhfp, r, $C`room-mkroom`);
     for (i = 0; i < r.nsubrooms; i = $c.i16(i + 1)) {
         await save_room(nhfp, r.sbrooms[i]);
     }
@@ -859,7 +860,7 @@ async function save_room(nhfp, r) {   // mkroom.c:844
 export async function save_rooms(nhfp) {   // mkroom.c:863
     let i = 0;
     /* First, write the number of rooms */
-    await sfo_int(nhfp, new $c.FieldRef(svn, "nroom", "i32"), $C`room-nroom`);
+    await Sfo_int(nhfp, new $c.FieldRef(svn, "nroom", "i32"), $C`room-nroom`);
     for (i = 0; i < svn.nroom; i = $c.i16(i + 1)) {
         await save_room(nhfp, $c.relem(svr.rooms, i));
     }
@@ -872,7 +873,7 @@ export async function save_rooms(nhfp) {   // mkroom.c:863
  */
 async function rest_room(nhfp, r) {   // mkroom.c:875
     let i = 0, $t1;
-    await sfi_mkroom(nhfp, r, $C`room-mkroom`);
+    await Sfi_mkroom(nhfp, r, $C`room-mkroom`);
     for (i = 0; i < r.nsubrooms; i = $c.i16(i + 1)) {
         r.sbrooms[i] = $c.radd(gs.subrooms, gn.nsubroom);
         await rest_room(nhfp, $c.radd(gs.subrooms, gn.nsubroom));

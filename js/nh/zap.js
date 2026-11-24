@@ -18,7 +18,7 @@ import { bot } from './botl.js';
 import { getdir, isok, xytodir } from './cmd.js';
 import { NO_COLOR } from './color.h.js';
 import { close_drawbridge, destroy_drawbridge, find_drawbridge, is_db_wall, is_drawbridge_wall, is_ice, is_lava, is_moat, is_pool, is_pool_or_lava, open_drawbridge } from './dbridge.js';
-import { c_common_strings, cg, disp, flags, gb, gc, gi, gm, gn, go, gp, gs, gt, gu, gv, gy, gz, hands_obj, iflags, svb, svc, svd, svk, svl, svm, svq, u, xdir, ydir } from './decl.js';
+import { c_common_strings, cg, disp, flags, gb, gc, gi, gm, gn, go, gp, gs, gt, gv, gy, gz, hands_obj, iflags, svb, svc, svd, svk, svl, svm, svq, u, xdir, ydir } from './decl.js';
 import { ARMOR_CLASS, COIN_CLASS, FOOD_CLASS, GEM_CLASS, POTION_CLASS, RING_CLASS, ROCK_CLASS, S, SCROLL_CLASS, SPBOOK_CLASS, TOOL_CLASS, WAND_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { cvt_sdoor_to_door, findit, show_map_spot } from './detect.js';
 import { bury_objs, draft_message, unearth_objs, zap_dig } from './dig.js';
@@ -33,6 +33,7 @@ import { ship_object } from './dokick.js';
 import { breakobj, breaks, endmultishot, hero_breaks, mhurtle, throwit_mon_hit } from './dothrow.js';
 import { defsyms } from './drawing.js';
 import { In_hell, In_mines, Invocation_lev, ceiling, on_level, surface, update_mapseen_for } from './dungeon.js';
+import { Is_airlevel, Is_qstart, Is_rogue_level, Is_waterlevel } from './dungeon.macros.js';
 import { cant_finish_meal, eaten_stat, fix_petrification } from './eat.js';
 import { done, panic } from './end.js';
 import { del_engr, engr_at, make_engr_at, random_engraving, rloc_engr, wipe_engr_at } from './engrave.js';
@@ -46,8 +47,8 @@ import { dryup } from './fountain.js';
 import { COLNO, FALSE, LARGEST_INT, LL, ROWNO, TRUE } from './global.h.js';
 import { check_capacity, in_rooms, long_to_any, losehp, nomul, obj_to_any, set_uinwater, spoteffects, test_move } from './hack.js';
 import { ARM, ARTICLE, CORPSTAT, COST, CXN, DIED, ECMD, ENL, EYE, FACE, FLASHED_LIGHT, FM, FOOT, GETOBJ, HEAD, INVIS_BEAM, KICKED_WEAPON, KILLED, MAGICENLIGHTENMENT, MIM, MM, NC, NO, NOTELL, NO_KILLER_PREFIX, NO_NC_FLAGS, NO_TRAP_FLAGS, ONAME_KNOW_ARTI, ONAME_WISH, PHYS_EXPL_TYPE, POLY, SHOP, TELL, TEST, THROWN_TETHERED_WEAPON, THROWN_WEAPON, WAND, XKILL, ZAPPED_WAND, st_all } from './hack.h.js';
-import { DIR_CLAMP, DIR_LEFT, DIR_RIGHT, Maybe_Half_Phys, You1, You_hear1, min, pline1 } from './hack.macros.js';
-import { dist2, eos, mungspaces, nh_snprintf, s_suffix, sgn, strncmpi, strsubst, upstart } from './hacklib.js';
+import { AC_VALUE, BZ_U_SPELL, BZ_U_WAND, DIR_CLAMP, DIR_LEFT, DIR_RIGHT, Maybe_Half_Phys, You1, You_hear1, distu, makeknown, max, min, pline1, rn1 } from './hack.macros.js';
+import { eos, mungspaces, nh_snprintf, s_suffix, sgn, strncmpi, strsubst, upstart } from './hacklib.js';
 import { enlightenment, mstatusline, ustatusline } from './insight.js';
 import { addinv_core1, addinv_core2, delobj, delobj_core, display_binventory, display_cinventory, display_minventory, freeinv_core, getobj, hold_another_object, merged, set_cknown_lknown, sobj_at, stackobj, update_inventory, useup, useupall, useupf } from './invent.js';
 import { find_mid, show_transient_light, transient_light_cleanup } from './light.js';
@@ -69,11 +70,11 @@ import { G_GENOD, G_NOCORPSE, G_UNIQ, M1, MZ } from './monflag.h.js';
 import { closed_door, dissolve_bars, monflee } from './monmove.js';
 import { mons } from './monst.js';
 import { MINV, M_AP, M_SEEN } from './monst.h.js';
-import { DEADMONSTER, M_AP_TYPE, engulfing_u, is_vampshifter, ismnum, resists_acid, resists_cold, resists_disint, resists_elec, resists_fire, resists_poison } from './monst.macros.js';
+import { DEADMONSTER, M_AP_TYPE, engulfing_u, is_obj_mappear, is_vampshifter, ismnum, resists_acid, resists_cold, resists_disint, resists_elec, resists_fire, resists_poison } from './monst.macros.js';
 import { PM } from './monsters.h.js';
 import { hits_bars, m_useup, rnd_hallublast, thitu } from './mthrowu.js';
 import { mcureblindness, mon_reflects, ureflects } from './muse.js';
-import { discover_object, observe_object } from './o_init.js';
+import { observe_object } from './o_init.js';
 import { BURIED_TOO, CONTAINED_TOO, ERODE, NOBJ_STATES, OBJ } from './obj.h.js';
 import { Has_contents, Is_box, Is_container, SchroedingersBox, bimanual, carried, has_omid, has_omonst, has_oname, is_pick, is_poisonable, is_weptool, unpolyable } from './obj.macros.js';
 import { BONE, CLOTH, COPPER, FLESH, GEMSTONE, GLASS, GOLD, IMMEDIATE, IRON, LEATHER, METAL, MINERAL, MITHRIL, NODIR, NUM_OBJECTS, PAPER, PLATINUM, SILVER, TRAP_EXPLODE, WOOD } from './objclass.h.js';
@@ -120,7 +121,7 @@ import { create_nhwindow, destroy_nhwindow, display_nhwindow, end_menu, nh_delay
 import { ATR, MENU, NHW, PICK } from './wintype.h.js';
 import { bypass_obj, bypass_objlist, extract_from_minvent, find_mac, mon_adjust_speed, mon_set_minvis, nxt_unbypassed_obj, setnotworn, setworn, wearmask_to_obj, wearslot, which_armor } from './worn.js';
 import { TT } from './you.h.js';
-import { Luck, URIGHTY, Upolyd, u_at } from './you.macros.js';
+import { Luck, Role_if, URIGHTY, Upolyd, u_at } from './you.macros.js';
 import { Acid_resistance, Antimagic, BInvis, Blind, Cold_resistance, Deaf, Disint_resistance, Drain_resistance, Fire_resistance, Fumbling, Half_spell_damage, Hallucination, Invis, Levitation, Passes_walls, Punished, Reflecting, Shock_resistance, Sleep_resistance, Stoned, Teleport_control, Unchanging, Underwater } from './youprop.macros.js';
 
 const MAGIC_COOKIE = 1000;
@@ -243,7 +244,7 @@ export async function learnwand(obj) {   // zap.c:123
             }
             /* make the discovery iff we know what we're manipulating */
             if (obj.dknown) {
-                await discover_object(obj.otyp, TRUE, TRUE, TRUE);
+                await makeknown(obj.otyp);
             }
         }
         await update_inventory();
@@ -265,7 +266,7 @@ export async function bhitm(mtmp, otmp) {   // zap.c:160
     let wake = TRUE;   /* Most 'zaps' should wake monster */
     let reveal_invis = FALSE;
     learn_it[0] = FALSE;
-    const dbldam = gu.urole.mnum === PM.KNIGHT && u.uhave.questart ? 1 : 0;
+    const dbldam = Role_if(PM.KNIGHT) && u.uhave.questart ? 1 : 0;
     let helpful_gesture = FALSE;
     const otyp = otmp.otyp;   /* otmp is not NULL */
     let zap_type_text = $C`spell`;
@@ -469,7 +470,7 @@ export async function bhitm(mtmp, otmp) {   // zap.c:160
             }
         case WAN_LOCKING:
         case SPE_WIZARD_LOCK:
-            if (disguised_mimic && ((mtmp.m_ap_type & M_AP.TYPMASK) === M_AP.OBJECT && (mtmp.mappearance === CHEST || mtmp.mappearance === LARGE_BOX) || (mtmp.m_ap_type & M_AP.TYPMASK) === M_AP.FURNITURE && (mtmp.mappearance >= S.vodoor && mtmp.mappearance <= S.hcdoor))) {
+            if (disguised_mimic && box_or_door(mtmp)) {
                 await that_is_a_mimic(mtmp, MIM.REVEAL);   /*seemimic()*/
             }
             wake = await closeholdingtrap(mtmp, new $c.Ptr(learn_it, 0));
@@ -482,7 +483,7 @@ export async function bhitm(mtmp, otmp) {   // zap.c:160
             break;
         case WAN_OPENING:
         case SPE_KNOCK:
-            if (disguised_mimic && ((mtmp.m_ap_type & M_AP.TYPMASK) === M_AP.OBJECT && (mtmp.mappearance === CHEST || mtmp.mappearance === LARGE_BOX) || (mtmp.m_ap_type & M_AP.TYPMASK) === M_AP.FURNITURE && (mtmp.mappearance >= S.vodoor && mtmp.mappearance <= S.hcdoor))) {
+            if (disguised_mimic && box_or_door(mtmp)) {
                 await that_is_a_mimic(mtmp, MIM.REVEAL);   /*seemimic()*/
             }
             wake = FALSE;   /* don't want immediate counterattack */
@@ -547,7 +548,7 @@ export async function bhitm(mtmp, otmp) {   // zap.c:160
                     }
                     if (canseemon(mtmp)) {
                         if (disguised_mimic) {
-                            if ((mtmp.m_ap_type & M_AP.TYPMASK) === M_AP.OBJECT && mtmp.mappearance === STRANGE_OBJECT) {
+                            if (is_obj_mappear(mtmp, STRANGE_OBJECT)) {
                                 /* it can do better now */
                                 await set_mimic_sym(mtmp);
                                 await newsym(mtmp.mx, mtmp.my);
@@ -558,12 +559,12 @@ export async function bhitm(mtmp, otmp) {   // zap.c:160
                             await pline($C`%s looks%s better.`, await Monnam(mtmp), otyp === SPE_EXTRA_HEALING ? $C` much` : $C``);
                         }
                     }
-                    if (mtmp.mtame && gu.urole.mnum === PM.HEALER && delta > 0) {
+                    if (mtmp.mtame && Role_if(PM.HEALER) && delta > 0) {
                         await more_experienced(min(delta, healamt), 0);
                         await newexplevel();
                     }
                     if (mtmp.mtame || mtmp.mpeaceful) {
-                        adjalign(gu.urole.mnum === PM.HEALER ? 1 : sgn(u.ualign.type));
+                        adjalign(Role_if(PM.HEALER) ? 1 : sgn(u.ualign.type));
                     }
                 } else {
                     /* Pestilence */
@@ -2173,7 +2174,7 @@ async function stone_to_flesh_obj(obj) {   // zap.c:1993
            vegetarian conduct yet (or if poly'd into non-carnivorous/
            non-omnivorous form, regardless of whether it's herbivorous,
            non-eating, or something stranger) */
-        if (gu.urole.mnum === PM.MONK || !u.uconduct.unvegetarian || !carnivorous(gy.youmonst.data)) {
+        if (Role_if(PM.MONK) || !u.uconduct.unvegetarian || !carnivorous(gy.youmonst.data)) {
             await Norep($C`You smell the odor of meat.`);
         } else {
             await Norep($C`You smell a delicious smell.`);
@@ -2445,7 +2446,7 @@ export async function bhito(obj, otmp) {   // zap.c:2119
                             }
                         } else {
                             /* couldn't see corpse's location */
-                            if (gu.urole.mnum === PM.HEALER && !Deaf() && !nonliving($c.relem(mons, corpsenm))) {
+                            if (Role_if(PM.HEALER) && !Deaf() && !nonliving($c.relem(mons, corpsenm))) {
                                 if (!type_is_pname($c.relem(mons, corpsenm))) {
                                     corpsname = await an(corpsname);
                                 }
@@ -2646,7 +2647,7 @@ export async function zapnodir(obj) {   // zap.c:2539
             break;
         case WAN_STASIS:
             {
-                const tmp_until = $c.add64(svm.moves, rn2(21) + 10 | 0);
+                const tmp_until = $c.add64(svm.moves, rn1(21, 10));
                 /* no immediately obvious effect, and no message so that it isn't
                    distinguishable from other NODIR wands that produce no message;
                    for multiple zaps, keep the longest duration rather than latest */
@@ -2657,7 +2658,7 @@ export async function zapnodir(obj) {   // zap.c:2539
             }
         case WAN_CREATE_MONSTER:
             /* create_critters() returns True iff hero sees a new monster appear */
-            if (await create_critters(rn2(23) ? 1 : rn2(7) + 2 | 0, null, FALSE)) {
+            if (await create_critters(rn2(23) ? 1 : rn1(7, 2), null, FALSE)) {
                 known = !!obj.dknown ? 1 : 0;
             }
             break;
@@ -2916,7 +2917,7 @@ export async function zapyourself(obj, ordinary) {   // zap.c:2705
                     await You_feel($C`rather itchy under %s.`, await yname($G.uarmc));
                     break;
                 }
-                incr_itimeout(new $c.FieldRef(u.uprops[INVIS], "intrinsic", "i64"), rn2(15) + 31 | 0);
+                incr_itimeout(new $c.FieldRef(u.uprops[INVIS], "intrinsic", "i64"), rn1(15, 31));
                 if (msg) {
                     learn_it[0] = TRUE;
                     await newsym(u.ux, u.uy);
@@ -2926,7 +2927,7 @@ export async function zapyourself(obj, ordinary) {   // zap.c:2705
             }
         case WAN_SPEED_MONSTER:
             /* no longer gives intrinsic, but gives very fast speed instead */
-            await speed_up(rn2(25) + 50 | 0);
+            await speed_up(rn1(25, 50));
             learn_it[0] = TRUE;
             break;
         case WAN_SLEEP:
@@ -2957,7 +2958,7 @@ export async function zapyourself(obj, ordinary) {   // zap.c:2705
         case SPE_TELEPORT_AWAY:
             await tele();
             /* same criteria as when mounted (zap_steed) */
-            if (Teleport_control() && !u.uprops[STUNNED].intrinsic || !couldsee(u.ux0, u.uy0) || dist2(u.ux0, u.uy0, u.ux, u.uy) >= 16) {
+            if (Teleport_control() && !u.uprops[STUNNED].intrinsic || !couldsee(u.ux0, u.uy0) || distu(u.ux0, u.uy0) >= 16) {
                 learn_it[0] = TRUE;
             }
             break;
@@ -3191,7 +3192,7 @@ async function zap_steed(obj) {   // zap.c:3087
             /* you go together */
             await tele();
             /* same criteria as when unmounted (zapyourself) */
-            if (Teleport_control() && !u.uprops[STUNNED].intrinsic || !couldsee(u.ux0, u.uy0) || dist2(u.ux0, u.uy0, u.ux, u.uy) >= 16) {
+            if (Teleport_control() && !u.uprops[STUNNED].intrinsic || !couldsee(u.ux0, u.uy0) || distu(u.ux0, u.uy0) >= 16) {
                 await learnwand(obj);
             }
             steedhit = TRUE;
@@ -3385,7 +3386,7 @@ async function zap_updown(obj) {   // zap.c:3219
                     await destroy_drawbridge(xx[0], yy[0]);
                 }
                 disclose[0] = TRUE;
-            } else if (striking && u.dz < 0 && rn2(3) && !((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && !Underwater() && !((svd.dungeon_topology.d_qstart_level.dlevel || svd.dungeon_topology.d_qstart_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_qstart_level))) {
+            } else if (striking && u.dz < 0 && rn2(3) && !Is_airlevel(u.uz) && !Is_waterlevel(u.uz) && !Underwater() && !Is_qstart(u.uz)) {
                 /* similar to zap_dig() */
                 await pline($C`A rock is dislodged from the %s and falls on your %s.`, ceiling(x, y), await body_part(HEAD));
                 const dmg = rnd(hard_helmet($G.uarmh) ? 2 : 6);
@@ -3430,7 +3431,7 @@ async function zap_updown(obj) {   // zap.c:3219
             }
             break;
         case SPE_STONE_TO_FLESH:
-            if ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) || Underwater() || (svd.dungeon_topology.d_qstart_level.dlevel || svd.dungeon_topology.d_qstart_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_qstart_level) && u.dz < 0) {
+            if (Is_airlevel(u.uz) || Is_waterlevel(u.uz) || Underwater() || Is_qstart(u.uz) && u.dz < 0) {
                 await pline($C`%s`, c_common_strings.c_nothing_happens);
             } else if (u.dz < 0) {
                 /* we should do more... */
@@ -3515,7 +3516,7 @@ export async function weffects(obj$in) {   // zap.c:3431
         } else if (u.dz) {
             disclose = await zap_updown(obj[0]);
         } else {
-            await bhit(u.dx, u.dy, rn2(8) + 6 | 0, ZAPPED_WAND, bhitm, bhito, new $c.Ptr(obj, 0));
+            await bhit(u.dx, u.dy, rn1(8, 6), ZAPPED_WAND, bhitm, bhito, new $c.Ptr(obj, 0));
         }
         await zapwrapup();   /* give feedback for obj_zapped */
     } else if (objects[otyp].oc_dir === NODIR) {
@@ -3525,9 +3526,9 @@ export async function weffects(obj$in) {   // zap.c:3431
         if (otyp === WAN_DIGGING || otyp === SPE_DIG) {
             await zap_dig();
         } else if (otyp >= SPE_MAGIC_MISSILE && otyp <= SPE_FINGER_OF_DEATH) {
-            await ubuzz(10 + $c.rem32($c.abs(otyp - SPE_MAGIC_MISSILE | 0), 10) | 0, $c.div32(u.ulevel, 2) + 1 | 0);
+            await ubuzz(BZ_U_SPELL(otyp), $c.div32(u.ulevel, 2) + 1 | 0);
         } else if (otyp >= WAN_MAGIC_MISSILE && otyp <= WAN_LIGHTNING) {
-            await ubuzz(0 + $c.rem32($c.abs(otyp - WAN_MAGIC_MISSILE | 0), 10), otyp === WAN_MAGIC_MISSILE ? 2 : 6);
+            await ubuzz(BZ_U_WAND(otyp), otyp === WAN_MAGIC_MISSILE ? 2 : 6);
         } else {
             await impossible($C`weffects: unexpected spell or wand`);
         }
@@ -3803,7 +3804,7 @@ async function zap_map(x, y, obj) {   // zap.c:3628
             if (cansee(x, y)) {
                 await pline($C`Probing reveals a secret door.`);
                 learn_it[0] = TRUE;
-            } else if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level)) {
+            } else if (Is_rogue_level(u.uz)) {
                 /* from zap_over_floor() */
                 await draft_message(FALSE);   /* "You feel a draft." (open doorway) */
             }
@@ -4188,7 +4189,7 @@ export async function boomhit(obj$in, dx, dy) {   // zap.c:4148
     let ct = 0, mtmp = null, $t1;
     /* showsym[] index  */
     const counterclockwise = URIGHTY();   /* ULEFTY => clockwise */
-    let nhits = 1 > obj[0].spe + 1 ? 1 : obj[0].spe + 1;
+    let nhits = max(1, obj[0].spe + 1);
     /* counterclockwise traversal patterns, from @ to 1 then on through to 9
      *  ..........................54.................................
      *  ..................43.....6..3....765.........................
@@ -4205,11 +4206,11 @@ export async function boomhit(obj$in, dx, dy) {   // zap.c:4148
     gb.bhitpos.y = u.uy;
     let boom = counterclockwise ? S.boomleft : S.boomright;
     let i = xytodir(dx, dy);
-    await tmp_at(DISP_FLASH, $c.i16(boom === S.stone ? GLYPH.CMAP_STONE_OFF : boom <= S.trwall ? (boom - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : boom < S.altar ? (boom - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : boom === S.altar ? 4008 : boom < S.arrow_trap + MAXTCHARS ? (boom - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : boom <= S.goodpos ? (boom - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH));
+    await tmp_at(DISP_FLASH, $c.i16((boom === S.stone ? GLYPH.CMAP_STONE_OFF : boom <= S.trwall ? (boom - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : boom < S.altar ? (boom - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : boom === S.altar ? 4008 : boom < S.arrow_trap + MAXTCHARS ? (boom - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : boom <= S.goodpos ? (boom - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH)));
     for (ct = 0; ct < 10; ct = ct + 1 | 0) {
         i = DIR_CLAMP(i);
         boom = S.boomleft + S.boomright - boom | 0;   /* toggle */
-        await tmp_at(DISP_CHANGE, $c.i16(boom === S.stone ? GLYPH.CMAP_STONE_OFF : boom <= S.trwall ? (boom - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : boom < S.altar ? (boom - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : boom === S.altar ? 4008 : boom < S.arrow_trap + MAXTCHARS ? (boom - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : boom <= S.goodpos ? (boom - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH));   /* change glyph */
+        await tmp_at(DISP_CHANGE, $c.i16((boom === S.stone ? GLYPH.CMAP_STONE_OFF : boom <= S.trwall ? (boom - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : boom < S.altar ? (boom - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : boom === S.altar ? 4008 : boom < S.arrow_trap + MAXTCHARS ? (boom - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : boom <= S.goodpos ? (boom - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH)));   /* change glyph */
         dx = xdir[i];
         dy = ydir[i];
         gb.bhitpos.x = $c.i16(gb.bhitpos.x + dx | 0);
@@ -4436,10 +4437,10 @@ export async function zhitm(mon, type, nd, ootmp) {   // zap.c:4238
     if (sho_shieldeff) {
         await shieldeff(mon.mx, mon.my);
     }
-    if (is_hero_spell(type) && (gu.urole.mnum === PM.KNIGHT && u.uhave.questart)) {
+    if (is_hero_spell(type) && (Role_if(PM.KNIGHT) && u.uhave.questart)) {
         tmp = Math.imul(tmp, 2);
     }
-    if (tmp > 0 && type >= 0 && await resist(mon, type < 10 ? WAND_CLASS : 0, 0, NOTELL)) {
+    if (tmp > 0 && type >= 0 && await resist(mon, type < ZT_SPELL(0) ? WAND_CLASS : 0, 0, NOTELL)) {
         tmp = $c.div32(tmp, 2);
     }
     if (tmp < 0) {
@@ -4775,7 +4776,7 @@ function zap_hit(ac, type) {   // zap.c:4705
         return rnd(10) < (ac + spell_bonus | 0) ? 1 : 0;
     }
     /* very high armor protection does not achieve invulnerability */
-    ac = ac >= 0 ? ac : -rnd(-ac | 0) | 0;
+    ac = AC_VALUE(ac);
     return (3 - chance | 0) < (ac + spell_bonus | 0) ? 1 : 0;
 }
 /**
@@ -4890,7 +4891,7 @@ export async function dobuzz(type, nd, sx, sy, dx$in, dy$in, sayhit, saymiss, fo
     if (type < 0) {
         await newsym(u.ux, u.uy);
     }
-    range = rn2(7) + 7 | 0;
+    range = rn1(7, 7);
     if (dx[0] === 0 && dy[0] === 0) {
         range = 1;
     }
@@ -5077,7 +5078,7 @@ export async function dobuzz(type, nd, sx, sy, dx$in, dy$in, sayhit, saymiss, fo
                             $goto = null;   // make_bounce:
                             bchance = !isok(sx, sy) || svl.level.locations[sx][sy].typ === STONE ? 10 : In_mines(u.uz) && (svl.level.locations[sx][sy].typ && svl.level.locations[sx][sy].typ <= DBWALL) ? 20 : 75;
                             if ((range = range - 1 | 0) > 0 && isok(lsx, lsy) && cansee(lsx, lsy) || fireball) {
-                                if ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) {
+                                if (Is_airlevel(u.uz)) {
                                     /* nothing to bounce off of */
                                     await pline_The($C`%s vanishes into the aether!`, flash_str(fltyp, FALSE));
                                     if (fireball) {
@@ -5259,7 +5260,7 @@ export async function zap_over_floor(x, y, type, shopdamage, ignoremon, explodin
             if (is_ice(x, y)) {
                 await melt_ice(x, y, null);
             } else if (is_pool(x, y)) {
-                on_water_level = (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? 1 : 0;
+                on_water_level = Is_waterlevel(u.uz);
                 msggiven = FALSE;
                 /* Deaf-aware */
                 msgtxt = !Deaf() ? $C`You hear hissing gas.` : type >= 0 ? $C`That seemed remarkably uneventful.` : null;
@@ -5327,7 +5328,7 @@ export async function zap_over_floor(x, y, type, shopdamage, ignoremon, explodin
             if (is_pool(x, y) || is_lava(x, y) || lavawall) {
                 lava = is_lava(x, y) || lavawall ? 1 : 0;
                 moat = is_moat(x, y);
-                chance = 2 > 5 + Math.imul(svl.level.flags.temperature, 10) ? 2 : 5 + Math.imul(svl.level.flags.temperature, 10);
+                chance = max(2, 5 + Math.imul(svl.level.flags.temperature, 10));
                 if (IS_WATERWALL(lev.typ) || lavawall && rn2(chance)) {
                     /* For now, don't let WATER freeze. */
                     if (see_it) {
@@ -5350,7 +5351,7 @@ export async function zap_over_floor(x, y, type, shopdamage, ignoremon, explodin
                             } else {
                                 lev.typ = HWALL;
                             }
-                            await fix_wall_spines($c.i16(0 > x - 1 ? 0 : x - 1), $c.i16(0 > y - 1 ? 0 : y - 1), $c.i16(COLNO - 1 < x + 1 ? COLNO - 1 : x + 1), $c.i16(ROWNO - 1 < y + 1 ? ROWNO - 1 : y + 1));
+                            await fix_wall_spines($c.i16(max(0, x - 1)), $c.i16(max(0, y - 1)), $c.i16(COLNO - 1 < x + 1 ? COLNO - 1 : x + 1), $c.i16(ROWNO - 1 < y + 1 ? ROWNO - 1 : y + 1));
                         } else {
                             lev.typ = lava ? ROOM : ICE;
                         }
@@ -5383,7 +5384,7 @@ export async function zap_over_floor(x, y, type, shopdamage, ignoremon, explodin
                                 await You($C`pass through the now-solid rock.`);
                                 await reset_utrap(TRUE);
                             } else {
-                                set_utrap((rn2(50) + 20 | 0) >>> 0, TT.INFLOOR);
+                                set_utrap(rn1(50, 20) >>> 0, TT.INFLOOR);
                                 await You($C`are firmly stuck in the cooling rock.`);
                             }
                         }
@@ -5454,9 +5455,9 @@ export async function zap_over_floor(x, y, type, shopdamage, ignoremon, explodin
     zapverb = $C`blast`;   /* breath attack or wand explosion */
     if (!exploding_wand_typ) {
         ztype = zaptype(type);   /* 0..29 for both hero and monsters */
-        if (ztype < 10) {
+        if (ztype < ZT_SPELL(0)) {
             zapverb = $C`bolt`;   /* wand zap */
-        } else if (ztype < 20) {
+        } else if (ztype < ZT_BREATH(0)) {
             zapverb = $C`spell`;
         }
     } else if (exploding_wand_typ === POT_OIL || exploding_wand_typ === SCR_FIRE) {
@@ -5476,7 +5477,7 @@ export async function zap_over_floor(x, y, type, shopdamage, ignoremon, explodin
         await newsym(x, y);
         if (see_it) {
             await pline($C`%s %s reveals a secret door.`, yourzap ? $C`Your` : $C`The`, zapverb);
-        } else if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level)) {
+        } else if (Is_rogue_level(u.uz)) {
             await draft_message(FALSE);   /* "You feel a draft." (open doorway) */
         }
     }
@@ -5612,7 +5613,7 @@ export async function mon_spell_hits_spot(caster, adtyp, x, y) {   // zap.c:5501
          * is non-negative (hero's fault) */
         /* convert AD_xxxx to ZT_xxxx */
         const zt_typ = adtyp - 1 | 0;
-        const zapdmgtyp = -ZT_SPELL(zt_typ) | 0;   /* damage is from monster spell */
+        const zapdmgtyp = -(10 + zt_typ | 0) | 0;   /* damage is from monster spell */
         await zap_over_floor(x, y, zapdmgtyp, new $c.Ptr(shopdummy, 0), TRUE, 0);
     } else {
         await impossible($C`Unsupported damage type (%d) for mon_spell_hits_spot.`, adtyp);
@@ -5644,7 +5645,7 @@ export async function fracture_rock(obj) {   // zap.c:5537
     }
     obj.otyp = ROCK;
     obj.oclass = GEM_CLASS;
-    $t1 = rn2(60) + 7 | 0, obj.quan = $t1;
+    $t1 = rn1(60, 7), obj.quan = $t1;
     $t2 = await weight(obj) >>> 0, obj.owt = $t2;
     $t4 = ($t3 = obj.rknown = 0, obj.bknown = ($t3) & 1), obj.dknown = ($t4) & 1;
     obj.known = (objects[obj.otyp].oc_uses_known ? 0 : 1) & 1;
@@ -5681,7 +5682,7 @@ export async function break_statue(obj) {   // zap.c:5582
         await obj_extract_self(item);
         await place_object(item, obj.ox, obj.oy);
     }
-    if (by_you && gu.urole.mnum === PM.ARCHEOLOGIST && obj.spe & CORPSTAT.HISTORIC) {
+    if (by_you && Role_if(PM.ARCHEOLOGIST) && obj.spe & CORPSTAT.HISTORIC) {
         await You_feel($C`guilty about damaging such a historic statue.`);
         adjalign(-1);
     }
@@ -6388,11 +6389,11 @@ export async function makewish() {   // zap.c:6314
     if (otmp.otyp === CORPSE && !u_safe_from_fatal_corpse(otmp, st_all)) {
         otmp.usecount = 1;
     }
-    verb = (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || u.uinwater ? $C`slip` : otmp.otyp === CORPSE && otmp.usecount ? $C`materialize` : $C`drop`;
-    oops_msg = u.uswallow ? $C`Oops!  %s out of your reach!` : (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) || svl.level.locations[u.ux][u.uy].typ < IRONBARS || svl.level.locations[u.ux][u.uy].typ >= ICE ? $C`Oops!  %s away from you!` : !(otmp.otyp === CORPSE && otmp.usecount) ? $C`Oops!  %s to the floor!` : $C`Careful! %s on the floor!`;
+    verb = Is_airlevel(u.uz) || u.uinwater ? $C`slip` : otmp.otyp === CORPSE && otmp.usecount ? $C`materialize` : $C`drop`;
+    oops_msg = u.uswallow ? $C`Oops!  %s out of your reach!` : Is_airlevel(u.uz) || Is_waterlevel(u.uz) || svl.level.locations[u.ux][u.uy].typ < IRONBARS || svl.level.locations[u.ux][u.uy].typ >= ICE ? $C`Oops!  %s away from you!` : !(otmp.otyp === CORPSE && otmp.usecount) ? $C`Oops!  %s to the floor!` : $C`Careful! %s on the floor!`;
     /* The(aobjnam()) is safe since otmp is unidentified -dlc */
     await hold_another_object(otmp, oops_msg, await The(await aobjnam(otmp, verb)), null);
-    $t2 = rn2(100) + 50 | 0, u.ublesscnt = u.ublesscnt + $t2 | 0;   /* the gods take notice */
+    $t2 = rn1(100, 50), u.ublesscnt = u.ublesscnt + $t2 | 0;   /* the gods take notice */
 }
 /* Fills buf with the appropriate string for this ray.
  * In the hallucination case, insert "blast of <silly thing>".
@@ -6417,13 +6418,19 @@ export function flash_str(typ, nohallu) {   // zap.c:6429
     return new $c.Ptr(flash_str$fltxt, 0);
 }
 function ZT_SPELL(x) {
-    return 10 + x | 0;
+    return 10 + x;
+}
+function ZT_BREATH(x) {
+    return 20 + x;
 }
 function is_hero_spell(type) {
     return type >= 10 && type < 20 ? 1 : 0;
 }
 function M_IN_WATER(ptr) {
     return ptr.mlet === S.EEL || ($c.andu64(ptr.mflags1, M1.SWIM) !== 0 || $c.andu64(ptr.mflags1, M1.AMPHIBIOUS) !== 0 || $c.andu64(ptr.mflags1, M1.BREATHLESS) !== 0) ? 1 : 0;
+}
+function box_or_door(monst) {
+    return (monst.m_ap_type & M_AP.TYPMASK) === M_AP.OBJECT && (monst.mappearance === CHEST || monst.mappearance === LARGE_BOX) || (monst.m_ap_type & M_AP.TYPMASK) === M_AP.FURNITURE && (monst.mappearance >= S.vodoor && monst.mappearance <= S.hcdoor) ? 1 : 0;
 }
 function USES_CORPSENM(typ) {
     return typ === CORPSE || typ === STATUE || typ === FIGURINE ? 1 : 0;

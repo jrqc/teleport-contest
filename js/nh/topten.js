@@ -21,6 +21,7 @@ import { discover, wizard } from './flag.macros.js';
 import { BUFSZ, COLNO, FALSE, TRUE } from './global.h.js';
 import { money_cnt } from './hack.js';
 import { CORPSTAT, KILLED, NO_KILLER_PREFIX, ONAME_NO_FLAGS, PANICKED, SCOREPREFIX } from './hack.h.js';
+import { rn1 } from './hack.macros.js';
 import { copynchars, digit, eos, highc, lcase, nh_snprintf, onlyspace, ordin, strNsubst, strsubst } from './hacklib.js';
 import { num_genocides, sokoban_in_play } from './insight.js';
 import { set_corpsenm } from './mkobj.js';
@@ -1262,7 +1263,7 @@ export async function tt_doppel(mon) {   // topten.c:1445
     let ret = 0;
     const tt = rn2(13) ? await get_rnd_toptenentry() : null;
     if (!tt) {
-        ret = rn2(PM.WIZARD - PM.ARCHEOLOGIST + 1) + PM.ARCHEOLOGIST | 0;
+        ret = rn1(PM.WIZARD - PM.ARCHEOLOGIST + 1, PM.ARCHEOLOGIST);
     } else {
         if (tt.plgend[0] === 70) {
             mon.female = 1;

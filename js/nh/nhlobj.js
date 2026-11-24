@@ -17,9 +17,10 @@ import { obj_to_any } from './hack.js';
 import { CORPSTAT } from './hack.h.js';
 import { addinv } from './invent.js';
 import { LUAL_NUMSIZES } from './lauxlib.h.js';
-import { LUA, LUA_REGISTRYINDEX } from './lua.h.js';
-import { lua_newtable, lua_newuserdata } from './lua.macros.js';
-import { luaL_checkinteger, luaL_checklstring, luaL_checktype, luaL_checkudata, luaL_checkversion_, luaL_newmetatable, luaL_setfuncs, lua_createtable, lua_getfield, lua_gettop, lua_pushboolean, lua_pushinteger, lua_pushvalue, lua_setfield, lua_setglobal, lua_setmetatable, lua_settop, lua_toboolean, lua_tointegerx, lua_type } from './luabridge.js';
+import { luaL_getmetatable } from './lauxlib.macros.js';
+import { LUA } from './lua.h.js';
+import { lua_newtable, lua_newuserdata, lua_pop, lua_tointeger } from './lua.macros.js';
+import { luaL_checkinteger, luaL_checklstring, luaL_checktype, luaL_checkudata, luaL_checkversion_, luaL_newmetatable, luaL_setfuncs, lua_createtable, lua_gettop, lua_pushboolean, lua_pushinteger, lua_pushvalue, lua_setfield, lua_setglobal, lua_setmetatable, lua_toboolean, lua_type } from './luabridge.js';
 import { add_to_container, dealloc_obj, mkobj, mksobj, obj_extract_self, place_object, weight } from './mkobj.js';
 import { NEUTRAL } from './monflag.h.js';
 import { mons } from './monst.js';
@@ -84,7 +85,7 @@ async function l_obj_gc(L) {   // nhlobj.c:47
  */
 async function l_obj_push(L, otmp) {   // nhlobj.c:73
     const lo = $c.asRec(await lua_newuserdata(L, 16), $T._lua_obj, 16);
-    await lua_getfield(L, LUA_REGISTRYINDEX, $C`obj`);
+    await luaL_getmetatable(L, $C`obj`);
     await lua_setmetatable(L, -2);
     lo.state = 0;
     lo.obj = otmp;
@@ -186,7 +187,7 @@ async function l_obj_objects_to_table(L) {   // nhlobj.c:171
             otyp = lo.obj.otyp;
         }
     }
-    await lua_settop(L, -2);
+    await lua_pop(L, 1);
     if (otyp === -1) {
         await nhl_error(L, $C`l_obj_objects_to_table: Wrong args`);
         /*NOTREACHED*/
@@ -338,7 +339,7 @@ async function l_obj_new_readobjnam(L) {   // nhlobj.c:350
     const argc = lua_gettop(L);
     if (argc === 1 && lua_type(L, 1) === LUA.TSTRING) {
         $c.sprintf(new $c.Ptr(buf, 0), $C`%s`, await luaL_checklstring(L, 1, null));
-        await lua_settop(L, -2);
+        await lua_pop(L, 1);
         if ((otmp = await readobjnam(new $c.Ptr(buf, 0), null)) === hands_obj) {
             otmp = null;
         }
@@ -356,7 +357,7 @@ async function l_obj_new_readobjnam(L) {   // nhlobj.c:350
             }
             otmp$2 = await mkobj(class_, FALSE);
         }
-        await lua_settop(L, -2);
+        await lua_pop(L, 1);
         await l_obj_push(L, otmp$2);
         return 1;
     } else {
@@ -378,7 +379,7 @@ async function l_obj_at(L) {   // nhlobj.c:389
         x[0] = $c.i16(await luaL_checkinteger(L, 1));
         y[0] = $c.i16(await luaL_checkinteger(L, 2));
         cvt_to_abscoord(new $c.Ptr(x, 0), new $c.Ptr(y, 0));
-        await lua_settop(L, -3);
+        await lua_pop(L, 2);
         await l_obj_push(L, svl.level.objects[x[0]][y[0]]);
         return 1;
     } else {
@@ -404,7 +405,7 @@ async function l_obj_placeobj(L) {   // nhlobj.c:413
     x[0] = $c.i16(await luaL_checkinteger(L, 2));
     y[0] = $c.i16(await luaL_checkinteger(L, 3));
     cvt_to_abscoord(new $c.Ptr(x, 0), new $c.Ptr(y, 0));
-    await lua_settop(L, -4);
+    await lua_pop(L, 3);
     if (lobj_is_ok(lo)) {
         await obj_extract_self(lo.obj);
         await place_object(lo.obj, x[0], y[0]);
@@ -585,8 +586,8 @@ async function l_obj_bury(L) {   // nhlobj.c:603
         x[0] = lo.obj.ox;
         y[0] = lo.obj.oy;
     } else if (argc === 3) {
-        x[0] = $c.i16(lua_tointegerx(L, 2, null));
-        y[0] = $c.i16(lua_tointegerx(L, 3, null));
+        x[0] = $c.i16(lua_tointeger(L, 2));
+        y[0] = $c.i16(lua_tointeger(L, 3));
         cvt_to_abscoord(new $c.Ptr(x, 0), new $c.Ptr(y, 0));
     } else {
         await nhl_error(L, $C`l_obj_bury: Wrong args`);
@@ -619,7 +620,7 @@ export async function l_obj_register(L) {   // nhlobj.c:654
     await lua_setfield(L, -2, $C`__metatable`);
     /* We don't need the metatable anymore. It's safe in the
        Lua registry for use by luaL_setmetatable. */
-    await lua_settop(L, -2);
+    await lua_pop(L, 1);
     /* global obj = the method table we created at the start */
     await lua_setglobal(L, $C`obj`);
     return 0;

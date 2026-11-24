@@ -11,22 +11,23 @@ import { alloc } from './alloc.js';
 import { unleash_all } from './apply.js';
 import { artifact_exists, artifact_light, exist_artifact } from './artifact.js';
 import { yyyymmddhhmmss } from './calendar.js';
-import { isok, yn_function } from './cmd.js';
-import { flags, gb, gf, gi, gs, gu, iflags, program_state, svd, svl, svn, svp, svr, u, ynchars } from './decl.js';
+import { isok } from './cmd.js';
+import { flags, gb, gf, gi, gs, gu, iflags, program_state, svd, svl, svn, svp, svr, u } from './decl.js';
 import { FOOD_CLASS, S } from './defsym.h.js';
 import { newsym } from './display.js';
 import { GLYPH_UNEXPLORED } from './display.h.js';
 import { obj_no_longer_held } from './do.js';
 import { christen_monst, free_oname, safe_oname } from './do_name.js';
 import { update_mlstmv } from './dog.js';
-import { In_hell, Is_botlevel, Is_branchlev, Is_special, assign_level, depth, dunlevs_in_dungeon, ledger_no, maxledgerno, on_level } from './dungeon.js';
+import { In_hell, Is_botlevel, Is_branchlev, Is_special, assign_level, depth, dunlevs_in_dungeon, ledger_no, maxledgerno } from './dungeon.js';
+import { Is_oracle_level } from './dungeon.macros.js';
 import { forget_engravings, sanitize_engravings } from './engrave.js';
 import { close_nhfile, commit_bonesfile, compress_bonesfile, create_bonesfile, debugcore, delete_bonesfile, open_bonesfile, paniclog } from './files.js';
 import { discover, wizard } from './flag.macros.js';
 import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
 import { in_rooms } from './hack.js';
 import { DEFUNCT_MONSTER, DISMOUNT, MM, NO, NUM, ONAME_BONES, SF, WRITING } from './hack.h.js';
-import { pline1 } from './hack.macros.js';
+import { pline1, y_n } from './hack.macros.js';
 import { obj_is_burning } from './light.js';
 import { makemon, mongets, newmextra } from './makemon.js';
 import { EBONES, has_ebones, has_mgivenname } from './mextra.macros.js';
@@ -55,7 +56,7 @@ import { getlev, trickery } from './restore.js';
 import { rn2 } from './rnd.js';
 import { aligns, genders, races, roles } from './role.js';
 import { savefruitchn, savelev } from './save.js';
-import { sfi_char, sfo_char } from './sfbase.js';
+import { Sfi_char, Sfo_char } from './savefile.macros.js';
 import { fix_shop_damage, inside_shop, tended_shop } from './shk.js';
 import { dismount_steed } from './steed.js';
 import { enexto, rloc_to } from './teleport.js';
@@ -362,7 +363,7 @@ async function fixuporacle(oracle) {   // bones.c:308
        could push her onto a hole in the floor; at present, traps don't
        activate in such situation hence she won't fall to another level;
        however, that could change so be prepared to cope with such things */
-    if (!((svd.dungeon_topology.d_oracle_level.dlevel || svd.dungeon_topology.d_oracle_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_oracle_level))) {
+    if (!Is_oracle_level(u.uz)) {
         return FALSE;
     }
     oracle.mpeaceful = 1;   /* for behavior toward next character */
@@ -466,7 +467,7 @@ export async function savebones(how, when, corpse) {   // bones.c:403
         if (nhfp) {
             await close_nhfile(nhfp);
             if (wizard()) {
-                if (await yn_function($C`Bones file already exists.  Replace it?`, new $c.Ptr(ynchars, 0), 110, TRUE) === 121) {
+                if (await y_n($C`Bones file already exists.  Replace it?`) === 121) {
                     if (await delete_bonesfile(u.uz)) {
                         break make_bones$;
                     } else {
@@ -655,11 +656,11 @@ export async function savebones(how, when, corpse) {   // bones.c:403
     c[0] = $c.i8($c.addu64($c.strlen(bonesid[0]), 1));
     nhfp.mode = WRITING;
     await store_version(nhfp);
-    await sfo_char(nhfp, new $c.Ptr(svn.nhuuid, 0), $C`ancestor-nhuuid`, 37);
+    await Sfo_char(nhfp, new $c.Ptr(svn.nhuuid, 0), $C`ancestor-nhuuid`, 37);
     /* if a bones pool digit is in use, it precedes the bonesid
        string and isn't recorded in the file */
-    await sfo_char(nhfp, new $c.Ptr(c, 0), $C`bones_count`, 1);
-    await sfo_char(nhfp, bonesid[0], $C`bonesid`, c[0]);   /* DD.nnn */
+    await Sfo_char(nhfp, new $c.Ptr(c, 0), $C`bones_count`, 1);
+    await Sfo_char(nhfp, bonesid[0], $C`bonesid`, c[0]);   /* DD.nnn */
     await savefruitchn(nhfp);
     await update_mlstmv();   /* update monsters for eventual restoration */
     await savelev(nhfp, $c.i8(ledger_no(u.uz)));
@@ -714,17 +715,17 @@ export async function getbones() {   // bones.c:630
     } else {
         ok = TRUE;
         if (wizard()) {
-            if (await yn_function($C`Get bones?`, new $c.Ptr(ynchars, 0), 110, TRUE) === 110) {
+            if (await y_n($C`Get bones?`) === 110) {
                 await close_nhfile(nhfp);
                 await compress_bonesfile();
                 program_state.reading_bonesfile = 0;
                 return 0;
             }
         }
-        await sfi_char(nhfp, new $c.Ptr(ancestor_nhuuid, 0), $C`ancestor-nhuuid`, 37);
-        await sfi_char(nhfp, new $c.Ptr(c, 0), $C`bones_count`, 1);   /* length incl. '\0' */
+        await Sfi_char(nhfp, new $c.Ptr(ancestor_nhuuid, 0), $C`ancestor-nhuuid`, 37);
+        await Sfi_char(nhfp, new $c.Ptr(c, 0), $C`bones_count`, 1);   /* length incl. '\0' */
         if (c[0] >>> 0 <= 40) {
-            await sfi_char(nhfp, new $c.Ptr(oldbonesid, 0), $C`bonesid`, c[0]);
+            await Sfi_char(nhfp, new $c.Ptr(oldbonesid, 0), $C`bonesid`, c[0]);
         } else {
             if (wizard()) {
                 do {
@@ -788,7 +789,7 @@ export async function getbones() {   // bones.c:630
     sanitize_engravings();
     u.uroleplay.numbones = $c.add64(u.uroleplay.numbones, 1);
     if (wizard()) {
-        if (await yn_function($C`Unlink bones?`, new $c.Ptr(ynchars, 0), 110, TRUE) === 110) {
+        if (await y_n($C`Unlink bones?`) === 110) {
             await compress_bonesfile();
             return ok;
         }

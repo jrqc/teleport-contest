@@ -32,8 +32,8 @@ import { AD, M_ATTK } from './monattk.h.js';
 import { cvt_adtyp_to_mseenres, monstseesu, monstunseesu, pronoun_gender } from './mondata.js';
 import { eyecount, is_demon, nonliving, perceives, type_is_pname } from './mondata.macros.js';
 import { mons } from './monst.js';
-import { MFAST, M_AP, M_SEEN } from './monst.h.js';
-import { ismnum } from './monst.macros.js';
+import { MFAST, M_SEEN } from './monst.h.js';
+import { is_obj_mappear, ismnum } from './monst.macros.js';
 import { lined_up } from './mthrowu.js';
 import { ureflects } from './muse.js';
 import { STRANGE_OBJECT } from './objects.h.js';
@@ -73,7 +73,7 @@ async function cursetxt(mtmp, undirected) {   // mcastu.c:63
         /* spellcasting monsters are impolite */
         if (undirected) {
             point_msg = $C`all around, then curses`;
-        } else if (Invis() && !perceives(mtmp.data) && (mtmp.mux !== u.ux || mtmp.muy !== u.uy) || (gy.youmonst.m_ap_type & M_AP.TYPMASK) === M_AP.OBJECT && gy.youmonst.mappearance === STRANGE_OBJECT || u.uundetected) {
+        } else if (Invis() && !perceives(mtmp.data) && (mtmp.mux !== u.ux || mtmp.muy !== u.uy) || is_obj_mappear(gy.youmonst, STRANGE_OBJECT) || u.uundetected) {
             point_msg = $C`and curses in your general direction`;
         } else if (Displaced() && (mtmp.mux !== u.ux || mtmp.muy !== u.uy)) {
             point_msg = $C`and curses at your displaced image`;

@@ -18,8 +18,9 @@ import { def_char_to_monclass, def_char_to_objclass, def_monsyms, def_oc_syms } 
 import { nh_terminate, panic } from './end.js';
 import { debugcore } from './files.js';
 import { BUFSZ, COLNO } from './global.h.js';
+import { strcmpi } from './global.macros.js';
 import { CMDQ } from './hack.h.js';
-import { eos, mungspaces, strncmpi } from './hacklib.js';
+import { eos, mungspaces } from './hacklib.js';
 import { nhUse } from './lint.macros.js';
 import { pline, raw_printf } from './pline.js';
 import { regex_match } from './posixregex.js';
@@ -112,7 +113,7 @@ export function check_tty_wincap2(wincap2) {   // windows.c:241
 function win_choices_find(s) {   // windows.c:253
     let i = 0;
     for (i = 0; winchoices[i].procs; i = i + 1 | 0) {
-        if (!strncmpi(s, winchoices[i].procs.name, -1)) {
+        if (!strcmpi(s, winchoices[i].procs.name)) {
             return $c.relem(winchoices, i);
         }
     }
@@ -132,7 +133,7 @@ export async function choose_windows(s) {   // windows.c:267
         if (45 === winchoices[i].procs.name.get(0)) {
             continue;
         }
-        if (!strncmpi(s, winchoices[i].procs.name, -1)) {
+        if (!strcmpi(s, winchoices[i].procs.name)) {
             windowprocs.$copyFrom(winchoices[i].procs);
             if (gl.last_winchoice && gl.last_winchoice.ini_routine) {
                 await gl.last_winchoice.ini_routine(WININIT_UNDO);

@@ -26,14 +26,14 @@ import { finish_meating } from './dogmove.js';
 import { breaks, breaktest, hero_breaks, hurtle, thitmonst } from './dothrow.js';
 import { In_mines, Is_botlevel, dunlev, dunlevs_in_dungeon, on_level, surface } from './dungeon.js';
 import { MIGR } from './dungeon.h.js';
-import { In_endgame } from './dungeon.macros.js';
+import { In_endgame, Is_airlevel, Is_stronghold, Is_waterlevel } from './dungeon.macros.js';
 import { del_engr_at, disturb_grave, u_wipe_engr } from './engrave.js';
 import { scatter } from './explode.js';
 import { sink_backs_up } from './fountain.js';
 import { FALSE, PL, TRUE } from './global.h.js';
 import { impact_disturbs_zombies, in_rooms, in_town, inv_weight, losehp, money_cnt, near_capacity, overexertion, weight_cap } from './hack.js';
 import { CXN, DF, ECMD, FOOT, KICKED_WEAPON, KILLED, LEG, MAY_HIT, MM, NO_TRAP_FLAGS, SHOP, SLT_ENCUMBER, VIS_EFFECTS } from './hack.h.js';
-import { Maybe_Half_Phys } from './hack.macros.js';
+import { Maybe_Half_Phys, min, pline1, rn1 } from './hack.macros.js';
 import { eos, sgn, upstart } from './hacklib.js';
 import { currency, delobj, sobj_at, stackobj, useup } from './invent.js';
 import { breakchestlock } from './lock.js';
@@ -85,7 +85,7 @@ import { cansee, couldsee } from './vision.macros.js';
 import { special_dmgval, use_skill } from './weapon.js';
 import { display_nhwindow } from './winprocs.macros.js';
 import { PRONOUN, TT } from './you.h.js';
-import { Luck, Upolyd } from './you.macros.js';
+import { Luck, Role_if, Upolyd } from './you.macros.js';
 import { Blind, Deaf, Fumbling, Hallucination, Levitation, Passes_walls, Stone_resistance, Wounded_legs } from './youprop.macros.js';
 import { bhit, miss, obj_resists } from './zap.js';
 
@@ -141,7 +141,7 @@ async function kickdmg(mon, clumsy) {   // dokick.c:34
     if (dmg > 0) {
         /* convert potential damage to actual damage */
         dmg = rnd(dmg);
-        if (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || gy.youmonst.data === mons[PM.SASQUATCH] || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) {
+        if (martial()) {
             if (dmg > 1) {
                 kick_skill = P_MARTIAL_ARTS;
             }
@@ -158,7 +158,7 @@ async function kickdmg(mon, clumsy) {   // dokick.c:34
     if (dmg > 0) {
         mon.mhp = mon.mhp - dmg | 0;
     }
-    if (!DEADMONSTER(mon) && (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || gy.youmonst.data === mons[PM.SASQUATCH] || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) && !bigmonst(mon.data) && !rn2(3) && mon.mcanmove && mon !== u.ustuck && !mon.mtrapped) {
+    if (!DEADMONSTER(mon) && martial() && !bigmonst(mon.data) && !rn2(3) && mon.mcanmove && mon !== u.ustuck && !mon.mtrapped) {
         /* see if the monster has a place to move into */
         const mdx = mon.mx + u.dx | 0;
         const mdy = mon.my + u.dy | 0;
@@ -296,7 +296,7 @@ async function kick_monster(mon, x, y) {   // dokick.c:146
          */
         if (i < $c.div32(Math.imul(j, 3), 10)) {
             if (!rn2(i < $c.div32(j, 10) ? 2 : i < $c.div32(j, 5) ? 3 : 4)) {
-                if (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || gy.youmonst.data === mons[PM.SASQUATCH] || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) {
+                if (martial()) {
                     break doit$;
                 }
                 await Your($C`clumsy kick does no damage.`);
@@ -593,13 +593,13 @@ async function really_kick_object(x, y) {   // dokick.c:508
            (maybe dexterity should also figure here) */
         range = $c.div32(ACURRSTR(), 2) - $c.div32(k_owt, 40) | 0;
     }
-    if (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || gy.youmonst.data === mons[PM.SASQUATCH] || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) {
+    if (martial()) {
         range = range + rnd(3) | 0;
     }
     if (is_pool(x, y)) {
         /* you're in the water too; significantly reduce range */
         range = $c.div32(range, 3) + 1 | 0;   /* {1,2}=>1, {3,4,5}=>2, {6,7,8}=>3 */
-    } else if ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
+    } else if (Is_airlevel(u.uz) || Is_waterlevel(u.uz)) {
         /* you're in air, since is_pool did not match */
         range = range + rnd(3) | 0;
     } else {
@@ -627,13 +627,13 @@ async function really_kick_object(x, y) {   // dokick.c:508
        messages refer to "it" */
     await Norep($C`You kick %s.`, !isgold ? await singular(gk.kickedobj, doname) : await doname(gk.kickedobj));
     if (svl.level.locations[x][y].typ < POOL || closed_door(x, y)) {
-        if (!(gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || gy.youmonst.data === mons[PM.SASQUATCH] || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) && rn2(20) > ACURR(A.DEX) || svl.level.locations[u.ux][u.uy].typ < POOL || closed_door(u.ux, u.uy)) {
+        if (!martial() && rn2(20) > ACURR(A.DEX) || svl.level.locations[u.ux][u.uy].typ < POOL || closed_door(u.ux, u.uy)) {
             if (Blind()) {
                 await pline($C`It doesn't come loose.`);
             } else {
                 await pline($C`%s %sn't come loose.`, await The(await distant_name(gk.kickedobj, xname)), await otense(gk.kickedobj, $C`do`));
             }
-            return !rn2(3) || (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || gy.youmonst.data === mons[PM.SASQUATCH] || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) ? 1 : 0;
+            return !rn2(3) || martial() ? 1 : 0;
         }
         if (Blind()) {
             await pline($C`It comes loose.`);
@@ -666,7 +666,7 @@ async function really_kick_object(x, y) {   // dokick.c:508
         }
         await container_impact_dmg(gk.kickedobj, x, y);
         if (gk.kickedobj.olocked) {
-            if (!rn2(5) || (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || gy.youmonst.data === mons[PM.SASQUATCH] || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) && !rn2(2)) {
+            if (!rn2(5) || martial() && !rn2(2)) {
                 await You($C`break open the lock!`);
                 await breakchestlock(gk.kickedobj, FALSE);
                 if (otrp) {
@@ -675,7 +675,7 @@ async function really_kick_object(x, y) {   // dokick.c:508
                 return 1;
             }
         } else {
-            if (!rn2(3) || (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || gy.youmonst.data === mons[PM.SASQUATCH] || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) && !rn2(2)) {
+            if (!rn2(3) || martial() && !rn2(2)) {
                 await pline_The($C`lid slams open, then falls shut.`);
                 gk.kickedobj.lknown = 1;
                 if (otrp) {
@@ -701,7 +701,7 @@ async function really_kick_object(x, y) {   // dokick.c:508
         if (!Is_box(gk.kickedobj)) {
             await pline($C`Thump!`);
         }
-        return !rn2(3) || (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || gy.youmonst.data === mons[PM.SASQUATCH] || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) ? 1 : 0;
+        return !rn2(3) || martial() ? 1 : 0;
     }
     if (gk.kickedobj.quan > 1) {
         if (!isgold) {
@@ -709,7 +709,7 @@ async function really_kick_object(x, y) {   // dokick.c:508
         } else {
             if (rn2(20)) {
                 if (!Deaf()) {
-                    await pline($C`%s`, $C`Thwwpingg!`);
+                    await pline1($C`Thwwpingg!`);
                 }
                 await You($C`%s!`, really_kick_object$flyingcoinmsg[rn2(3)]);
                 await scatter(x, y, rnd(3), VIS_EFFECTS | MAY_HIT, gk.kickedobj);
@@ -718,7 +718,7 @@ async function really_kick_object(x, y) {   // dokick.c:508
             }
             if (gk.kickedobj.quan > 300) {
                 await pline($C`Thump!`);
-                return !rn2(3) || (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || gy.youmonst.data === mons[PM.SASQUATCH] || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) ? 1 : 0;
+                return !rn2(3) || martial() ? 1 : 0;
             }
         }
     }
@@ -869,7 +869,7 @@ async function watchman_door_damage(mtmp, x, y) {   // dokick.c:846
  */
 async function kick_dumb(x, y) {   // dokick.c:864
     await exercise(A.DEX, FALSE);
-    if (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || gy.youmonst.data === mons[PM.SASQUATCH] || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS || ACURR(A.DEX) >= 16 || rn2(3)) {
+    if (martial() || ACURR(A.DEX) >= 16 || rn2(3)) {
         await You($C`kick at empty space.`);
         if (Blind()) {
             await feel_location(x, y);
@@ -879,7 +879,7 @@ async function kick_dumb(x, y) {   // dokick.c:864
         await exercise(A.STR, FALSE);
         await set_wounded_legs(W.RINGR, 5 + rnd(5) | 0);
     }
-    if (((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || Levitation()) && rn2(2)) {
+    if ((Is_airlevel(u.uz) || Levitation()) && rn2(2)) {
         await hurtle(-u.dx | 0, -u.dy | 0, 1, TRUE);
     }
 }
@@ -913,8 +913,8 @@ async function kick_ouch(x$in, y$in, kickobjnam) {   // dokick.c:881
     }
     const dmg = rnd(acurr(A.CON) > 15 ? 3 : 5);
     await losehp(Maybe_Half_Phys(dmg), kickstr(new $c.Ptr(buf, 0), kickobjnam), KILLED.BY);
-    if ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || Levitation()) {
-        await hurtle(-u.dx | 0, -u.dy | 0, rn2(2) + 4 | 0, TRUE);   /* assume it's heavy */
+    if (Is_airlevel(u.uz) || Levitation()) {
+        await hurtle(-u.dx | 0, -u.dy | 0, rn1(2, 4), TRUE);   /* assume it's heavy */
     }
 }
 /* kick a door */
@@ -937,7 +937,7 @@ async function kick_door(x, y, avrg_attrib) {   // dokick.c:910
     await exercise(A.DEX, TRUE);
     const doorbuster = Upolyd() && is_giant(gy.youmonst.data) ? 1 : 0;
     /* door is known to be CLOSED or LOCKED */
-    if (doorbuster || rnl(35) < (avrg_attrib + (!(gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || gy.youmonst.data === mons[PM.SASQUATCH] || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) ? 0 : ACURR(A.DEX)) | 0)) {
+    if (doorbuster || rnl(35) < (avrg_attrib + (!martial() ? 0 : ACURR(A.DEX)) | 0)) {
         const shopdoor = in_rooms(x, y, SHOPBASE).get(0) ? TRUE : FALSE;
         /* break the door */
         if (gm.maploc.flags & D.TRAPPED) {
@@ -1042,7 +1042,7 @@ async function kick_nondoor(x, y, avrg_attrib) {   // dokick.c:974
             await exercise(A.DEX, TRUE);
             return ECMD.TIME;
         } else if (Luck() > 0 && !rn2(3) && !gm.maploc.flags) {
-            await mkgold(rn2(201) + 300 | 0, x, y);
+            await mkgold(rn1(201, 300), x, y);
             let i = Luck() + 1;
             if (i > 6) {
                 i = 6;
@@ -1120,7 +1120,7 @@ async function kick_nondoor(x, y, avrg_attrib) {   // dokick.c:974
                not-yet-created contents (including zombie or mummy);
                any already created contents will still be buried here */
             await exercise(A.WIS, FALSE);
-            if (gu.urole.mnum === PM.ARCHEOLOGIST || gu.urole.mnum === PM.SAMURAI || u.ualign.type === A.LAWFUL && u.ualign.record > -10) {
+            if (Role_if(PM.ARCHEOLOGIST) || Role_if(PM.SAMURAI) || u.ualign.type === A.LAWFUL && u.ualign.record > -10) {
                 adjalign(-sgn(u.ualign.type) | 0);
             }
             gm.maploc.typ = ROOM;
@@ -1353,7 +1353,7 @@ export async function dokick() {   // dokick.c:1257
          * reachable for bracing purposes
          * Possible extension: allow bracing against stuff on the side?
          */
-        if (isok(xx, yy) && !(svl.level.locations[xx][yy].typ < POOL) && !(svl.level.locations[xx][yy].typ === DOOR) && (!((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) || !OBJ_AT(xx, yy))) {
+        if (isok(xx, yy) && !(svl.level.locations[xx][yy].typ < POOL) && !(svl.level.locations[xx][yy].typ === DOOR) && (!Is_airlevel(u.uz) || !OBJ_AT(xx, yy))) {
             await You($C`have nothing to brace yourself against.`);
             return ECMD.OK;
         }
@@ -1409,7 +1409,7 @@ export async function dokick() {   // dokick.c:1257
             await map_invisible(x, y);
         }
         /* recoil if floating */
-        if (((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || Levitation()) && svc.context.move) {
+        if ((Is_airlevel(u.uz) || Levitation()) && svc.context.move) {
             let range = (gy.youmonst.data.cwt | 0) + (weight_cap() + inv_weight() | 0) | 0;
             if (range < 1) {
                 range = 1;   /* divide by zero avoidance */
@@ -1429,9 +1429,9 @@ export async function dokick() {   // dokick.c:1257
         /* pretend the kick is fast enough for lava not to burn */
         return ECMD.TIME;
     }
-    if (OBJ_AT(x, y) && (!Levitation() || (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) || sobj_at(BOULDER, x, y))) {
+    if (OBJ_AT(x, y) && (!Levitation() || Is_airlevel(u.uz) || Is_waterlevel(u.uz) || sobj_at(BOULDER, x, y))) {
         if (await kick_object(x, y, new $c.Ptr(kickobjnam, 0))) {
-            if ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) {
+            if (Is_airlevel(u.uz)) {
                 await hurtle(-u.dx | 0, -u.dy | 0, 1, TRUE);   /* assume it's light */
             }
             return ECMD.TIME;
@@ -1459,7 +1459,7 @@ function drop_to(cc, loc, x, y) {   // dokick.c:1473
     switch (loc) {
         case MIGR.RANDOM:
             /* trap door or hole */
-            if ((svd.dungeon_topology.d_stronghold_level.dlevel || svd.dungeon_topology.d_stronghold_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_stronghold_level)) {
+            if (Is_stronghold(u.uz)) {
                 cc.x = svd.dungeon_topology.d_valley_level.dnum;
                 cc.y = svd.dungeon_topology.d_valley_level.dlevel;
                 break;
@@ -1691,7 +1691,7 @@ export async function ship_object(otmp, x, y, shop_floor_obj) {   // dokick.c:16
         } else {
             /* penalty for breaking eggs laid by you */
             if (otmp.otyp === EGG && otmp.spe && ismnum(otmp.corpsenm)) {
-                change_luck($c.i8($c.neg64(otmp.quan < 5 ? otmp.quan : 5)));
+                change_luck($c.i8($c.neg64(min(otmp.quan, 5))));
             }
             result = $C`splat`;
         }
@@ -1922,6 +1922,9 @@ export async function down_gate(x, y) {   // dokick.c:1943
         return MIGR.RANDOM;
     }
     return MIGR.NOWHERE;
+}
+function martial() {
+    return gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || gy.youmonst.data === mons[PM.SASQUATCH] || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS ? 1 : 0;
 }
 
 export function $init() {

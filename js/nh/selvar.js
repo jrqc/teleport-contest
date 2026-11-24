@@ -12,6 +12,7 @@ import { cg, gc, svl, svr } from './decl.js';
 import { newsym_force } from './display.js';
 import { panic } from './end.js';
 import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
+import { max } from './hack.macros.js';
 import { dist2 } from './hacklib.js';
 import { ROOMOFFSET } from './mkroom.h.js';
 import { impossible } from './pline.js';
@@ -356,8 +357,8 @@ export async function selection_do_grow(ov, dir) {   // selvar.c:321
         dir = random_wdir();
     }
     selection_getbounds(ov, rect);
-    for (x = $c.i16(0 > rect.lx - 1 ? 0 : rect.lx - 1); x <= (COLNO - 1 < rect.hx + 1 ? COLNO - 1 : rect.hx + 1); x = $c.i16(x + 1)) {
-        for (y = $c.i16(0 > rect.ly - 1 ? 0 : rect.ly - 1); y <= (ROWNO - 1 < rect.hy + 1 ? ROWNO - 1 : rect.hy + 1); y = $c.i16(y + 1)) {
+    for (x = $c.i16(max(0, rect.lx - 1)); x <= (COLNO - 1 < rect.hx + 1 ? COLNO - 1 : rect.hx + 1); x = $c.i16(x + 1)) {
+        for (y = $c.i16(max(0, rect.ly - 1)); y <= (ROWNO - 1 < rect.hy + 1 ? ROWNO - 1 : rect.hy + 1); y = $c.i16(y + 1)) {
             /* note:  dir is a mask of multiple directions, but the only
                way to specify diagonals is by including the two adjacent
                orthogonal directions, which effectively specifies three-
@@ -725,7 +726,7 @@ export async function selection_do_gradient(ov, x, y, x2, y2, gtyp, mind, maxd) 
                         const d3 = line_dist_coord(x, y, x2, y2, x2, dy);
                         const d4 = line_dist_coord(x, y, x2, y2, dx, y2);
                         const d5 = line_dist_coord(x, y, x2, y2, dx, dy);
-                        const d0$2 = d5 < ((d1 > d2 ? d1 : d2) < (d3 > d4 ? d3 : d4) ? d1 > d2 ? d1 : d2 : d3 > d4 ? d3 : d4) ? d5 : (d1 > d2 ? d1 : d2) < (d3 > d4 ? d3 : d4) ? d1 > d2 ? d1 : d2 : d3 > d4 ? d3 : d4;
+                        const d0$2 = (d5 < ((d1 > d2 ? d1 : d2) < (d3 > d4 ? d3 : d4) ? d1 > d2 ? d1 : d2 : d3 > d4 ? d3 : d4) ? d5 : (d1 > d2 ? d1 : d2) < (d3 > d4 ? d3 : d4) ? d1 > d2 ? d1 : d2 : d3 > d4 ? d3 : d4);
                         if (d0$2 <= $c.mul64(mind, mind) || d0$2 <= $c.mul64(maxd, maxd) && $c.sub64(d0$2, $c.mul64(mind, mind)) < rn2($c.i32(dofs))) {
                             selection_setpoint($c.i16(dx), $c.i16(dy), ov, 1);
                         }

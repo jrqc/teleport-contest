@@ -20,18 +20,19 @@ import { c_common_strings, cg, flags, gd, gf, gi, go, gs, gu, gw, gy, iflags, pr
 import { COIN_CLASS, DEF, ROCK_CLASS, S, VENOM_CLASS } from './defsym.h.js';
 import { trapped_chest_at, trapped_door_at } from './detect.js';
 import { glyph_at, map_glyphinfo, nul_glyphinfo } from './display.js';
-import { GLYPH, GLYPH_TRAP_OFF, MG, NO_GLYPH } from './display.h.js';
-import { canspotself, glyph_is_body, glyph_is_cmap, glyph_is_invisible, glyph_is_monster, glyph_is_nothing, glyph_is_object, glyph_is_statue, glyph_is_trap, glyph_is_unexplored, glyph_is_warning, glyph_to_body_corpsenm, glyph_to_obj, glyph_to_statue_corpsenm, glyph_to_warning } from './display.macros.js';
+import { GLYPH, MG, NO_GLYPH } from './display.h.js';
+import { canspotself, cmap_to_glyph, glyph_is_body, glyph_is_cmap, glyph_is_invisible, glyph_is_monster, glyph_is_nothing, glyph_is_object, glyph_is_statue, glyph_is_trap, glyph_is_unexplored, glyph_is_warning, glyph_to_body_corpsenm, glyph_to_obj, glyph_to_statue_corpsenm, glyph_to_trap, glyph_to_warning } from './display.macros.js';
 import { Mgender, coyotename, distant_monnam, hliquid, mon_nam, pmname, rndmonnam, y_monnam } from './do_name.js';
 import { def_monsyms, def_oc_syms, def_warnsyms, defsyms } from './drawing.js';
 import { In_hell, In_mines, on_level, surface } from './dungeon.js';
-import { Inhell } from './dungeon.macros.js';
+import { Inhell, Is_airlevel, Is_juiblex_level, Is_medusa_level, Is_qstart, Is_rogue_level, Is_waterlevel } from './dungeon.macros.js';
 import { engr_at } from './engrave.js';
 import { remembered_text } from './engrave.h.js';
 import { TER } from './flag.h.js';
 import { wizard } from './flag.macros.js';
 import { coord_desc, getpos } from './getpos.js';
 import { BUFSZ, COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
+import { strcmpi } from './global.macros.js';
 import { glyph_to_cmap } from './glyphs.js';
 import { ARTICLE, BOLT_LIM, CMDQ, CQ_CANNED, ECMD, LOOK, MHID, SYM_MAX, SYM_OFF_M, SYM_OFF_O, SYM_OFF_X } from './hack.h.js';
 import { distu, y_n } from './hack.macros.js';
@@ -84,7 +85,7 @@ import { cansee, couldsee } from './vision.macros.js';
 import { add_menu, add_menu_str, decode_mixed, encglyph, getlin, select_menu } from './windows.js';
 import { create_nhwindow, destroy_nhwindow, display_file, display_nhwindow, end_menu, putmixed, putstr, start_menu } from './winprocs.macros.js';
 import { ATR, MENU, NHW, PICK, WIN_ERR } from './wintype.h.js';
-import { Upolyd, u_at } from './you.macros.js';
+import { Race_if, Role_if, Upolyd, next2u, u_at } from './you.macros.js';
 import { Blind, Detect_monsters, Hallucination, Infravision, Invisible, Levitation, Punished, Unblind_telepat, Underwater } from './youprop.macros.js';
 
 const chkfilNone = 0;
@@ -412,7 +413,7 @@ export async function object_from_map(glyph, x, y, obj_p) {   // pager.c:284
        on the surface as soon as we moved next to its spot */
     /* not buried */
     /* terrain mode views what's already known, doesn't learn new stuff */
-    if (otmp && dist2(x, y, u.ux, u.uy) <= 2 && !Blind() && !Hallucination() && (fakeobj || otmp.where === OBJ.FLOOR) && !iflags.terrainmode) {   /* so don't set dknown when in terrain mode */
+    if (otmp && next2u(x, y) && !Blind() && !Hallucination() && (fakeobj || otmp.where === OBJ.FLOOR) && !iflags.terrainmode) {   /* so don't set dknown when in terrain mode */
         await observe_object(otmp);   /* if a pile, clearly see the top item only */
     }
     if (fakeobj && mtmp && mimic_obj && (otmp.dknown || M_AP_FLAG(mtmp) & M_AP.F_DKNOWN)) {
@@ -612,13 +613,13 @@ export function waterbody_name(x, y) {   // pager.c:561
         if (hallucinate) {
             nh_snprintf($C`waterbody_name`, 585, new $c.Ptr(waterbody_name$pooltype, 0), 40, $C`deep %s`, hliquid($C`water`));
             return new $c.Ptr(waterbody_name$pooltype, 0);
-        } else if ((svd.dungeon_topology.d_medusa_level.dlevel || svd.dungeon_topology.d_medusa_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_medusa_level)) {
+        } else if (Is_medusa_level(u.uz)) {
             /* somewhat iffy since ordinary stairs can take you beneath,
                but previous generic "water" was rather anti-climactic */
             return $C`shallow sea`;
-        } else if ((svd.dungeon_topology.d_juiblex_level.dlevel || svd.dungeon_topology.d_juiblex_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_juiblex_level)) {
+        } else if (Is_juiblex_level(u.uz)) {
             return $C`swamp`;
-        } else if (gu.urole.mnum === PM.SAMURAI && ((svd.dungeon_topology.d_qstart_level.dlevel || svd.dungeon_topology.d_qstart_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_qstart_level))) {
+        } else if (Role_if(PM.SAMURAI) && Is_qstart(u.uz)) {
             /* samurai quest home level has two isolated moat spots;
                they sound silly if farlook describes them as such */
             return $C`pond`;
@@ -626,7 +627,7 @@ export function waterbody_name(x, y) {   // pager.c:561
             return $C`moat`;
         }
     } else if (IS_WATERWALL(ltyp)) {
-        if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
+        if (Is_waterlevel(u.uz)) {
             return $C`limitless water`;   /* even if hallucinating */
         }
         nh_snprintf($C`waterbody_name`, 603, new $c.Ptr(waterbody_name$pooltype, 0), 40, $C`wall of %s`, hliquid($C`water`));
@@ -691,7 +692,7 @@ async function lookat(x, y, buf, monbuf) {   // pager.c:657
         /* file lookup can't distinguish between "gnomish wizard" monster
            and correspondingly named player character, always picking the
            former; force it to find the general "wizard" entry instead */
-        if (gu.urole.mnum === PM.WIZARD && gu.urace.mnum === PM.GNOME && !Upolyd()) {
+        if (Role_if(PM.WIZARD) && Race_if(PM.GNOME) && !Upolyd()) {
             pm = mons[PM.WIZARD];
         }
         /* When you see yourself normally, no explanation is appended
@@ -731,7 +732,7 @@ async function lookat(x, y, buf, monbuf) {   // pager.c:657
     } else if (glyph_is_object(glyph)) {
         await look_at_object(buf, x, y, glyph);   /* fill in buf[] */
     } else if (glyph_is_trap(glyph)) {
-        const tnum = glyph >= GLYPH_TRAP_OFF && glyph < GLYPH_TRAP_OFF + MAXTCHARS ? (((glyph - GLYPH_TRAP_OFF | 0) + S.arrow_trap | 0) - S.arrow_trap | 0) + 1 | 0 : NO_GLYPH;
+        const tnum = glyph_to_trap(glyph);
         trap_description(buf, tnum, x, y);
     } else if (glyph_is_warning(glyph)) {
         const warnindx = glyph_to_warning(glyph);
@@ -741,7 +742,7 @@ async function lookat(x, y, buf, monbuf) {   // pager.c:657
     } else if (glyph_is_nothing(glyph)) {
         $c.strcpy(buf, $C`dark part of a room`);
     } else if (glyph_is_unexplored(glyph)) {
-        if (Underwater() && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) {
+        if (Underwater() && !Is_waterlevel(u.uz)) {
             /* "unknown" == previously mapped but not visible when
                submerged; better terminology appreciated... */
             $c.strcpy(buf, dist2(x, y, u.ux, u.uy) <= 2 ? $C`land` : $C`unknown`);
@@ -787,7 +788,7 @@ async function lookat(x, y, buf, monbuf) {   // pager.c:657
                 if (!svl.level.locations[x][y].seenv) {
                     $c.strcpy(buf, $C`unexplored`);
                     break;
-                } else if (Underwater() && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) {
+                } else if (Underwater() && !Is_waterlevel(u.uz)) {
                     /* "unknown" == previously mapped but not visible when
                        submerged; better terminology appreciated... */
                     $c.strcpy(buf, dist2(x, y, u.ux, u.uy) <= 2 ? $C`land` : $C`unknown`);
@@ -1179,7 +1180,7 @@ async function add_cmap_descr(found, idx, glyph, article, cc$in, x_str, prefix, 
             if (idx === S.pool) {
                 x_str = $C`pool of water`;
             } else if (idx === S.water) {
-                x_str = !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) ? $C`wall of water` : $C`limitless water`;
+                x_str = !Is_waterlevel(u.uz) ? $C`wall of water` : $C`limitless water`;
             }
         }
         if (absidx === S.pool) {
@@ -1218,7 +1219,7 @@ async function add_cmap_descr(found, idx, glyph, article, cc$in, x_str, prefix, 
            "a pool or a moat or a wall of water" become too verbose */
         /* ice while hallucinating */
         /* thawing ice ("solid ice", "thin ice", &c) */
-        article = !(!$c.strncmp(x_str, $C`water`, 5) || !$c.strncmp(x_str, $C`ice`, 3) || !$c.strncmp(x_str, $C`pool`, 4) || !$c.strncmp(x_str, $C`moat`, 4) || !$c.strncmp(x_str, $C`lava`, 4) || !$c.strncmp(x_str, $C`swamp`, 5) || !$c.strncmp(x_str, $C`molten`, 6) || !$c.strncmp(x_str, $C`shallow`, 7) || !$c.strncmp(x_str, $C`limitless`, 9) || !$c.strncmp(x_str, $C`wall of lava`, 12) || !$c.strncmp(x_str, $C`wall of water`, 13) || !$c.strncmp(x_str, $C`frozen`, 6) || (p = $c.strchr(x_str, 32)) !== null && !strncmpi(p, $C` ice`, -1)) ? 1 : 0;
+        article = !(!$c.strncmp(x_str, $C`water`, 5) || !$c.strncmp(x_str, $C`ice`, 3) || !$c.strncmp(x_str, $C`pool`, 4) || !$c.strncmp(x_str, $C`moat`, 4) || !$c.strncmp(x_str, $C`lava`, 4) || !$c.strncmp(x_str, $C`swamp`, 5) || !$c.strncmp(x_str, $C`molten`, 6) || !$c.strncmp(x_str, $C`shallow`, 7) || !$c.strncmp(x_str, $C`limitless`, 9) || !$c.strncmp(x_str, $C`wall of lava`, 12) || !$c.strncmp(x_str, $C`wall of water`, 13) || !$c.strncmp(x_str, $C`frozen`, 6) || (p = $c.strchr(x_str, 32)) !== null && !strcmpi(p, $C` ice`)) ? 1 : 0;
     }
     if (!found) {
         /* this is the first match */
@@ -1230,7 +1231,7 @@ async function add_cmap_descr(found, idx, glyph, article, cc$in, x_str, prefix, 
         }
         firstmatch.set(0, x_str);
         found = 1;
-    } else if (!(hit_trap.get(0) && is_cmap_trap(idx)) && !(found >= 3 && is_cmap_drawbridge(idx)) && (idx !== S.vibrating_square || Inhell() || glyph_is_trap(glyph) && (glyph >= GLYPH_TRAP_OFF && glyph < GLYPH_TRAP_OFF + MAXTCHARS ? (((glyph - GLYPH_TRAP_OFF | 0) + S.arrow_trap | 0) - S.arrow_trap | 0) + 1 | 0 : NO_GLYPH) === VIBRATING_SQUARE)) {
+    } else if (!(hit_trap.get(0) && is_cmap_trap(idx)) && !(found >= 3 && is_cmap_drawbridge(idx)) && (idx !== S.vibrating_square || Inhell() || glyph_is_trap(glyph) && glyph_to_trap(glyph) === VIBRATING_SQUARE)) {
         /* don't mention vibrating square outside of Gehennom
            unless this happens to be one (hallucination?) */
         /* append unless out_str already contains the string to append */
@@ -1257,7 +1258,7 @@ export async function do_screen_description(cc$in, looked, sym, out_str, firstma
     skipped_venom = 0;
     found = 0;   /* count of matching syms found */
     need_to_look = FALSE;
-    submerged = Underwater() && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) ? 1 : 0;
+    submerged = Underwater() && !Is_waterlevel(u.uz) ? 1 : 0;
     hallucinate = Hallucination() && !program_state.gameover ? 1 : 0;
     glyphinfo.$copyFrom(nul_glyphinfo);
     if (looked) {
@@ -1292,7 +1293,7 @@ export async function do_screen_description(cc$in, looked, sym, out_str, firstma
     x_str = null;
     if (!looked) {
         /* skip special handling */
-    } else if ((u.uswallow || submerged) && !(dist2(cc.x, cc.y, u.ux, u.uy) <= 2) || (iflags.terrainmode & (TER.DETECT | TER.MAP)) >>> 0 === TER.DETECT && glyph === 3929) {
+    } else if ((u.uswallow || submerged) && !(dist2(cc.x, cc.y, u.ux, u.uy) <= 2) || (iflags.terrainmode & (TER.DETECT | TER.MAP)) >>> 0 === TER.DETECT && glyph === cmap_to_glyph(S.stone)) {
         /* detection showing some category, so mostly background */
         x_str = new $c.Ptr(do_screen_description$unreconnoitered, 0);
         need_to_look = FALSE;
@@ -1339,14 +1340,14 @@ export async function do_screen_description(cc$in, looked, sym, out_str, firstma
                 /* handle '@' as a special case if it refers to you and you're
                    playing a character which isn't normally displayed by that
                    symbol; firstmatch is assumed to already be set for '@' */
-                if ((looked ? sym === gs.showsyms[S.HUMAN + SYM_OFF_M] && (cc.x === u.ux && cc.y === u.uy) : sym === def_monsyms[S.HUMAN].sym && !flags.showrace) && !(gu.urace.mnum === PM.HUMAN || gu.urace.mnum === PM.ELF) && !Upolyd()) {
+                if ((looked ? sym === gs.showsyms[S.HUMAN + SYM_OFF_M] && (cc.x === u.ux && cc.y === u.uy) : sym === def_monsyms[S.HUMAN].sym && !flags.showrace) && !(Race_if(PM.HUMAN) || Race_if(PM.ELF)) && !Upolyd()) {
                     found = found + await append_str(out_str, $C`you`) | 0;   /* tack on "or you" */
                 }
             }
             /* Now check for objects */
             if (!iflags.terrainmode || (iflags.terrainmode & TER.OBJ) >>> 0 !== 0) {
                 j = SYM.BOULDER + SYM_OFF_X;
-                bouldersym = (svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? go.ov_rogue_syms[j] : go.ov_primary_syms[j];
+                bouldersym = Is_rogue_level(u.uz) ? go.ov_rogue_syms[j] : go.ov_primary_syms[j];
                 if (!bouldersym) {
                     bouldersym = $c.u8(def_oc_syms[ROCK_CLASS].sym);
                 }
@@ -1508,7 +1509,7 @@ export async function do_screen_description(cc$in, looked, sym, out_str, firstma
                 if (j === SYM.INVISIBLE + SYM_OFF_X || j === SYM.BOULDER + SYM_OFF_X) {
                     continue;   /* already handled above */
                 }
-                tmpsym = (svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? go.ov_rogue_syms[j] : go.ov_primary_syms[j];
+                tmpsym = Is_rogue_level(u.uz) ? go.ov_rogue_syms[j] : go.ov_primary_syms[j];
                 if (tmpsym && sym === tmpsym) {
                     switch (j) {
                         case SYM.PET_OVERRIDE + SYM_OFF_X:
@@ -1973,10 +1974,10 @@ async function look_traps(nearby) {   // pager.c:2078
             lookbuf[0] = 0;
             let glyph = glyph_at(x, y);
             if (glyph_is_trap(glyph)) {
-                const tnum = glyph >= GLYPH_TRAP_OFF && glyph < GLYPH_TRAP_OFF + MAXTCHARS ? (((glyph - GLYPH_TRAP_OFF | 0) + S.arrow_trap | 0) - S.arrow_trap | 0) + 1 | 0 : NO_GLYPH;
+                const tnum = glyph_to_trap(glyph);
                 trap_description(new $c.Ptr(lookbuf, 0), tnum, x, y);
                 count = count + 1 | 0;
-            } else if ((t = t_at(x, y)) !== null && t.tseen && (!((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && !((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) || couldsee(x, y))) {
+            } else if ((t = t_at(x, y)) !== null && t.tseen && (!Is_waterlevel(u.uz) && !Is_airlevel(u.uz) || couldsee(x, y))) {
                 /* can't use /" to track traps moved by bubbles or
                    clouds except when hero has direct line of sight */
                 $c.strcpy(new $c.Ptr(lookbuf, 0), trapname(t.ttyp, FALSE));
@@ -2057,7 +2058,7 @@ async function look_engrs(nearby) {   // pager.c:2144
             } else {
                 /* engraving or grave covered by object(s) */
                 nh_snprintf($C`look_engrs`, 2190, eos(new $c.Ptr(lookbuf, 0)), $c.subu64(256, $c.strlen(new $c.Ptr(lookbuf, 0))), $C`, obscured by %s`, encglyph(glyph));
-                glyph = is_headstone ? 4011 : (svl.level.locations[e.engr_x][e.engr_y].typ === CORR ? S.engrcorr : S.engroom) === S.stone ? GLYPH.CMAP_STONE_OFF : (svl.level.locations[e.engr_x][e.engr_y].typ === CORR ? S.engrcorr : S.engroom) <= S.trwall ? (svl.level.locations[e.engr_x][e.engr_y].typ === CORR ? S.engrcorr : S.engroom) - S.vwall + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) : (svl.level.locations[e.engr_x][e.engr_y].typ === CORR ? S.engrcorr : S.engroom) < S.altar ? (svl.level.locations[e.engr_x][e.engr_y].typ === CORR ? S.engrcorr : S.engroom) - S.ndoor + GLYPH.CMAP_A_OFF : (svl.level.locations[e.engr_x][e.engr_y].typ === CORR ? S.engrcorr : S.engroom) === S.altar ? 4008 : (svl.level.locations[e.engr_x][e.engr_y].typ === CORR ? S.engrcorr : S.engroom) < S.arrow_trap + MAXTCHARS ? (svl.level.locations[e.engr_x][e.engr_y].typ === CORR ? S.engrcorr : S.engroom) - S.grave + GLYPH.CMAP_B_OFF : (svl.level.locations[e.engr_x][e.engr_y].typ === CORR ? S.engrcorr : S.engroom) <= S.goodpos ? (svl.level.locations[e.engr_x][e.engr_y].typ === CORR ? S.engrcorr : S.engroom) - S.digbeam + GLYPH.CMAP_C_OFF : NO_GLYPH;
+                glyph = is_headstone ? cmap_to_glyph(S.grave) : (svl.level.locations[e.engr_x][e.engr_y].typ === CORR ? S.engrcorr : S.engroom) === S.stone ? GLYPH.CMAP_STONE_OFF : (svl.level.locations[e.engr_x][e.engr_y].typ === CORR ? S.engrcorr : S.engroom) <= S.trwall ? (svl.level.locations[e.engr_x][e.engr_y].typ === CORR ? S.engrcorr : S.engroom) - S.vwall + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) : (svl.level.locations[e.engr_x][e.engr_y].typ === CORR ? S.engrcorr : S.engroom) < S.altar ? (svl.level.locations[e.engr_x][e.engr_y].typ === CORR ? S.engrcorr : S.engroom) - S.ndoor + GLYPH.CMAP_A_OFF : (svl.level.locations[e.engr_x][e.engr_y].typ === CORR ? S.engrcorr : S.engroom) === S.altar ? 4008 : (svl.level.locations[e.engr_x][e.engr_y].typ === CORR ? S.engrcorr : S.engroom) < S.arrow_trap + MAXTCHARS ? (svl.level.locations[e.engr_x][e.engr_y].typ === CORR ? S.engrcorr : S.engroom) - S.grave + GLYPH.CMAP_B_OFF : (svl.level.locations[e.engr_x][e.engr_y].typ === CORR ? S.engrcorr : S.engroom) <= S.goodpos ? (svl.level.locations[e.engr_x][e.engr_y].typ === CORR ? S.engrcorr : S.engroom) - S.digbeam + GLYPH.CMAP_C_OFF : NO_GLYPH;
                 count = count + 1 | 0;
             }
             if (new $c.Ptr(lookbuf, 0).get(0)) {
@@ -2178,7 +2179,7 @@ export async function doidtrap() {   // pager.c:2336
        chain; usually they revert to normal door or chest when the hero
        sees them but player might be using '^' while the hero is blind */
     const glyph = glyph_at(x, y);
-    if (glyph_is_trap(glyph) && ((tt = glyph >= GLYPH_TRAP_OFF && glyph < GLYPH_TRAP_OFF + MAXTCHARS ? (((glyph - GLYPH_TRAP_OFF | 0) + S.arrow_trap | 0) - S.arrow_trap | 0) + 1 | 0 : NO_GLYPH) === BEAR_TRAP || tt === TRAPPED_DOOR || tt === TRAPPED_CHEST)) {
+    if (glyph_is_trap(glyph) && ((tt = glyph_to_trap(glyph)) === BEAR_TRAP || tt === TRAPPED_DOOR || tt === TRAPPED_CHEST)) {
         const chesttrap = trapped_chest_at(tt, x, y);
         if (chesttrap || trapped_door_at(tt, x, y)) {
             await pline($C`That is a trapped %s.`, chesttrap ? $C`chest` : $C`door`);

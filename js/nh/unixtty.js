@@ -64,7 +64,7 @@ function speednum(speed) {   // unixtty.c:157
     return 0;
 }
 function setctty() {   // unixtty.c:199
-    if ($c.tcsetattr(0, 1, curttyb) < 0 || 0) {
+    if (STTY(curttyb) < 0 || 0) {
         /* Silent when running under NOMUX_MARKERS (no controlling tty). */
         if (!$c.getenv($C`NOMUX_MARKERS`)) {
             $c.perror($C`NetHack (setctty)`);
@@ -77,7 +77,7 @@ function setctty() {   // unixtty.c:199
  * Called by startup() in termcap.c and after returning from ! or ^Z
  */
 export function gettty() {   // unixtty.c:214
-    if ($c.tcgetattr(0, inittyb) < 0 || 0) {
+    if (GTTY(inittyb) < 0 || 0) {
         if (!$c.getenv($C`NOMUX_MARKERS`)) {
             $c.perror($C`NetHack (gettty)`);
         }
@@ -117,7 +117,7 @@ export async function settty(s) {   // unixtty.c:247
     if (s) {
         await raw_print()(s);
     }
-    if ($c.tcsetattr(0, 1, inittyb) < 0 || 0) {
+    if (STTY(inittyb) < 0 || 0) {
         if (!$c.getenv($C`NOMUX_MARKERS`)) {
             $c.perror($C`NetHack (settty)`);
         }
@@ -230,6 +230,12 @@ export async function error(s, ...$va) {   // unixtty.c:489
  * required for support of utf8.
  */
 export function tty_utf8graphics_fixup() {   // unixtty.c:514
+}
+function GTTY(x) {
+    return $c.tcgetattr(0, x);
+}
+function STTY(x) {
+    return $c.tcsetattr(0, 1, x);
 }
 function nonesuch() {
     return $c.fpathconf(0, 9);

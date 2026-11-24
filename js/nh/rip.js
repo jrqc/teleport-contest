@@ -11,6 +11,7 @@ import { alloc, dupstr } from './alloc.js';
 import { yyyymmdd } from './calendar.js';
 import { gd, gr, svp } from './decl.js';
 import { FALSE } from './global.h.js';
+import { max } from './hack.macros.js';
 import { formatkiller } from './topten.js';
 import { putstr } from './winprocs.macros.js';
 
@@ -62,7 +63,7 @@ export async function genl_outrip(tmpwin, how, when) {   // rip.c:86
     $c.sprintf(new $c.Ptr(buf, 0), $C`%.*s`, STONE_LINE_LEN, new $c.Ptr(svp.plname, 0));
     center(NAME_LINE, new $c.Ptr(buf, 0));
     /* Put $ on stone */
-    let cash = gd.done_money > 0 ? gd.done_money : 0;
+    let cash = max(gd.done_money, 0);
     /* arbitrary upper limit; practical upper limit is quite a bit less */
     if (cash > 999999999) {
         cash = 999999999;

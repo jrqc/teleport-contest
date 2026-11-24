@@ -12,16 +12,16 @@ import { SPFX } from './artifact.h.js';
 import { ART } from './artilist.h.js';
 import { adjattrib, change_luck, exercise } from './attrib.js';
 import { A } from './attrib.h.js';
-import { yn_function } from './cmd.js';
 import { is_ice, is_lava, is_pool } from './dbridge.js';
-import { c_color_names, c_common_strings, cg, disp, flags, gi, gy, iflags, svd, svl, u, ynchars } from './decl.js';
+import { c_color_names, c_common_strings, cg, disp, flags, gi, gy, iflags, svd, svl, u } from './decl.js';
 import { COIN_CLASS, S, SPBOOK_CLASS } from './defsym.h.js';
 import { do_mapping } from './detect.js';
 import { map_background, newsym, newsym_force, see_monsters, set_mimic_blocking, shieldeff } from './display.js';
 import { dropy, heal_legs, schedule_goto } from './do.js';
 import { Monnam, hcolor, hliquid, mon_nam } from './do_name.js';
 import { defsyms } from './drawing.js';
-import { In_V_tower, find_hell, on_level, surface } from './dungeon.js';
+import { In_V_tower, find_hell, surface } from './dungeon.js';
+import { Is_waterlevel } from './dungeon.macros.js';
 import { morehungry } from './eat.js';
 import { can_reach_floor } from './engrave.js';
 import { losexp } from './exper.js';
@@ -30,6 +30,7 @@ import { dryup } from './fountain.js';
 import { FALSE, TRUE } from './global.h.js';
 import { losehp, money_cnt } from './hack.js';
 import { ECMD, EYE, FOOT, HEAD, KILLED, NO, POLY, VIASITTING } from './hack.h.js';
+import { rn1, y_n } from './hack.macros.js';
 import { delobj, identify_pack, stackobj, update_inventory, useupf } from './invent.js';
 import { makemon } from './makemon.js';
 import { msummon } from './minion.js';
@@ -38,7 +39,6 @@ import { courtmon } from './mkroom.js';
 import { egg_type_from_parent } from './mon.js';
 import { pronoun_gender, sticks } from './mondata.js';
 import { amorphous, eggs_in_water, eyecount, humanoid, is_hider, is_prince, is_vampire, lays_eggs, likes_lava, slithy } from './mondata.macros.js';
-import { M1 } from './monflag.h.js';
 import { mons } from './monst.js';
 import { PM } from './monsters.h.js';
 import { observe_object } from './o_init.js';
@@ -51,7 +51,7 @@ import { There, You, You_cant, You_feel, Your, impossible, pline, pline_The, ver
 import { body_part, polyself } from './polyself.js';
 import { make_blinded, make_confused, make_glib, make_sick, split_mon } from './potion.js';
 import { altar_wrath } from './pray.js';
-import { AGGRAVATE_MONSTER, ANTIMAGIC, COLD_RES, CONFUSION, FAST, FIRE_RES, FLYING, FROMOUTSIDE, HALF_SPDAM, INTRINSIC, INVIS, POISON_RES, PROTECTION, SEE_INVIS, SHOCK_RES, STEALTH, TELEPAT, TELEPORT, TIMEOUT, W } from './prop.h.js';
+import { AGGRAVATE_MONSTER, ANTIMAGIC, COLD_RES, CONFUSION, FAST, FIRE_RES, FROMOUTSIDE, HALF_SPDAM, INTRINSIC, INVIS, POISON_RES, PROTECTION, SEE_INVIS, SHOCK_RES, STEALTH, TELEPAT, TELEPORT, TIMEOUT, W } from './prop.h.js';
 import { do_genocide, seffects } from './read.js';
 import { DRAWBRIDGE_DOWN, FOUNTAIN, LADDER, ROOM, STAIRS } from './rm.h.js';
 import { IS_ALTAR, IS_GRAVE, IS_SINK, IS_THRONE, OBJ_AT } from './rm.macros.js';
@@ -68,7 +68,7 @@ import { aggravate } from './wizard.js';
 import { which_armor } from './worn.js';
 import { PRONOUN, SICK_ALL, TT, UTOTYPE } from './you.h.js';
 import { Luck, Upolyd } from './you.macros.js';
-import { Acid_resistance, Antimagic, Blind, Blind_telepat, BlindedTimeout, Cold_resistance, Deaf, Drain_resistance, Half_physical_damage, Hallucination, Levitation, See_invisible, Shock_resistance, Slimed, Underwater } from './youprop.macros.js';
+import { Acid_resistance, Antimagic, Blind, Blind_telepat, BlindedTimeout, Cold_resistance, Deaf, Drain_resistance, Flying, Half_physical_damage, Hallucination, Levitation, See_invisible, Shock_resistance, Slimed, Underwater } from './youprop.macros.js';
 import { makewish } from './zap.js';
 
 const dosit$sit_message = new Int8Array(15);   // static in dosit()
@@ -125,7 +125,7 @@ async function throne_sit_effect() {   // sit.c:39
         }
         switch (effect) {
             case 1:
-                await adjattrib(rn2(A.MAX), -(rn2(4) + 3 | 0) | 0, FALSE);
+                await adjattrib(rn2(A.MAX), -rn1(4, 3) | 0, FALSE);
                 await losehp(rnd(10), $C`cursed throne`, KILLED.BY_AN);
                 break;
             case 2:
@@ -190,7 +190,7 @@ async function throne_sit_effect() {   // sit.c:39
                 await pline($C`A voice echoes:`);
                 await verbalize($C`A curse upon thee for sitting upon this most holy throne!`);
                 if (Luck() > 0) {
-                    await make_blinded($c.add64(BlindedTimeout(), rn2(100) + 250 | 0), TRUE);
+                    await make_blinded($c.add64(BlindedTimeout(), rn1(100, 250)), TRUE);
                     change_luck($c.i8(Luck() > 1 ? -rnd(2) | 0 : -1));
                 } else {
                     await rndcurse();
@@ -254,7 +254,7 @@ async function throne_sit_effect() {   // sit.c:39
                 break;
             case 13:
                 await Your($C`mind turns into a pretzel!`);
-                await make_confused($c.add64($c.and64(u.uprops[CONFUSION].intrinsic, TIMEOUT), rn2(7) + 16 | 0), FALSE);
+                await make_confused($c.add64($c.and64(u.uprops[CONFUSION].intrinsic, TIMEOUT), rn1(7, 16)), FALSE);
                 break;
             default:
                 await impossible($C`throne effect`);
@@ -274,7 +274,7 @@ async function throne_sit_effect() {   // sit.c:39
        only happened when teleporting back to the same point where hero
        started from.]  "Analyzing a throne" doesn't really make any sense
        but if the answer is yes than it will vanish in a puff of logic. */
-    if (!special_throne && !rn2(3) && (!wizard() || await yn_function($C`Analyze throne?`, new $c.Ptr(ynchars, 0), 110, TRUE) === 121)) {
+    if (!special_throne && !rn2(3) && (!wizard() || await y_n($C`Analyze throne?`) === 121)) {
         svl.level.locations[tx][ty].typ = ROOM, svl.level.locations[tx][ty].flags = 0;
         await map_background(tx, ty, FALSE);
         await newsym_force(tx, ty);
@@ -329,7 +329,7 @@ async function special_throne_effect(effect) {   // sit.c:238
                         otmp.greased = 1;
                     }
                 }
-                await make_glib(rn2(101) + 100 | 0);
+                await make_glib(rn1(101, 100));
                 await update_inventory();
                 break;
             }
@@ -414,7 +414,7 @@ async function lay_an_egg() {   // sit.c:358
         await You($C`don't have enough energy to lay an egg.`);
         return ECMD.OK;
     } else if (eggs_in_water(gy.youmonst.data)) {
-        if (!(Underwater() || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) {
+        if (!(Underwater() || Is_waterlevel(u.uz))) {
             await pline($C`A splash tetra you are not.`);
             return ECMD.OK;
         }
@@ -521,7 +521,7 @@ export async function dosit() {   // sit.c:400
                         $t1 = rn2(5) >>> 0, u.utrap = u.utrap + $t1 >>> 0;
                     } else if (u.utraptype === TT.WEB) {
                         await You($C`sit in the spider web and get entangled further!`);
-                        $t2 = (rn2(10) + 5 | 0) >>> 0, u.utrap = u.utrap + $t2 >>> 0;
+                        $t2 = rn1(10, 5) >>> 0, u.utrap = u.utrap + $t2 >>> 0;
                     } else if (u.utraptype === TT.LAVA) {
                         /* Must have fire resistance or they'd be dead already */
                         await You($C`sit in the %s!`, hliquid($C`lava`));
@@ -538,11 +538,11 @@ export async function dosit() {   // sit.c:400
                     /* when flying, "you land" might need some refinement; it sounds
                        as if you're staying on the ground but you will immediately
                        take off again unless you become stuck in a holding trap */
-                    await You($C`%s.`, (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked ? $C`land` : $C`sit down`);
+                    await You($C`%s.`, Flying() ? $C`land` : $C`sit down`);
                     await dotrap(trap, VIASITTING);
                 }
-            } else if ($goto !== "in_water" && ((Underwater() || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && !eggs_in_water(gy.youmonst.data))) {
-                if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
+            } else if ($goto !== "in_water" && ((Underwater() || Is_waterlevel(u.uz)) && !eggs_in_water(gy.youmonst.data))) {
+                if (Is_waterlevel(u.uz)) {
                     await There($C`are no cushions floating nearby.`);
                 } else {
                     await You($C`sit down on the muddy bottom.`);

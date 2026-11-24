@@ -39,7 +39,7 @@ import { MAILCKFREQ } from './unixconf.h.js';
 import { child } from './unixunix.js';
 import { cansee, couldsee } from './vision.macros.js';
 import { display_nhwindow, nh_delay_output } from './winprocs.macros.js';
-import { u_at } from './you.macros.js';
+import { m_next2u, u_at } from './you.macros.js';
 import { Blind, Blind_telepat, Deaf } from './youprop.macros.js';
 
 const ckmailstatus$deliver = new $T.mail_info();   // static in ckmailstatus()
@@ -360,7 +360,7 @@ async function newmail(info) {   // mail.c:399
                 if (info.response_cmd) {
                     await new_omailcmd(obj, info.response_cmd);
                 }
-                if (!(dist2(md.mx, md.my, u.ux, u.uy) <= 2)) {
+                if (!m_next2u(md)) {
                     if (!Deaf()) {
                         await verbalize($C`Catch!`);
                     } else {

@@ -15,20 +15,22 @@ import { A } from './attrib.h.js';
 import { sanitize_name } from './bones.js';
 import { isok, set_occupation, yn_function } from './cmd.js';
 import { db_under_typ, is_ice, is_lava, is_pool, is_pool_or_lava } from './dbridge.js';
-import { c_common_strings, flags, gi, gm, gn, gy, hands_obj, iflags, svc, svd, svl, svm, u, ynqchars } from './decl.js';
+import { c_common_strings, flags, gi, gm, gn, gy, hands_obj, iflags, svc, svl, svm, u, ynqchars } from './decl.js';
 import { AMULET_CLASS, ARMOR_CLASS, BALL_CLASS, CHAIN_CLASS, COIN_CLASS, FOOD_CLASS, GEM_CLASS, ILLOBJ_CLASS, POTION_CLASS, RING_CLASS, ROCK_CLASS, SCROLL_CLASS, SPBOOK_CLASS, TOOL_CLASS, VENOM_CLASS, WAND_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { map_engraving, newsym } from './display.js';
 import { mon_nam } from './do_name.js';
-import { ceiling, on_level, surface } from './dungeon.js';
+import { ceiling, surface } from './dungeon.js';
+import { Is_airlevel, Is_waterlevel } from './dungeon.macros.js';
 import { BURN, DUST, ENGRAVE, ENGR_BLOOD, HEADSTONE, MARK, N_ENGRAVE, actual_text, pristine_text, remembered_text, text_states } from './engrave.h.js';
-import { dealloc_engr } from './engrave.macros.js';
+import { dealloc_engr, newengr } from './engrave.macros.js';
 import { more_experienced } from './exper.js';
 import { debugcore } from './files.js';
 import { BUFSZ, COLNO, FALSE, LL, MD_PAD, ROWNO, TRUE } from './global.h.js';
+import { strcmpi } from './global.macros.js';
 import { check_capacity, nomul } from './hack.js';
 import { ECMD, FINGERTIP, GETOBJ, GETOBJ_PROMPT, HAND, NO, WAND } from './hack.h.js';
-import { min, release_data, update_file } from './hack.macros.js';
-import { mungspaces, strncmpi, strstri, xcrypt } from './hacklib.js';
+import { max, min, release_data, update_file } from './hack.macros.js';
+import { mungspaces, strstri, xcrypt } from './hacklib.js';
 import { getobj, hold_another_object, prinv, update_inventory, useup } from './invent.js';
 import { nhUse } from './lint.macros.js';
 import { makemon } from './makemon.js';
@@ -37,7 +39,7 @@ import { obj_extract_self, splitobj } from './mkobj.js';
 import { AT } from './monattk.h.js';
 import { attacktype, resists_blnd, sticks } from './mondata.js';
 import { cantwield, ceiling_hider, is_animal, is_demon, is_vampire, is_whirly } from './mondata.macros.js';
-import { M1, MZ } from './monflag.h.js';
+import { MZ } from './monflag.h.js';
 import { mons } from './monst.js';
 import { PM } from './monsters.h.js';
 import { bimanual, is_blade, is_boots, is_wet_towel } from './obj.macros.js';
@@ -49,13 +51,14 @@ import { There, You, You_cant, You_see, Your, impossible, livelog_printf, pline,
 import { body_part } from './polyself.js';
 import { make_blinded } from './potion.js';
 import { altar_wrath } from './pray.js';
-import { BLINDED, CONFUSION, DEAF, FLYING, STUNNED } from './prop.h.js';
+import { BLINDED, CONFUSION, DEAF, STUNNED } from './prop.h.js';
 import { wand_explode } from './read.js';
 import { ALTAR, CLOUD, DRAWBRIDGE_DOWN, DRAWBRIDGE_UP, GRAVE, ROOM } from './rm.h.js';
 import { ACCESSIBLE, IS_AIR, IS_FOUNTAIN, IS_GRAVE, SURFACE_AT } from './rm.macros.js';
 import { rn2, rnd } from './rnd.js';
 import { get_rnd_text, getrumor } from './rumors.js';
-import { sfi_char, sfi_engr, sfi_unsigned, sfo_char, sfo_engr, sfo_unsigned } from './sfbase.js';
+import { Sfi_char, Sfi_engr, Sfo_char, Sfo_engr, Sfo_unsigned } from './savefile.macros.js';
+import { sfi_unsigned } from './sfbase.js';
 import { check_unpaid } from './shk.js';
 import { P } from './skills.h.js';
 import { Strlen_ } from './strutil.js';
@@ -64,7 +67,7 @@ import { t_at, uescaped_shaft, uteetering_at_seen_pit } from './trap.js';
 import { dry_a_towel } from './weapon.js';
 import { welded } from './wield.js';
 import { getlin } from './windows.js';
-import { Blind, Hallucination, Levitation } from './youprop.macros.js';
+import { Blind, Flying, Hallucination, Levitation } from './youprop.macros.js';
 import { learnwand, zapnodir, zappable } from './zap.js';
 
 /* Partial rubouts for engraving characters. -3. */
@@ -164,7 +167,7 @@ export function can_reach_floor(check_pit) {   // engrave.c:187
        has been lifted up above the floor [doesn't explain
        how hero can attack the creature holding him or her;
        that's life in nethack...] */
-    if (u.uswallow || u.ustuck && !sticks(gy.youmonst.data) && attacktype(u.ustuck.data, AT.HUGS) || Levitation() && !((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) {
+    if (u.uswallow || u.ustuck && !sticks(gy.youmonst.data) && attacktype(u.ustuck.data, AT.HUGS) || Levitation() && !(Is_airlevel(u.uz) || Is_waterlevel(u.uz))) {
         return FALSE;
     }
     /* Restricted/unskilled riders can't reach the floor */
@@ -174,7 +177,7 @@ export function can_reach_floor(check_pit) {   // engrave.c:187
     if (u.uundetected && ceiling_hider(gy.youmonst.data)) {
         return FALSE;
     }
-    if ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked || gy.youmonst.data.msize >= MZ.HUGE) {
+    if (Flying() || gy.youmonst.data.msize >= MZ.HUGE) {
         return TRUE;
     }
     if (check_pit && (t = t_at(u.ux, u.uy)) !== null && (uteetering_at_seen_pit(t) || uescaped_shaft(t))) {
@@ -226,7 +229,7 @@ export function engr_at(x, y) {   // engrave.c:231
 export function sengr_at(s, x, y, strict) {   // engrave.c:251
     const ep = engr_at(x, y);
     if (ep && ep.engr_type !== HEADSTONE && ep.engr_time <= svm.moves) {
-        if (strict ? !strncmpi(ep.engr_txt[actual_text], s, -1) : strstri(ep.engr_txt[actual_text], s) !== null) {
+        if (strict ? !strcmpi(ep.engr_txt[actual_text], s) : strstri(ep.engr_txt[actual_text], s) !== null) {
             return ep;
         }
     }
@@ -410,7 +413,7 @@ export async function make_engr_at(x, y, s, pristine_s, e_time, e_type) {   // e
     if ((ep = engr_at(x, y)) !== null) {
         await del_engr(ep);
     }
-    ep = $c.asRec(await alloc((Math.imul(smem, 3) >>> 0) + 64 >>> 0), $T.engr, 64);
+    ep = await newengr(Math.imul(smem, 3) >>> 0);
     $c.memset(ep, 0, $c.addu64(Math.imul(smem, 3) >>> 0, 64));
     ep.nxt_engr = $G.head_engr;
     $G.head_engr = ep;
@@ -1300,7 +1303,7 @@ async function engrave() {   // engrave.c:1267
             await update_inventory();
         }
     } else if (marker) {
-        let ink_cost = $c.div32(rate, 2) > 1 ? $c.div32(rate, 2) : 1;   /* Prevent infinite graffiti */
+        let ink_cost = max($c.div32(rate, 2), 1);   /* Prevent infinite graffiti */
         if (stylus.spe < ink_cost) {
             await impossible($C`overly dry marker valid for graffiti?`);
             ink_cost = stylus.spe;
@@ -1413,7 +1416,7 @@ export function forget_engravings() {   // engrave.c:1509
  */
 export async function engraving_sanity_check() {   // engrave.c:1524
     let ep = null;
-    if ($G.head_engr && ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) {
+    if ($G.head_engr && (Is_airlevel(u.uz) || Is_waterlevel(u.uz))) {
         await impossible($C`engraving sanity: on plane of air/water`);
         return;
     }
@@ -1443,21 +1446,21 @@ export async function save_engravings(nhfp) {   // engrave.c:1551
         if (ep.engr_alloc && ep.engr_txt[actual_text].get(0) && update_file(nhfp)) {
             engr_alloc[0] = ep.engr_alloc;
             const szeach = ep.engr_szeach;
-            await sfo_unsigned(nhfp, new $c.Ptr(engr_alloc, 0), $C`engraving-engr_alloc`);
-            await sfo_engr(nhfp, ep, $C`engraving`);
+            await Sfo_unsigned(nhfp, new $c.Ptr(engr_alloc, 0), $C`engraving-engr_alloc`);
+            await Sfo_engr(nhfp, ep, $C`engraving`);
             ep.engr_txt[actual_text] = $c.recTail(ep);
             ep.engr_txt[remembered_text] = ep.engr_txt[actual_text].add(szeach);
             ep.engr_txt[pristine_text] = ep.engr_txt[remembered_text].add(szeach);
-            await sfo_char(nhfp, ep.engr_txt[actual_text], $C`engraving-actual_text`, szeach | 0);
-            await sfo_char(nhfp, ep.engr_txt[remembered_text], $C`engraving-remembered_text`, szeach | 0);
-            await sfo_char(nhfp, ep.engr_txt[pristine_text], $C`engraving-pristine_text`, szeach | 0);
+            await Sfo_char(nhfp, ep.engr_txt[actual_text], $C`engraving-actual_text`, szeach | 0);
+            await Sfo_char(nhfp, ep.engr_txt[remembered_text], $C`engraving-remembered_text`, szeach | 0);
+            await Sfo_char(nhfp, ep.engr_txt[pristine_text], $C`engraving-pristine_text`, szeach | 0);
         }
         if (release_data(nhfp)) {
             dealloc_engr(ep);
         }
     }
     if (update_file(nhfp)) {
-        await sfo_unsigned(nhfp, new $c.Ptr(no_more_engr, 0), $C`engraving-engr_alloc`);
+        await Sfo_unsigned(nhfp, new $c.Ptr(no_more_engr, 0), $C`engraving-engr_alloc`);
     }
     if (release_data(nhfp)) {
         $G.head_engr = null;
@@ -1477,17 +1480,17 @@ export async function rest_engravings(nhfp) {   // engrave.c:1584
         if (lth[0] === 0) {
             return;
         }
-        const ep = $c.asRec(await alloc(lth[0] + 64 >>> 0), $T.engr, 64);
-        await sfi_engr(nhfp, ep, $C`engraving`);
+        const ep = await newengr(lth[0]);
+        await Sfi_engr(nhfp, ep, $C`engraving`);
         const szeach = ep.engr_szeach;
         ep.nxt_engr = $G.head_engr;
         $G.head_engr = ep;
         ep.engr_txt[actual_text] = $c.recTail(ep);   /* Andreas Bormann */
         ep.engr_txt[remembered_text] = ep.engr_txt[actual_text].add(szeach);
         ep.engr_txt[pristine_text] = ep.engr_txt[remembered_text].add(szeach);
-        await sfi_char(nhfp, ep.engr_txt[actual_text], $C`engraving-actual_text`, szeach | 0);
-        await sfi_char(nhfp, ep.engr_txt[remembered_text], $C`engraving-remembered_text`, szeach | 0);
-        await sfi_char(nhfp, ep.engr_txt[pristine_text], $C`engraving-pristine_text`, szeach | 0);
+        await Sfi_char(nhfp, ep.engr_txt[actual_text], $C`engraving-actual_text`, szeach | 0);
+        await Sfi_char(nhfp, ep.engr_txt[remembered_text], $C`engraving-remembered_text`, szeach | 0);
+        await Sfi_char(nhfp, ep.engr_txt[pristine_text], $C`engraving-pristine_text`, szeach | 0);
         while (ep.engr_txt[actual_text].get(0) === 32) {
             ep.engr_txt[actual_text] = ep.engr_txt[actual_text].add(1);
         }

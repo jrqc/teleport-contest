@@ -20,7 +20,7 @@ import { canseemon, map_location, nul_glyphinfo, see_nearby_objects } from './di
 import { goto_level } from './do.js';
 import { hliquid } from './do_name.js';
 import { BR, BR_NO_END1, BR_NO_END2, LR, VISITED } from './dungeon.h.js';
-import { In_endgame, In_sokoban, In_tutorial } from './dungeon.macros.js';
+import { In_endgame, In_sokoban, In_tutorial, Is_airlevel, Is_astralevel, Is_bigroom, Is_earthlevel, Is_firelevel, Is_knox, Is_qstart, Is_rogue_level, Is_sanctum, Is_stronghold, Is_valley, Is_waterlevel, Is_wiz1_level, Is_wiz2_level, Is_wiz3_level } from './dungeon.macros.js';
 import { done, panic } from './end.js';
 import { debugcore } from './files.js';
 import { wizard } from './flag.macros.js';
@@ -28,17 +28,17 @@ import { COLNO, FALSE, MAXDUNGEON, MAXLEVEL, MAXNROFROOMS, NHL_SB, ROWNO, TRUE }
 import { strcmpi } from './global.macros.js';
 import { in_rooms, switch_terrain } from './hack.js';
 import { ASCENDED, ECMD, ESCAPED, FOOT, MAXLINFO } from './hack.h.js';
-import { panic1, update_file } from './hack.macros.js';
+import { panic1, rn1, update_file } from './hack.macros.js';
 import { eos, highc, mungspaces, nh_snprintf, strncmpi, strstri, strsubst, trimspaces } from './hacklib.js';
 import { LUA } from './lua.h.js';
-import { luaL_checkoption, lua_getfield, lua_getglobal, lua_gettable, lua_gettop, lua_len, lua_next, lua_pushinteger, lua_pushnil, lua_settop, lua_tointegerx, lua_type } from './luabridge.js';
+import { lua_istable, lua_pop, lua_tointeger } from './lua.macros.js';
+import { luaL_checkoption, lua_getfield, lua_getglobal, lua_gettable, lua_gettop, lua_len, lua_next, lua_pushinteger, lua_pushnil, lua_settop, lua_type } from './luabridge.js';
 import { place_lregion } from './mkmaze.js';
 import { cmap_to_type } from './mkroom.js';
 import { DELPHI, ROOMOFFSET, SHOPBASE, TEMPLE, VAULT } from './mkroom.h.js';
 import { AD, AT } from './monattk.h.js';
 import { dmgtype_fromattack } from './mondata.js';
 import { is_animal } from './mondata.macros.js';
-import { M1 } from './monflag.h.js';
 import { M_AP } from './monst.h.js';
 import { M_AP_TYPE } from './monst.macros.js';
 import { PM } from './monsters.h.js';
@@ -48,14 +48,14 @@ import { You, impossible, pline } from './pline.js';
 import { body_part } from './polyself.js';
 import { align_gname, altarmask_at } from './pray.js';
 import { findpriest, inhistemple } from './priest.js';
-import { FLYING } from './prop.h.js';
 import { ldrname } from './questpgr.js';
 import { restcemetery } from './restore.js';
 import { ALTAR, CLOUD, CORR, DBWALL, DOOR, DRAWBRIDGE_DOWN, DRAWBRIDGE_UP, FOUNTAIN, GRAVE, MAX_TYPE, ROOM, SDOOR, SINK, SVALL, THRONE, TREE } from './rm.h.js';
 import { IS_AIR, IS_ALTAR, IS_DOOR, IS_FOUNTAIN, IS_GRAVE, IS_ROOM, IS_WALL, SURFACE_AT, Sokoban } from './rm.macros.js';
 import { rn2, rnd } from './rnd.js';
 import { savecemetery } from './save.js';
-import { sfi_branch, sfi_char, sfi_d_level, sfi_dgn_topology, sfi_dungeon, sfi_int, sfi_int16, sfi_linfo, sfi_mapseen_feat, sfi_mapseen_flags, sfi_mapseen_rooms, sfi_nhcoord, sfi_unsigned, sfi_xint16, sfo_branch, sfo_char, sfo_d_level, sfo_dgn_topology, sfo_dungeon, sfo_int, sfo_int16, sfo_linfo, sfo_mapseen_feat, sfo_mapseen_flags, sfo_mapseen_rooms, sfo_nhcoord, sfo_unsigned, sfo_xint16 } from './sfbase.js';
+import { Sfi_branch, Sfi_char, Sfi_coordxy, Sfi_d_level, Sfi_dgn_topology, Sfi_dungeon, Sfi_linfo, Sfi_mapseen_feat, Sfi_mapseen_flags, Sfi_mapseen_rooms, Sfi_nhcoord, Sfo_branch, Sfo_char, Sfo_coordxy, Sfo_d_level, Sfo_dgn_topology, Sfo_dungeon, Sfo_int, Sfo_linfo, Sfo_mapseen_feat, Sfo_mapseen_flags, Sfo_mapseen_rooms, Sfo_nhcoord, Sfo_unsigned, Sfo_xint16 } from './savefile.macros.js';
+import { sfi_int, sfi_unsigned, sfi_xint16 } from './sfbase.js';
 import { inhishop, shop_keeper } from './shk.js';
 import { shtypes } from './shknam.js';
 import { On_stairs, stairway_at, stairway_find_special_dir } from './stairs.js';
@@ -64,8 +64,8 @@ import { MAGIC_PORTAL, VIBRATING_SQUARE } from './trap.h.js';
 import { add_menu, add_menu_heading, add_menu_str, getlin, select_menu } from './windows.js';
 import { clear_nhwindow, cliparound, create_nhwindow, destroy_nhwindow, display_nhwindow, end_menu, putstr, start_menu } from './winprocs.macros.js';
 import { ATR, MENU, NHW, PICK } from './wintype.h.js';
-import { Upolyd, u_at } from './you.macros.js';
-import { Blind, EAggravate_monster, Hallucination, Levitation, Underwater } from './youprop.macros.js';
+import { Race_if, Upolyd, u_at } from './you.macros.js';
+import { Blind, EAggravate_monster, Flying, Hallucination, Levitation, Underwater } from './youprop.macros.js';
 
 let add_branch$branch_id = 0;   // static in add_branch()
 const get_dgn_flags$flagstrs = $c.nulls(6);   // static in get_dgn_flags()
@@ -118,29 +118,29 @@ async function dumpit() {   // dungeon.c:91
 export async function save_dungeon(nhfp, perform_write, free_data) {   // dungeon.c:149
     let i = 0, count = Int32Array.of(0), curr = null, next = null, curr_ms = null, next_ms = null;
     if (perform_write) {
-        await sfo_int(nhfp, new $c.FieldRef(svn, "n_dgns", "i32"), $C`dungeon_count`);
+        await Sfo_int(nhfp, new $c.FieldRef(svn, "n_dgns", "i32"), $C`dungeon_count`);
         for (i = 0; i < svn.n_dgns; i = i + 1 | 0) {
-            await sfo_dungeon(nhfp, $c.relem(svd.dungeons, i), $C`dungeon`);
+            await Sfo_dungeon(nhfp, $c.relem(svd.dungeons, i), $C`dungeon`);
         }
-        await sfo_dgn_topology(nhfp, svd.dungeon_topology, $C`svd.dungeon_topology`);
-        await sfo_char(nhfp, new $c.Ptr(svt.tune, 0), $C`tune`, 6);
+        await Sfo_dgn_topology(nhfp, svd.dungeon_topology, $C`svd.dungeon_topology`);
+        await Sfo_char(nhfp, new $c.Ptr(svt.tune, 0), $C`tune`, 6);
         for (count[0] = 0, curr = svb.branches; curr; curr = curr.next) {
             count[0] = count[0] + 1 | 0;
         }
-        await sfo_int(nhfp, new $c.Ptr(count, 0), $C`branch_count`);
+        await Sfo_int(nhfp, new $c.Ptr(count, 0), $C`branch_count`);
         for (curr = svb.branches; curr; curr = curr.next) {
-            await sfo_branch(nhfp, curr, $C`branch`);
+            await Sfo_branch(nhfp, curr, $C`branch`);
         }
         count[0] = maxledgerno();
-        await sfo_int(nhfp, new $c.Ptr(count, 0), $C`level_info_count`);
+        await Sfo_int(nhfp, new $c.Ptr(count, 0), $C`level_info_count`);
         for (i = 0; i < count[0]; i = i + 1 | 0) {
-            await sfo_linfo(nhfp, $c.relem(svl.level_info, i), $C`svl.level_info`);
+            await Sfo_linfo(nhfp, $c.relem(svl.level_info, i), $C`svl.level_info`);
         }
-        await sfo_nhcoord(nhfp, svi.inv_pos, $C`svi.inv_pos`);
+        await Sfo_nhcoord(nhfp, svi.inv_pos, $C`svi.inv_pos`);
         for (count[0] = 0, curr_ms = svm.mapseenchn; curr_ms; curr_ms = curr_ms.next) {
             count[0] = count[0] + 1 | 0;
         }
-        await sfo_int(nhfp, new $c.Ptr(count, 0), $C`mapseen_count`);
+        await Sfo_int(nhfp, new $c.Ptr(count, 0), $C`mapseen_count`);
         for (curr_ms = svm.mapseenchn; curr_ms; curr_ms = curr_ms.next) {
             await save_mapseen(nhfp, curr_ms);
         }
@@ -175,15 +175,15 @@ export async function restore_dungeon(nhfp) {   // dungeon.c:211
     count[0] = 0;
     await sfi_int(nhfp, new $c.FieldRef(svn, "n_dgns", "i32"), $C`dungeon_count`);
     for (i = 0; i < svn.n_dgns; i = i + 1 | 0) {
-        await sfi_dungeon(nhfp, $c.relem(svd.dungeons, i), $C`dungeon`);
+        await Sfi_dungeon(nhfp, $c.relem(svd.dungeons, i), $C`dungeon`);
     }
-    await sfi_dgn_topology(nhfp, svd.dungeon_topology, $C`svd.dungeon_topology`);
-    await sfi_char(nhfp, new $c.Ptr(svt.tune, 0), $C`tune`, 6);
+    await Sfi_dgn_topology(nhfp, svd.dungeon_topology, $C`svd.dungeon_topology`);
+    await Sfi_char(nhfp, new $c.Ptr(svt.tune, 0), $C`tune`, 6);
     let last = svb.branches = null;
     await sfi_int(nhfp, new $c.Ptr(count, 0), $C`branch_count`);
     for (i = 0; i < count[0]; i = i + 1 | 0) {
         curr = $c.asRec(await alloc(32), $T.branch, 32);
-        await sfi_branch(nhfp, curr, $C`branch`);
+        await Sfi_branch(nhfp, curr, $C`branch`);
         curr.next = null;
         if (last) {
             last.next = curr;
@@ -197,9 +197,9 @@ export async function restore_dungeon(nhfp) {   // dungeon.c:211
         await panic($C`level information count larger (%d) than allocated size`, count[0]);
     }
     for (i = 0; i < count[0]; i = i + 1 | 0) {
-        await sfi_linfo(nhfp, $c.relem(svl.level_info, i), $C`svl.level_info`);
+        await Sfi_linfo(nhfp, $c.relem(svl.level_info, i), $C`svl.level_info`);
     }
-    await sfi_nhcoord(nhfp, svi.inv_pos, $C`svi.inv_pos`);
+    await Sfi_nhcoord(nhfp, svi.inv_pos, $C`svi.inv_pos`);
     await sfi_int(nhfp, new $c.Ptr(count, 0), $C`mapseen_count`);
     let last_ms = null;
     for (i = 0; i < count[0]; i = i + 1 | 0) {
@@ -263,7 +263,7 @@ async function find_branch(s, pd) {   // dungeon.c:311
         /* support for level tport by name */
         for (br = svb.branches; br; br = br.next) {
             const dnam = new $c.Ptr(svd.dungeons[br.end2.dnum].dname, 0);
-            if (!strcmpi(dnam, s) || !strncmpi(dnam, $C`The `, 4) && !strncmpi(dnam.add(4), s, -1)) {
+            if (!strcmpi(dnam, s) || !strncmpi(dnam, $C`The `, 4) && !strcmpi(dnam.add(4), s)) {
                 break;
             }
         }
@@ -608,14 +608,14 @@ async function get_dgn_flags(L) {   // dungeon.c:744
     await lua_getfield(L, -1, $C`flags`);
     if (lua_type(L, -1) === LUA.TTABLE) {
         await lua_len(L, -1);
-        const nflags = $c.i32(lua_tointegerx(L, -1, null));
-        await lua_settop(L, -2);
+        const nflags = $c.i32(lua_tointeger(L, -1));
+        await lua_pop(L, 1);
         for (f = 0; f < nflags; f = f + 1 | 0) {
             lua_pushinteger(L, f + 1 | 0);
             await lua_gettable(L, -2);
             if (lua_type(L, -1) === LUA.TSTRING) {
                 dgn_flags = dgn_flags | get_dgn_flags$flagstrs2i[await luaL_checkoption(L, -1, null, new $c.Ptr(get_dgn_flags$flagstrs, 0))];
-                await lua_settop(L, -2);
+                await lua_pop(L, 1);
             } else {
                 await impossible($C`flags[%i] is not a string`, f);
             }
@@ -625,7 +625,7 @@ async function get_dgn_flags(L) {   // dungeon.c:744
     } else if (lua_type(L, -1) !== LUA.TNIL) {
         await impossible($C`flags is not an array or string`);
     }
-    await lua_settop(L, -2);
+    await lua_pop(L, 1);
     return dgn_flags;
 }
 /**
@@ -645,9 +645,9 @@ async function get_dgn_align(L) {   // dungeon.c:781
 async function init_dungeon_levels(L, pd, dngidx) {   // dungeon.c:797
     let bi = 0, f = 0;
     await lua_len(L, -1);
-    const nlevels = $c.i32(lua_tointegerx(L, -1, null));
+    const nlevels = $c.i32(lua_tointeger(L, -1));
     pd.tmpdungeon[dngidx].levels = nlevels;
-    await lua_settop(L, -2);
+    await lua_pop(L, 1);
     for (f = 0; f < nlevels; f = f + 1 | 0) {
         lua_pushinteger(L, f + 1 | 0);
         await lua_gettable(L, -2);
@@ -711,7 +711,7 @@ async function init_dungeon_levels(L, pd, dngidx) {   // dungeon.c:797
         } else {
             await panic($C`dungeon[%i].levels[%i] is not a hash`, dngidx, f);
         }
-        await lua_settop(L, -2);
+        await lua_pop(L, 1);
     }
     pd.n_levs = pd.n_levs + nlevels | 0;
     if (pd.n_levs > LEV_LIMIT) {
@@ -727,9 +727,9 @@ async function init_dungeon_levels(L, pd, dngidx) {   // dungeon.c:797
 async function init_dungeon_branches(L, pd, dngidx) {   // dungeon.c:867
     let bi = 0, f = 0;
     await lua_len(L, -1);
-    const nbranches = $c.i32(lua_tointegerx(L, -1, null));
+    const nbranches = $c.i32(lua_tointeger(L, -1));
     pd.tmpdungeon[dngidx].branches = nbranches;
-    await lua_settop(L, -2);
+    await lua_pop(L, 1);
     for (f = 0; f < nbranches; f = f + 1 | 0) {
         lua_pushinteger(L, f + 1 | 0);
         await lua_gettable(L, -2);
@@ -776,7 +776,7 @@ async function init_dungeon_branches(L, pd, dngidx) {   // dungeon.c:867
         } else {
             await panic($C`dungeon[%i].branches[%i] is not a hash`, dngidx, f);
         }
-        await lua_settop(L, -2);
+        await lua_pop(L, 1);
     }
     pd.n_brs = pd.n_brs + nbranches | 0;
     if (pd.n_brs > BRANCH_LIMIT) {
@@ -895,7 +895,7 @@ async function init_dungeon_dungeons(L, pd, dngidx) {   // dungeon.c:997
     } else if (lua_type(L, -1) !== LUA.TNIL) {
         await panic($C`dungeon[%i].levels is not an array of hashes`, dngidx);
     }
-    await lua_settop(L, -2);
+    await lua_pop(L, 1);
     /* levels end */
     /* branches begin */
     await lua_getfield(L, -1, $C`branches`);
@@ -904,7 +904,7 @@ async function init_dungeon_dungeons(L, pd, dngidx) {   // dungeon.c:997
     } else if (lua_type(L, -1) !== LUA.TNIL) {
         await panic($C`dungeon[%i].branches is not an array of hashes`, dngidx);
     }
-    await lua_settop(L, -2);
+    await lua_pop(L, 1);
     /* branches end */
     pd.tmpdungeon[dngidx].name = dgn_name;
     pd.tmpdungeon[dngidx].protoname = dgn_protoname;
@@ -927,7 +927,7 @@ async function init_dungeon_dungeons(L, pd, dngidx) {   // dungeon.c:997
     $c.free(dgn_bonetag);
     $c.free(dgn_themerms);
     if (dgn_range) {
-        $t1 = $c.i16(rn2(dgn_range) + dgn_base | 0), svd.dungeons[dngidx].num_dunlevs = $t1;
+        $t1 = $c.i16(rn1(dgn_range, dgn_base)), svd.dungeons[dngidx].num_dunlevs = $t1;
     } else {
         svd.dungeons[dngidx].num_dunlevs = $c.i16(dgn_base);
     }
@@ -1059,7 +1059,7 @@ export async function init_dungeons() {   // dungeon.c:1205
     $t1 = pd.n_brs = 0, pd.n_levs = $t1;
     const L = await nhl_init(sbi);   /* private Lua state for this function */
     if (!L) {
-        await panic($C`%s`, $C`'nhl_init' failed; can't continue.`);
+        await panic1($C`'nhl_init' failed; can't continue.`);
         /*NOTREACHED*/
     }
     if (!await nhl_loadlua(L, $C`dungeon.lua`)) {
@@ -1075,12 +1075,12 @@ export async function init_dungeons() {   // dungeon.c:1205
     svs.sp_levchn = null;
     await lua_settop(L, 0);
     await lua_getglobal(L, $C`dungeon`);
-    if (!(lua_type(L, -1) === LUA.TTABLE)) {
+    if (!lua_istable(L, -1)) {
         await panic($C`dungeon is not a lua table`);
     }
     await lua_len(L, -1);
-    $t2 = $c.i32(lua_tointegerx(L, -1, null)), svn.n_dgns = $t2;
-    await lua_settop(L, -2);
+    $t2 = $c.i32(lua_tointeger(L, -1)), svn.n_dgns = $t2;
+    await lua_pop(L, 1);
     pd.start = 0;
     pd.n_levs = 0;
     pd.n_brs = 0;
@@ -1095,7 +1095,7 @@ export async function init_dungeons() {   // dungeon.c:1205
     lua_pushnil(L);   /* first key */
     let i = 0;
     while (await lua_next(L, tidx) !== 0) {
-        if (!(lua_type(L, -1) === LUA.TTABLE)) {
+        if (!lua_istable(L, -1)) {
             await panic($C`dungeon[%i] is not a lua table`, i);
         }
         if (await init_dungeon_dungeons(L, pd, i)) {
@@ -1118,9 +1118,9 @@ export async function init_dungeons() {   // dungeon.c:1205
             /* levels handling end */
             i = i + 1 | 0;
         }
-        await lua_settop(L, -2);   /* pop the dungeon table */
+        await lua_pop(L, 1);   /* pop the dungeon table */
     }
-    await lua_settop(L, -2);   /* get rid of the dungeon global */
+    await lua_pop(L, 1);   /* get rid of the dungeon global */
     do {
         if (debugcore($C`dungeon.c`, TRUE)) {
             const save_plnmsg = iflags.last_msg;
@@ -1367,10 +1367,10 @@ export async function prev_level(at_stairs) {   // dungeon.c:1518
  */
 async function earth_sense() {   // dungeon.c:1548
     let otmp = null;
-    if (!(gu.urace.mnum === PM.DWARF)) {
+    if (!Race_if(PM.DWARF)) {
         return;
     }
-    if (u.usteed || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked || Levitation() || Upolyd()) {
+    if (u.usteed || Flying() || Levitation() || Upolyd()) {
         return;
     }
     if (svl.level.locations[u.ux][u.uy].typ !== CORR && svl.level.locations[u.ux][u.uy].typ !== ROOM) {
@@ -1472,7 +1472,7 @@ export function Can_dig_down(lev) {   // dungeon.c:1649
  * @returns {number} boolean
  */
 export function Can_fall_thru(lev) {   // dungeon.c:1662
-    return Can_dig_down(lev) || (svd.dungeon_topology.d_stronghold_level.dlevel || svd.dungeon_topology.d_stronghold_level.dnum) && on_level(lev, svd.dungeon_topology.d_stronghold_level) ? 1 : 0;
+    return Can_dig_down(lev) || Is_stronghold(lev) ? 1 : 0;
 }
 /*
  * True if one can rise up a level (e.g. cursed gain level).
@@ -1490,7 +1490,7 @@ export async function Can_rise_up(x, y, lev) {   // dungeon.c:1674
     const stway = stairway_find_special_dir(FALSE);
     /* can't rise up from inside the top of the Wizard's tower */
     /* KMH -- or in sokoban */
-    if (In_endgame(lev) || In_sokoban(lev) || (svd.dungeon_topology.d_wiz1_level.dlevel || svd.dungeon_topology.d_wiz1_level.dnum) && on_level(lev, svd.dungeon_topology.d_wiz1_level) && await In_W_tower(x, y, lev)) {
+    if (In_endgame(lev) || In_sokoban(lev) || Is_wiz1_level(lev) && await In_W_tower(x, y, lev)) {
         return FALSE;
     }
     return lev.dlevel > 1 || svd.dungeons[lev.dnum].entry_lev === 1 && ledger_no(lev) !== 1 && stway && stway.up ? 1 : 0;
@@ -1503,7 +1503,7 @@ export function has_ceiling(lev) {   // dungeon.c:1690
     /* FIXME: some (most? all?) of the quest home levels are conceptually
        above ground and don't have ceilings outside of their buildings
        but we don't presently check for that */
-    if (In_endgame(lev) && !((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(lev, svd.dungeon_topology.d_earth_level))) {
+    if (In_endgame(lev) && !Is_earthlevel(lev)) {
         return FALSE;
     }
     return TRUE;
@@ -1540,17 +1540,17 @@ export function ceiling(x, y) {   // dungeon.c:1714
         what = $C`temple's ceiling`;
     } else if (in_rooms(x, y, SHOPBASE).get(0)) {
         what = $C`shop's ceiling`;
-    } else if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {   /* water plane has no surface; its air bubbles aren't below sky */
+    } else if (Is_waterlevel(u.uz)) {   /* water plane has no surface; its air bubbles aren't below sky */
         what = $C`water above`;
     } else if (IS_AIR(lev.typ)) {
         what = $C`sky`;
-    } else if ((svd.dungeon_topology.d_fire_level.dlevel || svd.dungeon_topology.d_fire_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_fire_level)) {
+    } else if (Is_firelevel(u.uz)) {
         what = $C`flames above`;
     } else if (In_quest(u.uz)) {   /* just in case; try to avoid in caller if you can */
         what = $C`expanse above`;
     } else if (Underwater()) {
         what = $C`water's surface`;
-    } else if (IS_ROOM(lev.typ) && !((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level)) || IS_WALL(lev.typ) || IS_DOOR(lev.typ) || lev.typ === SDOOR) {
+    } else if (IS_ROOM(lev.typ) && !Is_earthlevel(u.uz) || IS_WALL(lev.typ) || IS_DOOR(lev.typ) || lev.typ === SDOOR) {
         what = $C`ceiling`;
     } else {
         what = $C`rock cavern`;
@@ -1568,9 +1568,9 @@ export function surface(x, y) {   // dungeon.c:1750
     if (u_at(x, y) && u.uswallow && is_animal(u.ustuck.data)) {   /* 'husk' is iffy but maw is wrong for 't' class */
         return dmgtype_fromattack(u.ustuck.data, AD.DGST, AT.ENGL) !== null ? $C`maw` : dmgtype_fromattack(u.ustuck.data, AD.WRAP, AT.ENGL) !== null ? $C`husk` : $C`nonesuch`;   /* can't happen (fingers crossed...) */
     } else if (IS_AIR(levtyp)) {
-        return (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? $C`air bubble` : levtyp === CLOUD ? $C`cloud` : $C`air`;
+        return Is_waterlevel(u.uz) ? $C`air bubble` : levtyp === CLOUD ? $C`cloud` : $C`air`;
     } else if (is_pool(x, y)) {
-        return Underwater() && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) ? $C`bottom` : hliquid($C`water`);
+        return Underwater() && !Is_waterlevel(u.uz) ? $C`bottom` : hliquid($C`water`);
     } else if (is_ice(x, y)) {
         return $C`ice`;
     } else if (is_lava(x, y)) {
@@ -1589,7 +1589,7 @@ export function surface(x, y) {   // dungeon.c:1750
         return $C`wall`;   /* 'surface' during Passes_walls */
     } else if (IS_DOOR(levtyp)) {
         return $C`doorway`;   /* even for closed door */
-    } else if (IS_ROOM(levtyp) && !((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level))) {
+    } else if (IS_ROOM(levtyp) && !Is_earthlevel(u.uz)) {
         return $C`floor`;
     } else {
         return $C`ground`;
@@ -1723,7 +1723,7 @@ export function In_V_tower(lev) {   // dungeon.c:1907
  * @returns {number} boolean
  */
 export function On_W_tower_level(lev) {   // dungeon.c:1914
-    return (svd.dungeon_topology.d_wiz1_level.dlevel || svd.dungeon_topology.d_wiz1_level.dnum) && on_level(lev, svd.dungeon_topology.d_wiz1_level) || (svd.dungeon_topology.d_wiz2_level.dlevel || svd.dungeon_topology.d_wiz2_level.dnum) && on_level(lev, svd.dungeon_topology.d_wiz2_level) || (svd.dungeon_topology.d_wiz3_level.dlevel || svd.dungeon_topology.d_wiz3_level.dnum) && on_level(lev, svd.dungeon_topology.d_wiz3_level) ? 1 : 0;
+    return Is_wiz1_level(lev) || Is_wiz2_level(lev) || Is_wiz3_level(lev) ? 1 : 0;
 }
 /* is <x,y> of `lev' inside the Wizard's tower? */
 /**
@@ -1784,7 +1784,7 @@ export function single_level_branch(lev) {   // dungeon.c:1967
      * TODO:  this should be generalized instead of assuming that
      * Fort Ludios is the only single level branch in the dungeon.
      */
-    return (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(lev, svd.dungeon_topology.d_knox_level) ? 1 : 0;
+    return Is_knox(lev);
 }
 /* equivalent to dest = source */
 /**
@@ -1926,13 +1926,13 @@ export async function lev_by_name(nam) {   // dungeon.c:2098
         }
         /* hell is the old name, and wouldn't match; gehennom would match its
            branch, yielding the castle level instead of valley of the dead */
-        if (!strncmpi(nam, $C`gehennom`, -1) || !strncmpi(nam, $C`hell`, -1)) {
+        if (!strcmpi(nam, $C`gehennom`) || !strcmpi(nam, $C`hell`)) {
             if (In_V_tower(u.uz)) {
                 nam = $C` to Vlad's tower`;   /* branch to... */
             } else {
                 nam = $C`valley`;
             }
-        } else if (!strncmpi(nam, $C`delphi`, -1)) {
+        } else if (!strcmpi(nam, $C`delphi`)) {
             /* Oracle says "welcome to Delphi" so recognize that name too */
             nam = $C`oracle`;
         }
@@ -2202,7 +2202,7 @@ export async function print_dungeon(bymenu, rlev, rdgn) {   // dungeon.c:2290
         }
         if (trap) {
             $c.sprintf(new $c.Ptr(buf, 0), $C`Portal @ (%d,%d), hero @ (%d,%d)`, trap.tx, trap.ty, u.ux, u.uy);
-        } else if ((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) || (svd.dungeon_topology.d_fire_level.dlevel || svd.dungeon_topology.d_fire_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_fire_level) || (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_qstart_level.dlevel || svd.dungeon_topology.d_qstart_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_qstart_level) || await at_dgn_entrance($C`The Quest`) || (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level)) {
+        } else if (Is_earthlevel(u.uz) || Is_waterlevel(u.uz) || Is_firelevel(u.uz) || Is_airlevel(u.uz) || Is_qstart(u.uz) || await at_dgn_entrance($C`The Quest`) || Is_knox(u.uz)) {
             /* only report "no portal found" when actually expecting a portal */
             $c.strcpy(new $c.Ptr(buf, 0), $C`No portal found.`);
         }
@@ -2363,13 +2363,13 @@ export async function save_exclusions(nhfp) {   // dungeon.c:2596
     for (nez[0] = 0, ez = sve.exclusion_zones; ez; ez = ez.next, nez[0] = nez[0] + 1 | 0) {
     }
     if (update_file(nhfp)) {
-        await sfo_int(nhfp, new $c.Ptr(nez, 0), $C`exclusion_count`);
+        await Sfo_int(nhfp, new $c.Ptr(nez, 0), $C`exclusion_count`);
         for (ez = sve.exclusion_zones; ez; ez = ez.next) {
-            await sfo_xint16(nhfp, new $c.FieldRef(ez, "zonetype", "i16"), $C`exclusion-zonetype`);
-            await sfo_int16(nhfp, new $c.FieldRef(ez, "lx", "i16"), $C`exclusion-lx`);
-            await sfo_int16(nhfp, new $c.FieldRef(ez, "ly", "i16"), $C`exclusion-ly`);
-            await sfo_int16(nhfp, new $c.FieldRef(ez, "hx", "i16"), $C`exclusion-hx`);
-            await sfo_int16(nhfp, new $c.FieldRef(ez, "hy", "i16"), $C`exclusion-hy`);
+            await Sfo_xint16(nhfp, new $c.FieldRef(ez, "zonetype", "i16"), $C`exclusion-zonetype`);
+            await Sfo_coordxy(nhfp, new $c.FieldRef(ez, "lx", "i16"), $C`exclusion-lx`);
+            await Sfo_coordxy(nhfp, new $c.FieldRef(ez, "ly", "i16"), $C`exclusion-ly`);
+            await Sfo_coordxy(nhfp, new $c.FieldRef(ez, "hx", "i16"), $C`exclusion-hx`);
+            await Sfo_coordxy(nhfp, new $c.FieldRef(ez, "hy", "i16"), $C`exclusion-hy`);
         }
     }
 }
@@ -2384,10 +2384,10 @@ export async function load_exclusions(nhfp) {   // dungeon.c:2617
     while (($t1 = nez[0], nez[0] = $t1 - 1 | 0, $t1) > 0) {
         ez = $c.asRec(await alloc(24), $T.exclusion_zone, 24);
         await sfi_xint16(nhfp, new $c.FieldRef(ez, "zonetype", "i16"), $C`exclusion-zonetype`);
-        await sfi_int16(nhfp, new $c.FieldRef(ez, "lx", "i16"), $C`exclusion-lx`);
-        await sfi_int16(nhfp, new $c.FieldRef(ez, "ly", "i16"), $C`exclusion-ly`);
-        await sfi_int16(nhfp, new $c.FieldRef(ez, "hx", "i16"), $C`exclusion-hx`);
-        await sfi_int16(nhfp, new $c.FieldRef(ez, "hy", "i16"), $C`exclusion-hy`);
+        await Sfi_coordxy(nhfp, new $c.FieldRef(ez, "lx", "i16"), $C`exclusion-lx`);
+        await Sfi_coordxy(nhfp, new $c.FieldRef(ez, "ly", "i16"), $C`exclusion-ly`);
+        await Sfi_coordxy(nhfp, new $c.FieldRef(ez, "hx", "i16"), $C`exclusion-hx`);
+        await Sfi_coordxy(nhfp, new $c.FieldRef(ez, "hy", "i16"), $C`exclusion-hy`);
         ez.next = sve.exclusion_zones;
         sve.exclusion_zones = ez;
     }
@@ -2413,7 +2413,7 @@ function find_mapseen(lev) {   // dungeon.c:2640
 function find_mapseen_by_str(s) {   // dungeon.c:2652
     let mptr = null;
     for (mptr = svm.mapseenchn; mptr; mptr = mptr.next) {
-        if (mptr.custom && !strncmpi(s, mptr.custom, -1)) {
+        if (mptr.custom && !strcmpi(s, mptr.custom)) {
             break;
         }
     }
@@ -2460,16 +2460,16 @@ async function save_mapseen(nhfp, mptr) {   // dungeon.c:2695
             break;
         }
     }
-    await sfo_int(nhfp, new $c.Ptr(brindx, 0), $C`mapseen-branch_index`);
-    await sfo_d_level(nhfp, mptr.lev, $C`mapseen-d_level`);
-    await sfo_mapseen_feat(nhfp, mptr.feat, $C`mapseen-feat`);
-    await sfo_mapseen_flags(nhfp, mptr.flags, $C`mapseen-flags`);
-    await sfo_unsigned(nhfp, new $c.FieldRef(mptr, "custom_lth", "u32"), $C`mapseen-custom_lth`);
+    await Sfo_int(nhfp, new $c.Ptr(brindx, 0), $C`mapseen-branch_index`);
+    await Sfo_d_level(nhfp, mptr.lev, $C`mapseen-d_level`);
+    await Sfo_mapseen_feat(nhfp, mptr.feat, $C`mapseen-feat`);
+    await Sfo_mapseen_flags(nhfp, mptr.flags, $C`mapseen-flags`);
+    await Sfo_unsigned(nhfp, new $c.FieldRef(mptr, "custom_lth", "u32"), $C`mapseen-custom_lth`);
     if (mptr.custom_lth) {
-        await sfo_char(nhfp, mptr.custom, $C`mapseen-custom`, mptr.custom_lth | 0);
+        await Sfo_char(nhfp, mptr.custom, $C`mapseen-custom`, mptr.custom_lth | 0);
     }
     for (i = 0; i < (MAXNROFROOMS + 1) * 2; i = i + 1 | 0) {
-        await sfo_mapseen_rooms(nhfp, $c.relem(mptr.msrooms, i), $C`mapseen-msrooms`);
+        await Sfo_mapseen_rooms(nhfp, $c.relem(mptr.msrooms, i), $C`mapseen-msrooms`);
     }
     await savecemetery(nhfp, new $c.FieldRef(mptr, "final_resting_place", "ptr"));
 }
@@ -2489,20 +2489,20 @@ async function load_mapseen(nhfp) {   // dungeon.c:2721
         }
     }
     load.br = curr;
-    await sfi_d_level(nhfp, load.lev, $C`mapseen-d_level`);
-    await sfi_mapseen_feat(nhfp, load.feat, $C`mapseen-feat`);
-    await sfi_mapseen_flags(nhfp, load.flags, $C`mapseen-flags`);
+    await Sfi_d_level(nhfp, load.lev, $C`mapseen-d_level`);
+    await Sfi_mapseen_feat(nhfp, load.feat, $C`mapseen-feat`);
+    await Sfi_mapseen_flags(nhfp, load.flags, $C`mapseen-flags`);
     await sfi_unsigned(nhfp, new $c.FieldRef(load, "custom_lth", "u32"), $C`mapseen-custom_lth`);
     if (load.custom_lth) {
         /* length doesn't include terminator (which isn't saved & restored) */
         $t1 = $c.asArr(await alloc(load.custom_lth + 1 >>> 0), Int8Array), load.custom = $t1;
-        await sfi_char(nhfp, load.custom, $C`mapseen-custom`, load.custom_lth | 0);
+        await Sfi_char(nhfp, load.custom, $C`mapseen-custom`, load.custom_lth | 0);
         load.custom.set(load.custom_lth, 0);
     } else {
         load.custom = null;
     }
     for (i = 0; i < (MAXNROFROOMS + 1) * 2; i = i + 1 | 0) {
-        await sfi_mapseen_rooms(nhfp, $c.relem(load.msrooms, i), $C`mapseen-msrooms`);
+        await Sfi_mapseen_rooms(nhfp, $c.relem(load.msrooms, i), $C`mapseen-msrooms`);
     }
     await restcemetery(nhfp, new $c.FieldRef(load, "final_resting_place", "ptr"));
     return load;
@@ -2727,7 +2727,7 @@ function count_feat_lastseentyp(mptr, x, y) {   // dungeon.c:2951
             /* get the altarmask for this location; might be a mimic */
             atmp = altarmask_at(x, y) >>> 0;
             /* convert to index: 0..3 */
-            atmp = (svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level) && (svl.level.locations[x][y].seenv & SVALL) !== SVALL ? MSA_NONE : Amask2msa(atmp);
+            atmp = Is_astralevel(u.uz) && (svl.level.locations[x][y].seenv & SVALL) !== SVALL ? MSA_NONE : Amask2msa(atmp);
             if (!mptr.feat.naltar) {
                 mptr.feat.msalign = (atmp) & 3;
             } else if (mptr.feat.msalign !== atmp) {
@@ -2753,7 +2753,7 @@ function count_feat_lastseentyp(mptr, x, y) {   // dungeon.c:2951
              *  not recognizable as a bridge location unless/until
              *  the adjacent DBWALL has been seen.
              */
-            if ((svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level)) {
+            if (Is_knox(u.uz)) {
                 const tx = x - 4;
                 /* Throne is four columns to left, either directly in
                  * line or one row higher or lower, and doesn't have
@@ -2779,7 +2779,7 @@ function count_feat_lastseentyp(mptr, x, y) {   // dungeon.c:2951
         case DBWALL:
         case DRAWBRIDGE_DOWN:
             /*FALLTHRU*/
-            if ((svd.dungeon_topology.d_stronghold_level.dlevel || svd.dungeon_topology.d_stronghold_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_stronghold_level)) {
+            if (Is_stronghold(u.uz)) {
                 mptr.flags.castle = 1, mptr.flags.castletune = 1;
             }
             break;
@@ -2824,11 +2824,11 @@ export async function recalc_mapseen() {   // dungeon.c:3075
     mptr.flags.sokosolved = (In_sokoban(u.uz) && !Sokoban() ? 1 : 0) & 1;
     /* mptr->flags.bigroom retains previous value when hero can't see */
     if (!Blind()) {
-        $t1 = (svd.dungeon_topology.d_bigroom_level.dlevel || svd.dungeon_topology.d_bigroom_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_bigroom_level) ? 1 : 0, mptr.flags.bigroom = ($t1) & 1;
+        $t1 = Is_bigroom(u.uz), mptr.flags.bigroom = ($t1) & 1;
     } else if (mptr.flags.forgot) {
         mptr.flags.bigroom = 0;
     }
-    $t2 = (svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? 1 : 0, mptr.flags.roguelevel = ($t2) & 1;
+    $t2 = Is_rogue_level(u.uz), mptr.flags.roguelevel = ($t2) & 1;
     mptr.flags.oracle = 0;   /* recalculated during room traversal below */
     mptr.flags.castletune = 0;
     /* flags.castle retains previous value */
@@ -2902,7 +2902,7 @@ export async function recalc_mapseen() {   // dungeon.c:3075
        but it is possible for the priest to be killed prior to that; we
        assume that both of those levels only contain one altar, so add the
        annotation if that altar has been mapped (seen or magic mapping) */
-    if ((svd.dungeon_topology.d_valley_level.dlevel || svd.dungeon_topology.d_valley_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_valley_level)) {
+    if (Is_valley(u.uz)) {
         /* don't clear valley if naltar==0; maybe altar got destroyed? */
         if (mptr.feat.naltar > 0) {
             mptr.flags.valley = 1;
@@ -2910,7 +2910,7 @@ export async function recalc_mapseen() {   // dungeon.c:3075
         /* Sanctum and Gateway-to-Sanctum are mutually exclusive automatic
            annotations but handling that is tricky because they're stored
            with data for different levels */
-    } else if ((svd.dungeon_topology.d_sanctum_level.dlevel || svd.dungeon_topology.d_sanctum_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_sanctum_level)) {
+    } else if (Is_sanctum(u.uz)) {
         if (mptr.feat.naltar > 0) {
             mptr.flags.msanctum = 1;
         }
@@ -2970,9 +2970,9 @@ export function mapseen_temple(priest) {   // dungeon.c:3267
     if (!mptr) {
         return;
     }
-    if ((svd.dungeon_topology.d_valley_level.dlevel || svd.dungeon_topology.d_valley_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_valley_level)) {
+    if (Is_valley(u.uz)) {
         mptr.flags.valley = 1;
-    } else if ((svd.dungeon_topology.d_sanctum_level.dlevel || svd.dungeon_topology.d_sanctum_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_sanctum_level)) {
+    } else if (Is_sanctum(u.uz)) {
         mptr.flags.msanctum = 1;
     }
 }

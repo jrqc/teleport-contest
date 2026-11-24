@@ -11,7 +11,6 @@ import * as $c from '../crt/index.js';
 import { $C } from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
-import { A } from './attrib.h.js';
 import { isok } from './cmd.js';
 import { c_color_names, gf, gm, gs, svc, svd, svl, svm, u } from './decl.js';
 import { S } from './defsym.h.js';
@@ -19,12 +18,12 @@ import { newsym } from './display.js';
 import { Monnam, hcolor } from './do_name.js';
 import { mon_arrive, mon_catchup_elapsed_time } from './dog.js';
 import { def_monsyms } from './drawing.js';
-import { In_W_tower, builds_up, on_level } from './dungeon.js';
-import { Inhell } from './dungeon.macros.js';
+import { In_W_tower, builds_up } from './dungeon.js';
+import { Inhell, Is_astralevel, Is_rogue_level } from './dungeon.macros.js';
 import { FALSE, LARGEST_INT, TRUE } from './global.h.js';
 import { BOLT_LIM, MM, NO, RLOC } from './hack.h.js';
-import { distu, min } from './hack.macros.js';
-import { dist2, sgn } from './hacklib.js';
+import { distu, min, rn1 } from './hack.macros.js';
+import { sgn } from './hacklib.js';
 import { makemon, set_malign, unmakemon } from './makemon.js';
 import { expels } from './mhitu.js';
 import { monster_census, msummon } from './minion.js';
@@ -36,13 +35,13 @@ import { is_covetous } from './mondata.macros.js';
 import { G_GENOD, G_HELL, G_NOHELL, M2, M3, NEUTRAL } from './monflag.h.js';
 import { mons } from './monst.js';
 import { M_AP, STRAT } from './monst.h.js';
-import { DEADMONSTER, helpless } from './monst.macros.js';
+import { DEADMONSTER, helpless, is_lminion } from './monst.macros.js';
 import { PM } from './monsters.h.js';
 import { any_quest_artifact } from './obj.macros.js';
 import { AMULET_OF_YENDOR, BELL_OF_OPENING, CANDELABRUM_OF_INVOCATION, FAKE_AMULET_OF_YENDOR, SPE_BOOK_OF_THE_DEAD } from './objects.h.js';
 import { Tobjnam, distant_name, doname } from './objnam.js';
 import { You, You_feel, pline, verbalize } from './pline.js';
-import { inhistemple, mon_aligntyp } from './priest.js';
+import { inhistemple } from './priest.js';
 import { com_pager } from './questpgr.js';
 import { MON_AT } from './rm.macros.js';
 import { rn2, rnd } from './rnd.js';
@@ -53,7 +52,7 @@ import { mpickobj } from './steal.js';
 import { enexto, noteleport_level, rloc, rloc_to } from './teleport.js';
 import { MAGIC_PORTAL } from './trap.h.js';
 import { cansee } from './vision.macros.js';
-import { u_at } from './you.macros.js';
+import { m_next2u, u_at } from './you.macros.js';
 import { Blind, Deaf, Protection_from_shape_changers } from './youprop.macros.js';
 
 const MAXNASTIES = 10;
@@ -80,7 +79,7 @@ export async function amulet() {   // wizard.c:61
     if (((amu = $G.uamul) !== null && amu.otyp === AMULET_OF_YENDOR || (amu = $G.uwep) !== null && amu.otyp === AMULET_OF_YENDOR) && !rn2(15)) {
         for (ttmp = gf.ftrap; ttmp; ttmp = ttmp.ntrap) {
             if (ttmp.ttyp === MAGIC_PORTAL) {
-                const du = dist2(ttmp.tx, ttmp.ty, u.ux, u.uy);
+                const du = distu(ttmp.tx, ttmp.ty);
                 if (du <= 9) {
                     await pline($C`%s hot!`, await Tobjnam(amu, $C`feel`));
                 } else if (du <= 64) {
@@ -103,7 +102,7 @@ export async function amulet() {   // wizard.c:61
         }
         if (mtmp.iswiz && mtmp.msleeping && !rn2(40)) {
             mtmp.msleeping = 0;
-            if (!(dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2)) {
+            if (!m_next2u(mtmp)) {
                 await You($C`get the creepy feeling that somebody noticed your taking the Amulet.`);
             }
             return;
@@ -570,7 +569,7 @@ export function pick_nasty(difcap) {   // wizard.c:538
      * We want monsters represented by uppercase on rogue level,
      * but we don't try very hard.
      */
-    if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) && !(65 <= def_monsyms[$c.relem(mons, res).mlet].sym && def_monsyms[$c.relem(mons, res).mlet].sym <= 90)) {
+    if (Is_rogue_level(u.uz) && !(65 <= def_monsyms[$c.relem(mons, res).mlet].sym && def_monsyms[$c.relem(mons, res).mlet].sym <= 90)) {
         res = nasties[rn2(44)];
     }
     /* if genocided or too difficult or out of place, try a substitute
@@ -785,7 +784,7 @@ export async function resurrect() {   // wizard.c:715
  * @returns {Promise<void>}
  */
 export async function intervene() {   // wizard.c:785
-    const which = (svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level) ? rnd(4) : rn2(6);
+    const which = Is_astralevel(u.uz) ? rnd(4) : rn2(6);
     /* cases 0 and 5 don't apply on the Astral level */
     switch (which) {
         case 0:
@@ -816,7 +815,7 @@ export function wizdeadorgone() {   // wizard.c:815
     svc.context.no_of_wizards = svc.context.no_of_wizards - 1 >>> 0;
     if (!u.uevent.udemigod) {
         u.uevent.udemigod = (TRUE) & 1;
-        $t1 = (rn2(250) + 50 | 0) >>> 0, u.udg_cnt = $t1;
+        $t1 = rn1(250, 50) >>> 0, u.udg_cnt = $t1;
     }
 }
 /* Insult or intimidate the player */
@@ -843,7 +842,7 @@ export async function cuss(mtmp) {   // wizard.c:846
         } else {
             await verbalize($C`%s %s!`, random_malediction[rn2(11)], random_insult[rn2(28)]);
         }
-    } else if ($c.andu64(mtmp.data.mflags2, M2.MINION) !== 0 && mon_aligntyp(mtmp) === A.LAWFUL && !(mtmp.isminion && mtmp.mextra.emin.renegade)) {
+    } else if (is_lminion(mtmp) && !(mtmp.isminion && mtmp.mextra.emin.renegade)) {
         await com_pager($C`angel_cuss`);   /* TODO: the Hallucination msg */
         /*com_pager(rn2(QTN_ANGELIC - 1 + (Hallucination ? 1 : 0))
           + QT_ANGELIC);*/

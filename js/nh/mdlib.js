@@ -194,7 +194,7 @@ async function opt_out_words(str, length_p) {   // mdlib.c:641
  * @returns {Promise<void>}
  */
 async function build_options() {   // mdlib.c:669
-    let buf = new Int8Array(256), i = 0, length = Int32Array.of(0), $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13, $t14, $t15, $t16, $t17, $t18, $t19, $t20, $t21, $t22, $t23, $t24, $t25, $t26, $t27, $t28, $t29, $t30, $t31, $t32, $t33, $t34, $t35, $t36;
+    let buf = new Int8Array(256), i = 0, length = Int32Array.of(0), $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13, $t14, $t15, $t16, $t17, $t18, $t19, $t20, $t21, $t22, $t23, $t24, $t25, $t26, $t27, $t28, $t29, $t30, $t31, $t32, $t33, $t34, $t35, $t36, $t37, $t38, $t39, $t40, $t41, $t42;
     let cnt = 0;
     const defwinsys = $C`tty`;
     build_savebones_compat_string();
@@ -288,7 +288,7 @@ async function build_options() {   // mdlib.c:669
     }
     /* MAKEDEFS_C || FOR_RUNTIME */
     /* end with a blank line */
-    idxopttext < MAXOPT ? ($t35 = await dupstr($C``), $t36 = new $c.Ptr(opttext, ($t34 = idxopttext, idxopttext = $t34 + 1 | 0, $t34)), $t36.set(0, $t35)) : null;
+    idxopttext < MAXOPT ? ($t41 = await dupstr($C``), $t42 = new $c.Ptr(opttext, ($t40 = idxopttext, idxopttext = $t40 + 1 | 0, $t40)), $t42.set(0, $t41)) : null;
     return;
 }
 /**

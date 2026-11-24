@@ -14,7 +14,8 @@ import { FALSE, TRUE } from './global.h.js';
 import { release_data, update_file } from './hack.macros.js';
 import { distmin } from './hacklib.js';
 import { RIN_STEALTH } from './objects.h.js';
-import { sfi_int, sfi_nhcoord, sfo_int, sfo_nhcoord } from './sfbase.js';
+import { Sfi_nhcoord, Sfo_int, Sfo_nhcoord } from './savefile.macros.js';
+import { sfi_int } from './sfbase.js';
 
 const UTSZ = 100;
 
@@ -87,10 +88,10 @@ export function hastrack(x, y) {   // track.c:63
 export async function save_track(nhfp) {   // track.c:76
     let i = 0;
     if (update_file(nhfp)) {
-        await sfo_int(nhfp, new $c.Ptr(utcnt, 0), $C`track-utcnt`);
-        await sfo_int(nhfp, new $c.Ptr(utpnt, 0), $C`track-utpnt`);
+        await Sfo_int(nhfp, new $c.Ptr(utcnt, 0), $C`track-utcnt`);
+        await Sfo_int(nhfp, new $c.Ptr(utpnt, 0), $C`track-utpnt`);
         for (i = 0; i < utcnt[0]; i = i + 1 | 0) {
-            await sfo_nhcoord(nhfp, $c.relem(utrack, i), $C`utrack`);
+            await Sfo_nhcoord(nhfp, $c.relem(utrack, i), $C`utrack`);
         }
     }
     if (release_data(nhfp)) {
@@ -110,7 +111,7 @@ export async function rest_track(nhfp) {   // track.c:93
         await panic($C`rest_track: impossible pt counts`);
     }
     for (i = 0; i < utcnt[0]; i = i + 1 | 0) {
-        await sfi_nhcoord(nhfp, $c.relem(utrack, i), $C`utrack`);
+        await Sfi_nhcoord(nhfp, $c.relem(utrack, i), $C`utrack`);
     }
 }
 

@@ -24,7 +24,8 @@ import { CANDELABRUM_OF_INVOCATION, GOLD_DRAGON_SCALE_MAIL, MAGIC_LAMP } from '.
 import { otense, simpleonames, xname } from './objnam.js';
 import { impossible } from './pline.js';
 import { lookup_id_mapping } from './restore.js';
-import { sfi_int, sfi_ls_t, sfo_int, sfo_ls_t } from './sfbase.js';
+import { Sfi_ls_t, Sfo_int, Sfo_ls_t } from './savefile.macros.js';
+import { sfi_int } from './sfbase.js';
 import { find_oid } from './shk.js';
 import { end_burn, obj_is_local } from './timeout.js';
 import { RANGE } from './timeout.h.js';
@@ -441,7 +442,7 @@ export async function save_light_sources(nhfp, range) {   // light.c:421
     gv.vision_full_recalc = 0;
     if (update_file(nhfp)) {
         count[0] = await maybe_write_ls(nhfp, range, FALSE);
-        await sfo_int(nhfp, new $c.Ptr(count, 0), $C`lightsource-count`);
+        await Sfo_int(nhfp, new $c.Ptr(count, 0), $C`lightsource-count`);
         const actual = await maybe_write_ls(nhfp, range, TRUE);
         if (actual !== count[0]) {
             await panic($C`counted %d light sources, wrote %d! [range=%d]`, count[0], actual, range);
@@ -493,7 +494,7 @@ export async function restore_light_sources(nhfp) {   // light.c:479
     await sfi_int(nhfp, new $c.Ptr(count, 0), $C`lightsource-count`);
     while (($t1 = count[0], count[0] = $t1 - 1 | 0, $t1) > 0) {
         const ls = $c.asRec(await alloc(32), $T.ls_t, 32);
-        await sfi_ls_t(nhfp, ls, $C`lightsource`);
+        await Sfi_ls_t(nhfp, ls, $C`lightsource`);
         ls.next = gl.light_base;
         gl.light_base = ls;
     }
@@ -640,7 +641,7 @@ async function write_ls(nhfp, ls) {   // light.c:634
     let arg_save = new $T.any();
     if (ls.type === LS_OBJECT || ls.type === LS_MONSTER) {
         if (ls.flags & LSF_NEEDS_FIXUP) {
-            await sfo_ls_t(nhfp, ls, $C`lightsource`);
+            await Sfo_ls_t(nhfp, ls, $C`lightsource`);
         } else {
             /* replace object pointer with id for write, then put back */
             arg_save.$copyFrom(ls.id);
@@ -685,7 +686,7 @@ async function write_ls(nhfp, ls) {   // light.c:634
                 /* TODO: cleanup this ls, or skip writing it */
             }
             ls.flags = $c.i16(ls.flags | LSF_NEEDS_FIXUP);
-            await sfo_ls_t(nhfp, ls, $C`lightsource`);
+            await Sfo_ls_t(nhfp, ls, $C`lightsource`);
             ls.id.$copyFrom(arg_save);
             ls.flags = $c.i16(ls.flags & ~LSF_NEEDS_FIXUP);
             ls.flags = $c.i16(ls.flags & ~LSF_IS_PROBLEMATIC);

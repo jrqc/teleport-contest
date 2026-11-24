@@ -13,8 +13,8 @@ import { TIP } from './context.h.js';
 import { cg, flags, gc, gg, gi, gs, gw, iflags, quitchars, svl, u } from './decl.js';
 import { S } from './defsym.h.js';
 import { back_to_glyph, docrt_flags, flush_screen, glyph_at, nul_glyphinfo } from './display.js';
-import { GLYPH, GLYPH_NOTHING, GLYPH_UNEXPLORED, docrtRefresh } from './display.h.js';
-import { glyph_is_cmap, glyph_is_monster, glyph_is_nothing, glyph_is_object, glyph_is_unexplored } from './display.macros.js';
+import { GLYPH_NOTHING, GLYPH_UNEXPLORED, docrtRefresh } from './display.h.js';
+import { glyph_is_cmap, glyph_is_monster, glyph_is_nothing, glyph_is_object, glyph_is_unexplored, objnum_to_glyph } from './display.macros.js';
 import { defsyms } from './drawing.js';
 import { GFILTER_AREA, GFILTER_VIEW, GLOC, NUM_GFILTER, NUM_GLOCS, TER } from './flag.h.js';
 import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
@@ -395,7 +395,7 @@ export async function gather_locs_interesting(x, y, gloc) {   // getpos.c:438
                warning glyphs and remembered unseen ones */
             return glyph_is_monster(glyph) && glyph !== 330 && glyph !== 713 ? 1 : 0;
         case GLOC.OBJS:
-            return glyph_is_object(glyph) && glyph !== BOULDER + GLYPH.OBJ_OFF && glyph !== ROCK + GLYPH.OBJ_OFF ? 1 : 0;
+            return glyph_is_object(glyph) && glyph !== objnum_to_glyph(BOULDER) && glyph !== objnum_to_glyph(ROCK) ? 1 : 0;
         case GLOC.DOOR:
             return glyph_is_cmap(glyph) && (is_cmap_door(sym) || is_cmap_drawbridge(sym) || sym === S.ndoor) ? 1 : 0;
         case GLOC.EXPLORE:

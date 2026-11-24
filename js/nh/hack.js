@@ -35,7 +35,7 @@ import { breaktest } from './dothrow.js';
 import { defsyms } from './drawing.js';
 import { In_mines, Invocation_lev, assign_level, ceiling, depth, get_level, has_ceiling, on_level, room_discovered, surface, u_on_newpos } from './dungeon.js';
 import { MIGR } from './dungeon.h.js';
-import { In_sokoban } from './dungeon.macros.js';
+import { In_sokoban, Is_airlevel, Is_earthlevel, Is_juiblex_level, Is_medusa_level, Is_rogue_level, Is_waterlevel } from './dungeon.macros.js';
 import { gethungry, morehungry } from './eat.js';
 import { done, panic } from './end.js';
 import { can_reach_floor, engr_at, wipe_engr_at } from './engrave.js';
@@ -46,7 +46,7 @@ import { ParanoidConfirm, ParanoidSwim, ParanoidTrap } from './flag.macros.js';
 import { COLNO, FALSE, LL, ROWNO, TRUE } from './global.h.js';
 import { glyph_to_cmap } from './glyphs.js';
 import { ARTICLE, BRK, CMDQ, CQ_CANNED, DIED, DISMOUNT, DO_MOVE, ECMD, EXT_ENCUMBER, FAILEDUNTRAP, FOOT, GP, HVY_ENCUMBER, LAUNCH, MOD_ENCUMBER, NHCORE, NO_KILLER_PREFIX, NO_PART, NO_TRAP_FLAGS, N_DIRS, OVERLOADED, RLOC, ROLL, SHOP, SLT_ENCUMBER, SUPPRESS, TEST, UNENCUMBERED, invlet_basic } from './hack.h.js';
-import { Maybe_Half_Phys, NODIAG, SHOP_WALL_DMG, You1, pline1 } from './hack.macros.js';
+import { Maybe_Half_Phys, NODIAG, SHOP_WALL_DMG, You1, distu, max, min, pline1 } from './hack.macros.js';
 import { dist2, distmin, highc, ing_suffix, nh_snprintf, s_suffix, sgn, strncmpi, upstart, visctrl } from './hacklib.js';
 import { record_achievement } from './insight.js';
 import { carrying, delobj, freeinv, sobj_at, useupf } from './invent.js';
@@ -83,7 +83,7 @@ import { Norep, There, You, You_cant, You_feel, You_hear, Your, impossible, live
 import { body_part, float_vs_flight, rehumanize } from './polyself.js';
 import { incr_itimeout } from './potion.js';
 import { intemple } from './priest.js';
-import { COLD_RES, CONFUSION, DISINT_RES, FAST, FIRE_RES, FLYING, FROMFORM, FROMOUTSIDE, FUMBLING, HALF_PHDAM, INTRINSIC, INVIS, I_SPECIAL, LEVITATION, MAGICAL_BREATHING, POISON_RES, SEE_INVIS, SHOCK_RES, SLEEP_RES, STEALTH, STUNNED, SWIMMING, TELEPORT, TELEPORT_CONTROL, TIMEOUT, W, WOUNDED_LEGS, WWALKING } from './prop.h.js';
+import { COLD_RES, CONFUSION, DISINT_RES, FAST, FIRE_RES, FLYING, FROMFORM, FROMOUTSIDE, FUMBLING, HALF_PHDAM, INTRINSIC, INVIS, I_SPECIAL, LEVITATION, POISON_RES, SEE_INVIS, SHOCK_RES, SLEEP_RES, STEALTH, STUNNED, TELEPORT, TELEPORT_CONTROL, TIMEOUT, W, WOUNDED_LEGS } from './prop.h.js';
 import { in_out_region, reg_damg, visible_region_at } from './region.js';
 import { AIR, ALTAR, CLOUD, CORR, D, DB, DBWALL, DOOR, DRAWBRIDGE_UP, ICE, IRONBARS, LAVAPOOL, LAVAWALL, MAX_TYPE, MOAT, POOL, ROOM, SCORR, SDOOR, SINK, STAIRS, STONE, THRONE, TREE, WATER, xFLOOR, xGROUND, xOPENDOOR, xSEA, xSHUTDOOR, xSUBMERGED, xSWAMP, xWATERWALL } from './rm.h.js';
 import { IS_ALTAR, IS_DOOR, IS_FOUNTAIN, IS_FURNITURE, IS_GRAVE, IS_OBSTRUCTED, IS_SINK, IS_STWALL, IS_THRONE, IS_TREE, IS_WALL, IS_WATERWALL, OBJ_AT, Sokoban, m_at, remove_monster } from './rm.macros.js';
@@ -112,8 +112,8 @@ import { setuwep } from './wield.js';
 import { nh_delay_output, raw_print } from './winprocs.macros.js';
 import { worm_cross } from './worm.js';
 import { ACH, TT } from './you.h.js';
-import { Ugender, Upolyd, u_at } from './you.macros.js';
-import { BFlying, BLevitation, Blind, Conflict, Deaf, EFlying, ELevitation, Fumbling, HFlying, Half_physical_damage, Hallucination, Levitation, Passes_walls, Protection_from_shape_changers, Punished, Stealth, Unchanging, Underwater, Warning } from './youprop.macros.js';
+import { Race_if, Role_if, Ugender, Upolyd, u_at } from './you.macros.js';
+import { Amphibious, BFlying, BLevitation, Blind, Breathless, Conflict, Deaf, EFlying, ELevitation, Flying, Fumbling, HFlying, Half_physical_damage, Hallucination, Levitation, Passes_walls, Protection_from_shape_changers, Punished, Stealth, Swimming, Unchanging, Underwater, Warning, Wwalking } from './youprop.macros.js';
 
 const TRAVP_TRAVEL = 0;
 const TRAVP_GUESS = 1;
@@ -442,7 +442,7 @@ async function moverock_core(sx, sy) {   // hack.c:348
                 sokoban_guilt();
                 res = 0;   /* move to <sx,sy> */
             } else if (could_move_onto_boulder(sx, sy)) {
-                await You($C`squeeze yourself %s the boulder.`, (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked ? $C`over` : $C`against`);
+                await You($C`squeeze yourself %s the boulder.`, Flying() ? $C`over` : $C`against`);
                 sokoban_guilt();
                 res = 0;   /* move to <sx,sy> */
             } else {
@@ -456,7 +456,7 @@ async function moverock_core(sx, sy) {   // hack.c:348
             }
             return res;
         }
-        if (Levitation() || (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) {
+        if (Levitation() || Is_airlevel(u.uz)) {
             /* FIXME?  behavior in an air bubble on the water level should
                be similar to being on the air level; both cases probably
                ought to let push attempt proceed when flying (which implies
@@ -836,7 +836,7 @@ async function dosinkfall() {   // hack.c:836
         for (obj = svl.level.objects[u.ux][u.uy]; obj; obj = obj.v.v_nexthere) {
             if (obj.oclass === WEAPON_CLASS || is_weptool(obj)) {
                 await You($C`fell on %s.`, await doname(obj));
-                await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(3) + 1 | 0, 2) : rnd(3), new $c.Ptr(dosinkfall$fell_on_sink, 0), NO_KILLER_PREFIX);
+                await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(3) + 1 | 0, 2) : rnd(3)), new $c.Ptr(dosinkfall$fell_on_sink, 0), NO_KILLER_PREFIX);
                 await exercise(A.CON, FALSE);
             }
         }
@@ -1160,7 +1160,7 @@ export async function test_move(ux, uy, dx, dy, mode) {   // hack.c:991
            get here) unless flying or levitating or have known
            water-walking for pool or known lava-walking and
            already be on/over lava for lava */
-        if (svl.level.locations[x][y].seenv && is_pool_or_lava(x, y) && (svl.level.locations[x][y].typ === WATER || svl.level.locations[x][y].typ === LAVAWALL || !(Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked || (is_pool(x, y) ? Known_wwalking() : Known_lwalking() && is_lava(u.ux, u.uy))))) {
+        if (svl.level.locations[x][y].seenv && is_pool_or_lava(x, y) && (svl.level.locations[x][y].typ === WATER || svl.level.locations[x][y].typ === LAVAWALL || !(Levitation() || Flying() || (is_pool(x, y) ? Known_wwalking() : Known_lwalking() && is_lava(u.ux, u.uy))))) {
             return mode === TEST.TRAP ? 1 : 0;
         }
     }
@@ -1637,7 +1637,7 @@ async function trapmove(x, y, desttrap) {   // hack.c:1550
  */
 export async function u_rooted() {   // hack.c:1694
     if (!gy.youmonst.data.mmove) {
-        await You($C`are rooted %s.`, Levitation() || (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? $C`in place` : $C`to the ground`);
+        await You($C`are rooted %s.`, Levitation() || Is_airlevel(u.uz) || Is_waterlevel(u.uz) ? $C`in place` : $C`to the ground`);
         nomul(0);
         return TRUE;
     }
@@ -1667,7 +1667,7 @@ export async function notice_mon(mtmp) {   // hack.c:1708
 function notice_mons_cmp(ptr1, ptr2) {   // hack.c:1735
     const m1 = $c.asArr(ptr1, 'ptr').get(0);
     const m2 = $c.asArr(ptr2, 'ptr').get(0);
-    return dist2(m1.mx, m1.my, u.ux, u.uy) - dist2(m2.mx, m2.my, u.ux, u.uy) | 0;
+    return distu(m1.mx, m1.my) - distu(m2.mx, m2.my) | 0;
 }
 /**
  * @param {number} reset boolean
@@ -1736,7 +1736,7 @@ export async function disturb_buried_zombies(x, y) {   // hack.c:1798
     for (otmp = svl.level.buriedobjlist; otmp; otmp = otmp.nobj) {
         if (otmp.otyp === CORPSE && otmp.timed && otmp.ox >= x - 1 && otmp.ox <= x + 1 && otmp.oy >= y - 1 && otmp.oy <= y + 1 && (t = peek_timer(ZOMBIFY_MON, obj_to_any(otmp))) > 0) {
             t = await stop_timer(ZOMBIFY_MON, obj_to_any(otmp));
-            await start_timer(1 > $c.div64($c.mul64(t, 2), 3) ? 1 : $c.div64($c.mul64(t, 2), 3), TIMER.OBJECT, ZOMBIFY_MON, obj_to_any(otmp));
+            await start_timer(max(1, $c.div64($c.mul64(t, 2), 3)), TIMER.OBJECT, ZOMBIFY_MON, obj_to_any(otmp));
         }
     }
 }
@@ -1752,7 +1752,7 @@ export function u_locomotion(def) {   // hack.c:1817
        its is_flyer() and is_floater() tests wouldn't work on hero except
        when hero is polymorphed and not wearing an amulet of flying
        or boots/ring/spell of levitation */
-    return Levitation() ? capitalize ? $C`Float` : $C`float` : (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked ? capitalize ? $C`Fly` : $C`fly` : locomotion(gy.youmonst.data, def);
+    return Levitation() ? capitalize ? $C`Float` : $C`float` : Flying() ? capitalize ? $C`Fly` : $C`fly` : locomotion(gy.youmonst.data, def);
 }
 /* Return a simplified floor solid/liquid state based on hero's state */
 /**
@@ -1761,7 +1761,7 @@ export function u_locomotion(def) {   // hack.c:1817
  * @returns {number} schar
  */
 function u_simple_floortyp(x, y) {   // hack.c:1833
-    const u_in_air = Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked || !(!($c.andu64(gy.youmonst.data.mflags1, M1.FLY) !== 0) && !(gy.youmonst.data.mlet === S.EYE || gy.youmonst.data.mlet === S.LIGHT) && (!($c.andu64(gy.youmonst.data.mflags1, M1.CLING) !== 0) || !has_ceiling(u.uz))) ? 1 : 0;
+    const u_in_air = Levitation() || Flying() || !(!($c.andu64(gy.youmonst.data.mflags1, M1.FLY) !== 0) && !(gy.youmonst.data.mlet === S.EYE || gy.youmonst.data.mlet === S.LIGHT) && (!($c.andu64(gy.youmonst.data.mflags1, M1.CLING) !== 0) || !has_ceiling(u.uz))) ? 1 : 0;
     if (is_waterwall(x, y)) {
         return WATER;   /* wall of water, fly/lev does not matter */
     }
@@ -2214,7 +2214,7 @@ async function domove_fight_empty(x, y) {   // hack.c:2229
  * @returns {Promise<number>} boolean
  */
 async function air_turbulence() {   // hack.c:2342
-    if ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) && rn2(4) && !Levitation() && !((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked)) {
+    if (Is_airlevel(u.uz) && rn2(4) && !Levitation() && !Flying()) {
         switch (rn2(3)) {
             case 0:
                 await You($C`tumble in place.`);
@@ -2241,7 +2241,7 @@ async function air_turbulence() {   // hack.c:2342
 async function water_turbulence(x, y) {   // hack.c:2365
     let wtcap = 0;
     if (u.uinwater) {
-        const wtmod = u.uprops[SWIMMING].intrinsic || u.uprops[SWIMMING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.SWIM) !== 0 ? MOD_ENCUMBER : SLT_ENCUMBER;
+        const wtmod = Swimming() ? MOD_ENCUMBER : SLT_ENCUMBER;
         await water_friction();
         if (!u.dx && !u.dy) {
             nomul(0);
@@ -2250,7 +2250,7 @@ async function water_turbulence(x, y) {   // hack.c:2365
         x.set(0, $c.i16(u.ux + u.dx | 0));
         y.set(0, $c.i16(u.uy + u.dy | 0));
         /* are we trying to move out of water while carrying too much? */
-        if (isok(x.get(0), y.get(0)) && !is_pool(x.get(0), y.get(0)) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && (wtcap = near_capacity()) > wtmod) {
+        if (isok(x.get(0), y.get(0)) && !is_pool(x.get(0), y.get(0)) && !Is_waterlevel(u.uz) && (wtcap = near_capacity()) > wtmod) {
             /* when escaping from drowning you need to be unencumbered
                in order to crawl out of water, but when not drowning,
                doing so while encumbered is feasible; if in an aquatic
@@ -2270,7 +2270,7 @@ async function slippery_ice_fumbling() {   // hack.c:2396
     let recharged = !Levitation() && is_ice(u.ux, u.uy) ? 1 : 0;
     const iceskater = u.usteed ? u.usteed : gy.youmonst;
     if (recharged) {
-        if ($G.uarmf && await objdescr_is($G.uarmf, $C`snow boots`) || await resists_cold(iceskater) || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked || is_floater(iceskater.data) || is_clinger(iceskater.data) || is_whirly(iceskater.data)) {
+        if ($G.uarmf && await objdescr_is($G.uarmf, $C`snow boots`) || await resists_cold(iceskater) || Flying() || is_floater(iceskater.data) || is_clinger(iceskater.data) || is_whirly(iceskater.data)) {
             recharged = FALSE;
         } else if (!rn2(u.uprops[COLD_RES].intrinsic || u.uprops[COLD_RES].extrinsic ? 3 : 2)) {
             u.uprops[FUMBLING].intrinsic = $c.or64(u.uprops[FUMBLING].intrinsic, FROMOUTSIDE);
@@ -2336,7 +2336,7 @@ async function avoid_moving_on_trap(x, y, msg) {   // hack.c:2444
  * @returns {Promise<number>} boolean
  */
 async function avoid_moving_on_liquid(x, y, msg) {   // hack.c:2463
-    const in_air = Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked ? 1 : 0;
+    const in_air = Levitation() || Flying() ? 1 : 0;
     /* don't stop if you're not on a transition between terrain types... */
     /* or you are using shift-dir running and the transition isn't
        dangerous... */
@@ -2470,7 +2470,7 @@ async function move_out_of_bounds(x, y) {   // hack.c:2586
  */
 async function carrying_too_much() {   // hack.c:2616
     let wtcap = 0;
-    if (((wtcap = near_capacity()) >= OVERLOADED || wtcap > SLT_ENCUMBER && (Upolyd() ? u.mh < 5 && u.mh !== u.mhmax : u.uhp < 10 && u.uhp !== u.uhpmax)) && !((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level))) {
+    if (((wtcap = near_capacity()) >= OVERLOADED || wtcap > SLT_ENCUMBER && (Upolyd() ? u.mh < 5 && u.mh !== u.mhmax : u.uhp < 10 && u.uhp !== u.uhpmax)) && !Is_airlevel(u.uz)) {
         if (wtcap < OVERLOADED) {
             await You($C`don't have enough stamina to move.`);
             await exercise(A.CON, FALSE);
@@ -2767,7 +2767,7 @@ async function domove_core() {   // hack.c:2712
         }
     }
     /* your tread on the ground may disturb the slumber of nearby zombies */
-    if (!Levitation() && !((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) && !Stealth() && gy.youmonst.data.cwt >= 400) {
+    if (!Levitation() && !Flying() && !Stealth() && gy.youmonst.data.cwt >= 400) {
         await disturb_buried_zombies(u.ux, u.uy);
     }
     if (hides_under(gy.youmonst.data) || gy.youmonst.data.mlet === S.EEL || u.dx || u.dy) {
@@ -2891,7 +2891,7 @@ export async function invocation_message() {   // hack.c:3064
         nomul(0);   /* stop running or travelling */
         if (u.usteed) {
             $c.sprintf(new $c.Ptr(buf, 0), $C`beneath %s`, await y_monnam(u.usteed));
-        } else if (Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) {
+        } else if (Levitation() || Flying()) {
             $c.strcpy(new $c.Ptr(buf, 0), $C`beneath you`);
         } else {
             $c.sprintf(new $c.Ptr(buf, 0), $C`under your %s`, await makeplural(await body_part(FOOT)));
@@ -2926,7 +2926,7 @@ export function classify_terrain() {   // hack.c:3090
             case CORR:
             case ROOM:
                 /* this matches surface() but 'floor' is odd in many places */
-                typ = !((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level)) ? xFLOOR : xGROUND;
+                typ = !Is_earthlevel(u.uz) ? xFLOOR : xGROUND;
                 break;
             case DOOR:
                 /* defaults to "doorway" (door-less or broken) */
@@ -2945,14 +2945,14 @@ export function classify_terrain() {   // hack.c:3090
                 break;
             case MOAT:
                 /* moat and swamp handling match waterbody_name()'s result */
-                if ((svd.dungeon_topology.d_medusa_level.dlevel || svd.dungeon_topology.d_medusa_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_medusa_level)) {
+                if (Is_medusa_level(u.uz)) {
                     typ = xSEA;
-                } else if ((svd.dungeon_topology.d_juiblex_level.dlevel || svd.dungeon_topology.d_juiblex_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_juiblex_level)) {
+                } else if (Is_juiblex_level(u.uz)) {
                     typ = xSWAMP;
                 }
                 break;
             case WATER:
-                if (!((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) {
+                if (!Is_waterlevel(u.uz)) {
                     typ = xWATERWALL;
                 }
                 break;
@@ -2986,7 +2986,7 @@ export async function switch_terrain() {   // hack.c:3178
     const lev = $c.relem(svl.level.locations[u.ux], u.uy);
     const blocklev = IS_OBSTRUCTED(lev.typ) || closed_door(u.ux, u.uy) || IS_WATERWALL(lev.typ) || lev.typ === LAVAWALL ? 1 : 0;
     const was_levitating = !!Levitation() ? 1 : 0;
-    const was_flying = !!((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) ? 1 : 0;
+    const was_flying = !!Flying() ? 1 : 0;
     if (blocklev) {
         /* called from spoteffects(), stop levitating but skip float_down() */
         if (Levitation()) {
@@ -3003,7 +3003,7 @@ export async function switch_terrain() {   // hack.c:3178
     }
     /* the same terrain that blocks levitation also blocks flight */
     if (blocklev) {
-        if ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) {
+        if (Flying()) {
             await You_cant($C`fly in here.`);
         }
         u.uprops[FLYING].blocked = $c.or64(u.uprops[FLYING].blocked, FROMOUTSIDE);
@@ -3013,11 +3013,11 @@ export async function switch_terrain() {   // hack.c:3178
         /* [minor bug: we don't know whether this is beginning flight or
            resuming it; that could be tracked so that this message could
            be adjusted to "resume flying", but isn't worth the effort...] */
-        if ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) {
+        if (Flying()) {
             await You($C`start flying.`);
         }
     }
-    if ((!!Levitation() ? 1 : 0) ^ was_levitating || (!!((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) ? 1 : 0) ^ was_flying) {
+    if ((!!Levitation() ? 1 : 0) ^ was_levitating || (!!Flying() ? 1 : 0) ^ was_flying) {
         disp.botl = TRUE;   /* update Lev/Fly status condition */
     }
     if (flags.terrainstatus) {
@@ -3048,7 +3048,7 @@ export async function pooleffects(newspot) {   // hack.c:3233
     if (u.uinwater) {
         let still_inwater = FALSE;   /* assume we're getting out */
         if (!is_pool(u.ux, u.uy)) {
-            if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
+            if (Is_waterlevel(u.uz)) {
                 await You($C`pop into an air bubble.`);
                 iflags.last_msg = PLNMSG.BACK_ON_GROUND;
             } else if (is_lava(u.ux, u.uy)) {
@@ -3056,19 +3056,19 @@ export async function pooleffects(newspot) {   // hack.c:3233
             } else {
                 await back_on_ground(FALSE);
             }
-        } else if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
+        } else if (Is_waterlevel(u.uz)) {
             still_inwater = TRUE;
         } else if (Levitation()) {
             await You($C`pop out of the %s like a cork!`, hliquid($C`water`));
-        } else if ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) {
+        } else if (Flying()) {
             await You($C`fly out of the %s.`, hliquid($C`water`));
-        } else if ((u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) {
+        } else if (Wwalking()) {
             await You($C`slowly rise above the surface.`);
         } else {
             still_inwater = TRUE;
         }
         if (!still_inwater) {
-            const was_underwater = Underwater() && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) ? 1 : 0;
+            const was_underwater = Underwater() && !Is_waterlevel(u.uz) ? 1 : 0;
             await set_uinwater(0);   /* u.uinwater = 0; leave the water */
             if (was_underwater) {
                 /* restore vision */
@@ -3078,7 +3078,7 @@ export async function pooleffects(newspot) {   // hack.c:3233
         }
     }
     /* check for entering water or lava */
-    if (!u.ustuck && !Levitation() && !((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) && is_pool_or_lava(u.ux, u.uy)) {
+    if (!u.ustuck && !Levitation() && !Flying() && is_pool_or_lava(u.ux, u.uy)) {
         if (u.usteed && !(!($c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !(u.usteed.data.mlet === S.EYE || u.usteed.data.mlet === S.LIGHT) && (!($c.andu64(u.usteed.data.mflags1, M1.CLING) !== 0) || !has_ceiling(u.uz)))) {
             /* floating or clinging steed keeps hero safe (is_flyer() test
                is redundant; it can't be true since Flying yielded false) */
@@ -3088,7 +3088,7 @@ export async function pooleffects(newspot) {   // hack.c:3233
             await dismount_steed(Underwater() ? DISMOUNT.FELL : DISMOUNT.GENERIC);
             /* dismount_steed() -> float_down() -> pickup()
                (float_down doesn't do autopickup on Air or Water) */
-            if ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
+            if (Is_airlevel(u.uz) || Is_waterlevel(u.uz)) {
                 return FALSE;
             }
             /* even if we actually end up at same location, float_down()
@@ -3109,7 +3109,7 @@ export async function pooleffects(newspot) {   // hack.c:3233
             if (await lava_effects()) {
                 return TRUE;
             }
-        } else if ((!((u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) || is_waterwall(u.ux, u.uy)) && (newspot || !u.uinwater || !(u.uprops[SWIMMING].intrinsic || u.uprops[SWIMMING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.SWIM) !== 0 || (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.AMPHIBIOUS) !== 0) || (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.BREATHLESS) !== 0)))) {
+        } else if ((!Wwalking() || is_waterwall(u.ux, u.uy)) && (newspot || !u.uinwater || !(Swimming() || Amphibious() || Breathless()))) {
             if (await drown()) {
                 return TRUE;
             }
@@ -3593,7 +3593,7 @@ async function pickup_checks() {   // hack.c:3788
         }
     }
     if (is_pool(u.ux, u.uy)) {
-        if ((u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) || is_floater(gy.youmonst.data) || is_clinger(gy.youmonst.data) || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked && !(u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.BREATHLESS) !== 0)) {
+        if (Wwalking() || is_floater(gy.youmonst.data) || is_clinger(gy.youmonst.data) || Flying() && !Breathless()) {
             await You($C`cannot dive into the %s to pick things up.`, hliquid($C`water`));
             return 0;
         } else if (!Underwater()) {
@@ -3602,7 +3602,7 @@ async function pickup_checks() {   // hack.c:3788
         }
     }
     if (is_lava(u.ux, u.uy)) {
-        if ((u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) || is_floater(gy.youmonst.data) || is_clinger(gy.youmonst.data) || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked && !(u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.BREATHLESS) !== 0)) {
+        if (Wwalking() || is_floater(gy.youmonst.data) || is_clinger(gy.youmonst.data) || Flying() && !Breathless()) {
             await You_cant($C`reach the bottom to pick things up.`);
             return 0;
         } else if (!likes_lava(gy.youmonst.data)) {
@@ -3873,7 +3873,7 @@ export function doorless_door(x, y) {   // hack.c:4063
     }
     /* all rogue level doors are doorless but disallow diagonal access, so
        we treat them as if their non-existent doors were actually present */
-    if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level)) {
+    if (Is_rogue_level(u.uz)) {
         return FALSE;
     }
     return !(lev_p.flags & ~(D.NODOOR | D.BROKEN)) ? 1 : 0;
@@ -4023,8 +4023,8 @@ async function maybe_wail() {   // hack.c:4211
         return;
     }
     gw.wailmsg = svm.moves;
-    if (gu.urole.mnum === PM.WIZARD || gu.urace.mnum === PM.ELF || gu.urole.mnum === PM.VALKYRIE) {
-        const who = gu.urole.mnum === PM.WIZARD || gu.urole.mnum === PM.VALKYRIE ? gu.urole.name.m : $C`Elf`;
+    if (Role_if(PM.WIZARD) || Race_if(PM.ELF) || Role_if(PM.VALKYRIE)) {
+        const who = Role_if(PM.WIZARD) || Role_if(PM.VALKYRIE) ? gu.urole.name.m : $C`Elf`;
         if (u.uhp === 1) {
             await pline($C`%s is about to die.`, who);
         } else {
@@ -4119,13 +4119,13 @@ export function weight_cap() {   // hack.c:4295
         }
     }
     /* pugh@cornell */
-    if (Levitation() || (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || u.usteed && strongmonst(u.usteed.data)) {
+    if (Levitation() || Is_airlevel(u.uz) || u.usteed && strongmonst(u.usteed.data)) {
         carrcap = MAX_CARR_CAP;
     } else {
         if (carrcap > MAX_CARR_CAP) {
             carrcap = MAX_CARR_CAP;
         }
-        if (!((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked)) {
+        if (!Flying()) {
             if ($c.and64(u.uprops[WOUNDED_LEGS].extrinsic, W.RINGL)) {
                 carrcap = $c.sub64(carrcap, WT.WOUNDEDLEG_REDUCT);
             }
@@ -4139,7 +4139,7 @@ export function weight_cap() {   // hack.c:4295
         u.uprops[LEVITATION].blocked = save_BLev;
         float_vs_flight();
     }
-    return $c.i32(carrcap > 1 ? carrcap : 1);   /* never return 0 */
+    return $c.i32(max(carrcap, 1));   /* never return 0 */
 }
 /* returns how far beyond the normal capacity the player is currently. */
 /* inv_weight() is negative if the player is below normal capacity. */
@@ -4178,7 +4178,7 @@ export function calc_capacity(xtra_wt) {   // hack.c:4372
         return OVERLOADED;
     }
     const cap = $c.div32(Math.imul(wt, 2), gw.wc) + 1 | 0;
-    return cap < OVERLOADED ? cap : OVERLOADED;
+    return min(cap, OVERLOADED);
 }
 /**
  * @returns {number} int

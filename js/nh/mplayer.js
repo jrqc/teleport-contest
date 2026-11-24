@@ -16,6 +16,7 @@ import { christen_monst } from './do_name.js';
 import { In_endgame } from './dungeon.macros.js';
 import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
 import { MM, NO, RLOC } from './hack.h.js';
+import { rn1 } from './hack.macros.js';
 import { makemon, mkmonmoney, mongets, set_malign } from './makemon.js';
 import { bless, curse, mkobj, mksobj, weight } from './mkobj.js';
 import { set_mon_data } from './mondata.js';
@@ -119,7 +120,7 @@ async function mk_mplayer_armor(mon, typ) {   // mplayer.c:95
      * have it because the wizard or other monsters cursed it, so its
      * chances of having plusses is the same as usual....
      */
-    $t2 = $c.i8(rn2(10) ? rn2(3) ? rn2(5) : rn2(4) + 4 | 0 : -rnd(3) | 0), obj.spe = $t2;
+    $t2 = $c.i8(rn2(10) ? rn2(3) ? rn2(5) : rn1(4, 4) : -rnd(3) | 0), obj.spe = $t2;
     await mpickobj(mon, obj);
 }
 /**
@@ -141,7 +142,7 @@ export async function mk_mplayer(ptr, x, y, special) {   // mplayer.c:118
         special = FALSE;
     }
     if ((mtmp = await makemon(ptr, x, y, $c.u32(special ? MM.NOMSG : NO.MM_FLAGS))) !== null) {
-        $t1 = $c.u8(special ? rn2(16) + 15 | 0 : rnd(16)), mtmp.m_lev = $t1;
+        $t1 = $c.u8(special ? rn1(16, 15) : rnd(16)), mtmp.m_lev = $t1;
         $t3 = ($t2 = d(mtmp.m_lev, 10) + (special ? 30 + rnd(30) | 0 : 30) | 0, mtmp.mhpmax = $t2), mtmp.mhp = $t3;
         if (special) {
             get_mplname(mtmp, new $c.Ptr(nam, 0));
@@ -278,7 +279,7 @@ export async function mk_mplayer(ptr, x, y, special) {   // mplayer.c:118
         if (weapon !== STRANGE_OBJECT) {
             let otmp = await mksobj(weapon, TRUE, FALSE);
             $t4 = otmp.oeroded2 = 0, otmp.oeroded = ($t4) & 3;
-            $t5 = $c.i8(special ? rn2(5) + 4 | 0 : rn2(4)), otmp.spe = $t5;
+            $t5 = $c.i8(special ? rn1(5, 4) : rn2(4)), otmp.spe = $t5;
             if (!rn2(3)) {
                 otmp.oerodeproof = 1;
             } else if (!rn2(2)) {
@@ -361,7 +362,7 @@ export async function create_mplayers(num, special) {   // mplayer.c:327
     while (num) {
         let tryct = 0;
         /* roll for character class */
-        const pm = rn2(PM.WIZARD - PM.ARCHEOLOGIST + 1) + PM.ARCHEOLOGIST | 0;
+        const pm = rn1(PM.WIZARD - PM.ARCHEOLOGIST + 1, PM.ARCHEOLOGIST);
         set_mon_data(fakemon, $c.relem(mons, pm));
         /* roll for an available location */
         do {

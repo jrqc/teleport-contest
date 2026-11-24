@@ -18,14 +18,13 @@ import { PLNMSG } from './flag.h.js';
 import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
 import { losehp } from './hack.js';
 import { EYE, FM, KILLED, LUNG, M_POISONGAS, NHF, TELEDS } from './hack.h.js';
-import { plur, release_data, update_file } from './hack.macros.js';
-import { dist2, eos } from './hacklib.js';
+import { distu, pline1, plur, release_data, rn1, update_file } from './hack.macros.js';
+import { eos } from './hacklib.js';
 import { find_mid } from './light.js';
 import { killed, m_poisongas_ok, monkilled, setmangry, wake_nearto } from './mon.js';
 import { AD } from './monattk.h.js';
 import { monstseesu, monstunseesu } from './mondata.js';
 import { haseyes, is_silent, nonliving } from './mondata.macros.js';
-import { M1 } from './monflag.h.js';
 import { mons } from './monst.js';
 import { M_SEEN } from './monst.h.js';
 import { DEADMONSTER, resists_poison } from './monst.macros.js';
@@ -40,15 +39,16 @@ import { MONST_INC, REG } from './region.h.js';
 import { clear_hero_inside, clear_heros_fault, hero_inside, heros_fault, set_hero_inside, set_heros_fault } from './region.macros.js';
 import { lookup_id_mapping } from './restore.js';
 import { d, rn2, rnd } from './rnd.js';
+import { Sfi_any, Sfi_boolean, Sfi_char, Sfi_nhrect, Sfi_short, Sfo_any, Sfo_boolean, Sfo_char, Sfo_int, Sfo_nhrect, Sfo_short, Sfo_unsigned } from './savefile.macros.js';
 import { selection_getbounds, selection_getpoint } from './selvar.js';
-import { sfi_any, sfi_boolean, sfi_char, sfi_int, sfi_long, sfi_nhrect, sfi_short, sfi_unsigned, sfo_any, sfo_boolean, sfo_char, sfo_int, sfo_long, sfo_nhrect, sfo_short, sfo_unsigned } from './sfbase.js';
+import { sfi_int, sfi_long, sfi_unsigned, sfo_long } from './sfbase.js';
 import { MAXTCHARS } from './sym.h.js';
 import { safe_teleds } from './teleport.js';
 import { block_point, does_block, unblock_point } from './vision.js';
 import { cansee } from './vision.macros.js';
 import { putstr } from './winprocs.macros.js';
 import { u_at } from './you.macros.js';
-import { Blind, BlindedTimeout, Half_gas_damage, Poison_resistance } from './youprop.macros.js';
+import { Blind, BlindedTimeout, Breathless, Half_gas_damage, Poison_resistance } from './youprop.macros.js';
 
 const NO_CALLBACK = (-1);
 const INSIDE_GAS_CLOUD = 0;
@@ -491,7 +491,7 @@ export async function in_out_region(x, y) {   // region.c:480
         if (hero_inside(gr.regions.get(i)) && !inside_region(gr.regions.get(i), x, y)) {
             gr.regions.get(i).player_flags = (gr.regions.get(i).player_flags & 4294967294) >>> 0;
             if (gr.regions.get(i).leave_msg !== null) {
-                await pline($C`%s`, gr.regions.get(i).leave_msg);
+                await pline1(gr.regions.get(i).leave_msg);
             }
             if ((f_indx = gr.regions.get(i).leave_f) !== NO_CALLBACK) {
                 await callbacks[f_indx](gr.regions.get(i), null);
@@ -506,7 +506,7 @@ export async function in_out_region(x, y) {   // region.c:480
         if (!hero_inside(gr.regions.get(i)) && inside_region(gr.regions.get(i), x, y)) {
             gr.regions.get(i).player_flags = (gr.regions.get(i).player_flags | REG.HERO_INSIDE) >>> 0;
             if (gr.regions.get(i).enter_msg !== null) {
-                await pline($C`%s`, gr.regions.get(i).enter_msg);
+                await pline1(gr.regions.get(i).enter_msg);
             }
             if ((f_indx = gr.regions.get(i).enter_f) !== NO_CALLBACK) {
                 await callbacks[f_indx](gr.regions.get(i), null);
@@ -714,42 +714,42 @@ export async function save_regions(nhfp) {   // region.c:741
         }
         /* timestamp */
         await sfo_long(nhfp, new $c.FieldRef(svm, "moves", "i64"), $C`region-tmstamp`);
-        await sfo_int(nhfp, new $c.FieldRef(svn, "n_regions", "i32"), $C`region-region_count`);
+        await Sfo_int(nhfp, new $c.FieldRef(svn, "n_regions", "i32"), $C`region-region_count`);
         for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
             r = gr.regions.get(i);
-            await sfo_nhrect(nhfp, r.bounding_box, $C`region-bounding_box`);
-            await sfo_short(nhfp, new $c.FieldRef(r, "nrects", "i16"), $C`region-nrects`);
+            await Sfo_nhrect(nhfp, r.bounding_box, $C`region-bounding_box`);
+            await Sfo_short(nhfp, new $c.FieldRef(r, "nrects", "i16"), $C`region-nrects`);
             for (j = 0; j < r.nrects; j = j + 1 | 0) {
-                await sfo_nhrect(nhfp, $c.radd(r.rects, j), $C`region-rect`);
+                await Sfo_nhrect(nhfp, $c.radd(r.rects, j), $C`region-rect`);
             }
-            await sfo_boolean(nhfp, new $c.FieldRef(r, "attach_2_u", "i8"), $C`region-attach_2_u`);
-            await sfo_unsigned(nhfp, new $c.FieldRef(r, "attach_2_m", "u32"), $C`region-attach_2_m`);
+            await Sfo_boolean(nhfp, new $c.FieldRef(r, "attach_2_u", "i8"), $C`region-attach_2_u`);
+            await Sfo_unsigned(nhfp, new $c.FieldRef(r, "attach_2_m", "u32"), $C`region-attach_2_m`);
             n[0] = 0;
             n[0] = !r.enter_msg ? 0 : $c.u32($c.strlen(r.enter_msg));
-            await sfo_unsigned(nhfp, new $c.Ptr(n, 0), $C`region-enter_msg_length`);
+            await Sfo_unsigned(nhfp, new $c.Ptr(n, 0), $C`region-enter_msg_length`);
             if (n[0] > 0) {
-                await sfo_char(nhfp, r.enter_msg, $C`region-enter_msg`, n[0] | 0);
+                await Sfo_char(nhfp, r.enter_msg, $C`region-enter_msg`, n[0] | 0);
             }
             n[0] = !r.leave_msg ? 0 : $c.u32($c.strlen(r.leave_msg));
-            await sfo_unsigned(nhfp, new $c.Ptr(n, 0), $C`region-leave_msg_length`);
+            await Sfo_unsigned(nhfp, new $c.Ptr(n, 0), $C`region-leave_msg_length`);
             if (n[0] > 0) {
-                await sfo_char(nhfp, r.leave_msg, $C`region-leave_msg`, n[0] | 0);
+                await Sfo_char(nhfp, r.leave_msg, $C`region-leave_msg`, n[0] | 0);
             }
             await sfo_long(nhfp, new $c.FieldRef(r, "ttl", "i64"), $C`region-ttl`);
-            await sfo_short(nhfp, new $c.FieldRef(r, "expire_f", "i16"), $C`region-expire_f`);
-            await sfo_short(nhfp, new $c.FieldRef(r, "can_enter_f", "i16"), $C`region-can_enter_f`);
-            await sfo_short(nhfp, new $c.FieldRef(r, "enter_f", "i16"), $C`region-enter_f`);
-            await sfo_short(nhfp, new $c.FieldRef(r, "can_leave_f", "i16"), $C`region-can_leave_f`);
-            await sfo_short(nhfp, new $c.FieldRef(r, "leave_f", "i16"), $C`region-leave_f`);
-            await sfo_short(nhfp, new $c.FieldRef(r, "inside_f", "i16"), $C`region-inside_f`);
-            await sfo_unsigned(nhfp, new $c.FieldRef(r, "player_flags", "u32"), $C`region-player_flags`);
-            await sfo_short(nhfp, new $c.FieldRef(r, "n_monst", "i16"), $C`region-monster_count`);
+            await Sfo_short(nhfp, new $c.FieldRef(r, "expire_f", "i16"), $C`region-expire_f`);
+            await Sfo_short(nhfp, new $c.FieldRef(r, "can_enter_f", "i16"), $C`region-can_enter_f`);
+            await Sfo_short(nhfp, new $c.FieldRef(r, "enter_f", "i16"), $C`region-enter_f`);
+            await Sfo_short(nhfp, new $c.FieldRef(r, "can_leave_f", "i16"), $C`region-can_leave_f`);
+            await Sfo_short(nhfp, new $c.FieldRef(r, "leave_f", "i16"), $C`region-leave_f`);
+            await Sfo_short(nhfp, new $c.FieldRef(r, "inside_f", "i16"), $C`region-inside_f`);
+            await Sfo_unsigned(nhfp, new $c.FieldRef(r, "player_flags", "u32"), $C`region-player_flags`);
+            await Sfo_short(nhfp, new $c.FieldRef(r, "n_monst", "i16"), $C`region-monster_count`);
             for (j = 0; j < r.n_monst; j = j + 1 | 0) {
-                await sfo_unsigned(nhfp, r.monsters.add(j), $C`region-monster`);
+                await Sfo_unsigned(nhfp, r.monsters.add(j), $C`region-monster`);
             }
-            await sfo_boolean(nhfp, new $c.FieldRef(r, "visible", "i8"), $C`region-visible`);
-            await sfo_int(nhfp, new $c.FieldRef(r, "glyph", "i32"), $C`region-glyph`);
-            await sfo_any(nhfp, r.arg, $C`region-arg`);
+            await Sfo_boolean(nhfp, new $c.FieldRef(r, "visible", "i8"), $C`region-visible`);
+            await Sfo_int(nhfp, new $c.FieldRef(r, "glyph", "i32"), $C`region-glyph`);
+            await Sfo_any(nhfp, r.arg, $C`region-arg`);
         }
     }
     if (release_data(nhfp)) {
@@ -780,22 +780,22 @@ export async function rest_regions(nhfp) {   // region.c:799
     }
     for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
         r = ($t2 = $c.asRec(await alloc(96), $T.NhRegion, 96), gr.regions.set(i, $t2));
-        await sfi_nhrect(nhfp, r.bounding_box, $C`region-bounding box`);
-        await sfi_short(nhfp, new $c.FieldRef(r, "nrects", "i16"), $C`region-nrects`);
+        await Sfi_nhrect(nhfp, r.bounding_box, $C`region-bounding box`);
+        await Sfi_short(nhfp, new $c.FieldRef(r, "nrects", "i16"), $C`region-nrects`);
         if (r.nrects > 0) {
             $t3 = $c.asRec(await alloc($c.u32($c.mulu64($c.u64(r.nrects), 8))), $T.nhrect, 8), r.rects = $t3;
         } else {
             r.rects = null;
         }
         for (j = 0; j < r.nrects; j = j + 1 | 0) {
-            await sfi_nhrect(nhfp, $c.radd(r.rects, j), $C`region-rect`);
+            await Sfi_nhrect(nhfp, $c.radd(r.rects, j), $C`region-rect`);
         }
-        await sfi_boolean(nhfp, new $c.FieldRef(r, "attach_2_u", "i8"), $C`region-attach_2_u`);
+        await Sfi_boolean(nhfp, new $c.FieldRef(r, "attach_2_u", "i8"), $C`region-attach_2_u`);
         await sfi_unsigned(nhfp, new $c.FieldRef(r, "attach_2_m", "u32"), $C`region-attach_2_m`);
         await sfi_unsigned(nhfp, new $c.Ptr(n, 0), $C`region-enter_msg_length`);
         if (n[0] > 0) {
             msg_buf = $c.asArr(await alloc(n[0] + 1 >>> 0), Int8Array);
-            await sfi_char(nhfp, msg_buf, $C`region-enter_msg`, n[0] | 0);
+            await Sfi_char(nhfp, msg_buf, $C`region-enter_msg`, n[0] | 0);
             msg_buf.set(n[0], 0);
         } else {
             msg_buf = null;
@@ -804,7 +804,7 @@ export async function rest_regions(nhfp) {   // region.c:799
         await sfi_unsigned(nhfp, new $c.Ptr(n, 0), $C`region-leave_msg_length`);
         if (n[0] > 0) {
             msg_buf = $c.asArr(await alloc(n[0] + 1 >>> 0), Int8Array);
-            await sfi_char(nhfp, msg_buf, $C`region-leave_msg`, n[0] | 0);
+            await Sfi_char(nhfp, msg_buf, $C`region-leave_msg`, n[0] | 0);
             msg_buf.set(n[0], 0);
             r.leave_msg = msg_buf;
         } else {
@@ -816,19 +816,19 @@ export async function rest_regions(nhfp) {   // region.c:799
         if (r.ttl >= 0) {
             r.ttl = r.ttl > tmstamp[0] ? $c.sub64(r.ttl, tmstamp[0]) : 0;
         }
-        await sfi_short(nhfp, new $c.FieldRef(r, "expire_f", "i16"), $C`region-expire_f`);
-        await sfi_short(nhfp, new $c.FieldRef(r, "can_enter_f", "i16"), $C`region-can_enter_f`);
-        await sfi_short(nhfp, new $c.FieldRef(r, "enter_f", "i16"), $C`region-enter_f`);
-        await sfi_short(nhfp, new $c.FieldRef(r, "can_leave_f", "i16"), $C`region-can_leave_f`);
-        await sfi_short(nhfp, new $c.FieldRef(r, "leave_f", "i16"), $C`region-leave_f`);
-        await sfi_short(nhfp, new $c.FieldRef(r, "inside_f", "i16"), $C`region-inside_f`);
+        await Sfi_short(nhfp, new $c.FieldRef(r, "expire_f", "i16"), $C`region-expire_f`);
+        await Sfi_short(nhfp, new $c.FieldRef(r, "can_enter_f", "i16"), $C`region-can_enter_f`);
+        await Sfi_short(nhfp, new $c.FieldRef(r, "enter_f", "i16"), $C`region-enter_f`);
+        await Sfi_short(nhfp, new $c.FieldRef(r, "can_leave_f", "i16"), $C`region-can_leave_f`);
+        await Sfi_short(nhfp, new $c.FieldRef(r, "leave_f", "i16"), $C`region-leave_f`);
+        await Sfi_short(nhfp, new $c.FieldRef(r, "inside_f", "i16"), $C`region-inside_f`);
         await sfi_unsigned(nhfp, new $c.FieldRef(r, "player_flags", "u32"), $C`region-player_flags`);
         if (ghostly) {
             /* settings pertained to old player */
             clear_hero_inside(r);
             clear_heros_fault(r);
         }
-        await sfi_short(nhfp, new $c.FieldRef(r, "n_monst", "i16"), $C`region-monster_count`);
+        await Sfi_short(nhfp, new $c.FieldRef(r, "n_monst", "i16"), $C`region-monster_count`);
         if (r.n_monst > 0) {
             $t4 = $c.asArr(await alloc($c.u32($c.mulu64($c.u64(r.n_monst), 4))), Uint32Array), r.monsters = $t4;
         } else {
@@ -838,9 +838,9 @@ export async function rest_regions(nhfp) {   // region.c:799
         for (j = 0; j < r.n_monst; j = j + 1 | 0) {
             await sfi_unsigned(nhfp, r.monsters.add(j), $C`region-monster`);
         }
-        await sfi_boolean(nhfp, new $c.FieldRef(r, "visible", "i8"), $C`region-visible`);
+        await Sfi_boolean(nhfp, new $c.FieldRef(r, "visible", "i8"), $C`region-visible`);
         await sfi_int(nhfp, new $c.FieldRef(r, "glyph", "i32"), $C`region-glyph`);
-        await sfi_any(nhfp, r.arg, $C`region-arg`);
+        await Sfi_any(nhfp, r.arg, $C`region-arg`);
     }
     /* remove expired regions, do not trigger the expire_f callback (yet!);
        also update monster lists if this data is coming from a bones file */
@@ -1024,7 +1024,7 @@ export async function inside_gas_cloud(p1, p2) {   // region.c:1091
         mtmp = $c.asRec(p2, $T.monst, 192);
         if (await m_poisongas_ok(mtmp) !== M_POISONGAS.OK) {
             if (!is_silent(mtmp.data)) {
-                if (cansee(mtmp.mx, mtmp.my) || dist2(mtmp.mx, mtmp.my, u.ux, u.uy) < 8) {
+                if (cansee(mtmp.mx, mtmp.my) || distu(mtmp.mx, mtmp.my) < 8) {
                     await pline($C`%s coughs!`, await Monnam(mtmp));
                 }
                 await wake_nearto(mtmp.mx, mtmp.my, 2);
@@ -1191,7 +1191,7 @@ export async function create_gas_cloud(x, y, cloudsize, damage) {   // region.c:
         $t2 = tmprect.hy = ycoords[i], tmprect.ly = $t2;
         await add_rect_to_reg(cloud, tmprect);
     }
-    $t3 = rn2(3) + 4 | 0, cloud.ttl = $t3;
+    $t3 = rn1(3, 4), cloud.ttl = $t3;
     /* If cloud was constrained in small space, give it more time to live. */
     cloud.ttl = $c.div64($c.mul64(cloud.ttl, cloudsize), newidx);
     await make_gas_cloud(cloud, damage, inside_cloud);
@@ -1237,7 +1237,7 @@ export function region_danger() {   // region.c:1341
         /* the only type of region we understand is gas_cloud */
         if (f_indx === INSIDE_GAS_CLOUD) {
             /* completely harmless if you don't need to breathe */
-            if (nonliving(gy.youmonst.data) || (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.BREATHLESS) !== 0)) {
+            if (nonliving(gy.youmonst.data) || Breathless()) {
                 continue;
             }
             /* minor inconvenience if you're poison resistant;

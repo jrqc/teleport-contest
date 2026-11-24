@@ -19,7 +19,7 @@ import { timet_delta } from './allmain.js';
 import { ART } from './artilist.h.js';
 import { attrname, from_what, stone_luck } from './attrib.js';
 import { A } from './attrib.h.js';
-import { ACURR, ATTRMAX } from './attrib.macros.js';
+import { ACURR, ATTRMAX, STR18 } from './attrib.macros.js';
 import { enc_stat, rank_of, rank_to_xlev } from './botl.js';
 import { getnow, midnight, night } from './calendar.js';
 import { yn_function } from './cmd.js';
@@ -31,11 +31,10 @@ import { nul_glyphinfo } from './display.js';
 import { a_monnam, hliquid, pmname, x_monnam } from './do_name.js';
 import { find_ac, fingers_or_gloves, stuck_ring } from './do_wear.js';
 import { def_monsyms } from './drawing.js';
-import { In_quest, ceiling, depth, dunlev, endgamelevelname, has_ceiling, on_level, surface } from './dungeon.js';
-import { In_endgame } from './dungeon.macros.js';
+import { In_quest, ceiling, depth, dunlev, endgamelevelname, has_ceiling, surface } from './dungeon.js';
+import { In_endgame, Is_bigroom, Is_knox, Is_rogue_level } from './dungeon.macros.js';
 import { hu_stat, temp_resist } from './eat.js';
 import { newuexp } from './exper.js';
-import { debugcore } from './files.js';
 import { FULL_MOON, NEW_MOON } from './flag.h.js';
 import { discover, wizard } from './flag.macros.js';
 import { dxdy_to_dist_descr } from './getpos.js';
@@ -45,6 +44,7 @@ import { inv_weight, money_cnt, near_capacity } from './hack.js';
 import { ARTICLE, BASICENLIGHTENMENT, ECMD, ENL, EXT_ENCUMBER, HANDED, HVY_ENCUMBER, LEG, MAGICENLIGHTENMENT, MHID, MOD_ENCUMBER, OVERLOADED, SLT_ENCUMBER, SUPPRESS, UNENCUMBERED, VANQ } from './hack.h.js';
 import { digit, eos, highc, lcase, lowc, mungspaces, nh_snprintf, ordin, s_suffix, strncmpi, strstri, strsubst, upstart } from './hacklib.js';
 import { carrying, currency } from './invent.js';
+import { explicitdebug } from './lint.macros.js';
 import { has_mgivenname } from './mextra.macros.js';
 import { magic_negation } from './mhitu.js';
 import { AD, AT } from './monattk.h.js';
@@ -53,7 +53,7 @@ import { haseyes, hides_under, is_clinger, is_female, is_male, is_neuter, is_rid
 import { FEMALE, G_EXTINCT, G_GENOD, G_GONE, G_UNIQ, M1, M2, MALE, MZ, NEUTRAL } from './monflag.h.js';
 import { mons } from './monst.js';
 import { MFAST, MSLOW, M_AP, STRAT_WAITMASK } from './monst.h.js';
-import { U_AP_TYPE, ismnum } from './monst.macros.js';
+import { U_AP_TYPE, ismnum, vampshifted } from './monst.macros.js';
 import { PM } from './monsters.h.js';
 import { is_ammo, is_wet_towel, u_wield_art } from './obj.macros.js';
 import { is_metallic } from './objclass.macros.js';
@@ -86,7 +86,7 @@ import { count_wsegs, wseg_at } from './worm.js';
 import { find_mac, which_armor } from './worn.js';
 import { ACH, AC_MAX, N_ACH, RIGHT_HANDED, ROLE_FEMALE, ROLE_GENDMASK, ROLE_MALE, SICK_NONVOMITABLE, SICK_VOMITABLE, TT } from './you.h.js';
 import { Luck, Upolyd } from './you.macros.js';
-import { Acid_resistance, Adornment, Aggravate_monster, Antimagic, BBlinded, BClairvoyant, BFlying, BInvis, BLevitation, BStealth, Blind, Blind_telepat, BlindedTimeout, Blnd_resist, Clairvoyant, Cold_resistance, Conflict, Deaf, Detect_monsters, Disint_resistance, Displaced, Drain_resistance, EBlinded, EClairvoyant, EInvis, EStealth, Fast, Fire_resistance, Fixed_abil, Free_action, Fumbling, Glib, HBlinded, HClairvoyant, HInvis, HStealth, Half_gas_damage, Half_physical_damage, Half_spell_damage, Halluc_resistance, Hallucination, Hate_silver, Hunger, Infravision, Invis, Invisible, Invulnerable, Jumping, Lev_at_will, Levitation, Lifesaved, Passes_walls, PermaBlind, Poison_resistance, Polymorph, Polymorph_control, Protection, Protection_from_shape_changers, Punished, Reflecting, Regeneration, Searching, See_invisible, Shock_resistance, Sick, Sick_resistance, Sleep_resistance, Sleepy, Slimed, Slow_digestion, Stealth, Stone_resistance, Stoned, Strangled, Teleport_control, Teleportation, Unchanging, Undead_warning, Underwater, Vomiting, Warn_of_mon, Warning, Wounded_legs } from './youprop.macros.js';
+import { Acid_resistance, Adornment, Aggravate_monster, Amphibious, Antimagic, BBlinded, BClairvoyant, BFlying, BInvis, BLevitation, BStealth, Blind, Blind_telepat, BlindedTimeout, Blnd_resist, Breathless, Clairvoyant, Cold_resistance, Conflict, Deaf, Detect_monsters, Disint_resistance, Displaced, Drain_resistance, EBlinded, EClairvoyant, EInvis, EStealth, Fast, Fire_resistance, Fixed_abil, Flying, Free_action, Fumbling, Glib, HBlinded, HClairvoyant, HInvis, HStealth, Half_gas_damage, Half_physical_damage, Half_spell_damage, Halluc_resistance, Hallucination, Hate_silver, Hunger, Infravision, Invis, Invisible, Invulnerable, Jumping, Lev_at_will, Levitation, Lifesaved, Passes_walls, PermaBlind, Poison_resistance, Polymorph, Polymorph_control, Protection, Protection_from_shape_changers, Punished, Reflecting, Regeneration, Searching, See_invisible, Shock_resistance, Sick, Sick_resistance, Sleep_resistance, Sleepy, Slimed, Slow_digestion, Stealth, Stone_resistance, Stoned, Strangled, Swimming, Teleport_control, Teleportation, Unchanging, Undead_warning, Underwater, Vomiting, Warn_of_mon, Warning, Wounded_legs, Wwalking } from './youprop.macros.js';
 import { item_what, u_adtyp_resistance_obj } from './zap.js';
 
 const LL_majors = 16607;
@@ -219,10 +219,10 @@ async function enlght_halfdmg(category, final) {   // insight.c:201
  * @returns {number} boolean
  */
 function walking_on_water() {   // insight.c:224
-    if (u.uinwater || Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) {
+    if (u.uinwater || Levitation() || Flying()) {
         return FALSE;
     }
-    return (u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && is_pool_or_lava(u.ux, u.uy) ? 1 : 0;
+    return Wwalking() && is_pool_or_lava(u.ux, u.uy) ? 1 : 0;
 }
 /* describe u.utraptype; used by status_enlightenment() and self_lookat() */
 /**
@@ -295,7 +295,7 @@ function attrval(attrindx, attrvalue, resultbuf) {   // insight.c:287
     /* should be at least [7] to hold "18/100\0" */
     if (attrindx !== A.STR || attrvalue <= 18) {
         $c.sprintf(resultbuf, $C`%d`, attrvalue);
-    } else if (attrvalue > 118) {   /* 19 to 25 */
+    } else if (attrvalue > STR18(100)) {   /* 19 to 25 */
         $c.sprintf(resultbuf, $C`%d`, attrvalue - 100 | 0);
     } else {
         /* simplify "18/\**" to be "18/100" */
@@ -489,7 +489,7 @@ async function background_enlightenment(unused_mode, final) {   // insight.c:468
     if (Upolyd()) {
         /* includes trailing space; [4] suffices */
         const uasmon = gy.youmonst.data;
-        const altphrasing = (gy.youmonst.cham === PM.VAMPIRE || gy.youmonst.cham === PM.VAMPIRE_LEADER || gy.youmonst.cham === PM.VLAD_THE_IMPALER) && !(gy.youmonst.data.mlet === S.VAMPIRE) ? 1 : 0;
+        const altphrasing = vampshifted(gy.youmonst);
         tmpbuf[0] = 0;
         /* here we always use current gender, not saved role gender */
         if (!is_male(uasmon) && !is_female(uasmon) && !is_neuter(uasmon)) {
@@ -577,7 +577,7 @@ async function background_enlightenment(unused_mode, final) {   // insight.c:468
         const egdepth = observable_depth(u.uz);
         endgamelevelname(new $c.Ptr(tmpbuf, 0), egdepth);
         nh_snprintf($C`background_enlightenment`, 609, new $c.Ptr(buf, 0), 256, $C`in the endgame, on the %s%s`, !$c.strncmp(new $c.Ptr(tmpbuf, 0), $C`Plane`, 5) ? $C`Elemental ` : $C``, new $c.Ptr(tmpbuf, 0));
-    } else if ((svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level)) {
+    } else if (Is_knox(u.uz)) {
         /* this gives away the fact that the knox branch is only 1 level */
         $c.sprintf(new $c.Ptr(buf, 0), $C`on the %s level`, new $c.Ptr(svd.dungeons[u.uz.dnum].dname, 0));
         /* TODO? maybe phrase it differently when actually inside the fort,
@@ -590,9 +590,9 @@ async function background_enlightenment(unused_mode, final) {   // insight.c:468
         $c.sprintf(new $c.Ptr(tmpbuf, 0), $C`level %d`, In_quest(u.uz) ? dunlev(u.uz) : depth(u.uz));
         /* TODO? maybe extend this bit to include various other automatic
            annotations from the dungeon overview code */
-        if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level)) {
+        if (Is_rogue_level(u.uz)) {
             $c.strcat(new $c.Ptr(tmpbuf, 0), $C`, a primitive area`);
-        } else if ((svd.dungeon_topology.d_bigroom_level.dlevel || svd.dungeon_topology.d_bigroom_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_bigroom_level) && !Blind()) {
+        } else if (Is_bigroom(u.uz) && !Blind()) {
             $c.strcat(new $c.Ptr(tmpbuf, 0), $C`, a very big room`);
         }
         nh_snprintf($C`background_enlightenment`, 629, new $c.Ptr(buf, 0), 256, $C`in %s, on %s`, new $c.Ptr(dgnbuf, 0), new $c.Ptr(tmpbuf, 0));
@@ -854,7 +854,7 @@ async function one_characteristic(mode, final, attrindx) {   // insight.c:846
         const alimit = ATTRMAX(attrindx);
         /* criterium for whether the limit is interesting varies */
         /* was originally `(abase != alimit)' */
-        const interesting_alimit = final ? TRUE : alimit !== (attrindx !== A.STR ? 18 : 118) ? 1 : 0;
+        const interesting_alimit = final ? TRUE : alimit !== (attrindx !== A.STR ? 18 : STR18(100)) ? 1 : 0;
         let paren_pfx = final ? $C` (` : $C` (current; `;
         if (acurrent !== abase) {
             $c.sprintf(eos(new $c.Ptr(valubuf, 0)), $C`%sbase:%s`, paren_pfx, attrval(attrindx, abase, new $c.Ptr(valstring, 0)));
@@ -918,7 +918,7 @@ async function status_enlightenment(mode, final) {   // insight.c:940
         } else {
             await enlght_line(new $c.Ptr(youtoo, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $C`levitating`, await from_what(LEVITATION));
         }
-    } else if ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) {
+    } else if (Flying()) {
         /* can only fly when not levitating */
         await enlght_line(new $c.Ptr(youtoo, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $C`flying`, await from_what(FLYING));
     }
@@ -1230,7 +1230,7 @@ async function weapon_insight(final) {   // insight.c:1270
             /* (uwep->spe < 3) ? "moist towel" : */
             what = $C`wet towel`;
         }
-        if (!strncmpi(what, $C`armor`, -1) || !strncmpi(what, $C`food`, -1) || !strncmpi(what, $C`venom`, -1)) {
+        if (!strcmpi(what, $C`armor`) || !strcmpi(what, $C`food`) || !strcmpi(what, $C`venom`)) {
             $c.sprintf(new $c.Ptr(buf, 0), $C`wielding some %s`, what);
         } else {
             /* [maybe include known blessed?] */
@@ -1613,7 +1613,7 @@ async function attributes_enlightenment(unused_mode, final) {   // insight.c:148
         /* flight is blocked */
         const save_BFly = u.uprops[FLYING].blocked;
         u.uprops[FLYING].blocked = 0;
-        if ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) {
+        if (Flying()) {
             await enlght_line(new $c.Ptr(You_, 0), final ? $C`would have flown` : $C`would fly`, (u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked ? $C` if you weren't levitating` : save_BFly === I_SPECIAL ? $C` if you weren't trapped` : save_BFly === FROMOUTSIDE ? new $c.Ptr(attributes_enlightenment$if_surroundings_permitted, 0) : $C` if circumstances permitted`, $C``);
             /* wording quibble: for past tense, "hadn't been"
                would sound better than "weren't" (and
@@ -1641,16 +1641,16 @@ async function attributes_enlightenment(unused_mode, final) {   // insight.c:148
         }
     }
     /* actively walking on water handled earlier as a status condition */
-    if ((u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && !walking_on_water()) {
+    if (Wwalking() && !walking_on_water()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(could, 0) : new $c.Ptr(can, 0), $C`walk on water`, await from_what(WWALKING));
     }
     /* actively swimming (in water but not under it) handled earlier */
-    if ((u.uprops[SWIMMING].intrinsic || u.uprops[SWIMMING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.SWIM) !== 0) && (Underwater() || !u.uinwater)) {
+    if (Swimming() && (Underwater() || !u.uinwater)) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(could, 0) : new $c.Ptr(can, 0), $C`swim`, await from_what(SWIMMING));
     }
-    if (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.BREATHLESS) !== 0) {
+    if (Breathless()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(could, 0) : new $c.Ptr(can, 0), $C`survive without air`, await from_what(MAGICAL_BREATHING));
-    } else if (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.AMPHIBIOUS) !== 0) {
+    } else if (Amphibious()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(could, 0) : new $c.Ptr(can, 0), $C`breathe water`, await from_what(MAGICAL_BREATHING));
     }
     if (Passes_walls()) {
@@ -1756,7 +1756,7 @@ async function attributes_enlightenment(unused_mode, final) {   // insight.c:148
        [we need a more reliable way to detect this situation] */
     if (Upolyd() && u.umonnum !== u.ulycn && !(final === ENL.GAMEOVERDEAD && u.umonnum === PM.GREEN_SLIME && !Unchanging())) {
         /* foreign shape (except were-form which is handled below) */
-        if (!((gy.youmonst.cham === PM.VAMPIRE || gy.youmonst.cham === PM.VAMPIRE_LEADER || gy.youmonst.cham === PM.VLAD_THE_IMPALER) && !(gy.youmonst.data.mlet === S.VAMPIRE))) {
+        if (!vampshifted(gy.youmonst)) {
             $c.sprintf(new $c.Ptr(buf, 0), $C`polymorphed into %s`, await an(pmname(gy.youmonst.data, flags.female ? FEMALE : MALE)));
         } else {
             $c.sprintf(new $c.Ptr(buf, 0), $C`polymorphed into %s in %s form`, await an(pmname($c.relem(mons, gy.youmonst.cham), flags.female ? FEMALE : MALE)), pmname(gy.youmonst.data, flags.female ? FEMALE : MALE));
@@ -1850,7 +1850,7 @@ async function attributes_enlightenment(unused_mode, final) {   // insight.c:148
     }
     /* named fruit debugging (doesn't really belong here...); to enable,
        include 'fruit' in DEBUGFILES list (even though it isn't a file...) */
-    if (wizard() && debugcore($C`fruit`, FALSE)) {
+    if (wizard() && explicitdebug($C`fruit`)) {
         await reorder_fruit(TRUE);
         /* sort by fruit index, from low to high;
          * this modifies the gf.ffruit chain, so could
@@ -1941,7 +1941,7 @@ export async function youhiding(via_enlghtmt, msgflag) {   // insight.c:2022
             if (o) {
                 $c.sprintf(bp, $C` underneath %s`, await ansimpleoname(o));
             }
-        } else if (is_clinger(gy.youmonst.data) || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) {
+        } else if (is_clinger(gy.youmonst.data) || Flying()) {
             /* Flying: 'lurker above' hides on ceiling but doesn't cling */
             $c.sprintf(bp, $C` on the %s`, ceiling(u.ux, u.uy));
         } else {

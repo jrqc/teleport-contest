@@ -14,11 +14,11 @@ import { retouch_equipment, retouch_object, touch_artifact } from './artifact.js
 import { ART } from './artilist.h.js';
 import { acurr, acurrstr, adjalign, adjattrib, change_luck, exercise, gainstr, poison_strdmg, setuhpmax } from './attrib.js';
 import { A } from './attrib.h.js';
-import { ACURR } from './attrib.macros.js';
+import { ACURR, ATTRMAX } from './attrib.macros.js';
 import { bot } from './botl.js';
 import { paranoid_query, set_occupation, yn_function } from './cmd.js';
 import { is_ice, is_pool_or_lava } from './dbridge.js';
-import { c_color_names, c_common_strings, disp, flags, ga, gc, ge, gf, gm, gn, go, gu, gy, hands_obj, iflags, sa_victual, svc, svd, svk, svl, svm, u, ynchars, ynqchars } from './decl.js';
+import { c_color_names, c_common_strings, disp, flags, ga, gc, ge, gf, gm, gn, go, gu, gy, hands_obj, iflags, sa_victual, svc, svk, svl, svm, u, ynchars, ynqchars } from './decl.js';
 import { AMULET_CLASS, BALL_CLASS, CHAIN_CLASS, COIN_CLASS, FOOD_CLASS, GEM_CLASS, POTION_CLASS, RING_CLASS, S, SCROLL_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { canseemon, curs_on_u, newsym, see_monsters, set_mimic_blocking } from './display.js';
 import { EXPL } from './display.h.js';
@@ -27,6 +27,7 @@ import { donull, dropx, dropy, heal_legs, revive_corpse, trycall } from './do.js
 import { Mgender, Monnam, hcolor, mon_nam, pmname, rndmonnam } from './do_name.js';
 import { Ring_gone, fingers_or_gloves, toggle_displacement } from './do_wear.js';
 import { on_level, surface } from './dungeon.js';
+import { Is_airlevel, Is_astralevel, Is_waterlevel } from './dungeon.macros.js';
 import { delayed_killer, done } from './end.js';
 import { can_reach_floor } from './engrave.js';
 import { more_experienced, newexplevel, pluslvl } from './exper.js';
@@ -36,8 +37,8 @@ import { ParanoidEating } from './flag.macros.js';
 import { FALSE, LL, TRUE } from './global.h.js';
 import { check_capacity, end_running, inv_cnt, losehp, near_capacity, nomul, rounddiv, still_chewing, unmul } from './hack.js';
 import { BY, CHOKING, COST, CXN, DIED, DISMOUNT, ECMD, FAINTED, FAINTING, GETOBJ, HEALTHY_TIN, HOMEMADE_TIN, HUNGRY, KILLED, LIGHT_HEADED, NOSE, NOT_HUNGRY, NO_KILLER_PREFIX, NO_PART, POISONING, POLY, ROTTEN_TIN, SATIATED, SELL, SLT_ENCUMBER, SPINACH_TIN, STARVED, STARVING, STOMACH, STONING, WEAK, invlet_basic } from './hack.h.js';
-import { makeknown, pline1 } from './hack.macros.js';
-import { dist2, eos, nh_snprintf, s_suffix, sgn, strncmpi } from './hacklib.js';
+import { distu, makeknown, max, pline1, rn1, y_n } from './hack.macros.js';
+import { eos, nh_snprintf, s_suffix, sgn, strncmpi } from './hacklib.js';
 import { addinv_nomerge, carrying, feel_cockatrice, freeinv, g_at, getobj, obj_here, stackobj, useup, useupall, useupf, will_feel_cockatrice } from './invent.js';
 import { GD } from './mextra.h.js';
 import { bcsign, costly_alteration, is_flammable, is_rottable, mksobj, obj_extract_self, peek_at_iced_corpse_age, set_bknown, splitobj, weight } from './mkobj.js';
@@ -45,13 +46,13 @@ import { iter_mons, mondied, monstone, rescham } from './mon.js';
 import { AD, AT, M_ATTK } from './monattk.h.js';
 import { attacktype, attacktype_fordmg, cantvomit, dmgtype, olfaction, poly_when_stoned, same_race } from './mondata.js';
 import { acidic, can_teleport, cantwield, carnivorous, control_teleport, flesh_petrifies, herbivorous, humanoid, is_clinger, is_giant, is_rider, is_undead, is_were, metallivorous, mindless, noncorporeal, perceives, poisonous, slimeproof, telepathic, type_is_pname, vegan, vegetarian, your_race } from './mondata.macros.js';
-import { M1, M2, MR, NEUTRAL } from './monflag.h.js';
+import { M2, MR, NEUTRAL } from './monflag.h.js';
 import { monflee } from './monmove.js';
 import { mons } from './monst.js';
 import { M_AP } from './monst.h.js';
-import { DEADMONSTER, U_AP_TYPE, ismnum } from './monst.macros.js';
+import { DEADMONSTER, U_AP_TYPE, is_obj_mappear, ismnum } from './monst.macros.js';
 import { PM } from './monsters.h.js';
-import { discover_object, objdescr_is, observe_object } from './o_init.js';
+import { objdescr_is, observe_object } from './o_init.js';
 import { OBJ } from './obj.h.js';
 import { Has_contents, carried, polyfood, stale_egg } from './obj.macros.js';
 import { BONE, DRAGON_HIDE, FLESH, GLASS, LEATHER, PAPER, WAX } from './objclass.h.js';
@@ -62,10 +63,10 @@ import { Tobjnam, an, ansimpleoname, corpse_xname, doname, killer_xname, makeplu
 import { LOW_PM, NON_PM, NUMMONS } from './permonst.h.js';
 import { encumber_msg } from './pickup.js';
 import { You, You_cant, You_feel, You_hear, Your, impossible, livelog_printf, pline, pline_The, verbalize } from './pline.js';
-import { body_part, change_sex, polymon, polyself, rehumanize, uasmon_maxStr } from './polyself.js';
+import { body_part, change_sex, polymon, polyself, rehumanize } from './polyself.js';
 import { dopotion, incr_itimeout, make_blinded, make_confused, make_deaf, make_glib, make_hallucinated, make_sick, make_slimed, make_stoned, make_stunned, make_vomiting, self_invis_message, set_itimeout } from './potion.js';
 import { altar_wrath } from './pray.js';
-import { ACID_RES, AGGRAVATE_MONSTER, COLD_RES, CONFLICT, CONFUSION, DEAF, DISINT_RES, DISPLACED, FAST, FIRE_RES, FLYING, FROMFORM, FROMOUTSIDE, GLIB, HALLUC, HALLUC_RES, HUNGER, INTRINSIC, INVIS, LAST_PROP, LEVITATION, LIFESAVED, MAGICAL_BREATHING, POISON_RES, PROTECTION, REGENERATION, SEE_INVIS, SHOCK_RES, SICK, SLEEPY, SLEEP_RES, SLIMED, STONED, STONE_RES, STUNNED, TELEPAT, TELEPORT, TELEPORT_CONTROL, TIMEOUT, VOMITING, W, WWALKING, W_ARMOR, W_RING } from './prop.h.js';
+import { ACID_RES, AGGRAVATE_MONSTER, COLD_RES, CONFLICT, CONFUSION, DEAF, DISINT_RES, DISPLACED, FAST, FIRE_RES, FROMFORM, FROMOUTSIDE, GLIB, HALLUC, HALLUC_RES, HUNGER, INTRINSIC, INVIS, LAST_PROP, LEVITATION, LIFESAVED, POISON_RES, PROTECTION, REGENERATION, SEE_INVIS, SHOCK_RES, SICK, SLEEPY, SLEEP_RES, SLIMED, STONED, STONE_RES, STUNNED, TELEPAT, TELEPORT, TELEPORT_CONTROL, TIMEOUT, VOMITING, W, W_ARMOR, W_RING } from './prop.h.js';
 import { unpunish } from './read.js';
 import { ALTAR, IRONBARS } from './rm.h.js';
 import { d, rn2, rnd } from './rnd.js';
@@ -83,8 +84,8 @@ import { set_ulycn, were_beastie, you_unwere } from './were.js';
 import { uqwepgone, uswapwepgone, uwepgone, welded, wield_tool } from './wield.js';
 import { display_nhwindow } from './winprocs.macros.js';
 import { SICK_ALL, SICK_VOMITABLE, TT } from './you.h.js';
-import { Upolyd } from './you.macros.js';
-import { Acid_resistance, BInvis, Blind, BlindedTimeout, Deaf, Displaced, EInvis, ESee_invisible, Fixed_abil, Glib, HConflict, Hallucination, Hunger, Invis, Levitation, Lifesaved, Poison_resistance, See_invisible, Sick, Sick_resistance, Sleep_resistance, Slimed, Slow_digestion, Stone_resistance, Stoned, Strangled, Unaware, Unchanging, Vomiting } from './youprop.macros.js';
+import { Race_if, Role_if, Upolyd } from './you.macros.js';
+import { Acid_resistance, BInvis, Blind, BlindedTimeout, Breathless, Deaf, Displaced, EInvis, ESee_invisible, Fixed_abil, Flying, Glib, HConflict, Hallucination, Hunger, Invis, Levitation, Lifesaved, Poison_resistance, See_invisible, Sick, Sick_resistance, Sleep_resistance, Slimed, Slow_digestion, Stone_resistance, Stoned, Strangled, Unaware, Unchanging, Vomiting, Wwalking } from './youprop.macros.js';
 import { melt_ice, ubreatheu } from './zap.js';
 
 const eat_brains$brainlessness = new Int8Array(14);   // static in eat_brains()
@@ -195,11 +196,11 @@ export async function eatmupdate() {   // eat.c:181
     if (!ge.eatmbuf || !$c.peq(gn.nomovemsg, ge.eatmbuf)) {
         return;
     }
-    if ((gy.youmonst.m_ap_type & M_AP.TYPMASK) === M_AP.OBJECT && gy.youmonst.mappearance === ORANGE && !Hallucination()) {
+    if (is_obj_mappear(gy.youmonst, ORANGE) && !Hallucination()) {
         /* revert from hallucinatory to "normal" mimicking */
         altmsg = $C`You now prefer mimicking yourself.`;
         altapp = GOLD_PIECE;
-    } else if ((gy.youmonst.m_ap_type & M_AP.TYPMASK) === M_AP.OBJECT && gy.youmonst.mappearance === GOLD_PIECE && Hallucination()) {
+    } else if (is_obj_mappear(gy.youmonst, GOLD_PIECE) && Hallucination()) {
         /* won't happen; anything which might make immobilized
            hero begin hallucinating (black light attack, theft
            of Grayswandir) will terminate the mimicry first */
@@ -260,12 +261,12 @@ async function choke(food) {   // eat.c:245
         if (!food || food.otyp !== AMULET_OF_STRANGULATION) {
             return;
         }
-    } else if (gu.urole.mnum === PM.KNIGHT && u.ualign.type === A.LAWFUL) {
+    } else if (Role_if(PM.KNIGHT) && u.ualign.type === A.LAWFUL) {
         adjalign(-1);   /* gluttony is unchivalrous */
         await You_feel($C`like a glutton!`);
     }
     await exercise(A.CON, FALSE);
-    if (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.BREATHLESS) !== 0 || Hunger() || !Strangled() && !rn2(20)) {
+    if (Breathless() || Hunger() || !Strangled() && !rn2(20)) {
         /* choking by eating AoS doesn't involve stuffing yourself */
         if (food && food.otyp === AMULET_OF_STRANGULATION) {
             await You($C`choke, but recover your composure.`);
@@ -383,7 +384,7 @@ function adj_victual_nutrition() {   // eat.c:338
             nut = nut + $c.div32(nut + 3 | 0, 6) | 0;   /* 600 -> 700 */
         }
     }
-    nut = nut > 1 ? nut : 1;
+    nut = max(nut, 1);
     return nut;
 }
 /* might destroy otmp if hero drops it */
@@ -577,7 +578,7 @@ async function done_eating(message) {   // eat.c:544
     await newuhs(FALSE);
     if (gn.nomovemsg) {
         if (message) {
-            await pline($C`%s`, gn.nomovemsg);
+            await pline1(gn.nomovemsg);
         }
         gn.nomovemsg = null;
     } else if (message) {
@@ -792,7 +793,7 @@ async function maybe_cannibal(pm, allowmsg) {   // eat.c:758
        and also shouldn't eat current species when polymorphed
        (even if having the form of something which doesn't care
        about cannibalism--hero's innate traits aren't altered) */
-    if (!(gu.urole.mnum === PM.CAVE_DWELLER || gu.urace.mnum === PM.ORC) && (your_race(fptr) || Upolyd() && same_race(gy.youmonst.data, fptr) || ismnum(u.ulycn) && were_beastie(pm) === u.ulycn)) {
+    if (!CANNIBAL_ALLOWED() && (your_race(fptr) || Upolyd() && same_race(gy.youmonst.data, fptr) || ismnum(u.ulycn) && were_beastie(pm) === u.ulycn)) {
         if (allowmsg) {
             if (Upolyd() && your_race(fptr)) {
                 await You($C`have a bad feeling deep inside.`);
@@ -800,7 +801,7 @@ async function maybe_cannibal(pm, allowmsg) {   // eat.c:758
             await You($C`cannibal!  You will regret this!`);
         }
         u.uprops[AGGRAVATE_MONSTER].intrinsic = $c.or64(u.uprops[AGGRAVATE_MONSTER].intrinsic, FROMOUTSIDE);
-        change_luck($c.i8(-(rn2(4) + 2 | 0) | 0));   /* -5..-2 */
+        change_luck($c.i8(-rn1(4, 2) | 0));   /* -5..-2 */
         return TRUE;
     }
     return FALSE;
@@ -835,7 +836,7 @@ async function cprefx(pm) {   // eat.c:791
         case PM.HOUSECAT:
         case PM.LARGE_CAT:
             /* cannibals are allowed to eat domestic animals without penalty */
-            if (!(gu.urole.mnum === PM.CAVE_DWELLER || gu.urace.mnum === PM.ORC)) {
+            if (!CANNIBAL_ALLOWED()) {
                 await You_feel($C`that eating the %s was a bad idea.`, mons[pm].pmnames[NEUTRAL]);
                 u.uprops[AGGRAVATE_MONSTER].intrinsic = $c.or64(u.uprops[AGGRAVATE_MONSTER].intrinsic, FROMOUTSIDE);
             }
@@ -1362,7 +1363,7 @@ async function cpostfx(pm) {   // eat.c:1129
             break;
         case PM.STALKER:
             if (!Invis()) {
-                set_itimeout(new $c.FieldRef(u.uprops[INVIS], "intrinsic", "i64"), rn2(100) + 50 | 0);
+                set_itimeout(new $c.FieldRef(u.uprops[INVIS], "intrinsic", "i64"), rn1(100, 50));
                 if (!Blind() && !BInvis()) {
                     await self_invis_message();
                 }
@@ -1478,7 +1479,7 @@ async function cpostfx(pm) {   // eat.c:1129
             break;
         case PM.MIND_FLAYER:
         case PM.MASTER_MIND_FLAYER:
-            if (u.acurr.a[A.INT] < (0 ? uasmon_maxStr() : gu.urace.attrmax[A.INT])) {
+            if (u.acurr.a[A.INT] < ATTRMAX(A.INT)) {
                 if (!rn2(2)) {
                     await pline($C`Yum!  That was real brain food!`);
                     await adjattrib(A.INT, 1, FALSE);
@@ -1578,7 +1579,7 @@ export async function corpse_intrinsic(ptr) {   // eat.c:1339
  */
 export async function violated_vegetarian() {   // eat.c:1376
     u.uconduct.unvegetarian = $c.add64(u.uconduct.unvegetarian, 1);
-    if (gu.urole.mnum === PM.MONK) {
+    if (Role_if(PM.MONK)) {
         await You_feel($C`guilty.`);
         adjalign(-1);
     }
@@ -1686,7 +1687,7 @@ export function set_tin_variety(obj, forcetype) {   // eat.c:1461
     } else {
         /* RANDOM_TIN */
         r = rn2(15);   /* take your pick */
-        if (r === ROTTEN_TIN && (ismnum(mnum) && (mnum === PM.LIZARD || mnum === PM.LICHEN || ($c.relem(mons, mnum) === mons[PM.DEATH] || $c.relem(mons, mnum) === mons[PM.FAMINE] || $c.relem(mons, mnum) === mons[PM.PESTILENCE]) || mnum === PM.ACID_BLOB))) {
+        if (r === ROTTEN_TIN && (ismnum(mnum) && nonrotting_corpse(mnum))) {
             r = HOMEMADE_TIN;   /* lizards don't rot */
         }
     }
@@ -1714,7 +1715,7 @@ function tin_variety(obj, displ) {   // eat.c:1489
     if (!displ && r === HOMEMADE_TIN && !obj.blessed && !rn2(7)) {
         r = ROTTEN_TIN;   /* some homemade tins go bad */
     }
-    if (r === ROTTEN_TIN && (ismnum(mnum) && (mnum === PM.LIZARD || mnum === PM.LICHEN || ($c.relem(mons, mnum) === mons[PM.DEATH] || $c.relem(mons, mnum) === mons[PM.FAMINE] || $c.relem(mons, mnum) === mons[PM.PESTILENCE]) || mnum === PM.ACID_BLOB))) {
+    if (r === ROTTEN_TIN && (ismnum(mnum) && nonrotting_corpse(mnum))) {
         r = HOMEMADE_TIN;   /* lizards don't rot */
     }
     return r;
@@ -1789,7 +1790,7 @@ async function consume_tin(mesg) {   // eat.c:1528
         }
         if (!always_eat) {
             await pline($C`It smells like %s.`, what);
-            if (await yn_function($C`Eat it?`, new $c.Ptr(ynchars, 0), 110, TRUE) === 110) {
+            if (await y_n($C`Eat it?`) === 110) {
                 if (flags.verbose) {
                     await You($C`discard the open tin.`);
                 }
@@ -1820,7 +1821,7 @@ async function consume_tin(mesg) {   // eat.c:1528
         }
         if (tintxts[r].nut < 0) {
             /* rotten */
-            await make_vomiting(rn2(15) + 10 | 0, FALSE);
+            await make_vomiting(rn1(15, 10), FALSE);
         } else {
             nutamt = tintxts[r].nut;
             /* nutrition from a homemade tin (made from a single corpse)
@@ -1843,7 +1844,7 @@ async function consume_tin(mesg) {   // eat.c:1528
                it's debatable whether a rock mole should have its paws made
                slippery when eating a greasy tin, but we'll go with that... */
             const alreadyglib = $c.i32($c.and64(u.uprops[GLIB].intrinsic, TIMEOUT));
-            await make_glib(alreadyglib + (rn2(11) + 5 | 0) | 0);   /* 5..15 */
+            await make_glib(alreadyglib + rn1(11, 5) | 0);   /* 5..15 */
             await pline($C`Eating %s food made your %s %s slippery.`, tintxts[r].txt, await fingers_or_gloves(TRUE), alreadyglib ? $C`even more` : $C`very`);
         }
     } else {
@@ -1855,7 +1856,7 @@ async function consume_tin(mesg) {   // eat.c:1528
             await observe_object(tin);
             tin.known = 1;
         }
-        if (!always_eat && await yn_function($C`Eat it?`, new $c.Ptr(ynchars, 0), 110, TRUE) === 110) {
+        if (!always_eat && await y_n($C`Eat it?`) === 110) {
             if (flags.verbose) {
                 await You($C`discard the open tin.`);
             }
@@ -2043,7 +2044,7 @@ async function rottenfood(obj) {   // eat.c:1813
         const duration = rnd(10);
         if (!Blind()) {
             what = $C`goes`, where = $C`dark`;
-        } else if (Levitation() || (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
+        } else if (Levitation() || Is_airlevel(u.uz) || Is_waterlevel(u.uz)) {
             what = $C`you lose control of`, where = $C`yourself`;
         } else {
             what = $C`you slap against the`, where = u.usteed ? $C`saddle` : surface(u.ux, u.uy);
@@ -2088,7 +2089,7 @@ async function eatcorpse(otmp) {   // eat.c:1855
         }
         await violated_vegetarian();
     }
-    if (!(mnum === PM.LIZARD || mnum === PM.LICHEN || ($c.relem(mons, mnum) === mons[PM.DEATH] || $c.relem(mons, mnum) === mons[PM.FAMINE] || $c.relem(mons, mnum) === mons[PM.PESTILENCE]) || mnum === PM.ACID_BLOB)) {
+    if (!nonrotting_corpse(mnum)) {
         const age = await peek_at_iced_corpse_age(otmp);
         rotted = $c.div64($c.sub64(svm.moves, age), $c.add64(10, rn2(20)));
         if (otmp.cursed) {
@@ -2105,7 +2106,7 @@ async function eatcorpse(otmp) {   // eat.c:1855
         if (await Sick_resistance()) {
             await pline($C`It doesn't seem at all sickening, though...`);
         } else {
-            let sick_time = rn2(10) + 10 | 0;
+            let sick_time = rn1(10, 10);
             /* make sure new ill doesn't result in improvement */
             if (Sick() && sick_time > u.uprops[SICK].intrinsic) {
                 sick_time = u.uprops[SICK].intrinsic > 1 ? $c.sub64(u.uprops[SICK].intrinsic, 1) : 1;
@@ -2139,7 +2140,7 @@ async function eatcorpse(otmp) {   // eat.c:1855
     }
     /* delay is weight dependent */
     svc.context.victual.reqtime = 3 + ((!glob ? mons[mnum].cwt : otmp.owt) >>> 6) >>> 0 | 0;
-    if (!tp && !(mnum === PM.LIZARD || mnum === PM.LICHEN || ($c.relem(mons, mnum) === mons[PM.DEATH] || $c.relem(mons, mnum) === mons[PM.FAMINE] || $c.relem(mons, mnum) === mons[PM.PESTILENCE]) || mnum === PM.ACID_BLOB) && (otmp.oeroded || !rn2(7))) {
+    if (!tp && !nonrotting_corpse(mnum) && (otmp.oeroded || !rn2(7))) {
         if (await rottenfood(otmp)) {
             otmp.oeroded = (TRUE) & 3;
             otmp = await touchfood(otmp);
@@ -2283,7 +2284,7 @@ export function eating_glob(glob) {   // eat.c:2078
  * @returns {Promise<void>}
  */
 async function garlic_breath(mtmp) {   // eat.c:2085
-    if (olfaction(mtmp.data) && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) < 7) {
+    if (olfaction(mtmp.data) && distu(mtmp.mx, mtmp.my) < 7) {
         await monflee(mtmp, 0, FALSE, FALSE);
     }
 }
@@ -2344,7 +2345,7 @@ async function fprefx(otmp) {   // eat.c:2099
                     await newexplevel();
                     /* not cannibalism, but we use similar criteria
                        for deciding whether to be sickened by this meal */
-                    if (rn2(2) && !(gu.urole.mnum === PM.CAVE_DWELLER || gu.urace.mnum === PM.ORC)) {
+                    if (rn2(2) && !CANNIBAL_ALLOWED()) {
                         await make_vomiting(rn2(svc.context.victual.reqtime) + 14 | 0, FALSE);
                     }
                 }
@@ -2681,7 +2682,7 @@ async function foodword(otmp) {   // eat.c:2498
         return $C`food`;
     }
     if (otmp.oclass === GEM_CLASS && objects[otmp.otyp].oc_material === GLASS && otmp.dknown) {
-        await discover_object(otmp.otyp, TRUE, TRUE, TRUE);
+        await makeknown(otmp.otyp);
     }
     return foodwords[objects[otmp.otyp].oc_material];
 }
@@ -2768,14 +2769,14 @@ async function fpostfx(otmp) {   // eat.c:2510
                 /* Snow White; 'poisoned' applies to [a subset of] weapons,
                    not food, so we substitute cursed; fortunately our hero
                    won't have to wait for a prince to be rescued/revived */
-                if (gu.urace.mnum === PM.DWARF && Hallucination()) {
+                if (Race_if(PM.DWARF) && Hallucination()) {
                     await verbalize($C`Heigh-ho, ho-hum, I think I'll skip work today.`);
                 } else if (Deaf() || !flags.acoustics) {
                     await You($C`fall asleep.`);
                 } else {
                     await You_hear($C`sinister laughter as you fall asleep...`);
                 }
-                await fall_asleep(-(rn2(11) + 20 | 0) | 0, TRUE);
+                await fall_asleep(-rn1(11, 20) | 0, TRUE);
             }
             break;
     }
@@ -2813,7 +2814,7 @@ async function edibility_prompts(otmp) {   // eat.c:2627
         if (mnum === PM.GREEN_SLIME || otmp.otyp === GLOB_OF_GREEN_SLIME) {
             stoneorslime = !Unchanging() && !slimeproof(gy.youmonst.data) ? 1 : 0;
         }
-        if (cadaver && !(mnum === PM.LIZARD || mnum === PM.LICHEN || ($c.relem(mons, mnum) === mons[PM.DEATH] || $c.relem(mons, mnum) === mons[PM.FAMINE] || $c.relem(mons, mnum) === mons[PM.PESTILENCE]) || mnum === PM.ACID_BLOB)) {
+        if (cadaver && !nonrotting_corpse(mnum)) {
             const age = await peek_at_iced_corpse_age(otmp);
             /* worst case rather than random
                in this calculation to force prompt */
@@ -2851,7 +2852,7 @@ async function edibility_prompts(otmp) {   // eat.c:2627
     } else if (otmp.otyp === APPLE && otmp.cursed && !Sleep_resistance()) {
         /* causes sleep, for long enough to be dangerous */
         nh_snprintf($C`edibility_prompts`, 2698, new $c.Ptr(buf, 0), 256, $C`%s like %s might have been poisoned.`, new $c.Ptr(foodsmell, 0), new $c.Ptr(it_or_they, 0));
-    } else if (cadaver && !vegetarian($c.relem(mons, mnum)) && !u.uconduct.unvegetarian && gu.urole.mnum === PM.MONK) {
+    } else if (cadaver && !vegetarian($c.relem(mons, mnum)) && !u.uconduct.unvegetarian && Role_if(PM.MONK)) {
         nh_snprintf($C`edibility_prompts`, 2701, new $c.Ptr(buf, 0), 256, $C`%s unhealthy.`, new $c.Ptr(foodsmell, 0));
     } else if (cadaver && acidic($c.relem(mons, mnum)) && !Acid_resistance()) {
         nh_snprintf($C`edibility_prompts`, 2703, new $c.Ptr(buf, 0), 256, $C`%s rather acidic.`, new $c.Ptr(foodsmell, 0));
@@ -3567,8 +3568,8 @@ export async function newuhs(incr) {   // eat.c:3362
             case WEAK:
                 if (Hallucination()) {
                     await pline(!incr ? $C`You still have the munchies.` : $C`The munchies are interfering with your motor capabilities.`);
-                } else if (incr && (gu.urole.mnum === PM.WIZARD || gu.urace.mnum === PM.ELF || gu.urole.mnum === PM.VALKYRIE)) {
-                    await pline($C`%s needs food, badly!`, gu.urole.mnum === PM.WIZARD || gu.urole.mnum === PM.VALKYRIE ? gu.urole.name.m : $C`Elf`);
+                } else if (incr && (Role_if(PM.WIZARD) || Race_if(PM.ELF) || Role_if(PM.VALKYRIE))) {
+                    await pline($C`%s needs food, badly!`, Role_if(PM.WIZARD) || Role_if(PM.VALKYRIE) ? gu.urole.name.m : $C`Elf`);
                 } else {
                     await You($C`%s weak.`, !incr ? $C`are still` : u.uhunger < 45 ? $C`feel` : $C`are beginning to feel`);
                 }
@@ -3630,7 +3631,7 @@ function offer_ok(obj) {   // eat.c:3539
     }
     /* suppress corpses on astral, amulets elsewhere
      * (!astral && amulet) || (astral && !amulet) */
-    if (((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level) ? 1 : 0) ^ (obj.oclass === AMULET_CLASS ? 1 : 0)) {
+    if (Is_astralevel(u.uz) ^ (obj.oclass === AMULET_CLASS ? 1 : 0)) {
         return GETOBJ.DOWNPLAY;
     }
     return GETOBJ.SUGGEST;
@@ -3675,7 +3676,7 @@ export async function floorfood(verb, corpsecheck) {   // eat.c:3579
          * any suitable items */
         /* if we can't touch floor objects then use invent food only;
            same when 'm' prefix is used--for #eat, it means "skip floor food" */
-        if (iflags.menu_requested || !can_reach_floor(TRUE) || feeding && u.usteed || is_pool_or_lava(u.ux, u.uy) && ((u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) || is_clinger(uptr) || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked && !(u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.BREATHLESS) !== 0))) {
+        if (iflags.menu_requested || !can_reach_floor(TRUE) || feeding && u.usteed || is_pool_or_lava(u.ux, u.uy) && (Wwalking() || is_clinger(uptr) || Flying() && !Breathless())) {
             break skipfloor$;
         }
         if (feeding && metallivorous(uptr)) {
@@ -4016,6 +4017,12 @@ export async function Finish_digestion() {   // eat.c:3961
         gc.corpsenm_digested = NON_PM;
     }
     return 0;
+}
+function CANNIBAL_ALLOWED() {
+    return gu.urole.mnum === PM.CAVE_DWELLER || gu.urace.mnum === PM.ORC ? 1 : 0;
+}
+function nonrotting_corpse(mnum) {
+    return mnum === PM.LIZARD || mnum === PM.LICHEN || ($c.relem(mons, mnum) === mons[PM.DEATH] || $c.relem(mons, mnum) === mons[PM.FAMINE] || $c.relem(mons, mnum) === mons[PM.PESTILENCE]) || mnum === PM.ACID_BLOB ? 1 : 0;
 }
 function nonrotting_food(otyp) {
     return otyp === LEMBAS_WAFER || otyp === CRAM_RATION ? 1 : 0;

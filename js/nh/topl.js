@@ -13,6 +13,7 @@ import { flags, gs, gt, iflags, program_state, quitchars } from './decl.js';
 import { panic } from './end.js';
 import { xwaitforspace } from './getline.js';
 import { QBUFSZ, TBUFSZ } from './global.h.js';
+import { C } from './global.macros.js';
 import { OVERRIDE_MSGTYPE, SUPPRESS_HISTORY } from './hack.h.js';
 import { digit, eos, lowc } from './hacklib.js';
 import { AppendLongDigit } from './integer.macros.js';
@@ -91,7 +92,7 @@ export async function tty_doprev_message() {   // topl.c:20
                     await display_nhwindow()(prevmsg_win, 1);
                     await destroy_nhwindow()(prevmsg_win);
                 }
-            } while ($G.morc === 16);
+            } while ($G.morc === C(112));
             $G.ttyDisplay.dismiss_more = 0;
         } else {
             /* reversed */
@@ -136,7 +137,7 @@ export async function tty_doprev_message() {   // topl.c:20
             if (!cw.data.get($c.idx(cw.maxcol))) {
                 cw.maxcol = cw.maxrow;
             }
-        } while ($G.morc === 16);
+        } while ($G.morc === C(112));
         $G.ttyDisplay.dismiss_more = 0;
     }
     return 0;

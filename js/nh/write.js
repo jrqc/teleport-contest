@@ -13,14 +13,16 @@ import { dropx } from './do.js';
 import { fingers_or_gloves } from './do_wear.js';
 import { wipeout_text } from './engrave.js';
 import { FALSE, LL, MAXULEV, TRUE } from './global.h.js';
+import { strcmpi } from './global.macros.js';
 import { ECMD, GETOBJ } from './hack.h.js';
+import { makeknown } from './hack.macros.js';
 import { mungspaces, strncmpi, strstri, upstart } from './hacklib.js';
 import { getobj, hold_another_object, update_inventory, useup } from './invent.js';
 import { nhUse } from './lint.macros.js';
 import { bcsign, mksobj } from './mkobj.js';
 import { nohands } from './mondata.macros.js';
 import { PM } from './monsters.h.js';
-import { discover_object, observe_object } from './o_init.js';
+import { observe_object } from './o_init.js';
 import { obj_descr, objects } from './objects.js';
 import { SCR_AMNESIA, SCR_BLANK_PAPER, SCR_CHARGING, SCR_CONFUSE_MONSTER, SCR_CREATE_MONSTER, SCR_DESTROY_ARMOR, SCR_EARTH, SCR_ENCHANT_ARMOR, SCR_ENCHANT_WEAPON, SCR_FIRE, SCR_FOOD_DETECTION, SCR_GENOCIDE, SCR_GOLD_DETECTION, SCR_IDENTIFY, SCR_LIGHT, SCR_MAGIC_MAPPING, SCR_MAIL, SCR_PUNISHMENT, SCR_REMOVE_CURSE, SCR_SCARE_MONSTER, SCR_STINKING_CLOUD, SCR_TAMING, SCR_TELEPORTATION, SPE_BLANK_PAPER, SPE_BOOK_OF_THE_DEAD, SPE_NOVEL } from './objects.h.js';
 import { The, Tobjnam, an, aobjnam, ysimple_name } from './objnam.js';
@@ -137,7 +139,7 @@ export async function dowrite(pen) {   // write.c:74
         await exercise(A.WIS, FALSE);
         return ECMD.TIME;
     }
-    await discover_object(SCR_BLANK_PAPER, TRUE, TRUE, TRUE);
+    await makeknown(SCR_BLANK_PAPER);
     /* what to write */
     $c.sprintf(new $c.Ptr(qbuf, 0), $C`What type of %s do you want to write?`, typeword);
     await getlin(new $c.Ptr(qbuf, 0), new $c.Ptr(namebuf, 0));
@@ -204,7 +206,7 @@ export async function dowrite(pen) {   // write.c:74
              *   and 2/3 chance to keep previous 50:50
              *   choice; so on for higher match counts.
              */
-            if (objects[i].oc_uname && !strncmpi(objects[i].oc_uname, nm, -1) && !(real && objects[i].oc_name_known) && !rn2(deferralchance = deferralchance + 1 | 0)) {
+            if (objects[i].oc_uname && !strcmpi(objects[i].oc_uname, nm) && !(real && objects[i].oc_name_known) && !rn2(deferralchance = deferralchance + 1 | 0)) {
                 deferred = i;
                 /* writing by user-assigned name is same as by description:
                    fails for books, works for scrolls (having an assigned
@@ -389,7 +391,7 @@ function new_book_description(booktype, outbuf) {   // write.c:395
        much, we may need to add a new flag field to objects[] instead */
     const descr = obj_descr[objects[booktype].oc_descr_idx].oc_descr;
     for (comp_p = new $c.Ptr(new_book_description$compositions, 0); comp_p.get(0); comp_p = comp_p.add(1)) {
-        if (!strncmpi(descr, comp_p.get(0), -1)) {
+        if (!strcmpi(descr, comp_p.get(0))) {
             break;
         }
     }

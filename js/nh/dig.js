@@ -15,7 +15,7 @@ import { A } from './attrib.h.js';
 import { ACURR } from './attrib.macros.js';
 import { cmd_from_dir, cmdq_add_ec, cmdq_add_key, confdir, dxdy_moveok, getdir, isok, movecmd, set_occupation, xytodir } from './cmd.js';
 import { destroy_drawbridge, find_drawbridge, is_db_wall, is_drawbridge_wall, is_ice, is_lava, is_moat, is_pool, is_pool_or_lava } from './dbridge.js';
-import { disp, flags, gd, gm, gn, go, gu, gv, gy, iflags, svc, svd, svl, svm, u, xdir, ydir } from './decl.js';
+import { disp, flags, gd, gm, gn, go, gv, gy, iflags, svc, svd, svl, svm, u, xdir, ydir } from './decl.js';
 import { COIN_CLASS, POTION_CLASS, S } from './defsym.h.js';
 import { cvt_sdoor_to_door } from './detect.js';
 import { canseemon, feel_newsym, flush_screen, newsym, tmp_at } from './display.js';
@@ -27,6 +27,7 @@ import { migrate_to_level } from './dog.js';
 import { impact_drop } from './dokick.js';
 import { Can_dig_down, Is_botlevel, assign_level, ceiling, depth, get_level, has_ceiling, ledger_no, on_level, surface } from './dungeon.js';
 import { MIGR } from './dungeon.h.js';
+import { Is_airlevel, Is_earthlevel, Is_stronghold, Is_waterlevel } from './dungeon.macros.js';
 import { can_reach_floor, cant_reach_floor, del_engr_at, u_wipe_engr } from './engrave.js';
 import { explode } from './explode.js';
 import { debugcore } from './files.js';
@@ -34,7 +35,7 @@ import { breaksink, dogushforth, dryup } from './fountain.js';
 import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
 import { in_rooms, in_town, losehp, may_dig, nomul, obj_to_any, pooleffects, spot_checks, spoteffects, switch_terrain } from './hack.js';
 import { CQ_CANNED, CXN, DIGCHECK, DIR, ECMD, FOOT, FORCEBUNGLE, FORCETRAP, HEAD, KILLED, MM, MV, NO_PART, NO_TRAP_FLAGS, N_DIRS, N_DIRS_Z, RLOC, SHOP, STOMACH, TAINT_AGE } from './hack.h.js';
-import { DIR_180, Maybe_Half_Phys, SHOP_WALL_DMG, pline1, plur } from './hack.macros.js';
+import { DIR_180, Maybe_Half_Phys, SHOP_WALL_DMG, max, pline1, plur, rn1 } from './hack.macros.js';
 import { dist2, s_suffix, sgn } from './hacklib.js';
 import { align_str } from './insight.js';
 import { currency, delobj, sobj_at, stackobj, update_inventory } from './invent.js';
@@ -63,7 +64,7 @@ import { There, You, You_cant, You_feel, You_hear, Your, impossible, pline, plin
 import { body_part, mbodypart } from './polyself.js';
 import { altar_wrath, altarmask_at, desecrate_altar } from './pray.js';
 import { angry_priest } from './priest.js';
-import { FLYING, HALF_PHDAM, INVIS, W } from './prop.h.js';
+import { HALF_PHDAM, W } from './prop.h.js';
 import { punish, unpunish } from './read.js';
 import { ALTAR, CORR, D, DB, DBWALL, DOOR, DRAWBRIDGE_DOWN, DRAWBRIDGE_UP, F_WARNED, IRONBARS, LAVAPOOL, LAVAWALL, MOAT, POOL, ROOM, SCORR, SDOOR, STONE, THRONE } from './rm.h.js';
 import { IS_ALTAR, IS_DOOR, IS_FOUNTAIN, IS_FURNITURE, IS_GRAVE, IS_OBSTRUCTED, IS_ROOM, IS_SINK, IS_STWALL, IS_THRONE, IS_TREE, IS_WALL, IS_WATERWALL, MON_AT, OBJ_AT } from './rm.macros.js';
@@ -82,14 +83,14 @@ import { is_hole, is_magical_trap, is_pit, undestroyable_trap } from './trap.mac
 import { do_attack } from './uhitm.js';
 import { does_block, recalc_block_point, unblock_point } from './vision.js';
 import { COULD_SEE, IN_SIGHT } from './vision.h.js';
-import { cansee } from './vision.macros.js';
+import { cansee, m_canseeu } from './vision.macros.js';
 import { abon, dbon, dmgval, setmnotwielded } from './weapon.js';
 import { welded, wield_tool } from './wield.js';
 import { display_nhwindow, nh_delay_output } from './winprocs.macros.js';
 import { count_wsegs } from './worm.js';
 import { TT } from './you.h.js';
-import { u_at } from './you.macros.js';
-import { Blind, Deaf, Fumbling, Hallucination, Levitation, Unaware, Underwater } from './youprop.macros.js';
+import { Race_if, Role_if, next2u, u_at } from './you.macros.js';
+import { Blind, Deaf, Flying, Fumbling, Hallucination, Levitation, Unaware, Underwater } from './youprop.macros.js';
 import { break_statue, fracture_rock, obj_resists } from './zap.js';
 
 const DIGTYP = $c.cenum([
@@ -243,7 +244,7 @@ function pick_can_reach(pick, x, y) {   // dig.c:141
     }
     /* when hero isn't in a pit, a mattock or flying hero w/ pick can reach
        whether or not the statue is in a pit */
-    if (bimanual(pick) || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) {
+    if (bimanual(pick) || Flying()) {
         return TRUE;
     }
     /* one-handed pick-axe can reach if statue isn't in a pit */
@@ -300,9 +301,9 @@ export function dig_check(madeby, x, y) {   // dig.c:207
         return DIGCHECK.FAIL_THRONE;
     } else if (svl.level.locations[x][y].typ === ALTAR && (madeby !== null || (altarmask_at(x, y) & AM.SANCTUM) !== 0)) {
         return DIGCHECK.FAIL_ALTAR;
-    } else if ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) {
+    } else if (Is_airlevel(u.uz)) {
         return DIGCHECK.FAIL_AIRLEVEL;
-    } else if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
+    } else if (Is_waterlevel(u.uz)) {
         return DIGCHECK.FAIL_WATERLEVEL;
     } else if (svl.level.locations[x][y].typ < POOL && svl.level.locations[x][y].typ !== SDOOR && (svl.level.locations[x][y].flags & W.NONDIGGABLE) !== 0) {
         return DIGCHECK.FAIL_TOOHARD;
@@ -387,7 +388,7 @@ async function dig() {   // dig.c:300
     lev = $c.relem(svl.level.locations[dpx], dpy);
     /* perhaps a nymph stole your pick-axe while you were busy digging */
     /* or perhaps you teleported away */
-    if (u.uswallow || !$G.uwep || !ispick && !is_axe($G.uwep) || !on_level(svc.context.digging.level, u.uz) || (svc.context.digging.down ? dpx !== u.ux || dpy !== u.uy : !(dist2(dpx, dpy, u.ux, u.uy) <= 2))) {
+    if (u.uswallow || !$G.uwep || !ispick && !is_axe($G.uwep) || !on_level(svc.context.digging.level, u.uz) || (svc.context.digging.down ? dpx !== u.ux || dpy !== u.uy : !next2u(dpx, dpy))) {
         return 0;
     }
     if (svc.context.digging.down) {
@@ -433,7 +434,7 @@ async function dig() {   // dig.c:300
         return 0;
     }
     $t1 = ((((10 + rn2(5) | 0) + await abon() | 0) + $G.uwep.spe | 0) - greatest_erosion($G.uwep) | 0) + u.udaminc | 0, svc.context.digging.effort = svc.context.digging.effort + $t1 | 0;
-    if (gu.urace.mnum === PM.DWARF) {
+    if (Race_if(PM.DWARF)) {
         svc.context.digging.effort = Math.imul(svc.context.digging.effort, 2);
     }
     if (svc.context.digging.down) {
@@ -515,7 +516,7 @@ async function dig() {   // dig.c:300
                 }
                 digtxt = $C`The boulder falls apart.`;
             } else if (lev.typ === STONE || lev.typ === SCORR || IS_TREE(lev.typ)) {
-                if ((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level)) {
+                if (Is_earthlevel(u.uz)) {
                     if ($G.uwep.blessed && !rn2(3)) {
                         await mkcavearea(FALSE);
                         break cleanup$;
@@ -530,7 +531,7 @@ async function dig() {   // dig.c:300
                     if (!rn2(5)) {
                         await rnd_treefruit_at(dpx, dpy);
                     }
-                    if (gu.urace.mnum === PM.ELF || gu.urole.mnum === PM.RANGER) {
+                    if (Race_if(PM.ELF) || Role_if(PM.RANGER)) {
                         adjalign(-1);
                     }
                 } else {
@@ -579,7 +580,7 @@ async function dig() {   // dig.c:300
             if (dmgtxt) {
                 await pay_for_damage(dmgtxt, FALSE);
             }
-            if ((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level) && !rn2(3)) {
+            if (Is_earthlevel(u.uz) && !rn2(3)) {
                 mndx = rn2(2) ? PM.EARTH_ELEMENTAL : PM.XORN;
                 if (await makemon($c.relem(mons, mndx), dpx, dpy, MM.NOMSG)) {
                     await pline_The($C`debris from your digging comes to life!`);
@@ -662,9 +663,9 @@ export function holetime() {   // dig.c:597
 export function fillholetyp(x, y, fill_if_any) {   // dig.c:606
     let x1 = 0, y1 = 0;
     /* force filling if it exists at all */
-    const lo_x = $c.i16(1 > x - 1 ? 1 : x - 1);
+    const lo_x = $c.i16(max(1, x - 1));
     const hi_x = $c.i16(x + 1 < COLNO - 1 ? x + 1 : COLNO - 1);
-    const lo_y = $c.i16(0 > y - 1 ? 0 : y - 1);
+    const lo_y = $c.i16(max(0, y - 1));
     const hi_y = $c.i16(y + 1 < ROWNO - 1 ? y + 1 : ROWNO - 1);
     let pool_cnt = 0;
     let moat_cnt = 0;
@@ -711,7 +712,7 @@ export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
     const madeby_obj = madeby === null ? 1 : 0;
     const heros_fault = madeby_u || madeby_obj ? 1 : 0;
     const at_u = u_at(x, y);
-    let wont_fall = Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked ? 1 : 0;
+    let wont_fall = Levitation() || Flying() ? 1 : 0;
     let old_aligntyp = A.NONE;
     if (at_u && u.utrap) {
         if (u.utraptype === TT.BURIEDBALL) {
@@ -733,7 +734,7 @@ export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
     furniture[0] = 0;
     if (IS_FURNITURE(lev.typ)) {
         /* should mirror the word used by surface() for normal floor */
-        surface_type = IS_ROOM(lev.typ) && !((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level)) ? $C`floor` : $C`ground`;
+        surface_type = IS_ROOM(lev.typ) && !Is_earthlevel(u.uz) ? $C`floor` : $C`ground`;
         if (IS_ALTAR(lev.typ)) {
             old_aligntyp = (svl.level.locations[x][y].flags & AM.MASK & AM.MASK) === 0 ? A.NONE : (svl.level.locations[x][y].flags & AM.MASK & AM.MASK) === AM.LAWFUL ? A.LAWFUL : (svl.level.locations[x][y].flags & AM.MASK & AM.MASK) - 2;
             $c.strcpy(new $c.Ptr(furniture, 0), align_str($c.i8(old_aligntyp)));
@@ -794,12 +795,12 @@ export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
         /* in case we're digging down while encased in solid rock
            which is blocking levitation or flight */
         await switch_terrain();
-        if (Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) {
+        if (Levitation() || Flying()) {
             wont_fall = TRUE;
         }
         if (at_u) {
             if (!wont_fall) {
-                set_utrap((rn2(4) + 2 | 0) >>> 0, TT.PIT);
+                set_utrap(rn1(4, 2) >>> 0, TT.PIT);
                 gv.vision_full_recalc = 1;   /* vision limits change */
             } else {
                 await reset_utrap(TRUE);
@@ -822,7 +823,7 @@ export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
             /* in case we're digging down while encased in solid rock
                which is blocking levitation or flight */
             await switch_terrain();
-            if (Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) {
+            if (Levitation() || Flying()) {
                 wont_fall = TRUE;
             }
             /* check for leashed pet that can't fall right now */
@@ -877,7 +878,7 @@ export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
                     return;   /* temporary? kludge */
                 }
                 if (await teleport_pet(mtmp, FALSE)) {
-                    if ((svd.dungeon_topology.d_stronghold_level.dlevel || svd.dungeon_topology.d_stronghold_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_stronghold_level)) {
+                    if (Is_stronghold(u.uz)) {
                         assign_level(tolevel, svd.dungeon_topology.d_valley_level);
                     } else if (Is_botlevel(u.uz)) {
                         if (canseemon(mtmp)) {
@@ -1076,10 +1077,10 @@ async function dig_up_grave(cc) {   // dig.c:1027
     }
     /* Grave-robbing is frowned upon... */
     await exercise(A.WIS, FALSE);
-    if (gu.urole.mnum === PM.ARCHEOLOGIST) {
+    if (Role_if(PM.ARCHEOLOGIST)) {
         adjalign(Math.imul(-sgn(u.ualign.type) | 0, 3));
         await You_feel($C`like a despicable grave-robber!`);
-    } else if (gu.urole.mnum === PM.SAMURAI) {
+    } else if (Role_if(PM.SAMURAI)) {
         adjalign(-sgn(u.ualign.type) | 0);
         await You($C`disturb the honorable dead!`);
     } else if (u.ualign.type === A.LAWFUL) {
@@ -1263,7 +1264,7 @@ export async function use_pick_axe2(obj) {   // dig.c:1162
                     const vibrate = !rn2(3) ? 1 : 0;
                     await pline($C`Sparks fly as you whack the %s.%s`, what, vibrate ? $C`  The axe-handle vibrates violently!` : $C``);
                     if (vibrate) {
-                        await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? 1 : 2, $C`axing a hard object`, KILLED.BY);
+                        await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? 1 : 2), $C`axing a hard object`, KILLED.BY);
                     }
                     await wake_nearby(FALSE);
                 } else {
@@ -1309,7 +1310,7 @@ export async function use_pick_axe2(obj) {   // dig.c:1162
             }
             set_occupation(dig, verbing, 0);
         }
-    } else if ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
+    } else if (Is_airlevel(u.uz) || Is_waterlevel(u.uz)) {
         /* it must be air -- water checked above */
         await You($C`swing %s through thin air.`, await yobjnam(obj, null));
     } else if (!can_reach_floor(FALSE)) {
@@ -1355,7 +1356,7 @@ export async function use_pick_axe2(obj) {   // dig.c:1162
  * @returns {number} boolean
  */
 function watchman_canseeu(mtmp) {   // dig.c:1362
-    if (is_watch(mtmp.data) && mtmp.mcansee && ((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(mtmp.data.mflags1, M1.SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0) && mtmp.mpeaceful) {
+    if (is_watch(mtmp.data) && mtmp.mcansee && m_canseeu(mtmp) && mtmp.mpeaceful) {
         return TRUE;
     }
     return FALSE;
@@ -1562,7 +1563,7 @@ export async function zap_dig() {   // dig.c:1548
         return;
     }   /* swallowed */
     if (u.dz) {
-        if (!((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && !Underwater()) {
+        if (!Is_airlevel(u.uz) && !Is_waterlevel(u.uz) && !Underwater()) {
             if (u.dz < 0 || On_stairs(u.ux, u.uy)) {
                 if (On_stairs(u.ux, u.uy)) {
                     const stway = stairway_at(u.ux, u.uy);
@@ -1587,14 +1588,14 @@ export async function zap_dig() {   // dig.c:1548
     }   /* up or down */
     /* normal case: digging across the level */
     let shopdoor = shopwall = FALSE;
-    const maze_dig = svl.level.flags.is_maze_lev && !((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level)) ? 1 : 0;
+    const maze_dig = svl.level.flags.is_maze_lev && !Is_earthlevel(u.uz) ? 1 : 0;
     let zx = $c.i16(u.ux + u.dx | 0);
     let zy = $c.i16(u.uy + u.dy | 0);
     if (u.utrap && u.utraptype === TT.PIT && (trap_with_u = t_at(u.ux, u.uy))) {
         pitdig = TRUE;
         diridx = xytodir(u.dx, u.dy);
     }
-    let digdepth = rn2(18) + 8 | 0;
+    let digdepth = rn1(18, 8);
     await tmp_at(DISP_BEAM, 4083);
     while ((digdepth = digdepth - 1 | 0) >= 0) {
         if (!isok(zx, zy)) {
@@ -1947,7 +1948,7 @@ export async function bury_an_obj(otmp, dealloced) {   // dig.c:1984
     }
     if (otmp === $G.uball) {
         await unpunish();
-        set_utrap((rn2(50) + 20 | 0) >>> 0, TT.BURIEDBALL);
+        set_utrap(rn1(50, 20) >>> 0, TT.BURIEDBALL);
         await pline_The($C`iron ball gets buried!`);
     }
     /* after unpunish(), or might get deallocated chain */

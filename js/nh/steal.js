@@ -24,8 +24,8 @@ import { PLNMSG } from './flag.h.js';
 import { FALSE, LARGEST_INT, TRUE } from './global.h.js';
 import { in_rooms, inv_cnt, money_cnt, nomul } from './hack.js';
 import { FOOT, HAND, RLOC } from './hack.h.js';
-import { min } from './hack.macros.js';
-import { copynchars, dist2, s_suffix, strstri, strsubst, upstart } from './hacklib.js';
+import { distu, min } from './hack.macros.js';
+import { copynchars, s_suffix, strstri, strsubst, upstart } from './hacklib.js';
 import { carry_obj_effects, count_unpaid, freeinv, g_at, stackobj } from './invent.js';
 import { obj_sheds_light, snuff_light_source } from './light.js';
 import { add_to_minv, obj_extract_self, place_object, splitobj, unknow_object } from './mkobj.js';
@@ -34,7 +34,6 @@ import { can_carry, monnear } from './mon.js';
 import { AD, AT } from './monattk.h.js';
 import { attacktype, dmgtype } from './mondata.js';
 import { can_teleport, is_animal, slithy, throws_rocks, touch_petrifies } from './mondata.macros.js';
-import { M1 } from './monflag.h.js';
 import { monflee } from './monmove.js';
 import { mons } from './monst.js';
 import { DEADMONSTER, engulfing_u } from './monst.macros.js';
@@ -46,7 +45,7 @@ import { Tobjnam, armor_simple_name, distant_name, doname, makeplural, otense, s
 import { encumber_msg } from './pickup.js';
 import { You, Your, impossible, pline, pline_mon, urgent_pline } from './pline.js';
 import { body_part, mbodypart, skinback } from './polyself.js';
-import { ADORNED, FLYING, W, W_ACCESSORY, W_ARMOR, W_RING, W_WEAPONS } from './prop.h.js';
+import { ADORNED, W, W_ACCESSORY, W_ARMOR, W_RING, W_WEAPONS } from './prop.h.js';
 import { is_quest_artifact } from './questpgr.js';
 import { unpunish } from './read.js';
 import { rn2, rnd } from './rnd.js';
@@ -58,7 +57,7 @@ import { uqwepgone, uswapwepgone, uwepgone, welded } from './wield.js';
 import { extract_from_minvent, setnotworn, setworn, update_mon_extrinsics } from './worn.js';
 import { TT } from './you.h.js';
 import { RING_ON_PRIMARY, RING_ON_SECONDARY } from './you.macros.js';
-import { Blind, Conflict, Levitation, Punished } from './youprop.macros.js';
+import { Blind, Conflict, Flying, Levitation, Punished } from './youprop.macros.js';
 import { obj_resists } from './zap.js';
 
 const steal$how = $c.nulls(4);   // static in steal()
@@ -142,7 +141,7 @@ export async function stealgold(mtmp) {   // steal.c:58
         if (!$c.strncmp(what, $C`rear `, 5)) {
             what = what.add(5);
         }
-        await pline($C`%s quickly snatches some gold from %s %s %s!`, await Monnam(mtmp), Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked ? $C`beneath` : $C`between`, whose, what);
+        await pline($C`%s quickly snatches some gold from %s %s %s!`, await Monnam(mtmp), Levitation() || Flying() ? $C`beneath` : $C`between`, whose, what);
         if (!ygold || !rn2(5)) {
             if (!await tele_restrict(mtmp)) {
                 await rloc(mtmp, RLOC.MSG);
@@ -231,7 +230,7 @@ async function stealarm() {   // steal.c:165
                            steal attack, or perhaps while stealing hero's suit
                            the thief took away other items causing hero to fall
                            into water or lava and then teleport to safety */
-                        if (!dmgtype(mtmp.data, AD.SITM) || dist2(mtmp.mx, mtmp.my, u.ux, u.uy) > 2) {
+                        if (!dmgtype(mtmp.data, AD.SITM) || distu(mtmp.mx, mtmp.my) > 2) {
                             break botm$;   /* (could just use 'break' here) */
                         }
                         if (otmp.unpaid) {

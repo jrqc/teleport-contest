@@ -18,6 +18,7 @@ import { ParanoidWerechange } from './flag.macros.js';
 import { FALSE, TRUE } from './global.h.js';
 import { monster_nearby } from './hack.js';
 import { NO } from './hack.h.js';
+import { rn1 } from './hack.macros.js';
 import { makemon } from './makemon.js';
 import { healmon, monnear, wake_nearto } from './mon.js';
 import { set_mon_data } from './mondata.js';
@@ -158,7 +159,7 @@ export async function new_were(mon) {   // were.c:96
     /* vision capability isn't changing so we don't call set_apparxy() to
        update mon's idea of where hero is; peaceful check is redundant */
     if (svc.context.mon_moving && !mon.mpeaceful && onscary(mon.mux, mon.muy, mon) && monnear(mon, mon.mux, mon.muy)) {
-        await monflee(mon, rn2(9) + 2 | 0, TRUE, TRUE);   /* 2..10 turns */
+        await monflee(mon, rn1(9, 2), TRUE, TRUE);   /* 2..10 turns */
     }
 }
 /* were-creature (even you) summons a horde */
@@ -252,7 +253,7 @@ export async function you_unwere(purify) {   // were.c:213
     if (!Unchanging() && is_were(gy.youmonst.data) && !monster_nearby() && (!controllable_poly || !await paranoid_query(ParanoidWerechange(), $C`Remain in beast form?`))) {
         await rehumanize();
     } else if (is_were(gy.youmonst.data) && !u.mtimedone) {
-        $t1 = rn2(200) + 200 | 0, u.mtimedone = $t1;   /* 40% of initial were change */
+        $t1 = rn1(200, 200), u.mtimedone = $t1;   /* 40% of initial were change */
     }
 }
 /* lycanthropy is being caught or cured, but no shape change is involved */

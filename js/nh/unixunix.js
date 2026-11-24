@@ -9,12 +9,13 @@ import { $C } from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
 import { yn_function } from './cmd.js';
-import { gl, iflags, program_state, svh, svp, ynchars } from './decl.js';
+import { gl, iflags, program_state, svh, svp } from './decl.js';
 import { done1, nh_terminate } from './end.js';
 import { delete_levelfile, fqname, lock_file, set_levelfile_name, unlock_file } from './files.js';
 import { wizard } from './flag.macros.js';
 import { FALSE, MAXDUNGEON, MAXLEVEL, TRUE } from './global.h.js';
 import { LEVELPREFIX, LOCKPREFIX } from './hack.h.js';
+import { y_n } from './hack.macros.js';
 import { lowc } from './hacklib.js';
 import { Norep, pline, raw_printf } from './pline.js';
 import { sysopt } from './sys.js';
@@ -157,7 +158,7 @@ export async function getlock() {   // unixunix.c:103
             await unlock_file($C`perm`);
             if (iflags.window_inited) {
                 /* this is a candidate for paranoid_confirmation */
-                c = await yn_function(new $c.Ptr(getlock$destroy_old_game_prompt, 0), new $c.Ptr(ynchars, 0), 110, TRUE);
+                c = await y_n(new $c.Ptr(getlock$destroy_old_game_prompt, 0));
             } else {
                 await raw_printf($C`\n%s [yn] `, new $c.Ptr(getlock$destroy_old_game_prompt, 0));
                 $c.fflush($c.__stdoutp);

@@ -16,7 +16,7 @@ import { A } from './attrib.h.js';
 import { ACURR } from './attrib.macros.js';
 import { isok } from './cmd.js';
 import { is_lava, is_pool, is_waterwall } from './dbridge.js';
-import { c_common_strings, flags, gb, gi, gm, gn, go, gt, gu, gv, gy, svc, svl, svm, u } from './decl.js';
+import { c_common_strings, flags, gb, gi, gm, gn, go, gt, gv, gy, svc, svl, svm, u } from './decl.js';
 import { ARMOR_CLASS, BALL_CLASS, CHAIN_CLASS, COIN_CLASS, FOOD_CLASS, GEM_CLASS, POTION_CLASS, ROCK_CLASS, SPBOOK_CLASS, TOOL_CLASS, VENOM_CLASS, WAND_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { canseemon, newsym, tmp_at } from './display.js';
 import { BACKTRACK, DISP_END, DISP_FLASH, DISP_TETHER, GLYPH } from './display.h.js';
@@ -30,7 +30,7 @@ import { freehand } from './engrave.js';
 import { BUFSZ, FALSE, TRUE } from './global.h.js';
 import { calc_capacity, losehp, nomul, rounddiv } from './hack.js';
 import { ARM, BOLT_LIM, BRK, CORPSTAT, EYE, FACE, FOOT, HAND, KILLED, MON_POLE_DIST, PET_MISSILE_RANGE2, SLT_ENCUMBER, XKILL } from './hack.h.js';
-import { BZ_OFS_AD, BZ_VALID_ADTYP, Maybe_Half_Phys } from './hack.macros.js';
+import { BZ_M_BREATH, BZ_OFS_AD, BZ_VALID_ADTYP, Maybe_Half_Phys, makeknown } from './hack.macros.js';
 import { dist2, distmin, nh_snprintf, s_suffix, sgn, strncmpi, upstart } from './hacklib.js';
 import { delobj, hold_another_object, sobj_at, stackobj } from './invent.js';
 import { obj_sheds_light } from './light.js';
@@ -45,10 +45,10 @@ import { MZ, NEUTRAL } from './monflag.h.js';
 import { closed_door, dissolve_bars } from './monmove.js';
 import { mons } from './monst.js';
 import { M_AP, M_SEEN, NEED } from './monst.h.js';
-import { DEADMONSTER, MON_WEP, M_AP_TYPE, U_AP_TYPE, is_vampshifter, resists_acid, resists_poison, resists_ston } from './monst.macros.js';
+import { DEADMONSTER, MON_WEP, M_AP_TYPE, U_AP_TYPE, is_vampshifter, m_seenres, resists_acid, resists_poison, resists_ston } from './monst.macros.js';
 import { PM } from './monsters.h.js';
 import { munstone } from './muse.js';
-import { discover_object, observe_object } from './o_init.js';
+import { observe_object } from './o_init.js';
 import { OBJ, POTHIT } from './obj.h.js';
 import { ammo_and_launcher, is_ammo, is_flimsy, is_launcher, is_poisonable, is_pole, matching_launcher, stone_missile } from './obj.macros.js';
 import { ARM_GLOVES, GOLD, NUM_OBJECTS, SILVER } from './objclass.h.js';
@@ -77,7 +77,7 @@ import { mwelded } from './wield.js';
 import { nh_delay_output } from './winprocs.macros.js';
 import { extract_from_minvent, find_mac } from './worn.js';
 import { PRONOUN } from './you.h.js';
-import { Upolyd, u_at } from './you.macros.js';
+import { Role_if, Upolyd, u_at } from './you.macros.js';
 import { Acid_resistance, Blind, BlindedTimeout, Deaf, Fumbling, Hallucination, Hate_silver, Sleep_resistance, Stone_resistance, Stoned, Underwater } from './youprop.macros.js';
 import { dobuzz, exclam, hit, miss } from './zap.js';
 
@@ -540,7 +540,7 @@ async function ucatchgem(gem, mon) {   // mthrowu.c:506
         if (gem.otyp >= FIRST_GLASS_GEM) {
             await You($C`catch the %s.`, gem_xname);
             await You($C`are not interested in %s junk.`, mon_s_name);
-            await discover_object(gem.otyp, TRUE, TRUE, TRUE);
+            await makeknown(gem.otyp);
             await dropy(gem);
         } else {
             await You($C`accept %s gift in the spirit in which it was intended.`, mon_s_name);
@@ -557,7 +557,7 @@ async function ucatchgem(gem, mon) {   // mthrowu.c:506
  */
 async function u_catch_thrown_obj(otmp) {   // mthrowu.c:533
     let buf = new Int8Array(256);
-    const catch_chance = 100 - ACURR(A.DEX) - (gu.urole.mnum === PM.MONK || gu.urole.mnum === PM.ROGUE ? 20 : 0);
+    const catch_chance = 100 - ACURR(A.DEX) - (Role_if(PM.MONK) || Role_if(PM.ROGUE) ? 20 : 0);
     if (!Blind() && !u.uprops[CONFUSION].intrinsic && !u.uprops[STUNNED].intrinsic && !Fumbling() && otmp.oclass !== VENOM_CLASS && !nohands(gy.youmonst.data) && await freehand() && calc_capacity(otmp.owt | 0) <= SLT_ENCUMBER && !rn2(catch_chance)) {
         nh_snprintf($C`u_catch_thrown_obj`, 544, new $c.Ptr(buf, 0), BUFSZ, $C`You catch the %s!`, await simpleonames(otmp));
         await hold_another_object(otmp, $C`You catch, but drop, the %s.`, await simpleonames(otmp), new $c.Ptr(buf, 0));
@@ -1094,7 +1094,7 @@ export async function breamm(mtmp, mattk, mtarg) {   // mthrowu.c:1093
         }
         /* if we've seen the actual resistance, don't bother, or
            if we're close by and they reflect, just jump the player */
-        if (utarget && ($c.andu64(mtmp.seen_resistance, cvt_adtyp_to_mseenres($c.u8(typ))) || $c.andu64(mtmp.seen_resistance, M_SEEN.REFL))) {
+        if (utarget && ($c.andu64(mtmp.seen_resistance, cvt_adtyp_to_mseenres($c.u8(typ))) || m_seenres(mtmp, M_SEEN.REFL))) {
             return M_ATTK.HIT;
         }
         if (!mtmp.mspec_used && rn2(3)) {
@@ -1103,7 +1103,7 @@ export async function breamm(mtmp, mattk, mtarg) {   // mthrowu.c:1093
                     await pline($C`%s breathes %s!`, await Monnam(mtmp), breathwep_name(typ));
                 }
                 gb.buzzer = mtmp;
-                await dobuzz(-20 - $c.rem32($c.abs(typ - AD.MAGM | 0), 10) | 0, mattk.damn, mtmp.mx, mtmp.my, sgn(gt.tbx), sgn(gt.tby), utarget, utarget, FALSE);
+                await dobuzz(BZ_M_BREATH(typ), mattk.damn, mtmp.mx, mtmp.my, sgn(gt.tbx), sgn(gt.tby), utarget, utarget, FALSE);
                 gb.buzzer = null;
                 nomul(0);
                 /* breath runs out sometimes. Also, give monster some

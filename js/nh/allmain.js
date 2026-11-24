@@ -27,8 +27,8 @@ import { deferred_goto, hellish_smoke_mesg, save_currentstate, schedule_goto } f
 import { find_ac, glibr, set_wear } from './do_wear.js';
 import { makedog } from './dog.js';
 import { obj_delivery } from './dokick.js';
-import { assign_level, depth, find_level, init_dungeons, on_level, print_level_annotation } from './dungeon.js';
-import { In_endgame } from './dungeon.macros.js';
+import { assign_level, depth, find_level, init_dungeons, print_level_annotation } from './dungeon.js';
+import { In_endgame, Is_airlevel, Is_waterlevel } from './dungeon.macros.js';
 import { gethungry, maybe_finished_meal, reset_eat } from './eat.js';
 import { done, done1 } from './end.js';
 import { read_engr_at, u_wipe_engr } from './engrave.js';
@@ -39,6 +39,7 @@ import { COLNO, FALSE, LL, MAXULEV, NHLpa, TRUE } from './global.h.js';
 import { maybe_shuffle_customizations } from './glyphs.js';
 import { check_special_room, domove, end_running, lookaround, monster_nearby, near_capacity, nomul, notice_all_mons, overexert_hp, pooleffects, runmode_delay_output, unmul } from './hack.js';
 import { CQ_CANNED, CQ_REPEAT, ESCAPED, EXT_ENCUMBER, HVY_ENCUMBER, MOD_ENCUMBER, NHCB, NHCORE, NO, POLY, RLOC, SLT_ENCUMBER, UNENCUMBERED } from './hack.h.js';
+import { rn1 } from './hack.macros.js';
 import { eos } from './hacklib.js';
 import { align_str } from './insight.js';
 import { reroll_menu, update_inventory } from './invent.js';
@@ -50,7 +51,7 @@ import { mklev } from './mklev.js';
 import { fumaroles, movebubbles } from './mkmaze.js';
 import { clear_splitobjs, dobjsfree } from './mkobj.js';
 import { mcalcdistress, mcalcmove, mnexto, movemon, see_nearby_monsters } from './mon.js';
-import { G_NOCORPSE, M1 } from './monflag.h.js';
+import { G_NOCORPSE } from './monflag.h.js';
 import { m_everyturn_effect } from './monmove.js';
 import { mons, monst_globals_init } from './monst.js';
 import { ismnum } from './monst.macros.js';
@@ -63,7 +64,7 @@ import { LOW_PM, NON_PM, NORMAL_SPEED, NUMMONS } from './permonst.h.js';
 import { encumber_msg, pickup, reset_justpicked } from './pickup.js';
 import { Norep, You, impossible, livelog_printf, nhassert_failed, pline, urgent_pline } from './pline.js';
 import { polyself, rehumanize, set_uasmon, udeadinside, ugenocided } from './polyself.js';
-import { MAGICAL_BREATHING, REGENERATION, SLEEPY } from './prop.h.js';
+import { REGENERATION, SLEEPY } from './prop.h.js';
 import { com_pager } from './questpgr.js';
 import { any_visible_region, run_regions } from './region.js';
 import { crashreport_init } from './report.js';
@@ -91,8 +92,8 @@ import { amulet, intervene } from './wizard.js';
 import { sanity_check } from './wizcmds.js';
 import { clear_bypasses } from './worn.js';
 import { ROLE_FEMALE, ROLE_GENDMASK, ROLE_MALE, TT, UTOTYPE } from './you.h.js';
-import { Upolyd } from './you.macros.js';
-import { BClairvoyant, Blind, Clairvoyant, EMagical_breathing, Energy_regeneration, Fast, Glib, Half_physical_damage, Hallucination, Polymorph, Regeneration, Searching, Sleepy, Teleportation, Unblind_telepat, Unchanging, Underwater, Very_fast, Warn_of_mon, Warning } from './youprop.macros.js';
+import { Role_if, Upolyd } from './you.macros.js';
+import { BClairvoyant, Blind, Breathless, Clairvoyant, EMagical_breathing, Energy_regeneration, Fast, Glib, Half_physical_damage, Hallucination, Polymorph, Regeneration, Searching, Sleepy, Teleportation, Unblind_telepat, Unchanging, Underwater, Very_fast, Warn_of_mon, Warning } from './youprop.macros.js';
 import { makewish } from './zap.js';
 
 let mvl_wtcap = 0;
@@ -411,14 +412,14 @@ export async function moveloop_core() {   // allmain.c:177
                     }
                     if (!u.udg_cnt) {
                         await intervene();
-                        $t2 = (rn2(200) + 50 | 0) >>> 0, u.udg_cnt = $t2;
+                        $t2 = rn1(200, 50) >>> 0, u.udg_cnt = $t2;
                     }
                 }
                 /* XXX This should be recoded to use something like regions - a list of
                  * things that are active and need to be handled that is dynamically
                  * maintained and not a list of special cases. */
                 /* vision will be updated as bubbles move */
-                if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) || (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) {
+                if (Is_waterlevel(u.uz) || Is_airlevel(u.uz)) {
                     await movebubbles();
                 } else if (svl.level.flags.fumaroles) {
                     await fumaroles();
@@ -456,7 +457,7 @@ export async function moveloop_core() {   // allmain.c:177
             }
             /* we maintain this counter even when clairvoyance isn't
                taking place; on average, go again 30 turns from now */
-            $t3 = $c.add64(svm.moves, rn2(31) + 15 | 0), svc.context.seer_turn = $t3;   /*15..45*/
+            $t3 = $c.add64(svm.moves, rn1(31, 15)), svc.context.seer_turn = $t3;   /*15..45*/
             /* [it used to be that on every 15th turn, there was a 50%
                chance of farsight, so it could happen as often as every
                15 turns or theoretically never happen at all; but when
@@ -617,12 +618,12 @@ export async function moveloop(resuming) {   // allmain.c:587
  */
 async function regen_pw(wtcap) {   // allmain.c:600
     let $t1;
-    if (u.uen < u.uenmax && (wtcap < MOD_ENCUMBER && !$c.rem64(svm.moves, $c.div32(Math.imul(MAXULEV + 8 - u.ulevel | 0, gu.urole.mnum === PM.WIZARD ? 3 : 4), 6)) || Energy_regeneration())) {
+    if (u.uen < u.uenmax && (wtcap < MOD_ENCUMBER && !$c.rem64(svm.moves, $c.div32(Math.imul(MAXULEV + 8 - u.ulevel | 0, Role_if(PM.WIZARD) ? 3 : 4), 6)) || Energy_regeneration())) {
         let upper = $c.div32(ACURR(A.WIS) + ACURR(A.INT), 15) + 1 | 0;
         if (EMagical_breathing()) {
             upper = upper + 2 | 0;
         }
-        $t1 = rn2(upper) + 1 | 0, u.uen = u.uen + $t1 | 0;
+        $t1 = rn1(upper, 1), u.uen = u.uen + $t1 | 0;
         if (u.uen > u.uenmax) {
             u.uen = u.uenmax;
         }
@@ -645,7 +646,7 @@ async function regen_hp(wtcap) {   // allmain.c:625
         if (u.mh < 1) {
             /* shouldn't happen... */
             await rehumanize();
-        } else if (gy.youmonst.data.mlet === S.EEL && !is_pool(u.ux, u.uy) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && !(u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.BREATHLESS) !== 0)) {
+        } else if (gy.youmonst.data.mlet === S.EEL && !is_pool(u.ux, u.uy) && !Is_waterlevel(u.uz) && !Breathless()) {
             /* eel out of water loses hp, similar to monster eels;
                as hp gets lower, rate of further loss slows down */
             if (u.mh > 1 && !Regeneration() && rn2(u.mh) > rn2(8) && (!Half_physical_damage() || !$c.rem64(svm.moves, 2))) {

@@ -11,15 +11,18 @@ import { acurrstr } from './attrib.js';
 import { yn_function } from './cmd.js';
 import { svc, u, ynNaqchars, ynaqchars, ynchars, ynqchars } from './decl.js';
 import { panic } from './end.js';
-import { TRUE } from './global.h.js';
+import { FALSE, TRUE } from './global.h.js';
 import { COUNTING, FREEING, N_DIRS, WRITING } from './hack.h.js';
 import { dist2, online2 } from './hacklib.js';
 import { AD } from './monattk.h.js';
 import { PM } from './monsters.h.js';
 import { discover_object } from './o_init.js';
 import { OBJ } from './obj.h.js';
+import { objects } from './objects.js';
+import { SPE_MAGIC_MISSILE, WAN_MAGIC_MISSILE } from './objects.h.js';
 import { You, You_hear, pline, verbalize } from './pline.js';
 import { HALF_PHDAM, WARN_OF_MON } from './prop.h.js';
+import { rn2, rnd } from './rnd.js';
 
 export function SHOP_WALL_DMG() {
     return $c.mul64(10, acurrstr());
@@ -84,6 +87,9 @@ export async function nyaq(query) {
 export async function ynNaq(query) {
     return await yn_function(query, new $c.Ptr(ynNaqchars, 0), 121, TRUE);
 }
+export async function YN(query) {
+    return await yn_function(query, new $c.Ptr(ynchars, 0), 110, FALSE);
+}
 export function BALL_IN_MON() {
     return u.uswallow && $G.uball && $G.uball.where === OBJ.FREE ? 1 : 0;
 }
@@ -100,7 +106,13 @@ export function BZ_OFS_AD(adtyp) {
     return $c.rem32($c.abs(adtyp - AD.MAGM | 0), 10);
 }
 export function BZ_U_WAND(bztyp) {
-    return 0 + bztyp;
+    return 0 + $c.rem32($c.abs(bztyp - WAN_MAGIC_MISSILE | 0), 10);
+}
+export function BZ_U_SPELL(bztyp) {
+    return 10 + $c.rem32($c.abs(bztyp - SPE_MAGIC_MISSILE | 0), 10) | 0;
+}
+export function BZ_M_BREATH(bztyp) {
+    return -20 - $c.rem32($c.abs(bztyp - AD.MAGM | 0), 10) | 0;
 }
 export function FEATURE_NOTICE_VER(major, minor, patch) {
     return $c.oru64($c.oru64($c.oru64($c.shlu64($c.u64(major), 24), $c.shlu64($c.u64(minor), 16)), $c.shlu64($c.u64(patch), 8)), 0);
@@ -114,6 +126,9 @@ export function min(x, y) {
 export function plur(x) {
     return x === 1 ? $C`` : $C`s`;
 }
+export function ARM_BONUS(obj) {
+    return objects[obj.otyp].oc_oc1 + obj.spe - ((obj.oeroded > obj.oeroded2 ? obj.oeroded : obj.oeroded2) < objects[obj.otyp].oc_oc1 ? obj.oeroded > obj.oeroded2 ? obj.oeroded : obj.oeroded2 : objects[obj.otyp].oc_oc1);
+}
 export async function makeknown(x) {
     await discover_object(x, TRUE, TRUE, TRUE);
 }
@@ -122,4 +137,13 @@ export function distu(xx, yy) {
 }
 export function onlineu(xx, yy) {
     return online2(xx, yy, u.ux, u.uy);
+}
+export function rn1(x, y) {
+    return rn2(x) + y | 0;
+}
+export function AC_VALUE(AC) {
+    return AC >= 0 ? AC : -rnd(-AC | 0) | 0;
+}
+export async function qsort(base, nmemb, size, compar) {
+    await $c.nh_deterministic_qsort$async(base, $c.u64(nmemb), size, compar);
 }

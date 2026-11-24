@@ -12,17 +12,17 @@ import { $G } from './globals.js';
 import { exercise } from './attrib.js';
 import { A } from './attrib.h.js';
 import { is_pool } from './dbridge.js';
-import { flags, gi, gv, svd, svl, u } from './decl.js';
+import { flags, gi, gv, svl, u } from './decl.js';
 import { cls, map_object, newsym } from './display.js';
 import { canletgo, flooreffects, set_wounded_legs } from './do.js';
 import { hliquid } from './do_name.js';
 import { hard_helmet } from './do_wear.js';
 import { hitfloor, omon_adj } from './dothrow.js';
-import { on_level } from './dungeon.js';
+import { Is_waterlevel } from './dungeon.macros.js';
 import { FALSE, TRUE } from './global.h.js';
 import { losehp, movobj, near_capacity, nomul, spoteffects, weight_cap } from './hack.js';
 import { HEAD, HMON, KILLED, LEG, NO_KILLER_PREFIX, SLT_ENCUMBER, override_restriction } from './hack.h.js';
-import { Maybe_Half_Phys } from './hack.macros.js';
+import { Maybe_Half_Phys, rn1 } from './hack.macros.js';
 import { dist2, distmin } from './hacklib.js';
 import { freeinv } from './invent.js';
 import { obj_extract_self, place_object, remove_object } from './mkobj.js';
@@ -89,7 +89,7 @@ export async function ballfall() {   // ball.c:43
     const gets_hit = ($G.uball.ox !== u.ux || $G.uball.oy !== u.uy) && ($G.uwep === $G.uball ? FALSE : $c.i8(rn2(5))) ? 1 : 0;
     await ballrelease(TRUE);
     if (gets_hit) {
-        let dmg = rn2(7) + 25 | 0;
+        let dmg = rn1(7, 25);
         await pline_The($C`iron ball falls on your %s.`, await body_part(HEAD));
         if ($G.uarmh) {
             if (hard_helmet($G.uarmh)) {
@@ -178,7 +178,7 @@ async function placebc_core() {   // ball.c:120
  */
 async function unplacebc_core() {   // ball.c:147
     if (u.uswallow) {
-        if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
+        if (Is_waterlevel(u.uz)) {
             /* we need to proceed with the removal from the floor
              * so that movebubbles() processing will disregard it as
              * intended. Ignore all the vision stuff.
@@ -540,7 +540,7 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
              * appear, since unless we moved at least two squares there is no
              * possibility of the chain position being in solid rock.
              */
-            if (svl.level.locations[u.ux][u.uy].typ < POOL || svl.level.locations[u.ux][u.uy].typ === DOOR && svl.level.locations[u.ux][u.uy].flags & (D.CLOSED | D.LOCKED) || (svl.level.locations[chainx.get(0)][chainy.get(0)].typ < POOL || svl.level.locations[chainx.get(0)][chainy.get(0)].typ === DOOR && svl.level.locations[chainx.get(0)][chainy.get(0)].flags & (D.CLOSED | D.LOCKED)) || (svl.level.locations[$G.uball.ox][$G.uball.oy].typ < POOL || svl.level.locations[$G.uball.ox][$G.uball.oy].typ === DOOR && svl.level.locations[$G.uball.ox][$G.uball.oy].flags & (D.CLOSED | D.LOCKED))) {
+            if (IS_CHAIN_ROCK(u.ux, u.uy) || IS_CHAIN_ROCK(chainx.get(0), chainy.get(0)) || IS_CHAIN_ROCK($G.uball.ox, $G.uball.oy)) {
                 already_in_rock = TRUE;
             } else {
                 already_in_rock = FALSE;
@@ -550,7 +550,7 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
                     /* two spaces diagonal from ball, move chain in-between */
                     chainx.set(0, $c.i16($c.div32($G.uball.ox + x, 2)));
                     chainy.set(0, $c.i16($c.div32($G.uball.oy + y, 2)));
-                    if ((svl.level.locations[chainx.get(0)][chainy.get(0)].typ < POOL || svl.level.locations[chainx.get(0)][chainy.get(0)].typ === DOOR && svl.level.locations[chainx.get(0)][chainy.get(0)].flags & (D.CLOSED | D.LOCKED)) && !already_in_rock) {
+                    if (IS_CHAIN_ROCK(chainx.get(0), chainy.get(0)) && !already_in_rock) {
                         do {
                             chainx.set(0, oldchainx);
                             chainy.set(0, oldchainy);
@@ -578,7 +578,7 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
                             tempy = y;
                             tempy2 = $G.uball.oy;
                         }
-                        if ((svl.level.locations[tempx][tempy].typ < POOL || svl.level.locations[tempx][tempy].typ === DOOR && svl.level.locations[tempx][tempy].flags & (D.CLOSED | D.LOCKED)) && !(svl.level.locations[tempx2][tempy2].typ < POOL || svl.level.locations[tempx2][tempy2].typ === DOOR && svl.level.locations[tempx2][tempy2].flags & (D.CLOSED | D.LOCKED)) && !already_in_rock) {
+                        if (IS_CHAIN_ROCK(tempx, tempy) && !IS_CHAIN_ROCK(tempx2, tempy2) && !already_in_rock) {
                             if (allow_drag) {
                                 /* Avoid pathological case *if* not teleporting:
                                  *   0                          0_
@@ -609,7 +609,7 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
                             }
                             chainx.set(0, tempx2);
                             chainy.set(0, tempy2);
-                        } else if (!(svl.level.locations[tempx][tempy].typ < POOL || svl.level.locations[tempx][tempy].typ === DOOR && svl.level.locations[tempx][tempy].flags & (D.CLOSED | D.LOCKED)) && (svl.level.locations[tempx2][tempy2].typ < POOL || svl.level.locations[tempx2][tempy2].typ === DOOR && svl.level.locations[tempx2][tempy2].flags & (D.CLOSED | D.LOCKED)) && !already_in_rock) {
+                        } else if (!IS_CHAIN_ROCK(tempx, tempy) && IS_CHAIN_ROCK(tempx2, tempy2) && !already_in_rock) {
                             if (allow_drag) {
                                 if (dist2(u.ux, u.uy, $G.uball.ox, $G.uball.oy) === 5 && dist2(x, y, tempx2, tempy2) === 1) {
                                     do {
@@ -630,7 +630,7 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
                             }
                             chainx.set(0, tempx);
                             chainy.set(0, tempy);
-                        } else if ((svl.level.locations[tempx][tempy].typ < POOL || svl.level.locations[tempx][tempy].typ === DOOR && svl.level.locations[tempx][tempy].flags & (D.CLOSED | D.LOCKED)) && (svl.level.locations[tempx2][tempy2].typ < POOL || svl.level.locations[tempx2][tempy2].typ === DOOR && svl.level.locations[tempx2][tempy2].flags & (D.CLOSED | D.LOCKED)) && !already_in_rock) {
+                        } else if (IS_CHAIN_ROCK(tempx, tempy) && IS_CHAIN_ROCK(tempx2, tempy2) && !already_in_rock) {
                             do {
                                 chainx.set(0, oldchainx);
                                 chainy.set(0, oldchainy);
@@ -654,7 +654,7 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
                     }
                     chainx.set(0, $c.i16($c.div32(x + $G.uball.ox, 2)));
                     chainy.set(0, $c.i16($c.div32(y + $G.uball.oy, 2)));
-                    if ((svl.level.locations[chainx.get(0)][chainy.get(0)].typ < POOL || svl.level.locations[chainx.get(0)][chainy.get(0)].typ === DOOR && svl.level.locations[chainx.get(0)][chainy.get(0)].flags & (D.CLOSED | D.LOCKED)) && !already_in_rock) {
+                    if (IS_CHAIN_ROCK(chainx.get(0), chainy.get(0)) && !already_in_rock) {
                         do {
                             chainx.set(0, oldchainx);
                             chainy.set(0, oldchainy);
@@ -678,7 +678,7 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
                         } else {
                             chainy.set(0, $G.uball.oy);
                         }
-                        if ((svl.level.locations[chainx.get(0)][chainy.get(0)].typ < POOL || svl.level.locations[chainx.get(0)][chainy.get(0)].typ === DOOR && svl.level.locations[chainx.get(0)][chainy.get(0)].flags & (D.CLOSED | D.LOCKED)) && !already_in_rock) {
+                        if (IS_CHAIN_ROCK(chainx.get(0), chainy.get(0)) && !already_in_rock) {
                             do {
                                 chainx.set(0, oldchainx);
                                 chainy.set(0, oldchainy);
@@ -774,10 +774,10 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
          * take the simple approach if the hero's previous location or
          * the potential between location is inaccessible.
          */
-        if (dist2(x, y, $G.uchain.ox, $G.uchain.oy) === 4 && !(svl.level.locations[newchainx][newchainy].typ < POOL || svl.level.locations[newchainx][newchainy].typ === DOOR && svl.level.locations[newchainx][newchainy].flags & (D.CLOSED | D.LOCKED))) {
+        if (dist2(x, y, $G.uchain.ox, $G.uchain.oy) === 4 && !IS_CHAIN_ROCK(newchainx, newchainy)) {
             newchainx = $c.i16($c.div32(x + $G.uchain.ox, 2));
             newchainy = $c.i16($c.div32(y + $G.uchain.oy, 2));
-            if (svl.level.locations[newchainx][newchainy].typ < POOL || svl.level.locations[newchainx][newchainy].typ === DOOR && svl.level.locations[newchainx][newchainy].flags & (D.CLOSED | D.LOCKED)) {
+            if (IS_CHAIN_ROCK(newchainx, newchainy)) {
                 /* don't let chain move to inaccessible location */
                 newchainx = u.ux;
                 newchainy = u.uy;
@@ -830,10 +830,10 @@ export async function drop_ball(x, y) {   // ball.c:882
                 case TT.BEARTRAP:
                     side = rn2(3) ? W.RINGL : W.RINGR;
                     await pline($C`%s%s!`, new $c.Ptr(drop_ball$pullmsg, 0), $C`bear trap`);
-                    await set_wounded_legs(side, rn2(1000) + 500 | 0);
+                    await set_wounded_legs(side, rn1(1000, 500));
                     if (!u.usteed) {
                         await Your($C`%s %s is severely damaged.`, side === W.RINGL ? $C`left` : $C`right`, await body_part(LEG));
-                        await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? 1 : 2, $C`leg damage from being pulled out of a bear trap`, KILLED.BY);
+                        await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? 1 : 2), $C`leg damage from being pulled out of a bear trap`, KILLED.BY);
                     }
                     break;
             }
@@ -912,19 +912,19 @@ export async function drag_down() {   // ball.c:986
     if (forward) {
         if (rn2(6)) {
             await pline_The($C`iron ball drags you downstairs!`);
-            await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(6) + 1 | 0, 2) : rnd(6), $C`dragged downstairs by an iron ball`, NO_KILLER_PREFIX);
+            await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(6) + 1 | 0, 2) : rnd(6)), $C`dragged downstairs by an iron ball`, NO_KILLER_PREFIX);
             await litter();
         }
     } else {
         if (rn2(2)) {
             await pline_The($C`iron ball smacks into you!`);
-            await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(20) + 1 | 0, 2) : rnd(20), $C`iron ball collision`, KILLED.BY_AN);
+            await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(20) + 1 | 0, 2) : rnd(20)), $C`iron ball collision`, KILLED.BY_AN);
             await exercise(A.STR, FALSE);
             dragchance = $c.u8(dragchance - 2 | 0);
         }
         if (dragchance >= rnd(6)) {
             await pline_The($C`iron ball drags you downstairs!`);
-            await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(3) + 1 | 0, 2) : rnd(3), $C`dragged downstairs by an iron ball`, NO_KILLER_PREFIX);
+            await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(3) + 1 | 0, 2) : rnd(3)), $C`dragged downstairs by an iron ball`, NO_KILLER_PREFIX);
             await exercise(A.STR, FALSE);
             await litter();
         }
@@ -976,6 +976,9 @@ export async function bc_sanity_check() {   // ball.c:1034
         }
     }
     /* [check bc_order too?] */
+}
+function IS_CHAIN_ROCK(x, y) {
+    return svl.level.locations[x][y].typ < POOL || svl.level.locations[x][y].typ === DOOR && svl.level.locations[x][y].flags & (D.CLOSED | D.LOCKED) ? 1 : 0;
 }
 
 export function $init() {

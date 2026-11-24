@@ -13,9 +13,9 @@ import { change_luck } from './attrib.js';
 import { status_finish } from './botl.js';
 import { VIA_WINDOWPORT } from './botl.macros.js';
 import { getnow, yyyymmddhhmmss } from './calendar.js';
-import { cmdbind_freeall, cmdq_clear, yn_function } from './cmd.js';
+import { cmdbind_freeall, cmdq_clear } from './cmd.js';
 import { free_menu_coloring } from './coloratt.js';
-import { a11y, flags, gb, gf, gg, gh, gi, gl, gm, go, gs, gu, iflags, program_state, svc, svd, svh, svk, svl, svm, svn, svp, svq, svr, svs, svu, svw, u, urealtime, ynchars } from './decl.js';
+import { a11y, flags, gb, gf, gg, gh, gi, gl, gm, go, gs, gu, iflags, program_state, svc, svd, svh, svk, svl, svm, svn, svp, svq, svr, svs, svu, svw, u, urealtime } from './decl.js';
 import { docrt, tmp_at } from './display.js';
 import { DISP_FREEMEM } from './display.h.js';
 import { ledger_no, maxledgerno, save_dungeon, save_exclusions } from './dungeon.js';
@@ -29,7 +29,7 @@ import { BUFSZ, COLNO, FALSE, PL_NSIZ_PLUS, ROWNO, TRUE } from './global.h.js';
 import { free_glyphid_cache, glyphid_cache_status, purge_all_custom_entries } from './glyphs.js';
 import { nomul } from './hack.js';
 import { COUNTING, CQ_CANNED, CQ_REPEAT, ECMD, FREEING, REST, SAVEPREFIX, TRICKED, WRITING, all_themes } from './hack.h.js';
-import { BALL_IN_MON, CHAIN_IN_MON, pline1, release_data, update_file } from './hack.macros.js';
+import { BALL_IN_MON, CHAIN_IN_MON, pline1, release_data, update_file, y_n } from './hack.macros.js';
 import { nh_snprintf } from './hacklib.js';
 import { free_invbuf } from './invent.js';
 import { save_light_sources } from './light.js';
@@ -57,7 +57,8 @@ import { save_regions } from './region.js';
 import { getlev, moves_to_relative_time, relative_time_to_moves, rest_adjust_levelflags } from './restore.js';
 import { aligns, genders } from './role.js';
 import { free_CapMons, save_oracles } from './rumors.js';
-import { sfi_int, sfo_cemetery, sfo_char, sfo_context_info, sfo_damage, sfo_dest_area, sfo_ebones, sfo_edog, sfo_egd, sfo_emin, sfo_epri, sfo_eshk, sfo_flag, sfo_fruit, sfo_gamelog_line, sfo_int, sfo_int32, sfo_levelflags, sfo_long, sfo_monst, sfo_mvitals, sfo_nhcoord, sfo_obj, sfo_q_score, sfo_rm, sfo_s_level, sfo_schar, sfo_spell, sfo_stairway, sfo_trap, sfo_ulong, sfo_unsigned, sfo_xint8, sfo_you } from './sfbase.js';
+import { Sfo_cemetery, Sfo_char, Sfo_context_info, Sfo_damage, Sfo_dest_area, Sfo_ebones, Sfo_edog, Sfo_egd, Sfo_emin, Sfo_epri, Sfo_eshk, Sfo_flag, Sfo_fruit, Sfo_gamelog_line, Sfo_int, Sfo_int32, Sfo_levelflags, Sfo_monst, Sfo_mvitals, Sfo_nhcoord, Sfo_obj, Sfo_q_score, Sfo_rm, Sfo_s_level, Sfo_schar, Sfo_spell, Sfo_stairway, Sfo_trap, Sfo_unsigned, Sfo_you } from './savefile.macros.js';
+import { sfi_int, sfo_char, sfo_long, sfo_ulong, sfo_unsigned, sfo_xint8 } from './sfbase.js';
 import { bflush, bufoff, bufon } from './sfstruct.js';
 import { soundprocs } from './sounds.js';
 import { Strlen_ } from './strutil.js';
@@ -83,7 +84,7 @@ const savefruitchn$zerofruit = new $T.fruit();   // static in savefruitchn()
  */
 export async function dosave() {   // save.c:43
     await clear_nhwindow()($G.WIN_MESSAGE);
-    if (await yn_function($C`Really save?`, new $c.Ptr(ynchars, 0), 110, TRUE) === 110) {
+    if (await y_n($C`Really save?`) === 110) {
         await clear_nhwindow()($G.WIN_MESSAGE);
         if (gm.multi > 0) {
             nomul(0);
@@ -152,7 +153,7 @@ export async function dosave0() {   // save.c:74
                     await close_nhfile(nhfp);
                     await clear_nhwindow()($G.WIN_MESSAGE);
                     await There($C`seems to be an old save file.`);
-                    if (await yn_function($C`Overwrite the old file?`, new $c.Ptr(ynchars, 0), 110, TRUE) === 110) {
+                    if (await y_n($C`Overwrite the old file?`) === 110) {
                         nh_sfconvert(fq_save);
                         await nh_compress(fq_save);
                         break done$;
@@ -276,9 +277,9 @@ async function save_gamelog(nhfp) {   // save.c:237
         const tmp2 = tmp.next;
         if (nhfp.mode & (COUNTING | WRITING)) {
             slen[0] = await Strlen_(tmp.text, $C`save_gamelog`, 245) | 0;
-            await sfo_int(nhfp, new $c.Ptr(slen, 0), $C`gamelog-length`);
-            await sfo_char(nhfp, tmp.text, $C`gamelog-gamelog_text`, slen[0]);
-            await sfo_gamelog_line(nhfp, tmp, $C`gamelog-gamelog_line`);
+            await Sfo_int(nhfp, new $c.Ptr(slen, 0), $C`gamelog-length`);
+            await Sfo_char(nhfp, tmp.text, $C`gamelog-gamelog_text`, slen[0]);
+            await Sfo_gamelog_line(nhfp, tmp, $C`gamelog-gamelog_line`);
         }
         if (nhfp.mode & FREEING) {
             $c.free(tmp.text);
@@ -288,7 +289,7 @@ async function save_gamelog(nhfp) {   // save.c:237
     }
     if (nhfp.mode & (COUNTING | WRITING)) {
         slen[0] = -1;
-        await sfo_int(nhfp, new $c.Ptr(slen, 0), $C`gamelog-length`);
+        await Sfo_int(nhfp, new $c.Ptr(slen, 0), $C`gamelog-length`);
     }
     if (nhfp.mode & FREEING) {
         gg.gamelog = null;
@@ -303,19 +304,19 @@ async function savegamestate(nhfp) {   // save.c:265
     program_state.saving = program_state.saving + 1 | 0;   /* caller should/did already set this... */
     uid[0] = $c.getuid();
     await sfo_ulong(nhfp, new $c.Ptr(uid, 0), $C`gamestate-uid`);
-    await sfo_char(nhfp, new $c.Ptr(svn.nhuuid, 0), $C`nhuuid`, 37);
+    await Sfo_char(nhfp, new $c.Ptr(svn.nhuuid, 0), $C`nhuuid`, 37);
     await sfo_long(nhfp, new $c.FieldRef(svm, "moves", "i64"), $C`gamestate-moves`);
     moves_to_relative_time(new $c.FieldRef(svc.context, "seer_turn", "i64"));
     moves_to_relative_time(new $c.FieldRef(svc.context.digging, "lastdigtime", "i64"));
-    await sfo_context_info(nhfp, svc.context, $C`gamestate-context`);
+    await Sfo_context_info(nhfp, svc.context, $C`gamestate-context`);
     relative_time_to_moves(new $c.FieldRef(svc.context, "seer_turn", "i64"));
     relative_time_to_moves(new $c.FieldRef(svc.context.digging, "lastdigtime", "i64"));
-    await sfo_flag(nhfp, flags, $C`gamestate-flags`);
+    await Sfo_flag(nhfp, flags, $C`gamestate-flags`);
     $t1 = getnow(), urealtime.finish_time = $t1;
     $t2 = timet_delta(urealtime.finish_time, urealtime.start_timing), urealtime.realtime = $c.add64(urealtime.realtime, $t2);
     await sfo_long(nhfp, new $c.FieldRef(svw, "wreserve", "i64"), $C`wreserve`);
-    await sfo_int32(nhfp, new $c.FieldRef(svw, "wtreserved", "i32"), $C`wtreserved`);
-    await sfo_you(nhfp, u, $C`gamestate-you`);
+    await Sfo_int32(nhfp, new $c.FieldRef(svw, "wtreserved", "i32"), $C`wtreserved`);
+    await Sfo_you(nhfp, u, $C`gamestate-you`);
     await sfo_char(nhfp, yyyymmddhhmmss($G.ubirthday), $C`gamestate-ubirthday`, 14);
     await sfo_long(nhfp, new $c.FieldRef(urealtime, "realtime", "i64"), $C`gamestate-realtime`);
     await sfo_char(nhfp, yyyymmddhhmmss(urealtime.start_timing), $C`gamestate-start_timing`, 14);
@@ -336,18 +337,18 @@ async function savegamestate(nhfp) {   // save.c:265
         gm.migrating_mons = null;
     }
     for (i = 0; i < NUMMONS; i = i + 1 | 0) {
-        await sfo_mvitals(nhfp, $c.relem(svm.mvitals, i), $C`gamestate-mvitals`);
+        await Sfo_mvitals(nhfp, $c.relem(svm.mvitals, i), $C`gamestate-mvitals`);
     }
     await save_dungeon(nhfp, !!update_file(nhfp) ? 1 : 0, !!release_data(nhfp) ? 1 : 0);
     await savelevchn(nhfp);
-    await sfo_q_score(nhfp, svq.quest_status, $C`gamestate-quest_status`);
+    await Sfo_q_score(nhfp, svq.quest_status, $C`gamestate-quest_status`);
     for (i = 0; i < MAXSPELL + 1; i = i + 1 | 0) {
-        await sfo_spell(nhfp, $c.relem(svs.spl_book, i), $C`gamestate-spl_book`);
+        await Sfo_spell(nhfp, $c.relem(svs.spl_book, i), $C`gamestate-spl_book`);
     }
     await save_artifacts(nhfp);
     await save_oracles(nhfp);
-    await sfo_char(nhfp, new $c.Ptr(svp.pl_character, 0), $C`gamestate-pl_character`, 32);
-    await sfo_char(nhfp, new $c.Ptr(svp.pl_fruit, 0), $C`gamestate-pl_fruit`, 32);
+    await Sfo_char(nhfp, new $c.Ptr(svp.pl_character, 0), $C`gamestate-pl_character`, 32);
+    await Sfo_char(nhfp, new $c.Ptr(svp.pl_fruit, 0), $C`gamestate-pl_fruit`, 32);
     await savefruitchn(nhfp);
     await savenames(nhfp);
     await save_msghistory(nhfp);
@@ -437,10 +438,10 @@ export async function savestateinlock() {   // save.c:351
                     }
                 }
                 nhfp.mode = WRITING;
-                await sfo_int(nhfp, new $c.FieldRef(svh, "hackpid", "i32"), $C`gamestate-hackpid`);
+                await Sfo_int(nhfp, new $c.FieldRef(svh, "hackpid", "i32"), $C`gamestate-hackpid`);
                 if (flags.ins_chkpt) {
                     currlev[0] = ledger_no(u.uz);
-                    await sfo_int(nhfp, new $c.Ptr(currlev, 0), $C`gamestate-savestateinlock`);
+                    await Sfo_int(nhfp, new $c.Ptr(currlev, 0), $C`gamestate-savestateinlock`);
                     await save_savefile_name(nhfp);
                     await store_version(nhfp);
                     await store_plname_in_file(nhfp);
@@ -527,7 +528,7 @@ async function savelev_core(nhfp, lev$in) {   // save.c:452
         if (lev[0] >= 0 && lev[0] <= maxledgerno()) {
             svl.level_info[lev[0]].flags = $c.u8(svl.level_info[lev[0]].flags | VISITED);
         }
-        await sfo_int(nhfp, new $c.FieldRef(svh, "hackpid", "i32"), $C`gamestate-hackpid`);
+        await Sfo_int(nhfp, new $c.FieldRef(svh, "hackpid", "i32"), $C`gamestate-hackpid`);
         await sfo_xint8(nhfp, new $c.Ptr(lev, 0), $C`gamestate-dlvl`);
     }
     /* bones info comes before level data; the intent is for an external
@@ -544,24 +545,24 @@ async function savelev_core(nhfp, lev$in) {   // save.c:452
         await savelevl(nhfp);
         for (c = 0; c < COLNO; c = c + 1 | 0) {
             for (r = 0; r < ROWNO; r = r + 1 | 0) {
-                await sfo_schar(nhfp, new $c.Ptr(svl.lastseentyp[c], r), $C`lastseentyp`);
+                await Sfo_schar(nhfp, new $c.Ptr(svl.lastseentyp[c], r), $C`lastseentyp`);
             }
         }
         /* svm.moves will actually be read back into svo.omoves on restore */
         await sfo_long(nhfp, new $c.FieldRef(svm, "moves", "i64"), $C`lev-timestmp`);
         await save_stairs(nhfp);
-        await sfo_dest_area(nhfp, svu.updest, $C`lev-updest`);
-        await sfo_dest_area(nhfp, svd.dndest, $C`lev-dndest`);
+        await Sfo_dest_area(nhfp, svu.updest, $C`lev-updest`);
+        await Sfo_dest_area(nhfp, svd.dndest, $C`lev-dndest`);
         save_adjust_levelflags();
-        await sfo_levelflags(nhfp, svl.level.flags, $C`lev-level_flags`);
+        await Sfo_levelflags(nhfp, svl.level.flags, $C`lev-level_flags`);
         rest_adjust_levelflags();
-        await sfo_int(nhfp, new $c.FieldRef(svd, "doors_alloc", "i32"), $C`lev-doors_alloc`);
+        await Sfo_int(nhfp, new $c.FieldRef(svd, "doors_alloc", "i32"), $C`lev-doors_alloc`);
         /* don't rely on underlying write() behavior to write
          *  nothing if count arg is 0, just skip it */
         if (svd.doors_alloc) {
             tmpc = svd.doors;
             for (i = 0; i < svd.doors_alloc; i = i + 1 | 0) {
-                await sfo_nhcoord(nhfp, tmpc, $C`lev-doors`);
+                await Sfo_nhcoord(nhfp, tmpc, $C`lev-doors`);
                 tmpc = $c.radd(tmpc, 1);
             }
         }
@@ -609,7 +610,7 @@ async function savelevl(nhfp) {   // save.c:577
     let x = 0, y = 0;
     for (x = 0; x < COLNO; x = x + 1 | 0) {
         for (y = 0; y < ROWNO; y = y + 1 | 0) {
-            await sfo_rm(nhfp, $c.relem(svl.level.locations[x], y), $C`location-rm`);
+            await Sfo_rm(nhfp, $c.relem(svl.level.locations[x], y), $C`location-rm`);
         }
     }
     return;
@@ -649,13 +650,13 @@ export async function savecemetery(nhfp, cemeteryaddr) {   // save.c:617
     let thisbones = null, flag = Int32Array.of(0);
     flag[0] = cemeteryaddr.get(0) ? 0 : -1;
     if (update_file(nhfp)) {
-        await sfo_int(nhfp, new $c.Ptr(flag, 0), $C`cemetery-cemetery_flag`);
+        await Sfo_int(nhfp, new $c.Ptr(flag, 0), $C`cemetery-cemetery_flag`);
     }
     let nextbones = cemeteryaddr.get(0);
     while ((thisbones = nextbones) !== null) {
         nextbones = thisbones.next;
         if (update_file(nhfp)) {
-            await sfo_cemetery(nhfp, thisbones, $C`cemetery-bonesinfo`);
+            await Sfo_cemetery(nhfp, thisbones, $C`cemetery-bonesinfo`);
         }
         if (release_data(nhfp)) {
             $c.free(thisbones);
@@ -677,11 +678,11 @@ async function savedamage(nhfp) {   // save.c:640
         xl[0] = xl[0] + 1 >>> 0;
     }
     if (update_file(nhfp)) {
-        await sfo_unsigned(nhfp, new $c.Ptr(xl, 0), $C`damage-damage_count`);
+        await Sfo_unsigned(nhfp, new $c.Ptr(xl, 0), $C`damage-damage_count`);
     }
     while (damageptr) {
         if (update_file(nhfp)) {
-            await sfo_damage(nhfp, damageptr, $C`damage`);
+            await Sfo_damage(nhfp, damageptr, $C`damage`);
         }
         tmp_dam = damageptr;
         damageptr = damageptr.next;
@@ -708,8 +709,8 @@ async function save_stairs(nhfp) {   // save.c:665
                 /* make dlevel relative to current level */
                 stway.tolev.dlevel = $c.i16(stway.tolev.dlevel - u.uz.dlevel | 0);
             }
-            await sfo_int(nhfp, new $c.Ptr(buflen, 0), $C`stairs-staircount`);
-            await sfo_stairway(nhfp, stway, $C`stairs-stairway`);
+            await Sfo_int(nhfp, new $c.Ptr(buflen, 0), $C`stairs-staircount`);
+            await Sfo_stairway(nhfp, stway, $C`stairs-stairway`);
             if (use_relative) {
                 /* reset stairway dlevel back to absolute */
                 stway.tolev.dlevel = $c.i16(stway.tolev.dlevel + u.uz.dlevel | 0);
@@ -719,7 +720,7 @@ async function save_stairs(nhfp) {   // save.c:665
     }
     if (update_file(nhfp)) {
         buflen[0] = -1;
-        await sfo_int(nhfp, new $c.Ptr(buflen, 0), $C`stairs-staircount`);
+        await Sfo_int(nhfp, new $c.Ptr(buflen, 0), $C`stairs-staircount`);
     }
 }
 /* if ball and/or chain are loose, make an object chain for it/them and
@@ -764,11 +765,11 @@ async function saveobj(nhfp, otmp) {   // save.c:726
     let buflen = Int32Array.of(0), zerobuf = Int32Array.of(0);
     zerobuf[0] = 0;
     buflen[0] = 112;
-    await sfo_int(nhfp, new $c.Ptr(buflen, 0), $C`obj-obj_length`);
-    await sfo_obj(nhfp, otmp, $C`obj`);
+    await Sfo_int(nhfp, new $c.Ptr(buflen, 0), $C`obj-obj_length`);
+    await Sfo_obj(nhfp, otmp, $C`obj`);
     if (otmp.oextra) {
         buflen[0] = ONAME(otmp) ? $c.i32($c.strlen(otmp.oextra.oname)) + 1 | 0 : 0;
-        await sfo_int(nhfp, new $c.Ptr(buflen, 0), $C`obj-oname_length`);
+        await Sfo_int(nhfp, new $c.Ptr(buflen, 0), $C`obj-oname_length`);
         if (buflen[0] > 0) {
             await sfo_char(nhfp, otmp.oextra.oname, $C`obj-oname`, buflen[0]);
         }
@@ -776,11 +777,11 @@ async function saveobj(nhfp, otmp) {   // save.c:726
         if (OMONST(otmp)) {
             await savemon(nhfp, otmp.oextra.omonst);
         } else {
-            await sfo_int(nhfp, new $c.Ptr(zerobuf, 0), $C`obj-omonst_length`);
+            await Sfo_int(nhfp, new $c.Ptr(zerobuf, 0), $C`obj-omonst_length`);
         }
         /* extra info about scroll of mail */
         buflen[0] = OMAILCMD(otmp) ? $c.i32($c.strlen(otmp.oextra.omailcmd)) + 1 | 0 : 0;
-        await sfo_int(nhfp, new $c.Ptr(buflen, 0), $C`obj-omailcmd_length`);
+        await Sfo_int(nhfp, new $c.Ptr(buflen, 0), $C`obj-omailcmd_length`);
         if (buflen[0] > 0) {
             await sfo_char(nhfp, otmp.oextra.omailcmd, $C`obj-omailcmd`, buflen[0]);
         }
@@ -851,7 +852,7 @@ async function saveobjchn(nhfp, obj_p) {   // save.c:762
         otmp = otmp2;
     }
     if (update_file(nhfp)) {
-        await sfo_int(nhfp, new $c.Ptr(minusone, 0), $C`obj-obj_length`);
+        await Sfo_int(nhfp, new $c.Ptr(minusone, 0), $C`obj-obj_length`);
     }
     if (release_data(nhfp)) {
         if (is_invent) {
@@ -871,53 +872,53 @@ async function savemon(nhfp, mtmp) {   // save.c:826
     /* normally clear; if set here then a panic save
      * is being written while bhit() was executing */
     buflen[0] = 192;
-    await sfo_int(nhfp, new $c.Ptr(buflen, 0), $C`monst-monst_length`);
-    await sfo_monst(nhfp, mtmp, $C`monst`);
+    await Sfo_int(nhfp, new $c.Ptr(buflen, 0), $C`monst-monst_length`);
+    await Sfo_monst(nhfp, mtmp, $C`monst`);
     if (mtmp.mextra) {
         buflen[0] = MGIVENNAME(mtmp) ? $c.i32($c.strlen(mtmp.mextra.mgivenname)) + 1 | 0 : 0;
-        await sfo_int(nhfp, new $c.Ptr(buflen, 0), $C`monst-mgivenname_length`);
+        await Sfo_int(nhfp, new $c.Ptr(buflen, 0), $C`monst-mgivenname_length`);
         if (buflen[0] > 0) {
             await sfo_char(nhfp, mtmp.mextra.mgivenname, $C`monst-mgivenname`, buflen[0]);
         }
         buflen[0] = EGD(mtmp) ? 640 : 0;
-        await sfo_int(nhfp, new $c.Ptr(buflen, 0), $C`monst-egd_length`);
+        await Sfo_int(nhfp, new $c.Ptr(buflen, 0), $C`monst-egd_length`);
         if (buflen[0] > 0) {
-            await sfo_egd(nhfp, mtmp.mextra.egd, $C`monst-egd`);
+            await Sfo_egd(nhfp, mtmp, $C`monst-egd`);
         }
         buflen[0] = EPRI(mtmp) ? 56 : 0;
-        await sfo_int(nhfp, new $c.Ptr(buflen, 0), $C`monst-epri_length`);
+        await Sfo_int(nhfp, new $c.Ptr(buflen, 0), $C`monst-epri_length`);
         if (buflen[0] > 0) {
-            await sfo_epri(nhfp, mtmp.mextra.epri, $C`monst-epri`);
+            await Sfo_epri(nhfp, mtmp, $C`monst-epri`);
         }
         buflen[0] = ESHK(mtmp) ? 4960 : 0;
-        await sfo_int(nhfp, new $c.Ptr(buflen, 0), $C`monst-eshk_length`);
+        await Sfo_int(nhfp, new $c.Ptr(buflen, 0), $C`monst-eshk_length`);
         if (buflen[0] > 0) {
-            await sfo_eshk(nhfp, mtmp.mextra.eshk, $C`monst-eshk`);
+            await Sfo_eshk(nhfp, mtmp, $C`monst-eshk`);
         }
         buflen[0] = EMIN(mtmp) ? 8 : 0;
-        await sfo_int(nhfp, new $c.Ptr(buflen, 0), $C`monst-emin_length`);
+        await Sfo_int(nhfp, new $c.Ptr(buflen, 0), $C`monst-emin_length`);
         if (buflen[0] > 0) {
-            await sfo_emin(nhfp, mtmp.mextra.emin, $C`monst-emin`);
+            await Sfo_emin(nhfp, mtmp, $C`monst-emin`);
         }
         buflen[0] = EDOG(mtmp) ? 64 : 0;
-        await sfo_int(nhfp, new $c.Ptr(buflen, 0), $C`monst-edog_length`);
+        await Sfo_int(nhfp, new $c.Ptr(buflen, 0), $C`monst-edog_length`);
         if (buflen[0] > 0) {
             /* we only store relative times in save and bones */
             moves_to_relative_time(new $c.FieldRef(mtmp.mextra.edog, "droptime", "i64"));
             moves_to_relative_time(new $c.FieldRef(mtmp.mextra.edog, "hungrytime", "i64"));
-            await sfo_edog(nhfp, mtmp.mextra.edog, $C`monst-edog`);
+            await Sfo_edog(nhfp, mtmp, $C`monst-edog`);
             relative_time_to_moves(new $c.FieldRef(mtmp.mextra.edog, "droptime", "i64"));
             relative_time_to_moves(new $c.FieldRef(mtmp.mextra.edog, "hungrytime", "i64"));
         }
         buflen[0] = EBONES(mtmp) ? 28 : 0;
-        await sfo_int(nhfp, new $c.Ptr(buflen, 0), $C`monst-ebones_length`);
+        await Sfo_int(nhfp, new $c.Ptr(buflen, 0), $C`monst-ebones_length`);
         if (buflen[0] > 0) {
-            await sfo_ebones(nhfp, mtmp.mextra.ebones, $C`monst-ebones`);
+            await Sfo_ebones(nhfp, mtmp, $C`monst-ebones`);
         }
         /* mcorpsenm is inline int rather than pointer to something,
            so doesn't need to be preceded by a length field */
         buflen[0] = mtmp.mextra.mcorpsenm;
-        await sfo_int(nhfp, new $c.Ptr(buflen, 0), $C`monst-mcorpsenm`);
+        await Sfo_int(nhfp, new $c.Ptr(buflen, 0), $C`monst-mcorpsenm`);
     }
 }
 /**
@@ -957,7 +958,7 @@ async function savemonchn(nhfp, mtmp) {   // save.c:884
         mtmp = mtmp2;
     }
     if (update_file(nhfp)) {
-        await sfo_int(nhfp, new $c.Ptr(minusone, 0), $C`monst-monst_length`);
+        await Sfo_int(nhfp, new $c.Ptr(minusone, 0), $C`monst-monst_length`);
     }
 }
 /* save traps; gf.ftrap is the only trap chain so 2nd arg is superfluous */
@@ -974,7 +975,7 @@ async function savetrapchn(nhfp, trap) {   // save.c:920
             trap.dst.dlevel = $c.i16(trap.dst.dlevel - u.uz.dlevel | 0);   /* make it relative */
         }
         if (update_file(nhfp)) {
-            await sfo_trap(nhfp, trap, $C`trap`);
+            await Sfo_trap(nhfp, trap, $C`trap`);
         }
         if (use_relative) {
             trap.dst.dlevel = $c.i16(trap.dst.dlevel + u.uz.dlevel | 0);   /* reset back to absolute */
@@ -985,7 +986,7 @@ async function savetrapchn(nhfp, trap) {   // save.c:920
         trap = trap2;
     }
     if (update_file(nhfp)) {
-        await sfo_trap(nhfp, savetrapchn$zerotrap, $C`trap`);
+        await Sfo_trap(nhfp, savetrapchn$zerotrap, $C`trap`);
     }
 }
 /* save all the fruit names and ID's; this is used only in saving whole games
@@ -1002,7 +1003,7 @@ export async function savefruitchn(nhfp) {   // save.c:951
     while (f1) {
         const f2 = f1.nextf;
         if (f1.fid >= 0 && update_file(nhfp)) {
-            await sfo_fruit(nhfp, f1, $C`fruit`);
+            await Sfo_fruit(nhfp, f1, $C`fruit`);
         }
         if (release_data(nhfp)) {
             dealloc_fruit(f1);
@@ -1010,7 +1011,7 @@ export async function savefruitchn(nhfp) {   // save.c:951
         f1 = f2;
     }
     if (update_file(nhfp)) {
-        await sfo_fruit(nhfp, savefruitchn$zerofruit, $C`fruit`);
+        await Sfo_fruit(nhfp, savefruitchn$zerofruit, $C`fruit`);
     }
     if (release_data(nhfp)) {
         gf.ffruit = null;
@@ -1027,12 +1028,12 @@ async function savelevchn(nhfp) {   // save.c:974
         cnt[0] = cnt[0] + 1 | 0;
     }
     if (update_file(nhfp)) {
-        await sfo_int(nhfp, new $c.Ptr(cnt, 0), $C`levchn-lev_count`);
+        await Sfo_int(nhfp, new $c.Ptr(cnt, 0), $C`levchn-lev_count`);
     }
     for (tmplev = svs.sp_levchn; tmplev; tmplev = tmplev2) {
         tmplev2 = tmplev.next;
         if (update_file(nhfp)) {
-            await sfo_s_level(nhfp, tmplev, $C`levchn-s_level`);
+            await Sfo_s_level(nhfp, tmplev, $C`levchn-s_level`);
         }
         if (release_data(nhfp)) {
             $c.free(tmplev);
@@ -1067,8 +1068,8 @@ export async function store_plname_in_file(nhfp) {   // save.c:999
     if (nhfp.structlevel) {
         await bufoff(nhfp.fd);   /* bwrite() before bufon() uses plain write() */
     }
-    await sfo_int(nhfp, new $c.Ptr(plsiztmp, 0), $C`plname-size`);
-    await sfo_char(nhfp, new $c.Ptr(hero, 0), $C`plname`, plsiztmp[0]);
+    await Sfo_int(nhfp, new $c.Ptr(plsiztmp, 0), $C`plname-size`);
+    await Sfo_char(nhfp, new $c.Ptr(hero, 0), $C`plname`, plsiztmp[0]);
     if (nhfp.structlevel) {
         await bufon(nhfp.fd);
     }
@@ -1096,11 +1097,11 @@ async function save_msghistory(nhfp) {   // save.c:1030
             if (msglen[0] > BUFSZ - 1) {
                 msglen[0] = BUFSZ - 1;
             }
-            await sfo_int(nhfp, new $c.Ptr(msglen, 0), $C`msghistory-length`);
-            await sfo_char(nhfp, msg, $C`msghistory-msg`, msglen[0]);
+            await Sfo_int(nhfp, new $c.Ptr(msglen, 0), $C`msghistory-length`);
+            await Sfo_char(nhfp, msg, $C`msghistory-msg`, msglen[0]);
             msgcount = msgcount + 1 | 0;
         }
-        await sfo_int(nhfp, new $c.Ptr(minusone, 0), $C`msghistory-length`);
+        await Sfo_int(nhfp, new $c.Ptr(minusone, 0), $C`msghistory-length`);
     }
     do {
         if (debugcore($C`save.c`, TRUE)) {

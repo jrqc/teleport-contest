@@ -14,6 +14,7 @@ import { canseemon } from './display.js';
 import { schedule_goto } from './do.js';
 import { Monnam, mon_nam, noit_mon_nam } from './do_name.js';
 import { Is_special, dungeon_branch, on_level, remdun_mapseen } from './dungeon.js';
+import { Is_nemesis, Is_qlocate, Is_qstart } from './dungeon.macros.js';
 import { wizard } from './flag.macros.js';
 import { FALSE, LL, TRUE } from './global.h.js';
 import { nomul } from './hack.js';
@@ -113,11 +114,11 @@ export async function onquest() {   // quest.c:90
     if (!Is_special(u.uz)) {
         return;
     }
-    if ((svd.dungeon_topology.d_qstart_level.dlevel || svd.dungeon_topology.d_qstart_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_qstart_level)) {
+    if (Is_qstart(u.uz)) {
         await on_start();
-    } else if ((svd.dungeon_topology.d_qlocate_level.dlevel || svd.dungeon_topology.d_qlocate_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_qlocate_level)) {
+    } else if (Is_qlocate(u.uz)) {
         await on_locate();
-    } else if ((svd.dungeon_topology.d_nemesis_level.dlevel || svd.dungeon_topology.d_nemesis_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_nemesis_level)) {
+    } else if (Is_nemesis(u.uz)) {
         await on_goal();
     }
     return;

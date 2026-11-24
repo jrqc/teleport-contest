@@ -13,7 +13,7 @@ import { A } from './attrib.h.js';
 import { ACURR } from './attrib.macros.js';
 import { night } from './calendar.js';
 import { is_pool } from './dbridge.js';
-import { flags, gb, gc, gd, gf, gh, gm, gn, gp, gu, gy, iflags, program_state, svc, svd, svl, svm, svq, svr, svu, u } from './decl.js';
+import { flags, gb, gc, gd, gf, gh, gm, gn, gp, gu, gy, iflags, program_state, svc, svl, svm, svq, svr, svu, u } from './decl.js';
 import { BALL_CLASS, CHAIN_CLASS, FOOD_CLASS, ROCK_CLASS, S, SCROLL_CLASS, SPBOOK_CLASS } from './defsym.h.js';
 import { canseemon, newsym } from './display.js';
 import { canspotmon } from './display.macros.js';
@@ -22,13 +22,13 @@ import { dog_eat, finish_meating } from './dogmove.js';
 import { deliver_obj_to_mon } from './dokick.js';
 import { In_W_tower, builds_up, depth, ledger_no, ledger_to_dlev, ledger_to_dnum, on_level } from './dungeon.js';
 import { MIGR } from './dungeon.h.js';
-import { In_endgame } from './dungeon.macros.js';
+import { In_endgame, Is_qstart } from './dungeon.macros.js';
 import { panic } from './end.js';
 import { FULL_MOON } from './flag.h.js';
 import { COLNO, FALSE, LARGEST_INT, LL, MAXMONNO, ROWNO, TRUE } from './global.h.js';
 import { in_rooms, monst_to_any } from './hack.js';
 import { CORPSTAT, DF, DISMOUNT, EYE, MM, NO, NO_TRAP_FLAGS, RLOC } from './hack.h.js';
-import { max } from './hack.macros.js';
+import { max, min } from './hack.macros.js';
 import { s_suffix } from './hacklib.js';
 import { carrying } from './invent.js';
 import { del_light_source } from './light.js';
@@ -79,7 +79,7 @@ import { cansee } from './vision.macros.js';
 import { mon_wield_item } from './weapon.js';
 import { mon_has_amulet } from './wizard.js';
 import { count_wsegs, get_wormno, initworm, redraw_worm, wormgone } from './worm.js';
-import { Upolyd } from './you.macros.js';
+import { Role_if, Upolyd } from './you.macros.js';
 import { Aggravate_monster, Conflict, Hallucination } from './youprop.macros.js';
 import { obj_resists } from './zap.js';
 
@@ -312,16 +312,16 @@ export async function makedog() {   // dog.c:219
     /* default pet names */
     if (!petname.get(0) && pettype === PM.LITTLE_DOG) {
         /* All of these names were for dogs. */
-        if (gu.urole.mnum === PM.CAVE_DWELLER) {
+        if (Role_if(PM.CAVE_DWELLER)) {
             petname = $C`Slasher`;   /* The Warrior */
         }
-        if (gu.urole.mnum === PM.SAMURAI) {
+        if (Role_if(PM.SAMURAI)) {
             petname = $C`Hachi`;   /* Shibuya Station */
         }
-        if (gu.urole.mnum === PM.BARBARIAN) {
+        if (Role_if(PM.BARBARIAN)) {
             petname = $C`Idefix`;   /* Obelix */
         }
-        if (gu.urole.mnum === PM.RANGER) {
+        if (Role_if(PM.RANGER)) {
             petname = $C`Sirius`;   /* Orion's dog */
         }
     }
@@ -556,7 +556,7 @@ export async function mon_arrive(mtmp, when) {   // dog.c:420
         const nmv = $c.sub64($c.sub64(svm.moves, 1), mtmp.mlstmv);
         await mon_catchup_elapsed_time(mtmp, nmv);
         /* let monster move a bit on new level (see placement code below) */
-        wander = $c.i16(nmv < 8 ? nmv : 8);
+        wander = $c.i16(min(nmv, 8));
     } else {
         wander = 0;
     }
@@ -624,7 +624,7 @@ export async function mon_arrive(mtmp, when) {   // dog.c:420
                 /* debugfuzzer returns from or enters another branch */
                 xlocale = stway.sx, ylocale = stway.sy;
                 break;
-            } else if (!(u.uevent.qexpelled && ((svd.dungeon_topology.d_qstart_level.dlevel || svd.dungeon_topology.d_qstart_level.dnum) && on_level(u.uz0, svd.dungeon_topology.d_qstart_level) || (svd.dungeon_topology.d_qstart_level.dlevel || svd.dungeon_topology.d_qstart_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_qstart_level)))) {
+            } else if (!(u.uevent.qexpelled && (Is_qstart(u.uz0) || Is_qstart(u.uz)))) {
                 await impossible($C`mon_arrive: no corresponding portal?`);
             }
         default:
@@ -652,10 +652,10 @@ export async function mon_arrive(mtmp, when) {   // dog.c:420
             }
         } else {
             /* not in a room */
-            let i = 1 > xlocale - wander ? 1 : xlocale - wander;
+            let i = max(1, xlocale - wander);
             let j = COLNO - 1 < xlocale + wander ? COLNO - 1 : xlocale + wander;
             xlocale = $c.i16(rn2(j - i | 0) + i | 0);
-            i = 0 > ylocale - wander ? 0 : ylocale - wander;
+            i = max(0, ylocale - wander);
             j = ROWNO - 1 < ylocale + wander ? ROWNO - 1 : ylocale + wander;
             ylocale = $c.i16(rn2(j - i | 0) + i | 0);
         }

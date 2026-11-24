@@ -22,7 +22,7 @@ import { breaktest } from './dothrow.js';
 import { defsyms } from './drawing.js';
 import { Can_fall_thru, In_V_tower, In_hell, In_mines, In_quest, Is_botlevel, Is_branchlev, Is_special, assign_level, at_dgn_entrance, depth, dungeon_branch, dunlev, dunlevs_in_dungeon, find_level, free_exclusions, init_dungeons, init_mapseen, insert_branch, level_difficulty, on_level, single_level_branch } from './dungeon.js';
 import { BR, BR_NO_END1, BR_NO_END2 } from './dungeon.h.js';
-import { In_endgame, Inhell } from './dungeon.macros.js';
+import { In_endgame, Inhell, Is_oracle_level, Is_rogue_level, Is_waterlevel } from './dungeon.macros.js';
 import { panic } from './end.js';
 import { make_engr_at, make_grave, random_engraving, wipe_engr_at } from './engrave.js';
 import { DUST, MARK } from './engrave.h.js';
@@ -33,7 +33,7 @@ import { COLNO, DOORINC, FALSE, MAXNROFROOMS, MAX_SUBROOMS, NHL_SB, NHLpa, ROWNO
 import { glyph_to_cmap } from './glyphs.js';
 import { in_rooms, invocation_pos } from './hack.js';
 import { CORPSTAT, DIR, MKTRAP, MM, NHCB, NO, NO_TRAP_FLAGS, TAINT_AGE, most_themes, tut_themes } from './hack.h.js';
-import { DIR_180 } from './hack.macros.js';
+import { DIR_180, max, rn1 } from './hack.macros.js';
 import { nh_snprintf } from './hacklib.js';
 import { sobj_at } from './invent.js';
 import { LUA } from './lua.h.js';
@@ -286,7 +286,7 @@ async function do_room_or_subroom(croom, lowx, lowy, hix, hiy, lit, rtype, speci
     }
     if (lit) {
         for (x = $c.i16(lowx - 1); x <= hix + 1; x = $c.i16(x + 1)) {
-            lev = $c.relem(svl.level.locations[x], lowy - 1 > 0 ? lowy - 1 : 0);
+            lev = $c.relem(svl.level.locations[x], max(lowy - 1, 0));
             for (y = $c.i16(lowy - 1); y <= hiy + 1; y = $c.i16(y + 1)) {
                 ($t1 = lev, lev = $c.radd($t1, 1), $t1).lit = 1;
             }
@@ -696,7 +696,7 @@ async function dosdoor(x, y, aroom, type) {   // mklev.c:615
         }
         /* also done in roguecorr(); doing it here first prevents
            making mimics in place of trapped doors on rogue svl.level */
-        if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level)) {
+        if (Is_rogue_level(u.uz)) {
             svl.level.locations[x][y].flags = (D.NODOOR) & 31;
         }
         if (svl.level.locations[x][y].flags & D.TRAPPED) {
@@ -1007,7 +1007,7 @@ async function fill_ordinary_room(croom, bonus_items) {   // mklev.c:939
         await mkgold(0, pos.x, pos.y);
     }
     skip_nonrogue$: {
-        if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level)) {
+        if (Is_rogue_level(u.uz)) {
             break skip_nonrogue$;
         }
         if (!rn2(10)) {
@@ -1237,7 +1237,7 @@ async function makelevel() {   // mklev.c:1251
     await clear_level_structures();
     slev = Is_special(u.uz);
     /* check for special levels */
-    if (slev && !((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level))) {
+    if (slev && !Is_rogue_level(u.uz)) {
         await makemaz(new $c.Ptr(slev.proto, 0));
     } else if (svd.dungeons[u.uz.dnum].proto[0]) {
         await makemaz($C``);
@@ -1254,7 +1254,7 @@ async function makelevel() {   // mklev.c:1251
     } else {
         /* otherwise, fall through - it's a "regular" level. */
         u_depth = depth(u.uz);
-        if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level)) {
+        if (Is_rogue_level(u.uz)) {
             await makeroguerooms();
             await makerogueghost();
         } else {
@@ -1268,7 +1268,7 @@ async function makelevel() {   // mklev.c:1251
         skip0$: {
             /* minimum number of rooms needed
               to allow a random special room */
-            if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level)) {
+            if (Is_rogue_level(u.uz)) {
                 break skip0$;
             }
             await makecorridors();
@@ -1397,7 +1397,7 @@ async function makelevel() {   // mklev.c:1251
  * @returns {number} boolean
  */
 function water_has_kelp(x, y, kelp_pool, kelp_moat) {   // mklev.c:1432
-    if (kelp_pool && (svl.level.locations[x][y].typ === POOL || svl.level.locations[x][y].typ === WATER && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) && !rn2(kelp_pool) || kelp_moat && svl.level.locations[x][y].typ === MOAT && !rn2(kelp_moat)) {
+    if (kelp_pool && (svl.level.locations[x][y].typ === POOL || svl.level.locations[x][y].typ === WATER && !Is_waterlevel(u.uz)) && !rn2(kelp_pool) || kelp_moat && svl.level.locations[x][y].typ === MOAT && !rn2(kelp_moat)) {
         return TRUE;
     }
     return FALSE;
@@ -1437,7 +1437,7 @@ export async function mineralize(kelp_pool, kelp_moat, goldprob, gemprob, skip_l
     }
     /* determine if it is even allowed;
        almost all special levels are excluded */
-    if (!skip_lvl_checks && (In_hell(u.uz) || In_V_tower(u.uz) || (svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) || svl.level.flags.arboreal || (sp = Is_special(u.uz)) !== null && !((svd.dungeon_topology.d_oracle_level.dlevel || svd.dungeon_topology.d_oracle_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_oracle_level)) && (!In_mines(u.uz) || sp.flags.town))) {
+    if (!skip_lvl_checks && (In_hell(u.uz) || In_V_tower(u.uz) || Is_rogue_level(u.uz) || svl.level.flags.arboreal || (sp = Is_special(u.uz)) !== null && !Is_oracle_level(u.uz) && (!In_mines(u.uz) || sp.flags.town))) {
         return;
     }
     /* basic level-related probabilities */
@@ -1886,7 +1886,7 @@ async function mktrap_victim(ttmp) {   // mklev.c:1815
        and vampire corpses; usually change it into a fake player monster
        instead (always human); no role-specific equipment is provided */
     if (victim_mnum === PM.HUMAN && rn2(25)) {
-        victim_mnum = rn2(PM.WIZARD - PM.ARCHEOLOGIST) + PM.ARCHEOLOGIST | 0;
+        victim_mnum = rn1(PM.WIZARD - PM.ARCHEOLOGIST, PM.ARCHEOLOGIST);
     }
     otmp = await mkcorpstat(CORPSE, null, $c.relem(mons, victim_mnum), x, y, CORPSTAT.INIT);
     otmp.age = $c.sub64(otmp.age, TAINT_AGE + 1);   /* died too long ago to safely eat */
@@ -2027,7 +2027,7 @@ export async function mktrap(num, mktrapflags, croom, tm) {   // mklev.c:2036
     }
     if (num > NO_TRAP && num < TRAPNUM) {
         kind = num;
-    } else if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level)) {
+    } else if (Is_rogue_level(u.uz)) {
         kind = traptype_roguelvl();
     } else if (Inhell() && !rn2(5)) {
         /* bias the frequency of fire traps in Gehennom */

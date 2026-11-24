@@ -22,11 +22,12 @@ import { c_common_strings, cg, flags, ga, gd, gf, gi, gk, gm, gn, gs, gu, gv, gy
 import { COIN_CLASS, DEF, FOOD_CLASS, POTION_CLASS, ROCK_CLASS, S, SCROLL_CLASS, SPBOOK_CLASS } from './defsym.h.js';
 import { back_to_glyph, cls, docrt, feel_location, feel_newsym, flash_glyph_at, flush_screen, glyph_at, magic_map_background, map_background, map_engraving, map_invisible, map_object, map_trap, mon_visible, newsym, see_monsters, sensemon, show_glyph, under_ground, under_water, unmap_invisible, unmap_object, warning_of, xy_set_wall_state } from './display.js';
 import { GLYPH, GLYPH_INVISIBLE, GLYPH_NOTHING, GLYPH_TRAP_OFF, GLYPH_UNEXPLORED, NO_GLYPH } from './display.h.js';
-import { canspotmon, covers_objects, glyph_is_cmap, glyph_is_invisible, glyph_is_monster, glyph_is_object, glyph_is_swallow, glyph_is_trap, glyph_is_unexplored, glyph_is_warning, glyph_to_mon, glyph_to_obj } from './display.macros.js';
+import { canspotmon, cmap_to_glyph, covers_objects, glyph_is_cmap, glyph_is_invisible, glyph_is_monster, glyph_is_object, glyph_is_swallow, glyph_is_trap, glyph_is_unexplored, glyph_is_warning, glyph_to_mon, glyph_to_obj } from './display.macros.js';
 import { cmd_safety_prevention } from './do.js';
 import { Monnam, a_monnam, hcolor, x_monnam, y_monnam } from './do_name.js';
 import { def_char_is_furniture, def_char_to_monclass, def_char_to_objclass, def_monsyms, def_oc_syms } from './drawing.js';
 import { In_hell, In_mines, depth, on_level, room_discovered } from './dungeon.js';
+import { Is_rogue_level } from './dungeon.macros.js';
 import { engr_at } from './engrave.js';
 import { TER } from './flag.h.js';
 import { getpos } from './getpos.js';
@@ -34,7 +35,8 @@ import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
 import { glyph_to_cmap } from './glyphs.js';
 import { losehp, money_cnt, nomul } from './hack.js';
 import { ARTICLE, BOLT_LIM, ECMD, FOOT, KILLED, NOSE, NO_PART, SUPPRESS, SYM_OFF_X, TOE } from './hack.h.js';
-import { dist2, eos, s_suffix } from './hacklib.js';
+import { distu, makeknown } from './hack.macros.js';
+import { eos, s_suffix } from './hacklib.js';
 import { consume_obj_charge, currency, sobj_at, useup } from './invent.js';
 import { has_mcorpsenm } from './mextra.macros.js';
 import { expels } from './mhitu.js';
@@ -49,7 +51,7 @@ import { mons } from './monst.js';
 import { M_AP } from './monst.h.js';
 import { DEADMONSTER, M_AP_TYPE, helpless } from './monst.macros.js';
 import { PM } from './monsters.h.js';
-import { discover_object, observe_object } from './o_init.js';
+import { observe_object } from './o_init.js';
 import { BURIED_TOO, CONTAINED_TOO } from './obj.h.js';
 import { Has_contents, Is_box, SchroedingersBox } from './obj.macros.js';
 import { GOLD, MAXOCLASSES, NUM_OBJECTS } from './objclass.h.js';
@@ -1285,7 +1287,7 @@ export async function use_crystal_ball(optr) {   // detect.c:1206
                         await useup(obj);
                         $t1 = obj = null, optr.set(0, $t1);   /* it's gone */
                         /* physical damage cause by the shards and force */
-                        await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(30) + 1 | 0, 2) : rnd(30), $C`exploding crystal ball`, KILLED.BY_AN);
+                        await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(30) + 1 | 0, 2) : rnd(30)), $C`exploding crystal ball`, KILLED.BY_AN);
                         break;
                 }
                 if (obj) {
@@ -1368,7 +1370,7 @@ export async function use_crystal_ball(optr) {   // detect.c:1206
                 }
             } else {
                 ret = 0;
-                await discover_object(CRYSTAL_BALL, TRUE, TRUE, TRUE);
+                await makeknown(CRYSTAL_BALL);
                 await consume_obj_charge(obj, TRUE);
                 /* special case: accept ']' as synonym for mimic
                  * we have to do this before the def_char_to_objclass check
@@ -1625,7 +1627,7 @@ export async function do_vicinity_map(sobj) {   // detect.c:1448
  */
 export function cvt_sdoor_to_door(lev) {   // detect.c:1589
     let newmask = lev.flags & ~WM_MASK;
-    if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level)) {
+    if (Is_rogue_level(u.uz)) {
         /* rogue didn't have doors, only doorways */
         newmask = D.NODOOR;
     } else {
@@ -1686,18 +1688,18 @@ async function findone(zx, zy, whatfound) {   // detect.c:1639
     found_p.ft_cc.y = zy;
     if (lev.typ === SDOOR) {
         const sym = lev.horizontal ? S.hcdoor : S.vcdoor;
-        await flash_glyph_at(zx, zy, sym === S.stone ? GLYPH.CMAP_STONE_OFF : sym <= S.trwall ? sym - S.vwall + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) : sym < S.altar ? sym - S.ndoor + GLYPH.CMAP_A_OFF : sym === S.altar ? 4008 : sym < S.arrow_trap + MAXTCHARS ? sym - S.grave + GLYPH.CMAP_B_OFF : sym <= S.goodpos ? sym - S.digbeam + GLYPH.CMAP_C_OFF : NO_GLYPH, FOUND_FLASH_COUNT);
+        await flash_glyph_at(zx, zy, cmap_to_glyph(sym), FOUND_FLASH_COUNT);
         cvt_sdoor_to_door(lev);   /* set lev->typ = DOOR */
         recalc_block_point(zx, zy);
         await magic_map_background(zx, zy, 0);
         await foundone(zx, zy, await back_to_glyph(zx, zy));
         found_p.num_sdoors = $c.u8(found_p.num_sdoors + 1);
     } else if (lev.typ === SCORR) {
-        await flash_glyph_at(zx, zy, 3995, FOUND_FLASH_COUNT);
+        await flash_glyph_at(zx, zy, cmap_to_glyph(S.corr), FOUND_FLASH_COUNT);
         lev.typ = CORR;
         unblock_point(zx, zy);
         await magic_map_background(zx, zy, 0);
-        await foundone(zx, zy, 3995);
+        await foundone(zx, zy, cmap_to_glyph(S.corr));
         found_p.num_scorrs = $c.u8(found_p.num_scorrs + 1);
     }
     /* [shouldn't successful 'find' reveal and activate statue traps?] */
@@ -1781,7 +1783,7 @@ async function openone(zx$in, zy$in, num) {   // detect.c:1729
             cvt_sdoor_to_door($c.relem(svl.level.locations[zx[0]], zy[0]));   /* .typ = DOOR */
         }
         if (svl.level.locations[zx[0]][zy[0]].flags & D.TRAPPED) {
-            if (dist2(zx[0], zy[0], u.ux, u.uy) < 3) {
+            if (distu(zx[0], zy[0]) < 3) {
                 await b_trapped($C`door`, NO_PART);
             } else {
                 await Norep($C`You %s an explosion!`, cansee(zx[0], zy[0]) ? $C`see` : !Deaf() ? $C`hear` : $C`feel the shock of`);
@@ -2274,10 +2276,10 @@ async function reveal_terrain_getglyph(x, y, swallowed, default_glyph, which_sub
         }
     }
     /* FIXME: dirty hack */
-    if (glyph === 3993) {
-        glyph = 3992;
-    } else if (glyph === 3996) {
-        glyph = 3995;
+    if (glyph === cmap_to_glyph(S.darkroom)) {
+        glyph = cmap_to_glyph(S.room);
+    } else if (glyph === cmap_to_glyph(S.litcorr)) {
+        glyph = cmap_to_glyph(S.corr);
     }
     return glyph;
 }
@@ -2319,7 +2321,7 @@ export async function reveal_terrain(which_subset) {   // detect.c:2356
         if (unconstrain_map()) {
             await docrt();
         }
-        const default_glyph = default_sym === S.stone ? GLYPH.CMAP_STONE_OFF : default_sym <= S.trwall ? default_sym - S.vwall + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) : default_sym < S.altar ? default_sym - S.ndoor + GLYPH.CMAP_A_OFF : default_sym === S.altar ? 4008 : default_sym < S.arrow_trap + MAXTCHARS ? default_sym - S.grave + GLYPH.CMAP_B_OFF : default_sym <= S.goodpos ? default_sym - S.digbeam + GLYPH.CMAP_C_OFF : NO_GLYPH;
+        const default_glyph = cmap_to_glyph(default_sym);
         for (x = 1; x < COLNO; x = $c.i16(x + 1)) {
             for (y = 0; y < ROWNO; y = $c.i16(y + 1)) {
                 const glyph = await reveal_terrain_getglyph(x, y, swallowed, default_glyph, which_subset);

@@ -31,7 +31,7 @@ import { FALSE, LL, TRUE } from './global.h.js';
 import { strcmpi } from './global.macros.js';
 import { invocation_pos, losehp, nomul, spoteffects } from './hack.js';
 import { AFTER_LAST_ARTIFACT, DISMOUNT, ECMD, ENL, GETOBJ, GETOBJ_PROMPT, KILLED, MAGICENLIGHTENMENT, NECK, NOTELL, NROFARTIFACTS, ONAME_BONES, ONAME_GIFT, ONAME_KNOW_ARTI, ONAME_LEVEL_DEF, ONAME_NO_FLAGS, ONAME_RANDOM, ONAME_VIA_DIP, ONAME_VIA_NAMING, ONAME_WISH } from './hack.h.js';
-import { Maybe_Half_Phys, verbalize1 } from './hack.macros.js';
+import { Maybe_Half_Phys, max, verbalize1 } from './hack.macros.js';
 import { eos, fuzzymatch, nh_snprintf, s_suffix, sgn, strncmpi, upstart } from './hacklib.js';
 import { align_str, enlightenment } from './insight.js';
 import { freeinv, getobj, hold_another_object, nxtobj, update_inventory } from './invent.js';
@@ -67,10 +67,11 @@ import { IS_DOOR } from './rm.macros.js';
 import { d, rn2, rnd, rnz } from './rnd.js';
 import { aligns } from './role.js';
 import { getrumor } from './rumors.js';
-import { sfi_arti_info, sfi_short, sfo_arti_info, sfo_xint16 } from './sfbase.js';
+import { Sfi_arti_info, Sfi_short, Sfo_arti_info, Sfo_xint16 } from './savefile.macros.js';
 import { inside_shop, obfree } from './shk.js';
 import { P } from './skills.h.js';
 import { spell_skilltype, spelleffects } from './spell.js';
+import { SPELL_LEV_PW } from './spell.macros.js';
 import { On_stairs } from './stairs.js';
 import { remove_worn_item } from './steal.js';
 import { dismount_steed } from './steed.js';
@@ -145,7 +146,7 @@ function hack_artifacts() {   // artifact.c:87
         }
     }
     /* Excalibur can be used by any lawful character, not just knights */
-    if (!(gu.urole.mnum === PM.KNIGHT)) {
+    if (!Role_if(PM.KNIGHT)) {
         artilist[ART.EXCALIBUR].role = NON_PM;
     }
     /* Fix up the quest artifact */
@@ -168,10 +169,10 @@ export function init_artifacts() {   // artifact.c:111
 export async function save_artifacts(nhfp) {   // artifact.c:119
     let i = 0;
     for (i = 0; i < NROFARTIFACTS + 1; i = i + 1 | 0) {
-        await sfo_arti_info(nhfp, $c.relem(artiexist, i), $C`artiexist`);
+        await Sfo_arti_info(nhfp, $c.relem(artiexist, i), $C`artiexist`);
     }
     for (i = 0; i < NROFARTIFACTS; i = i + 1 | 0) {
-        await sfo_xint16(nhfp, new $c.Ptr(artidisco, i), $C`artidisco`);
+        await Sfo_xint16(nhfp, new $c.Ptr(artidisco, i), $C`artidisco`);
     }
 }
 /* SFCTOOL */
@@ -182,10 +183,10 @@ export async function save_artifacts(nhfp) {   // artifact.c:119
 export async function restore_artifacts(nhfp) {   // artifact.c:133
     let i = 0;
     for (i = 0; i < NROFARTIFACTS + 1; i = i + 1 | 0) {
-        await sfi_arti_info(nhfp, $c.relem(artiexist, i), $C`artiexist`);
+        await Sfi_arti_info(nhfp, $c.relem(artiexist, i), $C`artiexist`);
     }
     for (i = 0; i < NROFARTIFACTS; i = i + 1 | 0) {
-        await sfi_short(nhfp, new $c.Ptr(artidisco, i), $C`artidisco`);
+        await Sfi_short(nhfp, new $c.Ptr(artidisco, i), $C`artidisco`);
     }
     hack_artifacts();   /* redo non-saved special cases */
 }
@@ -1170,7 +1171,7 @@ export async function spec_dbon(otmp, mon, tmp) {   // artifact.c:1091
         $t1 = await spec_applies(weap, mon), gs.spec_dbon_applies = $t1;
     }
     if (gs.spec_dbon_applies) {
-        return weap.attk.damd ? rnd(weap.attk.damd) : tmp > 1 ? tmp : 1;
+        return weap.attk.damd ? rnd(weap.attk.damd) : max(tmp, 1);
     }
     return 0;
 }
@@ -1299,7 +1300,7 @@ async function Mb_hit(magr, mdef, mb, dmgptr, dieroll, vis, hittee) {   // artif
        in that case it will only happen if the other effect fails;
        extra damage will apply regardless; 3.4.1: sometimes might
        just probe even when it hasn't been enchanted */
-    let do_stun = (mb.spe > 0 ? mb.spe : 0) < rn2(gs.spec_dbon_applies ? 11 : 7) ? 1 : 0;
+    let do_stun = max(mb.spe, 0) < rn2(gs.spec_dbon_applies ? 11 : 7) ? 1 : 0;
     /* the special effects also boost physical damage; increments are
        generally cumulative, but since the stun effect is based on a
        different criterium its damage might not be included; the base
@@ -2086,7 +2087,7 @@ function arti_invoke_cost_pw(obj) {   // artifact.c:2091
     const oart = get_artifact(obj);
     if (oart.inv_prop === FLING_POISON || oart.inv_prop === BLINDING_RAY) {
         /* pretend it's a level 5 spell */
-        return 25;
+        return SPELL_LEV_PW(5);
     }
     return -1;
 }
@@ -2753,7 +2754,7 @@ export async function mkot_trap_warn() {   // artifact.c:2753
 export function is_magic_key(mon, obj) {   // artifact.c:2775
     /* if null, non-rogue is assumed */
     if (is_art(obj, ART.MASTER_KEY_OF_THIEVERY)) {
-        if (mon === gy.youmonst ? gu.urole.mnum === PM.ROGUE : mon && mon.data === mons[PM.ROGUE]) {
+        if (mon === gy.youmonst ? Role_if(PM.ROGUE) : mon && mon.data === mons[PM.ROGUE]) {
             return !obj.cursed ? 1 : 0;   /* a rogue; non-cursed suffices for magic */
         }
         /* not a rogue; key must be blessed to behave as a magic one */

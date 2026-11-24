@@ -23,7 +23,7 @@ import { dosearch, reveal_terrain } from './detect.js';
 import { wiz_debug_cmd_bury } from './dig.js';
 import { cls, docrt, docrt_flags, doredraw, flush_screen, glyph_at, nul_glyphinfo } from './display.js';
 import { GLYPH, GLYPH_INVISIBLE, GLYPH_UNEXPLORED, docrtRefresh } from './display.h.js';
-import { canspotmon, glyph_is_cmap } from './display.macros.js';
+import { canspotmon, glyph_is_cmap, objnum_to_glyph } from './display.macros.js';
 import { doddrop, dodown, dodrop, donull, doup, dowipe, save_currentstate, u_collide_m } from './do.js';
 import { docallcmd, mon_nam, x_monnam } from './do_name.js';
 import { doddoremarm, doputon, doremring, dotakeoff, dowear, ia_dotakeoff, remarm_swapwep, reset_remarm } from './do_wear.js';
@@ -33,7 +33,7 @@ import { dokick } from './dokick.js';
 import { dofire, dothrow } from './dothrow.js';
 import { defsyms } from './drawing.js';
 import { donamelevel, dooverview, ledger_no, on_level, recalc_mapseen, rm_mapseen, u_on_rndspot } from './dungeon.js';
-import { In_tutorial } from './dungeon.macros.js';
+import { In_tutorial, Is_mineend_level, Is_sokoend_level } from './dungeon.macros.js';
 import { doeat } from './eat.js';
 import { done2, nh_terminate } from './end.js';
 import { can_reach_floor, doengrave } from './engrave.js';
@@ -44,11 +44,11 @@ import { dryup } from './fountain.js';
 import { AUTOCOMPLETE, AUTOCOMP_ADJ, CMD, CMD_INSANE, CMD_MOVE_PREFIXES, CMD_NOT_AVAILABLE, CMD_PARAM, ECM, GENERALCMD, IFBURIED, INTERNALCMD, MOUSECMD, MOVEMENTCMD, NOFUZZERCMD, PREFIXCMD, WIZMODECMD } from './func_tab.h.js';
 import { auto_describe, gather_locs_interesting, getpos, getpos_menu } from './getpos.js';
 import { BUFSZ, COLNO, FALSE, LARGEST_INT, NHLpa, QBUFSZ, ROWNO, TRUE } from './global.h.js';
-import { C, M, unmeta } from './global.macros.js';
+import { C, M, strcmpi, unmeta } from './global.macros.js';
 import { glyph_to_cmap } from './glyphs.js';
 import { check_special_room, domove, dopickup, set_uinwater, test_move, u_maybe_impaired } from './hack.js';
 import { ARTICLE, CMDQ, CQ_CANNED, CQ_REPEAT, DIR, ECMD, GC, GC_CONDHIST, MV, NHCB, NHKF, N_DIRS, N_DIRS_Z, N_MOVEMODES, SUPPRESS, SUPPRESS_HISTORY, TEST, commandInp, getdirInp, getposInp, otherInp } from './hack.h.js';
-import { NODIAG, pline1 } from './hack.macros.js';
+import { NODIAG, pline1, rn1 } from './hack.macros.js';
 import { copynchars, digit, dist2, eos, highc, letter, mungspaces, nh_snprintf, sgn, strncmpi, strstri, strsubst, trimspaces, upstart, visctrl } from './hacklib.js';
 import { do_gamelog, doattributes, doborn, doconduct, dogenocided, dovanquished, remove_achievement } from './insight.js';
 import { AppendLongDigit } from './integer.macros.js';
@@ -115,7 +115,7 @@ import { aggravate } from './wizard.js';
 import { makemap_remove_mons, wiz_custom, wiz_detect, wiz_display_macros, wiz_flip_level, wiz_fuzzer, wiz_genesis, wiz_identify, wiz_intrinsic, wiz_kill, wiz_level_change, wiz_level_tele, wiz_levltyp_legend, wiz_load_lua, wiz_load_splua, wiz_makemap, wiz_map, wiz_map_levltyp, wiz_migrate_mons, wiz_mon_diff, wiz_objprobs, wiz_panic, wiz_polyself, wiz_rumor_check, wiz_show_nhuuid, wiz_show_seenv, wiz_show_stats, wiz_show_vision, wiz_show_wmodes, wiz_smell, wiz_telekinesis, wiz_where, wiz_wish } from './wizcmds.js';
 import { which_armor } from './worn.js';
 import { ACH } from './you.h.js';
-import { Upolyd, u_at } from './you.macros.js';
+import { Upolyd, next2u, u_at } from './you.macros.js';
 import { Punished } from './youprop.macros.js';
 import { dozap } from './zap.js';
 
@@ -946,7 +946,7 @@ export async function domonability() {   // cmd.c:890
         }
     } else if (is_vampire(uptr) || is_vampshifter(gy.youmonst)) {
         return await dopoly();
-    } else if (u.usteed && attacktype(u.usteed.data, AT.BREA)) {
+    } else if (u.usteed && can_breathe(u.usteed.data)) {
         await pet_ranged_attk(u.usteed, TRUE);
         return ECMD.TIME;
     } else if (Upolyd()) {
@@ -1000,12 +1000,12 @@ export async function makemap_prepost(pre, wiztower) {   // cmd.c:986
             /* achievement tracking; if replacing a level that has a
                special prize, lose credit for previously finding it and
                reset for the new instance of that prize */
-            if ((svd.dungeon_topology.d_mineend_level.dlevel || svd.dungeon_topology.d_mineend_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_mineend_level)) {
+            if (Is_mineend_level(u.uz)) {
                 if (remove_achievement(ACH.MINE_PRIZE)) {
                     await pline(new $c.Ptr(makemap_prepost$Unachieve, 0), $C`Mine's-end`);
                 }
                 svc.context.achieveo.mines_prize_oid = 0;
-            } else if ((svd.dungeon_topology.d_sokoend_level.dlevel || svd.dungeon_topology.d_sokoend_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_sokoend_level)) {
+            } else if (Is_sokoend_level(u.uz)) {
                 if (remove_achievement(ACH.SOKO_PRIZE)) {
                     await pline(new $c.Ptr(makemap_prepost$Unachieve, 0), $C`Soko-prize`);
                 }
@@ -1995,7 +1995,7 @@ export async function extcmds_match(findstr, ecmflags, matchlist) {   // cmd.c:2
         if (!findstr) {
             extcmds_match$retmatchlist[($t1 = mi, mi = $t1 + 1 | 0, $t1)] = i;
         } else if (exactmatch) {
-            if (!strncmpi(findstr, extcmdlist[i].ef_txt, -1)) {
+            if (!strcmpi(findstr, extcmdlist[i].ef_txt)) {
                 extcmds_match$retmatchlist[($t2 = mi, mi = $t2 + 1 | 0, $t2)] = i;
             }
         } else {
@@ -2057,7 +2057,7 @@ export function key2extcmddesc(key) {   // cmd.c:2561
         /* special case: for reqmenu prefix (normally 'm'), replace
            "prefix: request menu or modify command (#reqmenu)"
            with two-line "movement prefix:...\nnon-movement prefix:..." */
-        if (!strncmpi(new $c.Ptr(key2extcmddesc$key2cmdbuf, 0), $C`prefix:`, 7) && !strncmpi(txt, $C`reqmenu`, -1)) {
+        if (!strncmpi(new $c.Ptr(key2extcmddesc$key2cmdbuf, 0), $C`prefix:`, 7) && !strcmpi(txt, $C`reqmenu`)) {
             /* relies on implicit concatenation of literal strings */
             strsubst(new $c.Ptr(key2extcmddesc$key2cmdbuf, 0), $C`prefix:`, $C`movement prefix: move without autopickup and without attacking\nnon-movement prefix:`);   /* and rest of buf */
         }
@@ -2080,12 +2080,12 @@ export async function bind_mousebtn(btn, command) {   // cmd.c:2624
     }
     btn = btn - 1 | 0;
     /* special case: "nothing" is reserved for unbinding */
-    if (!strncmpi(command, $C`nothing`, -1)) {
+    if (!strcmpi(command, $C`nothing`)) {
         gc.Cmd.mousebtn[btn] = null;
         return TRUE;
     }
     for (extcmd = extcmdlist[0]; extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
-        if (strncmpi(command, extcmd.ef_txt, -1)) {
+        if (strcmpi(command, extcmd.ef_txt)) {
             continue;
         }
         if (!((extcmd.flags & MOUSECMD) >>> 0)) {
@@ -2108,7 +2108,7 @@ export async function bind_key(key, command, user) {   // cmd.c:2662
     let p = null;
     let lastp = null;
     /* special case: "nothing" is reserved for unbinding */
-    if (!strncmpi(command, $C`nothing`, -1)) {
+    if (!strcmpi(command, $C`nothing`)) {
         cmdbind_remove(key);
         return TRUE;
     }
@@ -2124,7 +2124,7 @@ export async function bind_key(key, command, user) {   // cmd.c:2662
         p = p.add(1);
     }
     for (extcmd = extcmdlist[0]; extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
-        if (strncmpi(buf, extcmd.ef_txt, -1)) {
+        if (strcmpi(buf, extcmd.ef_txt)) {
             continue;
         }
         if ((extcmd.flags & INTERNALCMD) >>> 0 !== 0) {
@@ -2867,7 +2867,7 @@ function accept_menu_prefix(ec) {   // cmd.c:3509
 export async function randomkey() {   // cmd.c:3517
     let c = 0, $t1;
     /* give ^A and ^P a high probability of being repeated */
-    if ((randomkey$last_c === 1 || randomkey$last_c === 16) && program_state.input_state === commandInp && rn2(5)) {
+    if ((randomkey$last_c === C(97) || randomkey$last_c === C(112)) && program_state.input_state === commandInp && rn2(5)) {
         return randomkey$last_c;
     }
     switch (rn2(16)) {
@@ -2881,16 +2881,16 @@ export async function randomkey() {   // cmd.c:3517
         case 2:
         case 3:
         case 4:
-            c = $c.i8(rn2(95) + 32 | 0);
+            c = $c.i8(rn1(95, 32));
             break;
         case 5:
             c = rn2(2) ? 9 : 32;
             break;
         case 6:
-            c = $c.i8(rn2(26) + 97 | 0);
+            c = $c.i8(rn1(26, 97));
             break;
         case 7:
-            c = $c.i8(rn2(26) + 65 | 0);
+            c = $c.i8(rn1(26, 65));
             break;
         case 8:
             c = $c.i8(extcmdlist[$c.remu32(($t1 = randomkey$i, randomkey$i = $t1 + 1 >>> 0, $t1), 171)].key);
@@ -2908,7 +2908,7 @@ export async function randomkey() {   // cmd.c:3517
             }
             break;
         case 13:
-            c = $c.i8(rn2(10) + 48 | 0);
+            c = $c.i8(rn1(10, 48));
             break;
         case 14:
             /* any char, but avoid '\0' because it's used for mouse click */
@@ -3767,7 +3767,7 @@ async function there_cmd_menu_next2u(win, x, y, mod, act) {   // cmd.c:4524
     let buf = new Int8Array(256), ttmp = null;
     let K = 0;
     const typ = svl.level.locations[x][y].typ;
-    if (!(dist2(x, y, u.ux, u.uy) <= 2)) {
+    if (!next2u(x, y)) {
         return K;
     }
     if (IS_DOOR(typ)) {
@@ -3801,7 +3801,7 @@ async function there_cmd_menu_next2u(win, x, y, mod, act) {   // cmd.c:4524
         }
         await mcmd_addmenu(win, MCMD.MOVE_DIR, $C`Move on the trap`), K = K + 1 | 0;
     }
-    if (svl.level.locations[x][y].glyph === BOULDER + GLYPH.OBJ_OFF) {
+    if (svl.level.locations[x][y].glyph === objnum_to_glyph(BOULDER)) {
         await mcmd_addmenu(win, MCMD.MOVE_DIR, $C`Push the boulder`), K = K + 1 | 0;
     }
     let mtmp = svl.level.monsters[x][y];
@@ -4084,7 +4084,7 @@ async function there_cmd_menu(x, y, mod) {   // cmd.c:4843
     await start_menu()(win, MENU.BEHAVE_STANDARD);
     if (u_at(x, y)) {
         K = K + await there_cmd_menu_self(win, x, y, new $c.Ptr(act, 0)) | 0;
-    } else if (dist2(x, y, u.ux, u.uy) <= 2) {
+    } else if (next2u(x, y)) {
         K = K + await there_cmd_menu_next2u(win, x, y, mod, new $c.Ptr(act, 0)) | 0;
     } else {
         K = K + await there_cmd_menu_far(win, x, y, mod) | 0;
@@ -4092,7 +4092,7 @@ async function there_cmd_menu(x, y, mod) {   // cmd.c:4843
     K = K + await there_cmd_menu_common(win, x, y, mod, new $c.Ptr(act, 0)) | 0;
     if (!K) {
         /* no menu options, try to move */
-        if (dist2(x, y, u.ux, u.uy) <= 2 && await test_move(u.ux, u.uy, dx, dy, TEST.MOVE)) {
+        if (next2u(x, y) && await test_move(u.ux, u.uy, dx, dy, TEST.MOVE)) {
             const dir = xytodir(dx, dy);
             await cmdq_add_ec(CQ_CANNED, move_funcs[dir][MV.WALK]);
         } else if (flags.travelcmd) {
@@ -5393,10 +5393,10 @@ export function $init() {
     $c.init(reset_commands$ylist, [
         121,
         89,
-        25,
-        -7,
-        -39,
-        -103
+        C(121),
+        M(121),
+        M(89),
+        (-103)
     ]);
     for (let $i0 = 0; $i0 < 8; $i0++) {
         reset_commands$back_dir_cmd[$i0].fill(null);

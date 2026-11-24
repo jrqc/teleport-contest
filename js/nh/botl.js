@@ -11,7 +11,7 @@ import { alloc, dupstr, fmt_ptr } from './alloc.js';
 import { ART } from './artilist.h.js';
 import { acurr } from './attrib.js';
 import { A } from './attrib.h.js';
-import { ACURR } from './attrib.macros.js';
+import { ACURR, STR18 } from './attrib.macros.js';
 import { BL, BL_MASK, BL_TH, BOTL_NSIZ, CONDITION_COUNT, EQ_VALUE, GE_VALUE, GT_VALUE, HL, LE_VALUE, LT_VALUE, MAXBLSTATS, MAXVALWIDTH, NO_LTEQGT, TXT_VALUE, bl_bareh, bl_blind, bl_busy, bl_conf, bl_deaf, bl_elf_iron, bl_fly, bl_foodpois, bl_glowhands, bl_grab, bl_hallu, bl_held, bl_holding, bl_icy, bl_inlava, bl_lev, bl_parlyz, bl_ride, bl_sleeping, bl_slime, bl_slippery, bl_stone, bl_strngl, bl_stun, bl_submerged, bl_termill, bl_tethered, bl_trapped, bl_unconsc, bl_woundedl } from './botl.h.js';
 import { VIA_WINDOWPORT } from './botl.macros.js';
 import { config_error_add } from './cfgfiles.js';
@@ -22,14 +22,16 @@ import { COIN_CLASS, S, WEAPON_CLASS } from './defsym.h.js';
 import { nul_glyphinfo, suppress_map_output } from './display.js';
 import { GLYPH } from './display.h.js';
 import { pmname } from './do_name.js';
-import { In_quest, depth, dunlev, endgamelevelname, on_level } from './dungeon.js';
-import { In_endgame } from './dungeon.macros.js';
+import { In_quest, depth, dunlev, endgamelevelname } from './dungeon.js';
+import { In_endgame, Is_knox } from './dungeon.macros.js';
 import { hu_stat } from './eat.js';
 import { panic } from './end.js';
 import { newuexp } from './exper.js';
 import { BUFSZ, COLNO, FALSE, LARGEST_INT, QBUFSZ, TRUE, opt_in, opt_out } from './global.h.js';
+import { strcmpi } from './global.macros.js';
 import { classify_terrain, money_cnt, near_capacity } from './hack.js';
 import { NOT_HUNGRY, OVERLOADED, SATIATED, SLT_ENCUMBER, STARVED, SYM_OFF_O, UNENCUMBERED } from './hack.h.js';
+import { min, qsort } from './hack.macros.js';
 import { digit, eos, fuzzymatch, highc, lowc, mungspaces, nh_snprintf, sgn, strNsubst, str_start_is, stripchars, strkitten, strncmpi, strstri, strsubst, trimspaces, upstart } from './hacklib.js';
 import { sticks } from './mondata.js';
 import { humanoid } from './mondata.macros.js';
@@ -56,7 +58,7 @@ import { create_nhwindow, curs, destroy_nhwindow, display_nhwindow, end_menu, pu
 import { ANY, ATR, MENU, NHW, PICK } from './wintype.h.js';
 import { SICK_NONVOMITABLE, SICK_VOMITABLE, TT } from './you.h.js';
 import { Ugender, Upolyd } from './you.macros.js';
-import { Blind, Deaf, Hallucination, Levitation, Sick, Slimed, Stoned, Strangled } from './youprop.macros.js';
+import { Blind, Deaf, Flying, Hallucination, Levitation, Sick, Slimed, Stoned, Strangled } from './youprop.macros.js';
 
 const MAX_THRESH = 21;
 const MAX_SUBFIELDS = 16;
@@ -140,9 +142,9 @@ let status_hilite_str_id = 0;
 export function get_strength_str() {   // botl.c:21
     const st = ACURR(A.STR);
     if (st > 18) {
-        if (st > 118) {
+        if (st > STR18(100)) {
             $c.sprintf(new $c.Ptr(get_strength_str$buf, 0), $C`%2d`, st - 100 | 0);
-        } else if (st < 118) {
+        } else if (st < STR18(100)) {
             $c.sprintf(new $c.Ptr(get_strength_str$buf, 0), $C`18/%02d`, st - 18 | 0);
         } else {
             $c.sprintf(new $c.Ptr(get_strength_str$buf, 0), $C`18/**`);
@@ -298,7 +300,7 @@ export async function do_statusline2() {   // botl.c:101
     if (Levitation()) {
         $c.strcpy(nb = eos(nb), $C` Lev`);
     }
-    if ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) {
+    if (Flying()) {
         $c.strcpy(nb = eos(nb), $C` Fly`);
     }
     if (u.usteed) {
@@ -532,7 +534,7 @@ export function describe_level(buf, dflgs) {   // botl.c:441
     const addspace = (dflgs & 1) !== 0 ? 1 : 0;
     let addbranch = (dflgs & 2) !== 0 ? 1 : 0;   /* False: status, True: livelog */
     let ret = 1;
-    if ((svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level)) {
+    if (Is_knox(u.uz)) {
         $c.sprintf(buf, $C`%s`, new $c.Ptr(svd.dungeons[u.uz.dnum].dname, 0));
         addbranch = FALSE;
     } else if (In_quest(u.uz)) {
@@ -623,7 +625,7 @@ export async function weapon_status(outbuf) {   // botl.c:481
                 default:
                     res = await weapon_descr($G.uwep);
                     /* [should this be moved into weapon_descr()?] */
-                    if (!strncmpi(res, $C`food`, -1) && $G.uwep.otyp === CREAM_PIE) {
+                    if (!strcmpi(res, $C`food`) && $G.uwep.otyp === CREAM_PIE) {
                         res = $C`pie`;
                     }
                     break;
@@ -771,10 +773,10 @@ async function bot_via_windowport() {   // botl.c:962
         i = 0;
     }
     gb.blstats[idx][BL.HP].rawval.a_int = i;
-    gb.blstats[idx][BL.HP].a.a_int = i < 9999 ? i : 9999;
+    gb.blstats[idx][BL.HP].a.a_int = min(i, 9999);
     i = Upolyd() ? u.mhmax : u.uhpmax;
     gb.blstats[idx][BL.HPMAX].rawval.a_int = i;
-    gb.blstats[idx][BL.HPMAX].a.a_int = i < 9999 ? i : 9999;
+    gb.blstats[idx][BL.HPMAX].a.a_int = min(i, 9999);
     /*  Dungeon level. */
     describe_level(gb.blstats[idx][BL.LEVELDESC].val, 1);
     gv.valset[BL.LEVELDESC] = TRUE;   /* indicate val already set */
@@ -783,7 +785,7 @@ async function bot_via_windowport() {   // botl.c:962
         money = 0;   /* ought to issue impossible() and then discard gold */
     }
     gb.blstats[idx][BL.GOLD].rawval.a_long = money;
-    gb.blstats[idx][BL.GOLD].a.a_long = money < 999999 ? money : 999999;
+    gb.blstats[idx][BL.GOLD].a.a_long = min(money, 999999);
     /*
      * The tty port needs to display the current symbol for gold
      * as a field header, so to accommodate that we pass gold with
@@ -803,9 +805,9 @@ async function bot_via_windowport() {   // botl.c:962
     gv.valset[BL.GOLD] = TRUE;   /* indicate val already set */
     /* Power (magical energy) */
     gb.blstats[idx][BL.ENE].rawval.a_int = u.uen;
-    gb.blstats[idx][BL.ENE].a.a_int = u.uen < 9999 ? u.uen : 9999;
+    gb.blstats[idx][BL.ENE].a.a_int = min(u.uen, 9999);
     gb.blstats[idx][BL.ENEMAX].rawval.a_int = u.uenmax;
-    gb.blstats[idx][BL.ENEMAX].a.a_int = u.uenmax < 9999 ? u.uenmax : 9999;
+    gb.blstats[idx][BL.ENEMAX].a.a_int = min(u.uenmax, 9999);
     /* Armor class */
     gb.blstats[idx][BL.AC].a.a_int = u.uac;
     /* Monster level (if Upolyd) */
@@ -1086,7 +1088,7 @@ function cond_cmp(vptr1, vptr2) {   // botl.c:1333
         return c1 - c2 | 0;
     }
     /* tie-breaker - visible alpha by name */
-    return strncmpi(condtests[indx1].useroption, condtests[indx2].useroption, -1);
+    return strcmpi(condtests[indx1].useroption, condtests[indx2].useroption);
 }
 /* qsort callback routine for alphabetical sorting of index */
 /**
@@ -1097,7 +1099,7 @@ function cond_cmp(vptr1, vptr2) {   // botl.c:1333
 function menualpha_cmp(vptr1, vptr2) {   // botl.c:1346
     const indx1 = $c.asArr(vptr1, Int32Array).get(0);
     const indx2 = $c.asArr(vptr2, Int32Array).get(0);
-    return strncmpi(condtests[indx1].useroption, condtests[indx2].useroption, -1);
+    return strcmpi(condtests[indx1].useroption, condtests[indx2].useroption);
 }
 /**
  * @param {number} negated boolean
@@ -1138,7 +1140,7 @@ export async function cond_menu() {   // botl.c:1376
         for (i = 0; i < CONDITION_COUNT; i = i + 1 | 0) {
             sequence[i] = i;
         }
-        await $c.nh_deterministic_qsort$async(new $c.Ptr(sequence, 0), CONDITION_COUNT, 4, gc.condmenu_sortorder ? cond_cmp : menualpha_cmp);
+        await qsort(new $c.Ptr(sequence, 0), CONDITION_COUNT, 4, gc.condmenu_sortorder ? cond_cmp : menualpha_cmp);
         const tmpwin = await create_nhwindow()(NHW.MENU);
         await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
         any.$copyFrom(cg.zeroany);
@@ -2310,7 +2312,7 @@ function splitsubfields(str, sfarr, maxsf) {   // botl.c:2688
 function is_fld_arrayvalues(str, arr, arrmin, arrmax, retidx) {   // botl.c:2730
     let i = 0;
     for (i = arrmin; i < arrmax; i = i + 1 | 0) {
-        if (!strncmpi(str, arr.get(i), -1)) {
+        if (!strcmpi(str, arr.get(i))) {
             retidx.set(0, i);
             return TRUE;
         }

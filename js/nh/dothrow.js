@@ -14,11 +14,11 @@ import { artifact_hit, is_art, spec_abon } from './artifact.js';
 import { ART } from './artilist.h.js';
 import { change_luck, exercise } from './attrib.js';
 import { A } from './attrib.h.js';
-import { ACURR, ACURRSTR } from './attrib.macros.js';
+import { ACURR, ACURRSTR, STR19 } from './attrib.macros.js';
 import { drag_ball, drop_ball, move_bc } from './ball.js';
 import { cmdq_add_ec, cmdq_add_key, getdir, isok } from './cmd.js';
 import { is_lava, is_moat, is_pool, is_waterwall } from './dbridge.js';
-import { c_common_strings, flags, gb, gc, gh, gi, gk, gm, gn, go, gt, gu, gv, gy, iflags, svc, svd, svk, svl, svq, u } from './decl.js';
+import { c_common_strings, flags, gb, gc, gh, gi, gk, gm, gn, go, gt, gu, gv, gy, iflags, svc, svk, svl, svq, u } from './decl.js';
 import { ARMOR_CLASS, COIN_CLASS, GEM_CLASS, POTION_CLASS, S, SCROLL_CLASS, TOOL_CLASS, VENOM_CLASS, WAND_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { canseemon, flush_screen, glyph_at, map_invisible, newsym, tmp_at } from './display.js';
 import { BACKTRACK, DISP_END, DISP_FLASH, DISP_TETHER, EXPL, GLYPH } from './display.h.js';
@@ -28,15 +28,16 @@ import { Monnam, Some_Monnam, a_monnam, hliquid, mon_nam, pmname, rndmonnam, x_m
 import { hard_helmet } from './do_wear.js';
 import { dogfood, tamedog } from './dog.js';
 import { container_impact_dmg, ghitm, ship_object } from './dokick.js';
-import { ceiling, has_ceiling, on_level, surface, u_on_newpos } from './dungeon.js';
+import { ceiling, has_ceiling, surface, u_on_newpos } from './dungeon.js';
+import { Is_airlevel, Is_waterlevel } from './dungeon.macros.js';
 import { done } from './end.js';
 import { u_wipe_engr } from './engrave.js';
 import { explode, explode_oil } from './explode.js';
 import { FALSE, LARGEST_INT, TRUE } from './global.h.js';
 import { bad_rock, calc_capacity, check_capacity, check_special_room, impact_disturbs_zombies, in_rooms, inv_weight, losehp, may_passwall, nomul, switch_terrain, weight_cap } from './hack.js';
 import { ARM, ARTICLE, AUGMENT_IT, BOLT_LIM, BRK, BRK_KNOWN_OUTCOME, CORPSTAT, CQ_CANNED, CXN, ECMD, EXACT_NAME, EYE, FACE, FOOT, FORCEBUNGLE, GETOBJ, GETOBJ_PROMPT, HAND, HEAD, HMON, HURTLING, KILLED, MM, NO_TRAP_FLAGS, RLOC, SLT_ENCUMBER, STONING, SUPPRESS, SUPPRESS_NAME, THROWN_TETHERED_WEAPON, THROWN_WEAPON } from './hack.h.js';
-import { Maybe_Half_Phys, pline1 } from './hack.macros.js';
-import { dist2, distmin, isqrt, nh_snprintf, ordin, s_suffix, sgn } from './hacklib.js';
+import { Maybe_Half_Phys, min, pline1, rn1 } from './hack.macros.js';
+import { distmin, isqrt, nh_snprintf, ordin, s_suffix, sgn } from './hacklib.js';
 import { addinv, addinv_before, delobj, freeinv, fully_identify_obj, getobj, prinv, sobj_at, stackobj } from './invent.js';
 import { obj_sheds_light } from './light.js';
 import { nhUse } from './lint.macros.js';
@@ -49,7 +50,7 @@ import { minliquid, monnear, seemimic, setmangry, wake_nearto, wakeup } from './
 import { AD, AT } from './monattk.h.js';
 import { can_blnd, dmgtype_fromattack, mon_hates_blessings, poly_when_stoned, pronoun_gender } from './mondata.js';
 import { befriend_with_obj, bigmonst, breathless, eyecount, haseyes, is_animal, is_orc, is_unicorn, nohands, notake, passes_rocks, throws_rocks, touch_petrifies, your_race } from './mondata.macros.js';
-import { M1, M2, MZ, NEUTRAL } from './monflag.h.js';
+import { M2, MZ, NEUTRAL } from './monflag.h.js';
 import { closed_door, set_apparxy } from './monmove.js';
 import { mons } from './monst.js';
 import { M_AP } from './monst.h.js';
@@ -68,7 +69,7 @@ import { Norep, You, You_cant, You_feel, You_hear, Your, impossible, pline, plin
 import { body_part, polymon } from './polyself.js';
 import { make_blinded, potionbreathe, potionhit } from './potion.js';
 import { align_gname } from './pray.js';
-import { CONFUSION, FLYING, HALLUC, HALLUC_RES, I_SPECIAL, STUNNED, W, WWALKING } from './prop.h.js';
+import { CONFUSION, HALLUC, HALLUC_RES, I_SPECIAL, STUNNED, W, WWALKING } from './prop.h.js';
 import { finish_quest } from './quest.js';
 import { is_quest_artifact } from './questpgr.js';
 import { in_out_region, m_in_out_region } from './region.js';
@@ -94,8 +95,8 @@ import { nh_delay_output } from './winprocs.macros.js';
 import { cutworm } from './worm.js';
 import { find_mac, which_armor } from './worn.js';
 import { PRONOUN, TT } from './you.h.js';
-import { Luck, Upolyd, u_at } from './you.macros.js';
-import { Blind, BlindedTimeout, Deaf, Fumbling, Half_gas_damage, Hallucination, Hate_silver, Levitation, Passes_walls, Punished, Stone_resistance, Underwater } from './youprop.macros.js';
+import { Luck, Race_if, Role_if, Upolyd, next2u, u_at } from './you.macros.js';
+import { Blind, BlindedTimeout, Deaf, Flying, Fumbling, Half_gas_damage, Hallucination, Hate_silver, Levitation, Passes_walls, Punished, Stone_resistance, Underwater, Wwalking } from './youprop.macros.js';
 import { bhit, boomhit, hit, miss, obj_resists } from './zap.js';
 
 const gem_accept$nogood = new Int8Array(33);   // static in gem_accept()
@@ -196,7 +197,7 @@ async function throw_obj(obj, shotlimit) {   // dothrow.c:87
             res = ECMD.OK;
             break unsplit_stack$;
         }
-        if (is_art(obj, ART.MJOLLNIR) && ACURR(A.STR) < 125 || obj.otyp === BOULDER && !throws_rocks(gy.youmonst.data)) {
+        if (is_art(obj, ART.MJOLLNIR) && ACURR(A.STR) < STR19(25) || obj.otyp === BOULDER && !throws_rocks(gy.youmonst.data)) {
             await pline($C`It's too heavy.`);
             res = ECMD.TIME;
             break unsplit_stack$;
@@ -233,7 +234,7 @@ async function throw_obj(obj, shotlimit) {   // dothrow.c:87
         if (obj.quan > 1 && (is_ammo(obj) ? matching_launcher(obj, $G.uwep) : obj.oclass === WEAPON_CLASS) && !(u.uprops[CONFUSION].intrinsic || u.uprops[STUNNED].intrinsic)) {
             /* some roles don't get a volley bonus until becoming expert */
             /* poor dexterity also inhibits multishot */
-            weakmultishot = gu.urole.mnum === PM.WIZARD || gu.urole.mnum === PM.CLERIC || gu.urole.mnum === PM.HEALER && skill !== P.KNIFE || gu.urole.mnum === PM.TOURIST && skill !== -P.DART || Fumbling() || ACURR(A.DEX) <= 6 ? 1 : 0;
+            weakmultishot = Role_if(PM.WIZARD) || Role_if(PM.CLERIC) || Role_if(PM.HEALER) && skill !== P.KNIFE || Role_if(PM.TOURIST) && skill !== -P.DART || Fumbling() || ACURR(A.DEX) <= 6 ? 1 : 0;
             /* Bonus if the player is proficient in this weapon... */
             switch (u.weapon_skills[weapon_type(obj)].skill) {
                 case P.EXPERT:
@@ -285,7 +286,7 @@ async function throw_obj(obj, shotlimit) {   // dothrow.c:87
             /* crossbows are slow to load and probably shouldn't allow multiple
                shots at all, but that would result in players never using them;
                instead, high strength is necessary to load and shoot quickly */
-            if (multishot > 1 && skill === -P.CROSSBOW && ammo_and_launcher(obj, $G.uwep) && ACURRSTR() < (gu.urace.mnum === PM.GNOME ? 16 : 18)) {
+            if (multishot > 1 && skill === -P.CROSSBOW && ammo_and_launcher(obj, $G.uwep) && ACURRSTR() < (Race_if(PM.GNOME) ? 16 : 18)) {
                 multishot = rnd(multishot);
             }
             multishot = rnd(multishot);
@@ -381,7 +382,7 @@ async function throw_ok(obj) {   // dothrow.c:317
         return GETOBJ.DOWNPLAY;
     }
     /* to get here, obj is boomerang or is uwep and (alkys or Mjollnir) */
-    if (($c.and64(obj.owornmask, W.WEP) !== 0 && (obj.otyp === AKLYS || obj.oartifact === ART.MJOLLNIR && gu.urole.mnum === PM.VALKYRIE) || obj.otyp === BOOMERANG) && (obj.oartifact !== ART.MJOLLNIR || ACURR(A.STR) >= 125)) {
+    if (AutoReturn(obj, obj.owornmask) && (obj.oartifact !== ART.MJOLLNIR || ACURR(A.STR) >= STR19(25))) {
         return GETOBJ.SUGGEST;
     }
     if (obj.quan === 1 && (obj === $G.uwep || obj === $G.uswapwep && u.twoweap)) {
@@ -527,7 +528,7 @@ export async function dofire() {   // dothrow.c:469
     let shotlimit = Int32Array.of(0), olauncher = null;
     /* AutoReturn() verifies Valkyrie if weapon is Mjollnir, but it relies
        on its caller to make sure hero is strong enough to throw that */
-    const uwep_Throw_and_Return = $G.uwep && ($c.and64($G.uwep.owornmask, W.WEP) !== 0 && ($G.uwep.otyp === AKLYS || $G.uwep.oartifact === ART.MJOLLNIR && gu.urole.mnum === PM.VALKYRIE) || $G.uwep.otyp === BOOMERANG) && ($G.uwep.oartifact !== ART.MJOLLNIR || ACURR(A.STR) >= 125) ? 1 : 0;
+    const uwep_Throw_and_Return = $G.uwep && AutoReturn($G.uwep, $G.uwep.owornmask) && ($G.uwep.oartifact !== ART.MJOLLNIR || ACURR(A.STR) >= STR19(25)) ? 1 : 0;
     let skip_fireassist = FALSE;
     let res = ECMD.OK;
     /*
@@ -930,13 +931,13 @@ export async function hurtle_step(arg, x, y) {   // dothrow.c:773
        has a first-time entry message, or leaving shop with unpaid goods */
     await check_special_room(FALSE);
     if (is_pool(x, y) && !u.uinwater) {
-        if (is_waterwall(x, y) || !(Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked || (u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)))) {
+        if (is_waterwall(x, y) || !(Levitation() || Flying() || Wwalking())) {
             /* couldn't move while hurtling; allow movement now so that
                drown() will give a chance to crawl out of pool and survive */
             gm.multi = 0;
             await drown();
             return FALSE;
-        } else if (!((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && !stopping_short) {
+        } else if (!Is_waterlevel(u.uz) && !stopping_short) {
             await Norep($C`You move over %s.`, await an(is_moat(x, y) ? $C`moat` : $C`pool`));
         }
     } else if (is_lava(x, y) && !stopping_short) {
@@ -1162,7 +1163,7 @@ export async function mhurtle(mon, dx, dy, range) {   // dothrow.c:1130
         return;   /* paranoia */
     }
     /* don't let grid bugs be hurtled diagonally */
-    if (dx && dy && mon.data.pmidx === PM.GRID_BUG) {
+    if (dx && dy && (mon.data.pmidx === PM.GRID_BUG)) {
         return;
     }
     /* undetected monster can be moved by your strike */
@@ -1362,7 +1363,7 @@ async function toss_up(obj, hitsroof) {   // dothrow.c:1256
                         artimsg = FALSE;
                         dmg[0] = await dmgval(obj, gy.youmonst);
                         if (obj.oartifact && !harmless) {   /* need a fake die roll here; rn1(18,2) avoids 1 and 20 */
-                            artimsg = await artifact_hit(null, gy.youmonst, obj, new $c.Ptr(dmg, 0), rn2(18) + 2 | 0);
+                            artimsg = await artifact_hit(null, gy.youmonst, obj, new $c.Ptr(dmg, 0), rn1(18, 2));
                         }
                         if (!dmg[0]) {
                             /* probably wasn't a weapon; base damage on weight */
@@ -1573,7 +1574,7 @@ export async function throwit(obj$in, wep_mask, twoweap, oldslot) {   // dothrow
             impaired = TRUE;
         }
     }
-    if ((u.dx || u.dy || u.dz < 1) && calc_capacity(obj[0].owt | 0) > SLT_ENCUMBER && (Upolyd() ? u.mh < 5 && u.mh !== u.mhmax : u.uhp < 10 && u.uhp !== u.uhpmax) && obj[0].owt > Math.imul(Upolyd() ? u.mh : u.uhp, 2) >>> 0 && !((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level))) {
+    if ((u.dx || u.dy || u.dz < 1) && calc_capacity(obj[0].owt | 0) > SLT_ENCUMBER && (Upolyd() ? u.mh < 5 && u.mh !== u.mhmax : u.uhp < 10 && u.uhp !== u.uhpmax) && obj[0].owt > Math.imul(Upolyd() ? u.mh : u.uhp, 2) >>> 0 && !Is_airlevel(u.uz)) {
         await You($C`have so little stamina, %s drops from your grasp.`, await the(await xname(obj[0])));
         await exercise(A.CON, FALSE);
         $t3 = u.dy = 0, u.dx = $t3;
@@ -1581,7 +1582,7 @@ export async function throwit(obj$in, wep_mask, twoweap, oldslot) {   // dothrow
     }
     gt.thrownobj = obj[0];
     gt.thrownobj.how_lost = (LOST.THROWN) & 7;
-    iflags.returning_missile = $c.and64(wep_mask, W.WEP) !== 0 && (obj[0].otyp === AKLYS || obj[0].oartifact === ART.MJOLLNIR && gu.urole.mnum === PM.VALKYRIE) || obj[0].otyp === BOOMERANG ? obj[0] : null;
+    iflags.returning_missile = AutoReturn(obj[0], wep_mask) ? obj[0] : null;
     /* NOTE:  No early returns after this point or returning_missile
        will be left with a stale pointer. */
     if (u.uswallow) {
@@ -1613,7 +1614,7 @@ export async function throwit(obj$in, wep_mask, twoweap, oldslot) {   // dothrow
         throwit_return(TRUE);
         return;
     } else if (obj[0].otyp === BOOMERANG && !Underwater()) {
-        if ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || Levitation()) {
+        if (Is_airlevel(u.uz) || Levitation()) {
             await hurtle(-u.dx | 0, -u.dy | 0, 1, TRUE);
         }
         mon = await boomhit(obj[0], u.dx, u.dy);
@@ -1661,7 +1662,7 @@ export async function throwit(obj$in, wep_mask, twoweap, oldslot) {   // dothrow
                 await pline($C`You aren't wielding %s, so you throw your %s by %s.`, await an(skill_name(weapon_type(obj[0]))), await weapon_descr(obj[0]), await body_part(HAND));
             }
         }
-        if ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || Levitation()) {
+        if (Is_airlevel(u.uz) || Levitation()) {
             /* action, reaction... */
             urange = urange - range | 0;
             if (urange < 1) {
@@ -1690,7 +1691,7 @@ export async function throwit(obj$in, wep_mask, twoweap, oldslot) {   // dothrow
         mon = await bhit(u.dx, u.dy, range, tethered_weapon ? THROWN_TETHERED_WEAPON : THROWN_WEAPON, null, null, new $c.Ptr(obj, 0));
         gt.thrownobj = obj[0];   /* obj may be null now */
         /* have to do this after bhit() so u.ux & u.uy are correct */
-        if ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || Levitation()) {
+        if (Is_airlevel(u.uz) || Levitation()) {
             await hurtle(-u.dx | 0, -u.dy | 0, urange, TRUE);
         }
         if (!obj[0]) {
@@ -2153,9 +2154,9 @@ export async function thitmonst(mon, obj) {   // dothrow.c:2011
                  * especially their own special types of bow.
                  * Polymorphing won't make you a bow expert.
                  */
-                if ((gu.urace.mnum === PM.ELF || gu.urole.mnum === PM.SAMURAI) && (!Upolyd() || your_race(gy.youmonst.data)) && objects[$G.uwep.otyp].oc_subtyp === P.BOW) {
+                if ((Race_if(PM.ELF) || Role_if(PM.SAMURAI)) && (!Upolyd() || your_race(gy.youmonst.data)) && objects[$G.uwep.otyp].oc_subtyp === P.BOW) {
                     tmp = tmp + 1 | 0;
-                    if (gu.urace.mnum === PM.ELF && $G.uwep.otyp === ELVEN_BOW || gu.urole.mnum === PM.SAMURAI && $G.uwep.otyp === YUMI) {
+                    if (Race_if(PM.ELF) && $G.uwep.otyp === ELVEN_BOW || Role_if(PM.SAMURAI) && $G.uwep.otyp === YUMI) {
                         tmp = tmp + 1 | 0;
                     }
                 }
@@ -2473,7 +2474,7 @@ export async function breakobj(obj, x, y, hero_caused, from_invent) {   // dothr
             obj.in_use = 1;   /* in case it's fatal */
             if (obj.otyp === POT_OIL && obj.lamplit) {
                 await explode_oil(obj, x, y);
-            } else if (dist2(x, y, u.ux, u.uy) <= 2) {
+            } else if (next2u(x, y)) {
                 if (!breathless(gy.youmonst.data) || haseyes(gy.youmonst.data)) {
                     /* wet towel protects both eyes and breathing */
                     if (obj.otyp !== POT_WATER && !Half_gas_damage()) {
@@ -2499,7 +2500,7 @@ export async function breakobj(obj, x, y, hero_caused, from_invent) {   // dothr
         case EGG:
             /* breaking your own eggs is bad luck */
             if (hero_caused && obj.spe && ismnum(obj.corpsenm)) {
-                change_luck($c.i8($c.neg64(obj.quan < 5 ? obj.quan : 5)));
+                change_luck($c.i8($c.neg64(min(obj.quan, 5))));
             }
             if (obj.corpsenm === PM.PYROLISK) {
                 explosion = TRUE;
@@ -2658,7 +2659,7 @@ async function throw_gold(obj$in) {   // dothrow.c:2656
         return ECMD.TIME;
     }
     if (u.dz) {
-        if (u.dz < 0 && !((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) && !Underwater() && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) {
+        if (u.dz < 0 && !Is_airlevel(u.uz) && !Underwater() && !Is_waterlevel(u.uz)) {
             await pline_The($C`gold hits the %s, then falls back on top of your %s.`, ceiling(u.ux, u.uy), await body_part(HEAD));
             /* some self damage? */
             if ($G.uarmh) {
@@ -2705,6 +2706,9 @@ async function throw_gold(obj$in) {   // dothrow.c:2656
     await stackobj(obj[0]);
     await newsym(gb.bhitpos.x, gb.bhitpos.y);
     return ECMD.TIME;
+}
+function AutoReturn(o, wmsk) {
+    return $c.and64(wmsk, W.WEP) !== 0 && (o.otyp === AKLYS || o.oartifact === ART.MJOLLNIR && gu.urole.mnum === PM.VALKYRIE) || o.otyp === BOOMERANG ? 1 : 0;
 }
 function special_obj_hits_leader(obj, mon) {
     return (is_quest_artifact(obj) || objects[obj.otyp].oc_unique || obj.otyp === FAKE_AMULET_OF_YENDOR && !obj.known) && mon.m_id === svq.quest_status.leader_m_id ? 1 : 0;

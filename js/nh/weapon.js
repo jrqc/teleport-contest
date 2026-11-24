@@ -15,12 +15,11 @@ import { $G } from './globals.js';
 import { artifact_light, is_art, shade_glare, spec_abon, spec_dbon, touch_artifact } from './artifact.js';
 import { ART } from './artilist.h.js';
 import { A } from './attrib.h.js';
-import { ACURR } from './attrib.macros.js';
-import { yn_function } from './cmd.js';
+import { ACURR, STR18 } from './attrib.macros.js';
 import { NO_COLOR } from './color.h.js';
 import { TIP } from './context.h.js';
 import { is_pool } from './dbridge.js';
-import { cg, gi, gp, gu, gy, hands_obj, iflags, svc, u, ynchars } from './decl.js';
+import { cg, gi, gp, gu, gy, hands_obj, iflags, svc, u } from './decl.js';
 import { BALL_CLASS, CHAIN_CLASS, GEM_CLASS, S, TOOL_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { canseemon, newsym, nul_glyphinfo } from './display.js';
 import { flooreffects } from './do.js';
@@ -31,7 +30,7 @@ import { wizard } from './flag.macros.js';
 import { FALSE, MAXULEV, TRUE } from './global.h.js';
 import { handle_tip } from './hack.js';
 import { ECMD, HAND } from './hack.h.js';
-import { plur } from './hack.macros.js';
+import { max, min, plur, y_n } from './hack.macros.js';
 import { dist2, eos, nh_snprintf, s_suffix } from './hacklib.js';
 import { stackobj, update_inventory } from './invent.js';
 import { arti_light_description } from './light.js';
@@ -58,7 +57,7 @@ import { W } from './prop.h.js';
 import { d, rn2, rnd } from './rnd.js';
 import { genders } from './role.js';
 import { P, P_FIRST_H_TO_H, P_FIRST_SPELL, P_FIRST_WEAPON, P_LAST_H_TO_H, P_LAST_SPELL, P_LAST_WEAPON, P_SKILL_LIMIT } from './skills.h.js';
-import { P_RESTRICTED } from './skills.macros.js';
+import { P_RESTRICTED, martial_bonus, practice_needed_to_advance } from './skills.macros.js';
 import { skill_based_spellbook_id, spell_skilltype } from './spell.js';
 import { Strlen_ } from './strutil.js';
 import { begin_burn, end_burn } from './timeout.js';
@@ -70,7 +69,7 @@ import { create_nhwindow, destroy_nhwindow, end_menu, start_menu } from './winpr
 import { ATR, MENU, NHW, PICK } from './wintype.h.js';
 import { bypass_obj, which_armor } from './worn.js';
 import { PRONOUN } from './you.h.js';
-import { Upolyd } from './you.macros.js';
+import { Role_if, Upolyd } from './you.macros.js';
 
 const PN_BARE_HANDED = (-1);
 const PN_TWO_WEAPONS = (-2);
@@ -124,7 +123,7 @@ async function give_may_advance_msg(skill) {   // weapon.c:76
  */
 export async function weapon_descr(obj) {   // weapon.c:90
     const skill = weapon_type(obj);
-    let descr = skill_names_indices[skill] > 0 ? obj_descr[objects[skill_names_indices[skill]].oc_name_idx].oc_name : skill === P.BARE_HANDED_COMBAT ? barehands_or_martial[gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK ? 1 : 0] : odd_skill_names[-skill_names_indices[skill] | 0];
+    let descr = P_NAME(skill);
     /* assorted special cases */
     switch (skill) {
         case P.NONE:
@@ -936,9 +935,9 @@ export async function abon() {   // weapon.c:950
         sbon = -1;
     } else if (str < 17) {
         sbon = 0;
-    } else if (str < 68) {
+    } else if (str < STR18(50)) {
         sbon = 1;   /* up to 18/49 */
-    } else if (str < 118) {
+    } else if (str < STR18(100)) {
         sbon = 2;
     } else {
         sbon = 3;
@@ -975,11 +974,11 @@ export function dbon() {   // weapon.c:993
         return 1;
     } else if (str === 18) {
         return 2;   /* up to 18 */
-    } else if (str <= 93) {
+    } else if (str <= STR18(75)) {
         return 3;   /* up to 18/75 */
-    } else if (str <= 108) {
+    } else if (str <= STR18(90)) {
         return 4;   /* up to 18/90 */
-    } else if (str < 118) {
+    } else if (str < STR18(100)) {
         return 5;   /* up to 18/99 */
     } else {
         return 6;
@@ -993,8 +992,8 @@ export function dbon() {   // weapon.c:993
  */
 async function finish_towel_change(obj, newspe) {   // weapon.c:1020
     /* towel wetness is always between 0 (dry) and 7, inclusive */
-    newspe = newspe < 7 ? newspe : 7;
-    obj.spe = $c.i8(newspe > 0 ? newspe : 0);
+    newspe = min(newspe, 7);
+    obj.spe = $c.i8(max(newspe, 0));
     /* if hero is wielding this towel, don't give "you begin bashing with
        your [wet] towel" message if it's wet, do give one if it's dry */
     if (obj === $G.uwep) {
@@ -1094,7 +1093,7 @@ export function skill_level_name(skill, buf) {   // weapon.c:1092
  * @returns {$c.Ptr | null} const char *
  */
 export function skill_name(skill) {   // weapon.c:1125
-    return skill_names_indices[skill] > 0 ? obj_descr[objects[skill_names_indices[skill]].oc_name_idx].oc_name : skill === P.BARE_HANDED_COMBAT ? barehands_or_martial[gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK ? 1 : 0] : odd_skill_names[-skill_names_indices[skill] | 0];
+    return P_NAME(skill);
 }
 /* return the # of slots required to advance the skill */
 /**
@@ -1133,7 +1132,7 @@ export function can_advance(skill, speedy) {   // weapon.c:1156
     if (wizard() && speedy) {
         return TRUE;
     }
-    return u.weapon_skills[skill].advance >= Math.imul(Math.imul(u.weapon_skills[skill].skill, u.weapon_skills[skill].skill), 20) && u.weapon_slots >= slots_required(skill) ? 1 : 0;
+    return u.weapon_skills[skill].advance >= practice_needed_to_advance(skill) && u.weapon_slots >= slots_required(skill) ? 1 : 0;
 }
 /* return true if this skill could be advanced if more slots were available */
 /**
@@ -1144,7 +1143,7 @@ function could_advance(skill) {   // weapon.c:1173
     if (P_RESTRICTED(skill) || u.weapon_skills[skill].skill >= u.weapon_skills[skill].max_skill || u.skills_advanced >= P_SKILL_LIMIT) {
         return FALSE;
     }
-    return u.weapon_skills[skill].advance >= Math.imul(Math.imul(u.weapon_skills[skill].skill, u.weapon_skills[skill].skill), 20) ? 1 : 0;
+    return u.weapon_skills[skill].advance >= practice_needed_to_advance(skill) ? 1 : 0;
 }
 /* return true if this skill has reached its maximum and there's been enough
    practice to become eligible for the next step if that had been possible */
@@ -1156,7 +1155,7 @@ function peaked_skill(skill) {   // weapon.c:1187
     if (P_RESTRICTED(skill)) {
         return FALSE;
     }
-    return u.weapon_skills[skill].skill >= u.weapon_skills[skill].max_skill && u.weapon_skills[skill].advance >= Math.imul(Math.imul(u.weapon_skills[skill].skill, u.weapon_skills[skill].skill), 20) ? 1 : 0;
+    return u.weapon_skills[skill].skill >= u.weapon_skills[skill].max_skill && u.weapon_skills[skill].advance >= practice_needed_to_advance(skill) ? 1 : 0;
 }
 /**
  * @param {number} skill int
@@ -1168,7 +1167,7 @@ async function skill_advance(skill) {   // weapon.c:1198
     u.weapon_skills[skill].skill = $c.i16(u.weapon_skills[skill].skill + 1);
     u.skill_record[($t2 = u.skills_advanced, u.skills_advanced = $t2 + 1 | 0, $t2)] = $c.i16(skill);
     /* subtly change the advance message to indicate no more advancement */
-    await You($C`are now %s skilled in %s.`, u.weapon_skills[skill].skill >= u.weapon_skills[skill].max_skill ? $C`most` : $C`more`, skill_names_indices[skill] > 0 ? obj_descr[objects[skill_names_indices[skill]].oc_name_idx].oc_name : skill === P.BARE_HANDED_COMBAT ? barehands_or_martial[gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK ? 1 : 0] : odd_skill_names[-skill_names_indices[skill] | 0]);
+    await You($C`are now %s skilled in %s.`, u.weapon_skills[skill].skill >= u.weapon_skills[skill].max_skill ? $C`most` : $C`more`, P_NAME(skill));
     /* wizards discover spellbook IDs depending on spell 'school' skill limits;
        this allows them to successfully write books for unknown spells without
        the Luck bias they used to have over other roles */
@@ -1279,7 +1278,7 @@ export async function enhance_weapon_skill() {   // weapon.c:1329
     let speedy = FALSE;
     /* player knows about #enhance, don't show tip anymore */
     svc.context.tips = $c.oru64(svc.context.tips, 1 << TIP.ENHANCE);
-    if (wizard() && await yn_function($C`Advance skills without practice?`, new $c.Ptr(ynchars, 0), 110, TRUE) === 121) {
+    if (wizard() && await y_n($C`Advance skills without practice?`) === 121) {
         speedy = TRUE;
     }
     do {
@@ -1438,7 +1437,7 @@ export async function drain_weapon_skill(n) {   // weapon.c:1476
             /* refund slots used for skill */
             $t1 = slots_required(skill), u.weapon_slots = u.weapon_slots + $t1 | 0;
             /* drain skill training to a value appropriate for new level */
-            const curradv = Math.imul(Math.imul(u.weapon_skills[skill].skill, u.weapon_skills[skill].skill), 20);
+            const curradv = practice_needed_to_advance(skill);
             const prevadv = Math.imul(Math.imul(u.weapon_skills[skill].skill - 1, u.weapon_skills[skill].skill - 1), 20);
             if (u.weapon_skills[skill].advance >= curradv) {
                 $t2 = $c.u16(prevadv + rn2(curradv - prevadv | 0) | 0), u.weapon_skills[skill].advance = $t2;
@@ -1447,7 +1446,7 @@ export async function drain_weapon_skill(n) {   // weapon.c:1476
     }
     for (skill = 0; skill < P.NUM_SKILLS; skill = skill + 1 | 0) {
         if (tmpskills[skill]) {
-            await You($C`forget %syour training in %s.`, u.weapon_skills[skill].skill >= P.BASIC ? $C`some of ` : $C``, skill_names_indices[skill] > 0 ? obj_descr[objects[skill_names_indices[skill]].oc_name_idx].oc_name : skill === P.BARE_HANDED_COMBAT ? barehands_or_martial[gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK ? 1 : 0] : odd_skill_names[-skill_names_indices[skill] | 0]);
+            await You($C`forget %syour training in %s.`, u.weapon_skills[skill].skill >= P.BASIC ? $C`some of ` : $C``, P_NAME(skill));
         }
     }
 }
@@ -1545,8 +1544,8 @@ export async function weapon_hit_bonus(weapon) {   // weapon.c:1545
          * grand:  +3   +7
          */
         bonus = u.weapon_skills[type].skill;
-        bonus = (bonus > P.UNSKILLED ? bonus : P.UNSKILLED) - 1 | 0;   /* unskilled => 0 */
-        bonus = $c.div32(Math.imul(bonus + 2 | 0, gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK ? 2 : 1), 2);
+        bonus = max(bonus, P.UNSKILLED) - 1 | 0;   /* unskilled => 0 */
+        bonus = $c.div32(Math.imul(bonus + 2 | 0, martial_bonus() ? 2 : 1), 2);
     }
     /* KMH -- It's harder to hit while you are riding */
     if (u.usteed) {
@@ -1637,8 +1636,8 @@ export async function weapon_dam_bonus(weapon) {   // weapon.c:1644
          * grand:  +3   +9
          */
         bonus = u.weapon_skills[type].skill;
-        bonus = (bonus > P.UNSKILLED ? bonus : P.UNSKILLED) - 1 | 0;   /* unskilled => 0 */
-        bonus = $c.div32(Math.imul(bonus + 1 | 0, gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK ? 3 : 1), 2);
+        bonus = max(bonus, P.UNSKILLED) - 1 | 0;   /* unskilled => 0 */
+        bonus = $c.div32(Math.imul(bonus + 1 | 0, martial_bonus() ? 3 : 1), 2);
     }
     /* KMH -- Riding gives some thrusting damage */
     if (u.usteed && type !== P.TWO_WEAPON_COMBAT) {
@@ -1690,11 +1689,11 @@ export async function skill_init(class_skill) {   // weapon.c:1738
         }
     }
     /* set skills for magic */
-    if (gu.urole.mnum === PM.HEALER || gu.urole.mnum === PM.MONK) {
+    if (Role_if(PM.HEALER) || Role_if(PM.MONK)) {
         u.weapon_skills[P.HEALING_SPELL].skill = P.BASIC;
-    } else if (gu.urole.mnum === PM.CLERIC) {
+    } else if (Role_if(PM.CLERIC)) {
         u.weapon_skills[P.CLERIC_SPELL].skill = P.BASIC;
-    } else if (gu.urole.mnum === PM.WIZARD) {
+    } else if (Role_if(PM.WIZARD)) {
         u.weapon_skills[P.ATTACK_SPELL].skill = P.BASIC;
         u.weapon_skills[P.ENCHANTMENT_SPELL].skill = P.BASIC;
     }
@@ -1722,7 +1721,7 @@ export async function skill_init(class_skill) {   // weapon.c:1738
     for (skill = 0; skill < P.NUM_SKILLS; skill = skill + 1 | 0) {
         if (!P_RESTRICTED(skill)) {
             if (u.weapon_skills[skill].max_skill < u.weapon_skills[skill].skill) {
-                await impossible($C`skill_init: curr > max: %s`, skill_names_indices[skill] > 0 ? obj_descr[objects[skill_names_indices[skill]].oc_name_idx].oc_name : skill === P.BARE_HANDED_COMBAT ? barehands_or_martial[gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK ? 1 : 0] : odd_skill_names[-skill_names_indices[skill] | 0]);
+                await impossible($C`skill_init: curr > max: %s`, P_NAME(skill));
                 u.weapon_skills[skill].max_skill = u.weapon_skills[skill].skill;
             }
             u.weapon_skills[skill].advance = $c.u16(Math.imul(Math.imul(u.weapon_skills[skill].skill - 1, u.weapon_skills[skill].skill - 1), 20));
@@ -1754,6 +1753,9 @@ export async function setmnotwielded(mon, obj) {   // weapon.c:1814
         MON_NOWEP(mon);
     }
     obj.owornmask = $c.and64(obj.owornmask, ~W.WEP);
+}
+function P_NAME(type) {
+    return skill_names_indices[type] > 0 ? obj_descr[objects[skill_names_indices[type]].oc_name_idx].oc_name : type === P.BARE_HANDED_COMBAT ? barehands_or_martial[gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK ? 1 : 0] : odd_skill_names[-skill_names_indices[type] | 0];
 }
 
 export function $init() {

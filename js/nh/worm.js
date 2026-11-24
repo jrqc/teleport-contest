@@ -14,8 +14,8 @@ import { newsym, show_glyph } from './display.js';
 import { canspotmon, detected_monnum_to_glyph, monnum_to_glyph, petnum_to_glyph } from './display.macros.js';
 import { Monnam, mon_nam } from './do_name.js';
 import { FALSE, MHPMAX, TRUE } from './global.h.js';
-import { max, release_data, update_file } from './hack.macros.js';
-import { dist2, distmin, s_suffix } from './hacklib.js';
+import { distu, max, release_data, rn1, update_file } from './hack.macros.js';
+import { distmin, s_suffix } from './hacklib.js';
 import { clone_mon } from './makemon.js';
 import { has_mcorpsenm } from './mextra.macros.js';
 import { mattacku } from './mhitu.js';
@@ -29,7 +29,8 @@ import { You, impossible, pline } from './pline.js';
 import { HALLUC, HALLUC_RES } from './prop.h.js';
 import { remove_monster } from './rm.macros.js';
 import { d, rn2, rn2_on_display_rng, rnd } from './rnd.js';
-import { sfi_int, sfi_int16, sfi_long, sfo_int, sfo_int16, sfo_long } from './sfbase.js';
+import { Sfi_coordxy, Sfo_coordxy, Sfo_int } from './savefile.macros.js';
+import { sfi_int, sfi_long, sfo_long } from './sfbase.js';
 import { rnd_nextto_goodpos } from './trap.js';
 import { cansee } from './vision.macros.js';
 
@@ -238,10 +239,10 @@ export async function worm_move(worm) {   // worm.c:196
                exceeded by 'moves' on consecutive turns for the worm,
                resulting in an excessively rapid growth cycle */
             const mmove = mcalcmove(worm, FALSE);
-            let incr = rn2(10) + 2 | 0;
+            let incr = rn1(10, 2);
             /* 2..12; after adjusting for long worn
              * speed of 3, effective value is 8..48 */
-            incr = $c.div32(Math.imul(incr, NORMAL_SPEED), mmove > 1 ? mmove : 1);
+            incr = $c.div32(Math.imul(incr, NORMAL_SPEED), max(mmove, 1));
             wgrowtime[wnum] = $c.add64(svm.moves, incr);
         }
         /* increase HP based on number of segments; if it has shrunk, it
@@ -370,7 +371,7 @@ export async function wormhitu(worm) {   // worm.c:344
      *  sharing its location should be skipped.
      */
     for (seg = wtails[wnum]; seg !== wheads[wnum]; seg = seg.nseg) {
-        if (dist2(seg.wx, seg.wy, u.ux, u.uy) < 3) {
+        if (distu(seg.wx, seg.wy) < 3) {
             if (await mattacku(worm)) {
                 return 1;   /* your passive ability killed the worm */
             }
@@ -467,7 +468,7 @@ export async function cutworm(worm, x, y, cuttier) {   // worm.c:373
     new_worm.mcloned = 0;   /* treat second worm as a normal monster */
     /* Devalue the monster level of both halves of the worm.
        Note: m_lev is always at least 3 in order to get this far. */
-    worm.m_lev = $c.u8(worm.m_lev - 2 >>> 0 > 3 ? worm.m_lev - 2 >>> 0 : 3);
+    worm.m_lev = $c.u8(max(worm.m_lev - 2 >>> 0, 3));
     new_worm.m_lev = worm.m_lev;
     /* Calculate the lower-level mhp; use <N>d8 for long worms.
        Can't use newmonhp() here because it would reset m_lev. */
@@ -542,12 +543,12 @@ export async function save_worm(nhfp) {   // worm.c:528
                 count[0] = count[0] + 1 | 0;
             }
             /* Save number of segments */
-            await sfo_int(nhfp, new $c.Ptr(count, 0), $C`worm-segment_count`);
+            await Sfo_int(nhfp, new $c.Ptr(count, 0), $C`worm-segment_count`);
             /* Save segment locations of the monster. */
             if (count[0]) {
                 for (curr = wtails[i]; curr; curr = curr.nseg) {
-                    await sfo_int16(nhfp, new $c.FieldRef(curr, "wx", "i16"), $C`worm-wx`);
-                    await sfo_int16(nhfp, new $c.FieldRef(curr, "wy", "i16"), $C`worm-wy`);
+                    await Sfo_coordxy(nhfp, new $c.FieldRef(curr, "wx", "i16"), $C`worm-wx`);
+                    await Sfo_coordxy(nhfp, new $c.FieldRef(curr, "wy", "i16"), $C`worm-wy`);
                 }
             }
         }
@@ -591,8 +592,8 @@ export async function rest_worm(nhfp) {   // worm.c:577
         for (curr = null, j = 0; j < count[0]; j = j + 1 | 0) {
             const temp = await newseg();
             temp.nseg = null;
-            await sfi_int16(nhfp, new $c.FieldRef(temp, "wx", "i16"), $C`worm-wx`);
-            await sfi_int16(nhfp, new $c.FieldRef(temp, "wy", "i16"), $C`worm-wy`);
+            await Sfi_coordxy(nhfp, new $c.FieldRef(temp, "wx", "i16"), $C`worm-wx`);
+            await Sfi_coordxy(nhfp, new $c.FieldRef(temp, "wy", "i16"), $C`worm-wy`);
             if (curr) {
                 curr.nseg = temp;
             } else {

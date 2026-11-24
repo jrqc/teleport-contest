@@ -23,6 +23,7 @@ import { BUFSZ, PL_NSIZ_PLUS } from './global.h.js';
 import { strcmpi } from './global.macros.js';
 import { inv_cnt } from './hack.js';
 import { BONESPREFIX, COUNTING, FREEING, HACKPREFIX, LEVELPREFIX, NHF, READING, SAVEPREFIX, SCOREPREFIX, SF, SYSCONFPREFIX, TROUBLEPREFIX, WIZKIT_MAX, WRITING, exportascii, historical, invlet_basic } from './hack.h.js';
+import { min } from './hack.macros.js';
 import { c_eos, copynchars, eos, fuzzymatch, mungspaces, nh_snprintf, s_suffix, strip_newline, strncmpi } from './hacklib.js';
 import { addinv, merge_choice } from './invent.js';
 import { nhUse } from './lint.macros.js';
@@ -37,7 +38,7 @@ import { get_plname_from_file } from './restore.js';
 import { rn2 } from './rnd.js';
 import { aligns, genders } from './role.js';
 import { freedynamicdata } from './save.js';
-import { sfo_char } from './sfbase.js';
+import { Sfo_char } from './savefile.macros.js';
 import { bclose, close_check } from './sfstruct.js';
 import { pmatch } from './strutil.js';
 import { clear_symsetentry, proc_symset_line } from './symbols.js';
@@ -48,6 +49,7 @@ import { regularize } from './unixunix.js';
 import { validate, version_string } from './version.js';
 import { create_nhwindow, destroy_nhwindow, display_nhwindow, putmsghistory, putstr, raw_print, wait_synch } from './winprocs.macros.js';
 import { NHW, WIN_ERR } from './wintype.h.js';
+import { Role_if } from './you.macros.js';
 import { wish_history_add } from './zap.js';
 
 const O_BINARY = 0;
@@ -577,7 +579,7 @@ function set_bonesfile_name(file, lev) {   // files.c:769
      */
     $c.strcpy(file, $C`bon`);
     if (sysopt.bones_pools > 1) {
-        let poolnum = sysopt.bones_pools >>> 0 < 10 ? sysopt.bones_pools >>> 0 : 10;
+        let poolnum = min(sysopt.bones_pools >>> 0, 10);
         poolnum = $c.remu32($c.u32($G.ubirthday), poolnum);   /* 0..9 */
         $c.sprintf(eos(file), $C`%u`, poolnum);
     }
@@ -800,7 +802,7 @@ export function set_savefile_name(regularize_it) {   // files.c:1020
  * @returns {Promise<void>}
  */
 export async function save_savefile_name(nhfp) {   // files.c:1128
-    await sfo_char(nhfp, new $c.Ptr(gs.SAVEF, 0), $C`savefile_name`, 54);
+    await Sfo_char(nhfp, new $c.Ptr(gs.SAVEF, 0), $C`savefile_name`, 54);
 }
 /* change pre-existing savefile name to indicate an error savefile */
 export function set_error_savefile() {   // files.c:1137
@@ -1394,7 +1396,7 @@ async function wizkit_addinv(obj) {   // files.c:2537
     }
     /* subset of starting inventory pre-ID */
     await observe_object(obj);
-    if (gu.urole.mnum === PM.CLERIC) {
+    if (Role_if(PM.CLERIC)) {
         obj.bknown = 1;   /* ok to bypass set_bknown() */
     }
     /* same criteria as lift_object()'s check for available inventory slot */
@@ -1479,7 +1481,7 @@ export async function read_sym_file(which_set) {   // files.c:2631
         /* name caller put in symset[which_set].name was not found;
            if it looks like "Default symbols", null it out and return
            success to use the default; otherwise, return failure */
-        if (gs.symset[which_set].name && (fuzzymatch(gs.symset[which_set].name, $C`Default symbols`, $C` -_`, 1) || !strncmpi(gs.symset[which_set].name, $C`default`, -1))) {
+        if (gs.symset[which_set].name && (fuzzymatch(gs.symset[which_set].name, $C`Default symbols`, $C` -_`, 1) || !strcmpi(gs.symset[which_set].name, $C`default`))) {
             clear_symsetentry(which_set, 1);
         }
         await config_error_done();

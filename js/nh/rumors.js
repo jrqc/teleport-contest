@@ -14,7 +14,6 @@ import { disp, gf, gi, gm, go, gt, iflags, program_state, svo, u } from './decl.
 import { Monnam, bogon_codes, bogon_is_pname } from './do_name.js';
 import { is_fainted } from './eat.js';
 import { more_experienced, newexplevel } from './exper.js';
-import { debugcore } from './files.js';
 import { wizard } from './flag.macros.js';
 import { COLNO, FALSE, MD_PAD, TRUE } from './global.h.js';
 import { money_cnt } from './hack.js';
@@ -23,13 +22,15 @@ import { pline1, release_data, update_file, verbalize1, y_n, ynq } from './hack.
 import { eos, lowc, xcrypt } from './hacklib.js';
 import { record_achievement } from './insight.js';
 import { currency } from './invent.js';
+import { explicitdebug } from './lint.macros.js';
 import { G_UNIQ, MALE, NUM_MGENDERS } from './monflag.h.js';
 import { mons } from './monst.js';
 import { the_unique_pm } from './objnam.js';
 import { LOW_PM, NUMMONS } from './permonst.h.js';
 import { There, You, impossible, nhassert_failed, pline } from './pline.js';
 import { rn2, rnd } from './rnd.js';
-import { sfi_ulong, sfi_unsigned, sfo_ulong, sfo_unsigned } from './sfbase.js';
+import { Sfo_unsigned } from './savefile.macros.js';
+import { sfi_ulong, sfi_unsigned, sfo_ulong } from './sfbase.js';
 import { money2mon } from './shk.js';
 import { create_nhwindow, destroy_nhwindow, display_nhwindow, putstr } from './winprocs.macros.js';
 import { NHW, WIN_ERR } from './wintype.h.js';
@@ -555,7 +556,7 @@ async function init_oracles(fp) {   // rumors.c:577
 export async function save_oracles(nhfp) {   // rumors.c:598
     let i = 0;
     if (update_file(nhfp)) {
-        await sfo_unsigned(nhfp, new $c.FieldRef(svo, "oracle_cnt", "u32"), $C`oracle-oracle_cnt`);
+        await Sfo_unsigned(nhfp, new $c.FieldRef(svo, "oracle_cnt", "u32"), $C`oracle-oracle_cnt`);
         if (svo.oracle_cnt) {
             for (i = 0; i >>> 0 < svo.oracle_cnt; i = i + 1 | 0) {
                 await sfo_ulong(nhfp, svo.oracle_loc.add(i), $C`oracle-oracle_loc`);
@@ -859,7 +860,7 @@ async function init_CapMons() {   // rumors.c:829
      * it to trigger a message that passes "Archon" to the() which will
      * then call CapitalMon() which in turn will call init_CapMons().
      */
-    if (wizard() && debugcore($C`CapMons`, FALSE)) {
+    if (wizard() && explicitdebug($C`CapMons`)) {
         const tmpwin = await create_nhwindow()(NHW.TEXT);
         await putstr()(tmpwin, 0, $C`Capitalized monster type names normally preceded by "the":`);
         for (i = 0; i < CapMonSiz - 1 >>> 0; i = i + 1 >>> 0) {

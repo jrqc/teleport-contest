@@ -13,17 +13,16 @@ import { ART } from './artilist.h.js';
 import { adjalign, adjattrib, change_luck, exercise, setuhpmax, uchangealign } from './attrib.js';
 import { A } from './attrib.h.js';
 import { xlev_to_rank } from './botl.js';
-import { isok, paranoid_query, yn_function } from './cmd.js';
+import { isok, paranoid_query } from './cmd.js';
 import { is_pool_or_lava } from './dbridge.js';
-import { c_color_names, c_common_strings, disp, flags, ga, gi, gm, gn, gp, gu, gy, iflags, svb, svd, svk, svl, svm, svt, u, ynchars } from './decl.js';
+import { c_color_names, c_common_strings, disp, flags, ga, gi, gm, gn, gp, gu, gy, iflags, svb, svk, svl, svm, svt, u } from './decl.js';
 import { POTION_CLASS, S, SPBOOK_CLASS, TOOL_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { buried_ball_to_freedom } from './dig.js';
 import { newsym, see_monsters, shieldeff } from './display.js';
 import { dropy, heal_legs } from './do.js';
 import { Monnam, a_monnam, hcolor, mon_nam, oname } from './do_name.js';
 import { Amulet_off, disintegrate_arm, stuck_ring, unchanger } from './do_wear.js';
-import { on_level } from './dungeon.js';
-import { Inhell } from './dungeon.macros.js';
+import { Inhell, Is_astralevel, Is_sanctum } from './dungeon.macros.js';
 import { eaten_stat, floorfood, init_uhunger } from './eat.js';
 import { done } from './end.js';
 import { freehand } from './engrave.js';
@@ -33,6 +32,7 @@ import { ParanoidConfirm, ParanoidPray, wizard } from './flag.macros.js';
 import { FALSE, LARGEST_INT, LL, LL_SPOILER, TRUE } from './global.h.js';
 import { losehp, near_capacity, nomul } from './hack.js';
 import { ASCENDED, BOLT_LIM, CXN, DIED, DISSOLVED, ECMD, ESCAPED, EXT_ENCUMBER, EYE, FOOT, HUNGRY, HVY_ENCUMBER, KILLED, MM, NOTELL, ONAME_GIFT, ONAME_KNOW_ARTI, STOMACH, TELEDS, TELL, WEAK, XKILL } from './hack.h.js';
+import { YN, makeknown, max, min, rn1, y_n } from './hack.macros.js';
 import { dist2, eos, s_suffix, sgn, strncmpi, upstart } from './hacklib.js';
 import { align_str, record_achievement } from './insight.js';
 import { carrying, feel_cockatrice, sobj_at, update_inventory, useup, useupf } from './invent.js';
@@ -42,16 +42,15 @@ import { dlord, summon_minion } from './minion.js';
 import { bless, get_mtraits, mkobj, mksobj, peek_at_iced_corpse_age, place_object, set_bknown, uncurse } from './mkobj.js';
 import { iter_mons, killed, wake_nearby, xkilled } from './mon.js';
 import { AD, AT } from './monattk.h.js';
-import { Resists_Elem, attacktype_fordmg, can_chant, monstseesu, monstunseesu } from './mondata.js';
+import { attacktype_fordmg, can_chant, monstseesu, monstunseesu } from './mondata.js';
 import { eyecount, is_demon, is_human, is_undead, is_unicorn, nohands, throws_rocks, your_race } from './mondata.macros.js';
-import { M1 } from './monflag.h.js';
 import { monflee } from './monmove.js';
 import { mons } from './monst.js';
 import { M_AP, M_SEEN } from './monst.h.js';
-import { M_AP_TYPE, is_vampshifter, ismnum } from './monst.macros.js';
+import { M_AP_TYPE, is_vampshifter, ismnum, resists_disint, resists_elec } from './monst.macros.js';
 import { PM } from './monsters.h.js';
 import { ureflects } from './muse.js';
-import { discover_object, observe_object } from './o_init.js';
+import { observe_object } from './o_init.js';
 import { bimanual, carried, has_omonst, is_weptool, u_wield_art } from './obj.macros.js';
 import { SPBOOK_no_NOVEL } from './objclass.h.js';
 import { obj_descr, objects } from './objects.js';
@@ -63,7 +62,7 @@ import { You, You_feel, You_hear, Your, impossible, livelog_printf, pline, pline
 import { body_part, mbodypart, rehumanize } from './polyself.js';
 import { make_blinded, make_confused, make_deaf, make_glib, make_hallucinated, make_sick, make_slimed, make_stoned, make_stunned, set_itimeout } from './potion.js';
 import { angry_priest, findpriest, p_coaligned, temple_occupied } from './priest.js';
-import { AGGRAVATE_MONSTER, BLINDED, COLD_RES, CONFUSION, DEAF, DISINT_RES, FAST, FIRE_RES, FLYING, FROMOUTSIDE, HALLUC, HALLUC_RES, INTRINSIC, PASSES_WALLS, POISON_RES, PROTECTION, REFLECTING, SEE_INVIS, SHOCK_RES, SLEEP_RES, STEALTH, STRANGLED, STUNNED, TELEPAT, TIMEOUT, W } from './prop.h.js';
+import { AGGRAVATE_MONSTER, BLINDED, COLD_RES, CONFUSION, DEAF, DISINT_RES, FAST, FIRE_RES, FROMOUTSIDE, HALLUC, HALLUC_RES, INTRINSIC, PASSES_WALLS, POISON_RES, PROTECTION, REFLECTING, SEE_INVIS, SHOCK_RES, SLEEP_RES, STEALTH, STRANGLED, STUNNED, TELEPAT, TIMEOUT, W } from './prop.h.js';
 import { punish, unpunish } from './read.js';
 import { region_danger, region_safety } from './region.js';
 import { ALTAR, POOL, ROOM, SCORR, SDOOR } from './rm.h.js';
@@ -86,8 +85,8 @@ import { display_nhwindow } from './winprocs.macros.js';
 import { aggravate } from './wizard.js';
 import { which_armor } from './worn.js';
 import { ACH, LUCKMAX, SICK_ALL, TT } from './you.h.js';
-import { Luck, Upolyd } from './you.macros.js';
-import { Antimagic, Blind, Blinded, BlindedTimeout, Blindfolded_only, Deaf, Disint_resistance, Fixed_abil, Glib, Hallucination, Levitation, Passes_walls, Punished, Reflecting, Shock_resistance, Sick, Slimed, Stoned, Strangled, Unchanging, Wounded_legs } from './youprop.macros.js';
+import { Luck, Role_if, Upolyd } from './you.macros.js';
+import { Antimagic, Blind, Blinded, BlindedTimeout, Blindfolded_only, Deaf, Disint_resistance, Fixed_abil, Flying, Glib, Hallucination, Levitation, Passes_walls, Punished, Reflecting, Shock_resistance, Sick, Slimed, Stoned, Strangled, Unchanging, Wounded_legs } from './youprop.macros.js';
 import { resist, revive } from './zap.js';
 
 const PIOUS = 20;
@@ -283,7 +282,7 @@ async function in_trouble() {   // pray.c:198
     if (stuck_in_wall()) {
         return TROUBLE_STUCK_IN_WALL;
     }
-    if ($G.uarmf && $G.uarmf.otyp === LEVITATION_BOOTS && $G.uarmf.cursed || await stuck_ring($G.uleft, RIN_LEVITATION) || await stuck_ring($G.uright, RIN_LEVITATION)) {
+    if (Cursed_obj($G.uarmf, LEVITATION_BOOTS) || await stuck_ring($G.uleft, RIN_LEVITATION) || await stuck_ring($G.uright, RIN_LEVITATION)) {
         return TROUBLE_CURSED_LEVITATION;
     }
     if (nohands(gy.youmonst.data) || !await freehand()) {
@@ -306,7 +305,7 @@ async function in_trouble() {   // pray.c:198
     if (Punished() || u.utrap && u.utraptype === TT.BURIEDBALL) {
         return TROUBLE_PUNISHED;
     }
-    if ($G.uarmg && $G.uarmg.otyp === GAUNTLETS_OF_FUMBLING && $G.uarmg.cursed || $G.uarmf && $G.uarmf.otyp === FUMBLE_BOOTS && $G.uarmf.cursed) {
+    if (Cursed_obj($G.uarmg, GAUNTLETS_OF_FUMBLING) || Cursed_obj($G.uarmf, FUMBLE_BOOTS)) {
         return TROUBLE_FUMBLING;
     }
     if (await worst_cursed_item()) {
@@ -315,7 +314,7 @@ async function in_trouble() {   // pray.c:198
     if (u.usteed) {
         /* can't voluntarily dismount from a cursed saddle */
         otmp = await which_armor(u.usteed, W.SADDLE);
-        if (otmp && otmp.otyp === SADDLE && otmp.cursed) {
+        if (Cursed_obj(otmp, SADDLE)) {
             return TROUBLE_SADDLE;
         }
     }
@@ -358,7 +357,7 @@ async function worst_cursed_item() {   // pray.c:288
     /* if strained or worse, check for loadstone first */
     if (near_capacity() >= HVY_ENCUMBER) {
         for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
-            if (otmp && otmp.otyp === LOADSTONE && otmp.cursed) {
+            if (Cursed_obj(otmp, LOADSTONE)) {
                 return otmp;
             }
         }
@@ -507,7 +506,7 @@ async function fix_worst_trouble(trouble) {   // pray.c:373
             await You_feel($C`much better.`);
             if (Upolyd()) {
                 maxhp = u.mhmax + rnd(5) | 0;
-                setuhpmax(maxhp > 6 ? maxhp : 6, FALSE);   /* acts as setmhmax() */
+                setuhpmax(max(maxhp, 6), FALSE);   /* acts as setmhmax() */
                 u.mh = u.mhmax;
             }
             maxhp = u.uhpmax;
@@ -515,7 +514,7 @@ async function fix_worst_trouble(trouble) {   // pray.c:373
                 maxhp = maxhp + rnd(5) | 0;
             }
             /* True: update u.uhpmax even if currently poly'd */
-            setuhpmax(maxhp > 6 ? maxhp : 6, TRUE);
+            setuhpmax(max(maxhp, 6), TRUE);
             u.uhp = u.uhpmax;
             /* setuhpmax() will do this when u.uhp is higher
              * than u.uhpmax; prayer also does this if lower */
@@ -561,7 +560,7 @@ async function fix_worst_trouble(trouble) {   // pray.c:373
             }
             break;
         case TROUBLE_CURSED_LEVITATION:
-            if ($G.uarmf && $G.uarmf.otyp === LEVITATION_BOOTS && $G.uarmf.cursed) {
+            if (Cursed_obj($G.uarmf, LEVITATION_BOOTS)) {
                 otmp = $G.uarmf;
             } else if ((otmp = await stuck_ring($G.uleft, RIN_LEVITATION)) !== null) {
                 if (otmp === $G.uleft) {
@@ -612,9 +611,9 @@ async function fix_worst_trouble(trouble) {   // pray.c:373
             }
             break;
         case TROUBLE_FUMBLING:
-            if ($G.uarmg && $G.uarmg.otyp === GAUNTLETS_OF_FUMBLING && $G.uarmg.cursed) {
+            if (Cursed_obj($G.uarmg, GAUNTLETS_OF_FUMBLING)) {
                 otmp = $G.uarmg;
-            } else if ($G.uarmf && $G.uarmf.otyp === FUMBLE_BOOTS && $G.uarmf.cursed) {
+            } else if (Cursed_obj($G.uarmf, FUMBLE_BOOTS)) {
                 otmp = $G.uarmf;
             }
             await fix_curse_trouble(otmp, what);
@@ -706,7 +705,7 @@ async function god_zaps_you(resp_god) {   // pray.c:610
     if (u.uswallow) {
         await pline($C`Suddenly a bolt of lightning comes down at you from the heavens!`);
         await pline($C`It strikes %s!`, await mon_nam(u.ustuck));
-        if (!await Resists_Elem(u.ustuck, SHOCK_RES)) {
+        if (!await resists_elec(u.ustuck)) {
             await pline($C`%s fries to a crisp!`, await Monnam(u.ustuck));
             /* Yup, you get experience.  It takes guts to successfully
              * pull off this trick on your god, anyway.
@@ -740,7 +739,7 @@ async function god_zaps_you(resp_god) {   // pray.c:610
     await pline($C`%s is not deterred...`, await align_gname(resp_god));
     if (u.uswallow) {
         await pline($C`A wide-angle disintegration beam aimed at you hits %s!`, await mon_nam(u.ustuck));
-        if (!await Resists_Elem(u.ustuck, DISINT_RES)) {
+        if (!await resists_disint(u.ustuck)) {
             await pline($C`%s disintegrates into a pile of dust!`, await Monnam(u.ustuck));
             await xkilled(u.ustuck, XKILL.NOMSG | XKILL.NOCORPSE | XKILL.NOCONDUCT);
         } else {
@@ -771,7 +770,7 @@ async function god_zaps_you(resp_god) {   // pray.c:610
             await godvoice(resp_god, $C`I believe it not!`);
             monstseesu(M_SEEN.DISINT);
         }
-        if ((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level) || (svd.dungeon_topology.d_sanctum_level.dlevel || svd.dungeon_topology.d_sanctum_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_sanctum_level)) {
+        if (Is_astralevel(u.uz) || Is_sanctum(u.uz)) {
             /* one more try for high altars */
             await verbalize($C`Thou cannot escape my wrath, mortal!`);
             await summon_minion(resp_god, FALSE);
@@ -847,7 +846,7 @@ async function angrygods(resp_god) {   // pray.c:704
         case 7:
         case 8:
             await godvoice(resp_god, null);
-            await verbalize($C`Thou durst %s me?`, svl.level.locations[u.ux][u.uy].typ === ALTAR && ((svl.level.locations[u.ux][u.uy].flags & AM.MASK & AM.MASK) === 0 ? A.NONE : (svl.level.locations[u.ux][u.uy].flags & AM.MASK & AM.MASK) === AM.LAWFUL ? A.LAWFUL : (svl.level.locations[u.ux][u.uy].flags & AM.MASK & AM.MASK) - 2) !== resp_god ? $C`scorn` : $C`call upon`);
+            await verbalize($C`Thou durst %s me?`, svl.level.locations[u.ux][u.uy].typ === ALTAR && a_align(u.ux, u.uy) !== resp_god ? $C`scorn` : $C`call upon`);
             /* [why isn't this using verbalize()?] */
             await pline($C`"Then die, %s!"`, gy.youmonst.data.mlet === S.HUMAN ? $C`mortal` : $C`creature`);
             await summon_minion(resp_god, FALSE);
@@ -895,9 +894,9 @@ async function gcrownu() {   // pray.c:805
     let class_gift = STRANGE_OBJECT;
     /* 3.3.[01] had this in the A_NEUTRAL case,
        preventing chaotic wizards from receiving a spellbook */
-    if (gu.urole.mnum === PM.WIZARD && !u_wield_art(ART.VORPAL_BLADE) && !u_wield_art(ART.STORMBRINGER) && !carrying(SPE_FINGER_OF_DEATH)) {
+    if (Role_if(PM.WIZARD) && !u_wield_art(ART.VORPAL_BLADE) && !u_wield_art(ART.STORMBRINGER) && !carrying(SPE_FINGER_OF_DEATH)) {
         class_gift = SPE_FINGER_OF_DEATH;
-    } else if (gu.urole.mnum === PM.MONK && (!$G.uwep || !$G.uwep.oartifact) && !carrying(SPE_RESTORE_ABILITY)) {
+    } else if (Role_if(PM.MONK) && (!$G.uwep || !$G.uwep.oartifact) && !carrying(SPE_RESTORE_ABILITY)) {
         /* monks rarely wield a weapon */
         class_gift = SPE_RESTORE_ABILITY;
     }
@@ -1097,7 +1096,7 @@ async function give_spell() {   // pray.c:999
            be given again; small chance to arbitrarily discover
            some other book type without having to read it first */
         if (otmp.otyp === SPE_BLANK_PAPER || !rn2(100)) {
-            await discover_object(otmp.otyp, TRUE, TRUE, TRUE);
+            await makeknown(otmp.otyp);
         }
         await bless(otmp);
         await at_your_feet(upstart(await ansimpleoname(otmp)));
@@ -1159,12 +1158,12 @@ async function pleased(g_align) {   // pray.c:1071
         const prayer_luck = u.uluck + u.moreluck > -1 ? u.uluck + u.moreluck : -1;   /* => (prayer_luck + 2 > 0) */
         let action = rn2(prayer_luck + (svl.level.locations[u.ux][u.uy].typ === ALTAR ? 3 + ((svl.level.locations[u.ux][u.uy].flags & AM.SHRINE) !== 0 ? 1 : 0) : 2) | 0) + 1 | 0;
         if (!(svl.level.locations[u.ux][u.uy].typ === ALTAR)) {
-            action = action < 3 ? action : 3;
+            action = min(action, 3);
         }
         if (u.ualign.record < STRIDENT) {
             action = u.ualign.record > 0 || !rnl(2) ? 1 : 0;
         }
-        switch (action < 5 ? action : 5) {
+        switch (min(action, 5)) {
             case 5:
                 pat_on_head = 1;
             case 4:
@@ -1348,7 +1347,7 @@ async function pleased(g_align) {   // pray.c:1071
                         if (!$c.and64(u.uprops[PROTECTION].intrinsic, INTRINSIC)) {
                             u.uprops[PROTECTION].intrinsic = $c.or64(u.uprops[PROTECTION].intrinsic, FROMOUTSIDE);
                             if (!u.ublessed) {
-                                $t2 = rn2(3) + 2 | 0, u.ublessed = $t2;
+                                $t2 = rn1(3, 2), u.ublessed = $t2;
                             }
                         } else {
                             u.ublessed = u.ublessed + 1 | 0;
@@ -1787,14 +1786,14 @@ async function bestow_artifact(max_giftvalue) {   // pray.c:1781
         /* The player can gain an artifact */
         /* The chance goes down as the number of artifacts goes up */
         if (wizard()) {
-            do_bestow = await yn_function($C`Gift an artifact?`, new $c.Ptr(ynchars, 0), 110, TRUE) === 121 ? 1 : 0;
+            do_bestow = await y_n($C`Gift an artifact?`) === 121 ? 1 : 0;
         } else {
             do_bestow = !rn2(6 + Math.imul(Math.imul(2, u.ugifts), nartifacts) | 0) ? 1 : 0;
         }
     }
     if (do_bestow) {
         /* mk_artifact() with NULL obj and a_align() arg can return NULL */
-        const otmp = await mk_artifact(null, (svl.level.locations[u.ux][u.uy].flags & AM.MASK & AM.MASK) === 0 ? A.NONE : (svl.level.locations[u.ux][u.uy].flags & AM.MASK & AM.MASK) === AM.LAWFUL ? A.LAWFUL : (svl.level.locations[u.ux][u.uy].flags & AM.MASK & AM.MASK) - 2, max_giftvalue, TRUE);
+        const otmp = await mk_artifact(null, a_align(u.ux, u.uy), max_giftvalue, TRUE);
         if (otmp) {
             await artifact_origin(otmp, ONAME_GIFT | ONAME_KNOW_ARTI);
             if (otmp.spe < 0) {
@@ -1819,7 +1818,7 @@ async function bestow_artifact(max_giftvalue) {   // pray.c:1781
             unrestrict_weapon_skill(weapon_type(otmp));
             if (!Hallucination() && !Blind()) {
                 await observe_object(otmp);
-                await discover_object(otmp.otyp, TRUE, TRUE, TRUE);
+                await makeknown(otmp.otyp);
                 await discover_artifact(otmp.oartifact);
             }
             return TRUE;
@@ -1846,9 +1845,9 @@ async function sacrifice_value(otmp) {   // pray.c:1839
  * @returns {Promise<number>} int
  */
 export async function dosacrifice() {   // pray.c:1854
-    const altaralign = (svl.level.locations[u.ux][u.uy].flags & AM.MASK & AM.MASK) === 0 ? A.NONE : (svl.level.locations[u.ux][u.uy].flags & AM.MASK & AM.MASK) === AM.LAWFUL ? A.LAWFUL : (svl.level.locations[u.ux][u.uy].flags & AM.MASK & AM.MASK) - 2;
+    const altaralign = a_align(u.ux, u.uy);
     if (!(svl.level.locations[u.ux][u.uy].typ === ALTAR) || u.uswallow) {
-        await You($C`are not %s an altar.`, Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked ? $C`over` : $C`on`);
+        await You($C`are not %s an altar.`, Levitation() || Flying() ? $C`over` : $C`on`);
         return ECMD.OK;
     } else if (u.uprops[CONFUSION].intrinsic || u.uprops[STUNNED].intrinsic) {
         await You($C`are too impaired to perform the rite.`);
@@ -2098,7 +2097,7 @@ async function offer_corpse(otmp, highaltar, altaralign) {   // pray.c:1959
 export async function can_pray(praying) {   // pray.c:2124
     let alignment = 0, $t1;
     /* false means no messages should be given */
-    gp.p_aligntyp = svl.level.locations[u.ux][u.uy].typ === ALTAR ? (svl.level.locations[u.ux][u.uy].flags & AM.MASK & AM.MASK) === 0 ? A.NONE : (svl.level.locations[u.ux][u.uy].flags & AM.MASK & AM.MASK) === AM.LAWFUL ? A.LAWFUL : (svl.level.locations[u.ux][u.uy].flags & AM.MASK & AM.MASK) - 2 : u.ualign.type;
+    gp.p_aligntyp = svl.level.locations[u.ux][u.uy].typ === ALTAR ? a_align(u.ux, u.uy) : u.ualign.type;
     $t1 = await in_trouble(), gp.p_trouble = $t1;
     /* ok if chaotic or none (Moloch) */
     if (is_demon(gy.youmonst.data) && (gp.p_aligntyp === A.LAWFUL || gp.p_aligntyp !== A.NEUTRAL)) {
@@ -2200,10 +2199,10 @@ export async function dopray() {   // pray.c:2199
         if (ParanoidPray()) {
             const save_doagain = $c.i8(gi.in_doagain);
             gi.in_doagain = FALSE;
-            ok = await yn_function(new $c.Ptr(dopray$forcesuccess, 0), new $c.Ptr(ynchars, 0), 110, FALSE) === 121 ? 1 : 0;
+            ok = await YN(new $c.Ptr(dopray$forcesuccess, 0)) === 121 ? 1 : 0;
             gi.in_doagain = save_doagain;
         } else {
-            ok = await yn_function(new $c.Ptr(dopray$forcesuccess, 0), new $c.Ptr(ynchars, 0), 110, TRUE) === 121 ? 1 : 0;
+            ok = await y_n(new $c.Ptr(dopray$forcesuccess, 0)) === 121 ? 1 : 0;
         }
         if (ok) {
             u.ublesscnt = 0;
@@ -2369,7 +2368,7 @@ async function maybe_turn_mon_iter(mtmp) {   // pray.c:2347
 export async function doturn() {   // pray.c:2414
     let $t1;
     /* Knights & Priest(esse)s only please */
-    if (!(gu.urole.mnum === PM.CLERIC) && !(gu.urole.mnum === PM.KNIGHT)) {
+    if (!Role_if(PM.CLERIC) && !Role_if(PM.KNIGHT)) {
         /* Try to use the "turn undead" spell. */
         if (known_spell(SPE_TURN_UNDEAD)) {
             return await spelleffects(SPE_TURN_UNDEAD, FALSE, FALSE);
@@ -2464,7 +2463,7 @@ export async function a_gname_at(x, y) {   // pray.c:2514
     if (!(svl.level.locations[x][y].typ === ALTAR)) {
         return null;
     }
-    return await align_gname((svl.level.locations[x][y].flags & AM.MASK & AM.MASK) === 0 ? A.NONE : (svl.level.locations[x][y].flags & AM.MASK & AM.MASK) === AM.LAWFUL ? A.LAWFUL : (svl.level.locations[x][y].flags & AM.MASK & AM.MASK) - 2);
+    return await align_gname(a_align(x, y));
 }
 /* returns the name of the hero's deity */
 /**
@@ -2587,7 +2586,7 @@ export function align_gtitle(alignment) {   // pray.c:2628
  * @returns {Promise<void>}
  */
 export async function altar_wrath(x, y) {   // pray.c:2652
-    const altaralign = (svl.level.locations[x][y].flags & AM.MASK & AM.MASK) === 0 ? A.NONE : (svl.level.locations[x][y].flags & AM.MASK & AM.MASK) === AM.LAWFUL ? A.LAWFUL : (svl.level.locations[x][y].flags & AM.MASK & AM.MASK) - 2;
+    const altaralign = a_align(x, y);
     if (u.ualign.type === altaralign && u.ualign.record > (-rn2(4) | 0)) {
         await godvoice(altaralign, $C`How darest thou desecrate my altar!`);
         await adjattrib(A.WIS, -1, FALSE);
@@ -2649,11 +2648,17 @@ function blocked_boulder(dx, dy) {   // pray.c:2677
     }
     return FALSE;
 }
+function Cursed_obj(obj, typ) {
+    return obj && obj.otyp === typ && obj.cursed ? 1 : 0;
+}
 function ugod_is_angry() {
     return u.ualign.record < 0 ? 1 : 0;
 }
 function on_shrine() {
     return (svl.level.locations[u.ux][u.uy].flags & AM.SHRINE) !== 0 ? 1 : 0;
+}
+function a_align(x, y) {
+    return (svl.level.locations[x][y].flags & AM.MASK & AM.MASK) === 0 ? A.NONE : (svl.level.locations[x][y].flags & AM.MASK & AM.MASK) === AM.LAWFUL ? A.LAWFUL : (svl.level.locations[x][y].flags & AM.MASK & AM.MASK) - 2;
 }
 function ok_wep(o) {
     return o && (o.oclass === WEAPON_CLASS || o.oclass === TOOL_CLASS && objects[o.otyp].oc_subtyp !== P.NONE) ? 1 : 0;

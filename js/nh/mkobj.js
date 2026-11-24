@@ -14,7 +14,7 @@ import { set_moreluck } from './attrib.js';
 import { A } from './attrib.h.js';
 import { isok } from './cmd.js';
 import { is_ice, is_pool, is_pool_or_lava } from './dbridge.js';
-import { c_common_strings, cg, flags, gb, gc, gi, gk, gm, go, gt, gu, gz, hands_obj, iflags, program_state, svb, svc, svd, svl, svm, u } from './decl.js';
+import { c_common_strings, cg, flags, gb, gc, gi, gk, gm, go, gt, gu, gz, hands_obj, iflags, program_state, svb, svc, svl, svm, u } from './decl.js';
 import { AMULET_CLASS, ARMOR_CLASS, BALL_CLASS, CHAIN_CLASS, COIN_CLASS, FOOD_CLASS, GEM_CLASS, POTION_CLASS, RING_CLASS, ROCK_CLASS, S, SCROLL_CLASS, SPBOOK_CLASS, TOOL_CLASS, VENOM_CLASS, WAND_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { newsym } from './display.js';
 import { doaltarobj, dropy, obj_no_longer_held } from './do.js';
@@ -22,9 +22,9 @@ import { Mgender, mon_pmname, noveltitle, oname, pmname, safe_oname, x_monnam } 
 import { reset_remarm } from './do_wear.js';
 import { hitfloor } from './dothrow.js';
 import { def_oc_syms } from './drawing.js';
-import { In_quest, depth, level_difficulty, on_level, surface } from './dungeon.js';
+import { In_quest, depth, level_difficulty, surface } from './dungeon.js';
 import { MIGR } from './dungeon.h.js';
-import { Inhell } from './dungeon.macros.js';
+import { Inhell, Is_airlevel, Is_rogue_level, Is_waterlevel } from './dungeon.macros.js';
 import { eaten_stat, eating_glob, set_tin_variety } from './eat.js';
 import { panic } from './end.js';
 import { can_reach_floor } from './engrave.js';
@@ -33,6 +33,7 @@ import { PLNMSG } from './flag.h.js';
 import { COLNO, FALSE, LARGEST_INT, ROWNO, TRUE } from './global.h.js';
 import { in_rooms, near_capacity, obj_to_any } from './hack.js';
 import { ARTICLE, CORPSTAT, COST, EXACT_NAME, FM, ONAME_NO_FLAGS, ONAME_SKIP_INVUPD, RANDOM_TIN, ROT_AGE, SPINACH_TIN, TAINT_AGE, TROLL_REVIVE_CHANCE } from './hack.h.js';
+import { makeknown, max, rn1 } from './hack.macros.js';
 import { copynchars, eos, s_suffix, strstri, strsubst } from './hacklib.js';
 import { consume_obj_charge, freeinv, g_at, hold_another_object, mergable, merged, nxtobj, sobj_at, update_inventory, useupall } from './invent.js';
 import { arti_light_radius, del_light_source, find_mid, obj_adjust_light_radius, obj_sheds_light, obj_split_light_source } from './light.js';
@@ -48,7 +49,6 @@ import { mons } from './monst.js';
 import { MON } from './monst.h.js';
 import { DEADMONSTER, MON_NOWEP, ismnum, newmonst } from './monst.macros.js';
 import { PM } from './monsters.h.js';
-import { discover_object } from './o_init.js';
 import { BURIED_TOO, CONTAINED_TOO, LOST, MAX, NOBJ_STATES, OBJ } from './obj.h.js';
 import { Has_contents, Is_candle, Is_container, Is_dragon_scales, Is_mbag, Is_pudding, OMAILCMD, OMID, OMONST, bimanual, carried, has_omailcmd, has_omid, has_omonst, has_oname, is_mines_prize, is_multigen, is_poisonable, is_soko_prize, mcarried, newobj } from './obj.macros.js';
 import { DRAGON_HIDE, LIQUID, NODIR, PLASTIC, RANDOM_CLASS, SPBOOK_no_NOVEL, WOOD } from './objclass.h.js';
@@ -79,6 +79,7 @@ import { setmnotwielded } from './weapon.js';
 import { drop_uswapwep } from './wield.js';
 import { extract_from_minvent } from './worn.js';
 import { PRONOUN } from './you.h.js';
+import { Role_if } from './you.macros.js';
 import { Blind, Hallucination } from './youprop.macros.js';
 import { get_obj_location } from './zap.js';
 
@@ -318,7 +319,7 @@ export async function mksobj_migr_to_species(otyp, mflags2, init, artif) {   // 
 export async function mkobj(oclass, artif) {   // mkobj.c:270
     let tprob = 0, i = 0;
     if (oclass === RANDOM_CLASS) {
-        let iprobs = (svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? rogueprobs[0] : Inhell() ? hellprobs[0] : mkobjprobs[0];
+        let iprobs = Is_rogue_level(u.uz) ? rogueprobs[0] : Inhell() ? hellprobs[0] : mkobjprobs[0];
         for (tprob = rnd(100); (tprob = tprob - iprobs.iprob | 0) > 0; iprobs = $c.radd(iprobs, 1)) {
             continue;
         }
@@ -444,7 +445,7 @@ export async function rndmonnum_adj(minadj, maxadj) {   // mkobj.c:395
     /* Plan B: get any common monster */
     const excludeflags = G_UNIQ | G_NOGEN | (Inhell() ? G_NOHELL : G_HELL);
     do {
-        i = rn2(SPECIAL_PM - LOW_PM) + LOW_PM;
+        i = (rn2(SPECIAL_PM - LOW_PM) + LOW_PM);
         ptr = $c.relem(mons, i);
     } while ((ptr.geno & excludeflags) !== 0);
     return i;
@@ -919,7 +920,7 @@ async function mksobj_init(obj, artif) {   // mkobj.c:869
     const let_ = objects[otmp.otyp].oc_class;
     switch (let_) {
         case WEAPON_CLASS:
-            $t1 = is_multigen(otmp) ? rn2(6) + 6 | 0 : 1, otmp.quan = $t1;
+            $t1 = is_multigen(otmp) ? rn1(6, 6) : 1, otmp.quan = $t1;
             if (!rn2(11)) {
                 $t2 = $c.i8(rne(3)), otmp.spe = $t2;
                 $t3 = rn2(2) >>> 0, otmp.blessed = ($t3) & 1;
@@ -1023,7 +1024,7 @@ async function mksobj_init(obj, artif) {   // mkobj.c:869
             if (otmp.otyp === LOADSTONE) {
                 await curse(otmp);
             } else if (otmp.otyp === ROCK) {
-                $t8 = rn2(6) + 6 | 0, otmp.quan = $t8;
+                $t8 = rn1(6, 6), otmp.quan = $t8;
             } else if (otmp.otyp !== LUCKSTONE && !rn2(6)) {
                 otmp.quan = 2;
             } else {
@@ -1044,7 +1045,7 @@ async function mksobj_init(obj, artif) {   // mkobj.c:869
                 case BRASS_LANTERN:
                 case OIL_LAMP:
                     otmp.spe = 1;
-                    $t10 = rn2(500) + 1000 | 0, otmp.age = $t10;
+                    $t10 = rn1(500, 1000), otmp.age = $t10;
                     otmp.lamplit = 0;
                     await blessorcurse(otmp, 5);
                     break;
@@ -1068,19 +1069,19 @@ async function mksobj_init(obj, artif) {   // mkobj.c:869
                 case EXPENSIVE_CAMERA:
                 case TINNING_KIT:
                 case MAGIC_MARKER:
-                    $t14 = $c.i8(rn2(70) + 30 | 0), otmp.spe = $t14;
+                    $t14 = $c.i8(rn1(70, 30)), otmp.spe = $t14;
                     break;
                 case CAN_OF_GREASE:
-                    $t15 = $c.i8(rn2(21) + 5 | 0), otmp.spe = $t15;   /* 0..20 + 5 => 5..25 */
+                    $t15 = $c.i8(rn1(21, 5)), otmp.spe = $t15;   /* 0..20 + 5 => 5..25 */
                     await blessorcurse(otmp, 10);
                     break;
                 case CRYSTAL_BALL:
-                    $t16 = $c.i8(rn2(5) + 3 | 0), otmp.spe = $t16;   /* 0..4 + 3 => 3..7 */
+                    $t16 = $c.i8(rn1(5, 3)), otmp.spe = $t16;   /* 0..4 + 3 => 3..7 */
                     await blessorcurse(otmp, 2);
                     break;
                 case HORN_OF_PLENTY:
                 case BAG_OF_TRICKS:
-                    $t17 = $c.i8(rn2(18) + 3 | 0), otmp.spe = $t17;   /* 0..17 + 3 => 3..20 */
+                    $t17 = $c.i8(rn1(18, 3)), otmp.spe = $t17;   /* 0..17 + 3 => 3..20 */
                     break;
                 case FIGURINE:
                     tryct = 0;
@@ -1098,7 +1099,7 @@ async function mksobj_init(obj, artif) {   // mkobj.c:869
                 case FROST_HORN:
                 case FIRE_HORN:
                 case DRUM_OF_EARTHQUAKE:
-                    $t20 = $c.i8(rn2(5) + 4 | 0), otmp.spe = $t20;
+                    $t20 = $c.i8(rn1(5, 4)), otmp.spe = $t20;
                     break;
             }
             break;
@@ -1143,7 +1144,7 @@ async function mksobj_init(obj, artif) {   // mkobj.c:869
                 obj.set(0, otmp);
             }
             /* simulate lacquered armor for samurai */
-            if (gu.urole.mnum === PM.SAMURAI && otmp.otyp === SPLINT_MAIL && (svm.moves <= 1 || In_quest(u.uz))) {
+            if (Role_if(PM.SAMURAI) && otmp.otyp === SPLINT_MAIL && (svm.moves <= 1 || In_quest(u.uz))) {
                 /* optimizer bitfield bug */
                 $t24 = otmp.rknown = 1, otmp.oerodeproof = ($t24) & 1;
             }
@@ -1154,7 +1155,7 @@ async function mksobj_init(obj, artif) {   // mkobj.c:869
             } else if (otmp.otyp === WAN_STASIS) {
                 /* just as easy to recharge as other NODIR wands, but starts with
                    fewer charges */
-                $t25 = $c.i8(rn2(4) + 3 | 0), otmp.spe = $t25;
+                $t25 = $c.i8(rn1(4, 3)), otmp.spe = $t25;
             } else {
                 $t26 = $c.i8(rn2(5) + (objects[otmp.otyp].oc_dir === NODIR ? 11 : 4) | 0), otmp.spe = $t26;
             }
@@ -1220,7 +1221,7 @@ export async function mksobj(otyp, init, artif) {   // mkobj.c:1179
     const let_ = objects[otyp].oc_class;
     otmp[0] = await newobj();
     otmp[0].$copyFrom(cg.zeroobj);
-    otmp[0].age = svm.moves > 1 ? svm.moves : 1;
+    otmp[0].age = max(svm.moves, 1);
     $t1 = next_ident(), otmp[0].o_id = $t1;
     otmp[0].quan = 1;
     otmp[0].oclass = let_;
@@ -1437,7 +1438,7 @@ export async function start_corpse_timeout(body) {   // mkobj.c:1389
     }
     let action = ROT_CORPSE;   /* default action: rot away */
     const rot_adjust = gi.in_mklev ? 25 : 10;   /* give some variation */
-    let age = $c.sub64(svm.moves > 1 ? svm.moves : 1, body.age);
+    let age = $c.sub64(max(svm.moves, 1), body.age);
     if (age > ROT_AGE) {
         when = rot_adjust;
     } else {
@@ -1458,7 +1459,7 @@ export async function start_corpse_timeout(body) {   // mkobj.c:1389
         }
     } else if (gz.zombify && zombie_form($c.relem(mons, body.corpsenm)) !== NON_PM && !body.oeroded2) {
         action = ZOMBIFY_MON;
-        when = rn2(15) + 5 | 0;   /* 5..19 */
+        when = rn1(15, 5);   /* 5..19 */
     }
     await start_timer(when, TIMER.OBJECT, action, obj_to_any(body));
 }
@@ -1612,7 +1613,7 @@ export async function shrink_glob(arg, expire_time) {   // mkobj.c:1500
            is given for going from 1 to 0 (gone) */
         /* 20 */
         const basewt = objects[obj.otyp].oc_weight;
-        const msgwt = $c.divu32((basewt > 1 ? basewt : 1) + 1 >>> 0, 2);   /* 10 */
+        const msgwt = $c.divu32(max(basewt, 1) + 1 >>> 0, 2);   /* 10 */
         shrink = $c.remu32(obj.owt, msgwt) === 0 ? 1 : 0;
         obj.owt = obj.owt - 1 >>> 0;
         /* if glob is partly eaten, reduce the amount still available (but
@@ -2005,7 +2006,7 @@ export async function weight(obj) {   // mkobj.c:1888
     } else if (obj.oclass === COIN_CLASS) {
         /* 5.0: always weigh at least 1 unit; used to yield 0 for 1..49 */
         wt = $c.i32($c.div64($c.add64(obj.quan, 50), 100));
-        return wt > 1 ? wt : 1;
+        return max(wt, 1);
     } else if (obj.otyp === HEAVY_IRON_BALL && obj.owt !== 0) {
         return obj.owt | 0;   /* kludge for "very" heavy iron ball */
     } else if (obj.otyp === CANDELABRUM_OF_INVOCATION && obj.spe) {
@@ -2150,7 +2151,7 @@ export async function mkcorpstat(objtype, mtmp, ptr, x, y, corpstatflags) {   //
         const old_corpsenm = otmp.corpsenm;
         otmp.corpsenm = ptr.pmidx;
         $t1 = await weight(otmp) >>> 0, otmp.owt = $t1;
-        if (otmp.otyp === CORPSE && (gz.zombify || (old_corpsenm === PM.LIZARD || old_corpsenm === PM.LICHEN || (mons[old_corpsenm].mlet === S.TROLL || ($c.relem(mons, old_corpsenm) === mons[PM.DEATH] || $c.relem(mons, old_corpsenm) === mons[PM.FAMINE] || $c.relem(mons, old_corpsenm) === mons[PM.PESTILENCE]))) || (otmp.corpsenm === PM.LIZARD || otmp.corpsenm === PM.LICHEN || (mons[otmp.corpsenm].mlet === S.TROLL || ($c.relem(mons, otmp.corpsenm) === mons[PM.DEATH] || $c.relem(mons, otmp.corpsenm) === mons[PM.FAMINE] || $c.relem(mons, otmp.corpsenm) === mons[PM.PESTILENCE]))))) {
+        if (otmp.otyp === CORPSE && (gz.zombify || special_corpse(old_corpsenm) || special_corpse(otmp.corpsenm))) {
             await obj_stop_timers(otmp);
             await start_corpse_timeout(otmp);
         }
@@ -2290,7 +2291,7 @@ export async function mk_tt_object(objtype, x, y) {   // mkobj.c:2227
     /* tt_oname() will return null if the scoreboard is empty, which in
        turn leaves the random corpsenm value; force it to match a player */
     if (!await tt_oname(otmp)) {
-        const pm = rn2(PM.WIZARD - PM.ARCHEOLOGIST + 1) + PM.ARCHEOLOGIST | 0;
+        const pm = rn1(PM.WIZARD - PM.ARCHEOLOGIST + 1, PM.ARCHEOLOGIST);
         /* update weight for either, force timer sanity for corpses */
         await set_corpsenm(otmp, pm);
     }
@@ -2980,7 +2981,7 @@ export async function hornoplenty(horn, tipping, targetbox) {   // mkobj.c:2847
            being included in its formatted name during next message */
         iflags.suppress_price = iflags.suppress_price + 1 | 0;
         if (!tipping) {
-            obj = await hold_another_object(obj, u.uswallow ? $C`Oops!  %s out of your reach!` : (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) || svl.level.locations[u.ux][u.uy].typ < IRONBARS || svl.level.locations[u.ux][u.uy].typ >= ICE ? $C`Oops!  %s away from you!` : $C`Oops!  %s to the floor!`, await The(await aobjnam(obj, $C`slip`)), null);
+            obj = await hold_another_object(obj, u.uswallow ? $C`Oops!  %s out of your reach!` : Is_airlevel(u.uz) || Is_waterlevel(u.uz) || svl.level.locations[u.ux][u.uy].typ < IRONBARS || svl.level.locations[u.ux][u.uy].typ >= ICE ? $C`Oops!  %s away from you!` : $C`Oops!  %s to the floor!`, await The(await aobjnam(obj, $C`slip`)), null);
             nhUse(obj);
         } else if (targetbox) {
             await add_to_container(targetbox, obj);
@@ -3007,7 +3008,7 @@ export async function hornoplenty(horn, tipping, targetbox) {   // mkobj.c:2847
         }
         iflags.suppress_price = iflags.suppress_price - 1 | 0;
         if (horn.dknown) {
-            await discover_object(HORN_OF_PLENTY, TRUE, TRUE, TRUE);
+            await makeknown(HORN_OF_PLENTY);
         }
     }
     return objcount;
@@ -3877,6 +3878,9 @@ export async function pudding_merge_message(otmp, otmp2) {   // mkobj.c:3818
     } else {
         await You_hear($C`a faint sloshing sound.`);
     }
+}
+function special_corpse(num) {
+    return num === PM.LIZARD || num === PM.LICHEN || (mons[num].mlet === S.TROLL || ($c.relem(mons, num) === mons[PM.DEATH] || $c.relem(mons, num) === mons[PM.FAMINE] || $c.relem(mons, num) === mons[PM.PESTILENCE])) ? 1 : 0;
 }
 
 export function $init() {

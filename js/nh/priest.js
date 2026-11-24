@@ -10,17 +10,18 @@ import { AM } from './align.h.js';
 import { alloc } from './alloc.js';
 import { adjalign, exercise } from './attrib.js';
 import { A } from './attrib.h.js';
-import { flags, gb, gc, gi, gm, gn, gt, gv, program_state, svd, svl, svm, svr, u, xdir, ydir } from './decl.js';
+import { flags, gb, gc, gi, gm, gn, gt, program_state, svd, svl, svm, svr, u, xdir, ydir } from './decl.js';
 import { canseemon, newsym } from './display.js';
 import { canspotmon } from './display.macros.js';
 import { Monnam, bogon_is_pname, mon_nam, mon_pmname, rndmonnam } from './do_name.js';
 import { assign_level, mapseen_temple, on_level } from './dungeon.js';
-import { In_endgame } from './dungeon.macros.js';
+import { In_endgame, Is_astralevel, Is_sanctum } from './dungeon.macros.js';
 import { FALSE, LL, TRUE } from './global.h.js';
+import { strcmpi } from './global.macros.js';
 import { check_special_room, in_rooms, money_cnt, nomul } from './hack.js';
 import { ARTICLE, MM, N_DIRS, RLOC, SPINE } from './hack.h.js';
-import { DIR_CLAMP, onlineu, verbalize1 } from './hack.macros.js';
-import { dist2, s_suffix, sgn, strncmpi } from './hacklib.js';
+import { DIR_CLAMP, onlineu, rn1, verbalize1 } from './hack.macros.js';
+import { dist2, s_suffix, sgn } from './hacklib.js';
 import { record_achievement } from './insight.js';
 import { currency } from './invent.js';
 import { makemon, mongets, newmextra, set_malign } from './makemon.js';
@@ -34,7 +35,6 @@ import { mfndpos, mon_allowflags, mongone, monnear, setmangry, wakeup } from './
 import { AD } from './monattk.h.js';
 import { mon_learns_traps, pronoun_gender, resist_conflict } from './mondata.js';
 import { is_minion, is_rider } from './mondata.macros.js';
-import { M1 } from './monflag.h.js';
 import { m_break_boulder, m_move_aggress } from './monmove.js';
 import { mons } from './monst.js';
 import { DEADMONSTER, helpless } from './monst.macros.js';
@@ -47,7 +47,7 @@ import { You, You_feel, Your, impossible, livelog_printf, pline, verbalize } fro
 import { body_part } from './polyself.js';
 import { incr_itimeout } from './potion.js';
 import { a_gname_at, halu_gname } from './pray.js';
-import { CLAIRVOYANT, FROMOUTSIDE, HALLUC, HALLUC_RES, INTRINSIC, INVIS, PROTECTION, W } from './prop.h.js';
+import { CLAIRVOYANT, FROMOUTSIDE, HALLUC, HALLUC_RES, INTRINSIC, PROTECTION, W } from './prop.h.js';
 import { DOOR, ROOM } from './rm.h.js';
 import { IS_ALTAR, MON_AT, remove_monster } from './rm.macros.js';
 import { d, rn2 } from './rnd.js';
@@ -58,10 +58,10 @@ import { mpickobj } from './steal.js';
 import { place_monster } from './steed.js';
 import { rloc } from './teleport.js';
 import { ALL_TRAPS } from './trap.h.js';
-import { COULD_SEE } from './vision.h.js';
+import { m_canseeu } from './vision.macros.js';
 import { which_armor } from './worn.js';
 import { ACH, PRONOUN } from './you.h.js';
-import { u_at } from './you.macros.js';
+import { m_next2u, u_at } from './you.macros.js';
 import { Conflict, Deaf, Displaced, Hallucination, Invis } from './youprop.macros.js';
 import { buzz } from './zap.js';
 
@@ -247,8 +247,8 @@ export async function pri_move(priest) {   // priest.c:177
     const temple = priest.mextra.epri.shroom;
     let ggx = priest.mextra.epri.shrpos.x;
     let ggy = priest.mextra.epri.shrpos.y;
-    ggx = $c.i16(ggx + (rn2(3) + -1 | 0) | 0);   /* mill around the altar */
-    ggy = $c.i16(ggy + (rn2(3) + -1 | 0) | 0);
+    ggx = $c.i16(ggx + rn1(3, -1) | 0);   /* mill around the altar */
+    ggy = $c.i16(ggy + rn1(3, -1) | 0);
     if (!priest.mpeaceful || Conflict() && !resist_conflict(priest)) {
         if (monnear(priest, u.ux, u.uy)) {
             if (Displaced()) {
@@ -258,7 +258,7 @@ export async function pri_move(priest) {   // priest.c:177
             return 0;
         } else if ($c.strchr(new $c.Ptr(u.urooms, 0), temple)) {
             /* chase player if inside temple & can see him */
-            if (priest.mcansee && ((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(priest.data.mflags1, M1.SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(priest.my).get(priest.mx) & COULD_SEE) !== 0)) {
+            if (priest.mcansee && m_canseeu(priest)) {
                 ggx = u.ux;
                 ggy = u.uy;
             }
@@ -316,7 +316,7 @@ export async function priestini(lvl, sroom, sx, sy, sanctum) {   // priest.c:220
             await mongets(priest, AMULET_OF_YENDOR);
         }
         /* 2 to 4 spellbooks */
-        for (cnt = rn2(3) + 2 | 0; cnt > 0; cnt = cnt - 1 | 0) {
+        for (cnt = rn1(3, 2); cnt > 0; cnt = cnt - 1 | 0) {
             await mpickobj(priest, await mkobj(SPBOOK_no_NOVEL, FALSE));
         }
         /* robe [via makemon()] */
@@ -409,13 +409,13 @@ export async function priestname(mon, article, reveal_high_priest, pname) {   //
             $c.strcat(pname, do_hallu ? $C`grand ` : $C`high `);
         }
     } else {
-        if (mon.mtame && !strncmpi(what, $C`Angel`, -1)) {
+        if (mon.mtame && !strcmpi(what, $C`Angel`)) {
             $c.strcat(pname, $C`guardian `);
         }
     }
     $c.strcat(pname, what);
     /* same as distant_monnam(), more or less... */
-    if (do_hallu || !high_priest || reveal_high_priest || !((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level)) || dist2(mon.mx, mon.my, u.ux, u.uy) <= 2 || program_state.gameover) {
+    if (do_hallu || !high_priest || reveal_high_priest || !Is_astralevel(u.uz) || m_next2u(mon) || program_state.gameover) {
         $c.strcat(pname, $C` of `);
         $c.strcat(pname, await halu_gname(mon_aligntyp(mon)));
     }
@@ -475,7 +475,7 @@ export async function intemple(roomno) {   // priest.c:410
         await record_achievement(ACH.TMPL);
         const epri_p = priest.mextra.epri;
         const shrined = has_shrine(priest);
-        const sanctum = priest.data === mons[PM.HIGH_CLERIC] && ((svd.dungeon_topology.d_sanctum_level.dlevel || svd.dungeon_topology.d_sanctum_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_sanctum_level) || In_endgame(u.uz)) ? 1 : 0;
+        const sanctum = priest.data === mons[PM.HIGH_CLERIC] && (Is_sanctum(u.uz) || In_endgame(u.uz)) ? 1 : 0;
         const can_speak = !helpless(priest) ? 1 : 0;
         if (can_speak && !Deaf() && svm.moves >= epri_p.intone_time) {
             const save_priest = priest.ispriest;
@@ -493,7 +493,7 @@ export async function intemple(roomno) {   // priest.c:410
             epri_p.enter_time = 0;
         }
         let msg1 = msg2 = null;
-        if (sanctum && ((svd.dungeon_topology.d_sanctum_level.dlevel || svd.dungeon_topology.d_sanctum_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_sanctum_level))) {
+        if (sanctum && Is_sanctum(u.uz)) {
             if (priest.mpeaceful) {
                 /* first time inside */
                 msg1 = $C`Infidel, you have entered Moloch's Sanctum!`;
@@ -712,7 +712,7 @@ export async function priest_talk(priest) {   // priest.c:558
             }
             for (; offer >= $c.mul64(2, suggested); offer = $c.sub64(offer, $c.mul64(2, suggested))) {
                 if (!u.ublessed) {
-                    $t3 = rn2(3) + 2 | 0, u.ublessed = $t3;
+                    $t3 = rn1(3, 2), u.ublessed = $t3;
                 } else if (u.ublessed < 20 && (u.ublessed < 9 || !rn2(u.ublessed))) {
                     u.ublessed = u.ublessed + 1 | 0;
                 }

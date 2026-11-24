@@ -20,6 +20,7 @@ import { mon_explodes } from './explode.js';
 import { PLNMSG } from './flag.h.js';
 import { FALSE, TRUE } from './global.h.js';
 import { ARTICLE, MM, NC, NOTELL, NO_NC_FLAGS, NO_TRAP_FLAGS, POLY, RLOC, SUPPRESS, SUPPRESS_NAME, TELL, XKILL } from './hack.h.js';
+import { min } from './hack.macros.js';
 import { dist2, distmin, nh_snprintf, s_suffix, strNsubst, strncmpi, strsubst } from './hacklib.js';
 import { clone_mon, grow_up } from './makemon.js';
 import { could_seduce, getmattk, mswings_verb, mtrapped_in_pit } from './mhitu.js';
@@ -1210,7 +1211,7 @@ export async function sleep_monst(mon, amt, how) {   // mhitm.c:1223
         if (amt > 0) {
             /* sleep for N turns */
             mon.mcanmove = 0;
-            mon.mfrozen = ((amt < 127 ? amt : 127) >>> 0) & 127;
+            mon.mfrozen = (min(amt, 127) >>> 0) & 127;
         } else {
             /* sleep until awakened */
             mon.msleeping = 1;

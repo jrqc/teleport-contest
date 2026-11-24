@@ -19,21 +19,22 @@ import { bot } from './botl.js';
 import { getyear, midnight, night, yyyymmdd } from './calendar.js';
 import { reset_occupations } from './cmd.js';
 import { is_pool, is_waterwall } from './dbridge.js';
-import { c_common_strings, disp, flags, gb, gh, gi, gm, gn, gs, gu, gv, gy, svd, svk, svl, svm, svp, u } from './decl.js';
+import { c_common_strings, disp, flags, gb, gh, gi, gm, gn, gs, gy, svk, svl, svm, svp, u } from './decl.js';
 import { S, TOOL_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { canseemon, flush_screen, map_invisible, mon_visible, newsym, sensemon, shieldeff, swallowed, tp_sensemon } from './display.js';
 import { canspotmon } from './display.macros.js';
 import { Amonnam, Mgender, Monnam, Some_Monnam, christen_monst, hliquid, m_monnam, mon_nam, noit_Monnam, noit_mon_nam, pmname } from './do_name.js';
 import { Ring_gone, Ring_on, hard_helmet, stop_donning } from './do_wear.js';
 import { initedog } from './dog.js';
-import { In_hell, ceiling, on_level } from './dungeon.js';
+import { In_hell, ceiling } from './dungeon.js';
+import { Is_rogue_level } from './dungeon.macros.js';
 import { done, done_in_by } from './end.js';
 import { losexp, pluslvl } from './exper.js';
 import { mon_explodes } from './explode.js';
 import { FALSE, LARGEST_INT, TRUE } from './global.h.js';
 import { losehp, money_cnt, nomul, showdamage, spoteffects, unmul } from './hack.js';
 import { BOLT_LIM, DIED, DISMOUNT, HAIR, HAND, KILLED, MM, NO, RLOC, STONING, TELEDS, XKILL } from './hack.h.js';
-import { Maybe_Half_Phys, max, min, y_n } from './hack.macros.js';
+import { Maybe_Half_Phys, makeknown, max, min, rn1, y_n } from './hack.macros.js';
 import { dist2, s_suffix, upstart } from './hacklib.js';
 import { currency, freeinv, prinv, sobj_at, u_carried_gloves, update_inventory } from './invent.js';
 import { is_home_elemental, makemon } from './makemon.js';
@@ -45,7 +46,7 @@ import { AD, AT, M_ATTK } from './monattk.h.js';
 import { DISTANCE_ATTK_TYPE } from './monattk.macros.js';
 import { attacktype_fordmg, can_blnd, cvt_adtyp_to_mseenres, defended, dmgtype, dmgtype_fromattack, gender, get_atkdam_type, mon_hates_blessings, monstseesu, monstunseesu, poly_when_stoned, pronoun_gender, resists_blnd, resists_drli, stagger, sticks } from './mondata.js';
 import { amorphous, amphibious, digests, enfolds, flaming, haseyes, hides_under, is_animal, is_demon, is_hider, is_human, is_minion, is_swimmer, is_undead, is_were, is_whirly, likes_gold, nolimbs, perceives, thick_skinned, touch_petrifies, unsolid } from './mondata.macros.js';
-import { FEMALE, G_EXTINCT, M1, M2, MALE, MZ, NEUTRAL } from './monflag.h.js';
+import { FEMALE, G_EXTINCT, M2, MALE, MZ, NEUTRAL } from './monflag.h.js';
 import { set_apparxy } from './monmove.js';
 import { c_sa_no, mons } from './monst.js';
 import { M_AP, M_SEEN, NEED } from './monst.h.js';
@@ -53,7 +54,7 @@ import { DEADMONSTER, MON_WEP, U_AP_TYPE, is_vampshifter, resists_acid, resists_
 import { PM } from './monsters.h.js';
 import { breamu, spitmu, thrwmu } from './mthrowu.js';
 import { find_offensive, mon_reflects, ureflects, use_offensive } from './muse.js';
-import { discover_object, observe_object } from './o_init.js';
+import { observe_object } from './o_init.js';
 import { ERODE, OBJ } from './obj.h.js';
 import { is_weptool, is_wet_towel } from './obj.macros.js';
 import { PIERCE } from './objclass.h.js';
@@ -64,7 +65,7 @@ import { NATTK, NON_PM } from './permonst.h.js';
 import { You, You_cant, You_feel, You_hear, Your, impossible, pline, pline_The, pline_mon, set_msg_xy, urgent_pline, verbalize } from './pline.js';
 import { body_part, poly_gender, polymon, rehumanize, ugolemeffects } from './polyself.js';
 import { incr_itimeout, make_blinded, make_confused, make_hallucinated, make_sick, make_stunned, split_mon } from './potion.js';
-import { BLINDED, CONFUSION, FAST, HALF_PHDAM, HALLUC, INVIS, MAGICAL_BREATHING, PROTECTION, SICK, STUNNED, TIMEOUT, W, W_ACCESSORY, W_ARMOR } from './prop.h.js';
+import { BLINDED, CONFUSION, FAST, HALF_PHDAM, HALLUC, PROTECTION, SICK, STUNNED, TIMEOUT, W, W_ACCESSORY, W_ARMOR } from './prop.h.js';
 import { is_quest_artifact } from './questpgr.js';
 import { m_at, remove_monster } from './rm.macros.js';
 import { d, rn2, rnd } from './rnd.js';
@@ -81,8 +82,7 @@ import { acid_damage, burnarmor, drain_en, ignite_items, minstapetrify, reset_ut
 import { is_pit } from './trap.macros.js';
 import { erode_armor, mhitm_adtyping, mhitm_knockback } from './uhitm.js';
 import { vision_recalc } from './vision.js';
-import { COULD_SEE } from './vision.h.js';
-import { cansee, couldsee } from './vision.macros.js';
+import { cansee, couldsee, m_canseeu } from './vision.macros.js';
 import { hitval, mon_wield_item } from './weapon.js';
 import { new_were, were_summon } from './were.js';
 import { welded } from './wield.js';
@@ -90,8 +90,8 @@ import { display_nhwindow } from './winprocs.macros.js';
 import { worm_move } from './worm.js';
 import { find_mac, setworn, which_armor } from './worn.js';
 import { PRONOUN, SICK_NONVOMITABLE, TT } from './you.h.js';
-import { Ugender, Upolyd } from './you.macros.js';
-import { Acid_resistance, Blind, Blinded, Cold_resistance, Conflict, Deaf, Detect_monsters, Displaced, Fast, Fire_resistance, HProtection, Half_physical_damage, Hallucination, Invis, Protection_from_shape_changers, Punished, Reflecting, See_invisible, Shock_resistance, Sick, Sick_resistance, Slow_digestion, Stone_resistance, Unaware, Underwater } from './youprop.macros.js';
+import { Role_if, Ugender, Upolyd, m_next2u } from './you.macros.js';
+import { Acid_resistance, Amphibious, Blind, Blinded, Breathless, Cold_resistance, Conflict, Deaf, Detect_monsters, Displaced, Fast, Fire_resistance, HProtection, Half_physical_damage, Hallucination, Invis, Protection_from_shape_changers, Punished, Reflecting, See_invisible, Shock_resistance, Sick, Sick_resistance, Slow_digestion, Stone_resistance, Unaware, Underwater } from './youprop.macros.js';
 import { destroy_items, drain_item } from './zap.js';
 
 const gazemu$reactions = $c.nulls(8);   // static in gazemu()
@@ -398,7 +398,7 @@ export async function getmattk(magr, mdef, indx, prev_result, alt_attk_buf) {   
         attk.adtyp = AD.STUN;
         /* make drain-energy damage be somewhat in proportion to energy */
     } else if (attk.adtyp === AD.DREN && udefend) {
-        const ulev = u.ulevel > 6 ? u.ulevel : 6;
+        const ulev = max(u.ulevel, 6);
         alt_attk_buf.$copyFrom(attk);
         attk = alt_attk_buf;
         /* 3.6.0 used 4d6 but since energy drain came out of max energy
@@ -567,7 +567,7 @@ export async function mattacku(mtmp) {   // mhitu.c:491
             return 0;
         }
         /* Orcs like to steal and eat horses and the like */
-        if (!rn2($c.andu64(mtmp.data.mflags2, M2.ORC) !== 0 ? 2 : 4) && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2) {
+        if (!rn2($c.andu64(mtmp.data.mflags2, M2.ORC) !== 0 ? 2 : 4) && m_next2u(mtmp)) {
             /* attack your steed instead; 'bhitpos' and 'notonhead' are
                already set from targeting hero */
             i = await mattackm(mtmp, u.usteed);
@@ -575,7 +575,7 @@ export async function mattacku(mtmp) {   // mhitu.c:491
                 return 1;
             }
             /* make sure steed is still alive and within range */
-            if ((i & M_ATTK.DEF_DIED) !== 0 || !u.usteed || !(dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2)) {
+            if ((i & M_ATTK.DEF_DIED) !== 0 || !u.usteed || !m_next2u(mtmp)) {
                 return 0;
             }
             /* Let your steed retaliate */
@@ -891,7 +891,7 @@ export async function mattacku(mtmp) {   // mhitu.c:491
                 break;
             case AT.WEAP:
                 if (range2[0]) {
-                    if (!((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level))) {
+                    if (!Is_rogue_level(u.uz)) {
                         await thrwmu(mtmp);
                     }
                 } else {
@@ -910,7 +910,7 @@ export async function mattacku(mtmp) {   // mhitu.c:491
                     if (foundyou[0]) {
                         mon_currwep = mtmp.mw;
                         if (mon_currwep) {
-                            const bash = (mon_currwep.oclass === WEAPON_CLASS || mon_currwep.oclass === TOOL_CLASS) && (objects[mon_currwep.otyp].oc_subtyp === P.POLEARMS || objects[mon_currwep.otyp].oc_subtyp === P.LANCE || is_art(mon_currwep, ART.SNICKERSNEE)) && !is_art(mon_currwep, ART.SNICKERSNEE) && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2 ? 1 : 0;
+                            const bash = (mon_currwep.oclass === WEAPON_CLASS || mon_currwep.oclass === TOOL_CLASS) && (objects[mon_currwep.otyp].oc_subtyp === P.POLEARMS || objects[mon_currwep.otyp].oc_subtyp === P.LANCE || is_art(mon_currwep, ART.SNICKERSNEE)) && !is_art(mon_currwep, ART.SNICKERSNEE) && m_next2u(mtmp) ? 1 : 0;
                             hittmp = await hitval(mon_currwep, gy.youmonst);
                             tmp = tmp + hittmp | 0;
                             await mswings(mtmp, mon_currwep, bash);
@@ -1050,7 +1050,7 @@ export async function diseasemu(mdat) {   // mhitu.c:1033
         await You_feel($C`a slight illness.`);
         return FALSE;
     } else {
-        await make_sick(Sick() ? $c.add64($c.div64(u.uprops[SICK].intrinsic, 3), 1) : rn2(acurr(A.CON)) + 20 | 0, mdat.pmnames[NEUTRAL], TRUE, SICK_NONVOMITABLE);
+        await make_sick(Sick() ? $c.add64($c.div64(u.uprops[SICK].intrinsic, 3), 1) : (rn2(acurr(A.CON)) + 20 | 0), mdat.pmnames[NEUTRAL], TRUE, SICK_NONVOMITABLE);
         return TRUE;
     }
 }
@@ -1210,7 +1210,7 @@ async function hitmu(mtmp, mattk) {   // mhitu.c:1144
     if (mhm.damage > 0) {
         /* [Half_physical_damage isn't applied to mhm.permdmg] */
         /* Mitre of Holiness, even if not currently blessed */
-        if (Half_physical_damage() || gu.urole.mnum === PM.CLERIC && $G.uarmh && is_quest_artifact($G.uarmh) && mon_hates_blessings(mtmp)) {
+        if (Half_physical_damage() || Role_if(PM.CLERIC) && $G.uarmh && is_quest_artifact($G.uarmh) && mon_hates_blessings(mtmp)) {
             mhm.damage = $c.div32(mhm.damage + 1 | 0, 2);
         }
         if (mhm.permdmg) {
@@ -1416,8 +1416,8 @@ async function gulpmu(mtmp, mattk) {   // mhitu.c:1289
         case AD.PHYS:
             physical_damage = TRUE;
             if (mtmp.data === mons[PM.FOG_CLOUD]) {
-                await You($C`are laden with moisture and %s`, flaming(gy.youmonst.data) ? $C`are smoldering out!` : u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.BREATHLESS) !== 0 ? $C`find it mildly uncomfortable.` : amphibious(gy.youmonst.data) ? $C`feel comforted.` : $C`can barely breathe!`);
-                if ((u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.AMPHIBIOUS) !== 0 || (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.BREATHLESS) !== 0)) && !flaming(gy.youmonst.data)) {
+                await You($C`are laden with moisture and %s`, flaming(gy.youmonst.data) ? $C`are smoldering out!` : Breathless() ? $C`find it mildly uncomfortable.` : amphibious(gy.youmonst.data) ? $C`feel comforted.` : $C`can barely breathe!`);
+                if ((Amphibious() || Breathless()) && !flaming(gy.youmonst.data)) {
                     tmp = 0;
                 }
             } else {
@@ -1688,7 +1688,7 @@ export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
                 if (await mon_reflects(mtmp, !useeit ? null : $C`The gaze is reflected away by %s %s!`)) {
                     break;
                 }
-                if (!((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(mtmp.data.mflags1, M1.SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0)) {
+                if (!m_canseeu(mtmp)) {
                     /* probably you're invisible */
                     if (useeit) {
                         await pline($C`%s doesn't seem to notice that %s gaze was reflected.`, await Monnam(mtmp), genders[pronoun_gender(mtmp, PRONOUN.HALLU)].his);
@@ -1752,7 +1752,7 @@ export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
         case AD.BLND:
             if (canseemon(mtmp) && !await resists_blnd(gy.youmonst) && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= BOLT_LIM * BOLT_LIM) {
                 if (cancelled) {
-                    react = rn2(2) + 2 | 0;   /* "puzzled" || "dazzled" */
+                    react = rn1(2, 2);   /* "puzzled" || "dazzled" */
                     already = mtmp.mcansee === 0 ? 1 : 0;
                     /* Archons gaze every round; we don't want cancelled ones
                        giving the "seems puzzled/dazzled" message that often */
@@ -1782,7 +1782,7 @@ export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
         case AD.FIRE:
             if (mcanseeu && !mtmp.mspec_used && rn2(5)) {
                 if (cancelled) {
-                    react = rn2(2) + 4 | 0;   /* "irritated" || "inflamed" */
+                    react = rn1(2, 4);   /* "irritated" || "inflamed" */
                 } else {
                     let dmg = d(2, 6);
                     const orig_dmg = dmg;
@@ -1964,14 +1964,14 @@ export async function doseduce(mon) {   // mhitu.c:1985
             /* confirmation prompt when charisma is high bypassed if deaf */
             if (!Deaf() && rn2(20) < ACURR(A.CHA)) {
                 await safe_qbuf(new $c.Ptr(qbuf, 0), $C`"That `, $C` looks pretty.  May I have it?"`, ring, xname, simpleonames, $C`ring`);
-                await discover_object(RIN_ADORNMENT, TRUE, TRUE, TRUE);
+                await makeknown(RIN_ADORNMENT);
                 if (await y_n(new $c.Ptr(qbuf, 0)) === 110) {
                     continue;
                 }
             } else {
                 await pline($C`%s decides she'd like %s, and takes it.`, new $c.Ptr(Who, 0), await yname(ring));
             }
-            await discover_object(RIN_ADORNMENT, TRUE, TRUE, TRUE);
+            await makeknown(RIN_ADORNMENT);
             /* might be in left or right ring slot or weapon/alt-wep/quiver */
             if (ring.owornmask) {
                 await remove_worn_item(ring, FALSE);
@@ -1997,7 +1997,7 @@ export async function doseduce(mon) {   // mhitu.c:1985
             /* confirmation prompt when charisma is high bypassed if deaf */
             if (!Deaf() && rn2(20) < ACURR(A.CHA)) {
                 await safe_qbuf(new $c.Ptr(qbuf, 0), $C`"That `, $C` looks pretty.  Would you wear it for me?"`, ring, xname, simpleonames, $C`ring`);
-                await discover_object(RIN_ADORNMENT, TRUE, TRUE, TRUE);
+                await makeknown(RIN_ADORNMENT);
                 if (await y_n(new $c.Ptr(qbuf, 0)) === 110) {
                     continue;
                 }
@@ -2005,7 +2005,7 @@ export async function doseduce(mon) {   // mhitu.c:1985
                 await pline($C`%s decides you'd look prettier wearing %s,`, new $c.Ptr(Who, 0), await yname(ring));
                 await pline($C`and puts it on your finger.`);
             }
-            await discover_object(RIN_ADORNMENT, TRUE, TRUE, TRUE);
+            await makeknown(RIN_ADORNMENT);
             if (!$G.uright) {
                 await pline($C`%s puts %s on your right %s.`, new $c.Ptr(Who, 0), await the(await xname(ring)), await body_part(HAND));
                 await setworn(ring, W.RINGR);
@@ -2021,7 +2021,7 @@ export async function doseduce(mon) {   // mhitu.c:1985
                 await Ring_gone($G.uright);
                 /* ring removal might cause loss of levitation which could
                    drop hero onto trap that transports hero somewhere else */
-                if (u.utotype || !(dist2(mon.mx, mon.my, u.ux, u.uy) <= 2)) {
+                if (u.utotype || !m_next2u(mon)) {
                     return 1;
                 }
                 await setworn(ring, W.RINGR);
@@ -2029,7 +2029,7 @@ export async function doseduce(mon) {   // mhitu.c:1985
                 /* see "replaces" note above */
                 await pline($C`%s replaces %s with %s.`, new $c.Ptr(Who, 0), await yname($G.uleft), await yname(ring));
                 await Ring_gone($G.uleft);
-                if (u.utotype || !(dist2(mon.mx, mon.my, u.ux, u.uy) <= 2)) {
+                if (u.utotype || !m_next2u(mon)) {
                     return 1;
                 }
                 await setworn(ring, W.RINGL);
@@ -2061,7 +2061,7 @@ export async function doseduce(mon) {   // mhitu.c:1985
        and changing location, so hero might not be adjacent to seducer
        any more (mayberem() has its own adjacency test so we don't need
        to check after each potential removal) */
-    if (u.utotype || !(dist2(mon.mx, mon.my, u.ux, u.uy) <= 2)) {
+    if (u.utotype || !m_next2u(mon)) {
         return 1;
     }
     if ($G.uarm || $G.uarmc) {
@@ -2096,7 +2096,7 @@ export async function doseduce(mon) {   // mhitu.c:1985
        as far as deciding what will happen; chance for bad outcome when
        Cha+Int is 32 or more is 2/35, a bit over 5.7% */
     const attr_tot = ACURR(A.CHA) + ACURR(A.INT);
-    if (rn2(35) > (attr_tot < 32 ? attr_tot : 32)) {
+    if (rn2(35) > min(attr_tot, 32)) {
         /* Don't bother with mspec_used here... it didn't get tired! */
         await pline($C`%s seems to have enjoyed it more than you...`, await noit_Monnam(mon));
         switch (rn2(5)) {
@@ -2136,7 +2136,7 @@ export async function doseduce(mon) {   // mhitu.c:1985
                 {
                     await You_feel($C`exhausted.`);
                     await exercise(A.STR, FALSE);
-                    const tmp = rn2(10) + 6 | 0;
+                    const tmp = rn1(10, 6);
                     await losehp(Maybe_Half_Phys(tmp), $C`exhaustion`, KILLED.BY);
                     break;
                 }   /* case 4 */
@@ -2239,7 +2239,7 @@ async function mayberem(mon, seducer, obj, str) {   // mhitu.c:2309
     }
     /* removal of a previous item might have sent the hero elsewhere
        (loss of levitation that leads to landing on a transport trap) */
-    if (u.utotype || !(dist2(mon.mx, mon.my, u.ux, u.uy) <= 2)) {
+    if (u.utotype || !m_next2u(mon)) {
         return;
     }
     /* being deaf overrides confirmation prompt for high charisma */

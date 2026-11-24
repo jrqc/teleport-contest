@@ -18,22 +18,23 @@ import { all_options_autocomplete, bind_key, bind_mousebtn, bind_specialkey, cmd
 import { NO_COLOR } from './color.h.js';
 import { add_menu_coloring_parsed, attr2attrname, check_enhanced_colors, clr2colorname, color_attr_parse_str, color_attr_to_str, count_menucolors, free_one_menu_coloring, match_str2attr, query_attr, query_color, query_color_attr, wc_color_name } from './coloratt.js';
 import { nomakedefs } from './date.js';
-import { a11y, cg, disclosure_options, disp, flags, ga, gc, gd, gf, gh, gm, gn, go, gp, gs, gt, gv, gw, hexdd, iflags, program_state, svb, svc, svd, svp, u } from './decl.js';
+import { a11y, cg, disclosure_options, disp, flags, ga, gc, gd, gf, gh, gm, gn, go, gp, gs, gt, gv, gw, hexdd, iflags, program_state, svb, svc, svp, u } from './decl.js';
 import { AE, AS } from './decl.macros.js';
 import { AMULET_CLASS, ARMOR_CLASS, BALL_CLASS, CHAIN_CLASS, COIN_CLASS, FOOD_CLASS, GEM_CLASS, GOLD_SYM, POTION_CLASS, RING_CLASS, ROCK_CLASS, SCROLL_CLASS, SPBOOK_CLASS, TOOL_CLASS, VENOM_SYM, WAND_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { docrt, flush_screen, nul_glyphinfo, reglyph_darkroom, reset_glyphmap } from './display.js';
 import { gm_optionchange } from './display.h.js';
 import { def_char_to_monclass, def_char_to_objclass, def_oc_syms, def_warnsyms } from './drawing.js';
-import { on_level } from './dungeon.js';
+import { Is_rogue_level } from './dungeon.macros.js';
 import { nh_terminate, panic } from './end.js';
 import { do_deferred_showpaths, nh_basename, read_sym_file } from './files.js';
 import { AUTOUNLOCK, DISCLOSE_NO_WITHOUT_PROMPT, DISCLOSE_PROMPT_DEFAULT_NO, DISCLOSE_PROMPT_DEFAULT_SPECIAL, DISCLOSE_PROMPT_DEFAULT_YES, DISCLOSE_SPECIAL_WITHOUT_PROMPT, DISCLOSE_YES_WITHOUT_PROMPT, GFILTER_AREA, GFILTER_NONE, GFILTER_VIEW, GPCOORDS_COMFULL, GPCOORDS_COMPASS, GPCOORDS_MAP, GPCOORDS_NONE, GPCOORDS_SCREEN, NUM_DISCLOSURE_OPTIONS, PARANOID, RUN, VI, WC_COUNT, wcolor_menu, wcolor_message, wcolor_status, wcolor_text } from './flag.h.js';
 import { discover, wizard } from './flag.macros.js';
 import { BUFSZ, COLNO, FALSE, LARGEST_INT, OPTCOUNT, PL, ROWNO, TRUE, builtin_opt, cmdline_opt, environ_opt, num_opt_phases, opt_in, opt_out, play_opt, set_gameview, set_hidden, set_in_config, set_in_game, set_in_sysconf, set_wiznofuz, set_wizonly, syscf_opt } from './global.h.js';
-import { C, M, SET__IS_VALUE_VALID } from './global.macros.js';
+import { C, M, SET__IS_VALUE_VALID, strcmpi } from './global.macros.js';
 import { apply_customizations, fill_glyphid_cache, free_glyphid_cache, glyphid_cache_status, glyphrep_to_custom_map_entries, reset_customcolors } from './glyphs.js';
 import { classify_terrain } from './hack.js';
 import { ECMD, EXT_ENCUMBER, HVY_ENCUMBER, MAX_MENU_MAPPED_CMDS, MENUTYPELEN, MOD_ENCUMBER, MSGTYP, OVERLOADED, SLT_ENCUMBER, SYM_OFF_O, SYM_OFF_X, UNENCUMBERED, VANQ, WINTYPELEN } from './hack.h.js';
+import { max } from './hack.macros.js';
 import { copynchars, digit, eos, fuzzymatch, highc, letter, lowc, mungspaces, nh_snprintf, strNsubst, str_end_is, str_start_is, strkitten, strncmpi, strstri, strsubst, trimspaces, visctrl } from './hacklib.js';
 import { set_vanq_order, vanqorders } from './insight.js';
 import { reassign, update_inventory } from './invent.js';
@@ -875,7 +876,7 @@ async function optfn_boulder(optidx, req, negated, opts, op) {   // options.c:11
                initoptions_finish(), after all symset options
                have been processed */
             if (!go.opt_initial) {
-                const sym = get_othersym(SYM.BOULDER, (svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? ROGUESET : PRIMARYSET);
+                const sym = get_othersym(SYM.BOULDER, Is_rogue_level(u.uz) ? ROGUESET : PRIMARYSET);
                 if (sym) {
                     gs.showsyms[SYM.BOULDER + SYM_OFF_X] = sym;
                 }
@@ -1094,8 +1095,8 @@ async function optfn_disclose(optidx, req, negated, opts, op) {   // options.c:1
         }
         /* "disclose" without a value means "all with prompting"
            and negated means "none without prompting" */
-        if ($c.peq(op, new $c.Ptr(empty_optstr, 0)) || !strncmpi(op, $C`all`, -1) || !strncmpi(op, $C`none`, -1)) {
-            if (!$c.peq(op, new $c.Ptr(empty_optstr, 0)) && !strncmpi(op, $C`none`, -1)) {
+        if ($c.peq(op, new $c.Ptr(empty_optstr, 0)) || !strcmpi(op, $C`all`) || !strcmpi(op, $C`none`)) {
+            if (!$c.peq(op, new $c.Ptr(empty_optstr, 0)) && !strcmpi(op, $C`none`)) {
                 negated = TRUE;
             }
             for (num = 0; num < NUM_DISCLOSURE_OPTIONS; num = num + 1 >>> 0) {
@@ -1584,7 +1585,7 @@ async function optfn_IBMgraphics(optidx, req, negated, opts, op) {   // options.
                 return optn_err;
             } else {
                 await switch_symbols(TRUE);
-                if (!go.opt_initial && ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level))) {
+                if (!go.opt_initial && Is_rogue_level(u.uz)) {
                     assign_graphics(ROGUESET);
                 }
             }
@@ -1619,7 +1620,7 @@ async function optfn_map_mode(optidx, req, negated, opts, op) {   // options.c:1
         op = await string_for_opt(opts, negated);
         if (!$c.peq(op, new $c.Ptr(empty_optstr, 0)) && !negated) {
             const save_map_mode = iflags.wc_map_mode;
-            if (!strncmpi(op, $C`tiles`, -1)) {
+            if (!strcmpi(op, $C`tiles`)) {
                 iflags.wc_map_mode = MAP_MODE.TILES;
             } else if (!strncmpi(op, $C`ascii4x6`, 8)) {
                 iflags.wc_map_mode = MAP_MODE.ASCII4x6;
@@ -3011,7 +3012,7 @@ async function optfn_playmode(optidx, req, negated, opts, op) {   // options.c:3
         if ($c.peq(op, new $c.Ptr(empty_optstr, 0))) {
             return optn_err;
         }
-        if (!strncmpi(op, $C`normal`, 6) || !strncmpi(op, $C`play`, -1)) {
+        if (!strncmpi(op, $C`normal`, 6) || !strcmpi(op, $C`play`)) {
             $t1 = flags.explore = FALSE, flags.debug = $t1;
         } else if (!strncmpi(op, $C`explore`, 6) || !strncmpi(op, $C`discovery`, 6)) {
             flags.debug = FALSE, flags.explore = TRUE;
@@ -3093,7 +3094,7 @@ async function optfn_roguesymset(optidx, req, negated, opts, op) {   // options.
                 await config_error_add($C`Unable to load symbol set "%s" from "%s"`, op, $C`symbols`);
                 return optn_err;
             } else {
-                if (!go.opt_initial && ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level))) {
+                if (!go.opt_initial && Is_rogue_level(u.uz)) {
                     assign_graphics(ROGUESET);
                 }
                 $t2 = go.opt_need_glyph_reset = TRUE, go.opt_need_redraw = $t2;
@@ -4532,9 +4533,9 @@ export async function optfn_boolean(optidx, req, negated, opts, op) {   // optio
             }
             /* length is greater than 0 or we wouldn't have gotten here */
             ln = $c.i32($c.strlen(op));
-            if (!strncmpi(op, $C`true`, ln) || !strncmpi(op, $C`yes`, ln) || !strncmpi(op, $C`on`, -1) || digit(op.get(0)) && $c.atoi(op) === 1) {
+            if (!strncmpi(op, $C`true`, ln) || !strncmpi(op, $C`yes`, ln) || !strcmpi(op, $C`on`) || digit(op.get(0)) && $c.atoi(op) === 1) {
                 negated = FALSE;
-            } else if (!strncmpi(op, $C`false`, ln) || !strncmpi(op, $C`no`, ln) || !strncmpi(op, $C`off`, -1) || digit(op.get(0)) && $c.atoi(op) === 0) {
+            } else if (!strncmpi(op, $C`false`, ln) || !strncmpi(op, $C`no`, ln) || !strcmpi(op, $C`off`) || digit(op.get(0)) && $c.atoi(op) === 0) {
                 negated = TRUE;
             } else if (!allopt[optidx].valok) {
                 await config_error_add($C`'%s' is not valid for a boolean`, opts);
@@ -4550,7 +4551,7 @@ export async function optfn_boolean(optidx, req, negated, opts, op) {   // optio
         /* Before the change */
         switch (optidx) {
             case opt_female:
-                if (!strncmpi(opts, $C`female`, ln > 3 ? ln : 3)) {
+                if (!strncmpi(opts, $C`female`, max(ln, 3))) {
                     if (!go.opt_initial && flags.female === negated) {
                         nosexchange = TRUE;
                     } else {
@@ -4558,7 +4559,7 @@ export async function optfn_boolean(optidx, req, negated, opts, op) {   // optio
                         return optn_ok;
                     }
                 }
-                if (!strncmpi(opts, $C`male`, ln > 3 ? ln : 3)) {
+                if (!strncmpi(opts, $C`male`, max(ln, 3))) {
                     if (!go.opt_initial && flags.female !== negated) {
                         nosexchange = TRUE;
                     } else {
@@ -6181,7 +6182,7 @@ export async function initoptions_init() {   // options.c:7119
          * that situation though, so the game will use whatever is in
          * RC/NETHACKOPTIONS or resort to DEFAULT_WINDOW_SYS.
          */
-        if (windowprocs.name && !strncmpi(windowprocs.name, gc.cmdline_windowsys, -1)) {   /* ignore any windowtype:foo in RC file or NETHACKOPTIONS */
+        if (windowprocs.name && !strcmpi(windowprocs.name, gc.cmdline_windowsys)) {   /* ignore any windowtype:foo in RC file or NETHACKOPTIONS */
             iflags.windowtype_locked = TRUE;
         }
         /* shouldn't need cmdline_windowsys beyond here */
@@ -6340,7 +6341,7 @@ export async function initoptions_finish() {   // options.c:7324
      * slime mold or whatever custom name player assigns to that.
      */
     obj_descr[SLIME_MOLD].oc_name = $C`fruit`;
-    sym = get_othersym(SYM.BOULDER, (svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? ROGUESET : PRIMARYSET);
+    sym = get_othersym(SYM.BOULDER, Is_rogue_level(u.uz) ? ROGUESET : PRIMARYSET);
     if (sym) {
         gs.showsyms[SYM.BOULDER + SYM_OFF_X] = sym;
     }
@@ -7513,7 +7514,7 @@ async function doset_simple_menu() {   // options.c:8536
                     case CompOpt:
                     case OthrOpt:
                         k = i;
-                        if (allopt[i].optfn === optfn_symset && ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level))) {
+                        if (allopt[i].optfn === optfn_symset && Is_rogue_level(u.uz)) {
                             k = opt_roguesymset;
                             name = allopt[k].name;
                             any.a_int = k + 1 | 0;
@@ -8690,7 +8691,7 @@ async function wc_set_window_colors(op) {   // options.c:10023
             ($t3 = newop, newop = $t3.add(1), $t3).set(0, 0);
         }
         for (j = 0; j < WC_COUNT; j = j + 1 | 0) {
-            if (!strncmpi(wn, wcnames[j], -1) || !strncmpi(wn, wcshortnames[j], -1)) {
+            if (!strcmpi(wn, wcnames[j]) || !strcmpi(wn, wcshortnames[j])) {
                 if (!strstri(tfg, $C` `)) {
                     if (fgp[j].get(0)) {
                         $c.free(fgp[j].get(0));

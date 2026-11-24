@@ -19,18 +19,19 @@ import { bl_bareh } from './botl.h.js';
 import { cmdq_clear, cmdq_peek, cmdq_pop, paranoid_ynq, set_occupation, yn_function } from './cmd.js';
 import { CONTEXTVERBSZ } from './context.h.js';
 import { is_lava, is_pool, is_pool_or_lava } from './dbridge.js';
-import { c_color_names, c_common_strings, cg, disp, flags, ga, gi, gm, gn, gu, gw, gy, iflags, program_state, rightleftchars, svc, svd, u } from './decl.js';
+import { c_color_names, c_common_strings, cg, disp, flags, ga, gi, gm, gn, gw, gy, iflags, program_state, rightleftchars, svc, svd, u } from './decl.js';
 import { AMULET_CLASS, ARMOR_CLASS, RING_CLASS, S, WEAPON_CLASS } from './defsym.h.js';
 import { newsym, see_monsters, set_mimic_blocking } from './display.js';
 import { canletgo, dropx, trycall } from './do.js';
 import { hcolor, hliquid, obj_pmname, x_monnam } from './do_name.js';
-import { has_ceiling, on_level, surface } from './dungeon.js';
+import { has_ceiling, surface } from './dungeon.js';
+import { Is_airlevel, Is_waterlevel } from './dungeon.macros.js';
 import { panic } from './end.js';
 import { ParanoidRemove } from './flag.macros.js';
 import { FALSE, TRUE } from './global.h.js';
 import { nomul, spoteffects, unmul } from './hack.js';
 import { ALL_FINISHED, ALL_TYPES, ALL_TYPES_SELECTED, ARTICLE, BUCX_TYPES, CMDQ, CQ_CANNED, CXN, ECMD, FACE, FINGER, FOOT, GETOBJ, HAND, HEAD, INVORDER_SORT, LEG, NECK, SIGNAL, SUPPRESS, UNPAID_TYPES, USE_INVLET, WORN_TYPES, st_corpse, st_petrifies } from './hack.h.js';
-import { makeknown } from './hack.macros.js';
+import { ARM_BONUS, makeknown } from './hack.macros.js';
 import { nh_snprintf, sgn, strsubst } from './hacklib.js';
 import { carrying_stoning_corpse, getobj, ggetobj, is_worn, prinv, silly_thing, update_inventory, useup, wearing_armor } from './invent.js';
 import { arti_light_description } from './light.js';
@@ -42,7 +43,7 @@ import { cant_drown, has_head, humanoid, is_clinger, nohands, nolimbs, slithy, t
 import { M1, MZ } from './monflag.h.js';
 import { mons } from './monst.js';
 import { PM } from './monsters.h.js';
-import { discover_object, observe_object } from './o_init.js';
+import { observe_object } from './o_init.js';
 import { EF, ER, ERODE } from './obj.h.js';
 import { WrappingAllowed, bimanual, is_boots, is_cloak, is_flimsy, is_gloves, is_helmet, is_shield, is_shirt, is_suit, is_sword } from './obj.macros.js';
 import { ARM_BOOTS, ARM_CLOAK, ARM_GLOVES, ARM_HELM, ARM_SHIELD, ARM_SHIRT, ARM_SUIT } from './objclass.h.js';
@@ -54,7 +55,7 @@ import { add_valid_menu_class, encumber_msg, is_worn_by_type, menu_class_present
 import { There, You, You_cant, You_feel, Your, impossible, pline, pline_The, urgent_pline } from './pline.js';
 import { body_part, change_sex, float_vs_flight, livelog_newform, poly_gender } from './polyself.js';
 import { incr_itimeout, make_glib, make_hallucinated, make_slimed, self_invis_message, toggle_blindness } from './potion.js';
-import { ACID_RES, DISPLACED, DRAIN_RES, FAST, FLYING, FREE_ACTION, FROMOUTSIDE, FUMBLING, GLIB, INFRAVISION, INTRINSIC, I_SPECIAL, LEVITATION, MAGICAL_BREATHING, PROTECTION, SICK_RES, SLEEPY, SLOW_DIGESTION, STEALTH, STONE_RES, STRANGLED, SWIMMING, TIMEOUT, W, W_ACCESSORY, W_ARMOR, W_RING, W_WEAPONS } from './prop.h.js';
+import { ACID_RES, DISPLACED, DRAIN_RES, FAST, FLYING, FREE_ACTION, FROMOUTSIDE, FUMBLING, GLIB, INFRAVISION, INTRINSIC, I_SPECIAL, LEVITATION, MAGICAL_BREATHING, PROTECTION, SICK_RES, SLEEPY, SLOW_DIGESTION, STEALTH, STONE_RES, STRANGLED, TIMEOUT, W, W_ACCESSORY, W_ARMOR, W_RING, W_WEAPONS } from './prop.h.js';
 import { region_danger } from './region.js';
 import { rn2, rnd } from './rnd.js';
 import { shk_your } from './shk.js';
@@ -67,8 +68,8 @@ import { empty_handed, setuqwep, setuswapwep, setuwep, welded } from './wield.js
 import { MENU, PICK } from './wintype.h.js';
 import { racial_exception, setnotworn, setworn, which_armor } from './worn.js';
 import { AC_MAX, TT } from './you.h.js';
-import { RING_ON_PRIMARY, ULEFTY, URIGHTY, Upolyd } from './you.macros.js';
-import { BInvis, BStealth, Blind, Blind_telepat, Detect_monsters, EInvis, ESleepy, Fast, Glib, HFast, HInvis, HLevitation, HSee_invisible, HStealth, Hallucination, Invis, Invisible, Levitation, Protection_from_shape_changers, Punished, See_invisible, Slimed, Stone_resistance, Strangled, Unblind_telepat, Unchanging, Underwater, Very_fast } from './youprop.macros.js';
+import { RING_ON_PRIMARY, Role_if, ULEFTY, URIGHTY, Upolyd } from './you.macros.js';
+import { BInvis, BStealth, Blind, Blind_telepat, Breathless, Detect_monsters, EInvis, ESleepy, Fast, Flying, Glib, HFast, HInvis, HLevitation, HSee_invisible, HStealth, Hallucination, Invis, Invisible, Levitation, Protection_from_shape_changers, Punished, See_invisible, Slimed, Stone_resistance, Strangled, Swimming, Unblind_telepat, Unchanging, Underwater, Very_fast } from './youprop.macros.js';
 import { obj_resists } from './zap.js';
 
 const armoroff$offdelaybuf = new Int8Array(60);   // static in armoroff()
@@ -156,12 +157,12 @@ async function toggle_stealth(obj, oldprop, on) {   // do_wear.c:107
             await learnring(obj, TRUE);
         } else {
             /* discover elven cloak or elven boots */
-            await discover_object(obj.otyp, TRUE, TRUE, TRUE);
+            await makeknown(obj.otyp);
         }
         if (on) {
             if (!is_boots(obj)) {
                 await You($C`move very quietly.`);
-            } else if (Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) {
+            } else if (Levitation() || Flying()) {
                 await You($C`float imperceptibly.`);
             } else {
                 await You($C`walk very quietly.`);
@@ -203,7 +204,7 @@ export async function toggle_displacement(obj, oldprop, on) {   // do_wear.c:148
        hero also senses self in this situation */
     if (!oldprop && !u.uprops[DISPLACED].intrinsic && !u.uprops[DISPLACED].blocked && (!Blind() && !u.uswallow && !Invisible() || (Unblind_telepat() || Blind_telepat() && Blind() || Detect_monsters()))) {
         if (obj) {
-            await discover_object(obj.otyp, TRUE, TRUE, TRUE);
+            await makeknown(obj.otyp);
         }
         await You_feel($C`that monsters%s have difficulty pinpointing your location.`, on ? $C`` : $C` no longer`);
     }
@@ -239,7 +240,7 @@ export async function Boots_on() {   // do_wear.c:187
             /* init'd in accessory_or_armor_on() and only used here */
             if (gw.wasinwater) {
                 if (!u.uinwater) {
-                    await discover_object(WATER_WALKING_BOOTS, TRUE, TRUE, TRUE);
+                    await makeknown(WATER_WALKING_BOOTS);
                 }
                 gw.wasinwater = 0;
             }
@@ -250,7 +251,7 @@ export async function Boots_on() {   // do_wear.c:187
             /* Speed boots are still better than intrinsic speed, */
             /* though not better than potion speed */
             if (!oldprop && !$c.and64(u.uprops[FAST].intrinsic, TIMEOUT)) {
-                await discover_object($G.uarmf.otyp, TRUE, TRUE, TRUE);
+                await makeknown($G.uarmf.otyp);
                 await You_feel($C`yourself speed up%s.`, oldprop || HFast() ? $C` a bit more` : $C``);
             }
             break;
@@ -270,7 +271,7 @@ export async function Boots_on() {   // do_wear.c:187
                  * gets updated during brief interval they're
                  * worn so hero and player learn enchantment */
                 disp.botl = TRUE;   /* status hilites might mark AC changed */
-                await discover_object($G.uarmf.otyp, TRUE, TRUE, TRUE);
+                await makeknown($G.uarmf.otyp);
                 await float_up();
                 if (Levitation()) {
                     await spoteffects(FALSE);   /* for sink effect */
@@ -312,7 +313,7 @@ export async function Boots_off() {   // do_wear.c:262
         case WATER_WALKING_BOOTS:
             /* check for lava since fireproofed boots make it viable */
             /* avoid recursive call to lava_effects() */
-            if ((is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy)) && !Levitation() && !((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) && !(is_clinger(gy.youmonst.data) && has_ceiling(u.uz)) && !svc.context.takeoff.cancelled_don && !iflags.in_lava_effects) {
+            if ((is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy)) && !Levitation() && !Flying() && !(is_clinger(gy.youmonst.data) && has_ceiling(u.uz)) && !svc.context.takeoff.cancelled_don && !iflags.in_lava_effects) {
                 /* make boots known in case you survive the drowning */
                 await makeknown(otyp);
                 await spoteffects(TRUE);
@@ -363,7 +364,7 @@ async function Cloak_on() {   // do_wear.c:326
         case LEATHER_CLOAK:
             break;
         case CLOAK_OF_PROTECTION:
-            await discover_object($G.uarmc.otyp, TRUE, TRUE, TRUE);
+            await makeknown($G.uarmc.otyp);
             break;
         case ELVEN_CLOAK:
             await toggle_stealth($G.uarmc, oldprop, TRUE);
@@ -382,7 +383,7 @@ async function Cloak_on() {   // do_wear.c:326
             /* since cloak of invisibility was worn, we know mummy wrapping
                wasn't, so no need to check `oldprop' against blocked */
             if (!oldprop && !HInvis() && !Blind()) {
-                await discover_object($G.uarmc.otyp, TRUE, TRUE, TRUE);
+                await makeknown($G.uarmc.otyp);
                 await newsym(u.ux, u.uy);
                 await pline($C`Suddenly you can%s yourself.`, See_invisible() ? $C` see through` : $C`not see`);
             }
@@ -437,7 +438,7 @@ export async function Cloak_off() {   // do_wear.c:383
             break;
         case CLOAK_OF_INVISIBILITY:
             if (!oldprop && !HInvis() && !Blind()) {
-                await discover_object(CLOAK_OF_INVISIBILITY, TRUE, TRUE, TRUE);
+                await makeknown(CLOAK_OF_INVISIBILITY);
                 await newsym(u.ux, u.uy);
                 await pline($C`Suddenly you can %s.`, See_invisible() ? $C`no longer see through yourself` : new $c.Ptr(see_yourself, 0));
             }
@@ -457,7 +458,7 @@ export async function Cloak_off() {   // do_wear.c:383
 async function Helmet_on() {   // do_wear.c:434
     switch ($G.uarmh.otyp) {
         case FEDORA:
-            if (gu.urole.mnum === PM.ARCHEOLOGIST) {
+            if (Role_if(PM.ARCHEOLOGIST)) {
                 change_luck(1);
             }
             break;
@@ -478,9 +479,9 @@ async function Helmet_on() {   // do_wear.c:434
             /* people think marked wizards know what they're talking about,
                but it takes trained arrogance to pull it off, and the actual
                enchantment of the hat is irrelevant */
-            u.abon.a[A.CHA] = $c.i8(u.abon.a[A.CHA] + (gu.urole.mnum === PM.WIZARD ? 1 : -1) | 0);
+            u.abon.a[A.CHA] = $c.i8(u.abon.a[A.CHA] + (Role_if(PM.WIZARD) ? 1 : -1) | 0);
             disp.botl = TRUE;
-            await discover_object($G.uarmh.otyp, TRUE, TRUE, TRUE);
+            await makeknown($G.uarmh.otyp);
             break;
         case HELM_OF_OPPOSITE_ALIGNMENT:
             $G.uarmh.known = 1;   /* do this here because uarmh could get cleared */
@@ -503,7 +504,7 @@ async function Helmet_on() {   // do_wear.c:434
                    inventory; do so now [set_bknown() calls update_inventory()] */
                 if (Blind()) {
                     await set_bknown($G.uarmh, 0);   /* lose bknown if previously set */
-                } else if (gu.urole.mnum === PM.CLERIC) {
+                } else if (Role_if(PM.CLERIC)) {
                     await set_bknown($G.uarmh, 1);   /* (bknown should already be set) */
                 } else if ($G.uarmh.bknown) {
                     await update_inventory();   /* keep bknown as-is; display the curse */
@@ -517,7 +518,7 @@ async function Helmet_on() {   // do_wear.c:434
                 await You_feel($C`%s.`, ACURR(A.INT) <= u.acurr.a[A.INT] + u.abon.a[A.INT] + u.atemp.a[A.INT] ? $C`like sitting in a corner` : $C`giddy`);
             } else {
                 /* [message formerly given here moved to uchangealign()] */
-                await discover_object(HELM_OF_OPPOSITE_ALIGNMENT, TRUE, TRUE, TRUE);
+                await makeknown(HELM_OF_OPPOSITE_ALIGNMENT);
             }
             break;
         default:
@@ -537,7 +538,7 @@ export async function Helmet_off() {   // do_wear.c:518
     svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W.ARMH);
     switch ($G.uarmh.otyp) {
         case FEDORA:
-            if (gu.urole.mnum === PM.ARCHEOLOGIST) {
+            if (Role_if(PM.ARCHEOLOGIST)) {
                 change_luck(-1);
             }
             break;
@@ -552,7 +553,7 @@ export async function Helmet_off() {   // do_wear.c:518
             break;
         case CORNUTHAUM:
             if (!svc.context.takeoff.cancelled_don) {
-                u.abon.a[A.CHA] = $c.i8(u.abon.a[A.CHA] + (gu.urole.mnum === PM.WIZARD ? -1 : 1) | 0);
+                u.abon.a[A.CHA] = $c.i8(u.abon.a[A.CHA] + (Role_if(PM.WIZARD) ? -1 : 1) | 0);
                 disp.botl = TRUE;
             }
             break;
@@ -605,7 +606,7 @@ async function Gloves_on() {   // do_wear.c:576
             }
             break;
         case GAUNTLETS_OF_POWER:
-            await discover_object($G.uarmg.otyp, TRUE, TRUE, TRUE);
+            await makeknown($G.uarmg.otyp);
             disp.botl = TRUE;   /* taken care of in attrib.c */
             break;
         case GAUNTLETS_OF_DEXTERITY:
@@ -677,7 +678,7 @@ export async function Gloves_off() {   // do_wear.c:646
             }
             break;
         case GAUNTLETS_OF_POWER:
-            await discover_object($G.uarmg.otyp, TRUE, TRUE, TRUE);
+            await makeknown($G.uarmg.otyp);
             disp.botl = TRUE;   /* taken care of in attrib.c */
             break;
         case GAUNTLETS_OF_DEXTERITY:
@@ -994,7 +995,7 @@ async function Amulet_on(amul) {   // do_wear.c:963
                 const was_in_poison_gas = region_danger();
                 u.uprops[MAGICAL_BREATHING].extrinsic = $c.or64(u.uprops[MAGICAL_BREATHING].extrinsic, W.AMUL);
                 if (was_in_poison_gas) {
-                    await discover_object(AMULET_OF_MAGICAL_BREATHING, TRUE, TRUE, TRUE);
+                    await makeknown(AMULET_OF_MAGICAL_BREATHING);
                     await on_msg($G.uamul);
                     on_msg_done = TRUE;
                     await You($C`are no longer bothered by the poison gas.`);
@@ -1020,7 +1021,7 @@ async function Amulet_on(amul) {   // do_wear.c:963
                 }
                 const new_sex = poly_gender();
                 if (new_sex !== orig_sex) {
-                    await discover_object(AMULET_OF_CHANGE, TRUE, TRUE, TRUE);
+                    await makeknown(AMULET_OF_CHANGE);
                 }
                 await on_msg($G.uamul);   /* show 'z - amulet of change (being worn)' */
                 on_msg_done = TRUE;
@@ -1047,7 +1048,7 @@ async function Amulet_on(amul) {   // do_wear.c:963
         case AMULET_OF_STRANGULATION:
             /* note: might already be Strangled (via #wizintrinsic) */
             if (await can_be_strangled(gy.youmonst) && !Strangled()) {
-                await discover_object(AMULET_OF_STRANGULATION, TRUE, TRUE, TRUE);
+                await makeknown(AMULET_OF_STRANGULATION);
                 u.uprops[STRANGLED].intrinsic = 6;
                 disp.botl = TRUE;
                 await on_msg($G.uamul);
@@ -1069,14 +1070,14 @@ async function Amulet_on(amul) {   // do_wear.c:963
         case AMULET_OF_FLYING:
             /* setworn() has already set extrinsic flying */
             float_vs_flight();   /* block flying if levitating */
-            if ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) {
+            if (Flying()) {
                 /* to determine whether this flight is new we have to muck
                    about in the Flying intrinsic (actually extrinsic) */
                 u.uprops[FLYING].extrinsic = $c.and64(u.uprops[FLYING].extrinsic, ~W.AMUL);
-                const already_flying = !!((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) ? 1 : 0;
+                const already_flying = !!Flying() ? 1 : 0;
                 u.uprops[FLYING].extrinsic = $c.or64(u.uprops[FLYING].extrinsic, W.AMUL);
                 if (!already_flying) {
-                    await discover_object(AMULET_OF_FLYING, TRUE, TRUE, TRUE);
+                    await makeknown(AMULET_OF_FLYING);
                     await on_msg($G.uamul);
                     on_msg_done = TRUE;
                     disp.botl = TRUE;   /* status: 'Fly' On */
@@ -1085,7 +1086,7 @@ async function Amulet_on(amul) {   // do_wear.c:963
             }
             break;
         case AMULET_OF_GUARDING:
-            await discover_object(AMULET_OF_GUARDING, TRUE, TRUE, TRUE);
+            await makeknown(AMULET_OF_GUARDING);
             find_ac();
             break;
         case AMULET_OF_YENDOR:
@@ -1125,7 +1126,7 @@ export async function Amulet_off() {   // do_wear.c:1090
             await off_msg(amul);   /* 'uamul' has been set to Null */
             early_off_msg = TRUE;
             if (Underwater()) {
-                if (!cant_drown(gy.youmonst.data) && !(u.uprops[SWIMMING].intrinsic || u.uprops[SWIMMING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.SWIM) !== 0)) {
+                if (!cant_drown(gy.youmonst.data) && !Swimming()) {
                     await You($C`suddenly inhale an unhealthy amount of %s!`, hliquid($C`water`));
                     mkn = TRUE;   /* in case of life-saving */
                     await drown();
@@ -1144,7 +1145,7 @@ export async function Amulet_off() {   // do_wear.c:1090
             if (Strangled()) {
                 u.uprops[STRANGLED].intrinsic = 0;
                 disp.botl = TRUE;
-                if (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.BREATHLESS) !== 0) {
+                if (Breathless()) {
                     await Your($C`%s is no longer constricted!`, await body_part(NECK));
                 } else {
                     await You($C`can breathe more easily!`);
@@ -1161,16 +1162,16 @@ export async function Amulet_off() {   // do_wear.c:1090
             break;
         case AMULET_OF_FLYING:
             {
-                const was_flying = !!((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) ? 1 : 0;
+                const was_flying = !!Flying() ? 1 : 0;
                 /* remove amulet 'early' to determine whether Flying changes;
                    also in case spoteffects() does something with the amulet */
                 await setworn(null, W.AMUL);
                 await off_msg(amul);
                 early_off_msg = TRUE;
                 float_vs_flight();   /* probably not needed here */
-                if (was_flying && !((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked)) {
+                if (was_flying && !Flying()) {
                     disp.botl = TRUE;   /* status: 'Fly' Off */
-                    await You($C`%s.`, is_pool_or_lava(u.ux, u.uy) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) || (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) ? $C`stop flying` : $C`land`);
+                    await You($C`%s.`, is_pool_or_lava(u.ux, u.uy) || Is_waterlevel(u.uz) || Is_airlevel(u.uz) ? $C`stop flying` : $C`land`);
                     mkn = TRUE;   /* makeknown(AMULET_OF_FLYING) */
                     await spoteffects(TRUE);
                 }
@@ -1187,7 +1188,7 @@ export async function Amulet_off() {   // do_wear.c:1090
         await off_msg(amul);   /* (not 'uamul'; it's Null now) */
     }
     if (mkn) {
-        await discover_object(amul.otyp, TRUE, TRUE, TRUE);
+        await makeknown(amul.otyp);
     }
     return;
 }
@@ -2304,7 +2305,7 @@ async function accessory_or_armor_on(obj$in) {   // do_wear.c:2209
                 await You($C`are suddenly overcome with shame and change your mind.`);
             }
             u.ublessed = 0;   /* lose your god's protection */
-            await discover_object(obj[0].otyp, TRUE, TRUE, TRUE);
+            await makeknown(obj[0].otyp);
             disp.botl = TRUE;   /* for AC after zeroing u.ublessed */
             return ECMD.TIME;
         }
@@ -2522,25 +2523,25 @@ export function find_ac() {   // do_wear.c:2473
     let uac = mons[u.umonnum].ac;   /* base armor class for current form */
     /* armor class from worn gear */
     if ($G.uarm) {
-        uac = uac - (objects[$G.uarm.otyp].oc_oc1 + $G.uarm.spe - (($G.uarm.oeroded > $G.uarm.oeroded2 ? $G.uarm.oeroded : $G.uarm.oeroded2) < objects[$G.uarm.otyp].oc_oc1 ? $G.uarm.oeroded > $G.uarm.oeroded2 ? $G.uarm.oeroded : $G.uarm.oeroded2 : objects[$G.uarm.otyp].oc_oc1)) | 0;
+        uac = uac - ARM_BONUS($G.uarm) | 0;
     }
     if ($G.uarmc) {
-        uac = uac - (objects[$G.uarmc.otyp].oc_oc1 + $G.uarmc.spe - (($G.uarmc.oeroded > $G.uarmc.oeroded2 ? $G.uarmc.oeroded : $G.uarmc.oeroded2) < objects[$G.uarmc.otyp].oc_oc1 ? $G.uarmc.oeroded > $G.uarmc.oeroded2 ? $G.uarmc.oeroded : $G.uarmc.oeroded2 : objects[$G.uarmc.otyp].oc_oc1)) | 0;
+        uac = uac - ARM_BONUS($G.uarmc) | 0;
     }
     if ($G.uarmh) {
-        uac = uac - (objects[$G.uarmh.otyp].oc_oc1 + $G.uarmh.spe - (($G.uarmh.oeroded > $G.uarmh.oeroded2 ? $G.uarmh.oeroded : $G.uarmh.oeroded2) < objects[$G.uarmh.otyp].oc_oc1 ? $G.uarmh.oeroded > $G.uarmh.oeroded2 ? $G.uarmh.oeroded : $G.uarmh.oeroded2 : objects[$G.uarmh.otyp].oc_oc1)) | 0;
+        uac = uac - ARM_BONUS($G.uarmh) | 0;
     }
     if ($G.uarmf) {
-        uac = uac - (objects[$G.uarmf.otyp].oc_oc1 + $G.uarmf.spe - (($G.uarmf.oeroded > $G.uarmf.oeroded2 ? $G.uarmf.oeroded : $G.uarmf.oeroded2) < objects[$G.uarmf.otyp].oc_oc1 ? $G.uarmf.oeroded > $G.uarmf.oeroded2 ? $G.uarmf.oeroded : $G.uarmf.oeroded2 : objects[$G.uarmf.otyp].oc_oc1)) | 0;
+        uac = uac - ARM_BONUS($G.uarmf) | 0;
     }
     if ($G.uarms) {
-        uac = uac - (objects[$G.uarms.otyp].oc_oc1 + $G.uarms.spe - (($G.uarms.oeroded > $G.uarms.oeroded2 ? $G.uarms.oeroded : $G.uarms.oeroded2) < objects[$G.uarms.otyp].oc_oc1 ? $G.uarms.oeroded > $G.uarms.oeroded2 ? $G.uarms.oeroded : $G.uarms.oeroded2 : objects[$G.uarms.otyp].oc_oc1)) | 0;
+        uac = uac - ARM_BONUS($G.uarms) | 0;
     }
     if ($G.uarmg) {
-        uac = uac - (objects[$G.uarmg.otyp].oc_oc1 + $G.uarmg.spe - (($G.uarmg.oeroded > $G.uarmg.oeroded2 ? $G.uarmg.oeroded : $G.uarmg.oeroded2) < objects[$G.uarmg.otyp].oc_oc1 ? $G.uarmg.oeroded > $G.uarmg.oeroded2 ? $G.uarmg.oeroded : $G.uarmg.oeroded2 : objects[$G.uarmg.otyp].oc_oc1)) | 0;
+        uac = uac - ARM_BONUS($G.uarmg) | 0;
     }
     if ($G.uarmu) {
-        uac = uac - (objects[$G.uarmu.otyp].oc_oc1 + $G.uarmu.spe - (($G.uarmu.oeroded > $G.uarmu.oeroded2 ? $G.uarmu.oeroded : $G.uarmu.oeroded2) < objects[$G.uarmu.otyp].oc_oc1 ? $G.uarmu.oeroded > $G.uarmu.oeroded2 ? $G.uarmu.oeroded : $G.uarmu.oeroded2 : objects[$G.uarmu.otyp].oc_oc1)) | 0;
+        uac = uac - ARM_BONUS($G.uarmu) | 0;
     }
     if ($G.uleft && $G.uleft.otyp === RIN_PROTECTION) {
         uac = uac - $G.uleft.spe | 0;
@@ -3359,14 +3360,14 @@ export async function destroy_arm() {   // do_wear.c:3278
 export async function adj_abon(otmp, delta) {   // do_wear.c:3319
     if ($G.uarmg && $G.uarmg === otmp && otmp.otyp === GAUNTLETS_OF_DEXTERITY) {
         if (delta) {
-            await discover_object($G.uarmg.otyp, TRUE, TRUE, TRUE);
+            await makeknown($G.uarmg.otyp);
             u.abon.a[A.DEX] = $c.i8(u.abon.a[A.DEX] + delta | 0);
         }
         disp.botl = TRUE;
     }
     if ($G.uarmh && $G.uarmh === otmp && otmp.otyp === HELM_OF_BRILLIANCE) {
         if (delta) {
-            await discover_object($G.uarmh.otyp, TRUE, TRUE, TRUE);
+            await makeknown($G.uarmh.otyp);
             u.abon.a[A.INT] = $c.i8(u.abon.a[A.INT] + delta | 0);
             u.abon.a[A.WIS] = $c.i8(u.abon.a[A.WIS] + delta | 0);
         }

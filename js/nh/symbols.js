@@ -9,14 +9,15 @@ import { $G } from './globals.js';
 import { alloc, dupstr } from './alloc.js';
 import { config_error_add } from './cfgfiles.js';
 import { NO_COLOR } from './color.h.js';
-import { cg, gc, go, gp, gr, gs, svd, u } from './decl.js';
+import { cg, gc, go, gp, gr, gs, u } from './decl.js';
 import { DEF, ROCK_CLASS, S } from './defsym.h.js';
 import { nul_glyphinfo, reset_glyphmap } from './display.js';
 import { NO_GLYPH, gm_symchange } from './display.h.js';
 import { def_monsyms, def_oc_syms, def_r_oc_syms, def_warnsyms, defsyms } from './drawing.js';
-import { on_level } from './dungeon.js';
+import { Is_rogue_level } from './dungeon.macros.js';
 import { read_sym_file } from './files.js';
 import { BUFSZ, FALSE, TRUE } from './global.h.js';
+import { strcmpi } from './global.macros.js';
 import { apply_customizations, clear_all_glyphmap_colors, fill_glyphid_cache, free_glyphid_cache, glyphid_cache_status, glyphrep_to_custom_map_entries, match_glyph, purge_custom_entries } from './glyphs.js';
 import { DEF_NOTHING, SYM_MAX, SYM_OFF_M, SYM_OFF_O, SYM_OFF_P, SYM_OFF_W, SYM_OFF_X } from './hack.h.js';
 import { lowc, mungspaces, nh_snprintf, strncmpi } from './hacklib.js';
@@ -25,6 +26,7 @@ import { sym_val } from './options.js';
 import { There, pline } from './pline.js';
 import { strbuf_append } from './strutil.js';
 import { H_DEC, H_MAC, H_UNK, H_UTF8, MAXMCLASSES, MAXOTHER, MAXPCHARS, PRIMARYSET, ROGUESET, SYM, WARNCOUNT, do_custom_colors, do_custom_symbols } from './sym.h.js';
+import { SYMHANDLING } from './sym.macros.js';
 import { free_all_glyphmap_u } from './utf8map.js';
 import { add_menu, select_menu } from './windows.js';
 import { create_nhwindow, destroy_nhwindow, end_menu, preference_update, start_menu } from './winprocs.macros.js';
@@ -262,12 +264,12 @@ export async function switch_symbols(nondefault) {   // symbols.c:253
         /* curses doesn't assign any routine to dec..._callback but
            probably does the expected initialization under the hood
            for terminals capable of rendering DECgraphics */
-        if (gs.symset[gc.currentgraphics].handling === H_DEC && $G.decgraphics_mode_callback) {
+        if (SYMHANDLING(H_DEC) && $G.decgraphics_mode_callback) {
             await $G.decgraphics_mode_callback();
         }
         /* there aren't any symbol sets with CURS handling, and the
            curses interface never assigns a routine to curses..._callback */
-        if (gs.symset[gc.currentgraphics].handling === H_UTF8 && $G.utf8graphics_mode_callback) {
+        if (SYMHANDLING(H_UTF8) && $G.utf8graphics_mode_callback) {
             await $G.utf8graphics_mode_callback();
         }
     } else {
@@ -447,7 +449,7 @@ export async function parse_sym_line(buf, which_set) {   // symbols.c:438
                         /* handler type identified */
                         tmpsp = lastsp;   /* most recent symset */
                         for (i = 0; known_handling[i]; i = i + 1 | 0) {
-                            if (!strncmpi(known_handling[i], bufp, -1)) {
+                            if (!strcmpi(known_handling[i], bufp)) {
                                 if (tmpsp) {
                                     tmpsp.handling = i >>> 0;
                                 }
@@ -466,7 +468,7 @@ export async function parse_sym_line(buf, which_set) {   // symbols.c:438
                         /* restrictions: xxxx*/
                         tmpsp = lastsp;   /* most recent symset */
                         for (i = 0; known_restrictions[i]; i = i + 1 | 0) {
-                            if (!strncmpi(known_restrictions[i], bufp, -1)) {
+                            if (!strcmpi(known_restrictions[i], bufp)) {
                                 if (tmpsp) {
                                     switch (i) {
                                         case 0:
@@ -489,7 +491,7 @@ export async function parse_sym_line(buf, which_set) {   // symbols.c:438
             switch (symp.idx) {
                 case 0:
                     /* start of symset */
-                    if (!strncmpi(bufp, gs.symset[which_set].name, -1)) {
+                    if (!strcmpi(bufp, gs.symset[which_set].name)) {
                         /* matches desired one */
                         gc.chosen_symset_start = TRUE;
                         /* these init_*() functions clear symset fields too */
@@ -518,9 +520,9 @@ export async function parse_sym_line(buf, which_set) {   // symbols.c:438
                     /* color:off */
                     if (gc.chosen_symset_start) {
                         if (bufp) {
-                            if (!strncmpi(bufp, $C`true`, -1) || !strncmpi(bufp, $C`yes`, -1) || !strncmpi(bufp, $C`on`, -1)) {
+                            if (!strcmpi(bufp, $C`true`) || !strcmpi(bufp, $C`yes`) || !strcmpi(bufp, $C`on`)) {
                                 gs.symset[which_set].nocolor = 0;
-                            } else if (!strncmpi(bufp, $C`false`, -1) || !strncmpi(bufp, $C`no`, -1) || !strncmpi(bufp, $C`off`, -1)) {
+                            } else if (!strcmpi(bufp, $C`false`) || !strcmpi(bufp, $C`no`) || !strcmpi(bufp, $C`off`)) {
                                 gs.symset[which_set].nocolor = 1;
                             }
                         }
@@ -531,7 +533,7 @@ export async function parse_sym_line(buf, which_set) {   // symbols.c:438
                     if (gc.chosen_symset_start) {
                         let n = 0;
                         while (known_restrictions[n]) {
-                            if (!strncmpi(known_restrictions[n], bufp, -1)) {
+                            if (!strcmpi(known_restrictions[n], bufp)) {
                                 switch (n) {
                                     case 0:
                                         gs.symset[which_set].primary = 1;
@@ -578,7 +580,7 @@ export function set_symhandling(handling, which_set) {   // symbols.c:657
     let i = 0;
     gs.symset[which_set].handling = H_UNK;
     while (known_handling[i]) {
-        if (!strncmpi(known_handling[i], handling, -1)) {
+        if (!strcmpi(known_handling[i], handling)) {
             gs.symset[which_set].handling = i >>> 0;
             return;
         }
@@ -871,7 +873,7 @@ export async function do_symset(rogueflag) {   // symbols.c:909
                    +1 because Defaults are implicitly in slot [0];
                    +1 again so that valid data is never 0 */
                 any.a_int = sl.idx + 2 | 0;
-                if (symset_name && !strncmpi(sl.name, symset_name, -1)) {
+                if (symset_name && !strcmpi(sl.name, symset_name)) {
                     defindx = any.a_int;
                 }
                 $c.sprintf(new $c.Ptr(buf, 0), new $c.Ptr(fmtstr, 0), sl.name, sl.desc ? sl.desc : $C``);
@@ -965,7 +967,7 @@ export async function do_symset(rogueflag) {   // symbols.c:909
     if (ready_to_switch) {
         await switch_symbols(TRUE);
     }
-    if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level)) {
+    if (Is_rogue_level(u.uz)) {
         if (rogueflag) {
             assign_graphics(ROGUESET);
         }

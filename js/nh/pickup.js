@@ -20,7 +20,7 @@ import { bot } from './botl.js';
 import { cmdq_add_ec, get_adjacent_loc, isok, paranoid_ynq, yn_function } from './cmd.js';
 import { NO_COLOR } from './color.h.js';
 import { db_under_typ, is_lava, is_pool } from './dbridge.js';
-import { c_common_strings, cg, disp, flags, ga, gb, gc, gd, gi, gl, gm, gn, go, gp, gs, gt, gu, gv, gy, iflags, svc, svl, svm, u, ynqchars } from './decl.js';
+import { c_common_strings, cg, disp, flags, ga, gb, gc, gd, gi, gl, gm, gn, go, gp, gs, gt, gv, gy, iflags, svc, svl, svm, u, ynqchars } from './decl.js';
 import { COIN_CLASS, POTION_CLASS, VENOM_CLASS } from './defsym.h.js';
 import { flush_screen, map_glyphinfo, newsym, newsym_force, nul_glyphinfo } from './display.js';
 import { GLYPH } from './display.h.js';
@@ -40,8 +40,8 @@ import { ParanoidAutoAll, ParanoidConfirm } from './flag.macros.js';
 import { FALSE, LL, TRUE } from './global.h.js';
 import { calc_capacity, check_capacity, in_rooms, inv_cnt, losehp, max_capacity, money_cnt, near_capacity, nomul, obj_to_any } from './hack.js';
 import { ALL_TYPES, ALL_TYPES_SELECTED, ARTICLE, AUTOSELECT_SINGLE, BILLED_TYPES, BUC, BUCX_TYPES, BY_NEXTHERE, CHOOSE_ALL, CORPSTAT, CQ_CANNED, CXN, ECMD, EXT_ENCUMBER, FEEL_COCKATRICE, FOOT, GETOBJ, GETOBJ_PROMPT, HAND, HVY_ENCUMBER, INCLUDE_HERO, INCLUDE_VENOM, INVORDER_SORT, JUSTPICKED, KILLED, LOOKHERE, MAY, MAY_HIT, MM, MOD_ENCUMBER, NO, ONAME_NO_FLAGS, SELL, SIGNAL, SLT_ENCUMBER, SORTLOOT, SUPPRESS, UNPAID_TYPES, USE_INVLET, WORN_TYPES, invlet_basic, st_all, st_corpse, st_gloves, st_petrifies, st_resists } from './hack.h.js';
-import { Maybe_Half_Phys, min, pline1, plur, ynNaq, ynaq, ynq } from './hack.macros.js';
-import { dist2, strkitten, upstart } from './hacklib.js';
+import { Maybe_Half_Phys, distu, makeknown, max, min, pline1, plur, ynNaq, ynaq, ynq } from './hack.macros.js';
+import { strkitten, upstart } from './hacklib.js';
 import { addinv, askchain, carrying, consume_obj_charge, count_buc, count_unpaid, currency, dfeature_at, display_inventory, feel_cockatrice, freeinv, g_at, getobj, hold_another_object, is_worn, let_to_name, look_here, merge_choice, nxtobj, obj_here, prinv, sobj_at, sortloot, tally_BUCX, unsortloot, update_inventory, useup, useupf, will_feel_cockatrice } from './invent.js';
 import { obj_is_burning } from './light.js';
 import { nhUse } from './lint.macros.js';
@@ -56,7 +56,7 @@ import { dmgtype_fromattack, poly_when_stoned, stagger } from './mondata.js';
 import { bigmonst, hides_under, is_rider, nohands, nolimbs, notake, throws_rocks, touch_petrifies } from './mondata.macros.js';
 import { mons } from './monst.js';
 import { PM } from './monsters.h.js';
-import { discover_object, observe_object } from './o_init.js';
+import { observe_object } from './o_init.js';
 import { LOST, OBJ } from './obj.h.js';
 import { Has_contents, Is_box, Is_candle, Is_container, Is_mbag, SchroedingersBox, age_is_relative, carried, has_omonst, is_pick } from './obj.macros.js';
 import { NUM_OBJECTS } from './objclass.h.js';
@@ -87,6 +87,7 @@ import { add_menu, add_menu_heading, add_menu_str, getlin, select_menu } from '.
 import { clear_nhwindow, create_nhwindow, destroy_nhwindow, display_nhwindow, end_menu, putstr, start_menu } from './winprocs.macros.js';
 import { ATR, MENU, NHW, PICK, WIN_ERR } from './wintype.h.js';
 import { extract_from_minvent, which_armor } from './worn.js';
+import { Role_if } from './you.macros.js';
 import { Blind, Hallucination, Stone_resistance, Underwater } from './youprop.macros.js';
 import { get_obj_location } from './zap.js';
 
@@ -597,7 +598,7 @@ export async function allow_category(obj) {   // pickup.c:523
     if (obj.oclass === COIN_CLASS && gc.class_filter) {
         return $c.strchr(new $c.Ptr(gv.valid_menu_classes, 0), COIN_CLASS) ? TRUE : FALSE;
     }
-    if (gu.urole.mnum === PM.CLERIC && !obj.bknown) {
+    if (Role_if(PM.CLERIC) && !obj.bknown) {
         await set_bknown(obj, 1);
     }
     /*
@@ -2109,7 +2110,7 @@ async function do_loot_cont(cobjp, cindex, ccount) {   // pickup.c:2088
         await pline($C`It develops a huge set of teeth and bites you!`);
         const tmp = rnd(10);
         await losehp(Maybe_Half_Phys(tmp), $C`carnivorous bag`, KILLED.BY_AN);
-        await discover_object(BAG_OF_TRICKS, TRUE, TRUE, TRUE);
+        await makeknown(BAG_OF_TRICKS);
         ga.abort_looting = TRUE;
         return ECMD.TIME;
     }
@@ -2338,7 +2339,7 @@ async function reverse_loot() {   // pickup.c:2350
                 if (coffers.spe === 2) {
                     break;   /* a throne room chest */
                 }
-                if (!otmp || dist2(coffers.ox, coffers.oy, u.ux, u.uy) < dist2(otmp.ox, otmp.oy, u.ux, u.uy)) {
+                if (!otmp || distu(coffers.ox, coffers.oy) < distu(otmp.ox, otmp.oy)) {
                     otmp = coffers;   /* remember closest ordinary chest */
                 }
             }
@@ -3196,7 +3197,7 @@ async function menu_loot(retry, put_in) {   // pickup.c:3265
                 loot_everything = autopick = TRUE;
             } else if (put_in && $c.radd(pick_list[0], i).item.a_int === 80) {
                 loot_justpicked = TRUE;
-                count = 0 > $c.radd(pick_list[0], i).count ? 0 : $c.radd(pick_list[0], i).count;
+                count = max(0, $c.radd(pick_list[0], i).count);
                 add_valid_menu_class($c.radd(pick_list[0], i).item.a_int);
                 loot_everything = FALSE;
             } else if ($c.radd(pick_list[0], i).item.a_int === ALL_TYPES_SELECTED) {

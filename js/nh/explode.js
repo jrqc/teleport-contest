@@ -23,10 +23,11 @@ import { In_hell, In_mines, on_level } from './dungeon.js';
 import { done } from './end.js';
 import { PLNMSG } from './flag.h.js';
 import { FALSE, LARGEST_INT, TRUE } from './global.h.js';
+import { strcmpi } from './global.macros.js';
 import { in_rooms, nomul } from './hack.js';
 import { BURNING, DIED, KILLED, MAY, NO_KILLER_PREFIX, N_DIRS, PHYS_EXPL_TYPE, VIS_EFFECTS, XKILL } from './hack.h.js';
 import { Maybe_Half_Phys } from './hack.macros.js';
-import { dist2, lowc, nh_snprintf, s_suffix, strncmpi, strstri } from './hacklib.js';
+import { dist2, lowc, nh_snprintf, s_suffix, strstri } from './hacklib.js';
 import { sobj_at, stackobj } from './invent.js';
 import { obj_extract_self, place_object, splitobj } from './mkobj.js';
 import { SHOPBASE } from './mkroom.h.js';
@@ -58,7 +59,7 @@ import { STATUE_TRAP } from './trap.h.js';
 import { cansee } from './vision.macros.js';
 import { dmgval } from './weapon.js';
 import { nh_delay_output } from './winprocs.macros.js';
-import { Upolyd, u_at } from './you.macros.js';
+import { Upolyd, next2u, u_at } from './you.macros.js';
 import { Acid_resistance, Antimagic, Cold_resistance, Deaf, Disint_resistance, Fire_resistance, Hallucination, Invulnerable, Poison_resistance, Shock_resistance } from './youprop.macros.js';
 import { break_statue, destroy_items, fracture_rock, resist, zap_over_floor } from './zap.js';
 
@@ -600,7 +601,7 @@ export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:
                     /* if grabber is reaching into hero's spot and
                        hero's spot is within explosion radius, grabber
                        gets hit by double damage */
-                    if (grabbed && mtmp === u.ustuck && dist2(x, y, u.ux, u.uy) <= 2) {
+                    if (grabbed && mtmp === u.ustuck && next2u(x, y)) {
                         mdam = Math.imul(mdam, 2);
                     }
                     /* being resistant to opposite type of damage makes
@@ -715,7 +716,7 @@ export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:
                     svk.killer.format = NO_KILLER_PREFIX;
                     nh_snprintf($C`explode`, 660, new $c.Ptr(svk.killer.name, 0), 256, $C`caught %sself in %s own %s`, genders[flags.female ? 1 : 0].him, genders[flags.female ? 1 : 0].his, str);
                 } else {
-                    $t4 = !strncmpi(str, $C`tower of flame`, -1) || !strncmpi(str, $C`fireball`, -1) ? KILLED.BY_AN : KILLED.BY, svk.killer.format = $t4;
+                    $t4 = !strcmpi(str, $C`tower of flame`) || !strcmpi(str, $C`fireball`) ? KILLED.BY_AN : KILLED.BY, svk.killer.format = $t4;
                     $c.strcpy(new $c.Ptr(svk.killer.name, 0), str);
                 }
                 if (iflags.last_msg === PLNMSG.CAUGHT_IN_EXPLOSION || iflags.last_msg === PLNMSG.TOWER_OF_FLAME) {   /*seffects()*/

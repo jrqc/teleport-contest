@@ -9,6 +9,7 @@ import { $C } from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
 import { BUFSZ, FALSE, LARGEST_INT, TRUE } from './global.h.js';
+import { strcmpi } from './global.macros.js';
 
 const VISCTRL_NBUF = 5;
 const TABSIZ = 0x20;
@@ -433,19 +434,19 @@ export function ing_suffix(s) {   // hacklib.c:427
     $c.strcpy(new $c.Ptr(ing_suffix$buf, 0), s);
     let p = eos(new $c.Ptr(ing_suffix$buf, 0));
     $t2 = ($t1 = p.add(1).set(0, 0), p.set(0, $t1)), onoff[0] = $t2;
-    if ($c.pcmp(p, new $c.Ptr(ing_suffix$buf, 3)) >= 0 && !strncmpi(p.add(-3), $C` on`, -1) || $c.pcmp(p, new $c.Ptr(ing_suffix$buf, 4)) >= 0 && !strncmpi(p.add(-4), $C` off`, -1) || $c.pcmp(p, new $c.Ptr(ing_suffix$buf, 5)) >= 0 && !strncmpi(p.add(-5), $C` with`, -1)) {
+    if ($c.pcmp(p, new $c.Ptr(ing_suffix$buf, 3)) >= 0 && !strcmpi(p.add(-3), $C` on`) || $c.pcmp(p, new $c.Ptr(ing_suffix$buf, 4)) >= 0 && !strcmpi(p.add(-4), $C` off`) || $c.pcmp(p, new $c.Ptr(ing_suffix$buf, 5)) >= 0 && !strcmpi(p.add(-5), $C` with`)) {
         p = $c.strrchr(new $c.Ptr(ing_suffix$buf, 0), 32);
         $c.strcpy(new $c.Ptr(onoff, 0), p);
         p.set(0, 0);
     }
-    if ($c.pcmp(p, new $c.Ptr(ing_suffix$buf, 2)) >= 0 && !strncmpi(p.add(-2), $C`er`, -1)) {
+    if ($c.pcmp(p, new $c.Ptr(ing_suffix$buf, 2)) >= 0 && !strcmpi(p.add(-2), $C`er`)) {
         /* slither + ing */
         /* nothing here */
     } else if ($c.pcmp(p, new $c.Ptr(ing_suffix$buf, 3)) >= 0 && !$c.strchr(new $c.Ptr(ing_suffix$vowel, 0), p.add(-1).get(0)) && $c.strchr(new $c.Ptr(ing_suffix$vowel, 0), p.add(-2).get(0)) && !$c.strchr(new $c.Ptr(ing_suffix$vowel, 0), p.add(-3).get(0))) {
         /* tip -> tipp + ing */
         p.set(0, p.add(-1).get(0));
         p.add(1).set(0, 0);
-    } else if ($c.pcmp(p, new $c.Ptr(ing_suffix$buf, 2)) >= 0 && !strncmpi(p.add(-2), $C`ie`, -1)) {
+    } else if ($c.pcmp(p, new $c.Ptr(ing_suffix$buf, 2)) >= 0 && !strcmpi(p.add(-2), $C`ie`)) {
         /* vie -> vy + ing */
         p.add(-2).set(0, 121);
         p.add(-1).set(0, 0);

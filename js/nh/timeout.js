@@ -16,7 +16,7 @@ import { A } from './attrib.h.js';
 import { ACURR } from './attrib.macros.js';
 import { confdir, isok } from './cmd.js';
 import { is_ice, is_pool, is_pool_or_lava } from './dbridge.js';
-import { c_color_names, c_common_strings, cg, disp, flags, gb, gm, gn, gt, gu, gy, iflags, svc, svd, svk, svl, svm, svq, svt, u } from './decl.js';
+import { c_color_names, c_common_strings, cg, disp, flags, gb, gm, gn, gt, gy, iflags, svc, svk, svl, svm, svq, svt, u } from './decl.js';
 import { S } from './defsym.h.js';
 import { rot_corpse, rot_organic } from './dig.js';
 import { canseemon, newsym, see_monsters, set_mimic_blocking } from './display.js';
@@ -25,14 +25,15 @@ import { Monnam, a_monnam, hcolor, m_monnam, rndmonnam, x_monnam } from './do_na
 import { find_ac, toggle_displacement, wielding_corpse } from './do_wear.js';
 import { tamedog } from './dog.js';
 import { hurtle } from './dothrow.js';
-import { on_level, surface } from './dungeon.js';
+import { surface } from './dungeon.js';
+import { Is_waterlevel } from './dungeon.macros.js';
 import { Popeye, eating_dangerous_corpse, morehungry, vomit } from './eat.js';
 import { dealloc_killer, done, find_delayed_killer, panic } from './end.js';
 import { FULL_MOON, PLNMSG } from './flag.h.js';
 import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
 import { inv_weight, monst_to_any, nomul, obj_to_any, spoteffects } from './hack.js';
 import { ARTICLE, DIED, DISMOUNT, ECMD, FAINTING, FOOT, GENOCIDED, KILLED, MM, NECK, NHF, NO, NO_KILLER_PREFIX, POISONING, STONING, SUPPRESS, TURNED_SLIME } from './hack.h.js';
-import { NODIAG, You1, pline1, release_data, update_file } from './hack.macros.js';
+import { NODIAG, You1, pline1, release_data, rn1, update_file } from './hack.macros.js';
 import { eos, highc, ing_suffix, s_suffix, strstri, strsubst, upstart } from './hacklib.js';
 import { carrying, sobj_at, update_inventory, useup, useupall } from './invent.js';
 import { arti_light_radius, candle_light_range, del_light_source, new_light_source } from './light.js';
@@ -42,7 +43,7 @@ import { hideunder, maybe_unhide_at, restartcham, wake_nearby } from './mon.js';
 import { AD } from './monattk.h.js';
 import { big_to_little, cantvomit, little_to_big, locomotion, name_to_mon, pronoun_gender } from './mondata.js';
 import { emits_light, is_silent, is_were, nolimbs, touch_petrifies, type_is_pname } from './mondata.macros.js';
-import { G_EXTINCT, G_GENOD, G_UNIQ, M1, MV_KNOWS_EGG, NEUTRAL } from './monflag.h.js';
+import { G_EXTINCT, G_GENOD, G_UNIQ, MV_KNOWS_EGG, NEUTRAL } from './monflag.h.js';
 import { mons } from './monst.js';
 import { M_AP } from './monst.h.js';
 import { PM } from './monsters.h.js';
@@ -62,7 +63,8 @@ import { lookup_id_mapping } from './restore.js';
 import { CLOUD, DB, DOOR, DRAWBRIDGE_DOWN } from './rm.h.js';
 import { d, rn2, rnd } from './rnd.js';
 import { genders } from './role.js';
-import { sfi_fe, sfi_int, sfi_ulong, sfo_fe, sfo_int, sfo_ulong } from './sfbase.js';
+import { Sfi_fe, Sfo_fe, Sfo_int } from './savefile.macros.js';
+import { sfi_int, sfi_ulong, sfo_ulong } from './sfbase.js';
 import { Shk_Your, find_oid, obfree } from './shk.js';
 import { cry_sound } from './sounds.js';
 import { dismount_steed } from './steed.js';
@@ -77,8 +79,8 @@ import { create_nhwindow, destroy_nhwindow, display_nhwindow, putstr } from './w
 import { NHW, WIN_ERR } from './wintype.h.js';
 import { which_armor } from './worn.js';
 import { PRONOUN, SICK_ALL, SICK_NONVOMITABLE } from './you.h.js';
-import { Upolyd } from './you.macros.js';
-import { Acid_resistance, BInvis, Blind, Deaf, Displaced, EFumbling, ELevitation, EPasses_walls, Fast, Fire_resistance, Fumbling, Hallucination, Invis, Levitation, Passes_walls, Poison_resistance, Protection_from_shape_changers, See_invisible, Sick, Sleep_resistance, Sleepy, Slimed, Stone_resistance, Stoned, Strangled, Unaware, Unchanging, Very_fast, Vomiting, Warn_of_mon, Wounded_legs } from './youprop.macros.js';
+import { Role_if, Upolyd } from './you.macros.js';
+import { Acid_resistance, BInvis, Blind, Breathless, Deaf, Displaced, EFumbling, ELevitation, EPasses_walls, Fast, Fire_resistance, Flying, Fumbling, Hallucination, Invis, Levitation, Passes_walls, Poison_resistance, Protection_from_shape_changers, See_invisible, Sick, Sleep_resistance, Sleepy, Slimed, Stone_resistance, Stoned, Strangled, Unaware, Unchanging, Very_fast, Vomiting, Warn_of_mon, Wounded_legs, Wwalking } from './youprop.macros.js';
 import { buzz, get_obj_location, melt_ice_away } from './zap.js';
 
 /* used by wizard mode #timeout and #wizintrinsic; order by 'interest'
@@ -276,7 +278,7 @@ async function sleep_dialogue() {   // timeout.c:268
 async function choke_dialogue() {   // timeout.c:295
     const i = $c.and64(u.uprops[STRANGLED].intrinsic, TIMEOUT);
     if (i > 0 && i <= 5) {
-        if (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.BREATHLESS) !== 0 || !rn2(50)) {
+        if (Breathless() || !rn2(50)) {
             await urgent_pline(choke_texts2[$c.idx($c.sub64(5, i))], await body_part(NECK));
         } else {
             const str = choke_texts[$c.idx($c.sub64(5, i))];
@@ -329,7 +331,7 @@ async function levitation_dialogue() {   // timeout.c:353
     if ($c.rem64($c.and64(u.uprops[LEVITATION].intrinsic, TIMEOUT), 2) && i > 0 && i <= 2) {
         const s = levi_texts[$c.idx($c.sub64(2, i))];
         if ($c.strchr(s, 37)) {
-            const danger = is_pool_or_lava(u.ux, u.uy) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) ? 1 : 0;
+            const danger = is_pool_or_lava(u.ux, u.uy) && !Is_waterlevel(u.uz) ? 1 : 0;
             await urgent_pline(s, danger ? $C`over` : $C`in`, danger ? surface(u.ux, u.uy) : $C`air`);
         } else {
             await pline1(s);
@@ -490,7 +492,7 @@ async function region_dialogue() {   // timeout.c:554
     const i = $c.div64(r, 2);
     /* might have poly'd into non-breather or moved out of gas cloud */
     u.uprops[MAGICAL_BREATHING].intrinsic = $c.and64(u.uprops[MAGICAL_BREATHING].intrinsic, ~TIMEOUT);
-    const no_need_to_breathe = u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.BREATHLESS) !== 0 ? 1 : 0;
+    const no_need_to_breathe = Breathless();
     const in_poison_gas_cloud = region_danger();
     u.uprops[MAGICAL_BREATHING].intrinsic = $c.or64(u.uprops[MAGICAL_BREATHING].intrinsic, r);
     if (no_need_to_breathe || !in_poison_gas_cloud) {
@@ -528,7 +530,7 @@ export async function nh_timeout() {   // timeout.c:588
     if (svq.quest_status.killed_leader) {
         baseluck = baseluck - 4 | 0;
     }
-    if (gu.urole.mnum === PM.ARCHEOLOGIST && $G.uarmh && $G.uarmh.otyp === FEDORA) {
+    if (Role_if(PM.ARCHEOLOGIST) && $G.uarmh && $G.uarmh.otyp === FEDORA) {
         baseluck = baseluck + 1 | 0;
     }
     if (u.uluck !== baseluck && $c.rem64(svm.moves, u.uhave.amulet || u.ugangr ? 300 : 600) === 0) {
@@ -603,7 +605,7 @@ export async function nh_timeout() {   // timeout.c:588
             await pline($C`%s stops galloping.`, await Monnam(u.usteed));
         }
     }
-    const was_flying = (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked ? 1 : 0;
+    const was_flying = Flying();
     for (upp = u.uprops[0]; $c.pcmp(upp, $c.radd(u.uprops[0], 69)) < 0; upp = $c.radd(upp, 1)) {
         if ($c.and64(upp.intrinsic, TIMEOUT) && !$c.and64(upp.intrinsic = $c.sub64(upp.intrinsic, 1), TIMEOUT)) {
             const kptr = find_delayed_killer($c.i32($c.rdiff(upp, u.uprops[0])));
@@ -742,7 +744,7 @@ export async function nh_timeout() {   // timeout.c:588
                     break;
                 case FLYING:
                     /* timed Flying is via #wizintrinsic only */
-                    if (was_flying && !((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked)) {
+                    if (was_flying && !Flying()) {
                         disp.botl = TRUE;
                         await You($C`land.`);
                         await spoteffects(TRUE);
@@ -793,7 +795,7 @@ export async function nh_timeout() {   // timeout.c:588
                     break;
                 case WWALKING:
                     /* [see fire resistance] */
-                    if (!((u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)))) {
+                    if (!Wwalking()) {
                         await Your($C`temporary ability to walk on liquid has ended.`);
                     }
                     break;
@@ -823,7 +825,7 @@ export async function nh_timeout() {   // timeout.c:588
                     }
                     break;
                 case MAGICAL_BREATHING:
-                    if (!(u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.BREATHLESS) !== 0)) {
+                    if (!Breathless()) {
                         if (region_danger()) {
                             await You($C`cough%s`, Poison_resistance() ? $C`.` : $C` and spit blood!`);
                         }
@@ -843,7 +845,7 @@ export async function nh_timeout() {   // timeout.c:588
                 case FUMBLING:
                     /* call this only when a move took place.  */
                     /* otherwise handle fumbling msgs locally. */
-                    if (u.umoved && !(Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked)) {
+                    if (u.umoved && !(Levitation() || Flying())) {
                         await slip_or_trip();
                         nomul(-2);
                         gm.multi_reason = $C`fumbling`;
@@ -1741,7 +1743,7 @@ export async function do_storms() {   // timeout.c:1847
         /* Inside a cloud during a thunderstorm is deafening. */
         /* Even if already deaf, we sense the thunder's vibrations. */
         await pline($C`Kaboom!!!  Boom!!  Boom!!`);
-        incr_itimeout(new $c.FieldRef(u.uprops[DEAF], "intrinsic", "i64"), rn2(20) + 30 | 0);
+        incr_itimeout(new $c.FieldRef(u.uprops[DEAF], "intrinsic", "i64"), rn1(20, 30));
         disp.botl = TRUE;
         if (!u.uinvulnerable) {
             await stop_occupation();
@@ -2250,32 +2252,32 @@ async function write_timer(nhfp, timer) {   // timeout.c:2505
         case TIMER.GLOBAL:
         case TIMER.LEVEL:
             /* assume no pointers in arg */
-            await sfo_fe(nhfp, timer, $C`timer`);
+            await Sfo_fe(nhfp, timer, $C`timer`);
             break;
         case TIMER.OBJECT:
             if (timer.needs_fixup) {
-                await sfo_fe(nhfp, timer, $C`timer`);
+                await Sfo_fe(nhfp, timer, $C`timer`);
             } else {
                 /* replace object pointer with id */
                 arg_save.a_obj = timer.arg.a_obj;
                 timer.arg.$copyFrom(cg.zeroany);
                 timer.arg.a_uint = arg_save.a_obj.o_id;
                 timer.needs_fixup = 1;
-                await sfo_fe(nhfp, timer, $C`timer`);
+                await Sfo_fe(nhfp, timer, $C`timer`);
                 timer.arg.a_obj = arg_save.a_obj;
                 timer.needs_fixup = 0;
             }
             break;
         case TIMER.MONSTER:
             if (timer.needs_fixup) {
-                await sfo_fe(nhfp, timer, $C`timer`);
+                await Sfo_fe(nhfp, timer, $C`timer`);
             } else {
                 /* replace monster pointer with id */
                 arg_save.a_monst = timer.arg.a_monst;
                 timer.arg.$copyFrom(cg.zeroany);
                 timer.arg.a_uint = arg_save.a_monst.m_id;
                 timer.needs_fixup = 1;
-                await sfo_fe(nhfp, timer, $C`timer`);
+                await Sfo_fe(nhfp, timer, $C`timer`);
                 timer.arg.a_monst = arg_save.a_monst;
                 timer.needs_fixup = 0;
             }
@@ -2416,7 +2418,7 @@ export async function save_timers(nhfp, range) {   // timeout.c:2668
             await sfo_ulong(nhfp, new $c.FieldRef(svt, "timer_id", "u64"), $C`timer-timer_id`);
         }
         count[0] = await maybe_write_timer(nhfp, range, FALSE);
-        await sfo_int(nhfp, new $c.Ptr(count, 0), $C`timer-timer_count`);
+        await Sfo_int(nhfp, new $c.Ptr(count, 0), $C`timer-timer_count`);
         await maybe_write_timer(nhfp, range, TRUE);
     }
     if (release_data(nhfp)) {
@@ -2459,7 +2461,7 @@ export async function restore_timers(nhfp, range, adjust) {   // timeout.c:2707
     await sfi_int(nhfp, new $c.Ptr(count, 0), $C`timer-timer_count`);
     while (($t1 = count[0], count[0] = $t1 - 1 | 0, $t1) > 0) {
         const curr = $c.asRec(await alloc(48), $T.fe, 48);
-        await sfi_fe(nhfp, curr, $C`timer`);
+        await Sfi_fe(nhfp, curr, $C`timer`);
         if (ghostly) {
             curr.timeout = $c.add64(curr.timeout, adjust);
         }

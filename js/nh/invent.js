@@ -17,7 +17,7 @@ import { get_strength_str } from './botl.js';
 import { cmdq_add_int, cmdq_add_key, cmdq_clear, cmdq_pop, get_count, readchar, yn_function } from './cmd.js';
 import { NO_COLOR } from './color.h.js';
 import { db_under_typ, is_drawbridge_wall, is_ice, is_lava, is_pool, is_pool_or_lava } from './dbridge.js';
-import { c_common_strings, cg, disp, flags, gc, gd, gi, gl, go, gp, gs, gt, gu, gy, hands_obj, iflags, program_state, quitchars, svc, svd, svl, u, ynNaqchars, ynaqchars, ynchars } from './decl.js';
+import { c_common_strings, cg, disp, flags, gc, gd, gi, gl, go, gp, gs, gt, gy, hands_obj, iflags, program_state, quitchars, svc, svl, u, ynNaqchars, ynaqchars } from './decl.js';
 import { AMULET_CLASS, ARMOR_CLASS, BALL_CLASS, CHAIN_CLASS, COIN_CLASS, FOOD_CLASS, GEM_CLASS, GOLD_SYM, ILLOBJ_CLASS, POTION_CLASS, RING_CLASS, ROCK_CLASS, S, SCROLL_CLASS, SPBOOK_CLASS, TOOL_CLASS, VENOM_CLASS, WAND_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { docrt, map_glyphinfo, newsym, nul_glyphinfo, suppress_map_output } from './display.js';
 import { GLYPH } from './display.h.js';
@@ -26,7 +26,8 @@ import { hliquid, mon_nam, noit_Monnam, oname, safe_oname } from './do_name.js';
 import { fingers_or_gloves } from './do_wear.js';
 import { hitfloor, throwing_weapon } from './dothrow.js';
 import { def_char_to_objclass, def_oc_syms, defsyms } from './drawing.js';
-import { on_level, surface } from './dungeon.js';
+import { surface } from './dungeon.js';
+import { Is_airlevel, Is_waterlevel } from './dungeon.macros.js';
 import { panic } from './end.js';
 import { can_reach_floor, read_engr_at } from './engrave.js';
 import { PLNMSG } from './flag.h.js';
@@ -35,7 +36,7 @@ import { BUFSZ, FALSE, LARGEST_INT, LL, QBUFSZ, TRUE, set_gameview } from './glo
 import { strcmpi } from './global.macros.js';
 import { in_rooms, inv_cnt, money_cnt, near_capacity, obj_to_any } from './hack.js';
 import { ALL_FINISHED, BILLED_TYPES, BUC, BY_NEXTHERE, CMDQ, CONTAINED_SYM, CORPSTAT, COST, CQ_CANNED, CQ_REPEAT, CXN, ECMD, FINGERTIP, GC, GC_CONDHIST, GETOBJ, GETOBJ_PROMPT, HAND, HANDS_SYM, INCLUDE_HERO, INCLUDE_VENOM, INVORDER_SORT, JUSTPICKED, LOOKHERE, MSGTYP_MASK_REP_SHOW, NOINVSYM, ONAME_SKIP_INVUPD, SIGNAL, SORTLOOT, STOMACH, UNPAID_TYPES, USE_INVLET, invlet_basic, st_all } from './hack.h.js';
-import { pline1 } from './hack.macros.js';
+import { makeknown, pline1, y_n } from './hack.macros.js';
 import { digit, eos, highc, ing_suffix, letter, mungspaces, nh_snprintf, s_suffix, strkitten, strncmpi, strstri, strsubst, visctrl } from './hacklib.js';
 import { itemactions } from './iactions.js';
 import { align_str, record_achievement } from './insight.js';
@@ -49,7 +50,7 @@ import { mons } from './monst.js';
 import { MINV } from './monst.h.js';
 import { MON_WEP, engulfing_u } from './monst.macros.js';
 import { PM } from './monsters.h.js';
-import { discover_object, observe_object } from './o_init.js';
+import { observe_object } from './o_init.js';
 import { LOST, OBJ } from './obj.h.js';
 import { Has_contents, Is_candle, Is_container, Is_pudding, ammo_and_launcher, carried, greatest_erosion, has_omailcmd, has_omid, has_omonst, has_oname, is_ammo, is_gloves, is_mines_prize, is_missile, is_plural, is_pole, is_soko_prize, pair_of } from './obj.macros.js';
 import { ARM_BOOTS, ARM_CLOAK, ARM_GLOVES, ARM_HELM, ARM_SHIELD, ARM_SHIRT, ARM_SUIT, GEMSTONE, GLASS, MAXOCLASSES, NUM_OBJECTS } from './objclass.h.js';
@@ -87,7 +88,7 @@ import { clear_nhwindow, create_nhwindow, ctrl_nhwindow, destroy_nhwindow, displ
 import { ATR, InvInUse, InvOptNone, InvOptOn, InvShowGold, MENU, NHW, PICK, WIN_ERR, prohibited, request_settings, set_mode, toggling_not, toggling_off, toggling_on, too_early, too_small } from './wintype.h.js';
 import { bypass_objlist, clear_bypasses, nxt_unbypassed_loot, setnotworn, setworn } from './worn.js';
 import { ACH, LEFT_HANDED, RIGHT_HANDED } from './you.h.js';
-import { Upolyd } from './you.macros.js';
+import { Role_if, Upolyd } from './you.macros.js';
 import { Blind, Fumbling, Hallucination, Stone_resistance, Underwater } from './youprop.macros.js';
 import { get_obj_location, obj_resists } from './zap.js';
 
@@ -976,7 +977,7 @@ export async function merged(potmp, pobj) {   // invent.c:814
         }
         if (obj.bknown !== otmp.bknown) {
             otmp.bknown = 1;
-            if (!(gu.urole.mnum === PM.CLERIC)) {
+            if (!Role_if(PM.CLERIC)) {
                 discovered = TRUE;
             }
         }
@@ -1134,10 +1135,10 @@ export async function addinv_core2(obj) {   // invent.c:1025
     /* Archeologists can decipher the writing on a scroll label to work out
        what they are (exception: unlabeled scrolls don't have a label to
        decipher) */
-    if (gu.urole.mnum === PM.ARCHEOLOGIST && obj.oclass === SCROLL_CLASS && obj.otyp !== SCR_BLANK_PAPER && !Blind() && !objects[obj.otyp].oc_name_known) {
+    if (Role_if(PM.ARCHEOLOGIST) && obj.oclass === SCROLL_CLASS && obj.otyp !== SCR_BLANK_PAPER && !Blind() && !objects[obj.otyp].oc_name_known) {
         await observe_object(obj);
         await pline($C`You decipher the label on %s.`, await yname(obj));
-        await discover_object(obj.otyp, TRUE, TRUE, TRUE);
+        await makeknown(obj.otyp);
         /* conduct: this is avoidable via not picking up / wishing for
            scrolls */
         if (!($t1 = u.uconduct.literate, u.uconduct.literate = $c.add64($t1, 1), $t1)) {
@@ -2677,7 +2678,7 @@ export async function reroll_menu() {   // invent.c:2552
         /* user closed the menu without selecting; unclear what their choice
            is here so ask again; but (e.g. for hangup handling) stop asking if
            the user cancels out again */
-        option = await yn_function($C`Reroll this character?`, new $c.Ptr(ynchars, 0), 110, TRUE);
+        option = await y_n($C`Reroll this character?`);
     }
     await destroy_nhwindow()(win);
     if (option === 121) {
@@ -2711,7 +2712,7 @@ export function set_cknown_lknown(obj) {   // invent.c:2624
  */
 export async function fully_identify_obj(otmp) {   // invent.c:2637
     let $t1, $t2;
-    await discover_object(otmp.otyp, TRUE, TRUE, TRUE);
+    await makeknown(otmp.otyp);
     if (otmp.oartifact) {
         await discover_artifact(otmp.oartifact);
     }
@@ -2841,7 +2842,7 @@ export async function learn_unseen_invent() {   // invent.c:2750
         return;   /* sanity check */
     }
     for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
-        if (otmp.dknown && (otmp.bknown || !(gu.urole.mnum === PM.CLERIC)) && (otmp.oclass !== SCROLL_CLASS || !(gu.urole.mnum === PM.ARCHEOLOGIST))) {
+        if (otmp.dknown && (otmp.bknown || !Role_if(PM.CLERIC)) && (otmp.oclass !== SCROLL_CLASS || !Role_if(PM.ARCHEOLOGIST))) {
             continue;   /* already seen */
         }
         invupdated = TRUE;
@@ -3583,7 +3584,7 @@ export async function count_buc(list, type, filterfunc) {   // invent.c:3548
     let count = 0;
     for (; list; list = list.nobj) {
         /* priests always know bless/curse state */
-        if (gu.urole.mnum === PM.CLERIC) {
+        if (Role_if(PM.CLERIC)) {
             list.bknown = (list.oclass !== COIN_CLASS ? 1 : 0) & 1;
         }
         /* some actions exclude some or most items */
@@ -3627,7 +3628,7 @@ export function tally_BUCX(list, by_nexthere, bcp, ucp, ccp, xcp, ocp, jcp) {   
     $t5 = ($t4 = ($t3 = ($t2 = ($t1 = jcp.set(0, 0), ocp.set(0, $t1)), xcp.set(0, $t2)), ccp.set(0, $t3)), ucp.set(0, $t4)), bcp.set(0, $t5);
     for (; list; list = by_nexthere ? list.v.v_nexthere : list.nobj) {
         /* priests always know bless/curse state */
-        if (gu.urole.mnum === PM.CLERIC) {
+        if (Role_if(PM.CLERIC)) {
             list.bknown = (list.oclass !== COIN_CLASS ? 1 : 0) & 1;
         }
         if (list.pickup_prev) {
@@ -4198,7 +4199,7 @@ export async function look_here(obj_cnt, lookhere_flags) {   // invent.c:4104
         dfeature = null;
     }
     if (Blind()) {
-        const drift = (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? 1 : 0;
+        const drift = Is_airlevel(u.uz) || Is_waterlevel(u.uz) ? 1 : 0;
         if (dfeature && !$c.strncmp(dfeature, $C`altar `, 6)) {
             /* don't say "altar" twice, dfeature has more info */
             await You($C`try to feel what is here.`);
@@ -4234,7 +4235,7 @@ export async function look_here(obj_cnt, lookhere_flags) {   // invent.c:4104
            cases in an() but probably shouldn't be; don't rely on that */
         /* ice while hallucinating */
         /* thawing ice ("solid ice", "thin ice", &c) */
-        if (!$c.strcmp(dfeature, $C`molten lava`) || !$c.strcmp(dfeature, $C`iron bars`) || !$c.strcmp(dfeature, $C`ice`) || !$c.strncmp(dfeature, $C`frozen `, 7) || (p = $c.strchr(dfeature, 32)) !== null && !strncmpi(p, $C` ice`, -1)) {
+        if (!$c.strcmp(dfeature, $C`molten lava`) || !$c.strcmp(dfeature, $C`iron bars`) || !$c.strcmp(dfeature, $C`ice`) || !$c.strncmp(dfeature, $C`frozen `, 7) || (p = $c.strchr(dfeature, 32)) !== null && !strcmpi(p, $C` ice`)) {
             article = 0;
         }
         if (article === 1) {
@@ -4416,7 +4417,7 @@ export async function mergable(otmp, obj) {   // invent.c:4379
     if (obj.oclass === FOOD_CLASS && (obj.oeaten !== otmp.oeaten || obj.oeroded !== otmp.oeroded)) {
         return FALSE;
     }
-    if (obj.dknown !== otmp.dknown || obj.bknown !== otmp.bknown && !(gu.urole.mnum === PM.CLERIC) && (Blind() || Hallucination()) || obj.oeroded !== otmp.oeroded || obj.oeroded2 !== otmp.oeroded2 || obj.greased !== otmp.greased) {
+    if (obj.dknown !== otmp.dknown || obj.bknown !== otmp.bknown && !Role_if(PM.CLERIC) && (Blind() || Hallucination()) || obj.oeroded !== otmp.oeroded || obj.oeroded2 !== otmp.oeroded2 || obj.greased !== otmp.greased) {
         return FALSE;
     }
     if (erosion_matters(obj) && (obj.oerodeproof !== otmp.oerodeproof || obj.rknown !== otmp.rknown && (Blind() || Hallucination()))) {

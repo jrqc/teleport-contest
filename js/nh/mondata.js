@@ -12,16 +12,17 @@ import { ART } from './artilist.h.js';
 import { acurr } from './attrib.js';
 import { A } from './attrib.h.js';
 import { title_to_mon } from './botl.js';
-import { cg, gi, gu, gv, gy, svl, svm, u } from './decl.js';
+import { cg, gi, gu, gy, svl, svm, u } from './decl.js';
 import { ARMOR_CLASS, DEF, S, WEAPON_CLASS } from './defsym.h.js';
 import { canspotmon } from './display.macros.js';
 import { def_char_to_monclass, def_monsyms } from './drawing.js';
 import { FALSE, TRUE } from './global.h.js';
+import { strcmpi } from './global.macros.js';
 import { dist2, highc, strncmpi, strstri } from './hacklib.js';
 import { AD, AT } from './monattk.h.js';
 import { DISTANCE_ATTK_TYPE } from './monattk.macros.js';
 import { amorphous, bigmonst, breathless, completelyburns, completelyrots, completelyrusts, has_head, haseyes, hates_light, humanoid, is_animal, is_demon, is_dwarf, is_elf, is_floater, is_flyer, is_giant, is_gnome, is_golem, is_human, is_longworm, is_mind_flayer, is_minion, is_neuter, is_orc, is_rider, is_silent, is_undead, is_unicorn, is_were, is_whirly, metallivorous, mindless, nolimbs, noncorporeal, passes_walls, slithy, type_is_pname, unsolid, verysmall } from './mondata.macros.js';
-import { FEMALE, G_GENOD, G_LGROUP, G_SGROUP, G_UNIQ, M1, M2, MALE, MS, MZ, NEUTRAL, NUM_MGENDERS } from './monflag.h.js';
+import { FEMALE, G_GENOD, G_LGROUP, G_SGROUP, G_UNIQ, M2, MALE, MS, MZ, NEUTRAL, NUM_MGENDERS } from './monflag.h.js';
 import { mons } from './monst.js';
 import { M_SEEN } from './monst.h.js';
 import { DEADMONSTER, is_vampshifter, m_clearseenres, m_setseenres, mon_perma_blind, mon_resistancebits, resists_acid, resists_cold, resists_elec, resists_fire } from './monst.macros.js';
@@ -33,19 +34,18 @@ import { ALCHEMY_SMOCK, AMULET_OF_MAGICAL_BREATHING, BLINDING_VENOM, CREAM_PIE, 
 import { makesingular } from './objnam.js';
 import { LOW_PM, NATTK, NON_PM, NUMMONS } from './permonst.h.js';
 import { impossible } from './pline.js';
-import { ACID_RES, ANTIMAGIC, BLINDED, BLND_RES, COLD_RES, DISINT_RES, DRAIN_RES, FIRE_RES, INTRINSIC, INVIS, MAGICAL_BREATHING, POISON_RES, REFLECTING, SHOCK_RES, SLEEP_RES, STONE_RES, W, W_ACCESSORY, W_ARMOR } from './prop.h.js';
+import { ACID_RES, ANTIMAGIC, BLINDED, BLND_RES, COLD_RES, DISINT_RES, DRAIN_RES, FIRE_RES, INTRINSIC, POISON_RES, REFLECTING, SHOCK_RES, SLEEP_RES, STONE_RES, W, W_ACCESSORY, W_ARMOR } from './prop.h.js';
 import { res_to_mr } from './prop.macros.js';
 import { rn2, rnd } from './rnd.js';
 import { is_fshk } from './shk.js';
 import { MAXMCLASSES } from './sym.h.js';
 import { ALL_TRAPS, NO_TRAP } from './trap.h.js';
-import { COULD_SEE } from './vision.h.js';
-import { m_cansee } from './vision.macros.js';
+import { m_cansee, m_canseeu } from './vision.macros.js';
 import { mon_has_amulet } from './wizard.js';
 import { which_armor } from './worn.js';
 import { PRONOUN } from './you.h.js';
 import { Upolyd } from './you.macros.js';
-import { Blind, Blnd_resist, Hallucination, Strangled, Unaware } from './youprop.macros.js';
+import { Blind, Blnd_resist, Breathless, Hallucination, Strangled, Unaware } from './youprop.macros.js';
 
 const name_to_monplus$names = $c.recArray($T.alt_spl, 56);   // static in name_to_monplus()
 const name_to_monclass$falsematch = $c.nulls(6);   // static in name_to_monclass()
@@ -663,7 +663,7 @@ export async function can_be_strangled(mon) {   // mondata.c:591
         /* hero can't be mindless but poly'ing into mindless form can
            confer strangulation protection */
         nobrainer = mindless(gy.youmonst.data);
-        nonbreathing = u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.BREATHLESS) !== 0 ? 1 : 0;
+        nonbreathing = Breathless();
     } else {
         nobrainer = mindless(mon.data);
         /* monsters don't wear amulets of magical breathing,
@@ -1011,10 +1011,10 @@ export async function name_to_monplus(in_str, remainder_p, gender_name_var) {   
     const term = str.add($c.idx(slen));
     if ((s = strstri(str, $C`vortices`)) !== null) {
         $c.strcpy(s.add(4), $C`ex`);
-    } else if (slen > 3 && !strncmpi(term.add(-3), $C`ies`, -1) && (slen < 7 || strncmpi(term.add(-7), $C`zombies`, -1))) {
+    } else if (slen > 3 && !strcmpi(term.add(-3), $C`ies`) && (slen < 7 || strcmpi(term.add(-7), $C`zombies`))) {
         /* be careful with "ies"; "priest", "zombies" */
         $c.strcpy(term.add(-3), $C`y`);
-    } else if (slen > 3 && !strncmpi(term.add(-3), $C`ves`, -1)) {
+    } else if (slen > 3 && !strcmpi(term.add(-3), $C`ves`)) {
         /* luckily no monster names end in fe or ve with ves plurals */
         $c.strcpy(term.add(-3), $C`f`);
     }
@@ -1048,7 +1048,7 @@ export async function name_to_monplus(in_str, remainder_p, gender_name_var) {   
                     matchgend = mgend;
                     exact_match = TRUE;
                     break;   /* exact match */
-                } else if (slen > m_i_len && (str.get($c.idx(m_i_len)) === 32 || !strncmpi(str.add($c.idx(m_i_len)), $C`s`, -1) || !strncmpi(str.add($c.idx(m_i_len)), $C`s `, 2) || !strncmpi(str.add($c.idx(m_i_len)), $C`'`, -1) || !strncmpi(str.add($c.idx(m_i_len)), $C`' `, 2) || !strncmpi(str.add($c.idx(m_i_len)), $C`'s`, -1) || !strncmpi(str.add($c.idx(m_i_len)), $C`'s `, 3) || !strncmpi(str.add($c.idx(m_i_len)), $C`es`, -1) || !strncmpi(str.add($c.idx(m_i_len)), $C`es `, 3))) {
+                } else if (slen > m_i_len && (str.get($c.idx(m_i_len)) === 32 || !strcmpi(str.add($c.idx(m_i_len)), $C`s`) || !strncmpi(str.add($c.idx(m_i_len)), $C`s `, 2) || !strcmpi(str.add($c.idx(m_i_len)), $C`'`) || !strncmpi(str.add($c.idx(m_i_len)), $C`' `, 2) || !strcmpi(str.add($c.idx(m_i_len)), $C`'s`) || !strncmpi(str.add($c.idx(m_i_len)), $C`'s `, 3) || !strcmpi(str.add($c.idx(m_i_len)), $C`es`) || !strncmpi(str.add($c.idx(m_i_len)), $C`es `, 3))) {
                     mntmp = i;
                     len[0] = $c.i32(m_i_len);
                     matchgend = mgend;
@@ -1120,18 +1120,18 @@ export async function name_to_monclass(in_str, mndx_p) {   // mondata.c:1090
         return i;
     } else {
         /* multiple characters */
-        if (!strncmpi(in_str, $C`long`, -1)) {   /* not enough to match "long worm" */
+        if (!strcmpi(in_str, $C`long`)) {   /* not enough to match "long worm" */
             return 0;   /* avoid false whole-word match with "long worm tail" */
         }
         in_str = await makesingular(in_str);
         /* check for special cases */
         for (i = 0; name_to_monclass$falsematch[i]; i = i + 1 | 0) {
-            if (!strncmpi(in_str, name_to_monclass$falsematch[i], -1)) {
+            if (!strcmpi(in_str, name_to_monclass$falsematch[i])) {
                 return 0;
             }
         }
         for (i = 0; name_to_monclass$truematch[i].name; i = i + 1 | 0) {
-            if (!strncmpi(in_str, name_to_monclass$truematch[i].name, -1)) {
+            if (!strcmpi(in_str, name_to_monclass$truematch[i].name)) {
                 i = name_to_monclass$truematch[i].pm_val;
                 if (i < 0) {
                     return -i | 0;   /* class */
@@ -1488,7 +1488,7 @@ export function monstseesu(seenres) {   // mondata.c:1558
         return;
     }
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
-        if (!DEADMONSTER(mtmp) && ((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(mtmp.data.mflags1, M1.SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0)) {
+        if (!DEADMONSTER(mtmp) && m_canseeu(mtmp)) {
             m_setseenres(mtmp, seenres);
         }
     }
@@ -1503,7 +1503,7 @@ export function monstunseesu(seenres) {   // mondata.c:1572
         return;
     }
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
-        if (!DEADMONSTER(mtmp) && ((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(mtmp.data.mflags1, M1.SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0)) {
+        if (!DEADMONSTER(mtmp) && m_canseeu(mtmp)) {
             m_clearseenres(mtmp, seenres);
         }
     }

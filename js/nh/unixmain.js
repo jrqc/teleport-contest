@@ -11,14 +11,16 @@ import { $G } from './globals.js';
 import { early_init, init_sound_disp_gamewindows, moveloop, newgame } from './allmain.js';
 import { getnow } from './calendar.js';
 import { config_error_add, config_error_done, config_error_init } from './cfgfiles.js';
-import { hangup, yn_function } from './cmd.js';
-import { flags, ge, gh, gl, gp, gs, iflags, program_state, svh, svn, svp, u, ynchars } from './decl.js';
+import { hangup } from './cmd.js';
+import { flags, ge, gh, gl, gp, gs, iflags, program_state, svh, svn, svp, u } from './decl.js';
 import { early_options } from './earlyarg.js';
 import { build_english_list, done1 } from './end.js';
 import { check_panic_save, check_recordfile, delete_levelfile, delete_savefile, fqname, nh_compress, paniclog, restore_saved_game } from './files.js';
 import { discover, wizard } from './flag.macros.js';
 import { FALSE, TRUE } from './global.h.js';
+import { strcmpi } from './global.macros.js';
 import { SAVEPREFIX } from './hack.h.js';
+import { y_n } from './hack.macros.js';
 import { eos, strncmpi } from './hacklib.js';
 import { getmailstatus } from './mail.js';
 import { initoptions, nh_getenv, set_playmode } from './options.js';
@@ -192,7 +194,7 @@ export async function main(argc$in, argv$in) {   // unixmain.c:58
                 await wd_message();
                 if (discover() || wizard()) {
                     /* this seems like a candidate for paranoid_confirmation... */
-                    if (await yn_function($C`Do you want to keep the save file?`, new $c.Ptr(ynchars, 0), 110, TRUE) === 110) {
+                    if (await y_n($C`Do you want to keep the save file?`) === 110) {
                         await delete_savefile();
                     } else {
                         $c.chmod(fq_save, FCMASK);   /* back to readable */
@@ -283,7 +285,7 @@ async function process_options(argc, argv) {   // unixmain.c:330
         switch (arg.get(1)) {
             case 68:
             case 100:
-                if (arg.get(1) === 68 && !arg.get(2) || !strncmpi(arg, $C`-debug`, -1)) {
+                if (arg.get(1) === 68 && !arg.get(2) || !strcmpi(arg, $C`-debug`)) {
                     flags.debug = TRUE, flags.explore = FALSE;
                 } else if (!strncmpi(arg, $C`-DECgraphics`, l)) {
                     await load_symset($C`DECGraphics`, PRIMARYSET);

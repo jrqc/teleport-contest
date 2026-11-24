@@ -19,6 +19,7 @@ import { cancel_doff } from './do_wear.js';
 import { surface } from './dungeon.js';
 import { BUFSZ, FALSE, TRUE } from './global.h.js';
 import { BOLT_LIM, DISMOUNT } from './hack.h.js';
+import { ARM_BONUS, makeknown } from './hack.macros.js';
 import { nh_snprintf, s_suffix, sgn, strncmpi, strsubst } from './hacklib.js';
 import { update_inventory } from './invent.js';
 import { arti_light_description } from './light.js';
@@ -33,7 +34,6 @@ import { MFAST, MSLOW } from './monst.h.js';
 import { DEADMONSTER, MON_WEP, monstunseesu_prop } from './monst.macros.js';
 import { PM } from './monsters.h.js';
 import { m_useup } from './mthrowu.js';
-import { discover_object } from './o_init.js';
 import { OBJ } from './obj.h.js';
 import { Dragon_mail_to_pm, Dragon_scales_to_pm, Has_contents, Is_dragon_mail, Is_dragon_scales, WrappingAllowed, is_boots, is_cloak, is_elven_armor, is_flimsy, is_gloves, is_helmet, is_shield, is_shirt, is_suit, is_weptool } from './obj.macros.js';
 import { ARM_BOOTS, ARM_CLOAK, ARM_GLOVES, ARM_HELM, ARM_SHIELD, ARM_SHIRT, ARM_SUIT } from './objclass.h.js';
@@ -55,6 +55,7 @@ import { mwepgone } from './weapon.js';
 import { set_twoweap } from './wield.js';
 import { see_wsegs } from './worm.js';
 import { AC_MAX, PRONOUN } from './you.h.js';
+import { Role_if } from './you.macros.js';
 import { See_invisible, Stone_resistance } from './youprop.macros.js';
 import { learnwand } from './zap.js';
 
@@ -117,7 +118,7 @@ export async function setworn(obj, mask) {   // worn.c:73
                            nearby monsters will notice and attempt attacks of
                            that type again */
                         monstunseesu_prop($c.u8(p));
-                        if ((p = oobj.otyp === MUMMY_WRAPPING && $c.and64(mask, W.ARMC) !== 0 ? INVIS : oobj.otyp === CORNUTHAUM && $c.and64(mask, W.ARMH) !== 0 && !(gu.urole.mnum === PM.WIZARD) ? CLAIRVOYANT : is_art(oobj, ART.EYES_OF_THE_OVERWORLD) && $c.and64(mask, W.TOOL) !== 0 ? BLINDED : 0) !== 0) {
+                        if ((p = w_blocks(oobj, mask)) !== 0) {
                             u.uprops[p].blocked = $c.and64(u.uprops[p].blocked, $c.not64(wp.w_mask));
                         }
                         if (oobj.oartifact) {
@@ -140,7 +141,7 @@ export async function setworn(obj, mask) {   // worn.c:73
                         if (obj.oclass === WEAPON_CLASS || is_weptool(obj) || mask !== W.WEP) {
                             p = objects[obj.otyp].oc_oprop;
                             u.uprops[p].extrinsic = $c.or64(u.uprops[p].extrinsic, wp.w_mask);
-                            if ((p = obj.otyp === MUMMY_WRAPPING && $c.and64(mask, W.ARMC) !== 0 ? INVIS : obj.otyp === CORNUTHAUM && $c.and64(mask, W.ARMH) !== 0 && !(gu.urole.mnum === PM.WIZARD) ? CLAIRVOYANT : is_art(obj, ART.EYES_OF_THE_OVERWORLD) && $c.and64(mask, W.TOOL) !== 0 ? BLINDED : 0) !== 0) {
+                            if ((p = w_blocks(obj, mask)) !== 0) {
                                 u.uprops[p].blocked = $c.or64(u.uprops[p].blocked, wp.w_mask);
                             }
                         }
@@ -155,7 +156,7 @@ export async function setworn(obj, mask) {   // worn.c:73
             u.uroleplay.nudist = FALSE;
         }
         /* tux -> tuxedo -> "monkey suit" -> monk's suit */
-        iflags.tux_penalty = $G.uarm && gu.urole.mnum === PM.MONK && gu.urole.spelarmr ? 1 : 0;
+        iflags.tux_penalty = $G.uarm && Role_if(PM.MONK) && gu.urole.spelarmr ? 1 : 0;
     }
     if (flags.weaponstatus && $c.and64(mask, W.WEP) !== 0 || flags.armorstatus && $c.and64(mask, W_ARMOR) !== 0) {
         disp.botl = TRUE;
@@ -661,7 +662,7 @@ export async function update_mon_extrinsics(mon, obj, on, silently) {   // worn.
     /* obj->owornmask has been cleared by this point, so we can't use it.
        However, since monsters don't wield armor, we don't have to guard
        against that and can get away with a blanket worn-mask value. */
-    switch (obj.otyp === MUMMY_WRAPPING && 1 ? INVIS : obj.otyp === CORNUTHAUM && 1 && !(gu.urole.mnum === PM.WIZARD) ? CLAIRVOYANT : is_art(obj, ART.EYES_OF_THE_OVERWORLD) && 1 ? BLINDED : 0) {
+    switch (w_blocks(obj, -1)) {
         case INVIS:
             mon.invis_blkd = (on ? 1 : 0) & 1;
             mon.minvis = (on ? 0 : mon.perminvis) & 1;
@@ -690,7 +691,7 @@ export function find_mac(mon) {   // worn.c:717
             if (obj.otyp === AMULET_OF_GUARDING) {
                 base = base - 2 | 0;   /* fixed amount, not impacted by erosion */
             } else {
-                base = base - (objects[obj.otyp].oc_oc1 + obj.spe - ((obj.oeroded > obj.oeroded2 ? obj.oeroded : obj.oeroded2) < objects[obj.otyp].oc_oc1 ? obj.oeroded > obj.oeroded2 ? obj.oeroded : obj.oeroded2 : objects[obj.otyp].oc_oc1)) | 0;
+                base = base - ARM_BONUS(obj) | 0;
             }
             /* since ARM_BONUS is positive, subtracting it increases AC */
         }
@@ -877,7 +878,7 @@ async function m_dowear_type(mon, flag, creation, racialexception) {   // worn.c
              * it would forget spe and once again think the object is better
              * than what it already has.
              */
-            if (best && (objects[best.otyp].oc_oc1 + best.spe - ((best.oeroded > best.oeroded2 ? best.oeroded : best.oeroded2) < objects[best.otyp].oc_oc1 ? best.oeroded > best.oeroded2 ? best.oeroded : best.oeroded2 : objects[best.otyp].oc_oc1) + extra_pref(mon, best) | 0) >= (objects[obj.otyp].oc_oc1 + obj.spe - ((obj.oeroded > obj.oeroded2 ? obj.oeroded : obj.oeroded2) < objects[obj.otyp].oc_oc1 ? obj.oeroded > obj.oeroded2 ? obj.oeroded : obj.oeroded2 : objects[obj.otyp].oc_oc1) + extra_pref(mon, obj) | 0)) {
+            if (best && (ARM_BONUS(best) + extra_pref(mon, best) | 0) >= (ARM_BONUS(obj) + extra_pref(mon, obj) | 0)) {
                 continue;
             }
             best = obj;
@@ -972,7 +973,7 @@ async function m_dowear_type(mon, flag, creation, racialexception) {   // worn.c
     if (!creation && sawmon ^ canseemon(mon)) {
         if (mon.minvis && !See_invisible()) {
             await pline($C`Suddenly you cannot see %s.`, new $c.Ptr(nambuf, 0));
-            await discover_object(best.otyp, TRUE, TRUE, TRUE);
+            await makeknown(best.otyp);
             /* } else if (!mon->minvis) {
              *     pline("%s suddenly appears!", Amonnam(mon)); */
         }
@@ -1389,6 +1390,9 @@ export async function extract_from_minvent(mon, obj, do_extrinsics, silently) { 
     if ($c.and64(unwornmask, W.WEP)) {
         await mwepgone(mon);   /* unwields and sets weapon_check to NEED_WEAPON */
     }
+}
+function w_blocks(o, m) {
+    return o.otyp === MUMMY_WRAPPING && $c.and64(m, W.ARMC) !== 0 ? INVIS : o.otyp === CORNUTHAUM && $c.and64(m, W.ARMH) !== 0 && !(gu.urole.mnum === PM.WIZARD) ? CLAIRVOYANT : is_art(o, ART.EYES_OF_THE_OVERWORLD) && $c.and64(m, W.TOOL) !== 0 ? BLINDED : 0;
 }
 function altprop(o) {
     return o.otyp === ALCHEMY_SMOCK ? POISON_RES + ACID_RES - objects[o.otyp].oc_oprop : 0;

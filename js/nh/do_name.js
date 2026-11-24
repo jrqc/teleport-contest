@@ -14,17 +14,19 @@ import { ART } from './artilist.h.js';
 import { rank_of } from './botl.js';
 import { cmdq_clear, cmdq_pop, isok } from './cmd.js';
 import { CLR, NO_COLOR } from './color.h.js';
-import { c_obj_colors, cg, flags, gi, gu, gy, program_state, svd, svl, svp, u } from './decl.js';
+import { c_obj_colors, cg, flags, gi, gu, gy, program_state, svl, svp, u } from './decl.js';
 import { AMULET_CLASS, ARMOR_CLASS, COIN_CLASS, FOOD_CLASS, GEM_CLASS, POTION_CLASS, RING_CLASS, SCROLL_CLASS, SPBOOK_CLASS, TOOL_CLASS, VENOM_CLASS, WAND_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { canseemon, flush_screen, glyph_at, nul_glyphinfo, see_with_infrared, sensemon } from './display.js';
 import { canspotmon, glyph_is_object, glyph_is_swallow } from './display.macros.js';
-import { donamelevel, on_level } from './dungeon.js';
-import { In_endgame } from './dungeon.macros.js';
+import { donamelevel } from './dungeon.js';
+import { In_endgame, Is_astralevel } from './dungeon.macros.js';
 import { wipeout_text } from './engrave.js';
 import { getpos } from './getpos.js';
 import { BUFSZ, FALSE, LL, MD_PAD, PL, TRUE } from './global.h.js';
+import { strcmpi } from './global.macros.js';
 import { ARTICLE, AUGMENT_IT, CMDQ, CORPSTAT, CQ_CANNED, ECMD, EXACT_NAME, GETOBJ, GETOBJ_PROMPT, HAND, ONAME_KNOW_ARTI, ONAME_SKIP_INVUPD, ONAME_VIA_NAMING, SUPPRESS, SUPPRESS_NAME } from './hack.h.js';
-import { dist2, eos, fuzzymatch, highc, lcase, mungspaces, s_suffix, strncmpi, strstri, upstart } from './hacklib.js';
+import { rn1 } from './hack.macros.js';
+import { eos, fuzzymatch, highc, lcase, mungspaces, s_suffix, strncmpi, strstri, upstart } from './hacklib.js';
 import { carrying, getobj, update_inventory } from './invent.js';
 import { nhUse } from './lint.macros.js';
 import { newmextra } from './makemon.js';
@@ -61,7 +63,7 @@ import { add_menu, getlin, select_menu } from './windows.js';
 import { create_nhwindow, destroy_nhwindow, display_nhwindow, end_menu, start_menu } from './winprocs.macros.js';
 import { ATR, MENU, NHW, PICK } from './wintype.h.js';
 import { PRONOUN } from './you.h.js';
-import { Upolyd, u_at } from './you.macros.js';
+import { Upolyd, m_next2u, u_at } from './you.macros.js';
 import { Blind, Deaf, Hallucination, See_invisible } from './youprop.macros.js';
 
 const NUMMBUF = 5;
@@ -263,7 +265,7 @@ async function alreadynamed(mtmp, monnambuf, usrbuf) {   // do_name.c:158
             await pline($C`%s is already called %s.`, upstart($c.strcpy(new $c.Ptr(pronounbuf, 0), genders[pronoun_gender(mtmp, PRONOUN.HALLU)].he)), monnambuf);
         }
         return TRUE;
-    } else if (mtmp.data === mons[PM.JUIBLEX] && strstri(monnambuf, $C`Juiblex`) && !strncmpi(usrbuf, $C`Jubilex`, -1)) {
+    } else if (mtmp.data === mons[PM.JUIBLEX] && strstri(monnambuf, $C`Juiblex`) && !strcmpi(usrbuf, $C`Jubilex`)) {
         await pline($C`%s doesn't like being called %s.`, upstart(monnambuf), usrbuf);
         return TRUE;
     }
@@ -1165,7 +1167,7 @@ export async function distant_monnam(mon, article, outbuf) {   // do_name.c:1170
     /* high priest(ess)'s identity is concealed on the Astral Plane,
        unless you're adjacent (overridden for hallucination which does
        its own obfuscation) */
-    if (mon.data === mons[PM.HIGH_CLERIC] && !Hallucination() && ((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level)) && !(dist2(mon.mx, mon.my, u.ux, u.uy) <= 2)) {
+    if (mon.data === mons[PM.HIGH_CLERIC] && !Hallucination() && Is_astralevel(u.uz) && !m_next2u(mon)) {
         $c.strcpy(outbuf, article === ARTICLE.THE ? $C`the ` : $C``);
         $c.strcat(outbuf, mon.female ? $C`high priestess` : $C`high priest`);
     } else {
@@ -1226,7 +1228,7 @@ export async function monverbself(mon, monnamtext, verb, othertext) {   // do_na
         /* a match indicates that it stayed plural */
         monnamtext = await makeplural(monnamtext);
         /* for "it", makeplural() produces "them" but we want "they" */
-        if (!strncmpi(monnamtext, genders[3].he, -1)) {
+        if (!strcmpi(monnamtext, genders[3].he)) {
             const capitaliz = monnamtext.get(0) === highc(monnamtext.get(0)) ? 1 : 0;
             $c.strcpy(monnamtext, genders[3].him);
             if (capitaliz) {
@@ -1465,7 +1467,7 @@ export async function coyotename(mtmp, buf) {   // do_name.c:1526
  */
 export function rndorcname(s) {   // do_name.c:1538
     let i = 0;
-    const iend = rn2(2) + 3 | 0;
+    const iend = rn1(2, 3);
     let vstart = rn2(2);
     if (s) {
         s.set(0, 0);
@@ -1540,17 +1542,17 @@ export async function lookup_novel(lookname, idx) {   // do_name.c:1627
      */
     if (!strncmpi(await The(lookname), $C`The Color of Magic`, -1)) {
         lookname = sir_Terry_novels[NVL_COLOUR_OF_MAGIC];
-    } else if (!strncmpi(lookname, $C`Sorcery`, -1)) {
+    } else if (!strcmpi(lookname, $C`Sorcery`)) {
         lookname = sir_Terry_novels[NVL_SOURCERY];
-    } else if (!strncmpi(lookname, $C`Masquerade`, -1)) {
+    } else if (!strcmpi(lookname, $C`Masquerade`)) {
         lookname = sir_Terry_novels[NVL_MASKERADE];
     } else if (!strncmpi(await The(lookname), $C`The Amazing Maurice`, -1)) {
         lookname = sir_Terry_novels[NVL_AMAZING_MAURICE];
-    } else if (!strncmpi(lookname, $C`Thud`, -1)) {
+    } else if (!strcmpi(lookname, $C`Thud`)) {
         lookname = sir_Terry_novels[NVL_THUD];
     }
     for (k = 0; k < 41; k = k + 1 | 0) {
-        if (!strncmpi(lookname, sir_Terry_novels[k], -1) || !strncmpi(await The(lookname), sir_Terry_novels[k], -1)) {
+        if (!strcmpi(lookname, sir_Terry_novels[k]) || !strncmpi(await The(lookname), sir_Terry_novels[k], -1)) {
             if (idx) {
                 idx.set(0, k);
             }

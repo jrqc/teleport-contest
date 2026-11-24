@@ -14,19 +14,20 @@ import { A } from './attrib.h.js';
 import { ACURR, ACURRSTR } from './attrib.macros.js';
 import { cmdq_add_dir, cmdq_add_ec, get_adjacent_loc, getdir, isok, set_occupation, yn_function } from './cmd.js';
 import { is_db_wall, is_drawbridge_wall, is_lava, is_pool } from './dbridge.js';
-import { c_common_strings, cg, flags, gi, go, gu, gv, gx, gy, svc, svd, svl, svm, u, ynchars, ynqchars } from './decl.js';
+import { c_common_strings, cg, flags, gi, go, gv, gx, gy, svc, svl, svm, u, ynqchars } from './decl.js';
 import { POTION_CLASS, ROCK_CLASS, WAND_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { canseemon, feel_location, feel_newsym, map_invisible, newsym } from './display.js';
 import { canspotmon } from './display.macros.js';
 import { Some_Monnam, hliquid, mon_nam } from './do_name.js';
 import { dokick } from './dokick.js';
-import { on_level, update_mapseen_for } from './dungeon.js';
+import { update_mapseen_for } from './dungeon.js';
+import { Is_rogue_level } from './dungeon.macros.js';
 import { can_reach_floor, cant_reach_floor } from './engrave.js';
 import { AUTOUNLOCK } from './flag.h.js';
 import { FALSE, TRUE } from './global.h.js';
 import { in_rooms } from './hack.js';
 import { COST, CQ_CANNED, ECMD, FINGER, SHOP } from './hack.h.js';
-import { distu, pline1, ynq } from './hack.macros.js';
+import { distu, pline1, y_n, ynq } from './hack.macros.js';
 import { s_suffix, sgn } from './hacklib.js';
 import { currency, delobj, stackobj, useup } from './invent.js';
 import { costly_alteration, obj_extract_self, place_object, start_corpse_timeout } from './mkobj.js';
@@ -60,7 +61,7 @@ import { stumble_onto_mimic } from './uhitm.js';
 import { block_point, recalc_block_point, unblock_point, vision_recalc } from './vision.js';
 import { cansee } from './vision.macros.js';
 import { TT } from './you.h.js';
-import { u_at } from './you.macros.js';
+import { Role_if, u_at } from './you.macros.js';
 import { Blind, Deaf, Levitation, Passes_walls, Protection_from_shape_changers, Unaware, Underwater } from './youprop.macros.js';
 import { obj_resists } from './zap.js';
 
@@ -164,7 +165,7 @@ async function picklock() {   // lock.c:68
             }
             gx.xlock.box.tknown = 1;
         }
-        if (await yn_function($C`Do you want to try to disarm it?`, new $c.Ptr(ynchars, 0), 110, TRUE) === 121) {
+        if (await y_n($C`Do you want to try to disarm it?`) === 121) {
             /* disarming while using magic key always succeeds */
             if (gx.xlock.door) {
                 gx.xlock.door.flags = (((gx.xlock.door.flags | 0) & ~D.TRAPPED) >>> 0) & 31;
@@ -552,10 +553,10 @@ export async function pick_lock(pick, rx, ry, container) {   // lock.c:358
                 }
                 switch (picktyp) {
                     case CREDIT_CARD:
-                        ch = ACURR(A.DEX) + 20 * (gu.urole.mnum === PM.ROGUE ? 1 : 0);
+                        ch = ACURR(A.DEX) + 20 * Role_if(PM.ROGUE);
                         break;
                     case LOCK_PICK:
-                        ch = Math.imul(4, ACURR(A.DEX)) + 25 * (gu.urole.mnum === PM.ROGUE ? 1 : 0);
+                        ch = Math.imul(4, ACURR(A.DEX)) + 25 * Role_if(PM.ROGUE);
                         break;
                     case SKELETON_KEY:
                         ch = 75 + ACURR(A.DEX);
@@ -628,7 +629,7 @@ export async function pick_lock(pick, rx, ry, container) {   // lock.c:358
                 await pline($C`This door is broken.`);
                 return PICKLOCK_LEARNED_SOMETHING;
             default:
-                if ((flags.autounlock & AUTOUNLOCK.UNTRAP) >>> 0 !== 0 && await could_untrap(FALSE, FALSE) && (c = await yn_function($C`Check this door for a trap?`, new $c.Ptr(ynqchars, 0), 113, TRUE)) !== 110) {
+                if ((flags.autounlock & AUTOUNLOCK.UNTRAP) >>> 0 !== 0 && await could_untrap(FALSE, FALSE) && (c = await ynq($C`Check this door for a trap?`)) !== 110) {
                     if (c === 113) {
                         return PICKLOCK_DID_NOTHING;
                     }
@@ -652,10 +653,10 @@ export async function pick_lock(pick, rx, ry, container) {   // lock.c:358
                 }
                 switch (picktyp) {
                     case CREDIT_CARD:
-                        ch = Math.imul(2, ACURR(A.DEX)) + 20 * (gu.urole.mnum === PM.ROGUE ? 1 : 0);
+                        ch = Math.imul(2, ACURR(A.DEX)) + 20 * Role_if(PM.ROGUE);
                         break;
                     case LOCK_PICK:
-                        ch = Math.imul(3, ACURR(A.DEX)) + 30 * (gu.urole.mnum === PM.ROGUE ? 1 : 0);
+                        ch = Math.imul(3, ACURR(A.DEX)) + 30 * Role_if(PM.ROGUE);
                         break;
                     case SKELETON_KEY:
                         ch = 70 + ACURR(A.DEX);
@@ -871,7 +872,7 @@ export async function doopen_indir(x, y) {   // lock.c:780
             u.dz = 0;   /* should already be 0 since hero moved toward door */
             if ((flags.autounlock & AUTOUNLOCK.APPLY_KEY) >>> 0 !== 0 && (unlocktool = autokey(TRUE)) !== null) {
                 res = await pick_lock(unlocktool, cc.x, cc.y, null) ? ECMD.TIME : ECMD.OK;
-            } else if ((flags.autounlock & AUTOUNLOCK.KICK) >>> 0 !== 0 && !u.usteed && await yn_function($C`Kick it?`, new $c.Ptr(ynqchars, 0), 113, TRUE) === 121) {
+            } else if ((flags.autounlock & AUTOUNLOCK.KICK) >>> 0 !== 0 && !u.usteed && await ynq($C`Kick it?`) === 121) {
                 /* kicking is different when mounted */
                 await cmdq_add_ec(CQ_CANNED, dokick);
                 await cmdq_add_dir(CQ_CANNED, $c.i8(sgn(cc.x - u.ux)), $c.i8(sgn(cc.y - u.uy)), 0);
@@ -1060,7 +1061,7 @@ export async function boxlock(obj, otmp) {   // lock.c:1056
                 await pline($C`Klunk!`);
                 obj.olocked = 1;
                 obj.obroken = 0;
-                if (gu.urole.mnum === PM.WIZARD) {
+                if (Role_if(PM.WIZARD)) {
                     obj.lknown = 1;
                 } else {
                     obj.lknown = 0;
@@ -1075,7 +1076,7 @@ export async function boxlock(obj, otmp) {   // lock.c:1056
                 await pline($C`Klick!`);
                 obj.olocked = 0;
                 res = 1;
-                if (gu.urole.mnum === PM.WIZARD) {
+                if (Role_if(PM.WIZARD)) {
                     obj.lknown = 1;
                 } else {
                     obj.lknown = 0;
@@ -1138,7 +1139,7 @@ export async function doorlock(otmp, x, y) {   // lock.c:1103
     switch (otmp.otyp) {
         case WAN_LOCKING:
         case SPE_WIZARD_LOCK:
-            if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level)) {
+            if (Is_rogue_level(u.uz)) {
                 const vis = cansee(x, y);
                 /* Can't have real locking in Rogue, so just hide doorway */
                 if (vis) {

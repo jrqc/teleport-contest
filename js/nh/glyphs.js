@@ -18,6 +18,7 @@ import { glyph_is_body, glyph_is_body_piletop, glyph_is_cmap, glyph_is_cmap_a, g
 import { monsdump } from './earlyarg.js';
 import { panic } from './end.js';
 import { FALSE, TRUE } from './global.h.js';
+import { strcmpi } from './global.macros.js';
 import { nh_snprintf, strncmpi, unicodeval_to_utf8str } from './hacklib.js';
 import { nhUse } from './lint.macros.js';
 import { mons } from './monst.js';
@@ -402,7 +403,7 @@ function find_glyph_in_cache(id) {   // glyphs.c:395
             /* Empty bucket found */
             return -1;
         }
-        if (strncmpi(id, $c.radd(glyphid_cache, $c.idx(i)).id, -1) === 0) {
+        if (strcmpi(id, $c.radd(glyphid_cache, $c.idx(i)).id) === 0) {
             /* Match found */
             return $c.radd(glyphid_cache, $c.idx(i)).glyphnum;
         }
@@ -983,7 +984,7 @@ async function parse_id(id, findwhat) {   // glyphs.c:824
     } else if (is_S) {
         /* cmap entries */
         for (i = 0; i < cmap_count; i = i + 1 | 0) {
-            if (!strncmpi(loadsyms[i + cmap_offset | 0].name.add(2), id.add(2), -1)) {
+            if (!strcmpi(loadsyms[i + cmap_offset | 0].name.add(2), id.add(2))) {
                 findwhat.findtype = find_cmap;
                 findwhat.val = i;
                 findwhat.loadsyms_offset = i + cmap_offset | 0;
@@ -992,7 +993,7 @@ async function parse_id(id, findwhat) {   // glyphs.c:824
         }
         /* objclass entries */
         for (i = 0; i < oc_count; i = i + 1 | 0) {
-            if (!strncmpi(loadsyms[i + oc_offset | 0].name.add(2), id.add(2), -1)) {
+            if (!strcmpi(loadsyms[i + oc_offset | 0].name.add(2), id.add(2))) {
                 findwhat.findtype = find_oc;
                 findwhat.val = i;
                 findwhat.loadsyms_offset = i + oc_offset | 0;
@@ -1001,7 +1002,7 @@ async function parse_id(id, findwhat) {   // glyphs.c:824
         }
         /* permonst entries */
         for (i = 0; i <= pm_count; i = i + 1 | 0) {
-            if (!strncmpi(loadsyms[i + pm_offset | 0].name.add(2), id.add(2), -1)) {
+            if (!strcmpi(loadsyms[i + pm_offset | 0].name.add(2), id.add(2))) {
                 findwhat.findtype = find_pm;
                 findwhat.val = i + 1 | 0;   /* starts at 1 */
                 findwhat.loadsyms_offset = i + pm_offset | 0;

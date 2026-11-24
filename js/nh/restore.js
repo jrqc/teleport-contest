@@ -21,6 +21,7 @@ import { new_mgivenname, new_oname } from './do_name.js';
 import { mon_catchup_elapsed_time, newedog } from './dog.js';
 import { Is_branchlev, assign_level, ledger_no, load_exclusions, on_level, restore_dungeon } from './dungeon.js';
 import { BR, BR_NO_END1, BR_NO_END2 } from './dungeon.h.js';
+import { Is_rogue_level } from './dungeon.macros.js';
 import { done, panic, restore_killers } from './end.js';
 import { rest_engravings } from './engrave.js';
 import { close_nhfile, create_levelfile, debugcore, delete_savefile, free_saved_games, get_freeing_nhfile, get_saved_games, rewind_nhfile } from './files.js';
@@ -61,7 +62,8 @@ import { rnd } from './rnd.js';
 import { role_init } from './role.js';
 import { restore_oracles } from './rumors.js';
 import { savelev, savestateinlock } from './save.js';
-import { sfi_cemetery, sfi_char, sfi_context_info, sfi_damage, sfi_dest_area, sfi_ebones, sfi_edog, sfi_egd, sfi_emin, sfi_epri, sfi_eshk, sfi_flag, sfi_fruit, sfi_gamelog_line, sfi_int, sfi_int32, sfi_levelflags, sfi_long, sfi_monst, sfi_mvitals, sfi_nhcoord, sfi_obj, sfi_q_score, sfi_rm, sfi_s_level, sfi_schar, sfi_spell, sfi_stairway, sfi_trap, sfi_ulong, sfi_unsigned, sfi_xint8, sfi_you } from './sfbase.js';
+import { Sfi_cemetery, Sfi_char, Sfi_context_info, Sfi_damage, Sfi_dest_area, Sfi_ebones, Sfi_edog, Sfi_egd, Sfi_emin, Sfi_epri, Sfi_eshk, Sfi_flag, Sfi_fruit, Sfi_gamelog_line, Sfi_int32, Sfi_levelflags, Sfi_monst, Sfi_mvitals, Sfi_nhcoord, Sfi_obj, Sfi_q_score, Sfi_rm, Sfi_s_level, Sfi_schar, Sfi_spell, Sfi_stairway, Sfi_trap, Sfi_you } from './savefile.macros.js';
+import { sfi_char, sfi_int, sfi_long, sfi_ulong, sfi_unsigned, sfi_xint8 } from './sfbase.js';
 import { bufon, restoreinfo } from './sfstruct.js';
 import { restshk, set_residency } from './shk.js';
 import { neweshk } from './shknam.js';
@@ -161,7 +163,7 @@ async function restlevchn(nhfp) {   // restore.c:130
     await sfi_int(nhfp, new $c.Ptr(cnt, 0), $C`levchn-lev_count`);
     for (; cnt[0] > 0; cnt[0] = cnt[0] - 1 | 0) {
         const tmplev = $c.asRec(await alloc(40), $T.s_level, 40);
-        await sfi_s_level(nhfp, tmplev, $C`levchn-s_level`);
+        await Sfi_s_level(nhfp, tmplev, $C`levchn-s_level`);
         if (!svs.sp_levchn) {
             svs.sp_levchn = tmplev;
         } else {
@@ -187,7 +189,7 @@ async function restdamage(nhfp) {   // restore.c:153
     }
     do {
         tmp_dam = $c.asRec(await alloc(32), $T.damage, 32);
-        await sfi_damage(nhfp, tmp_dam, $C`damage`);
+        await Sfi_damage(nhfp, tmp_dam, $C`damage`);
         if (ghostly) {
             tmp_dam.when = $c.add64(tmp_dam.when, $c.sub64(svm.moves, svo.omoves));
         }
@@ -206,7 +208,7 @@ async function restobj(nhfp, otmp) {   // restore.c:183
     let buflen = Int32Array.of(0), omid = Uint32Array.of(0), $t1, $t2;
     buflen[0] = 0;
     omid[0] = 0;
-    await sfi_obj(nhfp, otmp, $C`obj`);
+    await Sfi_obj(nhfp, otmp, $C`obj`);
     otmp.lua_ref_cnt = 0;
     /* next object pointers are invalid; otmp->cobj needs to be left
        as is--being non-null is key to restoring container contents */
@@ -233,7 +235,7 @@ async function restobj(nhfp, otmp) {   // restore.c:183
         await sfi_int(nhfp, new $c.Ptr(buflen, 0), $C`obj-omailcmd_length`);
         if (buflen[0] > 0) {
             const omailcmd = $c.asArr(await alloc(buflen[0] >>> 0), Int8Array);
-            await sfi_char(nhfp, omailcmd, $C`obj-omailcmd`, buflen[0]);
+            await Sfi_char(nhfp, omailcmd, $C`obj-omailcmd`, buflen[0]);
             await new_omailcmd(otmp, omailcmd);
             $c.free(omailcmd);
         }
@@ -325,7 +327,7 @@ async function restmon(nhfp, mtmp) {   // restore.c:307
     let buflen = Int32Array.of(0), mc = Int32Array.of(0), $t1;
     buflen[0] = 0;
     mc[0] = 0;
-    await sfi_monst(nhfp, mtmp, $C`monst`);
+    await Sfi_monst(nhfp, mtmp, $C`monst`);
     /* next monster pointer is invalid */
     mtmp.nmon = null;
     /* non-null mextra needs to be reconstructed */
@@ -342,31 +344,31 @@ async function restmon(nhfp, mtmp) {   // restore.c:307
         await sfi_int(nhfp, new $c.Ptr(buflen, 0), $C`monst-egd_length`);
         if (buflen[0] > 0) {
             await newegd(mtmp);
-            await sfi_egd(nhfp, mtmp.mextra.egd, $C`monst-egd`);
+            await Sfi_egd(nhfp, mtmp, $C`monst-egd`);
         }
         /* epri - temple priest */
         await sfi_int(nhfp, new $c.Ptr(buflen, 0), $C`monst-epri_length`);
         if (buflen[0] > 0) {
             await newepri(mtmp);
-            await sfi_epri(nhfp, mtmp.mextra.epri, $C`monst-epri`);
+            await Sfi_epri(nhfp, mtmp, $C`monst-epri`);
         }
         /* eshk - shopkeeper */
         await sfi_int(nhfp, new $c.Ptr(buflen, 0), $C`monst-eshk_length`);
         if (buflen[0] > 0) {
             await neweshk(mtmp);
-            await sfi_eshk(nhfp, mtmp.mextra.eshk, $C`monst-eshk`);
+            await Sfi_eshk(nhfp, mtmp, $C`monst-eshk`);
         }
         /* emin - minion */
         await sfi_int(nhfp, new $c.Ptr(buflen, 0), $C`monst-emin_length`);
         if (buflen[0] > 0) {
             await newemin(mtmp);
-            await sfi_emin(nhfp, mtmp.mextra.emin, $C`monst-emin`);
+            await Sfi_emin(nhfp, mtmp, $C`monst-emin`);
         }
         /* edog - pet */
         await sfi_int(nhfp, new $c.Ptr(buflen, 0), $C`monst-edog_length`);
         if (buflen[0] > 0) {
             await newedog(mtmp);
-            await sfi_edog(nhfp, mtmp.mextra.edog, $C`monst-edog`);
+            await Sfi_edog(nhfp, mtmp, $C`monst-edog`);
             /* save or bones held a relative time */
             relative_time_to_moves(new $c.FieldRef(mtmp.mextra.edog, "droptime", "i64"));
             relative_time_to_moves(new $c.FieldRef(mtmp.mextra.edog, "hungrytime", "i64"));
@@ -379,7 +381,7 @@ async function restmon(nhfp, mtmp) {   // restore.c:307
         await sfi_int(nhfp, new $c.Ptr(buflen, 0), $C`monst-ebones_length`);
         if (buflen[0] > 0) {
             await newebones(mtmp);
-            await sfi_ebones(nhfp, mtmp.mextra.ebones, $C`monst-ebones`);
+            await Sfi_ebones(nhfp, mtmp, $C`monst-ebones`);
         }
         /* mcorpsenm - obj->corpsenm for mimic posing as corpse or
            statue (inline int rather than pointer to something) */
@@ -474,7 +476,7 @@ async function loadfruitchn(nhfp) {   // restore.c:468
     let flist = null;
     for (; ; ) {
         fnext = await newfruit();
-        await sfi_fruit(nhfp, fnext, $C`fruit`);
+        await Sfi_fruit(nhfp, fnext, $C`fruit`);
         if (fnext.fid !== 0) {
             fnext.nextf = flist;
             flist = fnext;
@@ -522,7 +524,7 @@ async function restgamestate(nhfp) {   // restore.c:525
     /* all 0, but has some pointers */
     uid[0] = 0;
     await sfi_ulong(nhfp, new $c.Ptr(uid, 0), $C`gamestate-uid`);
-    await sfi_char(nhfp, new $c.Ptr(svn.nhuuid, 0), $C`nhuuid`, 37);
+    await Sfi_char(nhfp, new $c.Ptr(svn.nhuuid, 0), $C`nhuuid`, 37);
     await sfi_long(nhfp, new $c.FieldRef(svm, "moves", "i64"), $C`gamestate-moves`);
     if (SYSOPT_CHECK_SAVE_UID() && uid[0] !== $c.getuid()) {
         /* strange ... */
@@ -541,7 +543,7 @@ async function restgamestate(nhfp) {   // restore.c:525
     }
     /* SFCTOOL */
     newgamecontext.$copyFrom(svc.context);   /* copy statically init'd context */
-    await sfi_context_info(nhfp, svc.context, $C`gamestate-context`);
+    await Sfi_context_info(nhfp, svc.context, $C`gamestate-context`);
     relative_time_to_moves(new $c.FieldRef(svc.context, "seer_turn", "i64"));
     relative_time_to_moves(new $c.FieldRef(svc.context.digging, "lastdigtime", "i64"));
     svc.context.warntype.species = ismnum(svc.context.warntype.speciesidx) ? $c.relem(mons, svc.context.warntype.speciesidx) : null;
@@ -552,7 +554,7 @@ async function restgamestate(nhfp) {   // restore.c:525
        file option values instead of keeping old save file option values
        if partial restore fails and we resort to starting a new game */
     newgameflags.$copyFrom(flags);
-    await sfi_flag(nhfp, flags, $C`gamestate-flags`);
+    await Sfi_flag(nhfp, flags, $C`gamestate-flags`);
     /* avoid keeping permanent inventory window up to date during restore
        (setworn() calls update_inventory); attempting to include the cost
        of unpaid items before shopkeeper's bill is available is a no-no;
@@ -579,8 +581,8 @@ async function restgamestate(nhfp) {   // restore.c:525
     /* use colors from save file */
     /* !SFCTOOL */
     await sfi_long(nhfp, new $c.FieldRef(svw, "wreserve", "i64"), $C`wreserve`);
-    await sfi_int32(nhfp, new $c.FieldRef(svw, "wtreserved", "i32"), $C`wtreserved`);
-    await sfi_you(nhfp, u, $C`gamestate-you`);
+    await Sfi_int32(nhfp, new $c.FieldRef(svw, "wtreserved", "i32"), $C`wtreserved`);
+    await Sfi_you(nhfp, u, $C`gamestate-you`);
     gy.youmonst.cham = u.mcham;
     if (restoring_special && iflags.explore_error_flag) {
         /* savefile has wizard or explore mode, but player is no longer
@@ -588,11 +590,11 @@ async function restgamestate(nhfp) {   // restore.c:525
            fail restoration. */
         u.uhp = 0;
     }
-    await sfi_char(nhfp, new $c.Ptr(timebuf, 0), $C`gamestate-ubirthday`, 14);
+    await Sfi_char(nhfp, new $c.Ptr(timebuf, 0), $C`gamestate-ubirthday`, 14);
     timebuf[14] = 0;
     $G.ubirthday = time_from_yyyymmddhhmmss(new $c.Ptr(timebuf, 0));
     await sfi_long(nhfp, new $c.FieldRef(urealtime, "realtime", "i64"), $C`gamestate-realtime`);
-    await sfi_char(nhfp, new $c.Ptr(timebuf, 0), $C`gamestate-start_timing`, 14);
+    await Sfi_char(nhfp, new $c.Ptr(timebuf, 0), $C`gamestate-start_timing`, 14);
     timebuf[14] = 0;
     $t2 = time_from_yyyymmddhhmmss(new $c.Ptr(timebuf, 0)), urealtime.start_timing = $t2;
     /* current time is the time to use for next urealtime.realtime update */
@@ -637,7 +639,7 @@ async function restgamestate(nhfp) {   // restore.c:525
     $t6 = await restobjchn(nhfp, FALSE), gm.migrating_objs = $t6;
     $t7 = await restmonchn(nhfp), gm.migrating_mons = $t7;
     for (i = 0; i < NUMMONS; i = i + 1 | 0) {
-        await sfi_mvitals(nhfp, $c.relem(svm.mvitals, i), $C`gamestate-mvitals`);
+        await Sfi_mvitals(nhfp, $c.relem(svm.mvitals, i), $C`gamestate-mvitals`);
     }
     /*
      * There are some things after this that can have unintended display
@@ -666,14 +668,14 @@ async function restgamestate(nhfp) {   // restore.c:525
     await restlevchn(nhfp);
     /* hero_seq isn't saved and restored because it can be recalculated */
     gh.hero_seq = $c.shl64(svm.moves, 3);   /* normally handled in moveloop() */
-    await sfi_q_score(nhfp, svq.quest_status, $C`gamestate-quest_status`);
+    await Sfi_q_score(nhfp, svq.quest_status, $C`gamestate-quest_status`);
     for (i = 0; i < MAXSPELL + 1; i = i + 1 | 0) {
-        await sfi_spell(nhfp, $c.relem(svs.spl_book, i), $C`gamestate-spl_book`);
+        await Sfi_spell(nhfp, $c.relem(svs.spl_book, i), $C`gamestate-spl_book`);
     }
     await restore_artifacts(nhfp);
     await restore_oracles(nhfp);
-    await sfi_char(nhfp, new $c.Ptr(svp.pl_character, 0), $C`gamestate-pl_character`, 32);
-    await sfi_char(nhfp, new $c.Ptr(svp.pl_fruit, 0), $C`gamestate-pl_fruit`, 32);
+    await Sfi_char(nhfp, new $c.Ptr(svp.pl_character, 0), $C`gamestate-pl_character`, 32);
+    await Sfi_char(nhfp, new $c.Ptr(svp.pl_fruit, 0), $C`gamestate-pl_fruit`, 32);
     freefruitchn(gf.ffruit);   /* clean up fruit(s) made by initoptions() */
     $t8 = await loadfruitchn(nhfp), gf.ffruit = $t8;
     await restnames(nhfp);
@@ -811,7 +813,7 @@ export async function dorecover(nhfp) {   // restore.c:789
     if (!wizard() && !discover()) {
         await delete_savefile();
     }
-    if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level)) {
+    if (Is_rogue_level(u.uz)) {
         assign_graphics(ROGUESET);
     }
     reset_glyphmap(gm_levelchange);
@@ -868,7 +870,7 @@ async function rest_stairs(nhfp) {   // restore.c:955
         if (buflen[0] === -1) {
             break;
         }
-        await sfi_stairway(nhfp, stway, $C`stairs-stairway`);
+        await Sfi_stairway(nhfp, stway, $C`stairs-stairway`);
         if (program_state.restoring !== REST.GSTATE && stway.tolev.dnum === u.uz.dnum) {
             /* stairway dlevel is relative, make it absolute */
             stway.tolev.dlevel = $c.i16(stway.tolev.dlevel + u.uz.dlevel | 0);
@@ -893,7 +895,7 @@ export async function restcemetery(nhfp, cemeteryaddr) {   // restore.c:988
         let bonesaddr = cemeteryaddr;
         do {
             bonesinfo = $c.asRec(await alloc(184), $T.cemetery, 184);
-            await sfi_cemetery(nhfp, bonesinfo, $C`cemetery-bonesinfo`);
+            await Sfi_cemetery(nhfp, bonesinfo, $C`cemetery-bonesinfo`);
             bonesaddr.set(0, bonesinfo);
             bonesaddr = new $c.FieldRef(bonesaddr.get(0), "next", "ptr");
         } while (bonesaddr.get(0));
@@ -919,7 +921,7 @@ async function rest_levl(nhfp) {   // restore.c:1021
     let c = 0, r = 0;
     for (c = 0; c < COLNO; c = c + 1 | 0) {
         for (r = 0; r < ROWNO; r = r + 1 | 0) {
-            await sfi_rm(nhfp, $c.relem(svl.level.locations[c], r), $C`location-rm`);
+            await Sfi_rm(nhfp, $c.relem(svl.level.locations[c], r), $C`location-rm`);
         }
     }
 }
@@ -978,15 +980,15 @@ export async function getlev(nhfp, pid, lev) {   // restore.c:1046
     await rest_levl(nhfp);
     for (c = 0; c < COLNO; c = c + 1 | 0) {
         for (r = 0; r < ROWNO; r = r + 1 | 0) {
-            await sfi_schar(nhfp, new $c.Ptr(svl.lastseentyp[c], r), $C`lastseentyp`);
+            await Sfi_schar(nhfp, new $c.Ptr(svl.lastseentyp[c], r), $C`lastseentyp`);
         }
     }
     await sfi_long(nhfp, new $c.FieldRef(svo, "omoves", "i64"), $C`lev-timestmp`);
     elapsed = $c.sub64(svm.moves, svo.omoves);
     await rest_stairs(nhfp);
-    await sfi_dest_area(nhfp, svu.updest, $C`lev-updest`);
-    await sfi_dest_area(nhfp, svd.dndest, $C`lev-dndest`);
-    await sfi_levelflags(nhfp, svl.level.flags, $C`lev-level_flags`);
+    await Sfi_dest_area(nhfp, svu.updest, $C`lev-updest`);
+    await Sfi_dest_area(nhfp, svd.dndest, $C`lev-dndest`);
+    await Sfi_levelflags(nhfp, svl.level.flags, $C`lev-level_flags`);
     rest_adjust_levelflags();
     if (svd.doors) {
         $c.free(svd.doors);
@@ -998,7 +1000,7 @@ export async function getlev(nhfp, pid, lev) {   // restore.c:1046
         $t2 = $c.asRec(await alloc($c.u32($c.mulu64($c.u64(svd.doors_alloc), 4))), $T.nhcoord, 4), svd.doors = $t2;
         tmpc = svd.doors;
         for (i = 0; i < svd.doors_alloc; i = i + 1 | 0) {
-            await sfi_nhcoord(nhfp, tmpc, $C`lev-doors`);
+            await Sfi_nhcoord(nhfp, tmpc, $C`lev-doors`);
             tmpc = $c.radd(tmpc, 1);
         }
     }
@@ -1016,7 +1018,7 @@ export async function getlev(nhfp, pid, lev) {   // restore.c:1046
     gf.ftrap = null;
     for (; ; ) {
         trap = await newtrap();
-        await sfi_trap(nhfp, trap, $C`trap`);
+        await Sfi_trap(nhfp, trap, $C`trap`);
         if (trap.tx !== 0) {
             if (program_state.restoring !== REST.GSTATE && trap.dst.dnum === u.uz.dnum) {
                 /* convert relative destination to absolute */
@@ -1200,7 +1202,7 @@ export async function get_plname_from_file(nhfp, outbuf, name_only) {   // resto
     plbuf[0] = 0;
     await sfi_int(nhfp, new $c.Ptr(pltmpsiz, 0), $C`plname-size`);
     /* pltmpsiz should now be PL_NSIZ_PLUS */
-    await sfi_char(nhfp, new $c.Ptr(plbuf, 0), $C`plname`, pltmpsiz[0]);
+    await Sfi_char(nhfp, new $c.Ptr(plbuf, 0), $C`plname`, pltmpsiz[0]);
     /* plbuf[PL_NSIZ_PLUS-2] should be '\0';
        plbuf[PL_NSIZ_PLUS-1] should be '-' or 'X' or 'D' */
     /* "-race-role-gend-algn" is already present except that it has been
@@ -1247,9 +1249,9 @@ async function restore_gamelog(nhfp) {   // restore.c:1390
         if (slen[0] > BUFSZ * 2 - 1) {
             await panic($C`restore_gamelog: msg too big (%d)`, slen[0]);
         }
-        await sfi_char(nhfp, new $c.Ptr(msg, 0), $C`gamelog-gamelog_text`, slen[0]);
+        await Sfi_char(nhfp, new $c.Ptr(msg, 0), $C`gamelog-gamelog_text`, slen[0]);
         msg[slen[0]] = 0;
-        await sfi_gamelog_line(nhfp, tmp, $C`gamelog-gamelog_line`);
+        await Sfi_gamelog_line(nhfp, tmp, $C`gamelog-gamelog_line`);
         await gamelog_add(tmp.flags, tmp.turn, new $c.Ptr(msg, 0));
         /* !SFCTOOL */
     }
@@ -1270,7 +1272,7 @@ async function restore_msghistory(nhfp) {   // restore.c:1415
         if (msgsize[0] > BUFSZ - 1) {
             await panic($C`restore_msghistory: msg too big (%d)`, msgsize[0]);
         }
-        await sfi_char(nhfp, new $c.Ptr(msg, 0), $C`msghistory-msg`, msgsize[0]);
+        await Sfi_char(nhfp, new $c.Ptr(msg, 0), $C`msghistory-msg`, msgsize[0]);
         msg[msgsize[0]] = 0;
         await putmsghistory()(new $c.Ptr(msg, 0), TRUE);
         msgcount = msgcount + 1 | 0;

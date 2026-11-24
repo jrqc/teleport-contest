@@ -6,26 +6,25 @@ import * as $c from '../crt/index.js';
 import { $C } from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
-import { A } from './attrib.h.js';
 import { midnight, night } from './calendar.js';
 import { getdir, isok } from './cmd.js';
-import { c_common_strings, flags, ga, gc, gi, gm, gn, gu, gy, iflags, svc, svd, svl, svm, svq, svr, u } from './decl.js';
+import { c_common_strings, flags, ga, gc, gi, gm, gn, gu, gy, iflags, svc, svl, svm, svq, svr, u } from './decl.js';
 import { S, WEAPON_CLASS } from './defsym.h.js';
 import { canseemon, glyph_at, map_invisible } from './display.js';
 import { GLYPH } from './display.h.js';
 import { canspotmon, glyph_is_invisible, glyph_is_statue, glyph_to_mon } from './display.macros.js';
 import { Monnam, mon_nam, noveltitle, pmname, rndmonnam } from './do_name.js';
 import { cursed } from './do_wear.js';
-import { on_level } from './dungeon.js';
-import { In_endgame } from './dungeon.macros.js';
+import { In_endgame, Is_astralevel, Is_oracle_level, Is_sanctum } from './dungeon.macros.js';
 import { panic } from './end.js';
 import { Death_quote } from './files.js';
 import { FULL_MOON, PLNMSG } from './flag.h.js';
 import { FALSE, TRUE } from './global.h.js';
+import { strcmpi } from './global.macros.js';
 import { money_cnt, nomul } from './hack.js';
 import { BLOOD, BOLT_LIM, ECMD, HAIR, HEAD, NECK } from './hack.h.js';
-import { You_hear1, verbalize1 } from './hack.macros.js';
-import { dist2, letter, nh_snprintf, strncmpi, ucase } from './hacklib.js';
+import { You_hear1, rn1, verbalize1 } from './hack.macros.js';
+import { dist2, letter, nh_snprintf, ucase } from './hacklib.js';
 import { currency, g_at, u_have_novel } from './invent.js';
 import { nhUse } from './lint.macros.js';
 import { has_emin } from './mextra.macros.js';
@@ -37,11 +36,11 @@ import { ROOM_INDEX } from './mkroom.macros.js';
 import { genus, get_iter_mons, wake_nearto } from './mon.js';
 import { pronoun_gender, same_race } from './mondata.js';
 import { carnivorous, haseyes, herbivorous, humanoid, is_animal, is_dwarf, is_elf, is_flyer, is_gnome, is_lord, is_mercenary, is_mplayer, is_prince, is_silent, is_undead, likes_magic, perceives } from './mondata.macros.js';
-import { FEMALE, M2, MALE, MS } from './monflag.h.js';
+import { FEMALE, MALE, MS } from './monflag.h.js';
 import { accessible } from './monmove.js';
 import { mons } from './monst.js';
 import { M_AP } from './monst.h.js';
-import { DEADMONSTER, M_AP_TYPE, helpless, is_vampshifter } from './monst.macros.js';
+import { DEADMONSTER, M_AP_TYPE, helpless, is_lminion, is_vampshifter } from './monst.macros.js';
 import { PM } from './monsters.h.js';
 import { mplayer_talk } from './mplayer.js';
 import { is_weptool } from './obj.macros.js';
@@ -50,7 +49,7 @@ import { an, helm_simple_name, vtense } from './objnam.js';
 import { You, You_cant, You_hear, Your, pline, pline_The, verbalize } from './pline.js';
 import { body_part, poly_gender } from './polyself.js';
 import { halu_gname } from './pray.js';
-import { inhistemple, mon_aligntyp, p_coaligned, priest_talk, temple_occupied } from './priest.js';
+import { inhistemple, p_coaligned, priest_talk, temple_occupied } from './priest.js';
 import { W } from './prop.h.js';
 import { quest_chat } from './quest.js';
 import { DBWALL, IRONBARS, SDOOR } from './rm.h.js';
@@ -69,7 +68,7 @@ import { ANY } from './wintype.h.js';
 import { aggravate, cuss } from './wizard.js';
 import { which_armor } from './worn.js';
 import { PRONOUN } from './you.h.js';
-import { Upolyd } from './you.macros.js';
+import { Role_if, Upolyd } from './you.macros.js';
 import { Blind, Conflict, Deaf, Hallucination, Invis, Strangled, Underwater } from './youprop.macros.js';
 
 const throne_mon_sound$throne_msg = $c.nulls(4);   // static in throne_mon_sound()
@@ -131,7 +130,7 @@ async function throne_mon_sound(mtmp) {   // sounds.c:30
             if (which === 0) {
             } else if (which === 1) {
             }
-            await You_hear($C`%s`, throne_mon_sound$throne_msg[which]);
+            await You_hear1(throne_mon_sound$throne_msg[which]);
         } else {
             await pline(throne_mon_sound$throne_msg[2], genders[flags.female ? 1 : 0].his);
         }
@@ -192,7 +191,7 @@ async function zoo_mon_sound(mtmp) {   // sounds.c:115
     if ((mtmp.msleeping || is_animal(mtmp.data)) && mon_in_room(mtmp, ZOO)) {
         const hallu = Hallucination() ? 1 : 0;
         const selection = rn2(2) + hallu | 0;
-        await You_hear($C`%s`, zoo_mon_sound$zoo_msg[selection]);
+        await You_hear1(zoo_mon_sound$zoo_msg[selection]);
         return TRUE;
     }
     return FALSE;
@@ -360,12 +359,12 @@ export async function dosounds() {   // sounds.c:202
         }
         return;
     }
-    if (svl.level.flags.has_temple && !rn2(200) && !((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level) || (svd.dungeon_topology.d_sanctum_level.dlevel || svd.dungeon_topology.d_sanctum_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_sanctum_level))) {
+    if (svl.level.flags.has_temple && !rn2(200) && !(Is_astralevel(u.uz) || Is_sanctum(u.uz))) {
         if (await get_iter_mons(temple_priest_sound)) {
             return;
         }
     }
-    if ((svd.dungeon_topology.d_oracle_level.dlevel || svd.dungeon_topology.d_oracle_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_oracle_level) && !rn2(400)) {
+    if (Is_oracle_level(u.uz) && !rn2(400)) {
         if (await get_iter_mons(oracle_sound)) {
             return;
         }
@@ -1122,7 +1121,7 @@ export async function domonnoise(mtmp) {   // sounds.c:679
             /* FALLTHRU */
             if (!mtmp.mpeaceful) {
                 await cuss(mtmp);
-            } else if ($c.andu64(mtmp.data.mflags2, M2.MINION) !== 0 && mon_aligntyp(mtmp) === A.LAWFUL) {
+            } else if (is_lminion(mtmp)) {
                 verbl_msg = $C`It's not too late.`;
             } else {
                 verbl_msg = $C`We're all doomed.`;
@@ -1137,7 +1136,7 @@ export async function domonnoise(mtmp) {   // sounds.c:679
             if ($G.uwep && ($G.uwep.oclass === WEAPON_CLASS || is_weptool($G.uwep))) {
                 verbl_msg = $C`Put that weapon away before you hurt someone!`;
             } else if ($G.uarmc || $G.uarm || $G.uarmh || $G.uarms || $G.uarmg || $G.uarmf) {
-                verbl_msg = gu.urole.mnum === PM.HEALER ? $C`Doc, I can't help you unless you cooperate.` : $C`Please undress so I can examine you.`;
+                verbl_msg = Role_if(PM.HEALER) ? $C`Doc, I can't help you unless you cooperate.` : $C`Please undress so I can examine you.`;
             } else if ($G.uarmu) {
                 verbl_msg = $C`Take off your shirt, please.`;
             } else {
@@ -1165,7 +1164,7 @@ export async function domonnoise(mtmp) {   // sounds.c:679
                     if ((tribtitle = noveltitle(new $c.FieldRef(book, "corpsenm", "i32"))) !== null) {
                         $c.sprintf(new $c.Ptr(verbuf, 0), $C`Ah, so you have a copy of /%s/.`, tribtitle);
                         /* no Death featured in these two, so exclude them */
-                        if (strncmpi(tribtitle, $C`Snuff`, -1) && strncmpi(tribtitle, $C`The Wee Free Men`, -1)) {
+                        if (strcmpi(tribtitle, $C`Snuff`) && strcmpi(tribtitle, $C`The Wee Free Men`)) {
                             $c.strcat(new $c.Ptr(verbuf, 0), $C`  I may have been misquoted there.`);
                         }
                         verbl_msg = new $c.Ptr(verbuf, 0);
@@ -1441,10 +1440,10 @@ export async function tiphat() {   // sounds.c:1427
                                 await pline($C`%s tips %s %s in response.`, await Monnam(mtmp), genders[pronoun_gender(mtmp, PRONOUN.HALLU)].his, helm_simple_name(otmp));
                             }
                         } else if ($goto !== "nada" && (vismon && humanoid(mtmp.data))) {
-                            which = !Deaf() ? rn2(3) : rn2(2) + 1 | 0;
-                            twice = Deaf() || which > 0 || rn2(3) ? 0 : rn2(2) + 1 | 0;
+                            which = !Deaf() ? rn2(3) : rn1(2, 1);
+                            twice = Deaf() || which > 0 || rn2(3) ? 0 : rn1(2, 1);
                             await pline($C`%s %s%s%s at you...`, await Monnam(mtmp), tiphat$reaction[which], twice ? $C` and ` : $C``, twice ? tiphat$reaction[twice] : $C``);
-                        } else if ($goto !== "nada" && (dist2($c.i16(x), $c.i16(y), u.ux, u.uy) <= 2 && !Deaf() && await domonnoise(mtmp))) {
+                        } else if ($goto !== "nada" && ((dist2($c.i16(x), $c.i16(y), u.ux, u.uy) <= 2) && !Deaf() && await domonnoise(mtmp))) {
                             if (!vismon) {
                                 await map_invisible($c.i16(x), $c.i16(y));
                             }

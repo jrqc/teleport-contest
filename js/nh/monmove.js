@@ -10,11 +10,10 @@ import { $G } from './globals.js';
 import { stop_occupation } from './allmain.js';
 import { artifact_light, has_magic_key, is_art } from './artifact.js';
 import { ART } from './artilist.h.js';
-import { A } from './attrib.h.js';
 import { ACURRSTR } from './attrib.macros.js';
 import { isok } from './cmd.js';
 import { is_pool } from './dbridge.js';
-import { a11y, c_common_strings, flags, gb, gi, gk, gn, go, gv, gy, svc, svd, svl, svm, u } from './decl.js';
+import { a11y, c_common_strings, flags, gb, gi, gk, gn, go, gv, gy, svc, svl, svm, u } from './decl.js';
 import { AMULET_CLASS, ARMOR_CLASS, BALL_CLASS, COIN_CLASS, FOOD_CLASS, GEM_CLASS, POTION_CLASS, RING_CLASS, ROCK_CLASS, S, SCROLL_CLASS, SPBOOK_CLASS, TOOL_CLASS, VENOM_CLASS, WAND_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { bury_an_obj, is_digging, mdig_tunnel, watch_dig } from './dig.js';
 import { canseemon, newsym, sensemon, swallowed } from './display.js';
@@ -22,14 +21,14 @@ import { canspotmon, vobj_at } from './display.macros.js';
 import { Adjmonnam, Amonnam, Monnam, YMonnam, mon_nam, y_monnam } from './do_name.js';
 import { dogfood } from './dog.js';
 import { could_reach_item, cursed_object_at, dog_move, finish_meating } from './dogmove.js';
-import { Is_special, on_level, u_on_newpos } from './dungeon.js';
-import { In_endgame, Inhell } from './dungeon.macros.js';
+import { Is_special, u_on_newpos } from './dungeon.js';
+import { In_endgame, Inhell, Is_rogue_level } from './dungeon.macros.js';
 import { eaten_stat } from './eat.js';
 import { sengr_at, wipe_engr_at } from './engrave.js';
 import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
 import { disturb_buried_zombies, in_rooms, in_town, losehp, may_dig, money_cnt, notice_mon, switch_terrain } from './hack.js';
 import { ARM, BOLT_LIM, HEAD, KILLED, MMOVE, MON_POLE_DIST, NC, NO_NC_FLAGS, NO_TRAP_FLAGS, RLOC } from './hack.h.js';
-import { distu, verbalize1 } from './hack.macros.js';
+import { distu, max, min, rn1, verbalize1 } from './hack.macros.js';
 import { dist2, distmin, sgn, upstart } from './hacklib.js';
 import { delobj, g_at, sobj_at } from './invent.js';
 import { nhUse } from './lint.macros.js';
@@ -48,10 +47,10 @@ import { angry_guards, can_carry, can_touch_safely, curr_mon_load, healmon, hide
 import { AD, AT, M_ATTK } from './monattk.h.js';
 import { attacktype, can_track, dmgtype, locomotion, mon_knows_traps, mon_learns_traps, noattacks, pronoun_gender, resist_conflict, sticks } from './mondata.js';
 import { amorphous, can_teleport, corpse_eater, grounded, hides_under, is_animal, is_covetous, is_demon, is_mercenary, is_mind_flayer, is_rider, is_unicorn, is_wanderer, is_watch, likes_gems, likes_gold, likes_magic, metallivorous, mindless, needspick, nohands, nolimbs, passes_walls, perceives, regenerates, telepathic, throws_rocks, touch_petrifies, tunnels, unique_corpstat, verysmall, webmaker } from './mondata.macros.js';
-import { G_GENOD, M1, M2, MS } from './monflag.h.js';
+import { G_GENOD, M2, MS } from './monflag.h.js';
 import { mons } from './monst.js';
 import { MTSZ, M_AP, NEED, STRAT, STRAT_WAITMASK } from './monst.h.js';
-import { DEADMONSTER, MON_WEP, M_AP_TYPE, U_AP_TYPE, engulfing_u, helpless, is_vampshifter, mon_offmap } from './monst.macros.js';
+import { DEADMONSTER, MON_WEP, M_AP_TYPE, U_AP_TYPE, engulfing_u, helpless, is_lminion, is_obj_mappear, is_vampshifter, mon_offmap } from './monst.macros.js';
 import { PM } from './monsters.h.js';
 import { lined_up, m_carrying, m_has_launcher_and_ammo } from './mthrowu.js';
 import { find_defensive, find_misc, find_offensive, searches_for_item, use_defensive, use_misc } from './muse.js';
@@ -65,8 +64,8 @@ import { an, bare_artifactname, makeplural, vtense, xname, yname } from './objna
 import { NATTK, NORMAL_SPEED } from './permonst.h.js';
 import { Norep, You, You_hear, You_see, impossible, pline, pline_The, pline_mon, pline_xy, set_msg_xy, verbalize } from './pline.js';
 import { mbodypart } from './polyself.js';
-import { in_your_sanctuary, inhistemple, mon_aligntyp, pri_move } from './priest.js';
-import { INVIS, W } from './prop.h.js';
+import { in_your_sanctuary, inhistemple, pri_move } from './priest.js';
+import { W } from './prop.h.js';
 import { quest_stat_check, quest_talk } from './quest.js';
 import { create_gas_cloud, m_in_out_region, visible_region_at } from './region.js';
 import { ALTAR, CORR, D, DBWALL, DOOR, D_WARNED, IRONBARS, LADDER, POOL, ROOM, STAIRS, STONE, TREE } from './rm.h.js';
@@ -86,7 +85,7 @@ import { is_pit } from './trap.macros.js';
 import { gd_move } from './vault.js';
 import { clear_path, recalc_block_point, vision_recalc } from './vision.js';
 import { COULD_SEE, IN_SIGHT } from './vision.h.js';
-import { cansee, couldsee, m_cansee } from './vision.macros.js';
+import { cansee, couldsee, m_cansee, m_canseeu } from './vision.macros.js';
 import { autoreturn_weapon, mon_wield_item, select_rwep } from './weapon.js';
 import { mwelded } from './wield.js';
 import { display_nhwindow } from './winprocs.macros.js';
@@ -94,7 +93,7 @@ import { cuss, tactics } from './wizard.js';
 import { see_wsegs, worm_move, worm_nomove, wormhitu } from './worm.js';
 import { extract_from_minvent } from './worn.js';
 import { PRONOUN } from './you.h.js';
-import { Upolyd, u_at } from './you.macros.js';
+import { Upolyd, m_next2u, next2u, u_at } from './you.macros.js';
 import { Aggravate_monster, Blind_telepat, Conflict, Deaf, Displaced, Half_spell_damage, Hallucination, Invis, Protection_from_shape_changers, Stealth, Unaware, Underwater } from './youprop.macros.js';
 import { fracture_rock } from './zap.js';
 
@@ -113,7 +112,7 @@ async function msg_mon_movement(mtmp, omx, omy) {   // monmove.c:33
     if (a11y.mon_movement && canspotmon(mtmp) && mtmp.mspotted) {
         const nix = mtmp.mx;
         const niy = mtmp.my;
-        const n2u = dist2(nix, niy, u.ux, u.uy) <= 2 ? 1 : 0;
+        const n2u = next2u(nix, niy);
         const close = !n2u && distu(nix, niy) <= BOLT_LIM * BOLT_LIM ? 1 : 0;
         const closer = !n2u && distu(nix, niy) <= distu(omx, omy) ? 1 : 0;
         await pline_xy(nix, niy, $C`%s %s%s.`, await Monnam(mtmp), await vtense(null, locomotion(mtmp.data, $C`move`)), n2u ? $C` next to you` : close && closer ? $C` closer` : close && !closer ? $C` further away` : $C` in the distance`);
@@ -230,7 +229,7 @@ export async function m_break_boulder(mtmp, x, y) {   // monmove.c:143
                 }
                 await pline($C`%s mutters %s.`, await Monnam(mtmp), mtmp.ispriest ? $C`a prayer` : $C`an incantation`);
             }
-            $t1 = rn2(20) + 10 | 0, mtmp.mspec_used = mtmp.mspec_used + $t1 | 0;
+            $t1 = rn1(20, 10), mtmp.mspec_used = mtmp.mspec_used + $t1 | 0;
         }
         if (cansee(x, y)) {
             set_msg_xy(x, y);
@@ -253,7 +252,7 @@ export async function m_break_boulder(mtmp, x, y) {   // monmove.c:143
  */
 async function watch_on_duty(mtmp) {   // monmove.c:176
     let x = Int16Array.of(0), y = Int16Array.of(0);
-    if (mtmp.mpeaceful && in_town($c.i16(u.ux + u.dx | 0), $c.i16(u.uy + u.dy | 0)) && mtmp.mcansee && ((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(mtmp.data.mflags1, M1.SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0) && !rn2(3)) {
+    if (mtmp.mpeaceful && in_town($c.i16(u.ux + u.dx | 0), $c.i16(u.uy + u.dy | 0)) && mtmp.mcansee && m_canseeu(mtmp) && !rn2(3)) {
         if (picking_lock(new $c.Ptr(x, 0), new $c.Ptr(y, 0)) && svl.level.locations[x[0]][y[0]].typ === DOOR && svl.level.locations[x[0]][y[0]].flags & D.LOCKED) {
             if (couldsee(mtmp.mx, mtmp.my)) {
                 if (svl.level.locations[x[0]][y[0]].flags & D_WARNED) {
@@ -317,7 +316,7 @@ export function onscary(x, y, mtmp) {   // monmove.c:241
     const magical_scare = !auditory_scare ? 1 : 0;
     /* creatures who are directly resistant to any type of scaring:
      * Rodney, lawful minions, Angels, the Riders */
-    if (mtmp.iswiz || $c.andu64(mtmp.data.mflags2, M2.MINION) !== 0 && mon_aligntyp(mtmp) === A.LAWFUL || mtmp.data === mons[PM.ANGEL] || is_rider(mtmp.data)) {
+    if (mtmp.iswiz || is_lminion(mtmp) || mtmp.data === mons[PM.ANGEL] || is_rider(mtmp.data)) {
         return FALSE;
     }
     /* creatures who are directly resistant to magical scaring
@@ -535,7 +534,7 @@ export async function monflee(mtmp, fleetime, first, fleemsg) {   // monmove.c:4
             if (fleetime === 1) {
                 fleetime = fleetime + 1 | 0;
             }
-            mtmp.mfleetim = ((fleetime < 127 ? fleetime : 127) >>> 0) & 127;
+            mtmp.mfleetim = (min(fleetime, 127) >>> 0) & 127;
         }
         if (!mtmp.mflee && fleemsg && canseemon(mtmp) && M_AP_TYPE(mtmp) !== M_AP.FURNITURE && M_AP_TYPE(mtmp) !== M_AP.OBJECT) {
             /* unfortunately we can't distinguish between temporary
@@ -747,7 +746,7 @@ export async function dochug(mtmp) {   // monmove.c:690
         }
     }
     /* check for waitmask status change */
-    if ($c.andu64(mtmp.mstrategy, STRAT.WAITFORU) && ((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(mtmp.data.mflags1, M1.SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0 || mtmp.mhp < mtmp.mhpmax)) {
+    if ($c.andu64(mtmp.mstrategy, STRAT.WAITFORU) && (m_canseeu(mtmp) || mtmp.mhp < mtmp.mhpmax)) {
         mtmp.mstrategy = $c.andu64(mtmp.mstrategy, 18446744073172680703n);
     }
     /* update quest status flags */
@@ -950,7 +949,7 @@ export async function dochug(mtmp) {   // monmove.c:690
             case MMOVE.MOVED:
                 /* monster moved */
                 /* if confused grabber has wandered off, let go */
-                if (mtmp === u.ustuck && !(dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2)) {
+                if (mtmp === u.ustuck && !m_next2u(mtmp)) {
                     await unstuck(mtmp);
                 }
                 if (grounded(mdat)) {
@@ -1123,7 +1122,7 @@ export function should_displace(mtmp, data, ggx, ggy) {   // monmove.c:1070
 export async function m_digweapon_check(mtmp, nix, niy) {   // monmove.c:1108
     let can_tunnel = FALSE;
     const mw_tmp = mtmp.mw;
-    if (!((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level))) {
+    if (!Is_rogue_level(u.uz)) {
         can_tunnel = tunnels(mtmp.data);
     }
     if (can_tunnel && needspick(mtmp.data) && !mwelded(mw_tmp) && (may_dig(nix, niy) || closed_door(nix, niy))) {
@@ -1166,7 +1165,7 @@ function leppie_avoidance(mtmp) {   // monmove.c:1139
  */
 async function leppie_stash(mtmp) {   // monmove.c:1154
     let gold = null;
-    if (mtmp.data === mons[PM.LEPRECHAUN] && !DEADMONSTER(mtmp) && !((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(mtmp.data.mflags1, M1.SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0) && !in_rooms(mtmp.mx, mtmp.my, SHOPBASE).get(0) && svl.level.locations[mtmp.mx][mtmp.my].typ === ROOM && !t_at(mtmp.mx, mtmp.my) && rn2(4) && (gold = findgold(mtmp.minvent)) !== null) {
+    if (mtmp.data === mons[PM.LEPRECHAUN] && !DEADMONSTER(mtmp) && !m_canseeu(mtmp) && !in_rooms(mtmp.mx, mtmp.my, SHOPBASE).get(0) && svl.level.locations[mtmp.mx][mtmp.my].typ === ROOM && !t_at(mtmp.mx, mtmp.my) && rn2(4) && (gold = findgold(mtmp.minvent)) !== null) {
         await mdrop_obj(mtmp, gold, FALSE);
         gold = g_at(mtmp.mx, mtmp.my);
         if (gold) {
@@ -1203,7 +1202,7 @@ function m_balks_at_approaching(oldappr, mtmp, pdistmin, pdistmax) {   // monmov
         pdistmax.set(0, 0);
     }
     /* peaceful, far away, or can't see you */
-    if (mtmp.mpeaceful || edist >= 25 || !((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(mtmp.data.mflags1, M1.SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0)) {
+    if (mtmp.mpeaceful || edist >= 25 || !m_canseeu(mtmp)) {
         return oldappr;
     }
     /* has ammo+launcher */
@@ -1301,7 +1300,7 @@ async function maybe_spin_web(mtmp) {   // monmove.c:1269
  * @returns {number} boolean
  */
 export function m_avoid_kicked_loc(mtmp, nx, ny) {   // monmove.c:1297
-    if ((mtmp.mpeaceful || mtmp.mtame) && mtmp.mcansee && !mtmp.mconf && !mtmp.mstun && !Conflict() && isok(gk.kickedloc.x, gk.kickedloc.y) && nx === gk.kickedloc.x && ny === gk.kickedloc.y && dist2(nx, ny, u.ux, u.uy) <= 2) {
+    if ((mtmp.mpeaceful || mtmp.mtame) && mtmp.mcansee && !mtmp.mconf && !mtmp.mstun && !Conflict() && isok(gk.kickedloc.x, gk.kickedloc.y) && nx === gk.kickedloc.x && ny === gk.kickedloc.y && next2u(nx, ny)) {
         return TRUE;
     }
     return FALSE;
@@ -1352,8 +1351,8 @@ async function m_search_items(mtmp, ggx, ggy, mmoved, appr) {   // monmove.c:133
         /* distmin() gives a rectangular area */
         hmx = $c.i16(COLNO - 1 < (omx + minr | 0) ? COLNO - 1 : omx + minr | 0);
         hmy = $c.i16(ROWNO - 1 < (omy + minr | 0) ? ROWNO - 1 : omy + minr | 0);
-        lmx = $c.i16(1 > (omx - minr | 0) ? 1 : omx - minr | 0);
-        lmy = $c.i16(0 > (omy - minr | 0) ? 0 : omy - minr | 0);
+        lmx = $c.i16(max(1, omx - minr | 0));
+        lmy = $c.i16(max(0, omy - minr | 0));
         for (xx = lmx; xx <= hmx; xx = $c.i16(xx + 1)) {
             for (yy = lmy; yy <= hmy; yy = $c.i16(yy + 1)) {
                 /* no object here */
@@ -1730,7 +1729,7 @@ export async function m_move(mtmp, after) {   // monmove.c:1715
     /* Where does 'mtmp' think you are?  Not necessary if m_move() called
        from this file, but needed for other calls of m_move(). */
     set_apparxy(mtmp);   /* set mtmp->mux, mtmp->muy */
-    if (!((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level))) {
+    if (!Is_rogue_level(u.uz)) {
         can_tunnel = tunnels(ptr);
     }
     can_open = !(nohands(ptr) || verysmall(ptr)) ? 1 : 0;
@@ -1817,7 +1816,7 @@ export async function m_move(mtmp, after) {   // monmove.c:1715
     } else {
         should_see = couldsee(omx, omy) && (svl.level.locations[ggx[0]][ggy[0]].lit || !svl.level.locations[omx][omy].lit) && dist2(omx, omy, ggx[0], ggy[0]) <= 36 ? 1 : 0;
         /* allow shks to follow */
-        if (!mtmp.mcansee || should_see && Invis() && !perceives(ptr) && rn2(11) || (gy.youmonst.m_ap_type & M_AP.TYPMASK) === M_AP.OBJECT && gy.youmonst.mappearance === STRANGE_OBJECT || u.uundetected || (gy.youmonst.m_ap_type & M_AP.TYPMASK) === M_AP.OBJECT && gy.youmonst.mappearance === GOLD_PIECE && !likes_gold(ptr) || mtmp.mpeaceful && !mtmp.isshk || (ptr.pmidx === PM.STALKER || ptr.mlet === S.BAT || ptr.mlet === S.LIGHT) && !rn2(3)) {
+        if (!mtmp.mcansee || should_see && Invis() && !perceives(ptr) && rn2(11) || is_obj_mappear(gy.youmonst, STRANGE_OBJECT) || u.uundetected || is_obj_mappear(gy.youmonst, GOLD_PIECE) && !likes_gold(ptr) || mtmp.mpeaceful && !mtmp.isshk || (ptr.pmidx === PM.STALKER || ptr.mlet === S.BAT || ptr.mlet === S.LIGHT) && !rn2(3)) {
             appr[0] = 0;
         }
         if (appr[0] === 1 && leppie_avoidance(mtmp)) {
@@ -1833,7 +1832,7 @@ export async function m_move(mtmp, after) {   // monmove.c:1715
             }
         }
     }
-    if ((!mtmp.mpeaceful || !rn2(10)) && !((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level))) {
+    if ((!mtmp.mpeaceful || !rn2(10)) && !Is_rogue_level(u.uz)) {
         in_line = lined_up(mtmp) && distmin(mtmp.mx, mtmp.my, mtmp.mux, mtmp.muy) <= (throws_rocks(gy.youmonst.data) ? 20 : $c.div32(ACURRSTR(), 2) + 1 | 0) ? 1 : 0;
         if (appr[0] !== 1 || !in_line) {
             /* Monsters in combat won't pick stuff up, avoiding the

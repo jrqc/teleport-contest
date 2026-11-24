@@ -16,7 +16,7 @@ import { build_english_list } from './end.js';
 import { debugcore, do_deferred_showpaths, fqname } from './files.js';
 import { BUFSZ, FALSE, PL, TRUE, environ_opt, rc_file_opt, set_in_config, set_in_sysconf } from './global.h.js';
 import { ECMD, SYM_OFF_X, SYSCONFPREFIX, WIZKIT_MAX } from './hack.h.js';
-import { plur } from './hack.macros.js';
+import { FEATURE_NOTICE_VER, min, plur } from './hack.macros.js';
 import { c_eos, eos, mungspaces, nh_snprintf, trimspaces } from './hacklib.js';
 import { nhUse } from './lint.macros.js';
 import { lua_newtable } from './lua.macros.js';
@@ -77,7 +77,7 @@ export async function do_write_config_file() {   // cfgfiles.c:169
         await pline($C`Strange, could not figure out config file name.`);
         return ECMD.OK;
     }
-    if (flags.suppress_alert < 50790400) {
+    if (flags.suppress_alert < FEATURE_NOTICE_VER(3, 7, 0)) {
         await pline($C`Warning: saveoptions is highly experimental!`);
         await wait_synch()();
         await pline($C`Some settings are not saved!`);
@@ -702,7 +702,7 @@ function cnf_line_BONES_POOLS(bufp) {   // cfgfiles.c:874
     /* max value of 10 guarantees (N % bones.pools) will be one digit
        so we don't lose control of the length of bones file names */
     const n = $c.atoi(bufp);
-    sysopt.bones_pools = n <= 0 ? 0 : n < 10 ? n : 10;
+    sysopt.bones_pools = n <= 0 ? 0 : min(n, 10);
     /* note: right now bones_pools==0 is the same as bones_pools==1,
        but we could change that and make bones_pools==0 become an
        indicator to suppress bones usage altogether */
@@ -1099,7 +1099,7 @@ export async function parse_config_line(origbuf) {   // cfgfiles.c:1389
         if (config_line_stmt[i].syscnf_only && !in_sysconf) {
             continue;
         }
-        if (match_optname(new $c.Ptr(buf, 0), config_line_stmt[i].name, config_line_stmt[i].len, TRUE)) {
+        if (match_varname(new $c.Ptr(buf, 0), config_line_stmt[i].name, config_line_stmt[i].len)) {
             const parm = config_line_stmt[i].origbuf ? origbuf : bufp;
             if (!disregarded_config_lines[i]) {
                 return await config_line_stmt[i].fn(parm);
@@ -1396,7 +1396,7 @@ async function parse_conf_buf(p, proc) {   // cfgfiles.c:1693
                 return;
             }
             /* from here onwards, we'll handle buf only */
-            if (match_optname(p.buf, $C`CHOOSE`, 6, TRUE)) {
+            if (match_varname(p.buf, $C`CHOOSE`, 6)) {
                 let bufp = find_optparam(p.buf);
                 if (!bufp) {
                     await config_error_add($C`Format is CHOOSE=section1,section2,...`);
@@ -1658,6 +1658,9 @@ export async function assure_syscf_file() {   // cfgfiles.c:2031
     }
     await raw_printf($C`Unable to open SYSCF_FILE.\n`);
     $c.exit(1);
+}
+function match_varname(INP, NAM, LEN) {
+    return match_optname(INP, NAM, LEN, TRUE);
 }
 
 export function $init() {

@@ -14,7 +14,7 @@ import { A } from './attrib.h.js';
 import { ACURR } from './attrib.macros.js';
 import { cmdq_add_key, cmdq_pop, getdir, isok, set_occupation, yn_function } from './cmd.js';
 import { NO_COLOR } from './color.h.js';
-import { c_color_names, c_common_strings, cg, disp, flags, gb, gi, gm, gn, go, gs, gu, gy, iflags, quitchars, svb, svc, svd, svl, svm, svs, u, xdir, ydir, ynchars } from './decl.js';
+import { c_color_names, c_common_strings, cg, disp, flags, gb, gi, gm, gn, go, gs, gu, gy, iflags, quitchars, svb, svc, svl, svm, svs, u, xdir, ydir } from './decl.js';
 import { SPBOOK_CLASS } from './defsym.h.js';
 import { do_vicinity_map } from './detect.js';
 import { canseemon, map_invisible, nul_glyphinfo, shieldeff, tmp_at, zapdir_to_glyph } from './display.js';
@@ -25,7 +25,7 @@ import { Monnam, hcolor, hliquid, mon_nam, noveltitle } from './do_name.js';
 import { find_ac } from './do_wear.js';
 import { make_familiar, tamedog } from './dog.js';
 import { walk_path } from './dothrow.js';
-import { on_level } from './dungeon.js';
+import { Is_waterlevel } from './dungeon.macros.js';
 import { morehungry } from './eat.js';
 import { freehand } from './engrave.js';
 import { more_experienced, newexplevel } from './exper.js';
@@ -36,7 +36,7 @@ import { getpos, getpos_sethilite } from './getpos.js';
 import { FALSE, LL, TRUE } from './global.h.js';
 import { check_capacity, invocation_pos, losehp, nomul } from './hack.js';
 import { CMDQ, CQ_REPEAT, ECMD, EYE, FACE, HEAD, KILLED, NO, NO_KILLER_PREFIX, N_DIRS, SPINE, XKILL } from './hack.h.js';
-import { Maybe_Half_Phys, makeknown, y_n } from './hack.macros.js';
+import { Maybe_Half_Phys, makeknown, max, min, rn1, y_n } from './hack.macros.js';
 import { dist2, distmin, eos, isqrt, nh_snprintf, sgn, strncmpi } from './hacklib.js';
 import { record_achievement } from './insight.js';
 import { update_inventory, useup } from './invent.js';
@@ -84,7 +84,7 @@ import { clear_nhwindow, create_nhwindow, destroy_nhwindow, display_nhwindow, en
 import { ATR, MENU, NHW, PICK } from './wintype.h.js';
 import { aggravate } from './wizard.js';
 import { ACH } from './you.h.js';
-import { u_at } from './you.macros.js';
+import { Role_if, u_at } from './you.macros.js';
 import { Antimagic, BClairvoyant, Blind, BlindedTimeout, Hallucination, Poison_resistance, Sick, Sleep_resistance, Slimed } from './youprop.macros.js';
 import { exclam, spell_damage_bonus, unturn_dead, weffects, zapyourself, zhitm } from './zap.js';
 
@@ -204,14 +204,14 @@ async function cursed_book(bp) {   // spell.c:130
             await aggravate();
             break;
         case 2:
-            await make_blinded($c.add64(BlindedTimeout(), rn2(100) + 250 | 0), TRUE);
+            await make_blinded($c.add64(BlindedTimeout(), rn1(100, 250)), TRUE);
             break;
         case 3:
             await take_gold();
             break;
         case 4:
             await pline($C`These runes were just too much to comprehend.`);
-            await make_confused($c.add64(u.uprops[CONFUSION].intrinsic, rn2(7) + 16 | 0), FALSE);
+            await make_confused($c.add64(u.uprops[CONFUSION].intrinsic, rn1(7, 16)), FALSE);
             break;
         case 5:
             await pline_The($C`book was coated with contact poison!`);
@@ -222,7 +222,7 @@ async function cursed_book(bp) {   // spell.c:130
             /* temp disable in_use; death should not destroy the book */
             was_in_use = bp.in_use;
             bp.in_use = (FALSE) & 1;
-            await poison_strdmg(Poison_resistance() ? rn2(2) + 1 | 0 : rn2(4) + 3 | 0, rnd(u.uprops[POISON_RES].intrinsic || u.uprops[POISON_RES].extrinsic ? 6 : 10), $C`contact-poisoned spellbook`, KILLED.BY_AN);
+            await poison_strdmg(Poison_resistance() ? rn1(2, 1) : rn1(4, 3), rnd(u.uprops[POISON_RES].intrinsic || u.uprops[POISON_RES].extrinsic ? 6 : 10), $C`contact-poisoned spellbook`, KILLED.BY_AN);
             bp.in_use = (was_in_use >>> 0) & 1;
             break;
         case 6:
@@ -294,7 +294,7 @@ async function deadbook(book2) {   // spell.c:231
         switch ($goto) {
         case null:
             await You($C`turn the pages of the Book of the Dead...`);
-            await discover_object(SPE_BOOK_OF_THE_DEAD, TRUE, TRUE, TRUE);
+            await makeknown(SPE_BOOK_OF_THE_DEAD);
             await observe_object(book2);   /* in case blind now and hasn't been seen yet */
             /* KMH -- Need ->known to avoid "_a_ Book of the Dead" */
             book2.known = 1;
@@ -456,7 +456,7 @@ async function learn() {   // spell.c:356
             $t2 = rn2(book.usecount), book.usecount = $t2;
         } else {
             await Your($C`knowledge of %s is %s.`, new $c.Ptr(splname, 0), spellknow(i) ? $C`keener` : $C`restored`);
-            svs.spl_book[i].sp_know = KEEN + 1;
+            incrnknow(i, 1);
             book.usecount = book.usecount + 1 | 0;
             await exercise(A.WIS, TRUE);   /* extra study */
         }
@@ -475,7 +475,7 @@ async function learn() {   // spell.c:356
         } else {
             svs.spl_book[i].sp_id = booktype;
             svs.spl_book[i].sp_lev = objects[booktype].oc_oc2;
-            svs.spl_book[i].sp_know = KEEN + 1;
+            incrnknow(i, 1);
             book.usecount = book.usecount + 1 | 0;
             if (!i) {   /* first is always 'a', so no need to mention the letter */
                 await You($C`learn %s.`, new $c.Ptr(splname, 0));
@@ -601,7 +601,7 @@ export async function study_book(spellbook) {   // spell.c:468
             /* hero has just been told what spell this book is for; it may
                have been undiscovered if spell was learned via divine gift */
             await makeknown(booktype);
-            if (await yn_function($C`Refresh your memory anyway?`, new $c.Ptr(ynchars, 0), 110, TRUE) === 110) {
+            if (await y_n($C`Refresh your memory anyway?`) === 110) {
                 return 0;
             }
         }
@@ -614,7 +614,7 @@ export async function study_book(spellbook) {   // spell.c:468
                 /* uncursed - chance to fail */
                 const read_ability = ((ACURR(A.INT) + 4 + $c.div32(u.ulevel, 2) | 0) - Math.imul(2, objects[booktype].oc_oc2) | 0) + ($G.ublindf && $G.ublindf.otyp === LENSES ? 2 : 0) | 0;
                 /* only wizards know if a spell is too difficult */
-                if (gu.urole.mnum === PM.WIZARD && read_ability < 20 && !confused) {
+                if (Role_if(PM.WIZARD) && read_ability < 20 && !confused) {
                     $c.sprintf(new $c.Ptr(qbuf, 0), $C`This spellbook is %sdifficult to comprehend.  Continue?`, read_ability < 12 ? $C`very ` : $C``);
                     if (await y_n(new $c.Ptr(qbuf, 0)) !== 121) {
                         spellbook.in_use = (FALSE) & 1;
@@ -881,7 +881,7 @@ export function spell_skilltype(booktype) {   // spell.c:856
  */
 export async function skill_based_spellbook_id() {   // spell.c:864
     let booktype = 0, known_up_to_level = 0;
-    if (!(gu.urole.mnum === PM.WIZARD)) {
+    if (!Role_if(PM.WIZARD)) {
         return;
     }
     const spbook_class = SPBOOK_CLASS;
@@ -1103,7 +1103,7 @@ async function cast_protection() {   // spell.c:1104
      *     16-30 -10    0,  5,  8,  9, 10
      */
     natac = $c.div32(10 - natac | 0, 10);   /* convert to positive and scale down */
-    const gain = loglev - $c.div32(u.uspellprot, 4 - (3 < natac ? 3 : natac) | 0) | 0;
+    const gain = loglev - $c.div32(u.uspellprot, 4 - min(3, natac) | 0) | 0;
     if (gain > 0) {
         if (!Blind()) {
             const hgolden = hcolor(c_color_names.c_golden);
@@ -1287,7 +1287,7 @@ async function spelleffects_check(spell, res, energy) {   // spell.c:1220
              * understand quite well how to cast spells.
              */
             let intell = acurr(A.INT);
-            if (!(gu.urole.mnum === PM.WIZARD)) {
+            if (!Role_if(PM.WIZARD)) {
                 intell = 10;
             }
             switch (intell) {
@@ -1528,7 +1528,7 @@ export async function spelleffects(spell_otyp, atme, force) {   // spell.c:1385
             await cast_protection();
             break;
         case SPE_JUMPING:
-            if (!(await jump(role_skill > 1 ? role_skill : 1) & ECMD.TIME)) {
+            if (!(await jump(max(role_skill, 1)) & ECMD.TIME)) {
                 await pline($C`%s`, c_common_strings.c_nothing_happens);
             }
             break;
@@ -1614,7 +1614,7 @@ async function throwspell() {   // spell.c:1655
     if (u.uinwater) {
         await pline($C`You're joking!  In this weather?`);
         return 0;
-    } else if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
+    } else if (Is_waterlevel(u.uz)) {
         await You($C`had better wait for the sun to come out.`);
         return 0;
     }
@@ -2053,11 +2053,11 @@ async function percent_success(spell) {   // spell.c:2173
      */
     const skilltype = spell_skilltype(svs.spl_book[spell].sp_id);
     /* Knights don't get metal armor penalty for clerical spells */
-    const paladin_bonus = gu.urole.mnum === PM.KNIGHT && skilltype === P.CLERIC_SPELL ? 1 : 0;
+    const paladin_bonus = Role_if(PM.KNIGHT) && skilltype === P.CLERIC_SPELL ? 1 : 0;
     /* Calculate intrinsic ability (splcaster) */
     let splcaster = gu.urole.spelbase;
     const special = gu.urole.spelheal;
-    const statused = acurr(gu.urole.spelstat);
+    const statused = ACURR(gu.urole.spelstat);
     if ($G.uarm && is_metallic($G.uarm) && !paladin_bonus) {
         splcaster = splcaster + ($G.uarmc && $G.uarmc.otyp === ROBE ? $c.div32(gu.urole.spelarmr, 2) : gu.urole.spelarmr) | 0;
     } else if ($G.uarmc && $G.uarmc.otyp === ROBE) {
@@ -2101,7 +2101,7 @@ async function percent_success(spell) {   // spell.c:2173
      * in that spell type.
      */
     let skill = u.weapon_skills[skilltype].skill;
-    skill = (skill > P.UNSKILLED ? skill : P.UNSKILLED) - 1 | 0;   /* unskilled => 0 */
+    skill = max(skill, P.UNSKILLED) - 1 | 0;   /* unskilled => 0 */
     const difficulty = Math.imul(svs.spl_book[spell].sp_lev - 1, 4) - ((Math.imul(skill, 6) + $c.div32(u.ulevel, 3) | 0) + 1 | 0) | 0;
     if (difficulty > 0) {
         /* Player is too low level or unskilled. */
@@ -2160,7 +2160,7 @@ async function percent_success(spell) {   // spell.c:2173
  */
 function spellretention(idx, outbuf) {   // spell.c:2295
     let skill = u.weapon_skills[spell_skilltype(svs.spl_book[idx].sp_id)].skill;
-    skill = skill > P.UNSKILLED ? skill : P.UNSKILLED;   /* restricted same as unskilled */
+    skill = max(skill, P.UNSKILLED);   /* restricted same as unskilled */
     const turnsleft = svs.spl_book[idx].sp_know;
     outbuf.set(0, 0);   /* lint suppression */
     if (turnsleft < 1) {
@@ -2213,7 +2213,7 @@ export async function initialspell(obj) {   // spell.c:2340
     } else {
         svs.spl_book[i].sp_id = $c.i16(otyp);
         svs.spl_book[i].sp_lev = objects[otyp].oc_oc2;
-        svs.spl_book[i].sp_know = KEEN + 0;
+        incrnknow(i, 0);
     }
     return;
 }
@@ -2269,7 +2269,7 @@ export async function force_learn_spell(otyp) {   // spell.c:2391
        are redundant but harmless; for an unknown spell, they're essential */
     svs.spl_book[i].sp_id = otyp;
     svs.spl_book[i].sp_lev = objects[otyp].oc_oc2;
-    svs.spl_book[i].sp_know = KEEN + 0;
+    incrnknow(i, 0);
     /* set spl_book[i].sp_know to KEEN; unlike when learning
      * a spell by reading its book, we don't need to add 1 */
     return spellet(i);
@@ -2286,6 +2286,9 @@ export function num_spells() {   // spell.c:2417
         }
     }
     return i;
+}
+function incrnknow(spell, x) {
+    return svs.spl_book[spell].sp_know = KEEN + x;
 }
 function spellet(spell) {
     return $c.i8(spell < 26 ? 97 + spell | 0 : (65 + spell | 0) - 26 | 0);

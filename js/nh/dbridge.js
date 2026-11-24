@@ -21,11 +21,11 @@ import { $C } from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
 import { isok } from './cmd.js';
-import { go, gy, iflags, svc, svd, svk, svl, u } from './decl.js';
+import { go, gy, iflags, svc, svk, svl, u } from './decl.js';
 import { canseemon, newsym, sensemon } from './display.js';
 import { flooreffects } from './do.js';
 import { Monnam, hliquid, mon_nam } from './do_name.js';
-import { on_level } from './dungeon.js';
+import { Is_juiblex_level, Is_stronghold } from './dungeon.macros.js';
 import { done } from './end.js';
 import { del_engr_at } from './engrave.js';
 import { scatter } from './explode.js';
@@ -34,21 +34,19 @@ import { FALSE, TRUE } from './global.h.js';
 import { revive_nasty, spoteffects } from './hack.js';
 import { BURNING, CRUSHING, DROWNING, ENTITIES, KILLED, MAY_HIT, NO_KILLER_PREFIX, TELEDS, XKILL } from './hack.h.js';
 import { distu } from './hack.macros.js';
-import { dist2 } from './hacklib.js';
 import { delallobj, sobj_at } from './invent.js';
 import { mksobj_at, obj_extract_self } from './mkobj.js';
 import { minliquid, monkilled, wake_nearto, xkilled } from './mon.js';
 import { AD } from './monattk.h.js';
 import { pronoun_gender } from './mondata.js';
 import { is_floater, is_flyer, is_swimmer, likes_lava, noncorporeal, passes_walls } from './mondata.macros.js';
-import { M1 } from './monflag.h.js';
 import { mons } from './monst.js';
 import { DEADMONSTER, helpless } from './monst.macros.js';
 import { PM } from './monsters.h.js';
 import { BOULDER, IRON_CHAIN } from './objects.h.js';
 import { vtense } from './objnam.js';
 import { You, You_hear, You_see, impossible, pline, pline_The } from './pline.js';
-import { CONFUSION, FLYING, MAGICAL_BREATHING, STUNNED, SWIMMING, W, WWALKING } from './prop.h.js';
+import { CONFUSION, STUNNED, W } from './prop.h.js';
 import { update_monster_region } from './region.js';
 import { D, DB, DBWALL, DOOR, DRAWBRIDGE_DOWN, DRAWBRIDGE_UP, ICE, ICED, LAVAPOOL, LAVAWALL, MOAT, POOL, ROOM, STONE, WATER } from './rm.h.js';
 import { IS_DRAWBRIDGE, OBJ_AT } from './rm.macros.js';
@@ -61,7 +59,7 @@ import { block_point, does_block, unblock_point, vision_recalc } from './vision.
 import { cansee } from './vision.macros.js';
 import { PRONOUN } from './you.h.js';
 import { u_at } from './you.macros.js';
-import { Deaf, Fumbling, Hallucination, Levitation, Passes_walls, Unaware, Underwater } from './youprop.macros.js';
+import { Amphibious, Breathless, Deaf, Flying, Fumbling, Hallucination, Levitation, Passes_walls, Swimming, Unaware, Underwater, Wwalking } from './youprop.macros.js';
 
 const E_phrase$wholebuf = new Int8Array(80);   // static in E_phrase()
 /**
@@ -145,7 +143,7 @@ export function is_moat(x, y) {   // dbridge.c:100
         return FALSE;
     }
     const ltyp = svl.level.locations[x][y].typ;
-    if (!((svd.dungeon_topology.d_juiblex_level.dlevel || svd.dungeon_topology.d_juiblex_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_juiblex_level)) && (ltyp === MOAT || ltyp === DRAWBRIDGE_UP && (svl.level.locations[x][y].flags & DB.UNDER) === DB.MOAT)) {
+    if (!Is_juiblex_level(u.uz) && (ltyp === MOAT || ltyp === DRAWBRIDGE_UP && (svl.level.locations[x][y].flags & DB.UNDER) === DB.MOAT)) {
         return TRUE;
     }
     return FALSE;
@@ -443,11 +441,11 @@ function e_survives_at(etmp, x, y) {   // dbridge.c:380
         return TRUE;
     }
     if (is_pool(x, y)) {
-        return is_u(etmp) && ((u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) || (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.AMPHIBIOUS) !== 0) || (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.BREATHLESS) !== 0) || (u.uprops[SWIMMING].intrinsic || u.uprops[SWIMMING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.SWIM) !== 0) || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked || Levitation()) || is_swimmer(etmp.edata) || is_flyer(etmp.edata) || is_floater(etmp.edata) ? 1 : 0;
+        return is_u(etmp) && (Wwalking() || Amphibious() || Breathless() || Swimming() || Flying() || Levitation()) || is_swimmer(etmp.edata) || is_flyer(etmp.edata) || is_floater(etmp.edata) ? 1 : 0;
     }
     /* must force call to lava_effects in e_died if is_u */
     if (is_lava(x, y)) {
-        return is_u(etmp) && (Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) || likes_lava(etmp.edata) || is_flyer(etmp.edata) ? 1 : 0;
+        return is_u(etmp) && (Levitation() || Flying()) || likes_lava(etmp.edata) || is_flyer(etmp.edata) ? 1 : 0;
     }
     if (is_db_wall(x, y)) {
         return is_u(etmp) ? Passes_walls() : passes_walls(etmp.edata);
@@ -919,7 +917,7 @@ export async function close_drawbridge(x, y) {   // dbridge.c:775
     y2[0] = y;
     get_wall_for_db(new $c.Ptr(x2, 0), new $c.Ptr(y2, 0));
     if (cansee(x, y) || cansee(x2[0], y2[0])) {
-        await You_see($C`a drawbridge %s up!`, (u.ux === x || u.uy === y) && !Underwater() || dist2(x2[0], y2[0], u.ux, u.uy) < distu(x, y) ? $C`coming` : $C`going`);
+        await You_see($C`a drawbridge %s up!`, (u.ux === x || u.uy === y) && !Underwater() || distu(x2[0], y2[0]) < distu(x, y) ? $C`coming` : $C`going`);
     } else {
         /* "5 gears turn" for castle drawbridge tune */
         await You_hear($C`chains rattling and gears turning.`);
@@ -981,7 +979,7 @@ export async function open_drawbridge(x, y) {   // dbridge.c:840
     y2[0] = y;
     get_wall_for_db(new $c.Ptr(x2, 0), new $c.Ptr(y2, 0));
     if (cansee(x, y) || cansee(x2[0], y2[0])) {
-        await You_see($C`a drawbridge %s down!`, dist2(x2[0], y2[0], u.ux, u.uy) < distu(x, y) ? $C`going` : $C`coming`);
+        await You_see($C`a drawbridge %s down!`, distu(x2[0], y2[0]) < distu(x, y) ? $C`going` : $C`coming`);
     } else {
         /* "5 gears turn" for castle drawbridge tune */
         await You_hear($C`gears turning and chains rattling.`);
@@ -1008,7 +1006,7 @@ export async function open_drawbridge(x, y) {   // dbridge.c:840
     await newsym(x, y);
     await newsym(x2[0], y2[0]);
     unblock_point(x2[0], y2[0]);   /* vision */
-    if ((svd.dungeon_topology.d_stronghold_level.dlevel || svd.dungeon_topology.d_stronghold_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_stronghold_level)) {
+    if (Is_stronghold(u.uz)) {
         u.uevent.uopened_dbridge = (TRUE) & 1;
     }
     nokiller();
@@ -1093,7 +1091,7 @@ export async function destroy_drawbridge(x, y) {   // dbridge.c:888
         unblock_point(x2[0], y2[0]);   /* vision */
     }
     await vision_recalc(0);
-    if ((svd.dungeon_topology.d_stronghold_level.dlevel || svd.dungeon_topology.d_stronghold_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_stronghold_level)) {
+    if (Is_stronghold(u.uz)) {
         u.uevent.uopened_dbridge = (TRUE) & 1;
     }
     set_entity(x2[0], y2[0], etmp2);   /* currently only automissers can be here */
@@ -1154,7 +1152,7 @@ export async function destroy_drawbridge(x, y) {   // dbridge.c:888
         }
     }
     nokiller();
-    if ((svd.dungeon_topology.d_stronghold_level.dlevel || svd.dungeon_topology.d_stronghold_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_stronghold_level)) {
+    if (Is_stronghold(u.uz)) {
         u.uevent.uheard_tune = 3;   /* bridge is gone so tune is now useless */
     }
 }

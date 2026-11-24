@@ -8,21 +8,20 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { isok } from './cmd.js';
 import { is_moat, is_pool } from './dbridge.js';
-import { gi, gs, gv, iflags, program_state, svd, svl, svr, u } from './decl.js';
-import { S } from './defsym.h.js';
+import { gi, gs, gv, iflags, program_state, svl, svr, u } from './decl.js';
 import { detecting } from './detect.js';
 import { canseemon, mon_visible, newsym, see_with_infrared, seenv_matrix, tp_sensemon } from './display.js';
-import { on_level } from './dungeon.js';
+import { Is_airlevel, Is_rogue_level, Is_waterlevel } from './dungeon.macros.js';
 import { panic } from './end.js';
-import { debugcore } from './files.js';
 import { wizard } from './flag.macros.js';
 import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
 import { notice_all_mons } from './hack.js';
 import { MATCH_WARN_OF_MON, max, min } from './hack.macros.js';
 import { dist2 } from './hacklib.js';
 import { do_light_sources } from './light.js';
+import { explicitdebug } from './lint.macros.js';
 import { ROOMOFFSET } from './mkroom.h.js';
-import { M_AP } from './monst.h.js';
+import { is_lightblocker_mappear } from './monst.macros.js';
 import { BOULDER } from './objects.h.js';
 import { visible_region_at } from './region.js';
 import { CLOUD, D, DOOR, LAVAWALL, SDOOR, SVALL, TREE } from './rm.h.js';
@@ -147,7 +146,7 @@ export function does_block(x, y, lev) {   // vision.c:153
     /* set DEBUGFILES=seethru in environment to see through bubbles */
     if (gs.seethru === 0) {
         /* init once */
-        $t1 = wizard() && debugcore($C`seethru`, FALSE) ? 1 : -1, gs.seethru = $t1;
+        $t1 = wizard() && explicitdebug($C`seethru`) ? 1 : -1, gs.seethru = $t1;
     }
     /* Features that block . . */
     if (IS_OBSTRUCTED(lev.typ) || lev.typ === TREE || IS_DOOR(lev.typ) && lev.flags & (D.CLOSED | D.LOCKED | D.TRAPPED)) {
@@ -165,7 +164,7 @@ export function does_block(x, y, lev) {   // vision.c:153
         }
     }
     /* Mimics mimicking a door or boulder or ... block light. */
-    if ((mon = svl.level.monsters[x][y]) && (!mon.minvis || See_invisible()) && ((mon.m_ap_type & M_AP.TYPMASK) === M_AP.OBJECT && mon.mappearance === BOULDER || (mon.m_ap_type & M_AP.TYPMASK) === M_AP.FURNITURE && (mon.mappearance === S.hcdoor || mon.mappearance === S.vcdoor || mon.mappearance < S.ndoor || mon.mappearance === S.tree))) {
+    if ((mon = svl.level.monsters[x][y]) && (!mon.minvis || See_invisible()) && is_lightblocker_mappear(mon)) {
         return 1;
     }
     if (gs.seethru !== 1) {
@@ -304,9 +303,9 @@ async function rogue_vision(next, rmin, rmax) {   // vision.c:314
     }
     const in_door = svl.level.locations[u.ux][u.uy].typ === DOOR ? 1 : 0;
     /* Can always see adjacent. */
-    const ylo = u.uy - 1 > 0 ? u.uy - 1 : 0;
+    const ylo = max(u.uy - 1, 0);
     const yhi = u.uy + 1 < ROWNO - 1 ? u.uy + 1 : ROWNO - 1;
-    const xlo = u.ux - 1 > 1 ? u.ux - 1 : 1;
+    const xlo = max(u.ux - 1, 1);
     const xhi = u.ux + 1 < COLNO - 1 ? u.ux + 1 : COLNO - 1;
     for (zy = ylo; zy <= yhi; zy = zy + 1 | 0) {
         if (xlo < rmin.get(zy)) {
@@ -501,18 +500,18 @@ export async function vision_recalc(control) {   // vision.c:512
             }
             /* skip the normal update loop */
             break skip$;
-        } else if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level)) {
+        } else if (Is_rogue_level(u.uz)) {
             await rogue_vision(next_array[0], next_rmin[0], next_rmax[0]);
         } else {
             has_night_vision = 1;   /* hero has night vision */
-            if (Underwater() && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) {
+            if (Underwater() && !Is_waterlevel(u.uz)) {
                 /*
                  * The hero is underwater.  Only see surrounding locations if
                  * they are also underwater.  This overrides night vision but
                  * does not override x-ray vision.
                  */
                 has_night_vision = 0;
-                lo_col = u.ux - 1 > 1 ? u.ux - 1 : 1;
+                lo_col = max(u.ux - 1, 1);
                 for (row = u.uy - 1; row <= u.uy + 1; row = row + 1 | 0) {
                     for (col = lo_col; col <= u.ux + 1; col = col + 1 | 0) {
                         if (!isok($c.i16(col), $c.i16(row)) || !is_pool($c.i16(col), $c.i16(row))) {
@@ -532,7 +531,7 @@ export async function vision_recalc(control) {   // vision.c:512
                     if (row >= ROWNO) {
                         break;
                     }
-                    next_rmin[0].set(row, $c.i16(1 > u.ux - 1 ? 1 : u.ux - 1));
+                    next_rmin[0].set(row, $c.i16(max(1, u.ux - 1)));
                     next_rmax[0].set(row, $c.i16(COLNO - 1 < u.ux + 1 ? COLNO - 1 : u.ux + 1));
                     next_row = next_array[0].get(row);
                     for (col = next_rmin[0].get(row); col <= next_rmax[0].get(row); col = col + 1 | 0) {
@@ -557,7 +556,7 @@ export async function vision_recalc(control) {   // vision.c:512
                         }
                         dy = v_abs(u.uy - row | 0);
                         next_row = next_array[0].get(row);
-                        start = 1 > u.ux - ranges.get(dy) ? 1 : u.ux - ranges.get(dy);
+                        start = max(1, u.ux - ranges.get(dy));
                         stop = COLNO - 1 < u.ux + ranges.get(dy) ? COLNO - 1 : u.ux + ranges.get(dy);
                         for (col = start; col <= stop; col = col + 1 | 0) {
                             old_row_val = $c.i8(next_row.get(col));
@@ -598,7 +597,7 @@ export async function vision_recalc(control) {   // vision.c:512
                         }
                         dy = v_abs(u.uy - row | 0);
                         next_row = next_array[0].get(row);
-                        start = 1 > u.ux - ranges.get(dy) ? 1 : u.ux - ranges.get(dy);
+                        start = max(1, u.ux - ranges.get(dy));
                         stop = COLNO - 1 < u.ux + ranges.get(dy) ? COLNO - 1 : u.ux + ranges.get(dy);
                         for (col = start; col <= stop; col = col + 1 | 0) {
                             if (next_row.get(col)) {
@@ -767,7 +766,7 @@ export function block_point(x, y) {   // vision.c:865
     /* set DEBUGFILES=seethru in environment to see through clouds & water */
     if (gs.seethru === 0) {
         /* init once */
-        $t1 = wizard() && debugcore($C`seethru`, FALSE) ? 1 : -1, gs.seethru = $t1;
+        $t1 = wizard() && explicitdebug($C`seethru`) ? 1 : -1, gs.seethru = $t1;
     }
     if (gs.seethru === 1) {
         if (!does_block(x, y, $c.relem(svl.level.locations[x], y))) {
@@ -2148,7 +2147,7 @@ export async function do_clear_area(scol, srow, range, func, arg) {   // vision.
     } else {
         /* vision doesn't pass through water or clouds, detection should
            [this probably ought to be an arg supplied by our caller...] */
-        const override_vision = detecting(func) && ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) || (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) ? 1 : 0;
+        const override_vision = detecting(func) && (Is_waterlevel(u.uz) || Is_airlevel(u.uz)) ? 1 : 0;
         if (range > MAX_RADIUS || range < 1) {
             await panic($C`do_clear_area:  illegal range %d`, range);
         }

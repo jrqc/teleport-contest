@@ -16,7 +16,7 @@ import { bot } from './botl.js';
 import { cmdq_add_ec, cmdq_add_key, confdir, get_adjacent_loc, getdir, isok, paranoid_query, set_occupation, yn_function } from './cmd.js';
 import { NO_COLOR } from './color.h.js';
 import { is_lava, is_pool, is_pool_or_lava } from './dbridge.js';
-import { c_color_names, c_common_strings, c_obj_colors, cg, disp, flags, gb, gc, gh, gi, gj, gm, gn, go, gp, gs, gt, gu, gv, gy, hands_obj, iflags, svc, svd, svl, svm, u, xdir, ydir, ynchars } from './decl.js';
+import { c_color_names, c_common_strings, c_obj_colors, cg, disp, flags, gb, gc, gh, gi, gj, gm, gn, go, gp, gs, gt, gu, gv, gy, hands_obj, iflags, svc, svl, svm, u, xdir, ydir, ynchars } from './decl.js';
 import { COIN_CLASS, FOOD_CLASS, GEM_CLASS, POTION_CLASS, RING_CLASS, S, SPBOOK_CLASS, TOOL_CLASS, WAND_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { cvt_sdoor_to_door, findit, openit, use_crystal_ball } from './detect.js';
 import { buried_ball_to_freedom, dig_check, digactualhole, fillholetyp, liquid_flow, use_pick_axe, watch_dig } from './dig.js';
@@ -29,7 +29,8 @@ import { Blindf_off, Blindf_on, cursed, fingers_or_gloves, inaccessible_equipmen
 import { make_familiar } from './dog.js';
 import { hurtle, hurtle_jump, thitmonst, walk_path } from './dothrow.js';
 import { defsyms } from './drawing.js';
-import { Can_dig_down, ceiling, on_level, surface } from './dungeon.js';
+import { Can_dig_down, ceiling, surface } from './dungeon.js';
+import { Is_airlevel, Is_stronghold, Is_waterlevel } from './dungeon.macros.js';
 import { floorfood, morehungry, set_tin_variety, use_tin_opener, vomit } from './eat.js';
 import { can_reach_floor, cant_reach_floor, freehand, u_wipe_engr } from './engrave.js';
 import { explode } from './explode.js';
@@ -40,7 +41,7 @@ import { COLNO, FALSE, MAXULEV, ROWNO, TRUE } from './global.h.js';
 import { glyph_to_cmap } from './glyphs.js';
 import { check_capacity, in_rooms, invocation_pos, losehp, may_passwall, near_capacity, nomul, obj_to_any, overexertion, spoteffects } from './hack.js';
 import { ARTICLE, CORPSTAT, COST, CQ_CANNED, DIGCHECK, ECMD, FACE, FLASHED_LIGHT, FM, FOOT, FORCEBUNGLE, FORCETRAP, GETOBJ, GETOBJ_PROMPT, HAND, HEAD, HOMEMADE_TIN, INVIS_BEAM, KILLED, LEG, MM, NO, NOSE, NO_KILLER_PREFIX, NO_TRAP_FLAGS, N_DIRS, RLOC, STOMACH, SUPPRESS, TELEDS, TOOKPLUNGE, UNENCUMBERED, WEAK, XKILL } from './hack.h.js';
-import { Maybe_Half_Phys, distu, pline1, plur, y_n } from './hack.macros.js';
+import { Maybe_Half_Phys, distu, makeknown, max, pline1, plur, rn1, y_n } from './hack.macros.js';
 import { copynchars, dist2, eos, highc, isqrt, nh_snprintf, s_suffix, sgn, strstri, upstart } from './hacklib.js';
 import { mstatusline, ustatusline } from './insight.js';
 import { addinv, addinv_nomerge, any_obj_ok, carrying, consume_obj_charge, delobj, freeinv, getobj, hold_another_object, nxtobj, prinv, sobj_at, stackobj, update_inventory, useup, useupall, useupf } from './invent.js';
@@ -65,7 +66,7 @@ import { DEADMONSTER, M_AP_TYPE, is_vampshifter } from './monst.macros.js';
 import { PM } from './monsters.h.js';
 import { mon_reflects } from './muse.js';
 import { do_play_instrument } from './music.js';
-import { discover_object, objdescr_is, observe_object } from './o_init.js';
+import { objdescr_is, observe_object } from './o_init.js';
 import { OBJ } from './obj.h.js';
 import { Has_contents, Is_candle, age_is_relative, bimanual, carried, ignitable, is_axe, is_boots, is_flimsy, is_gloves, is_graystone, is_pick, is_pole, is_wet_towel, u_wield_art } from './obj.macros.js';
 import { CLOTH, GEMSTONE, GLASS, GOLD, LIQUID, MINERAL, NUM_OBJECTS, RANDOM_CLASS, SILVER, WAX, WOOD } from './objclass.h.js';
@@ -77,7 +78,7 @@ import { pickup_object, use_container } from './pickup.js';
 import { There, You, You_cant, You_feel, You_hear, You_see, Your, impossible, pline, pline_The, pline_mon, set_msg_xy, verbalize } from './pline.js';
 import { body_part, mbodypart, poly_gender, polymon } from './polyself.js';
 import { djinni_from_bottle, incr_itimeout, make_blinded, make_confused, make_deaf, make_glib, make_hallucinated, make_sick, make_stunned, make_vomiting, set_itimeout } from './potion.js';
-import { BLINDED, CONFUSION, DEAF, FLYING, GLIB, HALF_PHDAM, HALLUC, HALLUC_RES, INTRINSIC, JUMPING, SICK, STUNNED, TIMEOUT, VOMITING, W, WWALKING } from './prop.h.js';
+import { BLINDED, CONFUSION, DEAF, GLIB, HALF_PHDAM, HALLUC, HALLUC_RES, INTRINSIC, JUMPING, SICK, STUNNED, TIMEOUT, VOMITING, W } from './prop.h.js';
 import { litroom, unpunish } from './read.js';
 import { AIR, ALTAR, CLOUD, CORR, D, DBWALL, DOOR, ICE, LAVAWALL, POOL, ROOM, SCORR, SDOOR, STAIRS, STONE, TREE, WATER } from './rm.h.js';
 import { IS_DOOR, IS_FURNITURE, IS_OBSTRUCTED, IS_STWALL } from './rm.macros.js';
@@ -110,8 +111,8 @@ import { mon_has_amulet } from './wizard.js';
 import { mon_adjust_speed, setnotworn } from './worn.js';
 import { dowrite } from './write.js';
 import { PRONOUN, SICK_ALL, SICK_NONVOMITABLE, TT } from './you.h.js';
-import { Ugender, Upolyd, u_at } from './you.macros.js';
-import { Blind, Blinded, BlindedTimeout, Conflict, Deaf, EJumping, Free_action, Fumbling, Glib, Hallucination, Invis, Jumping, Levitation, Passes_walls, Protection_from_shape_changers, See_invisible, Sick, Slimed, Stone_resistance, Stoned, Strangled, Underwater, Vomiting, Wounded_legs } from './youprop.macros.js';
+import { Race_if, Role_if, Ugender, Upolyd, m_next2u, u_at } from './you.macros.js';
+import { Blind, Blinded, BlindedTimeout, Conflict, Deaf, EJumping, Flying, Free_action, Fumbling, Glib, Hallucination, Invis, Jumping, Levitation, Passes_walls, Protection_from_shape_changers, See_invisible, Sick, Slimed, Stone_resistance, Stoned, Strangled, Underwater, Vomiting, Wounded_legs, Wwalking } from './youprop.macros.js';
 import { bhit, bhitm, bhito, bhitpile, get_obj_location, obj_resists, release_hold, zappable, zapsetup, zapwrapup, zapyourself } from './zap.js';
 
 const MAXLEASHED = 2;
@@ -200,7 +201,7 @@ async function use_towel(obj) {   // apply.c:112
         switch (rn2(3)) {
             case 2:
                 old = $c.and64(u.uprops[GLIB].intrinsic, TIMEOUT);
-                await make_glib($c.i32(old) + (rn2(10) + 3 | 0) | 0);   /* + 3..12 */
+                await make_glib($c.i32(old) + rn1(10, 3) | 0);   /* + 3..12 */
                 await Your($C`%s %s!`, await makeplural(await body_part(HAND)), old ? $C`are filthier than ever` : $C`get slimy`);
                 if (is_wet_towel(obj)) {
                     await dry_a_towel(obj, -1, drying_feedback);
@@ -209,7 +210,7 @@ async function use_towel(obj) {   // apply.c:112
             case 1:
                 if (!$G.ublindf) {
                     old = u.ucreamed;
-                    $t1 = (rn2(10) + 3 | 0) >>> 0, u.ucreamed = u.ucreamed + $t1 >>> 0;
+                    $t1 = rn1(10, 3) >>> 0, u.ucreamed = u.ucreamed + $t1 >>> 0;
                     await pline($C`Yecch!  Your %s %s gunk on it!`, await body_part(FACE), old ? $C`has more` : $C`now has`);
                     await make_blinded($c.sub64($c.add64(BlindedTimeout(), u.ucreamed), old), TRUE);
                 } else {
@@ -329,7 +330,7 @@ async function its_dead(rx, ry, resp) {   // apply.c:198
         if (Blind() && visglyph !== corpseglyph) {
             await map_object(corpse, TRUE);
         }
-        if (gu.urole.mnum === PM.HEALER) {
+        if (Role_if(PM.HEALER)) {
             /* ok to reset `corpse' here; we're done with it */
             do {
                 if (obj_has_timer(corpse, REVIVE_MON)) {
@@ -355,7 +356,7 @@ async function its_dead(rx, ry, resp) {   // apply.c:198
             }
         }
         let how = $C`fine`;
-        if (gu.urole.mnum === PM.HEALER) {
+        if (Role_if(PM.HEALER)) {
             const ttmp = t_at(rx, ry);
             if (ttmp && ttmp.ttyp === STATUE_TRAP) {
                 how = $C`extraordinary`;
@@ -418,7 +419,7 @@ async function use_stethoscope(obj) {   // apply.c:318
             await cant_reach_floor(u.ux, u.uy, u.dz < 0 ? 1 : 0, TRUE, FALSE);
         } else if (await its_dead(u.ux, u.uy, new $c.Ptr(res, 0))) {
             /* message already given */
-        } else if ((svd.dungeon_topology.d_stronghold_level.dlevel || svd.dungeon_topology.d_stronghold_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_stronghold_level)) {
+        } else if (Is_stronghold(u.uz)) {
             await You_hear($C`the crackling of hellfire.`);
         } else {
             await pline_The($C`%s seems healthy enough.`, surface(u.ux, u.uy));
@@ -673,7 +674,7 @@ async function magic_whistled(obj) {   // apply.c:518
         /* message(s) were handled by rloc(); if only noticeable change was
            pet(s) disappearing, the magic whistle won't become discovered */
         if (((shift + appear | 0) + trapped | 0) > 0) {
-            await discover_object(obj.otyp, TRUE, TRUE, TRUE);
+            await makeknown(obj.otyp);
         }
     } else {
         /* could use array of cardinal number names like wishcmdassist() but
@@ -915,10 +916,10 @@ export function get_mleash(mtmp) {   // apply.c:880
  */
 async function mleashed_next2u(mtmp) {   // apply.c:891
     if (mtmp.mleashed) {
-        if (!(dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2)) {
+        if (!m_next2u(mtmp)) {
             await mnexto(mtmp, RLOC.NOMSG);
         }
-        if (!(dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2)) {
+        if (!m_next2u(mtmp)) {
             const otmp = get_mleash(mtmp);
             if (!otmp) {
                 await impossible($C`leashed-unleashed mon?`);
@@ -1300,7 +1301,7 @@ async function use_bell(optr) {   // apply.c:1202
         }
     }   /* charged BofO */
     if (learno) {
-        await discover_object(BELL_OF_OPENING, TRUE, TRUE, TRUE);
+        await makeknown(BELL_OF_OPENING);
         obj.known = 1;
     }
     if (wakem) {
@@ -1514,14 +1515,14 @@ export async function splash_lit(obj) {   // apply.c:1518
             uhearit = !Deaf() ? 1 : 0;
             /* underwater light sources aren't allowed but if hero
                is just entering water, Underwater won't be set yet */
-            dunk = is_pool(u.ux, u.uy) && (!Levitation() && !((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) && !((u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) ? 1 : 0;
+            dunk = is_pool(u.ux, u.uy) && (!Levitation() && !Flying() && !Wwalking() || Is_waterlevel(u.uz)) ? 1 : 0;
             snuff = FALSE;
         } else if (obj.where === OBJ.MINVENT && (mtmp = obj.v.v_ocarry, humanoid(mtmp.data))) {
             /* don't assume that lit lantern has been swallowed;
                a nymph might have stolen it or picked it up */
             useeit = get_obj_location(obj, new $c.Ptr(x, 0), new $c.Ptr(y, 0), 0) && cansee(x[0], y[0]) ? 1 : 0;
-            uhearit = couldsee(x[0], y[0]) && dist2(x[0], y[0], u.ux, u.uy) < 25 ? 1 : 0;
-            dunk = is_pool(mtmp.mx, mtmp.my) && (!is_flyer(mtmp.data) && !is_floater(mtmp.data) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) ? 1 : 0;
+            uhearit = couldsee(x[0], y[0]) && distu(x[0], y[0]) < 25 ? 1 : 0;
+            dunk = is_pool(mtmp.mx, mtmp.my) && (!is_flyer(mtmp.data) && !is_floater(mtmp.data) || Is_waterlevel(u.uz)) ? 1 : 0;
             snuff = FALSE;
             if (useeit) {
                 set_msg_xy(x[0], y[0]);
@@ -1574,7 +1575,7 @@ export async function catch_lit(obj) {   // apply.c:1577
             await pline($C`%s %s %s`, await Yname2(obj), await otense(obj, Blind() ? $C`feel` : $C`catch`), Blind() ? $C`warm.` : $C`light!`);
         }
         if (obj.otyp === POT_OIL) {
-            await discover_object(obj.otyp, TRUE, TRUE, TRUE);
+            await makeknown(obj.otyp);
         }
         if (carried(obj) && obj.unpaid && await costly_spot(u.ux, u.uy)) {
             const shkp = await shop_keeper(in_rooms(u.ux, u.uy, SHOPBASE).get(0));
@@ -1698,7 +1699,7 @@ async function light_cocktail(optr) {   // apply.c:1703
         await verbalize($C`That's in addition to the cost of the potion, of course.`);
         await bill_dummy_object(obj);
     }
-    await discover_object(obj.otyp, TRUE, TRUE, TRUE);
+    await makeknown(obj.otyp);
     await begin_burn(obj, FALSE);   /* after shop billing */
     if (split1off) {
         await obj_extract_self(obj);   /* free from inv */
@@ -1768,12 +1769,12 @@ export async function dorub() {   // apply.c:1785
                artifact which blasts the hero with lethal results) */
             $G.uwep.otyp = OIL_LAMP;
             $G.uwep.spe = 0;   /* for safety */
-            $t1 = rn2(500) + 1000 | 0, $G.uwep.age = $t1;
+            $t1 = rn1(500, 1000), $G.uwep.age = $t1;
             if ($G.uwep.lamplit) {
                 await begin_burn($G.uwep, TRUE);
             }
             await djinni_from_bottle($G.uwep);
-            await discover_object(MAGIC_LAMP, TRUE, TRUE, TRUE);
+            await makeknown(MAGIC_LAMP);
             await update_inventory();
         } else if (rn2(2)) {
             await You($C`%s smoke.`, !Blind() ? $C`see a puff of` : $C`smell`);
@@ -1987,7 +1988,7 @@ export async function jump(magic) {   // apply.c:1988
         }
         await You($C`cannot escape from %s!`, await mon_nam(u.ustuck));
         return ECMD.OK;
-    } else if (Levitation() || (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
+    } else if (Levitation() || Is_airlevel(u.uz) || Is_waterlevel(u.uz)) {
         if (magic) {
             await You($C`flail around a little.`);
             return ECMD.TIME;
@@ -2028,8 +2029,8 @@ export async function jump(magic) {   // apply.c:1988
                 case TT.BEARTRAP:
                     side = rn2(3) ? W.RINGL : W.RINGR;
                     await You($C`rip yourself free of the bear trap!  Ouch!`);
-                    await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(10) + 1 | 0, 2) : rnd(10), $C`jumping out of a bear trap`, KILLED.BY);
-                    await set_wounded_legs(side, rn2(1000) + 500 | 0);
+                    await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(10) + 1 | 0, 2) : rnd(10)), $C`jumping out of a bear trap`, KILLED.BY);
+                    await set_wounded_legs(side, rn1(1000, 500));
                     break;
                 case TT.PIT:
                     await You($C`leap from the pit!`);
@@ -2045,8 +2046,8 @@ export async function jump(magic) {   // apply.c:1988
                 case TT.BURIEDBALL:
                 case TT.INFLOOR:
                     await You($C`strain your %s, but you're still %s.`, await makeplural(await body_part(LEG)), u.utraptype === TT.INFLOOR ? $C`stuck in the floor` : $C`attached to the buried ball`);
-                    await set_wounded_legs(W.RINGL, rn2(10) + 11 | 0);
-                    await set_wounded_legs(W.RINGR, rn2(10) + 11 | 0);
+                    await set_wounded_legs(W.RINGL, rn1(10, 11));
+                    await set_wounded_legs(W.RINGR, rn1(10, 11));
                     return ECMD.TIME;
                 default:
                     await impossible($C`Jumping out of strange trap (%d)?`, u.utraptype);
@@ -2065,7 +2066,7 @@ export async function jump(magic) {   // apply.c:1988
             }
             /* jumping in place on a trap will trigger it */
             if ((t = t_at(cc.x, cc.y)) !== null) {
-                await You($C`jump up and %s back down.`, !((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) ? $C`come` : $C`fly`);
+                await You($C`jump up and %s back down.`, !Flying() ? $C`come` : $C`fly`);
                 await dotrap(t, FORCETRAP | TOOKPLUNGE);
                 return ECMD.TIME;
             }
@@ -2198,11 +2199,11 @@ export async function use_unicorn_horn(optr) {   // apply.c:2259
     /* number of properties we're dealing with */
     const obj = optr ? optr.get(0) : null;
     if (obj && obj.cursed) {
-        const lcount = rn2(90) + 10 | 0;
+        const lcount = rn1(90, 10);
         switch ($c.div32(rn2(13), 2)) {
             case 0:
                 /* case 6 is half as likely as the others */
-                await make_sick($c.and64(u.uprops[SICK].intrinsic, TIMEOUT) ? $c.add64($c.div64($c.and64(u.uprops[SICK].intrinsic, TIMEOUT), 3), 1) : rn2(acurr(A.CON)) + 20 | 0, await xname(obj), TRUE, SICK_NONVOMITABLE);
+                await make_sick($c.and64(u.uprops[SICK].intrinsic, TIMEOUT) ? $c.add64($c.div64($c.and64(u.uprops[SICK].intrinsic, TIMEOUT), 3), 1) : (rn2(acurr(A.CON)) + 20 | 0), await xname(obj), TRUE, SICK_NONVOMITABLE);
                 break;
             case 1:
                 await make_blinded($c.add64(BlindedTimeout(), lcount), TRUE);
@@ -2472,7 +2473,7 @@ async function use_figurine(optr) {   // apply.c:2544
     if (!await figurine_location_checks(obj, cc, FALSE)) {
         return ECMD.TIME;
     }
-    await You($C`%s and it %stransforms.`, u.dx || u.dy ? $C`set the figurine beside you` : (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) || is_pool(cc.x, cc.y) ? $C`release the figurine` : u.dz < 0 ? $C`toss the figurine into the air` : $C`set the figurine on the ground`, Blind() ? $C`supposedly ` : $C``);
+    await You($C`%s and it %stransforms.`, u.dx || u.dy ? $C`set the figurine beside you` : Is_airlevel(u.uz) || Is_waterlevel(u.uz) || is_pool(cc.x, cc.y) ? $C`release the figurine` : u.dz < 0 ? $C`toss the figurine into the air` : $C`set the figurine on the ground`, Blind() ? $C`supposedly ` : $C``);
     await make_familiar(obj, cc.x, cc.y, FALSE);
     await stop_timer(FIG_TRANSFORM, obj_to_any(obj));
     await useup(obj);
@@ -2533,11 +2534,11 @@ async function use_grease(obj) {   // apply.c:2604
             await You($C`cover %s with a thick layer of grease.`, await yname(otmp));
             otmp.greased = 1;
             if (obj.cursed && !nohands(gy.youmonst.data)) {
-                await make_glib(oldglib + (rn2(6) + 10 | 0) | 0);   /* + 10..15 */
+                await make_glib(oldglib + rn1(6, 10) | 0);   /* + 10..15 */
                 await pline($C`Some of the grease gets all over your %s.`, await fingers_or_gloves(TRUE));
             }
         } else {
-            await make_glib(oldglib + (rn2(11) + 5 | 0) | 0);   /* + 5..15 */
+            await make_glib(oldglib + rn1(11, 5) | 0);   /* + 5..15 */
             await You($C`coat your %s with grease.`, await fingers_or_gloves(TRUE));
         }
     } else {
@@ -2624,9 +2625,9 @@ async function use_stone(tstone) {   // apply.c:2680
             /* these have class-specific handling below */
             if (tstone.otyp !== TOUCHSTONE) {
                 do_scratch = TRUE;
-            } else if (obj.oclass === GEM_CLASS && (tstone.blessed || !tstone.cursed && (gu.urole.mnum === PM.ARCHEOLOGIST || gu.urace.mnum === PM.GNOME))) {
-                await discover_object(TOUCHSTONE, TRUE, TRUE, TRUE);
-                await discover_object(obj.otyp, TRUE, TRUE, TRUE);
+            } else if (obj.oclass === GEM_CLASS && (tstone.blessed || !tstone.cursed && (Role_if(PM.ARCHEOLOGIST) || Race_if(PM.GNOME)))) {
+                await makeknown(TOUCHSTONE);
+                await makeknown(obj.otyp);
                 await prinv(null, obj, 0);
                 return ECMD.TIME;
             } else {
@@ -2720,7 +2721,7 @@ async function use_trap(otmp) {   // apply.c:2821
         what = stway.isladder ? $C`on the ladder` : $C`on the stairs`;
     } else if (IS_FURNITURE(levtyp) || IS_OBSTRUCTED(levtyp) || closed_door(u.ux, u.uy) || t_at(u.ux, u.uy)) {
         what = $C`here`;
-    } else if ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
+    } else if (Is_airlevel(u.uz) || Is_waterlevel(u.uz)) {
         what = levtyp === AIR ? $C`in midair` : levtyp === CLOUD ? $C`in a cloud` : $C`in this place`;   /* Air/Water Plane catch-all */
     }
     if (what) {
@@ -2856,7 +2857,7 @@ export async function use_whip(obj) {   // apply.c:2955
             }
             /* fake some proficiency checks */
             proficient = 0;
-            if (gu.urole.mnum === PM.ARCHEOLOGIST) {
+            if (Role_if(PM.ARCHEOLOGIST)) {
                 proficient = proficient + 1 | 0;
             }
             if (ACURR(A.DEX) < 6) {
@@ -2900,7 +2901,7 @@ export async function use_whip(obj) {   // apply.c:2955
                     }
                     return ECMD.TIME;
                 }
-                if (Levitation() || u.usteed || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) {
+                if (Levitation() || u.usteed || Flying()) {
                     /* Have a shot at snaring something on the floor.  A flyer
                        can reach the floor so could just pick an item up, but
                        allow snagging by whip too. */
@@ -3086,7 +3087,7 @@ export async function use_whip(obj) {   // apply.c:2955
                 }
                 /* regardless of mtmp's weapon or hero's proficiency */
                 await wakeup(mtmp, TRUE);
-            } else if ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
+            } else if (Is_airlevel(u.uz) || Is_waterlevel(u.uz)) {
                 /* it must be air -- water checked above */
                 await You($C`snap your whip through thin air.`);
             } else {
@@ -3109,8 +3110,8 @@ function find_poleable_mon(pos) {   // apply.c:3284
     mpos.y = 0;   /* no candidate location yet */
     const impaired = u.uprops[CONFUSION].intrinsic || u.uprops[STUNNED].intrinsic || Hallucination() ? 1 : 0;
     const rt = $c.i16(isqrt(gp.polearm_range_max));
-    lo_x = $c.i16(u.ux - rt > 1 ? u.ux - rt : 1), hi_x = $c.i16(u.ux + rt < COLNO - 1 ? u.ux + rt : COLNO - 1);
-    lo_y = $c.i16(u.uy - rt > 0 ? u.uy - rt : 0), hi_y = $c.i16(u.uy + rt < ROWNO - 1 ? u.uy + rt : ROWNO - 1);
+    lo_x = $c.i16(max(u.ux - rt, 1)), hi_x = $c.i16(u.ux + rt < COLNO - 1 ? u.ux + rt : COLNO - 1);
+    lo_y = $c.i16(max(u.uy - rt, 0)), hi_y = $c.i16(u.uy + rt < ROWNO - 1 ? u.uy + rt : ROWNO - 1);
     for (x = lo_x; x <= hi_x; x = $c.i16(x + 1)) {
         for (y = lo_y; y <= hi_y; y = $c.i16(y + 1)) {
             if (!get_valid_polearm_position(x, y)) {
@@ -3277,10 +3278,10 @@ export async function use_pole(obj, autohit) {   // apply.c:3426
         }
     }
     const glyph = glyph_at(cc.x, cc.y);
-    if (dist2(cc.x, cc.y, u.ux, u.uy) > max_range[0]) {
+    if (distu(cc.x, cc.y) > max_range[0]) {
         await pline($C`Too far!`);
         return ECMD.FAIL;
-    } else if (dist2(cc.x, cc.y, u.ux, u.uy) < min_range[0]) {
+    } else if (distu(cc.x, cc.y) < min_range[0]) {
         if (autohit && (cc.x === u.ux && cc.y === u.uy)) {
             await pline($C`Don't know what to hit.`);
         } else {
@@ -3549,7 +3550,7 @@ async function use_grapple(obj) {   // apply.c:3729
     }
     /* Calculate range; unlike use_pole(), there's no minimum for range */
     const typ = uwep_skill_type();
-    if (dist2(cc.x, cc.y, u.ux, u.uy) > grapple_range()) {
+    if (distu(cc.x, cc.y) > grapple_range()) {
         await pline($C`Too far!`);
         return res;
     } else if (!cansee(cc.x, cc.y)) {
@@ -3645,7 +3646,7 @@ async function use_grapple(obj) {   // apply.c:3729
             /* Yourself (oops!) */
             if (u.weapon_skills[typ].skill <= P.BASIC) {
                 await You($C`hook yourself!`);
-                await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32((rn2(10) + 10 | 0) + 1 | 0, 2) : rn2(10) + 10 | 0, $C`a grappling hook`, KILLED.BY);
+                await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32((rn2(10) + 10 | 0) + 1 | 0, 2) : rn2(10) + 10 | 0), $C`a grappling hook`, KILLED.BY);
                 return ECMD.TIME;
             }
             break;
@@ -3672,7 +3673,7 @@ async function discard_broken_wand() {   // apply.c:3876
  */
 async function broken_wand_explode(obj, dmg, expltype) {   // apply.c:3888
     await explode(u.ux, u.uy, -obj.otyp | 0, dmg, WAND_CLASS, expltype);
-    await discover_object(obj.otyp, TRUE, TRUE, TRUE);   /* explode describes the effect */
+    await makeknown(obj.otyp);   /* explode describes the effect */
     await discard_broken_wand();
 }
 /* if x,y has lava or water, dunk any boulders at that location into it */
@@ -3746,7 +3747,7 @@ async function do_break_wand(obj) {   // apply.c:3909
             if (u.ustuck) {
                 await release_hold();
                 if (obj.dknown) {
-                    await discover_object(WAN_OPENING, TRUE, TRUE, TRUE);
+                    await makeknown(WAN_OPENING);
                 }
                 await discard_broken_wand();
                 return ECMD.TIME;
@@ -4252,7 +4253,7 @@ async function flip_through_book(obj) {   // apply.c:4473
         await pline($C`The pages feel %s.`, Hallucination() ? $C`freshly picked` : $C`rough and dry`);
     } else if (obj.otyp === SPE_BLANK_PAPER) {
         await pline($C`This spellbook %s.`, Hallucination() ? $C`doesn't have much of a plot` : $C`has nothing written in it`);
-        await discover_object(obj.otyp, TRUE, TRUE, TRUE);
+        await makeknown(obj.otyp);
     } else if (Hallucination()) {
         await You($C`enjoy the animated initials.`);
     } else if (obj.otyp === SPE_NOVEL) {

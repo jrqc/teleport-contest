@@ -13,7 +13,7 @@ import { exercise } from './attrib.js';
 import { A } from './attrib.h.js';
 import { yn_function } from './cmd.js';
 import { NO_COLOR } from './color.h.js';
-import { cg, flags, go, gu, iflags, program_state, svb, svc, svd, u, ynchars } from './decl.js';
+import { cg, flags, go, iflags, program_state, svb, svc, svd, u } from './decl.js';
 import { AMULET_CLASS, ARMOR_CLASS, GEM_CLASS, ILLOBJ_CLASS, POTION_CLASS, RING_CLASS, SCROLL_CLASS, SPBOOK_CLASS, VENOM_CLASS, WAND_CLASS } from './defsym.h.js';
 import { nul_glyphinfo } from './display.js';
 import { docall, objtyp_is_callable } from './do_name.js';
@@ -22,9 +22,10 @@ import { ledger_no, maxledgerno } from './dungeon.js';
 import { panic } from './end.js';
 import { wizard } from './flag.macros.js';
 import { BUFSZ, FALSE, TRUE } from './global.h.js';
+import { strcmpi } from './global.macros.js';
 import { ECMD, NROFARTIFACTS } from './hack.h.js';
-import { release_data, update_file } from './hack.macros.js';
-import { eos, lowc, strkitten, strncmpi, strstri, strsubst, upstart, visctrl } from './hacklib.js';
+import { release_data, update_file, y_n } from './hack.macros.js';
+import { eos, lowc, strkitten, strstri, strsubst, upstart, visctrl } from './hacklib.js';
 import { let_to_name, loot_classify, update_inventory } from './invent.js';
 import { PM } from './monsters.h.js';
 import { IMMEDIATE, MAXOCLASSES, NODIR, NUM_OBJECTS } from './objclass.h.js';
@@ -34,12 +35,14 @@ import { Japanese_item_name, obj_typename } from './objnam.js';
 import { NON_PM } from './permonst.h.js';
 import { You, impossible, pline, raw_printf } from './pline.js';
 import { rn2 } from './rnd.js';
-import { sfi_char, sfi_int, sfi_objclass, sfi_short, sfi_unsigned, sfo_char, sfo_int, sfo_objclass, sfo_short, sfo_unsigned } from './sfbase.js';
+import { Sfi_char, Sfi_objclass, Sfi_short, Sfo_char, Sfo_int, Sfo_objclass, Sfo_short, Sfo_unsigned } from './savefile.macros.js';
+import { sfi_int, sfi_unsigned } from './sfbase.js';
 import { append_price_quote, gem_learned } from './shk.js';
 import { Strlen_ } from './strutil.js';
 import { add_menu, add_menu_heading, add_menu_str, select_menu } from './windows.js';
 import { clear_nhwindow, create_nhwindow, destroy_nhwindow, display_nhwindow, end_menu, putstr, start_menu, wait_synch } from './winprocs.macros.js';
 import { ATR, MENU, NHW, PICK, WIN_ERR } from './wintype.h.js';
+import { Role_if } from './you.macros.js';
 import { Hallucination } from './youprop.macros.js';
 
 const shuffle_all$shuffle_classes = new Int8Array(7);   // static in shuffle_all()
@@ -376,13 +379,13 @@ export async function savenames(nhfp) {   // o_init.c:375
     let i = 0, len = Uint32Array.of(0);
     if (update_file(nhfp)) {
         for (i = 0; i < MAXOCLASSES + 2; i = i + 1 | 0) {
-            await sfo_int(nhfp, new $c.Ptr(svb.bases, i), $C`names-bases`);
+            await Sfo_int(nhfp, new $c.Ptr(svb.bases, i), $C`names-bases`);
         }
         for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
-            await sfo_short(nhfp, new $c.Ptr(svd.disco, i), $C`names-disco`);
+            await Sfo_short(nhfp, new $c.Ptr(svd.disco, i), $C`names-disco`);
         }
         for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
-            await sfo_objclass(nhfp, $c.relem(objects, i), $C`names-objclass`);
+            await Sfo_objclass(nhfp, $c.relem(objects, i), $C`names-objclass`);
         }
     }
     /* as long as we use only one version of Hack we
@@ -392,8 +395,8 @@ export async function savenames(nhfp) {   // o_init.c:375
         if (objects[i].oc_uname) {
             if (update_file(nhfp)) {
                 len[0] = await Strlen_(objects[i].oc_uname, $C`savenames`, 397) + 1 >>> 0;
-                await sfo_unsigned(nhfp, new $c.Ptr(len, 0), $C`names-len`);
-                await sfo_char(nhfp, objects[i].oc_uname, $C`names-oc_uname`, len[0] | 0);
+                await Sfo_unsigned(nhfp, new $c.Ptr(len, 0), $C`names-len`);
+                await Sfo_char(nhfp, objects[i].oc_uname, $C`names-oc_uname`, len[0] | 0);
             }
             if (release_data(nhfp)) {
                 $c.free(objects[i].oc_uname);
@@ -414,16 +417,16 @@ export async function restnames(nhfp) {   // o_init.c:411
         await sfi_int(nhfp, new $c.Ptr(svb.bases, i), $C`names-bases`);
     }
     for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
-        await sfi_short(nhfp, new $c.Ptr(svd.disco, i), $C`names-disco`);
+        await Sfi_short(nhfp, new $c.Ptr(svd.disco, i), $C`names-disco`);
     }
     for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
-        await sfi_objclass(nhfp, $c.relem(objects, i), $C`names-objclass`);
+        await Sfi_objclass(nhfp, $c.relem(objects, i), $C`names-objclass`);
     }
     for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
         if (objects[i].oc_uname) {
             await sfi_unsigned(nhfp, new $c.Ptr(len, 0), $C`names-len`);
             $t1 = $c.asArr(await alloc(len[0]), Int8Array), objects[i].oc_uname = $t1;
-            await sfi_char(nhfp, objects[i].oc_uname, $C`names-oc_uname`, len[0] | 0);
+            await Sfi_char(nhfp, objects[i].oc_uname, $C`names-oc_uname`, len[0] | 0);
         }
     }
 }
@@ -456,7 +459,7 @@ export async function discover_object(oindx, mark_as_known, mark_as_encountered,
     if (oindx < FIRST_OBJECT) {   /* don't discover generic objects */
         return;
     }
-    if (!objects[oindx].oc_name_known && mark_as_known || !objects[oindx].oc_encountered && mark_as_encountered || gu.urole.mnum === PM.SAMURAI && Japanese_item_name(oindx, null)) {
+    if (!objects[oindx].oc_name_known && mark_as_known || !objects[oindx].oc_encountered && mark_as_encountered || Role_if(PM.SAMURAI) && Japanese_item_name(oindx, null)) {
         const acls = objects[oindx].oc_class;
         /* Loop thru disco[] 'til we find the target (which may have been
            uname'd) or the next open slot; one or the other will be found
@@ -523,7 +526,7 @@ export function interesting_to_discover(i) {   // o_init.c:526
     /* most players who don't speak Japanese manage to figure out what
        gunyoki, osaku, and so forth mean, but treat them as pre-discovered
        to be disclosed by '\' */
-    if (gu.urole.mnum === PM.SAMURAI && Japanese_item_name(i, null)) {
+    if (Role_if(PM.SAMURAI) && Japanese_item_name(i, null)) {
         return TRUE;
     }
     /* Objects that were discovered without encountering them are now printed
@@ -540,7 +543,7 @@ function discovered_cmp(v1, v2) {   // o_init.c:553
     const s1 = $c.asArr(v1, 'ptr').get(0);
     const s2 = $c.asArr(v2, 'ptr').get(0);
     /* each element starts with "* " or "  " but we don't sort by those */
-    const res = strncmpi(s1.add(2), s2.add(2), -1);
+    const res = strcmpi(s1.add(2), s2.add(2));
     if (res === 0) {
         /* no tie-breaker needed */
     }
@@ -616,7 +619,7 @@ export async function choose_disco_sort(mode) {   // o_init.c:611
 async function disco_typename(otyp) {   // o_init.c:661
     let buf = new Int8Array(256);
     const result = await obj_typename(otyp);
-    if (gu.urole.mnum === PM.SAMURAI && Japanese_item_name(otyp, null)) {
+    if (Role_if(PM.SAMURAI) && Japanese_item_name(otyp, null)) {
         /* undiscovered harp (since wooden harp is
            non-magic so pre-discovered, only applies
            to magic harp and will only be seen if
@@ -979,7 +982,7 @@ export async function doclassdisco() {   // o_init.c:891
                but requires at least one artifact discovery for other styles
                [could fix that by forcing the 'a' choice into the pick-class
                menu when running in wizard mode] */
-            if (wizard() && await yn_function($C`Dump information about all artifacts?`, new $c.Ptr(ynchars, 0), 110, TRUE) === 121) {
+            if (wizard() && await y_n($C`Dump information about all artifacts?`) === 121) {
                 await dump_artifact_info(tmpwin);
                 ct = NROFARTIFACTS;   /* non-zero vs zero is what matters below */
                 break;

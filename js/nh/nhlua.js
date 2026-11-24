@@ -26,9 +26,10 @@ import { long_to_any } from './hack.js';
 import { CQ_CANNED, NHCORE, NUM_NHCB, NUM_NHCORE_CALLS } from './hack.h.js';
 import { eos, ing_suffix, nh_snprintf, s_suffix, strncmpi } from './hacklib.js';
 import { addinv_nomerge, freeinv, update_inventory, useupall } from './invent.js';
+import { luaL_checkstring, luaL_optstring } from './lauxlib.macros.js';
 import { LUA, LUA_MASKCOUNT, LUA_REGISTRYINDEX, LUA_VERSION_RELEASE_NUM } from './lua.h.js';
-import { lua_newtable } from './lua.macros.js';
-import { luaL_checkinteger, luaL_checklstring, luaL_checkoption, luaL_checktype, luaL_loadbufferx, luaL_loadstring, luaL_optlstring, luaL_requiref, luaL_setfuncs, luaL_traceback, lua_atpanic, lua_callk, lua_close, lua_createtable, lua_error, lua_gc, lua_getallocf, lua_getfield, lua_getglobal, lua_getinfo, lua_getstack, lua_gettable, lua_gettop, lua_isstring, lua_newstate, lua_next, lua_pcallk, lua_pushboolean, lua_pushcclosure, lua_pushinteger, lua_pushnil, lua_pushstring, lua_pushvalue, lua_rawset, lua_rotate, lua_setfield, lua_setglobal, lua_sethook, lua_setmetatable, lua_settable, lua_settop, lua_setwarnf, lua_toboolean, lua_tointegerx, lua_tolstring, lua_type, luaopen_base, luaopen_coroutine, luaopen_debug, luaopen_math, luaopen_os, luaopen_string, luaopen_table, luaopen_utf8 } from './luabridge.js';
+import { lua_call, lua_insert, lua_isnil, lua_istable, lua_newtable, lua_pcall, lua_pop, lua_remove, lua_tointeger, lua_tostring } from './lua.macros.js';
+import { luaL_checkinteger, luaL_checkoption, luaL_checktype, luaL_loadbufferx, luaL_loadstring, luaL_requiref, luaL_setfuncs, luaL_traceback, lua_atpanic, lua_close, lua_createtable, lua_error, lua_gc, lua_getallocf, lua_getfield, lua_getglobal, lua_getinfo, lua_getstack, lua_gettable, lua_gettop, lua_isstring, lua_newstate, lua_next, lua_pushboolean, lua_pushcclosure, lua_pushinteger, lua_pushnil, lua_pushstring, lua_pushvalue, lua_rawset, lua_setfield, lua_setglobal, lua_sethook, lua_setmetatable, lua_settable, lua_settop, lua_setwarnf, lua_toboolean, lua_tolstring, lua_type, luaopen_base, luaopen_coroutine, luaopen_debug, luaopen_math, luaopen_os, luaopen_string, luaopen_table, luaopen_utf8 } from './luabridge.js';
 import { extract_nobj } from './mkobj.js';
 import { mongone } from './mon.js';
 import { name_to_mon } from './mondata.js';
@@ -46,7 +47,8 @@ import { HIGH_PM, LOW_PM, NON_PM, NUMMONS } from './permonst.h.js';
 import { impossible, livelog_printf, pline, verbalize } from './pline.js';
 import { AIR, ALTAR, BLCORNER, BRCORNER, CLOUD, CORR, CROSSWALL, D, DBWALL, DOOR, FOUNTAIN, F_LOOTED, F_WARNED, HWALL, ICE, INVALID_TYPE, IRONBARS, LAVAPOOL, LAVAWALL, MATCH_WALL, MAX_TYPE, MOAT, POOL, ROOM, SCORR, SDOOR, SINK, STONE, TDWALL, THRONE, TLCORNER, TLWALL, TRCORNER, TREE, TREE_LOOTED, TREE_SWARM, TRWALL, TUWALL, T_LOOTED, VWALL, WATER } from './rm.h.js';
 import { rn2, rng_log_set_caller } from './rnd.js';
-import { sfi_char, sfi_unsigned, sfo_char, sfo_unsigned } from './sfbase.js';
+import { Sfi_char, Sfo_char, Sfo_unsigned } from './savefile.macros.js';
+import { sfi_unsigned } from './sfbase.js';
 import { obfree } from './shk.js';
 import { cvt_to_abscoord, flip_level, get_coord, get_trapname_bytype, l_register_des, nhl_abs_coord } from './sp_lev.js';
 import { Strlen_ } from './strutil.js';
@@ -446,8 +448,8 @@ export async function nhl_get_xy_params(L, x, y) {   // nhlua.c:508
     const argc = lua_gettop(L);
     let ret = FALSE;
     if (argc === 2) {
-        $t1 = lua_tointegerx(L, 1, null), x.set(0, $t1);
-        $t2 = lua_tointegerx(L, 2, null), y.set(0, $t2);
+        $t1 = lua_tointeger(L, 1), x.set(0, $t1);
+        $t2 = lua_tointeger(L, 2), y.set(0, $t2);
         ret = TRUE;
     } else if (argc === 1 && lua_type(L, 1) === LUA.TTABLE) {
         ret = await get_coord(L, 1, new $c.Ptr(ax, 0), new $c.Ptr(ay, 0));
@@ -530,7 +532,7 @@ async function nhl_getmap(L) {   // nhlua.c:532
 async function nhl_impossible(L) {   // nhlua.c:622
     const argc = lua_gettop(L);
     if (argc === 1) {
-        await impossible($C`%s`, await luaL_checklstring(L, 1, null));
+        await impossible($C`%s`, await luaL_checkstring(L, 1));
     } else {
         await nhl_error(L, $C`Wrong args`);
     }
@@ -545,7 +547,7 @@ async function nhl_impossible(L) {   // nhlua.c:622
 async function nhl_pline(L) {   // nhlua.c:636
     const argc = lua_gettop(L);
     if (argc === 1 || argc === 2) {
-        await pline($C`%s`, await luaL_checklstring(L, 1, null));
+        await pline($C`%s`, await luaL_checkstring(L, 1));
         if (lua_toboolean(L, 2)) {
             await display_nhwindow()($G.WIN_MESSAGE, TRUE);   /* --more-- */
         }
@@ -562,7 +564,7 @@ async function nhl_pline(L) {   // nhlua.c:636
 async function nhl_verbalize(L) {   // nhlua.c:652
     const argc = lua_gettop(L);
     if (argc === 1) {
-        await verbalize($C`%s`, await luaL_checklstring(L, 1, null));
+        await verbalize($C`%s`, await luaL_checkstring(L, 1));
     } else {
         await nhl_error(L, $C`Wrong args`);
     }
@@ -576,7 +578,7 @@ async function nhl_verbalize(L) {   // nhlua.c:652
 async function nhl_parse_config(L) {   // nhlua.c:666
     const argc = lua_gettop(L);
     if (argc === 1) {
-        await parse_conf_str(await luaL_checklstring(L, 1, null), parse_config_line);
+        await parse_conf_str(await luaL_checkstring(L, 1), parse_config_line);
     } else {
         await nhl_error(L, $C`Wrong args`);
     }
@@ -590,7 +592,7 @@ async function nhl_parse_config(L) {   // nhlua.c:666
 async function nhl_get_config(L) {   // nhlua.c:680
     const argc = lua_gettop(L);
     if (argc === 1) {
-        await lua_pushstring(L, await get_option_value(await luaL_checklstring(L, 1, null), TRUE));
+        await lua_pushstring(L, await get_option_value(await luaL_checkstring(L, 1), TRUE));
         return 1;
     } else {
         await nhl_error(L, $C`Wrong args`);
@@ -608,7 +610,7 @@ async function nhl_getlin(L) {   // nhlua.c:697
     let buf = new Int8Array(256);
     const argc = lua_gettop(L);
     if (argc === 1) {
-        const prompt = await luaL_checklstring(L, 1, null);
+        const prompt = await luaL_checkstring(L, 1);
         await getlin(prompt, new $c.Ptr(buf, 0));
         await lua_pushstring(L, new $c.Ptr(buf, 0));
         return 1;
@@ -641,9 +643,9 @@ async function nhl_menu(L) {   // nhlua.c:723
         /*NOTREACHED*/
         return 0;
     }
-    const prompt = await luaL_checklstring(L, 1, null);
+    const prompt = await luaL_checkstring(L, 1);
     if (lua_isstring(L, 2)) {
-        defval = await luaL_checklstring(L, 2, null);
+        defval = await luaL_checkstring(L, 2);
     }
     if (lua_isstring(L, 3)) {
         pick = await luaL_checkoption(L, 3, $C`one`, new $c.Ptr(nhl_menu$pickX, 0));
@@ -656,26 +658,26 @@ async function nhl_menu(L) {   // nhlua.c:723
         let str = $C``;
         let key = $C``;
         /* key @ index -2, value @ index -1 */
-        if (lua_type(L, -1) === LUA.TTABLE) {
+        if (lua_istable(L, -1)) {
             await lua_pushstring(L, $C`key`);
             await lua_gettable(L, -2);
-            key = await lua_tolstring(L, -1, null);
-            await lua_settop(L, -2);
+            key = await lua_tostring(L, -1);
+            await lua_pop(L, 1);
             await lua_pushstring(L, $C`text`);
             await lua_gettable(L, -2);
-            str = await lua_tolstring(L, -1, null);
-            await lua_settop(L, -2);
+            str = await lua_tostring(L, -1);
+            await lua_pop(L, 1);
             /* TODO: glyph, attr, accel, group accel (all optional) */
         } else if (lua_isstring(L, -1)) {
-            str = await luaL_checklstring(L, -1, null);
-            key = await luaL_checklstring(L, -2, null);
+            str = await luaL_checkstring(L, -1);
+            key = await luaL_checkstring(L, -2);
         }
         any.$copyFrom(cg.zeroany);
         if (key.get(0)) {
             any.a_char = key.get(0);
         }
         await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, str, defval.get(0) && key.get(0) && defval.get(0) === key.get(0) ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
-        await lua_settop(L, -2);   /* removes 'value'; keeps 'key' for next iteration */
+        await lua_pop(L, 1);   /* removes 'value'; keeps 'key' for next iteration */
     }
     await end_menu()(tmpwin, prompt);
     const pick_cnt = await select_menu(tmpwin, pick, new $c.Ptr(picks, 0));
@@ -708,7 +710,7 @@ async function nhl_text(L) {   // nhlua.c:812
         const tmpwin = await create_nhwindow()(NHW.MENU);
         await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
         while (lua_gettop(L) > 0) {
-            const ostr = await dupstr(await luaL_checklstring(L, 1, null));
+            const ostr = await dupstr(await luaL_checkstring(L, 1));
             let str = ostr;
             const lstr = str.add($c.idx($c.strlen(str))).add(-1);
             do {
@@ -728,7 +730,7 @@ async function nhl_text(L) {   // nhlua.c:812
                 await add_menu_str(tmpwin, str);
                 str = ptr.add(1);
             } while (str.get(0) && $c.pcmp(str, lstr) <= 0);
-            await lua_settop(L, -2);
+            await lua_pop(L, 1);
             $c.free(ostr);
         }
         await end_menu()(tmpwin, null);
@@ -745,7 +747,7 @@ async function nhl_text(L) {   // nhlua.c:812
 async function nhl_makeplural(L) {   // nhlua.c:857
     const argc = lua_gettop(L);
     if (argc === 1) {
-        await lua_pushstring(L, await makeplural(await luaL_checklstring(L, 1, null)));
+        await lua_pushstring(L, await makeplural(await luaL_checkstring(L, 1)));
     } else {
         await nhl_error(L, $C`Wrong args`);
     }
@@ -759,7 +761,7 @@ async function nhl_makeplural(L) {   // nhlua.c:857
 async function nhl_makesingular(L) {   // nhlua.c:871
     const argc = lua_gettop(L);
     if (argc === 1) {
-        await lua_pushstring(L, await makesingular(await luaL_checklstring(L, 1, null)));
+        await lua_pushstring(L, await makesingular(await luaL_checkstring(L, 1)));
     } else {
         await nhl_error(L, $C`Wrong args`);
     }
@@ -773,7 +775,7 @@ async function nhl_makesingular(L) {   // nhlua.c:871
 async function nhl_s_suffix(L) {   // nhlua.c:885
     const argc = lua_gettop(L);
     if (argc === 1) {
-        await lua_pushstring(L, s_suffix(await luaL_checklstring(L, 1, null)));
+        await lua_pushstring(L, s_suffix(await luaL_checkstring(L, 1)));
     } else {
         await nhl_error(L, $C`Wrong args`);
     }
@@ -787,7 +789,7 @@ async function nhl_s_suffix(L) {   // nhlua.c:885
 async function nhl_ing_suffix(L) {   // nhlua.c:899
     const argc = lua_gettop(L);
     if (argc === 1) {
-        await lua_pushstring(L, ing_suffix(await luaL_checklstring(L, 1, null)));
+        await lua_pushstring(L, ing_suffix(await luaL_checkstring(L, 1)));
     } else {
         await nhl_error(L, $C`Wrong args`);
     }
@@ -801,7 +803,7 @@ async function nhl_ing_suffix(L) {   // nhlua.c:899
 async function nhl_an(L) {   // nhlua.c:913
     const argc = lua_gettop(L);
     if (argc === 1) {
-        await lua_pushstring(L, await an(await luaL_checklstring(L, 1, null)));
+        await lua_pushstring(L, await an(await luaL_checkstring(L, 1)));
     } else {
         await nhl_error(L, $C`Wrong args`);
     }
@@ -979,7 +981,7 @@ async function nhl_is_genocided(L) {   // nhlua.c:1124
     let mgend = Int32Array.of(0);
     const argc = lua_gettop(L);
     if (argc === 1) {
-        const paramstr = await luaL_checklstring(L, 1, null);
+        const paramstr = await luaL_checkstring(L, 1);
         const i = await name_to_mon(paramstr, new $c.Ptr(mgend, 0));
         lua_pushboolean(L, i !== NON_PM && svm.mvitals[i].mvflags & G_GENOD ? TRUE : FALSE);
     } else {
@@ -1000,7 +1002,7 @@ async function nhl_get_debug_themerm_name(L) {   // nhlua.c:1147
     if (argc === 1) {
         let dbg_themerm = null;
         const is_fill = $c.i8(lua_toboolean(L, 1));
-        await lua_settop(L, -2);
+        await lua_pop(L, 1);
         if (wizard()) {
             dbg_themerm = $c.getenv(is_fill ? $C`THEMERMFILL` : $C`THEMERM`);
         }
@@ -1023,7 +1025,7 @@ async function nhl_get_debug_themerm_name(L) {   // nhlua.c:1147
 export async function get_table_int(L, name) {   // nhlua.c:1171
     await lua_getfield(L, -1, name);
     const ret = $c.i32(await luaL_checkinteger(L, -1));
-    await lua_settop(L, -2);
+    await lua_pop(L, 1);
     return ret;
 }
 /* get optional integer value from table */
@@ -1036,10 +1038,10 @@ export async function get_table_int(L, name) {   // nhlua.c:1171
 export async function get_table_int_opt(L, name, defval) {   // nhlua.c:1183
     let ret = defval;
     await lua_getfield(L, -1, name);
-    if (!(lua_type(L, -1) === LUA.TNIL)) {
+    if (!lua_isnil(L, -1)) {
         ret = $c.i32(await luaL_checkinteger(L, -1));
     }
-    await lua_settop(L, -2);
+    await lua_pop(L, 1);
     return ret;
 }
 /**
@@ -1049,8 +1051,8 @@ export async function get_table_int_opt(L, name, defval) {   // nhlua.c:1183
  */
 export async function get_table_str(L, name) {   // nhlua.c:1196
     await lua_getfield(L, -1, name);
-    const ret = await dupstr(await luaL_checklstring(L, -1, null));
-    await lua_settop(L, -2);
+    const ret = await dupstr(await luaL_checkstring(L, -1));
+    await lua_pop(L, 1);
     return ret;
 }
 /* get optional string value from table.
@@ -1066,18 +1068,18 @@ export async function get_table_str_opt(L, name, defval) {   // nhlua.c:1209
     await lua_getfield(L, -1, name);
     const ltyp = lua_type(L, -1);
     if (ltyp === LUA.TSTRING || ltyp === LUA.TNIL) {
-        ret = await luaL_optlstring(L, -1, defval, null);
+        ret = await luaL_optstring(L, -1, defval);
     } else if (ltyp === LUA.TFUNCTION) {
         await nhl_pcall_handle(L, 0, 1, $C`get_table_str_opt`, NHLpa.panic);
-        ret = await luaL_optlstring(L, -1, defval, null);
+        ret = await luaL_optstring(L, -1, defval);
     } else {
         await nhl_error(L, $C`get_table_str_opt: no string`);
     }
     if (ret) {
-        await lua_settop(L, -2);
+        await lua_pop(L, 1);
         return await dupstr(ret);
     }
-    await lua_settop(L, -2);
+    await lua_pop(L, 1);
     return null;
 }
 /**
@@ -1101,7 +1103,7 @@ export async function get_table_boolean(L, name) {   // nhlua.c:1233
             ret = -1;
         }
     }
-    await lua_settop(L, -2);
+    await lua_pop(L, 1);
     if (ret === -1) {
         await nhl_error(L, $C`Expected a boolean`);
     }
@@ -1117,10 +1119,10 @@ export async function get_table_boolean_opt(L, name, defval) {   // nhlua.c:1261
     const ret = defval;
     await lua_getfield(L, -1, name);
     if (lua_type(L, -1) !== LUA.TNIL) {
-        await lua_settop(L, -2);
+        await lua_pop(L, 1);
         return await get_table_boolean(L, name);
     }
-    await lua_settop(L, -2);
+    await lua_pop(L, 1);
     return ret;
 }
 /* opts[] is a null-terminated list */
@@ -1134,7 +1136,7 @@ export async function get_table_boolean_opt(L, name, defval) {   // nhlua.c:1261
 export async function get_table_option(L, name, defval, opts) {   // nhlua.c:1276
     await lua_getfield(L, -1, name);
     const ret = await luaL_checkoption(L, -1, defval, opts);
-    await lua_settop(L, -2);
+    await lua_pop(L, 1);
     return ret;
 }
 /* local fname = dump_fmtstr("/tmp/nethack.%n.%d.log"); */
@@ -1226,22 +1228,22 @@ async function nhl_variable(L) {   // nhlua.c:1375
         return 0;
     }
     if (argc === 1) {
-        key = await luaL_checklstring(L, 1, null);
+        key = await luaL_checkstring(L, 1);
         await lua_getfield(gl.luacore, -1, key);
         typ = lua_type(gl.luacore, -1);
         if (typ === LUA.TSTRING) {
-            await lua_pushstring(L, await lua_tolstring(gl.luacore, -1, null));
+            await lua_pushstring(L, await lua_tostring(gl.luacore, -1));
         } else if (typ === LUA.TNIL) {
             lua_pushnil(L);
         } else if (typ === LUA.TBOOLEAN) {
             lua_pushboolean(L, lua_toboolean(gl.luacore, -1));
         } else if (typ === LUA.TNUMBER) {
-            lua_pushinteger(L, lua_tointegerx(gl.luacore, -1, null));
+            lua_pushinteger(L, lua_tointeger(gl.luacore, -1));
         } else if (typ === LUA.TTABLE) {
             await lua_getglobal(gl.luacore, $C`nh_get_variables_string`);
             lua_pushvalue(gl.luacore, -2);
             await nhl_pcall_handle(gl.luacore, 1, 1, $C`nhl_variable`, NHLpa.panic);
-            await luaL_loadstring(L, await lua_tolstring(gl.luacore, -1, null));
+            await luaL_loadstring(L, await lua_tostring(gl.luacore, -1));
             await nhl_pcall_handle(L, 0, 1, $C`nhl_variable-1`, NHLpa.panic);
         } else {
             await nhl_error(L, $C`Cannot get variable of that type`);
@@ -1250,11 +1252,11 @@ async function nhl_variable(L) {   // nhlua.c:1375
     } else if (argc === 2) {
         /* set nh_lua_variables[key] = value;
            nh.variable("key", value); */
-        key = await luaL_checklstring(L, 1, null);
+        key = await luaL_checkstring(L, 1);
         //pline("SETVAR:%s", key);
         typ = lua_type(L, -1);
         if (typ === LUA.TSTRING) {
-            await lua_pushstring(gl.luacore, await lua_tolstring(L, -1, null));
+            await lua_pushstring(gl.luacore, await lua_tostring(L, -1));
             await lua_setfield(gl.luacore, -2, key);
         } else if (typ === LUA.TNIL) {
             lua_pushnil(gl.luacore);
@@ -1263,14 +1265,14 @@ async function nhl_variable(L) {   // nhlua.c:1375
             lua_pushboolean(gl.luacore, lua_toboolean(L, -1));
             await lua_setfield(gl.luacore, -2, key);
         } else if (typ === LUA.TNUMBER) {
-            lua_pushinteger(gl.luacore, lua_tointegerx(L, -1, null));
+            lua_pushinteger(gl.luacore, lua_tointeger(L, -1));
             await lua_setfield(gl.luacore, -2, key);
         } else if (typ === LUA.TTABLE) {
             await lua_getglobal(L, $C`nh_set_variables_string`);
             await lua_pushstring(L, key);
             lua_pushvalue(L, -3);   /* copy value to top */
             await nhl_pcall_handle(L, 2, 1, $C`nhl_variable-2`, NHLpa.panic);
-            await luaL_loadstring(gl.luacore, await lua_tolstring(L, -1, null));
+            await luaL_loadstring(gl.luacore, await lua_tostring(L, -1));
             await nhl_pcall_handle(gl.luacore, 0, 0, $C`nhl_variable-3`, NHLpa.panic);
         } else {
             await nhl_error(L, $C`Cannot set variable of that type`);
@@ -1297,9 +1299,9 @@ export async function get_nh_lua_variables() {   // nhlua.c:1451
         if (await nhl_pcall_handle(gl.luacore, 0, 1, $C`get_nh_lua_variables`, NHLpa.impossible)) {
             return key;
         }
-        key = await dupstr(await lua_tolstring(gl.luacore, -1, null));
+        key = await dupstr(await lua_tostring(gl.luacore, -1));
     }
-    await lua_settop(gl.luacore, -2);
+    await lua_pop(gl.luacore, 1);
     return key;
 }
 /* !SFCTOOL */
@@ -1315,8 +1317,8 @@ export async function save_luadata(nhfp) {   // nhlua.c:1482
         lua_data = await dupstr(new $c.Ptr(emptystr, 0));
     }
     lua_data_len[0] = await Strlen_(lua_data, $C`save_luadata`, 1491) + 1 >>> 0;   /* +1: include the terminator */
-    await sfo_unsigned(nhfp, new $c.Ptr(lua_data_len, 0), $C`luadata-lua_data_len`);
-    await sfo_char(nhfp, lua_data, $C`luadata`, lua_data_len[0] | 0);
+    await Sfo_unsigned(nhfp, new $c.Ptr(lua_data_len, 0), $C`luadata-lua_data_len`);
+    await Sfo_char(nhfp, lua_data, $C`luadata`, lua_data_len[0] | 0);
     $c.free(lua_data);
 }
 /* restore nh_lua_variables table from file */
@@ -1330,7 +1332,7 @@ export async function restore_luadata(nhfp) {   // nhlua.c:1499
     /* !SFCTOOL */
     await sfi_unsigned(nhfp, new $c.Ptr(lua_data_len, 0), $C`luadata-lua_data_len`);
     const lua_data = $c.asArr(await alloc(lua_data_len[0]), Int8Array);
-    await sfi_char(nhfp, lua_data, $C`luadata`, lua_data_len[0] | 0);
+    await Sfi_char(nhfp, lua_data, $C`luadata`, lua_data_len[0] | 0);
     if (!gl.luacore) {
         await l_nhcore_init();
     }
@@ -1393,7 +1395,7 @@ async function nhl_test(L) {   // nhlua.c:1554
 async function nhl_pushkey(L) {   // nhlua.c:1578
     const argc = lua_gettop(L);
     if (argc === 1) {
-        let key = await luaL_checklstring(L, 1, null);
+        let key = await luaL_checkstring(L, 1);
         while (key.get(0)) {
             await cmdq_add_key(CQ_CANNED, key.get(0));
             key = key.add(1);
@@ -1470,7 +1472,7 @@ async function nhl_flip_level(L) {   // nhlua.c:1663
     const argc = lua_gettop(L);
     let flp = 0;
     if (argc === 1) {
-        flp = $c.i32(lua_tointegerx(L, 1, null));
+        flp = $c.i32(lua_tointeger(L, 1));
     }
     await flip_level(flp, !gi.in_mklev ? 1 : 0);
     return 0;
@@ -1486,7 +1488,7 @@ async function nhl_timer_has_at(L) {   // nhlua.c:1682
     let lx = [0], ly = [0], x = Int16Array.of(0), y = Int16Array.of(0);
     let ret = FALSE;
     const timertype = await nhl_get_timertype(L, -1);
-    await lua_settop(L, -2);   /* remove timertype */
+    await lua_pop(L, 1);   /* remove timertype */
     if (!await nhl_get_xy_params(L, new $c.Ptr(lx, 0), new $c.Ptr(ly, 0))) {
         await nhl_error(L, $C`nhl_timer_has_at: Wrong args`);
         /*NOTREACHED*/
@@ -1513,7 +1515,7 @@ async function nhl_timer_peek_at(L) {   // nhlua.c:1713
     let lx = [0], ly = [0], x = Int16Array.of(0), y = Int16Array.of(0);
     let when = 0;
     const timertype = await nhl_get_timertype(L, -1);
-    await lua_settop(L, -2);   /* remove timertype */
+    await lua_pop(L, 1);   /* remove timertype */
     if (!await nhl_get_xy_params(L, new $c.Ptr(lx, 0), new $c.Ptr(ly, 0))) {
         await nhl_error(L, $C`nhl_timer_peek_at: Wrong args`);
         /*NOTREACHED*/
@@ -1538,7 +1540,7 @@ async function nhl_timer_peek_at(L) {   // nhlua.c:1713
 async function nhl_timer_stop_at(L) {   // nhlua.c:1741
     let lx = [0], ly = [0], x = Int16Array.of(0), y = Int16Array.of(0);
     const timertype = await nhl_get_timertype(L, -1);
-    await lua_settop(L, -2);   /* remove timertype */
+    await lua_pop(L, 1);   /* remove timertype */
     if (!await nhl_get_xy_params(L, new $c.Ptr(lx, 0), new $c.Ptr(ly, 0))) {
         await nhl_error(L, $C`nhl_timer_stop_at: Wrong args`);
         /*NOTREACHED*/
@@ -1561,8 +1563,8 @@ async function nhl_timer_stop_at(L) {   // nhlua.c:1741
 async function nhl_timer_start_at(L) {   // nhlua.c:1766
     let lx = [0], ly = [0], x = Int16Array.of(0), y = Int16Array.of(0);
     const timertype = await nhl_get_timertype(L, -2);
-    const when = lua_tointegerx(L, -1, null);
-    await lua_settop(L, -3);   /* remove when and timertype */
+    const when = lua_tointeger(L, -1);
+    await lua_pop(L, 2);   /* remove when and timertype */
     if (!await nhl_get_xy_params(L, new $c.Ptr(lx, 0), new $c.Ptr(ly, 0))) {
         await nhl_error(L, $C`nhl_timer_start_at: Wrong args`);
         /*NOTREACHED*/
@@ -1588,7 +1590,7 @@ async function nhl_timer_start_at(L) {   // nhlua.c:1766
 async function nhl_get_cmd_key(L) {   // nhlua.c:1798
     const argc = lua_gettop(L);
     if (argc === 1) {
-        const cmd = await luaL_checklstring(L, 1, null);
+        const cmd = await luaL_checkstring(L, 1);
         const key = await cmd_from_ecname(cmd);
         await lua_pushstring(L, key);
         return 1;
@@ -1614,12 +1616,12 @@ async function nhl_callback(L) {   // nhlua.c:1818
     if (argc === 2 || argc === 3) {
         if (argc === 2) {
             rm = FALSE;
-            fn = await luaL_checklstring(L, -1, null);
-            cb = await luaL_checklstring(L, -2, null);
+            fn = await luaL_checkstring(L, -1);
+            cb = await luaL_checkstring(L, -2);
         } else {
             rm = $c.i8(lua_toboolean(L, -1));
-            fn = await luaL_checklstring(L, -2, null);
-            cb = await luaL_checklstring(L, -3, null);
+            fn = await luaL_checkstring(L, -2);
+            cb = await luaL_checkstring(L, -3);
         }
         for (i = 0; i < NUM_NHCB; i = i + 1 | 0) {
             if (!$c.strcmp(cb, nhcb_name[i])) {
@@ -1827,7 +1829,7 @@ function nhl_push_anything(L, anytype, src) {   // nhlua.c:2094
  */
 async function nhl_meta_u_index(L) {   // nhlua.c:2118
     let i = 0;
-    const tkey = await luaL_checklstring(L, 2, null);
+    const tkey = await luaL_checkstring(L, 2);
     /* FIXME: doesn't really work, eg. negative values for u.dx */
     for (i = 0; i < 24; i = i + 1 | 0) {
         if (!$c.strcmp(tkey, nhl_meta_u_index$ustruct[i].name)) {
@@ -1905,7 +1907,7 @@ async function init_u_data(L) {   // nhlua.c:2217
  * @returns {Promise<number>} int
  */
 async function traceback_handler(L) {   // nhlua.c:2246
-    await luaL_traceback(L, L, await lua_tolstring(L, 1, null), 0);
+    await luaL_traceback(L, L, await lua_tostring(L, 1), 0);
     /* TODO: call impossible() if fuzzing? */
     return 1;
 }
@@ -1930,7 +1932,7 @@ export async function nhl_pcall(L, nargs, nresults, name) {   // nhlua.c:2263
     let nud = [null], rv = 0, ic = 0, $t1;
     try {
         await lua_pushcclosure(L, traceback_handler, 0);
-        lua_rotate(L, 1, 1);
+        lua_insert(L, 1);
         lua_getallocf(L, new $c.Ptr(nud, 0));
         if (nud[0] && name) {
             nud[0].name = name;
@@ -1943,8 +1945,8 @@ export async function nhl_pcall(L, nargs, nresults, name) {   // nhlua.c:2263
             }
             $t1 = new $c.Ptr(nud[0].jb, 0), $c.setjmp($t1);   // setjmp: armed; a longjmp here runs the handler at the end of the function
         }
-        rv = await lua_pcallk(L, nargs, nresults, 1, 0, null);
-        lua_rotate(L, 1, -1), await lua_settop(L, -2);   /* remove handler */
+        rv = await lua_pcall(L, nargs, nresults, 1);
+        await lua_remove(L, 1);   /* remove handler */
         if (nud[0] && nud[0].perpcall && gl.loglua) {
             ic = Math.imul(nud[0].statctr, NHL_SB.STEPSIZE) >>> 0;   // an approximation
             await livelog_printf(LL.DEBUG, $C`LUASTATS PCAL %d:%s %ld`, nud[0].sid, nud[0].name, ic);
@@ -1976,13 +1978,13 @@ export async function nhl_pcall_handle(L, nargs, nresults, name, npa) {   // nhl
         /* XXX can we get a lua stack trace as well? */
         switch (npa) {
             case NHLpa.panic:
-                await panic($C`Lua error %d:%s %s`, nud[0].sid, nud[0].name ? nud[0].name : $C`(unknown)`, await lua_tolstring(L, -1, null));
+                await panic($C`Lua error %d:%s %s`, nud[0].sid, nud[0].name ? nud[0].name : $C`(unknown)`, await lua_tostring(L, -1));
                 /*NOTREACHED*/
                 break;
             case NHLpa.impossible:
-                await impossible($C`Lua error: %d:%s %s`, nud[0].sid, nud[0].name ? nud[0].name : $C`(unknown)`, await lua_tolstring(L, -1, null));
+                await impossible($C`Lua error: %d:%s %s`, nud[0].sid, nud[0].name ? nud[0].name : $C`(unknown)`, await lua_tostring(L, -1));
                 /* Drop the error.  If the caller cares, use nhl_pcall(). */
-                await lua_settop(L, -2);
+                await lua_pop(L, 1);
         }
     }
     return rv;
@@ -2077,7 +2079,7 @@ export async function nhl_loadlua(L, fname) {   // nhlua.c:2338
         $c.fclose(fh);
         llret = await luaL_loadbufferx(L, buf, $c.strlen(buf), altfname, null);
         if (llret !== LUA.OK) {
-            await impossible($C`luaL_loadbuffer: Error loading %s: %s`, altfname, await lua_tolstring(L, -1, null));
+            await impossible($C`luaL_loadbuffer: Error loading %s: %s`, altfname, await lua_tostring(L, -1));
             ret = FALSE;
             break give_up$;
         } else {
@@ -2403,26 +2405,26 @@ async function nhlL_openlibs(L, lflags) {   // nhlua.c:3000
         await nhl_clearfromtable(L, !!((lflags & NHL_SB.BASE_META) >>> 0) ? 1 : 0, baselib, ct_base_meta[0]);
         await nhl_clearfromtable(L, !!((lflags & NHL_SB.BASE_GC) >>> 0) ? 1 : 0, baselib, ct_base_iffy[0]);
         await nhl_clearfromtable(L, !!((lflags & NHL_SB.BASE_UNSAFE) >>> 0) ? 1 : 0, baselib, ct_base_unsafe[0]);
-        await lua_settop(L, -2);
+        await lua_pop(L, 1);
     }
     if ((lflags & NHL_SB.COROUTINE) >>> 0) {
         await luaL_requiref(L, $C`coroutine`, luaopen_coroutine, 1);
-        await lua_settop(L, -2);
+        await lua_pop(L, 1);
     }
     if ((lflags & NHL_SB.TABLE) >>> 0) {
         await luaL_requiref(L, $C`table`, luaopen_table, 1);
-        await lua_settop(L, -2);
+        await lua_pop(L, 1);
     }
     if ((lflags & NHL_SB.OSMASK) >>> 0) {
         await luaL_requiref(L, $C`os`, luaopen_os, 1);
         const oslib = lua_gettop(L);
         await nhl_clearfromtable(L, !!((lflags & NHL_SB.OS_TIME) >>> 0) ? 1 : 0, oslib, ct_os_time[0]);
         await nhl_clearfromtable(L, !!((lflags & NHL_SB.OS_FILES) >>> 0) ? 1 : 0, oslib, ct_os_files[0]);
-        await lua_settop(L, -2);
+        await lua_pop(L, 1);
     }
     if ((lflags & NHL_SB.STRING) >>> 0) {
         await luaL_requiref(L, $C`string`, luaopen_string, 1);
-        await lua_settop(L, -2);
+        await lua_pop(L, 1);
     }
     if ((lflags & NHL_SB.MATH) >>> 0) {
         await luaL_requiref(L, $C`math`, luaopen_math, 1);
@@ -2435,21 +2437,21 @@ async function nhlL_openlibs(L, lflags) {   // nhlua.c:3000
                 const seed = $c.strtoul(env_seed, null, 10);
                 await lua_getfield(L, -1, $C`randomseed`);
                 lua_pushinteger(L, $c.i64(seed));
-                await lua_callk(L, 1, 0, 0, null);
+                await lua_call(L, 1, 0);
             }
         }
-        await lua_settop(L, -2);
+        await lua_pop(L, 1);
     }
     if ((lflags & NHL_SB.UTF8) >>> 0) {
         await luaL_requiref(L, $C`utf8`, luaopen_utf8, 1);
-        await lua_settop(L, -2);
+        await lua_pop(L, 1);
     }
     if ((lflags & NHL_SB.DBMASK) >>> 0) {
         await luaL_requiref(L, $C`debug`, luaopen_debug, 1);
         const dblib = lua_gettop(L);
         await nhl_clearfromtable(L, !!((lflags & NHL_SB.DB_DB) >>> 0) ? 1 : 0, dblib, ct_debug_debug[0]);
         await nhl_clearfromtable(L, !!((lflags & NHL_SB.DB_SAFE) >>> 0) ? 1 : 0, dblib, ct_debug_safe[0]);
-        await lua_settop(L, -2);
+        await lua_pop(L, 1);
     }
 }
 /**
@@ -2457,7 +2459,7 @@ async function nhlL_openlibs(L, lflags) {   // nhlua.c:3000
  * @returns {Promise<number>} int
  */
 async function nhl_panic(L) {   // nhlua.c:3155
-    let msg = await lua_tolstring(L, -1, null);
+    let msg = await lua_tostring(L, -1);
     if ($c.peq(msg, $c.asArr(null, Int8Array))) {
         msg = $C`error object is not a string`;
     }

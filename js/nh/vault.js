@@ -26,6 +26,7 @@ import { debugcore } from './files.js';
 import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
 import { in_rooms, money_cnt, nomul, unmul } from './hack.js';
 import { ARTICLE, MM, RLOC, VAULT_GUARD_TIME } from './hack.h.js';
+import { distu } from './hack.macros.js';
 import { dist2, mungspaces, strncmpi, upstart } from './hacklib.js';
 import { currency, freeinv, g_at, sobj_at, stackobj } from './invent.js';
 import { makemon, newmextra, set_malign } from './makemon.js';
@@ -36,7 +37,7 @@ import { ROOMOFFSET, VAULT } from './mkroom.h.js';
 import { m_into_limbo, mnexto, mongone, mpickgold, setmangry } from './mon.js';
 import { pronoun_gender, sticks } from './mondata.js';
 import { is_silent } from './mondata.macros.js';
-import { FEMALE, M1, MALE } from './monflag.h.js';
+import { FEMALE, MALE } from './monflag.h.js';
 import { mon_track_clear } from './monmove.js';
 import { mons } from './monst.js';
 import { M_AP, NEED } from './monst.h.js';
@@ -48,7 +49,7 @@ import { objects } from './objects.js';
 import { BOULDER, GOLD_PIECE, ROCK, TIN_WHISTLE } from './objects.h.js';
 import { an, makeplural, mimic_obj_name, simpleonames } from './objnam.js';
 import { You, You_hear, You_see, Your, impossible, pline, pline_The, verbalize } from './pline.js';
-import { BLINDED, INVIS } from './prop.h.js';
+import { BLINDED } from './prop.h.js';
 import { BLCORNER, BRCORNER, CORR, D, DBWALL, DOOR, HWALL, POOL, ROOM, SCORR, STONE, TLCORNER, TRCORNER, VWALL } from './rm.h.js';
 import { ACCESSIBLE, IS_POOL, IS_ROOM, IS_STWALL, IS_WALL, MON_AT, remove_monster } from './rm.macros.js';
 import { rn2 } from './rnd.js';
@@ -63,7 +64,7 @@ import { MELT_ICE_AWAY } from './timeout.h.js';
 import { deltrap, t_at } from './trap.js';
 import { block_point, recalc_block_point, unblock_point } from './vision.js';
 import { COULD_SEE, IN_SIGHT } from './vision.h.js';
-import { cansee, couldsee } from './vision.macros.js';
+import { cansee, couldsee, m_canseeu } from './vision.macros.js';
 import { mon_wield_item } from './weapon.js';
 import { getlin } from './windows.js';
 import { PRONOUN } from './you.h.js';
@@ -816,7 +817,7 @@ async function gd_pick_corridor_gold(grd, goldx, goldy) {   // vault.c:752
                    to find the one meeting that criterium which is nearest
                    the guard's current location */
                 if (await enexto(newcc, $c.i16(goldx), $c.i16(goldy), grd.data)) {
-                    if ((newdelta = dist2(newcc.x, newcc.y, u.ux, u.uy)) < bestdelta || newdelta === bestdelta && dist2(newcc.x, newcc.y, $c.i16(guardx), $c.i16(guardy)) < dist2(bestcc.x, bestcc.y, $c.i16(guardx), $c.i16(guardy))) {
+                    if ((newdelta = distu(newcc.x, newcc.y)) < bestdelta || newdelta === bestdelta && dist2(newcc.x, newcc.y, $c.i16(guardx), $c.i16(guardy)) < dist2(bestcc.x, bestcc.y, $c.i16(guardx), $c.i16(guardy))) {
                         bestdelta = newdelta;
                         bestcc.$copyFrom(newcc);
                     }
@@ -1312,7 +1313,7 @@ export async function gd_sound() {   // vault.c:1272
  */
 export async function vault_gd_watching(activity) {   // vault.c:1278
     const guard = await findgd();
-    if (guard && guard.mx && guard.mcansee && ((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(guard.data.mflags1, M1.SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(guard.my).get(guard.mx) & COULD_SEE) !== 0)) {
+    if (guard && guard.mx && guard.mcansee && m_canseeu(guard)) {
         if (activity === GD.EATGOLD || activity === GD.DESTROYGOLD) {
             guard.mextra.egd.witness = (activity) & 3;
         }

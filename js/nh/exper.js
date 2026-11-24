@@ -16,22 +16,22 @@ import { S } from './defsym.h.js';
 import { done } from './end.js';
 import { FALSE, LARGEST_INT, LL, MAXULEV, TRUE } from './global.h.js';
 import { DIED, KILLED } from './hack.h.js';
+import { max, rn1 } from './hack.macros.js';
 import { achieve_rank, count_achievements, record_achievement } from './insight.js';
 import { monhp_per_lvl } from './makemon.js';
 import { AD, AT } from './monattk.h.js';
 import { resists_drli } from './mondata.js';
 import { extra_nasty } from './mondata.macros.js';
-import { M1 } from './monflag.h.js';
 import { mons } from './monst.js';
 import { PM } from './monsters.h.js';
 import { NATTK, NORMAL_SPEED } from './permonst.h.js';
 import { You_feel, livelog_printf, pline } from './pline.js';
 import { rehumanize } from './polyself.js';
-import { MAGICAL_BREATHING } from './prop.h.js';
 import { rn2, rnd } from './rnd.js';
 import { Goodbye } from './role.js';
 import { find_mac } from './worn.js';
-import { Upolyd } from './you.macros.js';
+import { Role_if, Upolyd } from './you.macros.js';
+import { Amphibious } from './youprop.macros.js';
 
 /**
  * @param {number} lev int
@@ -92,7 +92,7 @@ export function newpw() {   // exper.c:45
             enrnd = enrnd + (gu.urole.enadv.hirnd + gu.urace.enadv.hirnd) | 0;
             enfix = gu.urole.enadv.hifix + gu.urace.enadv.hifix;
         }
-        en = enermod(rn2(enrnd) + enfix | 0);
+        en = enermod(rn1(enrnd, enfix));
     }
     if (en <= 0) {
         en = 1;
@@ -104,7 +104,7 @@ export function newpw() {   // exper.c:45
         /* after level 30, throttle energy gains from extra experience;
            once max reaches 600, further increments will be just 1 more */
         let lim = $c.i8(4 - $c.div32(u.uenmax, 200) | 0);
-        lim = lim > 1 ? lim : 1;
+        lim = max(lim, 1);
         if (en > lim) {
             en = lim;
         }
@@ -156,7 +156,7 @@ export function experience(mtmp, nk) {   // exper.c:85
         if (ptr.mattk[i].damd * ptr.mattk[i].damn > 23) {
             tmp = tmp + mtmp.m_lev | 0;
         }
-        if (tmp2 === AD.WRAP && ptr.mlet === S.EEL && !(u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.AMPHIBIOUS) !== 0)) {
+        if (tmp2 === AD.WRAP && ptr.mlet === S.EEL && !Amphibious()) {
             tmp = tmp + 1000 | 0;
         }
     }
@@ -230,7 +230,7 @@ export async function more_experienced(exper, rexp) {   // exper.c:169
     if (newrexp !== oldrexp) {
         u.urexp = newrexp;
     }
-    if (u.urexp >= (gu.urole.mnum === PM.WIZARD ? 1000 : 2000)) {
+    if (u.urexp >= (Role_if(PM.WIZARD) ? 1000 : 2000)) {
         flags.beginner = FALSE;
     }
 }

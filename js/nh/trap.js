@@ -16,9 +16,9 @@ import { A } from './attrib.h.js';
 import { ACURR } from './attrib.macros.js';
 import { ballfall, drag_ball, move_bc, placebc, unplacebc } from './ball.js';
 import { bot, rank_of } from './botl.js';
-import { getdir, isok, xytodir, yn_function } from './cmd.js';
+import { getdir, isok, xytodir } from './cmd.js';
 import { destroy_drawbridge, find_drawbridge, is_drawbridge_wall, is_ice, is_lava, is_pool, is_pool_or_lava, is_waterwall } from './dbridge.js';
-import { c_common_strings, cg, disp, flags, ga, gb, gf, gi, gk, gl, gm, gn, go, gs, gt, gu, gv, gx, gy, iflags, materialnm, svc, svd, svk, svl, u, vowels, xdir, ydir, ynqchars } from './decl.js';
+import { c_common_strings, cg, disp, flags, ga, gb, gf, gi, gk, gl, gm, gn, go, gs, gt, gu, gv, gx, gy, iflags, materialnm, svc, svd, svk, svl, u, vowels, xdir, ydir } from './decl.js';
 import { POTION_CLASS, S, SCROLL_CLASS, SPBOOK_CLASS, WAND_CLASS } from './defsym.h.js';
 import { buried_ball, bury_an_obj, fillholetyp, liquid_flow, unearth_objs } from './dig.js';
 import { canseemon, curs_on_u, feel_newsym, map_invisible, map_trap, newsym, shieldeff, tmp_at, under_water } from './display.js';
@@ -32,7 +32,7 @@ import { down_gate, impact_drop, ship_object } from './dokick.js';
 import { defsyms } from './drawing.js';
 import { Can_fall_thru, In_hell, In_quest, assign_level, at_dgn_entrance, ceiling, depth, dunlev, dunlevs_in_dungeon, find_hell, get_level, has_ceiling, level_difficulty, on_level, single_level_branch, surface, u_on_newpos, update_lastseentyp } from './dungeon.js';
 import { MIGR } from './dungeon.h.js';
-import { In_endgame, In_sokoban } from './dungeon.macros.js';
+import { In_endgame, In_sokoban, Is_airlevel, Is_qlocate, Is_stronghold, Is_waterlevel } from './dungeon.macros.js';
 import { is_fainted, reset_faint } from './eat.js';
 import { done, panic } from './end.js';
 import { can_reach_floor, del_engr_at } from './engrave.js';
@@ -42,9 +42,10 @@ import { debugcore } from './files.js';
 import { PLNMSG } from './flag.h.js';
 import { discover, wizard } from './flag.macros.js';
 import { FALSE, LL, MAXULEV, TRUE } from './global.h.js';
+import { strcmpi } from './global.macros.js';
 import { bad_rock, calc_capacity, check_capacity, crawl_destination, in_rooms, inv_cnt, inv_weight, losehp, movobj, near_capacity, nomul, set_uinwater, spot_checks, spoteffects, test_move, u_locomotion, unmul, weight_cap } from './hack.js';
 import { ARM, ARTICLE, BOLT_LIM, BURNING, CORPSTAT, COST, CXN, DIR, DISMOUNT, DISSOLVED, DROWNING, ECMD, FAILEDUNTRAP, FINGER, FOOT, FORCEBUNGLE, FORCETRAP, GETOBJ, GETOBJ_PROMPT, HAND, HEAD, HURTLING, HVY_ENCUMBER, KILLED, LAUNCH, LEG, MAY, MAY_HIT, MM, NC, NO, NOTELL, NOWEBMSG, NO_KILLER_PREFIX, NO_NC_FLAGS, NO_PART, NO_TRAP_FLAGS, N_DIRS, POLY, RECURSIVETRAP, ROLL, SHOP, SLT_ENCUMBER, SPINE, STONING, SUPPRESS, TELEDS, TEST, TOOKPLUNGE, UNENCUMBERED, VIASITTING, VIS_EFFECTS, XKILL } from './hack.h.js';
-import { DIR_180, Maybe_Half_Phys, You1, distu, min, plur, ynq } from './hack.macros.js';
+import { DIR_180, Maybe_Half_Phys, You1, distu, makeknown, min, plur, rn1, ynq } from './hack.macros.js';
 import { copynchars, dist2, distmin, eos, lcase, nh_snprintf, ordin, s_suffix, sgn, strncmpi, strsubst, upstart } from './hacklib.js';
 import { carrying, consume_obj_charge, currency, delobj, getobj, nxtobj, prinv, sobj_at, stackobj, update_inventory, useup, useupall } from './invent.js';
 import { stumble_on_door_mimic } from './lock.js';
@@ -65,7 +66,7 @@ import { M_AP, M_SEEN } from './monst.h.js';
 import { DEADMONSTER, M_AP_TYPE, helpless, is_vampshifter, ismnum, resists_fire, resists_sleep, resists_ston } from './monst.macros.js';
 import { PM } from './monsters.h.js';
 import { hits_bars, linedup, m_carrying, ohitmon, thitu } from './mthrowu.js';
-import { discover_object, observe_object } from './o_init.js';
+import { observe_object } from './o_init.js';
 import { BURIED_TOO, CONTAINED_TOO, EF, ER, ERODE, MAX, OBJ } from './obj.h.js';
 import { Has_contents, Is_box, Is_container, Waterproof_container, bimanual, carried, has_omonst, has_oname, is_blade, is_plural, is_wet_towel, mcarried, stone_missile, u_wield_art } from './obj.macros.js';
 import { DRAGON_HIDE, IRON, NUM_OBJECTS } from './objclass.h.js';
@@ -79,7 +80,7 @@ import { encumber_msg, pickup } from './pickup.js';
 import { Norep, There, You, You_cant, You_feel, You_hear, You_see, Your, impossible, livelog_printf, pline, pline_The, pline_mon, pline_xy, set_msg_xy, urgent_pline } from './pline.js';
 import { body_part, float_vs_flight, mbodypart, polymon, polyself } from './polyself.js';
 import { incr_itimeout, make_blinded, make_hallucinated, make_stunned, self_invis_message, set_itimeout, split_mon } from './potion.js';
-import { CONFUSION, DEAF, FIRE_RES, FLYING, FROMOUTSIDE, HALF_PHDAM, HALLUC, HALLUC_RES, INVIS, I_SPECIAL, LEVITATION, MAGICAL_BREATHING, SLIMED, STUNNED, SWIMMING, TIMEOUT, W, WWALKING } from './prop.h.js';
+import { CONFUSION, DEAF, FIRE_RES, FLYING, FROMOUTSIDE, HALF_PHDAM, HALLUC, HALLUC_RES, INVIS, I_SPECIAL, LEVITATION, SLIMED, STUNNED, TIMEOUT, W, WWALKING } from './prop.h.js';
 import { is_quest_artifact, quest_info } from './questpgr.js';
 import { cant_revive, seffects, unpunish } from './read.js';
 import { create_gas_cloud } from './region.js';
@@ -107,8 +108,8 @@ import { mon_has_amulet } from './wizard.js';
 import { count_wsegs } from './worm.js';
 import { extract_from_minvent, find_mac, m_dowear, mon_adjust_speed, setnotworn, update_mon_extrinsics, which_armor } from './worn.js';
 import { TT, UTOTYPE } from './you.h.js';
-import { Luck, Upolyd, u_at } from './you.macros.js';
-import { Antimagic, BFlying, BLevitation, Blind, Deaf, Drain_resistance, EInvis, Fire_resistance, Free_action, Fumbling, HInvis, Half_physical_damage, Half_spell_damage, Halluc_resistance, Hallucination, Invis, Lev_at_will, Levitation, Lifesaved, Passes_walls, Punished, See_invisible, Shock_resistance, Sleep_resistance, Slimed, Stone_resistance, Teleport_control, Teleportation, Unaware, Unchanging, Underwater } from './youprop.macros.js';
+import { Luck, Role_if, Upolyd, m_next2u, u_at } from './you.macros.js';
+import { Amphibious, Antimagic, BFlying, BLevitation, Blind, Breathless, Deaf, Drain_resistance, EInvis, Fire_resistance, Flying, Free_action, Fumbling, HInvis, Half_physical_damage, Half_spell_damage, Halluc_resistance, Hallucination, Invis, Lev_at_will, Levitation, Lifesaved, Passes_walls, Punished, See_invisible, Shock_resistance, Sleep_resistance, Slimed, Stone_resistance, Swimming, Teleport_control, Teleportation, Unaware, Unchanging, Underwater, Wwalking } from './youprop.macros.js';
 import { blank_novel, burn_floor_objects, destroy_items, destroy_strings, fracture_rock, get_obj_location, inventory_resistance_check, melt_ice, montraits, obj_resists, poly_obj, resist } from './zap.js';
 
 const MINE_TRIGGER_WT = 400;
@@ -165,7 +166,7 @@ export async function burnarmor(victim) {   // trap.c:88
                     const mat_idx = objects[item.otyp].oc_material;
                     $c.sprintf(new $c.Ptr(buf, 0), $C`%s %s`, materialnm[mat_idx], helm_simple_name(item));
                 }
-                if (!await erode_obj(item, item ? new $c.Ptr(buf, 0) : $C`helmet`, ERODE.BURN, EF.GREASE)) {
+                if (!await burn_dmg(item, item ? new $c.Ptr(buf, 0) : $C`helmet`)) {
                     continue L1;
                 }
                 break;
@@ -182,24 +183,24 @@ export async function burnarmor(victim) {   // trap.c:88
                 }
                 item = hitting_u ? $G.uarmu : await which_armor(victim, W.ARMU);
                 if (item) {
-                    await erode_obj(item, $C`shirt`, ERODE.BURN, EF.GREASE);
+                    await burn_dmg(item, $C`shirt`);
                 }
                 return TRUE;
             case 2:
                 item = hitting_u ? $G.uarms : await which_armor(victim, W.ARMS);
-                if (!await erode_obj(item, $C`wooden shield`, ERODE.BURN, EF.GREASE)) {
+                if (!await burn_dmg(item, $C`wooden shield`)) {
                     continue L1;
                 }
                 break;
             case 3:
                 item = hitting_u ? $G.uarmg : await which_armor(victim, W.ARMG);
-                if (!await erode_obj(item, $C`gloves`, ERODE.BURN, EF.GREASE)) {
+                if (!await burn_dmg(item, $C`gloves`)) {
                     continue L1;
                 }
                 break;
             case 4:
                 item = hitting_u ? $G.uarmf : await which_armor(victim, W.ARMF);
-                if (!await erode_obj(item, $C`boots`, ERODE.BURN, EF.GREASE)) {
+                if (!await burn_dmg(item, $C`boots`)) {
                     continue L1;
                 }
                 break;
@@ -645,7 +646,7 @@ export async function fall_through(td, ftflags) {   // trap.c:602
     }
     if (Sokoban() && Can_fall_thru(u.uz)) {
         /* KMH -- You can't escape the Sokoban level traps */
-    } else if (Levitation() || u.ustuck || !Can_fall_thru(u.uz) && !svl.level.locations[u.ux][u.uy].candig || ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked || is_clinger(gy.youmonst.data) || ceiling_hider(gy.youmonst.data) && u.uundetected) && !((ftflags & TOOKPLUNGE) >>> 0)) {
+    } else if (Levitation() || u.ustuck || !Can_fall_thru(u.uz) && !svl.level.locations[u.ux][u.uy].candig || (Flying() || is_clinger(gy.youmonst.data) || ceiling_hider(gy.youmonst.data) && u.uundetected) && !((ftflags & TOOKPLUNGE) >>> 0)) {
         dont_fall = $C`don't fall in.`;
     } else if (gy.youmonst.data.msize >= MZ.HUGE) {
         dont_fall = $C`don't fit through.`;
@@ -662,16 +663,16 @@ export async function fall_through(td, ftflags) {   // trap.c:602
         }
         return;
     }
-    if (((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked || is_clinger(gy.youmonst.data)) && (ftflags & TOOKPLUNGE) >>> 0 && td && t) {
-        if ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) {
+    if ((Flying() || is_clinger(gy.youmonst.data)) && (ftflags & TOOKPLUNGE) >>> 0 && td && t) {
+        if (Flying()) {
             controlled_flight = TRUE;
         }
-        await You($C`%s down %s!`, (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked ? $C`swoop` : $C`deliberately drop`, t.ttyp === TRAPDOOR ? $C`through the trap door` : $C`into the gaping hole`);
+        await You($C`%s down %s!`, Flying() ? $C`swoop` : $C`deliberately drop`, t.ttyp === TRAPDOOR ? $C`through the trap door` : $C`into the gaping hole`);
     }
     if (new $c.Ptr(u.ushops, 0).get(0)) {
         await shopdig(1);
     }
-    if ((svd.dungeon_topology.d_stronghold_level.dlevel || svd.dungeon_topology.d_stronghold_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_stronghold_level)) {
+    if (Is_stronghold(u.uz)) {
         find_hell(dtmp);
     } else {
         if (t) {
@@ -691,7 +692,7 @@ export async function fall_through(td, ftflags) {   // trap.c:602
     if (!td) {
         $c.sprintf(new $c.Ptr(msgbuf, 0), $C`The hole in the %s above you closes up.`, ceiling(u.ux, u.uy));
     }
-    await schedule_goto(dtmp, !((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) ? UTOTYPE.FALLING : UTOTYPE.NONE, null, !td ? new $c.Ptr(msgbuf, 0) : null);
+    await schedule_goto(dtmp, !Flying() ? UTOTYPE.FALLING : UTOTYPE.NONE, null, !td ? new $c.Ptr(msgbuf, 0) : null);
 }
 /*
  * Animate the given statue.  May have been via shatter attempt, trap,
@@ -733,7 +734,7 @@ export async function animate_statue(statue, x, y, cause, fail_reason) {   // tr
     mnum[0] = statue.corpsenm;
     let mptr = $c.relem(mons, mnum[0]);
     let mon = null;
-    const historic = gu.urole.mnum === PM.ARCHEOLOGIST && (statue.spe & CORPSTAT.HISTORIC) !== 0 ? 1 : 0;
+    const historic = Role_if(PM.ARCHEOLOGIST) && (statue.spe & CORPSTAT.HISTORIC) !== 0 ? 1 : 0;
     let golem_xform = FALSE;
     if (cant_revive(new $c.Ptr(mnum, 0), TRUE, statue)) {
         /* mnum has changed; we won't be animating this statue as itself */
@@ -1011,13 +1012,13 @@ export function set_utrap(tim, typ) {   // trap.c:1030
  */
 export async function reset_utrap(msg) {   // trap.c:1045
     const was_Lev = Levitation() !== 0 ? 1 : 0;
-    const was_Fly = ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked ? 1 : 0) !== 0 ? 1 : 0;
+    const was_Fly = Flying() !== 0 ? 1 : 0;
     set_utrap(0, 0);
     if (msg) {
         if (!was_Lev && Levitation()) {
             await float_up();
         }
-        if (!was_Fly && ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked)) {
+        if (!was_Fly && Flying()) {
             await You($C`can fly.`);
         }
     }
@@ -1057,7 +1058,7 @@ function floor_trigger(ttyp) {   // trap.c:1061
 function check_in_air(mtmp, trflags) {   // trap.c:1086
     const is_you = mtmp === gy.youmonst ? 1 : 0;
     const plunged = (trflags & (TOOKPLUNGE | VIASITTING)) >>> 0 !== 0 ? 1 : 0;
-    return (trflags & HURTLING) >>> 0 !== 0 || (is_you ? Levitation() : is_floater(mtmp.data)) || (is_you ? (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked : is_flyer(mtmp.data)) && !plunged ? 1 : 0;
+    return (trflags & HURTLING) >>> 0 !== 0 || (is_you ? Levitation() : is_floater(mtmp.data)) || (is_you ? Flying() : is_flyer(mtmp.data)) && !plunged ? 1 : 0;
 }
 /* return TRUE if mtmp is wearing shoes made of iron (iron/kicking) */
 /**
@@ -1375,9 +1376,9 @@ async function trapeffect_sqky_board(mtmp, trap, trflags) {   // trap.c:1403
     tsnds[9] = se_squeak_A;
     tsnds[10] = se_squeak_B_flat;
     tsnds[11] = se_squeak_B;
-    const forcetrap = (trflags & FORCETRAP) >>> 0 !== 0 || (trflags & FAILEDUNTRAP) >>> 0 !== 0 || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked && (trflags & VIASITTING) >>> 0 !== 0 ? 1 : 0;
+    const forcetrap = (trflags & FORCETRAP) >>> 0 !== 0 || (trflags & FAILEDUNTRAP) >>> 0 !== 0 || Flying() && (trflags & VIASITTING) >>> 0 !== 0 ? 1 : 0;
     if (mtmp === gy.youmonst) {
-        if ((Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) && !forcetrap) {
+        if ((Levitation() || Flying()) && !forcetrap) {
             if (!Blind()) {
                 await seetrap(trap);
                 if (Hallucination()) {
@@ -1432,7 +1433,7 @@ async function trapeffect_bear_trap(mtmp, trap, trflags) {   // trap.c:1479
     const forcetrap = (trflags & FORCETRAP) >>> 0 !== 0 || (trflags & FAILEDUNTRAP) >>> 0 !== 0 || is_you && (trflags & VIASITTING) >>> 0 !== 0 ? 1 : 0;
     if (is_you) {
         const dmg = d(2, 4);
-        if ((Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) && !forcetrap) {
+        if ((Levitation() || Flying()) && !forcetrap) {
             return Trap.Effect_Finished;
         }
         await feeltrap(trap);
@@ -1444,7 +1445,7 @@ async function trapeffect_bear_trap(mtmp, trap, trflags) {   // trap.c:1479
             await pline($C`%s bear trap closes harmlessly over you.`, A_Your[trap.madeby_u]);
             return Trap.Effect_Finished;
         }
-        set_utrap((rn2(4) + 4 | 0) >>> 0, TT.BEARTRAP);
+        set_utrap(rn1(4, 4) >>> 0, TT.BEARTRAP);
         if (u.usteed) {
             await pline($C`%s bear trap closes on %s %s!`, A_Your[trap.madeby_u], s_suffix(await mon_nam(u.usteed)), await mbodypart(u.usteed, FOOT));
             if (await thitm(0, u.usteed, null, dmg, FALSE)) {
@@ -1458,7 +1459,7 @@ async function trapeffect_bear_trap(mtmp, trap, trflags) {   // trap.c:1479
             if (await wearing_iron_shoes(mtmp)) {
                 await pline($C`%s protects your leg.`, await Yname2($G.uarmf));
             } else {
-                await set_wounded_legs(rn2(2) ? W.RINGR : W.RINGL, rn2(10) + 10 | 0);
+                await set_wounded_legs(rn2(2) ? W.RINGR : W.RINGL, rn1(10, 10));
                 await losehp(Maybe_Half_Phys(dmg), $C`bear trap`, KILLED.BY_AN);
             }
         }
@@ -1780,7 +1781,7 @@ async function trapeffect_pit(mtmp, trap, trflags) {   // trap.c:1825
             steed_article = ARTICLE.NONE;
         }
         /* KMH -- You can't escape the Sokoban level traps */
-        if (!Sokoban() && (Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked && !plunged && !viasitting)) {
+        if (!Sokoban() && (Levitation() || Flying() && !plunged && !viasitting)) {
             return Trap.Effect_Finished;
         }
         await feeltrap(trap);
@@ -1816,7 +1817,7 @@ async function trapeffect_pit(mtmp, trap, trflags) {   // trap.c:1825
             }
         }
         /* wumpus reference */
-        if (gu.urole.mnum === PM.RANGER && !trap.madeby_u && !trap.once && In_quest(u.uz) && ((svd.dungeon_topology.d_qlocate_level.dlevel || svd.dungeon_topology.d_qlocate_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_qlocate_level))) {
+        if (Role_if(PM.RANGER) && !trap.madeby_u && !trap.once && In_quest(u.uz) && Is_qlocate(u.uz)) {
             await pline($C`Fortunately it has a bottom after all...`);
             trap.once = 1;
         } else if (u.umonnum === PM.PIT_VIPER || u.umonnum === PM.PIT_FIEND) {
@@ -1838,7 +1839,7 @@ async function trapeffect_pit(mtmp, trap, trflags) {   // trap.c:1825
          * show "you were trapped in a pit" during disclosure's display
          * of enlightenment, but hero is dying *before* becoming trapped.
          */
-        set_utrap((rn2(6) + 2 | 0) >>> 0, TT.PIT);
+        set_utrap(rn1(6, 2) >>> 0, TT.PIT);
         if (!await steedintrap(trap, null)) {
             if (relevant_spikes) {
                 const oldumort = u.umortality;
@@ -1854,7 +1855,7 @@ async function trapeffect_pit(mtmp, trap, trflags) {   // trap.c:1825
                 }
             } else {
                 /* plunging flyers take spike damage but not pit damage */
-                if (!conj_pit && !deliberate && !(plunged && ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked || is_clinger(gy.youmonst.data)))) {
+                if (!conj_pit && !deliberate && !(plunged && (Flying() || is_clinger(gy.youmonst.data)))) {
                     await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(adj_pit ? 3 : 6) + 1 | 0, 2) : rnd(adj_pit ? 3 : 6), plunged ? $C`deliberately plunged into a pit` : $C`fell into a pit`, NO_KILLER_PREFIX);
                 }
             }
@@ -2068,15 +2069,15 @@ async function trapeffect_web(mtmp, trap, trflags) {   // trap.c:2106
                 webmsgok = FALSE;   /* mintrap printed the messages */
             }
             if (str <= 3) {
-                tim = rn2(6) + 6 | 0;
+                tim = rn1(6, 6);
             } else if (str < 6) {
-                tim = rn2(6) + 4 | 0;
+                tim = rn1(6, 4);
             } else if (str < 9) {
-                tim = rn2(4) + 4 | 0;
+                tim = rn1(4, 4);
             } else if (str < 12) {
-                tim = rn2(4) + 2 | 0;
+                tim = rn1(4, 2);
             } else if (str < 15) {
-                tim = rn2(2) + 2 | 0;
+                tim = rn1(2, 2);
             } else if (str < 18) {
                 tim = rnd(2);
             } else if (str < 69) {
@@ -2424,7 +2425,7 @@ async function trapeffect_landmine(mtmp, trap, trflags) {   // trap.c:2528
         const forcebungle = (trflags & FORCEBUNGLE) >>> 0 !== 0 ? 1 : 0;
         let steed_mid = 0;
         let saddle = null;
-        if ((Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) && !forcetrap) {
+        if ((Levitation() || Flying()) && !forcetrap) {
             if (!already_seen && rn2(3)) {
                 return Trap.Effect_Finished;
             }
@@ -2451,8 +2452,8 @@ async function trapeffect_landmine(mtmp, trap, trflags) {   // trap.c:2528
             await steedintrap(trap, null);
             trapeffect_landmine$recursive_mine = FALSE;
             saddle = sobj_at(SADDLE, u.ux, u.uy);
-            await set_wounded_legs(W.RINGL, rn2(35) + 41 | 0);
-            await set_wounded_legs(W.RINGR, rn2(35) + 41 | 0);
+            await set_wounded_legs(W.RINGL, rn1(35, 41));
+            await set_wounded_legs(W.RINGR, rn1(35, 41));
             await exercise(A.DEX, FALSE);
         }
         /* add a pit before calling losehp so bones won't keep the landmine;
@@ -2679,7 +2680,7 @@ export async function immune_to_trap(mon, ttype) {   // trap.c:2783
             }
             if (is_floater(pm) || is_flyer(pm) || is_clinger(pm) && has_ceiling(u.uz)) {
                 return TRAP.CLEARLY_IMMUNE;
-            } else if (is_you && (Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked)) {
+            } else if (is_you && (Levitation() || Flying())) {
                 return TRAP.CLEARLY_IMMUNE;
             }
             return TRAP.NOT_IMMUNE;
@@ -3032,7 +3033,7 @@ export async function blow_up_landmine(trap) {   // trap.c:3172
     /* or could be null if scatter blew up oil which melted ice */
     /* convert landmine into pit */
     if (trap) {
-        if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) || (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) {
+        if (Is_waterlevel(u.uz) || Is_airlevel(u.uz)) {
             /* no pits here */
             await deltrap(trap);
         } else {
@@ -3444,7 +3445,7 @@ function find_random_launch_coord(ttmp, cc) {   // trap.c:3599
     if (ttmp.ttyp === ROLLING_BOULDER_TRAP) {
         mindist = 2;
     }
-    let distance = rn2(5) + 4 | 0;   /* 4..8 away */
+    let distance = rn1(5, 4);   /* 4..8 away */
     let tmp = rn2(N_DIRS);   /* randomly pick a direction to try first */
     while (distance >= mindist) {
         const dx = xdir[tmp];
@@ -3791,7 +3792,7 @@ export async function float_up() {   // trap.c:3937
         }
     } else if (Hallucination()) {
         await pline($C`Up, up, and awaaaay!  You're walking on air!`);
-    } else if ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) {
+    } else if (Is_airlevel(u.uz)) {
         await You($C`gain control over your movements.`);
     } else {
         await You($C`start to float in the air!`);
@@ -3804,7 +3805,7 @@ export async function float_up() {   // trap.c:3937
             await dismount_steed(DISMOUNT.GENERIC);
         }
     }
-    if ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) {
+    if (Flying()) {
         await You($C`are no longer able to control your flight.`);
     }
     float_vs_flight();   /* set BFlying, also BLevitation if still trapped */
@@ -3862,7 +3863,7 @@ export async function float_down(hmask, emask) {   // trap.c:4024
         float_vs_flight();
         /* clears BFlying & I_SPECIAL
          * unless hero is stuck in floor */
-        if ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) {
+        if (Flying()) {
             await You($C`have stopped levitating and are now flying.`);
             await encumber_msg();   /* carrying capacity might have changed */
             return 1;
@@ -3883,7 +3884,7 @@ export async function float_down(hmask, emask) {   // trap.c:4024
         gv.vision_full_recalc = 1;   /* in case the hero moved. */
     }
     /* check for falling into pool - added by GAN 10/20/86 */
-    if (!((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked)) {
+    if (!Flying()) {
         if (!u.uswallow && u.ustuck) {
             if (sticks(gy.youmonst.data)) {
                 await You($C`aren't able to maintain your hold on %s.`, await mon_nam(u.ustuck));
@@ -3900,7 +3901,7 @@ export async function float_down(hmask, emask) {   // trap.c:4024
          * Use knowledge of the two routines as a hack -- this
          * should really be handled differently -dlc
          */
-        if (is_pool(u.ux, u.uy) && !((u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) && !(u.uprops[SWIMMING].intrinsic || u.uprops[SWIMMING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.SWIM) !== 0) && !u.uinwater) {
+        if (is_pool(u.ux, u.uy) && !Wwalking() && !Swimming() && !u.uinwater) {
             no_msg = await drown();
         }
         if (is_lava(u.ux, u.uy) && !iflags.in_lava_effects) {
@@ -3910,9 +3911,9 @@ export async function float_down(hmask, emask) {   // trap.c:4024
     }
     if (!trap) {
         trap = t_at(u.ux, u.uy);
-        if ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) {
+        if (Is_airlevel(u.uz)) {
             await You($C`begin to tumble in place.`);
-        } else if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) && !no_msg) {
+        } else if (Is_waterlevel(u.uz) && !no_msg) {
             await You_feel($C`heavier.`);
             /* u.uinwater msgs already in spoteffects()/drown() */
         } else if (!u.uinwater && !no_msg) {
@@ -3968,7 +3969,7 @@ export async function float_down(hmask, emask) {   // trap.c:4024
     }
     /* falling through trap door calls goto_level,
        and goto_level does its own pickup() call */
-    if (!((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && !u.uswallow && on_level(u.uz, current_dungeon_level)) {
+    if (!Is_airlevel(u.uz) && !Is_waterlevel(u.uz) && !u.uswallow && on_level(u.uz, current_dungeon_level)) {
         await pickup(1);
     }
     return 1;
@@ -3993,7 +3994,7 @@ export async function climb_pit() {   // trap.c:4183
         await display_nhwindow()($G.WIN_MESSAGE, FALSE);
         await clear_nhwindow()($G.WIN_MESSAGE);
         await You($C`free your %s.`, await body_part(LEG));
-    } else if (((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked || is_clinger(gy.youmonst.data)) && !Sokoban()) {
+    } else if ((Flying() || is_clinger(gy.youmonst.data)) && !Sokoban()) {
         /* eg fell in pit, then poly'd to a flying monster;
            or used '>' to deliberately enter it */
         await You($C`%s from the %s.`, u_locomotion($C`climb`), pitname);
@@ -4119,7 +4120,7 @@ async function domagictrap() {   // trap.c:4317
         /* blindness effects */
         if (!await resists_blnd(gy.youmonst)) {
             await You($C`are momentarily blinded by a flash of light!`);
-            await make_blinded(rn2(5) + 10 | 0, FALSE);
+            await make_blinded(rn1(5, 10), FALSE);
             if (!Blind()) {
                 await Your($C`%s`, c_common_strings.c_vision_clears);
             }
@@ -4129,12 +4130,12 @@ async function domagictrap() {   // trap.c:4317
         /* deafness effects */
         if (!Deaf()) {
             await You_hear($C`a deafening roar!`);
-            incr_itimeout(new $c.FieldRef(u.uprops[DEAF], "intrinsic", "i64"), rn2(20) + 30 | 0);
+            incr_itimeout(new $c.FieldRef(u.uprops[DEAF], "intrinsic", "i64"), rn1(20, 30));
             disp.botl = TRUE;
         } else {
             /* magic vibrations still hit you */
             await You_feel($C`rankled.`);
-            incr_itimeout(new $c.FieldRef(u.uprops[DEAF], "intrinsic", "i64"), rn2(5) + 15 | 0);
+            incr_itimeout(new $c.FieldRef(u.uprops[DEAF], "intrinsic", "i64"), rn1(5, 15));
             disp.botl = TRUE;
         }
         while ($t1 = cnt, cnt = $t1 - 1 | 0, $t1) {
@@ -4542,7 +4543,7 @@ export async function water_damage(obj, ostr, force) {   // trap.c:4712
         if (in_invent && !Blind() && !Underwater()) {
             await pline_The($C`%s cannot get into your %s.`, hliquid($C`water`), ostr);
             gm.mentioned_water = !Hallucination() ? 1 : 0;
-            await discover_object(obj.otyp, TRUE, TRUE, TRUE);
+            await makeknown(obj.otyp);
             /* if an oilskin sack, discover it; doesn't
              * matter for chest, large box, ice box */
         }
@@ -4759,18 +4760,18 @@ export async function rnd_nextto_goodpos(x, y, mtmp) {   // trap.c:4947
  */
 export async function back_on_ground(rescued) {   // trap.c:4976
     let you_are_back = null, icebuf = new Int8Array(128);
-    let preposit = Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked ? $C`over` : $C`on`;
+    let preposit = Levitation() || Flying() ? $C`over` : $C`on`;
     let surf = surface(u.ux, u.uy);
     if (is_ice(u.ux, u.uy)) {
         /* "on ice" */
         surf = ice_descr(u.ux, u.uy, new $c.Ptr(icebuf, 0));
-    } else if (!strncmpi(surf, $C`floor`, -1) || !strncmpi(surf, $C`ground`, -1)) {
+    } else if (!strcmpi(surf, $C`floor`) || !strcmpi(surf, $C`ground`)) {
         /* "on solid ground" */
         surf = $C`solid ground`;
-    } else if (!strncmpi(surf, $C`bridge`, -1) || !strncmpi(surf, $C`altar`, -1) || !strncmpi(surf, $C`headstone`, -1)) {
+    } else if (!strcmpi(surf, $C`bridge`) || !strcmpi(surf, $C`altar`) || !strcmpi(surf, $C`headstone`)) {
         /* "on a bridge" */
         surf = await an(surf);
-    } else if (!strncmpi(surf, $C`stairs`, -1) || !strncmpi(surf, $C`lava`, -1) || !strncmpi(surf, $C`bottom`, -1)) {
+    } else if (!strcmpi(surf, $C`stairs`) || !strcmpi(surf, $C`lava`) || !strcmpi(surf, $C`bottom`)) {
         /* "on the stairs" */
         surf = await the(surf);
     } else {
@@ -4800,10 +4801,10 @@ export async function rescued_from_terrain(how) {   // trap.c:5014
     switch (how) {
         case DROWNING:
             if (is_pool(u.ux, u.uy)) {
-                await You($C`%s %s of %s.`, new $c.Ptr(rescued_from_terrain$find_yourself, 0), (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) || IS_WATERWALL(lev.typ) ? $C`in the midst` : $C`on top`, hliquid($C`water`));
+                await You($C`%s %s of %s.`, new $c.Ptr(rescued_from_terrain$find_yourself, 0), Is_waterlevel(u.uz) || IS_WATERWALL(lev.typ) ? $C`in the midst` : $C`on top`, hliquid($C`water`));
                 mesggiven = TRUE;
             } else if (IS_AIR(lev.typ)) {
-                await You($C`%s in %s.`, new $c.Ptr(rescued_from_terrain$find_yourself, 0), (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? $C`an air bubble` : $C`mid air`);
+                await You($C`%s in %s.`, new $c.Ptr(rescued_from_terrain$find_yourself, 0), Is_waterlevel(u.uz) ? $C`an air bubble` : $C`mid air`);
                 mesggiven = TRUE;
             }
             break;
@@ -4840,7 +4841,7 @@ export async function drown() {   // trap.c:5059
     const is_solid = is_waterwall(u.ux, u.uy);
     await feel_newsym(u.ux, u.uy);   /* in case Blind, map the water here */
     /* happily wading in the same contiguous pool */
-    if (u.uinwater && is_pool($c.i16(u.ux - u.dx | 0), $c.i16(u.uy - u.dy | 0)) && (u.uprops[SWIMMING].intrinsic || u.uprops[SWIMMING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.SWIM) !== 0 || (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.AMPHIBIOUS) !== 0) || (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.BREATHLESS) !== 0))) {
+    if (u.uinwater && is_pool($c.i16(u.ux - u.dx | 0), $c.i16(u.uy - u.dy | 0)) && (Swimming() || Amphibious() || Breathless())) {
         /* water effects on objects every now and then */
         if (!rn2(5)) {
             inpool_ok = TRUE;
@@ -4849,8 +4850,8 @@ export async function drown() {   // trap.c:5059
         }
     }
     if (!u.uinwater) {
-        await You($C`%s into the %s%c`, is_solid ? $C`plunge` : $C`fall`, waterbody_name(u.ux, u.uy), u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.AMPHIBIOUS) !== 0 || (u.uprops[SWIMMING].intrinsic || u.uprops[SWIMMING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.SWIM) !== 0) || (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.BREATHLESS) !== 0) ? 46 : 33);
-        if (!(u.uprops[SWIMMING].intrinsic || u.uprops[SWIMMING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.SWIM) !== 0) && !is_solid) {
+        await You($C`%s into the %s%c`, is_solid ? $C`plunge` : $C`fall`, waterbody_name(u.ux, u.uy), Amphibious() || Swimming() || Breathless() ? 46 : 33);
+        if (!Swimming() && !is_solid) {
             await You($C`sink like %s.`, Hallucination() ? $C`the Titanic` : $C`a rock`);
         }
     }
@@ -4859,7 +4860,7 @@ export async function drown() {   // trap.c:5059
         await split_mon(gy.youmonst, null);
     } else if (u.umonnum === PM.IRON_GOLEM) {
         await You($C`rust!`);
-        i = u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(d(2, 6) + 1 | 0, 2) : d(2, 6);
+        i = (u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(d(2, 6) + 1 | 0, 2) : d(2, 6));
         if (u.mhmax > i) {
             u.mhmax = u.mhmax - i | 0;
         }
@@ -4872,12 +4873,12 @@ export async function drown() {   // trap.c:5059
         await pline_The($C`leash%s slip%s loose.`, i > 1 ? $C`es` : $C``, i > 1 ? $C`` : $C`s`);
         unleash_all();
     }
-    if (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.AMPHIBIOUS) !== 0 || (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.BREATHLESS) !== 0) || (u.uprops[SWIMMING].intrinsic || u.uprops[SWIMMING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.SWIM) !== 0)) {
-        if (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.AMPHIBIOUS) !== 0 || (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.BREATHLESS) !== 0)) {
+    if (Amphibious() || Breathless() || Swimming()) {
+        if (Amphibious() || Breathless()) {
             if (flags.verbose) {
                 await pline($C`But you aren't drowning.`);
             }
-            if (!((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) {
+            if (!Is_waterlevel(u.uz)) {
                 if (Hallucination()) {
                     await Your($C`keel hits the bottom.`);
                 } else {
@@ -4927,7 +4928,7 @@ export async function drown() {   // trap.c:5059
     if (gm.multi >= 0 && gy.youmonst.data.mmove && await rnd_nextto_goodpos(new $c.Ptr(x, 0), new $c.Ptr(y, 0), gy.youmonst)) {
         lost[0] = FALSE;
         /* time to do some strip-tease... */
-        const succ = (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? TRUE : await emergency_disrobe(new $c.Ptr(lost, 0));
+        const succ = Is_waterlevel(u.uz) ? TRUE : await emergency_disrobe(new $c.Ptr(lost, 0));
         await You($C`try to crawl out of the %s.`, hliquid($C`water`));
         if (lost[0]) {
             await You($C`dump some of your gear to lose weight...`);
@@ -5103,17 +5104,17 @@ function untrap_prob(ttmp) {   // trap.c:5289
     if (ttmp.madeby_u) {
         chance = chance - 1 | 0;
     }
-    if (gu.urole.mnum === PM.RANGER && ttmp.ttyp === BEAR_TRAP && chance <= 3) {
+    if (Role_if(PM.RANGER) && ttmp.ttyp === BEAR_TRAP && chance <= 3) {
         return 0;   /* always succeeds */
     }
-    if (gu.urole.mnum === PM.ROGUE) {
+    if (Role_if(PM.ROGUE)) {
         if (rn2(2 * MAXULEV) < u.ulevel) {
             chance = chance - 1 | 0;
         }
         if (u.uhave.questart && chance > 1) {
             chance = chance - 1 | 0;
         }
-    } else if (gu.urole.mnum === PM.RANGER && chance > 1) {
+    } else if (Role_if(PM.RANGER) && chance > 1) {
         chance = chance - 1 | 0;
     }
     if (chance < 1) {
@@ -5423,7 +5424,7 @@ async function disarm_squeaky_board(ttmp) {   // trap.c:5630
         await consume_obj_charge(obj, TRUE);
     } else {
         await useup(obj);   /* oil */
-        await discover_object(POT_OIL, TRUE, TRUE, TRUE);
+        await makeknown(POT_OIL);
     }
     await You($C`repair the squeaky board.`);   /* no madeby_u */
     await deltrap(ttmp);
@@ -5562,7 +5563,7 @@ async function help_monster_out(mtmp, ttmp) {   // trap.c:5700
 async function disarm_box(box, force, confused) {   // trap.c:5794
     if (box.otrapped) {
         let ch = ACURR(A.DEX) + u.ulevel | 0;
-        if (gu.urole.mnum === PM.ROGUE) {
+        if (Role_if(PM.ROGUE)) {
             ch = Math.imul(ch, 2);
         }
         if (!force && (confused || Fumbling() || rnd(75 + $c.div32(await level_difficulty(), 2) | 0) > ch)) {
@@ -5600,7 +5601,7 @@ async function untrap_box(box, force, confused) {   // trap.c:5821
         if (!confused) {
             await exercise(A.WIS, TRUE);
         }
-        if (await yn_function($C`Disarm it?`, new $c.Ptr(ynqchars, 0), 113, TRUE) === 121) {
+        if (await ynq($C`Disarm it?`) === 121) {
             await disarm_box(box, force, confused);
         }
     } else {
@@ -5810,11 +5811,11 @@ export async function untrap(force, rx, ry, container) {   // trap.c:5848
     if ((svl.level.locations[x][y].flags & D.TRAPPED) !== 0 && (force || !confused && rn2((MAXULEV - u.ulevel | 0) + 11 | 0) < 10) || !force && confused && !rn2(3)) {
         await You($C`find a trap on the door!`);
         await exercise(A.WIS, TRUE);
-        if (await yn_function($C`Disarm it?`, new $c.Ptr(ynqchars, 0), 113, TRUE) !== 121) {
+        if (await ynq($C`Disarm it?`) !== 121) {
             return 1;
         }
         if (svl.level.locations[x][y].flags & D.TRAPPED) {
-            const ch = 15 + (gu.urole.mnum === PM.ROGUE ? Math.imul(u.ulevel, 3) : u.ulevel) | 0;
+            const ch = 15 + (Role_if(PM.ROGUE) ? Math.imul(u.ulevel, 3) : u.ulevel) | 0;
             await exercise(A.DEX, TRUE);
             if (!force && (confused || Fumbling() || rnd(75 + $c.div32(await level_difficulty(), 2) | 0) > ch)) {
                 await You($C`set it off!`);
@@ -5948,7 +5949,7 @@ export async function openholdingtrap(mon, noticed) {   // trap.c:6101
             }
         }
         /* might pacify monster if adjacent */
-        if (rn2(2) && dist2(mon.mx, mon.my, u.ux, u.uy) <= 2) {
+        if (rn2(2) && m_next2u(mon)) {
             await reward_untrap(t, mon);
         }
     }
@@ -6149,7 +6150,7 @@ export async function chest_trap(obj, bodypart, disarm) {   // trap.c:6294
                         await delobj(otmp);
                     }
                     await wake_nearby(FALSE);
-                    await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(d(6, 6) + 1 | 0, 2) : d(6, 6), new $c.Ptr(buf, 0), KILLED.BY_AN);
+                    await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(d(6, 6) + 1 | 0, 2) : d(6, 6)), new $c.Ptr(buf, 0), KILLED.BY_AN);
                     await exercise(A.STR, FALSE);
                     if (costly && loss) {
                         if (insider) {
@@ -6235,8 +6236,8 @@ export async function chest_trap(obj, bodypart, disarm) {   // trap.c:6294
                         await You($C`%s%s...`, stagger(gy.youmonst.data, $C`stagger`), Halluc_resistance() ? $C`` : Blind() ? $C` and get dizzy` : $C` and your vision blurs`);
                     }
                 }
-                await make_stunned($c.add64($c.and64(u.uprops[STUNNED].intrinsic, TIMEOUT), rn2(7) + 16 | 0), FALSE);
-                await make_hallucinated($c.add64($c.and64(u.uprops[HALLUC].intrinsic, TIMEOUT), rn2(5) + 16 | 0), FALSE, 0);
+                await make_stunned($c.add64($c.and64(u.uprops[STUNNED].intrinsic, TIMEOUT), rn1(7, 16)), FALSE);
+                await make_hallucinated($c.add64($c.and64(u.uprops[HALLUC].intrinsic, TIMEOUT), rn1(5, 16)), FALSE, 0);
                 break;
             default:
                 await impossible($C`bad chest trap`);
@@ -6528,7 +6529,7 @@ export async function lava_effects() {   // trap.c:6794
     if (likes_lava(gy.youmonst.data)) {
         return FALSE;
     }
-    usurvive = Fire_resistance() || (u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && dmg < u.uhp ? 1 : 0;
+    usurvive = Fire_resistance() || Wwalking() && dmg < u.uhp ? 1 : 0;
     /*
      * A timely interrupt might manage to salvage your life
      * but not your gear.  For scrolls and potions this
@@ -6584,7 +6585,7 @@ export async function lava_effects() {   // trap.c:6794
     }
     burn_stuff$: {
         if (!Fire_resistance()) {
-            if ((u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) {
+            if (Wwalking()) {
                 await pline_The($C`%s here burns you!`, hliquid($C`lava`));
                 if (usurvive) {
                     await losehp(dmg, new $c.Ptr(lava_killer, 0), KILLED.BY);   /* lava damage */
@@ -6656,7 +6657,7 @@ export async function lava_effects() {   // trap.c:6794
                 if (!Fire_resistance()) {
                     set_itimeout(new $c.FieldRef(u.uprops[FIRE_RES], "intrinsic", "i64"), 5);
                 }
-                if (!((u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)))) {
+                if (!Wwalking()) {
                     set_itimeout(new $c.FieldRef(u.uprops[WWALKING], "intrinsic", "i64"), 5);
                 }
                 break burn_stuff$;
@@ -6666,11 +6667,11 @@ export async function lava_effects() {   // trap.c:6794
                spoteffects() was no-op when called with nonzero in_lava_effects */
             await spoteffects(FALSE);   /* suppress auto-pickup for this landing... */
             return TRUE;
-        } else if (!((u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) && (!u.utrap || u.utraptype !== TT.LAVA)) {
+        } else if (!Wwalking() && (!u.utrap || u.utraptype !== TT.LAVA)) {
             boil_away = !Fire_resistance() ? 1 : 0;
             /* if not fire resistant, sink_into_lava() will quickly be fatal;
                hero needs to escape immediately */
-            set_utrap(((rn2(4) + 4 | 0) + ((boil_away ? 2 : rn2(4) + 12 | 0) << 8) | 0) >>> 0, TT.LAVA);
+            set_utrap((rn1(4, 4) + ((boil_away ? 2 : rn1(4, 12)) << 8) | 0) >>> 0, TT.LAVA);
             await You($C`sink into the %s%s!`, waterbody_name(u.ux, u.uy), !boil_away ? $C`, but it only burns slightly` : $C` and are about to be immolated`);
             if (Fire_resistance()) {
                 monstseesu(M_SEEN.FIRE);
@@ -6717,7 +6718,7 @@ export async function sink_into_lava() {   // trap.c:6991
             /* can only get here via life-saving; try to get away from lava */
             await reset_utrap(TRUE);
             /* levitation or flight have become unblocked, otherwise Tport */
-            if (!Levitation() && !((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked)) {
+            if (!Levitation() && !Flying()) {
                 await safe_teleds(TELEDS.ALLOW_DRAG | TELEDS.TELEPORT);
             }
         } else if (!u.umoved) {
@@ -6876,6 +6877,9 @@ export async function trap_sanity_check() {   // trap.c:7198
         }
         ttmp = ttmp.ntrap;
     }
+}
+async function burn_dmg(obj, descr) {
+    return await erode_obj(obj, descr, ERODE.BURN, EF.GREASE);
 }
 
 export function $init() {

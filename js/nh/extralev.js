@@ -13,7 +13,7 @@ import { gr, gs, svl, svn, svr } from './decl.js';
 import { christen_monst, roguename } from './do_name.js';
 import { FALSE, TRUE } from './global.h.js';
 import { NO } from './hack.h.js';
-import { max, min } from './hack.macros.js';
+import { max, min, rn1 } from './hack.macros.js';
 import { nhUse } from './lint.macros.js';
 import { makemon } from './makemon.js';
 import { add_room, dodoor } from './mklev.js';
@@ -251,11 +251,11 @@ export async function makeroguerooms() {   // extralev.c:193
                  * ones do.
                  */
                 gr.r[x][y].real = FALSE;
-                $t1 = $c.i16(rn2(22) + 2 | 0), gr.r[x][y].rlx = $t1;
+                $t1 = $c.i16(rn1(22, 2)), gr.r[x][y].rlx = $t1;
                 $t2 = $c.i16(rn2(y === 2 ? 4 : 3) + 2 | 0), gr.r[x][y].rly = $t2;
             } else {
                 gr.r[x][y].real = TRUE;
-                $t3 = $c.i16(rn2(22) + 2 | 0), gr.r[x][y].dx = $t3;   /* 2-23 long, plus walls */
+                $t3 = $c.i16(rn1(22, 2)), gr.r[x][y].dx = $t3;   /* 2-23 long, plus walls */
                 $t4 = $c.i16(rn2(y === 2 ? 4 : 3) + 2 | 0), gr.r[x][y].dy = $t4;   /* 2-5 high, plus walls */
                 /* boundaries of room floor */
                 $t5 = $c.i16(rnd(23 - gr.r[x][y].dx + 1)), gr.r[x][y].rlx = $t5;
@@ -356,7 +356,7 @@ export async function makerogueghost() {   // extralev.c:288
     }
     ghostobj = await mksobj_at(ARROW, x, y, FALSE, FALSE);
     ghostobj.spe = 0;
-    $t5 = rn2(10) + 25 | 0, ghostobj.quan = $t5;
+    $t5 = rn1(10, 25), ghostobj.quan = $t5;
     $t6 = await weight(ghostobj) >>> 0, ghostobj.owt = $t6;
     if (rn2(4)) {
         await curse(ghostobj);

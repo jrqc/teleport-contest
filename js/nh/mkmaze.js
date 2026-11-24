@@ -15,17 +15,18 @@ import { gb, ge, gf, gi, gl, gn, gr, gu, gv, gw, gx, gy, iflags, program_state, 
 import { FOOD_CLASS, GEM_CLASS, RING_CLASS, S } from './defsym.h.js';
 import { newsym } from './display.js';
 import { GLYPH, NO_GLYPH } from './display.h.js';
+import { cmap_b_to_glyph } from './display.macros.js';
 import { christen_monst, christen_orc, new_oname, rndorcname } from './do_name.js';
 import { migrate_to_level } from './dog.js';
 import { In_hell, In_mines, In_quest, Invocation_lev, Is_branchlev, Is_special, depth, dunlev, dunlevs_in_dungeon, find_level, get_level, ledger_no, on_level, u_on_newpos } from './dungeon.js';
 import { LR, MIGR } from './dungeon.h.js';
-import { within_bounded_area } from './dungeon.macros.js';
+import { Is_airlevel, Is_earthlevel, Is_firelevel, Is_medusa_level, Is_stronghold, Is_waterlevel, within_bounded_area } from './dungeon.macros.js';
 import { panic } from './end.js';
 import { debugcore } from './files.js';
 import { wizard } from './flag.macros.js';
 import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
 import { CONS, CORPSTAT, MKTRAP, MM, NO, RLOC } from './hack.h.js';
-import { distu, release_data, update_file } from './hack.macros.js';
+import { distu, max, min, release_data, rn1, update_file } from './hack.macros.js';
 import { distmin, nh_snprintf, sgn, upstart } from './hacklib.js';
 import { stackobj } from './invent.js';
 import { makemon, set_malign } from './makemon.js';
@@ -36,7 +37,7 @@ import { somex, somey } from './mkroom.js';
 import { dmonsfree, elemental_clog, m_into_limbo, mnearto, mnexto } from './mon.js';
 import { poly_when_stoned } from './mondata.js';
 import { is_orc } from './mondata.macros.js';
-import { M1, M2, MR } from './monflag.h.js';
+import { M2, MR } from './monflag.h.js';
 import { mons } from './monst.js';
 import { MON } from './monst.h.js';
 import { DEADMONSTER } from './monst.macros.js';
@@ -47,13 +48,14 @@ import { BOULDER, CORPSE, C_RATION, EGG, GAUNTLETS_OF_DEXTERITY, GOLD_PIECE, K_R
 import { shiny_obj } from './objnam.js';
 import { fruitadd } from './options.js';
 import { Norep, impossible, pline } from './pline.js';
-import { SWIMMING, W } from './prop.h.js';
+import { W } from './prop.h.js';
 import { create_gas_cloud } from './region.js';
 import { clear_heros_fault } from './region.macros.js';
 import { AIR, BLCORNER, BRCORNER, CLOUD, CORR, CROSSWALL, DBWALL, DOOR, HWALL, ICE, IRONBARS, LAVAPOOL, LAVAWALL, MAX_TYPE, POOL, ROOM, SDOOR, SET_LIT, STONE, TDWALL, TLCORNER, TLWALL, TRCORNER, TRWALL, TUWALL, VWALL, WATER } from './rm.h.js';
 import { CAN_OVERWRITE_TERRAIN, IS_DOOR, IS_FOUNTAIN, IS_LAVA, IS_SINK, IS_WALL, MON_AT, OBJ_AT, remove_monster } from './rm.macros.js';
 import { rn2, rnd } from './rnd.js';
-import { sfi_bubble, sfi_int, sfo_bubble, sfo_int } from './sfbase.js';
+import { Sfi_bubble, Sfo_bubble, Sfo_int } from './savefile.macros.js';
+import { sfi_int } from './sfbase.js';
 import { load_special } from './sp_lev.js';
 import { stairway_find_dir } from './stairs.js';
 import { Strlen_ } from './strutil.js';
@@ -66,8 +68,8 @@ import { MAGIC_PORTAL, VIBRATING_SQUARE } from './trap.h.js';
 import { undestroyable_trap } from './trap.macros.js';
 import { block_point, recalc_block_point, unblock_point, vision_recalc } from './vision.js';
 import { remove_worm } from './worm.js';
-import { u_at } from './you.macros.js';
-import { Deaf, Punished } from './youprop.macros.js';
+import { Role_if, u_at } from './you.macros.js';
+import { Deaf, Punished, Swimming } from './youprop.macros.js';
 
 const ORC_LEADER = 1;
 const x_maze_min = 2;
@@ -626,7 +628,7 @@ async function baalz_fixup() {   // mkmaze.c:475
             }
         }
     }
-    await wallification($c.i16(gb.bughack.inarea.x1 - 2 > 1 ? gb.bughack.inarea.x1 - 2 : 1), $c.i16(gb.bughack.inarea.y1 - 2 > 0 ? gb.bughack.inarea.y1 - 2 : 0), $c.i16(gb.bughack.inarea.x2 + 2 < COLNO - 1 ? gb.bughack.inarea.x2 + 2 : COLNO - 1), $c.i16(gb.bughack.inarea.y2 + 2 < ROWNO - 1 ? gb.bughack.inarea.y2 + 2 : ROWNO - 1));
+    await wallification($c.i16(max(gb.bughack.inarea.x1 - 2, 1)), $c.i16(max(gb.bughack.inarea.y1 - 2, 0)), $c.i16(gb.bughack.inarea.x2 + 2 < COLNO - 1 ? gb.bughack.inarea.x2 + 2 : COLNO - 1), $c.i16(gb.bughack.inarea.y2 + 2 < ROWNO - 1 ? gb.bughack.inarea.y2 + 2 : ROWNO - 1));
     /* bughack hack for rear-most legs on baalz level; first joint on
        both top and bottom gets a bogus extra connection to room area,
        producing unwanted rectangles; change back to separated legs */
@@ -662,7 +664,7 @@ export async function fixup_special() {   // mkmaze.c:570
     let r = null, sp = null, lev = new $T.d_level(), x = 0, y = 0, croom = null, added_branch = 0, otmp = null, tryct = 0, tryct2 = 0, $goto = null, $t1;
     r = gl.lregions;
     added_branch = FALSE;
-    if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) || (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) {
+    if (Is_waterlevel(u.uz) || Is_airlevel(u.uz)) {
         svl.level.flags.hero_memory = 0;
         /* water level is an odd beast - it has to be set up
            before calling place_lregions etc. */
@@ -728,7 +730,7 @@ export async function fixup_special() {   // mkmaze.c:570
         await place_lregion(0, 0, 0, 0, 0, 0, 0, 0, LR.BRANCH, null);
     }
     /* Still need to add some stuff to level file */
-    if ((svd.dungeon_topology.d_medusa_level.dlevel || svd.dungeon_topology.d_medusa_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_medusa_level)) {
+    if (Is_medusa_level(u.uz)) {
         croom = svr.rooms[0];   /* the first room defined on the medusa level */
         for (tryct = rnd(4); tryct; tryct = tryct - 1 | 0) {
             x = somex(croom);
@@ -755,10 +757,10 @@ export async function fixup_special() {   // mkmaze.c:570
                 await set_corpsenm(otmp, await rndmonnum());
             }
         }
-    } else if (gu.urole.mnum === PM.CLERIC && In_quest(u.uz)) {
+    } else if (Role_if(PM.CLERIC) && In_quest(u.uz)) {
         /* less chance for undead corpses (lured from lower morgues) */
         svl.level.flags.graveyard = 1;
-    } else if ((svd.dungeon_topology.d_stronghold_level.dlevel || svd.dungeon_topology.d_stronghold_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_stronghold_level)) {
+    } else if (Is_stronghold(u.uz)) {
         svl.level.flags.graveyard = 1;
     } else if (on_level(u.uz, svd.dungeon_topology.d_baalzebub_level)) {
         /* custom wallify the "beetle" potion of the level */
@@ -895,12 +897,12 @@ async function stolen_booty() {   // mkmaze.c:799
     for (i = 0; i < cnt; i = i + 1 | 0) {
         await migr_booty_item(SKELETON_KEY, gang);
     }
-    let otyp = rn2(GAUNTLETS_OF_DEXTERITY - LEATHER_GLOVES + 1) + LEATHER_GLOVES | 0;
+    let otyp = rn1(GAUNTLETS_OF_DEXTERITY - LEATHER_GLOVES + 1, LEATHER_GLOVES);
     await migr_booty_item(otyp, gang);
     cnt = rnd(10);
     for (i = 0; i < cnt; i = i + 1 | 0) {
         /* Food items - but no lembas! (or some other weird things) */
-        otyp = rn2(TIN - TRIPE_RATION + 1) + TRIPE_RATION | 0;
+        otyp = rn1(TIN - TRIPE_RATION + 1, TRIPE_RATION);
         /* exclude meat <anything>, globs of <anything>, kelp
            which all have random generation probability of 0
            (K-/C-rations do too, but we want to include those) */
@@ -1218,11 +1220,11 @@ export async function pick_vibrasquare_location() {   // mkmaze.c:1042
  */
 async function populate_maze() {   // mkmaze.c:1097
     let i = 0, mm = new $T.nhcoord();
-    for (i = rn2(8) + 11 | 0; i; i = i - 1 | 0) {
+    for (i = rn1(8, 11); i; i = i - 1 | 0) {
         await mazexy(mm);
         await mkobj_at(rn2(2) ? GEM_CLASS : RANDOM_CLASS, mm.x, mm.y, TRUE);
     }
-    for (i = rn2(10) + 2 | 0; i; i = i - 1 | 0) {
+    for (i = rn1(10, 2); i; i = i - 1 | 0) {
         await mazexy(mm);
         await mksobj_at(BOULDER, mm.x, mm.y, TRUE, FALSE);
     }
@@ -1230,15 +1232,15 @@ async function populate_maze() {   // mkmaze.c:1097
         await mazexy(mm);
         await makemon(mons[PM.MINOTAUR], mm.x, mm.y, NO.MM_FLAGS);
     }
-    for (i = rn2(5) + 7 | 0; i; i = i - 1 | 0) {
+    for (i = rn1(5, 7); i; i = i - 1 | 0) {
         await mazexy(mm);
         await makemon(null, mm.x, mm.y, NO.MM_FLAGS);
     }
-    for (i = rn2(6) + 7 | 0; i; i = i - 1 | 0) {
+    for (i = rn1(6, 7); i; i = i - 1 | 0) {
         await mazexy(mm);
         await mkgold(0, mm.x, mm.y);
     }
-    for (i = rn2(6) + 7 | 0; i; i = i - 1 | 0) {
+    for (i = rn1(6, 7); i; i = i - 1 | 0) {
         await mktrap(0, MKTRAP.MAZEFLAG, null, null);
     }
 }
@@ -1539,7 +1541,7 @@ export function get_level_extends(left, top, right, bottom) {   // mkmaze.c:1353
  */
 export function bound_digging() {   // mkmaze.c:1441
     let x = 0, y = 0, xmin = Int16Array.of(0), xmax = Int16Array.of(0), ymin = Int16Array.of(0), ymax = Int16Array.of(0);
-    if ((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level)) {
+    if (Is_earthlevel(u.uz)) {
         return;   /* everything diggable here */
     }
     get_level_extends(new $c.Ptr(xmin, 0), new $c.Ptr(ymin, 0), new $c.Ptr(xmax, 0), new $c.Ptr(ymax, 0));
@@ -1595,7 +1597,7 @@ export async function fumaroles() {   // mkmaze.c:1484
     let sizemin = 5;
     let snd = FALSE;
     let loud = FALSE;
-    if ((svd.dungeon_topology.d_fire_level.dlevel || svd.dungeon_topology.d_fire_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_fire_level)) {
+    if (Is_firelevel(u.uz)) {
         nmax = $c.i16(nmax + 1);
         sizemin = sizemin + 5 | 0;
     }
@@ -1607,7 +1609,7 @@ export async function fumaroles() {   // mkmaze.c:1484
         const x = $c.i16(rn2(COLNO - 4) + 3 | 0);
         const y = $c.i16(rn2(ROWNO - 4) + 3 | 0);
         if (svl.level.locations[x][y].typ === LAVAPOOL) {
-            const r = await create_gas_cloud(x, y, rn2(10) + sizemin | 0, rn2(10) + 5 | 0);
+            const r = await create_gas_cloud(x, y, rn1(10, sizemin), rn1(10, 5));
             clear_heros_fault(r);
             snd = TRUE;
             if (distu(x, y) < 15) {
@@ -1633,7 +1635,7 @@ export async function movebubbles() {   // mkmaze.c:1539
     }
     await vision_recalc(2);
     hero_bubble = null;
-    if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
+    if (Is_waterlevel(u.uz)) {
         /* keep attached ball&chain separate from bubble objects */
         if (Punished()) {
             bcpin = await unplacebc_and_covet_placebc();
@@ -1713,7 +1715,7 @@ export async function movebubbles() {   // mkmaze.c:1539
                 }
             }
         }
-    } else if ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) {
+    } else if (Is_airlevel(u.uz)) {
         for (x = 1; x <= COLNO - 1; x = $c.i16(x + 1)) {
             for (y = 0; y <= ROWNO - 1; y = $c.i16(y + 1)) {
                 svl.level.locations[x][y].$copyFrom(movebubbles$air_pos);
@@ -1743,7 +1745,7 @@ export async function movebubbles() {   // mkmaze.c:1539
         await mv_bubble(b, $c.i16(b.dx + 1 - (!b.dx ? rx : rx ? 1 : 0) | 0), $c.i16(b.dy + 1 - (!b.dy ? ry : ry ? 1 : 0) | 0), FALSE);
     }
     /* put attached ball&chain back */
-    if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) && Punished()) {
+    if (Is_waterlevel(u.uz) && Punished()) {
         await lift_covet_and_placebc(bcpin);
     }
     gv.vision_full_recalc = 1;
@@ -1755,7 +1757,7 @@ export async function movebubbles() {   // mkmaze.c:1539
 export async function water_friction() {   // mkmaze.c:1689
     let x = 0, y = 0, dx = 0, dy = 0;
     let eff = FALSE;
-    if ((u.uprops[SWIMMING].intrinsic || u.uprops[SWIMMING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.SWIM) !== 0) && rn2(4)) {
+    if (Swimming() && rn2(4)) {
         return;   /* natural swimmers have advantage */
     }
     if (u.dx && !rn2(!u.dy ? 3 : 6)) {
@@ -1799,13 +1801,13 @@ export async function save_waterlevel(nhfp) {   // mkmaze.c:1723
         for (b = svb.bbubbles; b; b = b.next) {
             n[0] = n[0] + 1 | 0;
         }
-        await sfo_int(nhfp, new $c.Ptr(n, 0), $C`waterlevel-bubble_count`);
-        await sfo_int(nhfp, new $c.FieldRef(svx, "xmin", "i32"), $C`waterlevel-xmin`);
-        await sfo_int(nhfp, new $c.FieldRef(svy, "ymin", "i32"), $C`waterlevel-ymin`);
-        await sfo_int(nhfp, new $c.FieldRef(svx, "xmax", "i32"), $C`waterlevel-xmax`);
-        await sfo_int(nhfp, new $c.FieldRef(svy, "ymax", "i32"), $C`waterlevel-ymax`);
+        await Sfo_int(nhfp, new $c.Ptr(n, 0), $C`waterlevel-bubble_count`);
+        await Sfo_int(nhfp, new $c.FieldRef(svx, "xmin", "i32"), $C`waterlevel-xmin`);
+        await Sfo_int(nhfp, new $c.FieldRef(svy, "ymin", "i32"), $C`waterlevel-ymin`);
+        await Sfo_int(nhfp, new $c.FieldRef(svx, "xmax", "i32"), $C`waterlevel-xmax`);
+        await Sfo_int(nhfp, new $c.FieldRef(svy, "ymax", "i32"), $C`waterlevel-ymax`);
         for (b = svb.bbubbles; b; b = b.next) {
-            await sfo_bubble(nhfp, b, $C`waterlevel-bubble`);
+            await Sfo_bubble(nhfp, b, $C`waterlevel-bubble`);
         }
     }
     if (release_data(nhfp)) {
@@ -1831,7 +1833,7 @@ export async function restore_waterlevel(nhfp) {   // mkmaze.c:1750
     for (i = 0; i < n[0]; i = i + 1 | 0) {
         const btmp = b;
         b = $c.asRec(await alloc(40), $T.bubble, 40);
-        await sfi_bubble(nhfp, b, $C`waterlevel-bubble`);
+        await Sfi_bubble(nhfp, b, $C`waterlevel-bubble`);
         if (btmp) {
             btmp.next = b;
             b.prev = btmp;
@@ -1849,7 +1851,7 @@ export async function restore_waterlevel(nhfp) {   // mkmaze.c:1750
         program_state.something_worth_saving = 0;
         /* during restore, information about what level this is might not
            be available so we're wishy-washy about what we describe */
-        await impossible($C`No %s to restore?`, (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(gu.uz_save, svd.dungeon_topology.d_water_level) ? $C`air bubbles` : (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(gu.uz_save, svd.dungeon_topology.d_air_level) ? $C`clouds` : $C`air bubbles or clouds`);
+        await impossible($C`No %s to restore?`, Is_waterlevel(u.uz) || Is_waterlevel(gu.uz_save) ? $C`air bubbles` : Is_airlevel(u.uz) || Is_airlevel(gu.uz_save) ? $C`clouds` : $C`air bubbles or clouds`);
         program_state.something_worth_saving = 1;
     }
 }
@@ -1870,7 +1872,7 @@ async function set_wportal() {   // mkmaze.c:1802
  */
 async function setup_waterlevel() {   // mkmaze.c:1812
     let x = 0, y = 0, xskip = 0, yskip = 0;
-    if (!((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && !((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level))) {
+    if (!Is_waterlevel(u.uz) && !Is_airlevel(u.uz)) {
         await panic($C`setup_waterlevel(): [%d:%d] neither 'Water' nor 'Air'`, u.uz.dnum, u.uz.dlevel);
     }
     /* ouch, hardcoded... (file scope statics and used in bxmin,bymax,&c) */
@@ -1880,13 +1882,13 @@ async function setup_waterlevel() {   // mkmaze.c:1812
        comparing two constants; the alternative is to do this in the
        preprocessor: #if (20 > ROWNO-1) ymax=ROWNO-1 #else ymax=20 #endif */
     svx.xmax = 78;
-    svx.xmax = svx.xmax < COLNO - 1 - 1 ? svx.xmax : COLNO - 1 - 1;
+    svx.xmax = min(svx.xmax, COLNO - 1 - 1);
     svy.ymax = 20;
-    svy.ymax = svy.ymax < ROWNO - 1 ? svy.ymax : ROWNO - 1;
+    svy.ymax = min(svy.ymax, ROWNO - 1);
     /* entire level is remembered as one glyph and any unspecified portion
        should default to level's base element rather than to usual stone */
     const glyph = ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) === S.stone ? GLYPH.CMAP_STONE_OFF : ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) <= S.trwall ? ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) - S.vwall + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) : ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) < S.altar ? ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) - S.ndoor + GLYPH.CMAP_A_OFF : ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) === S.altar ? 4008 : ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) < S.arrow_trap + MAXTCHARS ? ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) - S.grave + GLYPH.CMAP_B_OFF : ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) <= S.goodpos ? ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) - S.digbeam + GLYPH.CMAP_C_OFF : NO_GLYPH;
-    const typ = (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? WATER : AIR;
+    const typ = Is_waterlevel(u.uz) ? WATER : AIR;
     /* set unspecified terrain (stone) and hero's memory to water or air */
     for (x = 1; x <= COLNO - 1; x = $c.i16(x + 1)) {
         for (y = 0; y <= ROWNO - 1; y = $c.i16(y + 1)) {
@@ -1897,7 +1899,7 @@ async function setup_waterlevel() {   // mkmaze.c:1812
         }
     }
     /* make bubbles */
-    if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
+    if (Is_waterlevel(u.uz)) {
         xskip = $c.i16(10 + rn2(10) | 0);
         yskip = $c.i16(4 + rn2(4) | 0);
     } else {
@@ -1973,7 +1975,7 @@ async function mk_bubble(x, y, n) {   // mkmaze.c:1873
 }
 /* maybe change the movement direction of the bubble hero is in */
 export function maybe_adjust_hero_bubble() {   // mkmaze.c:1929
-    if (!((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) {
+    if (!Is_waterlevel(u.uz)) {
         return;
     }
     if (!u.dx && !u.dy) {
@@ -2003,7 +2005,7 @@ async function mv_bubble(b, dx, dy, ini) {   // mkmaze.c:1952
     let i = 0, j = 0, x = 0, y = 0, cons = null, ctemp = null, olist = null, otmp = null, $t1, $t2;
     let colli = 0;
     /* clouds move slowly */
-    if (!((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) || !rn2(6)) {
+    if (!Is_airlevel(u.uz) || !rn2(6)) {
         /* move bubble */
         if (dx < -1 || dx > 1 || dy < -1 || dy > 1) {
             /* pline("mv_bubble: dx = %d, dy = %d", dx, dy); */
@@ -2062,11 +2064,11 @@ async function mv_bubble(b, dx, dy, ini) {   // mkmaze.c:1952
     for (i = 0, x = b.x; i < b.bm[0]; i = i + 1 | 0, x = $c.i16(x + 1)) {
         for (j = 0, y = b.y; j < b.bm[1]; j = j + 1 | 0, y = $c.i16(y + 1)) {
             if (b.bm[j + 2 | 0] & 1 << i) {
-                if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
+                if (Is_waterlevel(u.uz)) {
                     svl.level.locations[x][y].typ = AIR;
                     svl.level.locations[x][y].lit = 1;
                     unblock_point(x, y);
-                } else if ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) {
+                } else if (Is_airlevel(u.uz)) {
                     svl.level.locations[x][y].typ = CLOUD;
                     svl.level.locations[x][y].lit = 1;
                     block_point(x, y);
@@ -2074,7 +2076,7 @@ async function mv_bubble(b, dx, dy, ini) {   // mkmaze.c:1952
             }
         }
     }
-    if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
+    if (Is_waterlevel(u.uz)) {
         /* replace contents of bubble */
         for (cons = b.cons; cons; cons = ctemp) {
             ctemp = cons.next;
@@ -2187,7 +2189,7 @@ export function $init() {
         CROSSWALL
     ]);
     movebubbles$water_pos.$copyFrom(new $T.rm());
-    movebubbles$water_pos.glyph = S.water - S.grave + GLYPH.CMAP_B_OFF;
+    movebubbles$water_pos.glyph = cmap_b_to_glyph(S.water);
     movebubbles$water_pos.typ = WATER;
     movebubbles$water_pos.seenv = 0;
     movebubbles$water_pos.flags = 0;
@@ -2198,7 +2200,7 @@ export function $init() {
     movebubbles$water_pos.edge = 0;
     movebubbles$water_pos.candig = 0;
     movebubbles$air_pos.$copyFrom(new $T.rm());
-    movebubbles$air_pos.glyph = S.cloud - S.grave + GLYPH.CMAP_B_OFF;
+    movebubbles$air_pos.glyph = cmap_b_to_glyph(S.cloud);
     movebubbles$air_pos.typ = AIR;
     movebubbles$air_pos.seenv = 0;
     movebubbles$air_pos.flags = 0;

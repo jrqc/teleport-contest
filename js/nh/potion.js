@@ -13,9 +13,9 @@ import { ART } from './artilist.h.js';
 import { acurr, adjattrib, exercise, poisontell } from './attrib.js';
 import { A } from './attrib.h.js';
 import { set_bc } from './ball.js';
-import { cmdq_peek, yn_function } from './cmd.js';
+import { cmdq_peek } from './cmd.js';
 import { is_pool } from './dbridge.js';
-import { c_color_names, c_common_strings, cg, disp, flags, gm, gn, gp, gu, gv, gy, hands_obj, iflags, svc, svd, svl, svm, u, ynchars } from './decl.js';
+import { c_color_names, c_common_strings, cg, disp, flags, gm, gn, gp, gv, gy, hands_obj, iflags, svc, svd, svl, svm, u } from './decl.js';
 import { COIN_CLASS, POTION_CLASS, SPBOOK_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { monster_detect, object_detect } from './detect.js';
 import { canseemon, glyph_at, map_invisible, newsym, see_monsters, see_objects, see_traps, sensemon, set_mimic_blocking, swallowed, tmp_at, unmap_object } from './display.js';
@@ -26,6 +26,7 @@ import { Monnam, a_monnam, docall, hcolor, hliquid, mon_nam, rndmonnam, x_monnam
 import { fingers_or_gloves, hard_helmet, inaccessible_equipment } from './do_wear.js';
 import { tamedog } from './dog.js';
 import { Can_rise_up, assign_level, ceiling, depth, get_level, has_ceiling, ledger_no, on_level, surface } from './dungeon.js';
+import { Is_airlevel, Is_waterlevel } from './dungeon.macros.js';
 import { eatmupdate, fix_petrification, newuhs } from './eat.js';
 import { dealloc_killer, delayed_killer, find_delayed_killer } from './end.js';
 import { can_reach_floor } from './engrave.js';
@@ -36,7 +37,7 @@ import { dipfountain, dipsink, drinkfountain, drinksink, floating_above, wash_ha
 import { COLNO, FALSE, LL, ROWNO, TRUE } from './global.h.js';
 import { in_rooms, losehp, near_capacity, nomul, spoteffects } from './hack.js';
 import { ARTICLE, BOLT_LIM, COST, CQ_CANNED, ECMD, ENL, EYE, FACE, FOOT, GETOBJ, GETOBJ_PROMPT, HAND, HEAD, KILLED, LEG, MAGICENLIGHTENMENT, MM, NOTELL, POLY, SUPPRESS } from './hack.h.js';
-import { Maybe_Half_Phys, pline1, y_n } from './hack.macros.js';
+import { Maybe_Half_Phys, makeknown, min, pline1, rn1, y_n } from './hack.macros.js';
 import { dist2, nh_snprintf, s_suffix, upstart } from './hacklib.js';
 import { enlightenment } from './insight.js';
 import { freeinv, getobj, hold_another_object, learn_unseen_invent, prinv, update_inventory, useup, useupall } from './invent.js';
@@ -56,7 +57,7 @@ import { M_AP, M_SEEN } from './monst.h.js';
 import { DEADMONSTER, U_AP_TYPE, is_vampshifter, ismnum, mon_perma_blind, resists_acid, resists_poison } from './monst.macros.js';
 import { PM } from './monsters.h.js';
 import { mcureblindness } from './muse.js';
-import { discover_object, objdescr_is, observe_object } from './o_init.js';
+import { objdescr_is, observe_object } from './o_init.js';
 import { EF, ER, ERODE, POTHIT } from './obj.h.js';
 import { carried, is_ammo, is_plural, is_poisonable, is_weptool, pair_of } from './obj.macros.js';
 import { is_corrodeable, is_rustprone } from './objclass.macros.js';
@@ -86,7 +87,7 @@ import { display_nhwindow } from './winprocs.macros.js';
 import { aggravate } from './wizard.js';
 import { mon_adjust_speed, mon_set_minvis, which_armor } from './worn.js';
 import { SICK_ALL } from './you.h.js';
-import { Upolyd } from './you.macros.js';
+import { Role_if, Upolyd } from './you.macros.js';
 import { Acid_resistance, Antimagic, BBlinded, BInvis, BLevitation, Blind, Blind_telepat, BlindedTimeout, Blindfolded_only, Cold_resistance, Deaf, Detect_monsters, EBlinded, EHalluc_resistance, Fast, Fire_resistance, Fixed_abil, Free_action, Glib, HBlinded, HHallucination, HInvis, HSee_invisible, Half_gas_damage, Halluc_resistance, Hallucination, Infravision, Invis, Invisible, Levitation, PermaBlind, Poison_resistance, Protection_from_shape_changers, Punished, See_invisible, Sick, Sick_resistance, Sleep_resistance, Slimed, Stoned, Strangled, Unaware, Unchanging, Underwater, Very_fast, Wounded_legs } from './youprop.macros.js';
 import { bhitm, do_enlightenment_effect, makewish, obj_resists, obj_unpolyable, poly_obj, resist } from './zap.js';
 
@@ -602,7 +603,7 @@ export async function dodrink() {   // potion.c:526
         /* Is there a fountain to drink from here? */
         /* not as low as floor level but similar restrictions apply */
         if (svl.level.locations[u.ux][u.uy].typ === FOUNTAIN && can_reach_floor(FALSE)) {
-            if (await yn_function($C`Drink from the fountain?`, new $c.Ptr(ynchars, 0), 110, TRUE) === 121) {
+            if (await y_n($C`Drink from the fountain?`) === 121) {
                 await drinkfountain();
                 return ECMD.TIME;
             }
@@ -611,7 +612,7 @@ export async function dodrink() {   // potion.c:526
         /* Or a kitchen sink? */
         /* not as low as floor level but similar restrictions apply */
         if (svl.level.locations[u.ux][u.uy].typ === SINK && can_reach_floor(FALSE)) {
-            if (await yn_function($C`Drink from the sink?`, new $c.Ptr(ynchars, 0), 110, TRUE) === 121) {
+            if (await y_n($C`Drink from the sink?`) === 121) {
                 await drinksink();
                 return ECMD.TIME;
             }
@@ -619,7 +620,7 @@ export async function dodrink() {   // potion.c:526
         }
         /* Or are you surrounded by water? */
         if (Underwater() && !u.uswallow) {
-            if (await yn_function($C`Drink the water around you?`, new $c.Ptr(ynchars, 0), 110, TRUE) === 121) {
+            if (await y_n($C`Drink the water around you?`) === 121) {
                 await pline($C`Do you know what lives in this water?`);
                 return ECMD.TIME;
             }
@@ -683,7 +684,7 @@ export async function dopotion(otmp) {   // potion.c:618
     }
     if (otmp.dknown && !objects[otmp.otyp].oc_name_known) {
         if (!gp.potion_unkn) {
-            await discover_object(otmp.otyp, TRUE, TRUE, TRUE);
+            await makeknown(otmp.otyp);
             await more_experienced(0, 10);
         } else {
             await trycall(otmp);
@@ -717,7 +718,7 @@ async function peffect_restore_ability(otmp) {   // potion.c:646
             if (u.acurr.a[i] < lim) {
                 u.acurr.a[i] = $c.i8(lim);
                 /* reset stat abuse (but not exercise) to 0 as well */
-                u.aexe.a[i] = u.aexe.a[i] > 0 ? u.aexe.a[i] : 0;
+                u.aexe.a[i] = (u.aexe.a[i] > 0 ? u.aexe.a[i] : 0);
                 disp.botl = TRUE;
                 /* only first found if not blessed */
                 if (!otmp.blessed) {
@@ -785,7 +786,7 @@ async function peffect_water(otmp) {   // potion.c:717
                 }
                 await set_ulycn(NON_PM);   /* cure lycanthropy */
             }
-            await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(d(2, 6) + 1 | 0, 2) : d(2, 6), $C`potion of holy water`, KILLED.BY_AN);
+            await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(d(2, 6) + 1 | 0, 2) : d(2, 6)), $C`potion of holy water`, KILLED.BY_AN);
         } else if (otmp.cursed) {
             await You_feel($C`quite proud of yourself.`);
             await healup(d(2, 6), 0, 0, 0);
@@ -807,7 +808,7 @@ async function peffect_water(otmp) {   // potion.c:717
         } else {
             if (u.ualign.type === A.LAWFUL) {
                 await pline($C`This burns like %s!`, hliquid($C`acid`));
-                await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(d(2, 6) + 1 | 0, 2) : d(2, 6), $C`potion of unholy water`, KILLED.BY_AN);
+                await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(d(2, 6) + 1 | 0, 2) : d(2, 6)), $C`potion of unholy water`, KILLED.BY_AN);
             } else {
                 await You_feel($C`full of dread.`);
             }
@@ -918,7 +919,7 @@ async function peffect_see_invisible(otmp) {   // potion.c:841
     if (otmp.blessed && !rn2(permchance)) {
         u.uprops[SEE_INVIS].intrinsic = $c.or64(u.uprops[SEE_INVIS].intrinsic, FROMOUTSIDE);
     } else {
-        incr_itimeout(new $c.FieldRef(u.uprops[SEE_INVIS], "intrinsic", "i64"), rn2(100) + 750 | 0);
+        incr_itimeout(new $c.FieldRef(u.uprops[SEE_INVIS], "intrinsic", "i64"), rn1(100, 750));
     }
     await set_mimic_blocking();   /* do special mimic handling */
     await see_monsters();   /* see invisible monsters */
@@ -937,7 +938,7 @@ async function peffect_paralysis(otmp) {   // potion.c:881
     if (Free_action()) {
         await You($C`stiffen momentarily.`);
     } else {
-        if (Levitation() || (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
+        if (Levitation() || Is_airlevel(u.uz) || Is_waterlevel(u.uz)) {
             await You($C`are motionlessly suspended.`);
         } else if (u.usteed) {
             await You($C`are frozen in place!`);
@@ -979,7 +980,7 @@ async function peffect_monster_detection(otmp) {   // potion.c:914
         if ($c.and64(u.uprops[DETECT_MONSTERS].intrinsic, TIMEOUT) >= 300) {
             i = 1;
         } else if (otmp.oclass === SPBOOK_CLASS) {
-            i = rn2(40) + 21 | 0;
+            i = rn1(40, 21);
         } else {
             /* potion */
             i = rn2(100) + 100 | 0;
@@ -1031,7 +1032,7 @@ async function peffect_sickness(otmp) {   // potion.c:964
     await pline($C`Yecch!  This stuff tastes like poison.`);
     if (otmp.blessed) {
         await pline($C`(But in fact it was mildly stale %s.)`, await fruitname(TRUE));
-        if (!(gu.urole.mnum === PM.HEALER)) {
+        if (!Role_if(PM.HEALER)) {
             /* NB: blessed otmp->fromsink is not possible */
             await losehp(1, $C`mildly contaminated potion`, KILLED.BY_AN);
         }
@@ -1039,14 +1040,14 @@ async function peffect_sickness(otmp) {   // potion.c:964
         if (Poison_resistance()) {
             await pline($C`(But in fact it was biologically contaminated %s.)`, await fruitname(TRUE));
         }
-        if (gu.urole.mnum === PM.HEALER) {
+        if (Role_if(PM.HEALER)) {
             await pline($C`Fortunately, you have been immunized.`);
         } else {
             const typ = rn2(A.MAX);
             $c.sprintf(new $c.Ptr(contaminant, 0), $C`%s%s`, u.uprops[POISON_RES].intrinsic || u.uprops[POISON_RES].extrinsic ? $C`mildly ` : $C``, otmp.corpsenm ? $C`contaminated tap water` : $C`contaminated potion`);
             if (!Fixed_abil()) {
                 await poisontell(typ, FALSE);
-                await adjattrib(typ, Poison_resistance() ? -1 : -(rn2(4) + 3 | 0) | 0, 1);
+                await adjattrib(typ, Poison_resistance() ? -1 : -rn1(4, 3) | 0, 1);
             }
             if (!Poison_resistance()) {
                 if (otmp.corpsenm) {
@@ -1266,13 +1267,13 @@ async function peffect_levitation(otmp) {   // potion.c:1165
         }
     } else if (otmp.blessed) {
         /* at this point, timeout is already at least 1 */
-        incr_itimeout(new $c.FieldRef(u.uprops[LEVITATION], "intrinsic", "i64"), rn2(50) + 250 | 0);
+        incr_itimeout(new $c.FieldRef(u.uprops[LEVITATION], "intrinsic", "i64"), rn1(50, 250));
         /* can descend at will (stop levitating via '>') provided timeout
            is the only factor (ie, not also wearing Lev ring or boots) */
         u.uprops[LEVITATION].intrinsic = $c.or64(u.uprops[LEVITATION].intrinsic, I_SPECIAL);
     } else {
         /* timeout is already at least 1 */
-        incr_itimeout(new $c.FieldRef(u.uprops[LEVITATION], "intrinsic", "i64"), rn2(140) + 10 | 0);
+        incr_itimeout(new $c.FieldRef(u.uprops[LEVITATION], "intrinsic", "i64"), rn1(140, 10));
     }
     if (Levitation() && svl.level.locations[u.ux][u.uy].typ === SINK) {
         await spoteffects(FALSE);
@@ -1611,7 +1612,7 @@ async function H2Opotion_dip(potion, targobj, useeit, objphrase) {   // potion.c
                 res = TRUE;
             }
             if (gm.mentioned_water) {
-                await discover_object(POT_WATER, TRUE, TRUE, TRUE);
+                await makeknown(POT_WATER);
             }
             gm.mentioned_water = FALSE;
         }
@@ -1711,7 +1712,7 @@ export async function potionhit(mon, obj, how) {   // potion.c:1625
         distance = 0;
         await pline_The($C`%s crashes on your %s and breaks into shards.`, botlnam, await body_part(HEAD));
         /* scatter */
-        await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(2) + 1 | 0, 2) : rnd(2), how === POTHIT.OTHER_THROW ? $C`propelled potion` : $C`thrown potion`, KILLED.BY_AN);
+        await losehp((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(2) + 1 | 0, 2) : rnd(2)), how === POTHIT.OTHER_THROW ? $C`propelled potion` : $C`thrown potion`, KILLED.BY_AN);
     } else {
         tx = mon.mx, ty = mon.my;
         /* sometimes it hits the saddle */
@@ -1884,7 +1885,7 @@ export async function potionhit(mon, obj, how) {   // potion.c:1625
                     if (haseyes(mon.data) && !mon_perma_blind(mon)) {
                         btmp = (64 + rn2(32) | 0) + Math.imul(rn2(32), !await resist(mon, POTION_CLASS, 0, NOTELL) ? 1 : 0) | 0;
                         btmp = btmp + mon.mblinded | 0;
-                        mon.mblinded = ((btmp < 127 ? btmp : 127) >>> 0) & 127;
+                        mon.mblinded = (min(btmp, 127) >>> 0) & 127;
                         mon.mcansee = 0;
                     }
                     break;
@@ -2079,7 +2080,7 @@ export async function potionbreathe(obj) {   // potion.c:1932
             await exercise(A.CON, TRUE);
             break;
         case POT_SICKNESS:
-            if (!(gu.urole.mnum === PM.HEALER)) {
+            if (!Role_if(PM.HEALER)) {
                 if (Upolyd()) {
                     if (u.mh <= 5) {
                         u.mh = 1;
@@ -2189,7 +2190,7 @@ export async function potionbreathe(obj) {   // potion.c:1932
     /* note: no obfree() -- that's our caller's responsibility */
     if (obj.dknown) {
         if (kn) {
-            await discover_object(obj.otyp, TRUE, TRUE, TRUE);
+            await makeknown(obj.otyp);
         } else {
             await trycall(obj);
         }
@@ -2553,10 +2554,10 @@ async function potion_dip(obj, potion) {   // potion.c:2442
              * if obj->otyp is worn amulet and becomes AMULET_OF_CHANGE.
              */
             if (!obj) {
-                await discover_object(POT_POLYMORPH, TRUE, TRUE, TRUE);
+                await makeknown(POT_POLYMORPH);
                 return ECMD.TIME;
             } else if (obj.otyp !== save_otyp) {
-                await discover_object(POT_POLYMORPH, TRUE, TRUE, TRUE);
+                await makeknown(POT_POLYMORPH);
                 await useup(potion);
                 await prinv(null, obj, 0);
                 return ECMD.TIME;
@@ -2723,7 +2724,7 @@ async function potion_dip(obj, potion) {   // potion.c:2442
             }
             await exercise(A.WIS, wisx);
             if (potion.dknown) {
-                await discover_object(potion.otyp, TRUE, TRUE, TRUE);
+                await makeknown(potion.otyp);
             }
             await useup(potion);
             return ECMD.TIME;
@@ -2760,7 +2761,7 @@ async function potion_dip(obj, potion) {   // potion.c:2442
             await exercise(A.WIS, TRUE);
         }
         if (potion.dknown) {
-            await discover_object(POT_OIL, TRUE, TRUE, TRUE);
+            await makeknown(POT_OIL);
         }
         obj.spe = 1;
         await update_inventory();

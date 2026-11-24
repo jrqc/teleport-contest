@@ -19,7 +19,7 @@ import { BEFORE, BL, HL, MAXBLSTATS, NOW } from './botl.h.js';
 import { randomkey } from './cmd.js';
 import { CLR, NH_BASIC_COLOR, NO_COLOR } from './color.h.js';
 import { COLORVAL } from './color.macros.js';
-import { cg, disp, flags, gc, gg, gm, gs, gt, iflags, program_state, quitchars, svp, u } from './decl.js';
+import { cg, disp, flags, gg, gm, gt, iflags, program_state, quitchars, svp, u } from './decl.js';
 import { GOLD_SYM } from './defsym.h.js';
 import { docrt, docrt_flags, flush_screen, nul_glyphinfo, redraw_map, row_refresh } from './display.js';
 import { MG, MG_BW_LAVA, MG_BW_SINK, NO_GLYPH, docrtRefresh } from './display.h.js';
@@ -28,6 +28,7 @@ import { clearlocks, debugcore, paniclog } from './files.js';
 import { wizard } from './flag.macros.js';
 import { tty_get_ext_cmd, tty_getlin, xwaitforspace } from './getline.js';
 import { BUFSZ, COLNO, MAX_MSG_HISTORY, QBUFSZ, ROWNO, set_in_game } from './global.h.js';
+import { max, min } from './hack.macros.js';
 import { eos, tabexpand } from './hacklib.js';
 import { AppendLongDigit } from './integer.macros.js';
 import { free_pickinv_cache } from './invent.js';
@@ -41,6 +42,7 @@ import { genl_outrip } from './rip.js';
 import { genl_player_setup } from './role.js';
 import { pmatchi } from './strutil.js';
 import { H_DEC, H_IBM, H_UTF8 } from './sym.h.js';
+import { SYMHANDLING } from './sym.macros.js';
 import { nh_CD, nh_CM, nh_ND, ul_hack } from './tcap.macros.js';
 import { backsp, cl_end, cl_eos, cmov, graph_off, graph_on, home, nocmov, nomux_capture_write_input_boundary, nomux_putch, nomux_raw_emit, standoutbeg, standoutend, term_attr_fixup, term_clear_screen, term_curs_set, term_end_attr, term_end_color, term_end_extracolor, term_end_raw_bold, term_shutdown, term_start_attr, term_start_bgcolor, term_start_color, term_start_extracolor, term_start_raw_bold, term_startup, tty_delay_output, tty_nhbell, tty_number_pad, xputs } from './termcap.js';
 import { addtopl, more, remember_topl, show_topl, tty_doprev_message, tty_getmsghistory, tty_putmsghistory, tty_yn_function, update_topl } from './topl.js';
@@ -1546,7 +1548,7 @@ async function process_text_window(window, cw) {   // wintty.c:1810
                 /* message recall for msg_window:full/combination/reverse
                    might have output from '/' in it (see redotoplin()) */
                 if (linestart) {
-                    if (gs.symset[gc.currentgraphics].handling === H_UTF8) {
+                    if (SYMHANDLING(H_UTF8)) {
                         /* FIXME: what is actually in that line? is it the \GNNNNNNNN or UTF-8? */
                         g_putch(cp.get(0));
                     } else if ((cp.get(0) & 128) !== 0) {
@@ -1648,7 +1650,7 @@ export async function tty_display_nhwindow(window, blocking) {   // wintty.c:190
             /* cw->maxcol is a long, but its value is constrained to
                be <= ttyDisplay->cols, so is sure to fit within a short */
             s_maxcol = $c.i16(cw.maxcol);
-            cw.offx = $c.i16(cw.type === NHW.TEXT ? 0 : (82 < $c.div32($G.ttyDisplay.cols, 2) ? 82 : $c.div32($G.ttyDisplay.cols, 2)) < $G.ttyDisplay.cols - s_maxcol - 1 ? 82 < $c.div32($G.ttyDisplay.cols, 2) ? 82 : $c.div32($G.ttyDisplay.cols, 2) : $G.ttyDisplay.cols - s_maxcol - 1);
+            cw.offx = $c.i16(cw.type === NHW.TEXT ? 0 : ((82 < $c.div32($G.ttyDisplay.cols, 2) ? 82 : $c.div32($G.ttyDisplay.cols, 2)) < $G.ttyDisplay.cols - s_maxcol - 1 ? 82 < $c.div32($G.ttyDisplay.cols, 2) ? 82 : $c.div32($G.ttyDisplay.cols, 2) : $G.ttyDisplay.cols - s_maxcol - 1));
             /* avoid converting to uchar before calculations are finished */
             if (cw.offx < 0) {
                 cw.offx = 0;
@@ -2291,7 +2293,7 @@ export async function tty_end_menu(window, prompt) {   // wintty.c:2706
         await tty_add_menu(window, nul_glyphinfo, any, 0, 0, tty_menu_promptstyle.attr, tty_menu_promptstyle.color, prompt, MENU.ITEMFLAGS_NONE);
     }
     /* 52: 'a'..'z' and 'A'..'Z'; avoids selector duplication within a page */
-    const lmax = 52 < $G.ttyDisplay.rows - 1 ? 52 : $G.ttyDisplay.rows - 1;   /* # lines per page */
+    const lmax = min(52, $G.ttyDisplay.rows - 1);   /* # lines per page */
     cw.npages = $c.div64($c.add64(cw.nitems, lmax - 1 | 0), lmax);   /* # of pages */
     /*
      * TODO?
@@ -2775,9 +2777,9 @@ export function g_putch(in_ch) {   // wintty.c:3797
             return;
         }
     } while (0);
-    if (gs.symset[gc.currentgraphics].handling === H_UTF8) {
+    if (SYMHANDLING(H_UTF8)) {
         $c.putchar(ch);
-    } else if (gs.symset[gc.currentgraphics].handling === H_IBM || iflags.wc_eight_bit_input && (!(gs.symset[gc.currentgraphics].handling === H_DEC) || (in_ch & 127) < 96)) {
+    } else if (SYMHANDLING(H_IBM) || iflags.wc_eight_bit_input && (!SYMHANDLING(H_DEC) || (in_ch & 127) < 96)) {
         /* for DECgraphics, lower-case letters with high bit set mean
            switch character set and render with high bit clear;
            user might want 8-bits for other characters */
@@ -2851,14 +2853,14 @@ export async function tty_cliparound(x, y) {   // wintty.c:3879
         return;
     }
     if (x < (clipx + 5 | 0)) {
-        clipx = 0 > (x - 20 | 0) ? 0 : x - 20 | 0;
+        clipx = max(0, x - 20 | 0);
         clipxmax = clipx + gt.tc_gbl_data.tc_CO | 0;
     } else if (x > (clipxmax - 5 | 0)) {
         clipxmax = COLNO < (clipxmax + 20 | 0) ? COLNO : clipxmax + 20 | 0;
         clipx = clipxmax - gt.tc_gbl_data.tc_CO | 0;
     }
     if (y < (clipy + 2 | 0)) {
-        clipy = 0 > (y - $c.div32(clipymax - clipy | 0, 2) | 0) ? 0 : y - $c.div32(clipymax - clipy | 0, 2) | 0;
+        clipy = max(0, y - $c.div32(clipymax - clipy | 0, 2) | 0);
         clipymax = clipy + ((gt.tc_gbl_data.tc_LI - 1 | 0) - iflags.wc2_statuslines | 0) | 0;
     } else if (y > (clipymax - 2 | 0)) {
         clipymax = ROWNO < (clipymax + $c.div32(clipymax - clipy | 0, 2) | 0) ? ROWNO : clipymax + $c.div32(clipymax - clipy | 0, 2) | 0;
@@ -2951,7 +2953,7 @@ export async function tty_print_glyph(window, x, y, glyphinfo, bkglyphinfo) {   
         term_start_attr(ATR.INVERSE);
         inverse_on = 1;
     }
-    if (!glyphdone && $c.andu64(tty_procs.wincap2, WC2.U_UTF8STR) && gs.symset[gc.currentgraphics].handling === H_UTF8 && glyphinfo.gm.u && glyphinfo.gm.u.utf8str) {
+    if (!glyphdone && $c.andu64(tty_procs.wincap2, WC2.U_UTF8STR) && SYMHANDLING(H_UTF8) && glyphinfo.gm.u && glyphinfo.gm.u.utf8str) {
         /* we have a sequence to do */
         g_pututf8(glyphinfo.gm.u.utf8str);
         glyphdone = 1;
@@ -3135,7 +3137,7 @@ export async function tty_putmixed(window, attr, str) {   // wintty.c:4243
         return;
     }
     $G.ttyDisplay.mixed = 1;
-    if ($c.andu64(windowprocs.wincap2, WC2.U_UTF8STR) && gs.symset[gc.currentgraphics].handling === H_UTF8) {
+    if ($c.andu64(windowprocs.wincap2, WC2.U_UTF8STR) && SYMHANDLING(H_UTF8)) {
         mixed_to_utf8(new $c.Ptr(buf, 0), 256, str, new $c.Ptr(utf8flag, 0));
         if (cw.type === NHW.MESSAGE) {
             $G.ttyDisplay.topl_utf8 = utf8flag[0];

@@ -132,12 +132,13 @@ import { bot, timebot } from './botl.js';
 import { isok } from './cmd.js';
 import { CLR, NO_COLOR } from './color.h.js';
 import { is_ice, is_pool, is_pool_or_lava } from './dbridge.js';
-import { a11y, cg, disp, flags, gc, gd, gf, gg, gi, go, gs, gu, gv, gw, gy, iflags, program_state, shield_static, svc, svd, svl, svm, u } from './decl.js';
+import { a11y, cg, disp, flags, gc, gd, gf, gg, gi, go, gs, gu, gv, gw, iflags, program_state, shield_static, svc, svd, svl, svm, u } from './decl.js';
 import { COIN_CLASS, FOOD_CLASS, POTION_CLASS, S } from './defsym.h.js';
 import { BACKTRACK, DISP_ALL, DISP_ALWAYS, DISP_BEAM, DISP_CHANGE, DISP_END, DISP_FLASH, DISP_FREEMEM, DISP_TETHER, GLYPH, GLYPH_INVISIBLE, GLYPH_NOTHING, GLYPH_UNEXPLORED, MAX_GLYPH, MG, MG_BW_LAVA, MG_BW_SINK, NO_GLYPH, NUM_ZAP, SHIELD_COUNT, altar_chaotic, altar_color_chaotic, altar_color_lawful, altar_color_neutral, altar_color_other, altar_color_unaligned, altar_lawful, altar_neutral, altar_other, altar_unaligned, docrtMapOnly, docrtNocls, docrtRecalc, docrtRefresh, expl_dark, expl_fiery, expl_frosty, expl_magical, expl_muddy, expl_noxious, expl_wet, explode_color_dark, explode_color_fiery, explode_color_frosty, explode_color_magical, explode_color_muddy, explode_color_noxious, explode_color_wet, gehennom_walls, gm_levelchange, knox_walls, main_walls, mines_walls, sokoban_walls, zap_color_acid, zap_color_death, zap_color_fire, zap_color_frost, zap_color_lightning, zap_color_missile, zap_color_poison_gas, zap_color_sleep } from './display.h.js';
-import { _mon_visible, canspotself, glyph_is_cmap, glyph_is_generic_object, glyph_is_invisible, glyph_is_monster, glyph_is_normal_generic_obj, glyph_is_nothing, glyph_is_pet, glyph_is_piletop_generic_obj, glyph_is_trap, glyph_is_unexplored, glyph_to_mon, monnum_to_glyph, warning_to_glyph } from './display.macros.js';
+import { _knowninvisible, _mon_visible, _mon_warning, canspotself, cmap_to_glyph, display_self, glyph_is_cmap, glyph_is_generic_object, glyph_is_invisible, glyph_is_monster, glyph_is_normal_generic_obj, glyph_is_nothing, glyph_is_pet, glyph_is_piletop_generic_obj, glyph_is_trap, glyph_is_unexplored, glyph_to_mon, monnum_to_glyph, objnum_to_glyph, warning_to_glyph } from './display.macros.js';
 import { def_warnsyms, defsyms } from './drawing.js';
 import { In_hell, In_mines, on_level, update_lastseentyp } from './dungeon.js';
+import { Is_rogue_level, Is_waterlevel } from './dungeon.macros.js';
 import { panic } from './end.js';
 import { can_reach_floor, engr_at, engr_can_be_felt } from './engrave.js';
 import { spot_shows_engravings } from './engrave.macros.js';
@@ -155,7 +156,7 @@ import { iter_mons } from './mon.js';
 import { FEMALE, M1, M3, MALE } from './monflag.h.js';
 import { mons } from './monst.js';
 import { MON, M_AP } from './monst.h.js';
-import { DEADMONSTER, M_AP_TYPE } from './monst.macros.js';
+import { DEADMONSTER, M_AP_TYPE, is_lightblocker_mappear } from './monst.macros.js';
 import { PM } from './monsters.h.js';
 import { observe_object } from './o_init.js';
 import { OBJ } from './obj.h.js';
@@ -165,14 +166,14 @@ import { BOULDER, CORPSE, FIRST_OBJECT, FIRST_REAL_GEM, FIRST_SPELL, LAST_GLASS_
 import { do_screen_description } from './pager.js';
 import { NUMMONS } from './permonst.h.js';
 import { impossible, pline_xy } from './pline.js';
-import { BLINDED, CONFUSION, DETECT_MONSTERS, HALLUC, HALLUC_RES, INFRAVISION, INTRINSIC, SEE_INVIS, STUNNED, TELEPAT, WARNING, WARN_OF_MON } from './prop.h.js';
+import { BLINDED, CONFUSION, DETECT_MONSTERS, HALLUC, HALLUC_RES, INFRAVISION, SEE_INVIS, STUNNED, TELEPAT, WARNING, WARN_OF_MON } from './prop.h.js';
 import { show_region, visible_region_at } from './region.js';
 import { AIR, ALTAR, BLCORNER, BRCORNER, CLOUD, CORR, CROSSWALL, D, DB, DBWALL, DOOR, DRAWBRIDGE_DOWN, DRAWBRIDGE_UP, FOUNTAIN, GRAVE, HWALL, ICE, IRONBARS, LA, LADDER, LAVAPOOL, LAVAWALL, MOAT, POOL, ROOM, SCORR, SDOOR, SINK, STAIRS, STONE, SV0, SV1, SV2, SV3, SV4, SV5, SV6, SV7, TDWALL, THRONE, TLCORNER, TLWALL, TRCORNER, TREE, TRWALL, TUWALL, VWALL, WATER, WM, WM_MASK } from './rm.h.js';
 import { ACCESSIBLE, IS_DOOR, IS_OBSTRUCTED, IS_POOL, IS_ROOM, IS_SDOOR, IS_STWALL, m_at } from './rm.macros.js';
 import { rn2_on_display_rng } from './rnd.js';
 import { known_branch_stairs, stairway_at } from './stairs.js';
 import { H_IBM, MAXTCHARS, ROGUESET, SYM, WARNCOUNT } from './sym.h.js';
-import { is_cmap_furniture, is_cmap_room, is_cmap_wall } from './sym.macros.js';
+import { DARKROOMSYM, is_cmap_furniture, is_cmap_room, is_cmap_wall } from './sym.macros.js';
 import { sysopt } from './sys.js';
 import { t_at } from './trap.js';
 import { BEAR_TRAP, NO_TRAP, WEB } from './trap.h.js';
@@ -184,7 +185,7 @@ import { has_color } from './windows.js';
 import { clear_nhwindow, curs, display_nhwindow, nh_delay_output, print_glyph } from './winprocs.macros.js';
 import { see_wsegs, worm_known } from './worm.js';
 import { BC } from './you.h.js';
-import { Upolyd, u_at } from './you.macros.js';
+import { Upolyd, next2u, u_at } from './you.macros.js';
 import { Blind, Detect_monsters, Hallucination, Protection_from_shape_changers, Punished, See_invisible, Underwater, Warn_of_mon } from './youprop.macros.js';
 
 const DETECTED = 2;
@@ -330,7 +331,7 @@ export function sensemon(mon) {   // display.c:173
  * @returns {number} int
  */
 export function mon_warning(mon) {   // display.c:180
-    return (u.uprops[WARNING].intrinsic || u.uprops[WARNING].extrinsic) && !mon.mpeaceful && dist2(mon.mx, mon.my, u.ux, u.uy) < 100 && $c.div32(mon.m_lev, 4) >= svc.context.warnlevel ? 1 : 0;
+    return _mon_warning(mon);
 }
 /**
  * @param {$T.monst | null} mon struct monst *
@@ -358,7 +359,7 @@ export function canseemon(mon) {   // display.c:201
  * @returns {number} int
  */
 export function knowninvisible(mon) {   // display.c:208
-    return mon.minvis && ((gv.viz_array.get(mon.my).get(mon.mx) & IN_SIGHT) !== 0 && (u.uprops[SEE_INVIS].intrinsic || u.uprops[SEE_INVIS].extrinsic || (u.uprops[DETECT_MONSTERS].intrinsic || u.uprops[DETECT_MONSTERS].extrinsic)) || !((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) && $c.and64(u.uprops[TELEPAT].intrinsic, ~INTRINSIC) && dist2(mon.mx, mon.my, u.ux, u.uy) <= 64) ? 1 : 0;
+    return _knowninvisible(mon);
 }
 /* #define knowninvisible() isn't useful here */
 /**
@@ -394,10 +395,10 @@ export async function magic_map_background(x, y, show) {   // display.c:233
      */
     if (!cansee(x, y) && !lev.waslit) {
         /* Floor spaces are dark if unlit.  Corridors are dark if unlit. */
-        if (lev.typ === ROOM && glyph === 3992) {
+        if (lev.typ === ROOM && glyph === cmap_to_glyph(S.room)) {
             glyph = flags.dark_room && iflags.wc_color ? ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? S.stone : S.darkroom) === S.stone ? GLYPH.CMAP_STONE_OFF : ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? S.stone : S.darkroom) <= S.trwall ? ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? S.stone : S.darkroom) - S.vwall + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) : ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? S.stone : S.darkroom) < S.altar ? ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? S.stone : S.darkroom) - S.ndoor + GLYPH.CMAP_A_OFF : ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? S.stone : S.darkroom) === S.altar ? 4008 : ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? S.stone : S.darkroom) < S.arrow_trap + MAXTCHARS ? ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? S.stone : S.darkroom) - S.grave + GLYPH.CMAP_B_OFF : ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? S.stone : S.darkroom) <= S.goodpos ? ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? S.stone : S.darkroom) - S.digbeam + GLYPH.CMAP_C_OFF : NO_GLYPH : GLYPH_NOTHING;
-        } else if (lev.typ === CORR && glyph === 3996) {
-            glyph = 3995;
+        } else if (lev.typ === CORR && glyph === cmap_to_glyph(S.litcorr)) {
+            glyph = cmap_to_glyph(S.corr);
         }
     }
     if (svl.level.flags.hero_memory && (glyph_is_unexplored(lev.glyph) || glyph_is_cmap(lev.glyph))) {
@@ -596,11 +597,11 @@ export async function unmap_object(x, y) {   // display.c:409
             await map_background(x, y, 0);
         }
         /* turn remembered dark room squares dark */
-        if (!lev.waslit && lev.glyph === 3992 && lev.typ === ROOM) {
-            $t1 = 3929, lev.glyph = $t1;
+        if (!lev.waslit && lev.glyph === cmap_to_glyph(S.room) && lev.typ === ROOM) {
+            $t1 = cmap_to_glyph(S.stone), lev.glyph = $t1;
         }
     } else {
-        $t2 = 3929, svl.level.locations[x][y].glyph = $t2;   /* default val */
+        $t2 = cmap_to_glyph(S.stone), svl.level.locations[x][y].glyph = $t2;   /* default val */
     }
 }
 /*
@@ -710,7 +711,7 @@ async function display_monster(x, y, mon, sightflags, worm_tail) {   // display.
                      * makemon.c.
                      */
                     const sym = mon.mappearance | 0;
-                    const glyph = sym === S.stone ? GLYPH.CMAP_STONE_OFF : sym <= S.trwall ? (sym - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : sym < S.altar ? (sym - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : sym === S.altar ? 4008 : sym < S.arrow_trap + MAXTCHARS ? (sym - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : sym <= S.goodpos ? (sym - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH;
+                    const glyph = (sym === S.stone ? GLYPH.CMAP_STONE_OFF : sym <= S.trwall ? (sym - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : sym < S.altar ? (sym - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : sym === S.altar ? 4008 : sym < S.arrow_trap + MAXTCHARS ? (sym - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : sym <= S.goodpos ? (sym - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH);
                     svl.level.locations[x][y].glyph = glyph;
                     if (!sensed) {
                         await show_glyph(x, y, glyph);
@@ -751,7 +752,7 @@ async function display_monster(x, y, mon, sightflags, worm_tail) {   // display.
          */
         if (mon.mtame && !Hallucination()) {
             if (worm_tail) {
-                num = PM.LONG_WORM_TAIL + (mgendercode === MALE ? GLYPH.PET_MALE_OFF : GLYPH.PET_FEM_OFF);
+                num = (PM.LONG_WORM_TAIL + (mgendercode === MALE ? GLYPH.PET_MALE_OFF : GLYPH.PET_FEM_OFF));
             } else {
                 num = (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : mon.data.pmidx) + (mon.female === 0 ? GLYPH.PET_MALE_OFF : GLYPH.PET_FEM_OFF) | 0;
             }
@@ -908,7 +909,7 @@ export async function feel_location(x, y) {   // display.c:746
     }
     /* The hero can't feel non pool locations while under water
        except for lava and ice. */
-    if (Underwater() && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && !is_pool_or_lava(x, y) && !is_ice(x, y)) {
+    if (Underwater() && !Is_waterlevel(u.uz) && !is_pool_or_lava(x, y) && !is_ice(x, y)) {
         return;
     }
     /* Set the seen vector as if the hero had seen it.
@@ -962,17 +963,17 @@ export async function feel_location(x, y) {   // display.c:746
              * object stack (if anything).
              */
             let do_room_glyph = FALSE;
-            if (lev.glyph === BOULDER + GLYPH.OBJ_OFF || glyph_is_invisible(lev.glyph)) {
+            if (lev.glyph === objnum_to_glyph(BOULDER) || glyph_is_invisible(lev.glyph)) {
                 if (lev.typ !== ROOM && lev.seenv) {
                     await map_background(x, y, 1);
                 } else {
                     do_room_glyph = TRUE;
                 }
-            } else if (lev.glyph >= 3929 && lev.glyph < 3993) {
+            } else if (lev.glyph >= cmap_to_glyph(S.stone) && lev.glyph < cmap_to_glyph(S.darkroom)) {
                 do_room_glyph = TRUE;
             }
             if (do_room_glyph) {
-                $t1 = flags.dark_room && iflags.wc_color && !((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level)) ? 3993 : lev.waslit ? 3992 : 3929, lev.glyph = $t1;
+                $t1 = flags.dark_room && iflags.wc_color && !Is_rogue_level(u.uz) ? cmap_to_glyph(S.darkroom) : lev.waslit ? cmap_to_glyph(S.room) : cmap_to_glyph(S.stone), lev.glyph = $t1;
                 await show_glyph(x, y, lev.glyph);
             }
         } else {
@@ -980,10 +981,10 @@ export async function feel_location(x, y) {   // display.c:746
             await map_background(x, y, 1);
             /* Corridors are never felt as lit (unless remembered that way) */
             /* (lit_corridor only).                                         */
-            if (lev.typ === CORR && lev.glyph === 3996 && !lev.waslit) {
-                await show_glyph(x, y, ($t2 = 3995, lev.glyph = $t2));
-            } else if (lev.typ === ROOM && flags.dark_room && iflags.wc_color && lev.glyph === 3992) {
-                await show_glyph(x, y, ($t3 = 3993, lev.glyph = $t3));
+            if (lev.typ === CORR && lev.glyph === cmap_to_glyph(S.litcorr) && !lev.waslit) {
+                await show_glyph(x, y, ($t2 = cmap_to_glyph(S.corr), lev.glyph = $t2));
+            } else if (lev.typ === ROOM && flags.dark_room && iflags.wc_color && lev.glyph === cmap_to_glyph(S.room)) {
+                await show_glyph(x, y, ($t3 = cmap_to_glyph(S.darkroom), lev.glyph = $t3));
             }
         }
     } else {
@@ -1030,10 +1031,10 @@ export async function feel_location(x, y) {   // display.c:746
             }
         }
         /* Floor spaces are dark if unlit.  Corridors are dark if unlit. */
-        if (lev.typ === ROOM && lev.glyph === 3992 && (!lev.waslit || flags.dark_room && iflags.wc_color)) {
+        if (lev.typ === ROOM && lev.glyph === cmap_to_glyph(S.room) && (!lev.waslit || flags.dark_room && iflags.wc_color)) {
             await show_glyph(x, y, ($t4 = (flags.dark_room ? S.darkroom : S.stone) === S.stone ? GLYPH.CMAP_STONE_OFF : (flags.dark_room ? S.darkroom : S.stone) <= S.trwall ? (flags.dark_room ? S.darkroom : S.stone) - S.vwall + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) : (flags.dark_room ? S.darkroom : S.stone) < S.altar ? (flags.dark_room ? S.darkroom : S.stone) - S.ndoor + GLYPH.CMAP_A_OFF : (flags.dark_room ? S.darkroom : S.stone) === S.altar ? 4008 : (flags.dark_room ? S.darkroom : S.stone) < S.arrow_trap + MAXTCHARS ? (flags.dark_room ? S.darkroom : S.stone) - S.grave + GLYPH.CMAP_B_OFF : (flags.dark_room ? S.darkroom : S.stone) <= S.goodpos ? (flags.dark_room ? S.darkroom : S.stone) - S.digbeam + GLYPH.CMAP_C_OFF : NO_GLYPH, lev.glyph = $t4));
-        } else if (lev.typ === CORR && lev.glyph === 3996 && !lev.waslit) {
-            await show_glyph(x, y, ($t5 = 3995, lev.glyph = $t5));
+        } else if (lev.typ === CORR && lev.glyph === cmap_to_glyph(S.litcorr) && !lev.waslit) {
+            await show_glyph(x, y, ($t5 = cmap_to_glyph(S.corr), lev.glyph = $t5));
         }
     }
     /* draw monster on top if we can sense it */
@@ -1066,14 +1067,14 @@ export async function newsym(x, y) {   // display.c:917
     /* only permit updating the hero when swallowed */
     if (u.uswallow) {
         if (u_at(x, y)) {
-            await show_glyph(u.ux, u.uy, u.usteed && ((!u.usteed.minvis || (u.uprops[SEE_INVIS].intrinsic || u.uprops[SEE_INVIS].extrinsic)) && !u.usteed.mundetected) ? (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : u.usteed.data.pmidx) + (u.usteed.female === 0 ? GLYPH.RIDDEN_MALE_OFF : GLYPH.RIDDEN_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & M_AP.TYPMASK) === M_AP.NOTHING ? (u.umonnum !== u.umonster || !flags.showrace ? u.umonnum : gu.urace.mnum) + (((u.umonnum !== u.umonster ? u.mfemale : flags.female) ? 1 : 0) === MALE ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & M_AP.TYPMASK) === M_AP.FURNITURE ? (gy.youmonst.mappearance | 0) === S.stone ? GLYPH.CMAP_STONE_OFF : (gy.youmonst.mappearance | 0) <= S.trwall ? ((gy.youmonst.mappearance | 0) - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : (gy.youmonst.mappearance | 0) < S.altar ? ((gy.youmonst.mappearance | 0) - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : (gy.youmonst.mappearance | 0) === S.altar ? 4008 : (gy.youmonst.mappearance | 0) < S.arrow_trap + MAXTCHARS ? ((gy.youmonst.mappearance | 0) - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : (gy.youmonst.mappearance | 0) <= S.goodpos ? ((gy.youmonst.mappearance | 0) - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH : (gy.youmonst.m_ap_type & M_AP.TYPMASK) === M_AP.OBJECT ? (gy.youmonst.mappearance | 0) + GLYPH.OBJ_OFF | 0 : (gy.youmonst.mappearance | 0) + (((u.umonnum !== u.umonster ? u.mfemale : flags.female) ? 1 : 0) === MALE ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0);
+            await display_self();
         }
         return;
     }
-    if (Underwater() && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) {
+    if (Underwater() && !Is_waterlevel(u.uz)) {
         /* when underwater, don't do anything unless <x,y> is an
            adjacent water or lava or ice position */
-        if (!(is_pool_or_lava(x, y) || is_ice(x, y)) || !(dist2(x, y, u.ux, u.uy) <= 2)) {
+        if (!(is_pool_or_lava(x, y) || is_ice(x, y)) || !next2u(x, y)) {
             return;
         }
     }
@@ -1145,7 +1146,7 @@ export async function newsym(x, y) {   // display.c:917
                 }
             } while (0);
             if (see_self) {
-                await show_glyph(u.ux, u.uy, u.usteed && ((!u.usteed.minvis || (u.uprops[SEE_INVIS].intrinsic || u.uprops[SEE_INVIS].extrinsic)) && !u.usteed.mundetected) ? (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : u.usteed.data.pmidx) + (u.usteed.female === 0 ? GLYPH.RIDDEN_MALE_OFF : GLYPH.RIDDEN_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & M_AP.TYPMASK) === M_AP.NOTHING ? (u.umonnum !== u.umonster || !flags.showrace ? u.umonnum : gu.urace.mnum) + (((u.umonnum !== u.umonster ? u.mfemale : flags.female) ? 1 : 0) === MALE ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & M_AP.TYPMASK) === M_AP.FURNITURE ? (gy.youmonst.mappearance | 0) === S.stone ? GLYPH.CMAP_STONE_OFF : (gy.youmonst.mappearance | 0) <= S.trwall ? ((gy.youmonst.mappearance | 0) - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : (gy.youmonst.mappearance | 0) < S.altar ? ((gy.youmonst.mappearance | 0) - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : (gy.youmonst.mappearance | 0) === S.altar ? 4008 : (gy.youmonst.mappearance | 0) < S.arrow_trap + MAXTCHARS ? ((gy.youmonst.mappearance | 0) - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : (gy.youmonst.mappearance | 0) <= S.goodpos ? ((gy.youmonst.mappearance | 0) - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH : (gy.youmonst.m_ap_type & M_AP.TYPMASK) === M_AP.OBJECT ? (gy.youmonst.mappearance | 0) + GLYPH.OBJ_OFF | 0 : (gy.youmonst.mappearance | 0) + (((u.umonnum !== u.umonster ? u.mfemale : flags.female) ? 1 : 0) === MALE ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0);
+                await display_self();
             }
         } else {
             show = FALSE;
@@ -1208,7 +1209,7 @@ export async function newsym(x, y) {   // display.c:917
                 if ($goto !== "show_mem" && u_at(x, y)) {
                     await feel_location(u.ux, u.uy);   /* forces an update */
                     if (canspotself()) {
-                        await show_glyph(u.ux, u.uy, u.usteed && ((!u.usteed.minvis || (u.uprops[SEE_INVIS].intrinsic || u.uprops[SEE_INVIS].extrinsic)) && !u.usteed.mundetected) ? (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : u.usteed.data.pmidx) + (u.usteed.female === 0 ? GLYPH.RIDDEN_MALE_OFF : GLYPH.RIDDEN_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & M_AP.TYPMASK) === M_AP.NOTHING ? (u.umonnum !== u.umonster || !flags.showrace ? u.umonnum : gu.urace.mnum) + (((u.umonnum !== u.umonster ? u.mfemale : flags.female) ? 1 : 0) === MALE ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & M_AP.TYPMASK) === M_AP.FURNITURE ? (gy.youmonst.mappearance | 0) === S.stone ? GLYPH.CMAP_STONE_OFF : (gy.youmonst.mappearance | 0) <= S.trwall ? ((gy.youmonst.mappearance | 0) - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : (gy.youmonst.mappearance | 0) < S.altar ? ((gy.youmonst.mappearance | 0) - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : (gy.youmonst.mappearance | 0) === S.altar ? 4008 : (gy.youmonst.mappearance | 0) < S.arrow_trap + MAXTCHARS ? ((gy.youmonst.mappearance | 0) - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : (gy.youmonst.mappearance | 0) <= S.goodpos ? ((gy.youmonst.mappearance | 0) - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH : (gy.youmonst.m_ap_type & M_AP.TYPMASK) === M_AP.OBJECT ? (gy.youmonst.mappearance | 0) + GLYPH.OBJ_OFF | 0 : (gy.youmonst.mappearance | 0) + (((u.umonnum !== u.umonster ? u.mfemale : flags.female) ? 1 : 0) === MALE ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0);
+                        await display_self();
                     }
                 } else if ($goto !== "show_mem" && ((mon = svl.level.monsters[x][y]) !== null && ((see_it = !($c.andu64(mon.data.mflags1, M1.MINDLESS) !== 0) && ((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked && (u.uprops[TELEPAT].intrinsic || u.uprops[TELEPAT].extrinsic) || u.uprops[TELEPAT].extrinsic && dist2(mon.mx, mon.my, u.ux, u.uy) <= u.unblind_telepat_range) || MATCH_WARN_OF_MON(mon) || !((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) && (u.uprops[INFRAVISION].intrinsic || u.uprops[INFRAVISION].extrinsic) && mon.data.mflags3 & M3.INFRAVISIBLE && (gv.viz_array.get(mon.my).get(mon.mx) & COULD_SEE) !== 0 && ((!mon.minvis || (u.uprops[SEE_INVIS].intrinsic || u.uprops[SEE_INVIS].extrinsic)) && !mon.mundetected) ? 1 : 0) !== 0 || Detect_monsters() && !(mon && (x !== mon.mx || y !== mon.my))))) {
                     /* Seen or sensed monsters are printed every time.
@@ -1237,18 +1238,18 @@ export async function newsym(x, y) {   // display.c:917
                      * These checks and changes must be here and not in back_to_glyph().
                      * They are dependent on the position being out of sight.
                      */
-                } else if ($goto !== "show_mem" && ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level))) {
-                    if (lev.glyph === 3996 && lev.typ === CORR) {
-                        await show_glyph(x, y, ($t1 = 3995, lev.glyph = $t1));
-                    } else if (lev.glyph === 3992 && lev.typ === ROOM && !lev.waslit) {
-                        await show_glyph(x, y, ($t2 = 3929, lev.glyph = $t2));
+                } else if ($goto !== "show_mem" && Is_rogue_level(u.uz)) {
+                    if (lev.glyph === cmap_to_glyph(S.litcorr) && lev.typ === CORR) {
+                        await show_glyph(x, y, ($t1 = cmap_to_glyph(S.corr), lev.glyph = $t1));
+                    } else if (lev.glyph === cmap_to_glyph(S.room) && lev.typ === ROOM && !lev.waslit) {
+                        await show_glyph(x, y, ($t2 = cmap_to_glyph(S.stone), lev.glyph = $t2));
                     } else {
                         $goto = "show_mem"; continue D1;
                     }
                 } else if ($goto !== "show_mem" && (!lev.waslit || flags.dark_room && iflags.wc_color)) {
-                    if (lev.glyph === 3996 && lev.typ === CORR) {
-                        await show_glyph(x, y, ($t3 = 3995, lev.glyph = $t3));
-                    } else if (lev.glyph === 3992 && lev.typ === ROOM) {
+                    if (lev.glyph === cmap_to_glyph(S.litcorr) && lev.typ === CORR) {
+                        await show_glyph(x, y, ($t3 = cmap_to_glyph(S.corr), lev.glyph = $t3));
+                    } else if (lev.glyph === cmap_to_glyph(S.room) && lev.typ === ROOM) {
                         await show_glyph(x, y, ($t4 = ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? S.stone : S.darkroom) === S.stone ? GLYPH.CMAP_STONE_OFF : ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? S.stone : S.darkroom) <= S.trwall ? ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? S.stone : S.darkroom) - S.vwall + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) : ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? S.stone : S.darkroom) < S.altar ? ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? S.stone : S.darkroom) - S.ndoor + GLYPH.CMAP_A_OFF : ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? S.stone : S.darkroom) === S.altar ? 4008 : ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? S.stone : S.darkroom) < S.arrow_trap + MAXTCHARS ? ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? S.stone : S.darkroom) - S.grave + GLYPH.CMAP_B_OFF : ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? S.stone : S.darkroom) <= S.goodpos ? ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? S.stone : S.darkroom) - S.digbeam + GLYPH.CMAP_C_OFF : NO_GLYPH, lev.glyph = $t4));
                     } else {
                         $goto = "show_mem"; continue D1;
@@ -1500,7 +1501,7 @@ export async function swallowed(first) {   // display.c:1332
     if (left_ok) {
         await show_glyph($c.i16(u.ux - 1), u.uy, await swallow_to_glyph(swallower, S.sw_ml));
     }
-    await show_glyph(u.ux, u.uy, u.usteed && ((!u.usteed.minvis || (u.uprops[SEE_INVIS].intrinsic || u.uprops[SEE_INVIS].extrinsic)) && !u.usteed.mundetected) ? (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : u.usteed.data.pmidx) + (u.usteed.female === 0 ? GLYPH.RIDDEN_MALE_OFF : GLYPH.RIDDEN_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & M_AP.TYPMASK) === M_AP.NOTHING ? (u.umonnum !== u.umonster || !flags.showrace ? u.umonnum : gu.urace.mnum) + (((u.umonnum !== u.umonster ? u.mfemale : flags.female) ? 1 : 0) === MALE ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & M_AP.TYPMASK) === M_AP.FURNITURE ? (gy.youmonst.mappearance | 0) === S.stone ? GLYPH.CMAP_STONE_OFF : (gy.youmonst.mappearance | 0) <= S.trwall ? ((gy.youmonst.mappearance | 0) - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : (gy.youmonst.mappearance | 0) < S.altar ? ((gy.youmonst.mappearance | 0) - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : (gy.youmonst.mappearance | 0) === S.altar ? 4008 : (gy.youmonst.mappearance | 0) < S.arrow_trap + MAXTCHARS ? ((gy.youmonst.mappearance | 0) - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : (gy.youmonst.mappearance | 0) <= S.goodpos ? ((gy.youmonst.mappearance | 0) - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH : (gy.youmonst.m_ap_type & M_AP.TYPMASK) === M_AP.OBJECT ? (gy.youmonst.mappearance | 0) + GLYPH.OBJ_OFF | 0 : (gy.youmonst.mappearance | 0) + (((u.umonnum !== u.umonster ? u.mfemale : flags.female) ? 1 : 0) === MALE ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0);
+    await display_self();
     if (rght_ok) {
         await show_glyph($c.i16(u.ux + 1), u.uy, await swallow_to_glyph(swallower, S.sw_mr));
     }
@@ -1530,7 +1531,7 @@ export async function swallowed(first) {   // display.c:1332
 export async function under_water(mode) {   // display.c:1395
     let x = 0, y = 0;
     /* swallowing has a higher precedence than under water */
-    if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) || u.uswallow) {
+    if (Is_waterlevel(u.uz) || u.uswallow) {
         return;
     }
     /* full update */
@@ -1662,7 +1663,7 @@ export async function see_monsters() {   // display.c:1487
  * @param {$T.monst | null} mtmp struct monst *
  */
 function mimic_light_blocking(mtmp) {   // display.c:1532
-    if (mtmp.minvis && ((mtmp.m_ap_type & M_AP.TYPMASK) === M_AP.OBJECT && mtmp.mappearance === BOULDER || (mtmp.m_ap_type & M_AP.TYPMASK) === M_AP.FURNITURE && (mtmp.mappearance === S.hcdoor || mtmp.mappearance === S.vcdoor || mtmp.mappearance < S.ndoor || mtmp.mappearance === S.tree))) {
+    if (mtmp.minvis && is_lightblocker_mappear(mtmp)) {
         if (See_invisible()) {
             block_point(mtmp.mx, mtmp.my);
         } else {
@@ -1800,7 +1801,7 @@ export async function docrt_flags(refresh_flags) {   // display.c:1709
             await swallowed(1);
             break post_map$;
         }
-        if (Underwater() && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) {
+        if (Underwater() && !Is_waterlevel(u.uz)) {
             await under_water(1);
             break post_map$;
         }
@@ -1884,23 +1885,23 @@ export function reglyph_darkroom() {   // display.c:1818
         for (y = 0; y < ROWNO; y = $c.i16(y + 1)) {
             const lev = $c.relem(svl.level.locations[x], y);
             if (!flags.dark_room) {
-                if (lev.glyph === 3995 && lev.waslit) {
-                    $t1 = 3996, lev.glyph = $t1;
+                if (lev.glyph === cmap_to_glyph(S.corr) && lev.waslit) {
+                    $t1 = cmap_to_glyph(S.litcorr), lev.glyph = $t1;
                 }
             } else {
-                if (lev.glyph === 3996 && !cansee(x, y)) {
-                    $t2 = 3995, lev.glyph = $t2;
+                if (lev.glyph === cmap_to_glyph(S.litcorr) && !cansee(x, y)) {
+                    $t2 = cmap_to_glyph(S.corr), lev.glyph = $t2;
                 }
             }
-            if (!flags.dark_room || !iflags.wc_color || (svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level)) {
-                if (lev.glyph === 3993) {
-                    $t3 = lev.waslit ? 3992 : GLYPH_NOTHING, lev.glyph = $t3;
+            if (!flags.dark_room || !iflags.wc_color || Is_rogue_level(u.uz)) {
+                if (lev.glyph === cmap_to_glyph(S.darkroom)) {
+                    $t3 = lev.waslit ? cmap_to_glyph(S.room) : GLYPH_NOTHING, lev.glyph = $t3;
                 }
             } else {
-                if (lev.glyph === 3992 && lev.seenv && lev.waslit && !cansee(x, y)) {
-                    $t4 = 3993, lev.glyph = $t4;
+                if (lev.glyph === cmap_to_glyph(S.room) && lev.seenv && lev.waslit && !cansee(x, y)) {
+                    $t4 = cmap_to_glyph(S.darkroom), lev.glyph = $t4;
                 } else if (lev.glyph === GLYPH_NOTHING && lev.typ === ROOM && lev.seenv && !cansee(x, y)) {
-                    $t5 = 3993, lev.glyph = $t5;
+                    $t5 = cmap_to_glyph(S.darkroom), lev.glyph = $t5;
                 }
             }
         }
@@ -2373,7 +2374,7 @@ export async function back_to_glyph(x, y) {   // display.c:2287
             idx = S.room;
             break;
     }
-    return bypass_glyph !== NO_GLYPH ? bypass_glyph : idx === S.stone ? GLYPH.CMAP_STONE_OFF : idx <= S.trwall ? (idx - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : idx < S.altar ? (idx - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : idx === S.altar ? 4008 : idx < S.arrow_trap + MAXTCHARS ? (idx - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : idx <= S.goodpos ? (idx - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH;
+    return bypass_glyph !== NO_GLYPH ? bypass_glyph : (idx === S.stone ? GLYPH.CMAP_STONE_OFF : idx <= S.trwall ? (idx - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : idx < S.altar ? (idx - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : idx === S.altar ? 4008 : idx < S.arrow_trap + MAXTCHARS ? (idx - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : idx <= S.goodpos ? (idx - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH);
 }
 /*
  * swallow_to_glyph()
@@ -2433,7 +2434,7 @@ export async function zapdir_to_glyph(dx, dy, beam_type) {   // display.c:2461
  */
 export function glyph_at(x, y) {   // display.c:2478
     if (x < 0 || y < 0 || x >= COLNO || y >= ROWNO) {
-        return 3992;   /* XXX */
+        return cmap_to_glyph(S.room);   /* XXX */
     }
     return gg.gbuf[y][x].glyphinfo.glyph;   /* _glyph_at(x,y) */
 }
@@ -2503,11 +2504,11 @@ async function get_bkglyph_and_framecolor(x, y, bkglyph, framecolor) {   // disp
             if (lev.typ === CORR && idx === S.litcorr) {
                 idx = S.corr;
             } else if (idx === S.room) {
-                idx = flags.dark_room && iflags.wc_color ? (svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? S.stone : S.darkroom : S.stone;
+                idx = flags.dark_room && iflags.wc_color ? DARKROOMSYM() : S.stone;
             }
         }
         if (idx !== S.room) {
-            tmp_bkglyph = idx === S.stone ? GLYPH.CMAP_STONE_OFF : idx <= S.trwall ? (idx - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : idx < S.altar ? (idx - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : idx === S.altar ? 4008 : idx < S.arrow_trap + MAXTCHARS ? (idx - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : idx <= S.goodpos ? (idx - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH;
+            tmp_bkglyph = (idx === S.stone ? GLYPH.CMAP_STONE_OFF : idx <= S.trwall ? (idx - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : idx < S.altar ? (idx - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : idx === S.altar ? 4008 : idx < S.arrow_trap + MAXTCHARS ? (idx - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : idx <= S.goodpos ? (idx - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH);
         }
     }
     bkglyph.set(0, tmp_bkglyph);
@@ -2548,7 +2549,7 @@ export function map_glyphinfo(x, y, glyph, mgflags, glyphinfo) {   // display.c:
         if (!iflags.wc_color || Upolyd() || glyph !== ((u.umonnum !== u.umonster || !flags.showrace ? u.umonnum : gu.urace.mnum) + (((u.umonnum !== u.umonster ? u.mfemale : flags.female) ? 1 : 0) === MALE ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0)) {
             /* color tweak not needed (!use_color) or not wanted (poly'd
                or riding--which uses steed's color, not hero's) */
-        } else if (gc.currentgraphics === ROGUESET && gs.symset[gc.currentgraphics].handling === H_IBM && gs.symset[gc.currentgraphics].nocolor === 0) {
+        } else if (HAS_ROGUE_IBM_GRAPHICS() && gs.symset[gc.currentgraphics].nocolor === 0) {
             /* actually player should be yellow-on-gray if in corridor */
             glyphinfo.gm.sym.color = CLR.YELLOW;
         } else if (flags.showrace) {
@@ -2622,7 +2623,7 @@ export function reset_glyphmap(trigger) {   // display.c:2739
     let glyph = 0, offset = 0;
     let color = NO_COLOR;
     /* condense multiple tests in macro version down to single */
-    const has_rogue_ibm_graphics = gc.currentgraphics === ROGUESET && gs.symset[gc.currentgraphics].handling === H_IBM ? 1 : 0;
+    const has_rogue_ibm_graphics = HAS_ROGUE_IBM_GRAPHICS();
     const has_rogue_color = has_rogue_ibm_graphics && gs.symset[gc.currentgraphics].nocolor === 0 ? 1 : 0;
     if (trigger === gm_levelchange) {
         gg.glyphmap_perlevel_flags = 0;
@@ -2633,7 +2634,7 @@ export function reset_glyphmap(trigger) {   // display.c:2739
          *    GMAP_ROGUELEVEL         0x00000002
          */
         gg.glyphmap_perlevel_flags = $c.or64(gg.glyphmap_perlevel_flags, GMAP_SET);
-        if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level)) {
+        if (Is_rogue_level(u.uz)) {
             gg.glyphmap_perlevel_flags = $c.or64(gg.glyphmap_perlevel_flags, GMAP_ROGUELEVEL);
         }
     }
@@ -3594,10 +3595,13 @@ async function wall_angle(lev) {   // display.c:3513
  * @returns {number} int
  */
 export function fn_cmap_to_glyph(cmap) {   // display.c:3797
-    return cmap === S.stone ? GLYPH.CMAP_STONE_OFF : cmap <= S.trwall ? (cmap - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : cmap < S.altar ? (cmap - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : cmap === S.altar ? 4008 : cmap < S.arrow_trap + MAXTCHARS ? (cmap - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : cmap <= S.goodpos ? (cmap - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH;
+    return (cmap === S.stone ? GLYPH.CMAP_STONE_OFF : cmap <= S.trwall ? (cmap - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : cmap < S.altar ? (cmap - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : cmap === S.altar ? 4008 : cmap < S.arrow_trap + MAXTCHARS ? (cmap - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : cmap <= S.goodpos ? (cmap - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH);
 }
 function _suppress_map_output() {
     return gi.in_mklev || program_state.saving || program_state.restoring || program_state.done_hup ? 1 : 0;
+}
+function HAS_ROGUE_IBM_GRAPHICS() {
+    return gc.currentgraphics === ROGUESET && gs.symset[gc.currentgraphics].handling === H_IBM ? 1 : 0;
 }
 
 export function $init() {
