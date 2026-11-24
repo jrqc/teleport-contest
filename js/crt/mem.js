@@ -282,6 +282,13 @@ export function lit(s) {
     return p;
 }
 
+/**
+ * A string literal as a tagged template: $C`text` is lit(text), the same shared array (so
+ * the same pointer) for the same text. The emitter writes only escapes whose cooked value is
+ * one char per byte (transpiler/emit/tu.mjs jsTemplate).
+ */
+export function $C(strs) { return lit(strs[0]); }
+
 /** Bytes available from p to the end of its buffer (clang's __builtin_object_size, mode 0, when known). */
 export const bytesLeft = (p) => p.buf.length - p.off;
 

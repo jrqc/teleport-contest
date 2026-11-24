@@ -87,6 +87,30 @@ function decodeEscapes(lit, s, wide) {
     }
     return out;
 }
+/**
+ * The tag of a C string literal in object-world code: $C`text` is $c.lit(text), the literal's
+ * shared NUL-terminated byte array (js/crt/mem.js). `$` keeps it apart from every C name.
+ */
+export const STR_TAG = '$C';
+/**
+ * A JS template literal for byte text (one char per byte) whose cooked value is that text:
+ * printable ASCII as is, except ` \ and ${ (escaped); \n and \t; every other byte as \xNN
+ * (CR too: a template turns a raw CR into LF). No \0 or octal escapes (invalid in templates).
+ */
+export function jsTemplate(s) {
+    let o = '`';
+    for (let i = 0; i < s.length; i++) {
+        const c = s.charCodeAt(i);
+        if (c === 96) o += '\\`';
+        else if (c === 92) o += '\\\\';
+        else if (c === 36 && s.charCodeAt(i + 1) === 123) o += '\\$';
+        else if (c === 10) o += '\\n';
+        else if (c === 9) o += '\\t';
+        else if (c < 32 || c >= 127) o += '\\x' + c.toString(16).padStart(2, '0');
+        else o += s[i];
+    }
+    return o + '`';
+}
 /** A JS string literal for byte text (one char per byte). */
 export function jsStr(s) {
     let o = '"';
@@ -1636,7 +1660,7 @@ export class TUEmitter {
             const s = Number.isInteger(v) ? v.toFixed(1) : String(v);
             return E(t.size === 4 ? `Math.fround(${s})` : s);
         }
-        case 'StringLiteral': return E(`$c.lit(${jsStr(decodeCString(n.value))})`, PREC.call);
+        case 'StringLiteral': return E(`${STR_TAG}${jsTemplate(decodeCString(n.value))}`, PREC.call);
         case 'PredefinedExpr': return this.ex(kids(n)[0], ctx);
         case 'DeclRefExpr': return this.declRef(n, ctx);
         case 'ImplicitCastExpr': case 'CStyleCastExpr': return this.cast(n, ctx);
