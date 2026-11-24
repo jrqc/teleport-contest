@@ -1122,7 +1122,10 @@ export class TUEmitter {
             const [init, , c, inc, b] = kids(n);
             let i = isEmpty(init) ? '' : init.kind === 'DeclStmt' ? this.declInitExpr(init) : this.exprStmtText(init);
             const cc = isEmpty(c) ? (n._inward ? this.inwardLoop(n, E('true')) : '') : this.inwardLoop(n, this.cond(c));
+            const nw = this.noWrapStep(n);
+            if (nw) this._noWrap = nw;
             const ic = isEmpty(inc) ? '' : this.exprStmtText(inc);
+            this._noWrap = null;
             const pre = [];
             if (n._inward && i) { pre.push(`${ind}if ($goto === null) ${i};   // a jump into the loop skips its initialization`); i = ''; }
             return [...pre, ...this.loop(n, ind, (lab) => [`${ind}${lab}for (${i}; ${cc}; ${ic}) {${tag}`, ...this.loopBody(n, b, ind), `${ind}}`])];
@@ -2697,6 +2700,7 @@ export class TUEmitter {
             if (t.k === 'int') {
                 if (t.size === 8) return E(`$c.${op === '++' ? 'add' : 'sub'}${t.signed ? '64' : 'u64'}(${v.c}, 1)`, PREC.call);
                 const sum = E(`${par(v, PREC.add)} ${op === '++' ? '+' : '-'} 1`, PREC.add);
+                if (this._noWrap === n) return sum;   // noWrapStep: proved not to overflow
                 return t.size === 4 ? (t.signed ? E(`${par(sum, PREC.bor)} | 0`, PREC.bor) : E(`${par(sum, PREC.shift)} >>> 0`, PREC.shift))
                     : E(`$c.${t.signed ? 'i' : 'u'}${t.size * 8}(${sum.c})`, PREC.call);
             }
@@ -2712,6 +2716,59 @@ export class TUEmitter {
         return E([...pre, `${tmp} = ${cur.c}`, lv.set(next(E(tmp, PREC.prim)).c).c, tmp].join(', '), PREC.comma);
     }
 
+    /**
+     * Readability (d): the step of `for (...; i < E; i++)` (or `i > E; i--`) that cannot
+     * overflow, else null. The step runs only after a pass of the body entered with the
+     * condition true, so i < E <= INT_MAX (i > E >= INT_MIN) held then; i is an int local,
+     * not boxed or static, written nowhere in the loop but by the step, and no label in the
+     * body lets a goto enter it, so i still has that value. With <= (>=) the bound's range
+     * must stay below INT_MAX (above INT_MIN). The comparison must be in int: both operands
+     * of 32-bit signed type.
+     */
+    noWrapStep(n) {
+        if (this.heap || n._inward) return null;
+        const [, , c, inc, body] = kids(n);
+        if (isEmpty(c) || isEmpty(inc)) return null;
+        const u = this.skipParens(inc);
+        if (u.kind !== 'UnaryOperator' || (u.opcode !== '++' && u.opcode !== '--')) return null;
+        const v = this.skipParens(kids(u)[0]);
+        if (v.kind !== 'DeclRefExpr' || !v.referencedDecl) return null;
+        const id = v.referencedDecl.id, lv = this.fn.locals.get(id);
+        const i32 = (t) => { t = this.S.resolve(t); return t.k === 'int' && t.size === 4 && t.signed; };
+        if (!lv || lv.boxed || lv.isStatic || !i32(this.T(v))) return null;
+        const isV = (x) => { x = this.stripCasts(x); while (x && x.kind === 'ParenExpr') x = this.stripCasts(kids(x)[0]); return !!x && x.kind === 'DeclRefExpr' && !!x.referencedDecl && x.referencedDecl.id === id; };
+        let bad = false;
+        const scan = (x) => {
+            if (!x || typeof x !== 'object' || bad) return;
+            if (x.kind === 'LabelStmt' || x.kind === 'GotoStmt' || x.kind === 'IndirectGotoStmt') bad = true;
+            if (((x.kind === 'BinaryOperator' && x.opcode === '=') || x.kind === 'CompoundAssignOperator') && isV(kids(x)[0])) bad = true;
+            if (x.kind === 'UnaryOperator' && ['++', '--', '&'].includes(x.opcode) && isV(kids(x)[0])) bad = true;
+            for (const k of kids(x)) scan(k);
+        };
+        scan(body); scan(c);
+        if (bad) return null;
+        const up = u.opcode === '++';
+        const conj = [];
+        const flat = (x) => { x = this.skipParens(x); if (x.kind === 'BinaryOperator' && x.opcode === '&&') { flat(kids(x)[0]); flat(kids(x)[1]); } else conj.push(x); };
+        flat(c);
+        const [MIN, MAX] = [-(2 ** 31), 2 ** 31 - 1];
+        for (const x of conj) {
+            if (x.kind !== 'BinaryOperator') continue;
+            const [a, b] = kids(x);
+            if (!i32(this.T(a)) || !i32(this.T(b))) continue;
+            // normalize to `i op E`
+            let op = x.opcode, E = null;
+            if (isV(a)) E = b;
+            else if (isV(b)) { E = a; op = { '<': '>', '>': '<', '<=': '>=', '>=': '<=' }[op]; }
+            if (!E || !op) continue;
+            if (up && op === '<') return u;
+            if (!up && op === '>') return u;
+            const r = this.range(E);
+            if (up && op === '<=' && r && r[1] < MAX) return u;
+            if (!up && op === '>=' && r && r[0] > MIN) return u;
+        }
+        return null;
+    }
     sizeofExpr(n) {
         const t = n.argType ? this.S.type(n.argType.desugaredQualType || n.argType.qualType) : this.T(kids(n)[0]);
         if (n.name === 'sizeof') return E(String(this.S.sizeof(t)));
