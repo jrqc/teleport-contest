@@ -82,6 +82,8 @@ const fin = prog.finish();
 // JSDoc record types name the classes types.js defines (program.mjs resolveDocTypes)
 perTu.forEach((t, i) => { const code = prog.resolveDocTypes(finalCode.get(results[i].path), fin.get('types.js')); writeFileSync(path.join(out, results[i].path), code); t.lines = code.split('\n').length; });
 for (const [f, text] of fin) writeFileSync(path.join(out, f), text);
+if (prog.macroStats) process.stderr.write(`P3 macro sites: ${prog.macroStats.calls} calls, ${prog.macroStats.kept} expansions kept (another site's body text chosen)\n`);
+if (process.env.NH_MACRO_WHY) writeFileSync(path.join(ROOT, 'transpiler/out/macro-why.json'), JSON.stringify(prog.macroWhyTally || {}, null, 1) + '\n');
 process.stderr.write(` emit ${((Date.now() - t0) / 1000).toFixed(0)}s\n`);
 // syntax check
 const bad = [];

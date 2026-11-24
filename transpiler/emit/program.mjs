@@ -322,6 +322,8 @@ export class Program {
             for (const [m, ns] of r.imports) for (const n of ns) addTo(imports, m, n);
             let code = r.code.replace(SITE_RE, (_, id) => {
                 const s = this.macroSites[Number(id)];
+                this.macroStats = this.macroStats || { calls: 0, kept: 0 };
+                if (chosen.has(Number(id))) this.macroStats.calls++; else this.macroStats.kept++;
                 if (chosen.has(Number(id))) {
                     for (const [m, ns] of s.callImports) for (const n of ns) addTo(imports, m, n);
                     if (/\.h$/.test(s.file)) addTo(imports, macroModule(s.file), jsName(s.name));
@@ -329,6 +331,7 @@ export class Program {
                     return s.isAsync ? `await ${call}` : call;
                 }
                 for (const [m, ns] of s.expImports) for (const n of ns) addTo(imports, m, n);
+                if (process.env.NH_MACRO_WHY) { const t = this.macroWhyTally || (this.macroWhyTally = {}); const w = t[s.name] || (t[s.name] = {}); w['20: body text not the one chosen for the macro'] = (w['20: body text not the one chosen for the macro'] || 0) + 1; }
                 return s.expP < s.callP || /^[-+]/.test(s.exp) ? `(${s.exp})` : s.exp;
             });
             const own = (this.macroDefs.get(r.module) || []).filter((d) => !/\.h$/.test(d.file));
